@@ -1,4 +1,4 @@
-"""HydroCore: a shared hydraulic representation model with three role outputs."""
+"""HydroCore shared scientific backbone and semantic specialist heads."""
 
 from __future__ import annotations
 
@@ -9,7 +9,15 @@ import torch
 from torch import Tensor, nn
 
 from .adapters import BottleneckAdapter, RoleHead
-from .encoders import GraphStructuralEncoder, QualityEncoder, StaticFeatureEncoder, TemporalEncoder
+from .encoders import (
+    GraphStructuralEncoder,
+    QualityEncoder,
+    StaticFeatureEncoder,
+    TemporalEncoder,
+    make_activation,
+    make_norm,
+)
+from .layers import LatentHydraulicBlock
 
 
 class HydroBatch(TypedDict, total=False):
@@ -19,17 +27,42 @@ class HydroBatch(TypedDict, total=False):
     travel_time: Tensor
     reservoir_reachability: Tensor
     demand_centrality: Tensor
+    edge_index: Tensor
+    edge_features: Tensor
     node_mask: Tensor
     sensor_mask: Tensor
     quality_mask: Tensor
+    edge_mask: Tensor
+    timestamps: Tensor
+    role_features: Tensor
+    previous_actions: Tensor
+    verifier_feedback: Tensor
+    residual_features: Tensor
+    classical_prior: Tensor
 
 
-class HydroOutput(TypedDict):
+class HydroOutput(TypedDict, total=False):
     hidden_state: Tensor
+    latent_state: Tensor
     sentinel: Tensor
     scout: Tensor
     strategist: Tensor
     node_mask: Tensor
+    source_node_logits: Tensor
+    source_region_logits: Tensor
+    start_time_logits: Tensor
+    duration_logits: Tensor
+    relative_strength_logits: Tensor
+    evidence_sufficiency: Tensor
+    sensor_fault_logits: Tensor
+    sample_node_logits: Tensor
+    expected_information_gain: Tensor
+    action_logits: Tensor
+    action_pointer_logits: Tensor
+    plan_value: Tensor
+    plan_validity_logits: Tensor
+    uncertainty: Tensor
+    ood_logits: Tensor
 
 
 @dataclass(frozen=True)
@@ -42,77 +75,187 @@ class ParameterReport:
     heads: int
 
 
+@dataclass(frozen=True, slots=True)
+class ModelVariant:
+    d_model: int
+    nhead: int
+    dim_feedforward: int
+    num_layers: int
+    latent_tokens: int
+    modality_layers: int = 1
+
+
+MODEL_VARIANTS: dict[str, ModelVariant] = {
+    "small": ModelVariant(192, 6, 576, 4, 64),
+    "medium": ModelVariant(256, 8, 768, 8, 64),
+    "large": ModelVariant(360, 8, 1080, 8, 96),
+}
+
+
 class HydroCore(nn.Module):
-    """Node-centric transformer shared by Sentinel, Scout and Strategist roles."""
+    """Edge-aware local graph model with bounded global latent attention."""
 
     def __init__(
         self,
         *,
-        node_feature_dim: int = 8,
+        node_feature_dim: int = 19,
+        edge_feature_dim: int = 13,
         temporal_feature_dim: int = 6,
         quality_feature_dim: int = 4,
-        d_model: int = 384,
+        role_feature_dim: int = 8,
+        action_feature_dim: int = 8,
+        verifier_feature_dim: int = 8,
+        residual_feature_dim: int = 4,
+        d_model: int = 360,
         nhead: int = 8,
-        dim_feedforward: int = 1152,
-        num_layers: int = 10,
-        modality_layers: int = 3,
-        dropout: float = 0.0,
+        dim_feedforward: int = 1080,
+        num_layers: int = 8,
+        modality_layers: int = 1,
+        latent_tokens: int = 96,
+        plan_queries: int = 8,
+        action_vocabulary_size: int = 8,
+        dropout: float = 0.1,
+        normalization: str = "rmsnorm",
+        activation: str = "silu",
         sentinel_output_dim: int = 2,
         scout_output_dim: int = 2,
         strategist_output_dim: int = 3,
         adapter_dims: tuple[int, int, int] = (32, 48, 64),
+        use_adapters: bool = True,
     ) -> None:
         super().__init__()
         if d_model % nhead:
             raise ValueError("d_model must be divisible by nhead")
+        if not 64 <= latent_tokens <= 96:
+            raise ValueError("latent_tokens must be between 64 and 96")
+        if not 1 <= plan_queries <= 8:
+            raise ValueError("plan_queries must be between 1 and 8")
+        if not 0 <= dropout < 1:
+            raise ValueError("dropout must be in [0, 1)")
         self.d_model = d_model
         self.num_layers = num_layers
-        self.node_encoder = StaticFeatureEncoder(node_feature_dim, d_model)
-        self.graph_encoder = GraphStructuralEncoder(d_model)
-        self.temporal_encoder = TemporalEncoder(
-            temporal_feature_dim, d_model, nhead, dim_feedforward, modality_layers, dropout
+        self.latent_tokens_count = latent_tokens
+        self.use_adapters = use_adapters
+        self.node_encoder = StaticFeatureEncoder(
+            node_feature_dim, d_model, normalization=normalization, activation=activation
         )
-        self.quality_encoder = QualityEncoder(
-            quality_feature_dim, d_model, nhead, dim_feedforward, modality_layers, dropout
+        self.graph_encoder = GraphStructuralEncoder(
+            d_model, normalization=normalization, activation=activation
         )
-        self.modality_fusion = nn.Sequential(
-            nn.Linear(4 * d_model, d_model), nn.GELU(), nn.LayerNorm(d_model)
-        )
-        layer = nn.TransformerEncoderLayer(
+        temporal_args = dict(
             d_model=d_model,
             nhead=nhead,
             dim_feedforward=dim_feedforward,
+            num_layers=modality_layers,
             dropout=dropout,
-            activation="gelu",
-            batch_first=True,
-            norm_first=True,
+            normalization=normalization,
+            activation=activation,
         )
-        self.backbone = nn.TransformerEncoder(
-            layer, num_layers=num_layers, norm=nn.LayerNorm(d_model), enable_nested_tensor=False
+        self.temporal_encoder = TemporalEncoder(temporal_feature_dim, **temporal_args)
+        self.quality_encoder = QualityEncoder(quality_feature_dim, **temporal_args)
+        self.modality_fusion = nn.Sequential(
+            nn.Linear(4 * d_model, d_model),
+            make_activation(activation),
+            make_norm(normalization, d_model),
+            nn.Dropout(dropout),
         )
+        self.residual_projection = nn.Linear(residual_feature_dim, d_model)
+        self.prior_projection = nn.Linear(1, d_model)
+        self.role_projection = nn.Linear(role_feature_dim, d_model)
+        self.action_projection = nn.Linear(action_feature_dim, d_model)
+        self.verifier_projection = nn.Linear(verifier_feature_dim, d_model)
+        self.global_latents = nn.Parameter(torch.empty(latent_tokens, d_model))
+        self.plan_query_tokens = nn.Parameter(torch.empty(plan_queries, d_model))
+        nn.init.normal_(self.global_latents, std=0.02)
+        nn.init.normal_(self.plan_query_tokens, std=0.02)
+
+        self.backbone = nn.ModuleList(
+            [
+                LatentHydraulicBlock(
+                    d_model,
+                    nhead,
+                    dim_feedforward,
+                    edge_feature_dim,
+                    dropout=dropout,
+                    normalization=normalization,
+                    activation=activation,
+                )
+                for _ in range(num_layers)
+            ]
+        )
+        self.final_norm = make_norm(normalization, d_model)
 
         roles = ("sentinel", "scout", "strategist")
         outputs = (sentinel_output_dim, scout_output_dim, strategist_output_dim)
         self.adapters = nn.ModuleDict(
-            {role: BottleneckAdapter(d_model, width) for role, width in zip(roles, adapter_dims, strict=True)}
+            {
+                role: (
+                    BottleneckAdapter(d_model, width) if use_adapters else nn.Identity()
+                )
+                for role, width in zip(roles, adapter_dims, strict=True)
+            }
         )
         self.heads = nn.ModuleDict(
             {role: RoleHead(d_model, size) for role, size in zip(roles, outputs, strict=True)}
         )
 
-    def forward(self, batch: HydroBatch) -> HydroOutput:
-        required = (
-            "node_features",
-            "temporal_features",
-            "quality_features",
-            "travel_time",
-            "reservoir_reachability",
-            "demand_centrality",
+        # Semantic heads expose the actual scientific tasks rather than anonymous widths.
+        self.source_node_head = RoleHead(d_model, 1)
+        self.source_region_head = RoleHead(d_model, 1)
+        self.sensor_fault_head = RoleHead(d_model, 1)
+        self.sample_node_head = RoleHead(d_model, 1)
+        self.information_gain_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Softplus())
+        self.profile_heads = nn.ModuleDict(
+            {
+                "start_time": RoleHead(d_model, 12),
+                "duration": RoleHead(d_model, 8),
+                "relative_strength": RoleHead(d_model, 4),
+            }
         )
+        self.evidence_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Sigmoid())
+        self.uncertainty_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Softplus())
+        self.ood_head = RoleHead(d_model, 3)
+        self.action_head = RoleHead(d_model, action_vocabulary_size)
+        self.plan_value_head = RoleHead(d_model, 1)
+        self.plan_validity_head = RoleHead(d_model, 2)
+        self.pointer_query = nn.Linear(d_model, d_model, bias=False)
+
+    @classmethod
+    def from_variant(cls, variant: str, **overrides: object) -> HydroCore:
+        try:
+            configuration = MODEL_VARIANTS[variant.lower()]
+        except KeyError as error:
+            raise ValueError(f"unknown model variant: {variant}") from error
+        values = {
+            "d_model": configuration.d_model,
+            "nhead": configuration.nhead,
+            "dim_feedforward": configuration.dim_feedforward,
+            "num_layers": configuration.num_layers,
+            "latent_tokens": configuration.latent_tokens,
+            "modality_layers": configuration.modality_layers,
+            **overrides,
+        }
+        return cls(**values)  # type: ignore[arg-type]
+
+    @staticmethod
+    def _optional_context(
+        batch: HydroBatch, key: str, projection: nn.Linear, batch_size: int, device: torch.device
+    ) -> Tensor:
+        value = batch.get(key)  # type: ignore[literal-required]
+        if value is None:
+            return torch.zeros(batch_size, projection.out_features, device=device)
+        value = torch.nan_to_num(value.float())
+        if value.ndim == 3:
+            value = value.mean(dim=1)
+        if value.ndim != 2 or value.shape[0] != batch_size:
+            raise ValueError(f"{key} must be [batch, features] or [batch, sequence, features]")
+        return projection(value)
+
+    def forward(self, batch: HydroBatch) -> HydroOutput:
+        required = ("node_features", "temporal_features", "quality_features")
         missing = [name for name in required if name not in batch]
         if missing:
             raise KeyError(f"missing HydroBatch fields: {', '.join(missing)}")
-
         node_features = batch["node_features"]
         if node_features.ndim != 3:
             raise ValueError("node_features must have shape [batch, nodes, features]")
@@ -122,33 +265,83 @@ class HydroCore(nn.Module):
         ).bool()
         if node_mask.shape != (batch_size, nodes):
             raise ValueError("node_mask must have shape [batch, nodes]")
-
+        safe_mask = node_mask.clone()
+        safe_mask[~safe_mask.any(dim=1), 0] = True
+        zeros = torch.zeros(batch_size, nodes, device=node_features.device)
         static = self.node_encoder(node_features)
         graph = self.graph_encoder(
-            batch["travel_time"], batch["reservoir_reachability"], batch["demand_centrality"]
+            batch.get("travel_time", zeros),
+            batch.get("reservoir_reachability", zeros),
+            batch.get("demand_centrality", zeros),
         )
-        temporal = self.temporal_encoder(batch["temporal_features"], batch.get("sensor_mask"))
-        quality = self.quality_encoder(batch["quality_features"], batch.get("quality_mask"))
+        temporal = self.temporal_encoder(
+            batch["temporal_features"], batch.get("sensor_mask"), batch.get("timestamps")
+        )
+        quality = self.quality_encoder(
+            batch["quality_features"], batch.get("quality_mask"), batch.get("timestamps")
+        )
         hidden = self.modality_fusion(torch.cat((static, graph, temporal, quality), dim=-1))
-
-        safe_mask = node_mask.clone()
-        all_missing = ~safe_mask.any(dim=1)
-        safe_mask[all_missing, 0] = True
-        hidden = self.backbone(hidden, src_key_padding_mask=~safe_mask)
+        residual = batch.get("residual_features")
+        if residual is not None:
+            if residual.shape[:2] != (batch_size, nodes):
+                raise ValueError("residual_features must have shape [batch, nodes, features]")
+            hidden = hidden + self.residual_projection(torch.nan_to_num(residual.float()))
+        prior = batch.get("classical_prior")
+        if prior is not None:
+            if prior.shape != (batch_size, nodes):
+                raise ValueError("classical_prior must have shape [batch, nodes]")
+            hidden = hidden + self.prior_projection(torch.nan_to_num(prior.float()).unsqueeze(-1))
+        context = self._optional_context(batch, "role_features", self.role_projection, batch_size, node_features.device)
+        context += self._optional_context(batch, "previous_actions", self.action_projection, batch_size, node_features.device)
+        context += self._optional_context(batch, "verifier_feedback", self.verifier_projection, batch_size, node_features.device)
+        hidden = hidden + context[:, None, :]
         hidden = hidden.masked_fill(~node_mask.unsqueeze(-1), 0.0)
-
-        role_outputs = {
-            role: self.heads[role](self.adapters[role](hidden)).masked_fill(
-                ~node_mask.unsqueeze(-1), 0.0
+        latents = self.global_latents.unsqueeze(0).expand(batch_size, -1, -1)
+        for block in self.backbone:
+            hidden, latents = block(
+                hidden,
+                latents,
+                safe_mask,
+                batch.get("edge_index"),
+                batch.get("edge_features"),
+                batch.get("edge_mask"),
             )
-            for role in self.adapters
+        hidden = self.final_norm(hidden).masked_fill(~node_mask.unsqueeze(-1), 0.0)
+        pooled = (hidden * node_mask.unsqueeze(-1)).sum(1) / node_mask.sum(1, keepdim=True).clamp_min(1)
+        role_hidden = {role: adapter(hidden) for role, adapter in self.adapters.items()}
+        role_outputs = {
+            role: self.heads[role](value).masked_fill(~node_mask.unsqueeze(-1), 0.0)
+            for role, value in role_hidden.items()
         }
+        sentinel_nodes = role_hidden["sentinel"]
+        scout_nodes = role_hidden["scout"]
+        plan_hidden = self.plan_query_tokens.unsqueeze(0) + pooled[:, None, :]
+        plan_hidden = self.adapters["strategist"](plan_hidden)
+        pointer_logits = torch.einsum(
+            "bqd,bnd->bqn", self.pointer_query(plan_hidden), role_hidden["strategist"]
+        ).masked_fill(~node_mask[:, None, :], torch.finfo(hidden.dtype).min)
         return HydroOutput(
             hidden_state=hidden,
+            latent_state=latents,
             sentinel=role_outputs["sentinel"],
             scout=role_outputs["scout"],
             strategist=role_outputs["strategist"],
             node_mask=node_mask,
+            source_node_logits=self.source_node_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
+            source_region_logits=self.source_region_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
+            start_time_logits=self.profile_heads["start_time"](pooled),
+            duration_logits=self.profile_heads["duration"](pooled),
+            relative_strength_logits=self.profile_heads["relative_strength"](pooled),
+            evidence_sufficiency=self.evidence_head(pooled),
+            sensor_fault_logits=self.sensor_fault_head(sentinel_nodes).squeeze(-1),
+            sample_node_logits=self.sample_node_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
+            expected_information_gain=self.information_gain_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, 0.0),
+            action_logits=self.action_head(plan_hidden),
+            action_pointer_logits=pointer_logits,
+            plan_value=self.plan_value_head(plan_hidden).squeeze(-1),
+            plan_validity_logits=self.plan_validity_head(plan_hidden),
+            uncertainty=self.uncertainty_head(pooled),
+            ood_logits=self.ood_head(pooled),
         )
 
     def parameter_count(self, *, trainable_only: bool = False) -> int:
@@ -160,16 +353,58 @@ class HydroCore(nn.Module):
 
     def parameter_report(self) -> ParameterReport:
         count = lambda module: sum(parameter.numel() for parameter in module.parameters())
-        encoders = count(self.node_encoder) + count(self.graph_encoder)
-        encoders += count(self.temporal_encoder) + count(self.quality_encoder) + count(self.modality_fusion)
+        encoders = sum(
+            count(module)
+            for module in (
+                self.node_encoder,
+                self.graph_encoder,
+                self.temporal_encoder,
+                self.quality_encoder,
+                self.modality_fusion,
+                self.residual_projection,
+                self.prior_projection,
+                self.role_projection,
+                self.action_projection,
+                self.verifier_projection,
+            )
+        )
+        heads = count(self.heads) + sum(
+            count(module)
+            for module in (
+                self.source_node_head,
+                self.source_region_head,
+                self.sensor_fault_head,
+                self.sample_node_head,
+                self.information_gain_head,
+                self.profile_heads,
+                self.evidence_head,
+                self.uncertainty_head,
+                self.ood_head,
+                self.action_head,
+                self.plan_value_head,
+                self.plan_validity_head,
+                self.pointer_query,
+            )
+        )
         return ParameterReport(
             total=self.parameter_count(),
             trainable=self.parameter_count(trainable_only=True),
-            backbone=count(self.backbone),
+            backbone=count(self.backbone) + self.global_latents.numel() + self.plan_query_tokens.numel() + count(self.final_norm),
             encoders=encoders,
             adapters=count(self.adapters),
-            heads=count(self.heads),
+            heads=heads,
         )
 
     def parameter_report_dict(self) -> dict[str, int]:
         return asdict(self.parameter_report())
+
+
+class NoAdapterHydroCore(HydroCore):
+    """Architecture ablation retaining the shared core but removing adapters."""
+
+    def __init__(self, **kwargs: object) -> None:
+        super().__init__(use_adapters=False, **kwargs)  # type: ignore[arg-type]
+
+
+class HydroMono(NoAdapterHydroCore):
+    """One-shot equal-backbone baseline without specialist adaptation."""

@@ -1,0 +1,13 @@
+model:
+  variant: medium
+  d_model: 256
+  attention_heads: 8
+  feed_forward_size: 768
+  layers: 8
+  latent_tokens: 64
+  plan_queries: 8
+  dropout: 0.1
+  normalization: rmsnorm
+  activation: silu
+  parameter_target: 12_000_000_to_15_000_000
+

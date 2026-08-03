@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import torch
 
-from hydroswarm.model import HydroCore
+from hydroswarm.model import HydroCore, HydroMono, NoAdapterHydroCore
 
 
 def _tiny_model() -> HydroCore:
@@ -76,3 +76,66 @@ def test_default_model_is_approximately_24_5m_parameters() -> None:
     assert report.total == model.parameter_count()
     assert report.trainable == report.total
     assert abs(report.total - 24_500_000) / 24_500_000 < 0.05
+
+
+def test_model_variants_meet_parameter_bands() -> None:
+    counts = {
+        name: HydroCore.from_variant(name).parameter_count()
+        for name in ("small", "medium", "large")
+    }
+    assert 4_000_000 <= counts["small"] <= 6_000_000
+    assert 12_000_000 <= counts["medium"] <= 15_000_000
+    assert 24_000_000 <= counts["large"] <= 25_000_000
+
+
+def test_edge_inputs_context_and_semantic_heads() -> None:
+    model = _tiny_model().eval()
+    with torch.no_grad():
+        output = model(
+            {
+                "node_features": torch.randn(1, 3, 3),
+                "temporal_features": torch.randn(1, 2, 3, 2),
+                "quality_features": torch.randn(1, 2, 3, 2),
+                "travel_time": torch.zeros(1, 3),
+                "reservoir_reachability": torch.ones(1, 3),
+                "demand_centrality": torch.ones(1, 3),
+                "edge_index": torch.tensor([[[0, 1], [1, 2]]]),
+                "edge_features": torch.randn(1, 2, 13),
+                "edge_mask": torch.ones(1, 2, dtype=torch.bool),
+                "timestamps": torch.tensor([[0.0, 300.0]]),
+                "role_features": torch.zeros(1, 8),
+                "previous_actions": torch.zeros(1, 2, 8),
+                "verifier_feedback": torch.zeros(1, 8),
+                "residual_features": torch.zeros(1, 3, 4),
+                "classical_prior": torch.tensor([[0.7, 0.2, 0.1]]),
+            }
+        )
+    assert output["latent_state"].shape == (1, 96, 32)
+    assert output["source_node_logits"].shape == (1, 3)
+    assert output["sample_node_logits"].shape == (1, 3)
+    assert output["action_logits"].shape == (1, 8, 8)
+    assert output["action_pointer_logits"].shape == (1, 8, 3)
+    assert output["plan_value"].shape == (1, 8)
+    assert output["plan_validity_logits"].shape == (1, 8, 2)
+    assert output["uncertainty"].shape == (1, 1)
+    assert output["ood_logits"].shape == (1, 3)
+    assert torch.isfinite(output["action_logits"]).all()
+
+
+def test_ablation_models_remove_role_adapters() -> None:
+    kwargs = {
+        "node_feature_dim": 3,
+        "temporal_feature_dim": 2,
+        "quality_feature_dim": 2,
+        "d_model": 32,
+        "nhead": 4,
+        "dim_feedforward": 64,
+        "num_layers": 1,
+        "modality_layers": 1,
+        "adapter_dims": (32, 32, 32),
+    }
+    full = HydroCore(**kwargs)
+    no_adapter = NoAdapterHydroCore(**kwargs)
+    mono = HydroMono(**kwargs)
+    assert no_adapter.parameter_count() < full.parameter_count()
+    assert mono.use_adapters is False
