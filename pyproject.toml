@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling>=1.25"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydroswarm"
@@ -26,8 +26,8 @@ dev = ["httpx>=0.28", "pytest>=8.3", "pytest-cov>=6", "ruff>=0.9"]
 [project.scripts]
 hydroswarm = "hydroswarm.cli:main"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/hydroswarm"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
@@ -40,4 +40,3 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-
