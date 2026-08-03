@@ -10,15 +10,19 @@ from .schema import (
     FeatureSchema,
     NormalizationStats,
 )
+from .builder import BuiltHydroBatch, HydraulicFeatureBuilder, SensorSeries
 
 __all__ = [
     "DEFAULT_FEATURE_SCHEMA",
+    "BuiltHydroBatch",
+    "HydraulicFeatureBuilder",
     "EDGE_FEATURE_NAMES",
     "FEATURE_SCHEMA_VERSION",
     "GraphSample",
     "NODE_FEATURE_NAMES",
     "FeatureSchema",
     "NormalizationStats",
+    "SensorSeries",
     "TimestampWindow",
     "align_edges",
     "align_node_features",
@@ -26,4 +30,3 @@ __all__ = [
     "pad_graph_batch",
     "timestamp_windows",
 ]
-
