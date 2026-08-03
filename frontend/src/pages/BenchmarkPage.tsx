@@ -15,7 +15,7 @@ export function BenchmarkPage({ incident }: { incident: IncidentView }) {
       </header>
       <div className="validation-summary">
         <article>
-          <strong>1.51 s</strong>
+          <strong>0.98 s</strong>
           <span>mean golden runtime</span>
         </article>
         <article>

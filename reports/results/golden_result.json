@@ -216,7 +216,7 @@
   "result_sha256": "92968abc79e3fb06d346404db45ee9cbc396ac056a220e6f4c18acf806925736",
   "runtime": {
     "cache_enabled": true,
-    "elapsed_seconds": 0.1671508001163602,
+    "elapsed_seconds": 0.13633419992402196,
     "exact_simulation_runs": 0
   },
   "schema_version": "hydroswarm-golden-v1",

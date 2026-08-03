@@ -15,8 +15,8 @@ All values below were produced by the frozen WNTR fixture. Missing neural checkp
 | approval_pause | 1 | [1, 1] |
 | replay_valid | 1 | [1, 1] |
 | exposure_reduction_mg | 14723.2 | [14723.2, 14723.2] |
-| latency_seconds | 1.5101 | [-0.105196, 3.1254] |
-| peak_python_tracemalloc_mb | 1.16555 | [0.346294, 1.98481] |
+| latency_seconds | 0.980088 | [-0.391434, 2.35161] |
+| peak_python_tracemalloc_mb | 1.16535 | [0.346173, 1.98452] |
 | logical_cache_hit_rate | 0.666667 | [0.0133333, 1] |
 
 ## Gate checks

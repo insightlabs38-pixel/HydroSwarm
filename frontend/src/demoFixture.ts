@@ -239,7 +239,7 @@ export const demoIncident: IncidentView = {
     },
     {
       metric: 'Latency / Python allocation peak',
-      value: '1.51 s / 1.17 MB',
+      value: '0.98 s / 1.17 MB',
       comparison: 'native WNTR RAM excluded',
       status: 'PASS',
     },

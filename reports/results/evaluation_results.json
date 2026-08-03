@@ -29,11 +29,11 @@
       "std": 0.0
     },
     "latency_seconds": {
-      "ci95_normal_high": 3.1253972879307215,
-      "ci95_normal_low": -0.1051962878561763,
-      "mean": 1.5101005000372727,
+      "ci95_normal_high": 2.3516110760491933,
+      "ci95_normal_low": -0.3914343427267517,
+      "mean": 0.9800883666612208,
       "n": 3,
-      "std": 1.4274367887419703
+      "std": 1.212013783874741
     },
     "localization_top1_accuracy": {
       "ci95_normal_high": 1.0,
@@ -50,11 +50,11 @@
       "std": 0.5773502691896257
     },
     "peak_python_tracemalloc_mb": {
-      "ci95_normal_high": 1.9848128503955365,
-      "ci95_normal_low": 0.34629397130042705,
-      "mean": 1.1655534108479817,
+      "ci95_normal_high": 1.9845195908497197,
+      "ci95_normal_low": 0.34617333619292334,
+      "mean": 1.1653464635213215,
       "n": 3,
-      "std": 0.7239790683044733
+      "std": 0.7239027942489157
     },
     "replay_valid": {
       "ci95_normal_high": 1.0,
@@ -95,9 +95,9 @@
     "no_cache": {
       "exact_simulation_runs": 7,
       "executed": true,
-      "latency_seconds": 2.897059299983084,
+      "latency_seconds": 2.663351600058377,
       "logical_cache_hit_rate": 0.0,
-      "peak_python_tracemalloc_mb": 2.4370460510253906
+      "peak_python_tracemalloc_mb": 2.4383153915405273
     },
     "no_exact_verifier": {
       "executed": true,
@@ -222,16 +222,16 @@
         "candidate_contraction": 3.0,
         "entropy_reduction_bits": 1.947230922881923,
         "exposure_reduction_mg": 14723.174527437892,
-        "latency_seconds": 3.1574450000189245,
+        "latency_seconds": 2.3795487000606954,
         "localization_top1_accuracy": 1.0,
         "logical_cache_hit_rate": 0.0,
-        "peak_python_tracemalloc_mb": 2.001523017883301,
+        "peak_python_tracemalloc_mb": 2.0012283325195312,
         "replay_valid": 1.0,
         "safe_plan_acceptance": 1.0,
         "true_source_probability": 0.9940198136146235,
         "unsafe_plan_rejection": 1.0
       },
-      "result_sha256": "92968abc79e3fb06d346404db45ee9cbc396ac056a220e6f4c18acf806925736",
+      "result_sha256": "4d65fd419d695865f0b5ad3c17e2f8f30b46187655c831170b63f3ac5e7a19c2",
       "seed": 2026
     },
     {
@@ -244,16 +244,16 @@
         "candidate_contraction": 3.0,
         "entropy_reduction_bits": 1.9487979163535658,
         "exposure_reduction_mg": 14723.174527437892,
-        "latency_seconds": 0.6388062001205981,
+        "latency_seconds": 0.29086979990825057,
         "localization_top1_accuracy": 1.0,
         "logical_cache_hit_rate": 1.0,
-        "peak_python_tracemalloc_mb": 0.7510042190551758,
+        "peak_python_tracemalloc_mb": 0.7507791519165039,
         "replay_valid": 1.0,
         "safe_plan_acceptance": 1.0,
         "true_source_probability": 0.9942314845775396,
         "unsafe_plan_rejection": 1.0
       },
-      "result_sha256": "f8963a75226a19f0c5e94b0e41ea69a762553d4d4056b789efeb440c1005c013",
+      "result_sha256": "8c59ab149b1bde1f39ae6728bdda15f2eb9f61670f019d4b27ca582caf9beeee",
       "seed": 2027
     },
     {
@@ -266,16 +266,16 @@
         "candidate_contraction": 3.0,
         "entropy_reduction_bits": 1.9481955797511246,
         "exposure_reduction_mg": 14723.174527437892,
-        "latency_seconds": 0.7340502999722958,
+        "latency_seconds": 0.2698466000147164,
         "localization_top1_accuracy": 1.0,
         "logical_cache_hit_rate": 1.0,
-        "peak_python_tracemalloc_mb": 0.7441329956054688,
+        "peak_python_tracemalloc_mb": 0.7440319061279297,
         "replay_valid": 1.0,
         "safe_plan_acceptance": 1.0,
         "true_source_probability": 0.9941502973894095,
         "unsafe_plan_rejection": 1.0
       },
-      "result_sha256": "db272c186367d92f93ccaf42ac6976cedc0e3d4ef7c0c38e60b17eb7a5949065",
+      "result_sha256": "13f3db6e28f4ac9b484226ef667d7b99794d7a5649d8815d2a0e8f23ee3be372",
       "seed": 2028
     }
   ],

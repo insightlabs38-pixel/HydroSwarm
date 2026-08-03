@@ -47,8 +47,6 @@ The current benchmark intentionally reports the S/M/L neural variants as
 [measured summary](reports/results/summary.md), and
 [technical report](output/pdf/HydroSwarm_Technical_Report.pdf).
 
-![Measured frozen WNTR benchmark view](docs/screenshots/measured-benchmarks.png)
-
 The operator screenshot below uses the console's visibly labeled deterministic fallback to
 demonstrate the interface when no active API incident is configured; it is not presented as
 live telemetry or benchmark evidence.
@@ -111,7 +109,7 @@ container, offline, and verification instructions.
 ## Reproduce the proof
 
 ```powershell
-python scripts/run_golden.py --config configs/demo.yaml
+python scripts/run_golden.py --seed 2026
 python scripts/evaluate.py --config configs/evaluation.yaml
 python -m pytest --cov=hydroswarm --cov-branch
 python -m ruff check src tests scripts
