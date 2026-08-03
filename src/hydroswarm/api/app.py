@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 from collections import defaultdict
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
@@ -13,6 +14,7 @@ import networkx as nx
 from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from hydroswarm import __version__
 from hydroswarm.domain import (
@@ -75,11 +77,6 @@ def create_app(
 
     settings = settings or ApiSettings(maximum_request_bytes=max_request_bytes)
     max_request_bytes = settings.maximum_request_bytes
-    app = FastAPI(
-        title="HydroSwarm API",
-        version=__version__,
-        description="Offline neuro-hydraulic incident decision support",
-    )
     runtime_state = RuntimeState.create(
         verifier=verifier,
         ledger_path=ledger_path,
@@ -87,6 +84,19 @@ def create_app(
         network_directory=network_directory,
         pipeline_factory=pipeline_factory,
         swarm_factory=swarm_factory,
+    )
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI):
+        yield
+        if runtime_state.jobs:
+            runtime_state.jobs.close()
+
+    app = FastAPI(
+        title="HydroSwarm API",
+        version=__version__,
+        description="Offline neuro-hydraulic incident decision support",
+        lifespan=lifespan,
     )
     app.state.runtime = runtime_state
     app.state.network_importer = NetworkImporter(
@@ -830,10 +840,16 @@ def create_app(
         except WebSocketDisconnect:
             return
 
-    @app.on_event("shutdown")
-    def shutdown_worker() -> None:
-        if runtime().jobs:
-            runtime().jobs.close()
+    frontend_candidates = (
+        Path.cwd() / "frontend" / "dist",
+        Path(__file__).resolve().parents[3] / "frontend" / "dist",
+    )
+    frontend_dist = next(
+        (path for path in frontend_candidates if (path / "index.html").is_file()), None
+    )
+    if frontend_dist is not None:
+        # Registered last so typed API/WebSocket routes always take precedence.
+        app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="operator-console")
 
     return app
 

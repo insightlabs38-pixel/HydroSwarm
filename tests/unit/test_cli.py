@@ -43,11 +43,17 @@ def test_start_uses_localhost_and_default_port(monkeypatch: pytest.MonkeyPatch, 
     monkeypatch.setattr(cli.subprocess, "run", fake_run)
 
     assert cli.main(["start"]) == 0
-    assert captured[captured.index("--server.address") + 1] == "127.0.0.1"
-    assert captured[captured.index("--server.port") + 1] == "8765"
+    assert captured[captured.index("--host") + 1] == "127.0.0.1"
+    assert captured[captured.index("--port") + 1] == "8765"
+    assert "hydroswarm.api.app:app" in captured
     assert "http://127.0.0.1:8765" in capsys.readouterr().out
 
 
 def test_start_rejects_invalid_port_without_launching(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(cli.subprocess, "run", lambda *_args, **_kwargs: pytest.fail("must not launch"))
     assert cli.main(["start", "--port", "0"]) == 2
+
+
+def test_network_bind_requires_explicit_override(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(cli.subprocess, "run", lambda *_args, **_kwargs: pytest.fail("must not launch"))
+    assert cli.main(["start", "--host", "0.0.0.0"]) == 2

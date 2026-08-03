@@ -141,17 +141,14 @@ def _start_console(host: str, port: int, *, runner: Any | None = None) -> int:
     command = [
         sys.executable,
         "-m",
-        "streamlit",
-        "run",
-        str(Path(__file__).resolve().parent / "console" / "app.py"),
-        "--server.address",
+        "uvicorn",
+        "hydroswarm.api.app:app",
+        "--host",
         host,
-        "--server.port",
+        "--port",
         str(port),
-        "--browser.gatherUsageStats",
-        "false",
     ]
-    print(f"Starting offline HydroSwarm console at http://{host}:{port}")
+    print(f"Starting offline HydroSwarm API and console at http://{host}:{port}")
     runner = runner or subprocess.run
     completed = runner(command, check=False)
     return int(completed.returncode)
@@ -164,9 +161,14 @@ app = typer.Typer(help="HydroSwarm local operations", no_args_is_help=True)
 def start_command(
     host: str = typer.Option(DEFAULT_HOST, help="Loopback bind address."),
     port: int = typer.Option(DEFAULT_PORT, min=1, max=65_535, help="Console port."),
+    allow_network_bind: bool = typer.Option(
+        False,
+        "--allow-network-bind",
+        help="Allow a non-loopback bind for an explicitly isolated container deployment.",
+    ),
 ) -> None:
-    """Start the offline operator console."""
-    if host not in {"127.0.0.1", "localhost", "::1"}:
+    """Start the offline API and built operator console."""
+    if host not in {"127.0.0.1", "localhost", "::1"} and not allow_network_bind:
         raise typer.BadParameter("HydroSwarm binds only to loopback by default")
     raise typer.Exit(_start_console(host, port))
 
