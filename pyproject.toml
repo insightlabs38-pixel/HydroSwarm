@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hydroswarm"
+version = "0.1.0"
+description = "Offline neuro-hydraulic decision support for drinking-water contamination incidents"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+dependencies = [
+  "fastapi>=0.115",
+  "networkx>=3.4",
+  "numpy>=2.0",
+  "pydantic>=2.10",
+  "torch>=2.5",
+  "uvicorn>=0.34",
+  "wntr>=1.3",
+]
+
+[project.optional-dependencies]
+console = ["streamlit>=1.41"]
+dev = ["httpx>=0.28", "pytest>=8.3", "pytest-cov>=6", "ruff>=0.9"]
+
+[project.scripts]
+hydroswarm = "hydroswarm.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hydroswarm"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
