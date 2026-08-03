@@ -41,6 +41,12 @@ regression measurements, not field-performance claims.
 | Replay | Stable 21-event hash chain |
 | Repeated-seed promotion gate | PASS |
 
+The seeded HydroCore-S FP32 runtime profile (random weights, runtime evidence only) measures
+31.60 ms median / 38.44 ms p95 at 128 nodes and 109.76 ms median at 1,000 nodes on this
+4-thread CPU host. The 4.04M-parameter safetensors artifact is 16.19 MB and repeated eager
+outputs match exactly. See [performance.json](reports/results/performance.json); these are
+not accuracy measurements.
+
 The current benchmark intentionally reports the S/M/L neural variants as
 `not_run_missing_checkpoint`; no untrained or fabricated metric is substituted. See the
 [machine-readable evaluation](reports/results/evaluation_results.json),
@@ -136,6 +142,7 @@ python scripts/build_signatures.py --output models/signatures
 python scripts/calibrate.py --help
 python scripts/train.py --help
 python scripts/export_openvino.py --help
+python scripts/benchmark_performance.py --variant small --nodes 128 --stress-nodes 1000
 ```
 
 The WNTR generator includes incident, hydraulic, topology, sensor, timing, missingness,

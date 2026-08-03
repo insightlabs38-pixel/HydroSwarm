@@ -185,6 +185,13 @@ These values are a compact regression proof, not a population estimate and not e
 of real-world accuracy. The authoritative machine-readable results are included alongside
 this report.
 
+A separate seeded HydroCore-S FP32 runtime profile uses random weights solely to measure
+execution behavior. On the current four-thread CPU host, 128-node inference measures 31.60
+ms median and 38.44 ms p95 over ten iterations. A 1,000-node canonical model stress case
+measures 109.76 ms median over five iterations. The 4.04M-parameter safetensors artifact is
+16.19 MB, and repeated eager outputs have zero maximum absolute difference. These values do
+not measure learned accuracy and do not include a 1,000-node WNTR solve.
+
 ## 13. Ablations and failure cases
 
 Removing exact verification fails the promotion gate by design: a proposal cannot become
@@ -241,7 +248,7 @@ EVALUATION. The final runtime requires no hosted AI service or internet connecti
 Next steps require utility partnerships, licensed field telemetry, prospective incident
 exercises, chemistry-specific transport validation, network-specific conformal calibration,
 authenticated deployment, operator usability studies, and external scientific review.
-Optional OpenVINO export, FP32/INT8 benchmarking, larger network stress tests, and sparse
+Optional OpenVINO and INT8 benchmarking, large-network WNTR stress tests, and further sparse
 attention optimization should follow only after compatible checkpoints and governed
 calibration data exist.
 

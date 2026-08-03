@@ -20,4 +20,11 @@ The golden end-to-end scenario should begin with a broad candidate set, select a
 informative sample, show contraction, reject an unsafe plan due to a simulated constraint,
 verify an alternative, compare both to no response, explain evidence changes, require
 operator approval, and replay the immutable event sequence with Wi-Fi disabled.
+# Runtime profiling
+
+`python scripts/benchmark_performance.py` records eager FP32 CPU latency, process RSS,
+safetensors disk size, deterministic output hashes/equivalence, and a 1,000-node canonical
+model stress case. Its seeded random weights make it a runtime baseline only; accuracy is
+measured only with governed checkpoints. ONNX/OpenVINO/INT8 status is explicit in the JSON
+and never inferred from eager PyTorch performance.
 

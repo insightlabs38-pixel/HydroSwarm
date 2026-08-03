@@ -152,8 +152,8 @@ def build(source: Path, results_path: Path, target: Path) -> None:
         leading=14, textColor=BLUE, spaceBefore=9, spaceAfter=5, keepWithNext=True,
     ))
     styles.add(ParagraphStyle(
-        "Bodyx", parent=styles["BodyText"], fontName="Helvetica", fontSize=9.15,
-        leading=13.2, textColor=INK, spaceAfter=7.5, alignment=TA_LEFT,
+        "Bodyx", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.8,
+        leading=12.7, textColor=INK, spaceAfter=7, alignment=TA_LEFT,
     ))
     styles.add(ParagraphStyle(
         "Bulletx", parent=styles["Bodyx"], leftIndent=14, firstLineIndent=-8,

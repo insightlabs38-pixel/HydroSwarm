@@ -1,0 +1,48 @@
+{
+  "device": "CPU",
+  "large_graph_stress": {
+    "iterations": 5,
+    "median_latency_ms": 109.76100014522672,
+    "minimum_latency_ms": 97.82300004735589,
+    "nodes": 1000,
+    "output_sha256": "faa1c93a220edb44f611535daa3bb5a95726bf271006ca70bc02ba4f6683a31a",
+    "p95_latency_ms": 114.3800001591444,
+    "process_rss_after_mb": 268.98046875,
+    "process_rss_before_mb": 268.30078125,
+    "repeat_max_absolute_error": 0.0,
+    "rss_delta_mb": 0.6796875
+  },
+  "limitations": [
+    "Latency is measured on the current host and is not portable across CPUs.",
+    "Process RSS includes the Python runtime and native libraries already loaded.",
+    "The stress case measures canonical model scaling, not a 1000-node WNTR solve.",
+    "Random seeded weights establish runtime and numerical repeatability, not accuracy."
+  ],
+  "measured": true,
+  "model_artifact_bytes": 16186296,
+  "model_artifact_sha256": "6f4693908f625d18ac2e6860f36f011e97042f709aba05025dae584ee7748994",
+  "optimization_status": {
+    "eager_fp32": "measured",
+    "onnx": "not_run_optional_dependency",
+    "openvino_fp32": "not_run_optional_dependency",
+    "openvino_int8": "not_run_requires_governed_quantization_calibration"
+  },
+  "parameters": 4040644,
+  "precision": "FP32",
+  "reference": {
+    "iterations": 10,
+    "median_latency_ms": 31.595000065863132,
+    "minimum_latency_ms": 26.75400022417307,
+    "nodes": 128,
+    "output_sha256": "7da2a1d9c22c6b7dbd8f918e988ed854227b9dbd8f4fd880a7172cc39d471000",
+    "p95_latency_ms": 38.43960026279092,
+    "process_rss_after_mb": 251.99609375,
+    "process_rss_before_mb": 251.9921875,
+    "repeat_max_absolute_error": 0.0,
+    "rss_delta_mb": 0.00390625
+  },
+  "schema_version": "hydroswarm-performance-v1",
+  "threads": 4,
+  "torch_version": "2.13.0+cpu",
+  "variant": "small"
+}
