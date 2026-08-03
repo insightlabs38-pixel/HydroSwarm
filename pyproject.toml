@@ -28,6 +28,7 @@ dependencies = [
 
 [project.optional-dependencies]
 console = ["streamlit>=1.41"]
+openvino = ["openvino>=2026.0"]
 dev = [
   "build>=1.2",
   "hypothesis>=6.120",
