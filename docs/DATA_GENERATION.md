@@ -18,11 +18,10 @@ outage, jitter, unit mismatch, and flow reversal. Every label is tied to a simul
 6. Freeze only compact golden fixtures under `data/frozen`.
 
 ```powershell
-python scripts/generate_dataset.py --config configs/training.yaml --output data/processed
-python scripts/build_signatures.py --data data/processed --output models/signatures
-python scripts/calibrate.py --data data/processed --output models/calibration
-python scripts/train.py --config configs/training.yaml
-python scripts/evaluate.py --config configs/evaluation.yaml
+python scripts/prepare_training_corpus.py --output data/learning-v1 --train-count 800 --validation-count 160 --calibration-count 160 --test-count 200
+python scripts/rebuild_canonical_tensors.py
+python scripts/train.py --config configs/training_benchmark.yaml --train-manifest data/learning-v1/tensors-canonical-v3/train.jsonl --validation-manifest data/learning-v1/tensors-canonical-v3/validation.jsonl
+python scripts/evaluate_learning.py --help
 ```
 
 The exact command interfaces are self-documenting with `--help`. Generated manifests

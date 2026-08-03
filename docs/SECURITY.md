@@ -20,3 +20,7 @@ the generator, no chemistry identification, no production safety guarantee, no c
 interpretation of sensitivity, and no demonstrated universal cross-network generalization.
 Operators must follow established utility procedures and qualified engineering judgment.
 
+The release audit exports a hash-locked dependency report, a CycloneDX SBOM, and a
+deterministic credential-pattern scan under `reports/results/`. The credential scan covers
+tracked and release-bound untracked text files and fails on common cloud, hosted-model,
+GitHub-token, and private-key signatures.

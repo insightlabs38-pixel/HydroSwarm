@@ -41,15 +41,46 @@ regression measurements, not field-performance claims.
 | Replay | Stable 21-event hash chain |
 | Repeated-seed promotion gate | PASS |
 
-The seeded HydroCore-S FP32 runtime profile (random weights, runtime evidence only) measures
-31.60 ms median / 38.44 ms p95 at 128 nodes and 109.76 ms median at 1,000 nodes on this
+## Measured learned benchmark
+
+A governed 1,320-scenario WNTR corpus contains 800 training, 160 validation, 160
+calibration, and 200 test incidents. Five balanced curriculum stages and five hydraulic
+regimes are represented; the test regime is excluded from training, signature fitting,
+and calibration. All regimes use one reference topology, so this is hydraulic-shift—not
+unseen-topology or field—evidence.
+
+| Held-out hydraulic-shift result | Top-1 | 95% bootstrap CI |
+|---|---:|---:|
+| Classical signature baseline | 91.5% | 87.5–95.0% |
+| HydroMono-S | 94.5% | 91.5–97.5% |
+| HydroCore-S neural | 94.5% | 91.0–97.5% |
+| HydroSwarm hybrid | **96.0%** | **93.0–98.5%** |
+| HydroCore-M partial (2 epochs) | 94.0% | 90.5–97.0% |
+
+The hybrid improves top-1 by 4.5 percentage points over the identical-scenario classical
+baseline. HydroCore-S does not outperform equal-budget HydroMono-S in this run, and M is
+not converged. Held-out conformal coverage is 91.0% at α=0.1 with mean candidate-set size
+0.92 and ECE 0.0269. Start-time (20.5%), duration (42.5%), and strength-bin (34.0%)
+accuracy remain weak and are not used as strong claims. See
+[learning-evaluation-final.json](reports/results/learning-evaluation-final.json), the
+[dataset report](data/learning-v1/dataset-report.json), and the
+[experiment registry](experiments/learning-v1/registry.json).
+
+The promoted 4.04M-parameter S checkpoint is 16.19 MB, hash-verified, and executes through
+the default API in `FULL_HYBRID` mode with compatible calibration and provenance. The
+[pipeline validation](reports/results/trained-pipeline-validation.json) records a complete
+real-checkpoint run. Corrupt, absent, or schema-incompatible assets fail closed to the
+classical path.
+
+The separate seeded HydroCore-S FP32 runtime profile (random weights, runtime evidence only) measures
+31.00 ms median / 32.34 ms p95 at 128 nodes and 104.33 ms median at 1,000 nodes on this
 4-thread CPU host. The 4.04M-parameter safetensors artifact is 16.19 MB and repeated eager
 outputs match exactly. See [performance.json](reports/results/performance.json); these are
 not accuracy measurements.
 
-The current benchmark intentionally reports the S/M/L neural variants as
-`not_run_missing_checkpoint`; no untrained or fabricated metric is substituted. See the
-[machine-readable evaluation](reports/results/evaluation_results.json),
+The frozen golden workflow report retains its original neural-variant fields for regression
+compatibility; learned results are reported in the separate governed benchmark above. See the
+[machine-readable golden evaluation](reports/results/evaluation_results.json),
 [measured summary](reports/results/summary.md), and
 [technical report](output/pdf/HydroSwarm_Technical_Report.pdf).
 
@@ -138,6 +169,10 @@ no known vulnerabilities; npm reports zero vulnerabilities.
 
 ```powershell
 python scripts/generate_dataset.py --output data/processed --count 100 --seed 2026
+python scripts/prepare_training_corpus.py --output data/learning-v1
+python scripts/rebuild_canonical_tensors.py
+python scripts/train.py --config configs/training_benchmark.yaml --train-manifest data/learning-v1/tensors-canonical-v3/train.jsonl --validation-manifest data/learning-v1/tensors-canonical-v3/validation.jsonl
+python scripts/evaluate_learning.py --help
 python scripts/build_signatures.py --output models/signatures
 python scripts/calibrate.py --help
 python scripts/train.py --help

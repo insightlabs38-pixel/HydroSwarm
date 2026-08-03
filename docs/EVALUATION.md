@@ -16,6 +16,15 @@ sampling, verifier removed versus enabled, uncertainty control removed versus en
 seen versus completely held-out networks. Removing the verifier is evaluation-only; it
 must never be a product runtime option.
 
+## Executed learned matrix
+
+`reports/results/learning-evaluation-final.json` evaluates 200 withheld hydraulic-regime
+incidents with 2,000-sample bootstrap confidence intervals. Classical-only, HydroCore-S,
+HydroMono-S, hybrid fusion, and partial HydroCore-M share the same scenarios and source
+budget. Hybrid reaches 96.0% top-1 versus 91.5% classical; HydroCore-S and HydroMono-S tie
+at 94.5%. Conformal calibration uses a separate 160-scenario split and reaches 91.0%
+held-out coverage at alpha 0.1. The result does not cover independent-topology transfer.
+
 The golden end-to-end scenario should begin with a broad candidate set, select an
 informative sample, show contraction, reject an unsafe plan due to a simulated constraint,
 verify an alternative, compare both to no response, explain evidence changes, require
@@ -27,4 +36,3 @@ safetensors disk size, deterministic output hashes/equivalence, and a 1,000-node
 model stress case. Its seeded random weights make it a runtime baseline only; accuracy is
 measured only with governed checkpoints. ONNX/OpenVINO/INT8 status is explicit in the JSON
 and never inferred from eager PyTorch performance.
-

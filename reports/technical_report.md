@@ -86,9 +86,11 @@ connections, and dropout support stable training.
 
 Semantic heads predict source logits, incident timing and strength, sensor health,
 sampling value, typed plan actions, consequence residuals, and fixed explanation intents.
-Small, medium, and large configurations contain approximately 4.0M, 12.4M, and 24.4M
-parameters. HydroMono and no-adapter variants support ablation. Missing checkpoints are
-reported as not run; the application never substitutes fabricated model results.
+Small, medium, and large configurations contain 4,040,645, 12,401,861, and 24,415,397
+parameters. HydroMono and no-adapter variants support ablation. Source logits learn a
+residual over the classical signature prior and exclude reservoirs and tanks with a typed
+candidate mask. The promoted S checkpoint and calibration artifact are hash-validated;
+missing or incompatible assets fail closed to classical mode.
 
 ## 6. Specialist agents and control
 
@@ -96,7 +98,8 @@ HydroSentinel validates evidence, assesses sensor versus network events, and loc
 source region. HydroScout ranks accessible, non-duplicate candidates by expected posterior
 information gain, likely region reduction, detection probability, delay, cost, and
 redundancy. HydroStrategist creates diverse bounded templates including no response,
-flushing, isolation, valve and pump adjustments, and public-notification recommendations.
+flushing, isolation, valve and pump adjustments, monitoring, and operator-reviewed
+information summaries. It does not issue public notifications or emergency alerts.
 HydroVerifier alone can promote a plan after exact simulation.
 
 An 18-state deterministic controller owns permissions, timeouts, retry budgets, and human
@@ -117,6 +120,12 @@ layout, corruption settings, replay hash, and provenance. Validators enforce fin
 aligned time axes, correct missing-value masks, replay consistency, and seed-family
 separation. Calibration and final test partitions are never used for model fitting.
 
+The measured learning-v1 corpus contains 1,320 scenarios: 800 train, 160 validation, 160
+calibration, and 200 test. Five curriculum stages each contain 264 incidents and four
+source nodes each contain 330. Four hydraulic regimes are used for training and one regime
+is withheld from training, signature fitting, and calibration. All regimes share one
+topology; this is hydraulic-shift evidence, not unseen-topology transfer.
+
 ## 8. Training
 
 Training uses governed JSONL trajectories and PyTorch. Multitask semantic losses cover
@@ -129,6 +138,12 @@ manifest hash, seeds, environment, progress, failures, and resource guards.
 Checkpoints are safetensors with resume state and checksums. Training can resume after a
 bounded interruption. A language decoder, when used, is trained against fixed evidence
 intents with the operational latent detached so fluent text cannot alter scientific heads.
+
+HydroCore-S and HydroMono-S each completed eight epochs and 600 optimizer steps on CPU in
+385 and 397 seconds respectively. HydroCore-M completed a two-epoch, 60-step feasibility
+run in 112 seconds using gradient accumulation; it is not converged. Published experiment
+records include per-epoch training curves, task losses, configuration, environment,
+dataset hash, and safe model weights without optimizer pickle state.
 
 ## 9. Uncertainty, OOD, and abstention
 
@@ -185,10 +200,23 @@ These values are a compact regression proof, not a population estimate and not e
 of real-world accuracy. The authoritative machine-readable results are included alongside
 this report.
 
+A governed learned benchmark evaluates 200 withheld hydraulic-regime incidents. The
+classical signature baseline reaches 91.5 percent top-1 accuracy (95 percent bootstrap CI
+87.5–95.0). HydroCore-S and equal-budget HydroMono-S each reach 94.5 percent. Hybrid fusion
+reaches 96.0 percent (93.0–98.5), a 4.5-point improvement over classical. HydroCore-M
+partial reaches 94.0 percent but is not a converged comparison. Because HydroCore-S and
+HydroMono tie, this experiment does not establish an adapter advantage.
+
+Held-out conformal coverage is 91.0 percent at alpha 0.1, mean candidate-set size is 0.92,
+and ECE is 0.0269. Sensor-fault element accuracy is 94.8 percent. Event-profile heads remain
+weak: start-time 20.5 percent, duration 42.5 percent, and strength-bin 34.0 percent. The
+default factory executes the promoted checkpoint in FULL_HYBRID mode with validated model,
+feature-schema, calibration, signature, and network hashes.
+
 A separate seeded HydroCore-S FP32 runtime profile uses random weights solely to measure
-execution behavior. On the current four-thread CPU host, 128-node inference measures 31.60
-ms median and 38.44 ms p95 over ten iterations. A 1,000-node canonical model stress case
-measures 109.76 ms median over five iterations. The 4.04M-parameter safetensors artifact is
+execution behavior. On the current four-thread CPU host, 128-node inference measures 31.00
+ms median and 32.34 ms p95 over ten iterations. A 1,000-node canonical model stress case
+measures 104.33 ms median over five iterations. The 4.04M-parameter safetensors artifact is
 16.19 MB, and repeated eager outputs have zero maximum absolute difference. These values do
 not measure learned accuracy and do not include a 1,000-node WNTR solve.
 
@@ -196,8 +224,10 @@ not measure learned accuracy and do not include a 1,000-node WNTR solve.
 
 Removing exact verification fails the promotion gate by design: a proposal cannot become
 VERIFIED. Disabling the signature cache is actually executed and increases repeated-run
-latency. Removing active sampling leaves the broad source set unchanged. The learned-model
-ablations remain explicitly not run until governed checkpoints are available.
+latency. Removing active sampling leaves the broad source set unchanged. The final
+equal-budget HydroMono ablation ties HydroCore-S at 94.5 percent; a specialist-adapter gain
+is therefore not established. HydroCore-L, learned Scout/Strategist, language-gradient,
+quantization, and independent-topology ablations remain unrun.
 
 Important failure cases include non-identifiable sensor layouts, stale hydraulic state,
 unknown controls, cache mismatch, unit error, timing jitter, frozen or drifting sensors,
