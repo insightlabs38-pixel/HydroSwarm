@@ -1,0 +1,283 @@
+{
+  "aggregate": {
+    "approval_pause": {
+      "ci95_normal_high": 1.0,
+      "ci95_normal_low": 1.0,
+      "mean": 1.0,
+      "n": 3,
+      "std": 0.0
+    },
+    "candidate_contraction": {
+      "ci95_normal_high": 3.0,
+      "ci95_normal_low": 3.0,
+      "mean": 3.0,
+      "n": 3,
+      "std": 0.0
+    },
+    "entropy_reduction_bits": {
+      "ci95_normal_high": 1.9489692815570858,
+      "ci95_normal_low": 1.9471803311006564,
+      "mean": 1.948074806328871,
+      "n": 3,
+      "std": 0.0007904472149897076
+    },
+    "exposure_reduction_mg": {
+      "ci95_normal_high": 14723.174527437892,
+      "ci95_normal_low": 14723.174527437892,
+      "mean": 14723.174527437892,
+      "n": 3,
+      "std": 0.0
+    },
+    "latency_seconds": {
+      "ci95_normal_high": 3.1253972879307215,
+      "ci95_normal_low": -0.1051962878561763,
+      "mean": 1.5101005000372727,
+      "n": 3,
+      "std": 1.4274367887419703
+    },
+    "localization_top1_accuracy": {
+      "ci95_normal_high": 1.0,
+      "ci95_normal_low": 1.0,
+      "mean": 1.0,
+      "n": 3,
+      "std": 0.0
+    },
+    "logical_cache_hit_rate": {
+      "ci95_normal_high": 1.0,
+      "ci95_normal_low": 0.013333333333333308,
+      "mean": 0.6666666666666666,
+      "n": 3,
+      "std": 0.5773502691896257
+    },
+    "peak_python_tracemalloc_mb": {
+      "ci95_normal_high": 1.9848128503955365,
+      "ci95_normal_low": 0.34629397130042705,
+      "mean": 1.1655534108479817,
+      "n": 3,
+      "std": 0.7239790683044733
+    },
+    "replay_valid": {
+      "ci95_normal_high": 1.0,
+      "ci95_normal_low": 1.0,
+      "mean": 1.0,
+      "n": 3,
+      "std": 0.0
+    },
+    "safe_plan_acceptance": {
+      "ci95_normal_high": 1.0,
+      "ci95_normal_low": 1.0,
+      "mean": 1.0,
+      "n": 3,
+      "std": 0.0
+    },
+    "true_source_probability": {
+      "ci95_normal_high": 0.9942547071121436,
+      "ci95_normal_low": 0.9940130232755716,
+      "mean": 0.9941338651938576,
+      "n": 3,
+      "std": 0.00010678792967113901
+    },
+    "unsafe_plan_rejection": {
+      "ci95_normal_high": 1.0,
+      "ci95_normal_low": 1.0,
+      "mean": 1.0,
+      "n": 3,
+      "std": 0.0
+    }
+  },
+  "baselines_and_ablations": {
+    "no_active_sampling": {
+      "candidate_contraction": 0.0,
+      "entropy_reduction_bits": 0.0,
+      "executed": true,
+      "localization_top1_accuracy": 0.0
+    },
+    "no_cache": {
+      "exact_simulation_runs": 7,
+      "executed": true,
+      "latency_seconds": 2.897059299983084,
+      "logical_cache_hit_rate": 0.0,
+      "peak_python_tracemalloc_mb": 2.4370460510253906
+    },
+    "no_exact_verifier": {
+      "executed": true,
+      "note": "Safety outcome is intentionally unavailable without authoritative verification.",
+      "promotable": false,
+      "unsafe_plan_rejection": null
+    },
+    "uniform_prior": {
+      "candidate_contraction": 0.0,
+      "executed": true,
+      "localization_top1_accuracy": 0.0,
+      "note": "Uniform probabilities tie-break to J1 while frozen truth is J2."
+    }
+  },
+  "config": {
+    "ablations": [
+      "no_active_sampling",
+      "no_exact_verifier",
+      "no_cache"
+    ],
+    "baselines": [
+      "uniform_prior"
+    ],
+    "metrics": [
+      "localization_top1_accuracy",
+      "candidate_contraction",
+      "entropy_reduction_bits",
+      "unsafe_plan_rejection",
+      "safe_plan_acceptance",
+      "latency_seconds",
+      "peak_python_tracemalloc_mb",
+      "logical_cache_hit_rate"
+    ],
+    "model_variants": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "modes": [
+      "classical-exact",
+      "hybrid"
+    ],
+    "promotion_gate": {
+      "maximum_mean_latency_seconds": 30.0,
+      "minimum_candidate_contraction": 1.0,
+      "minimum_localization_top1_accuracy": 1.0,
+      "minimum_safe_plan_acceptance": 1.0,
+      "minimum_unsafe_plan_rejection": 1.0
+    },
+    "schema_version": "hydroswarm-evaluation-config-v1",
+    "seeds": [
+      2026,
+      2027,
+      2028
+    ]
+  },
+  "measured": true,
+  "measurement_notes": {
+    "cache": "Logical hit rate covers four source-profile and three plan-evaluation calls.",
+    "confidence_intervals": "95% normal-approximation interval over configured repeated seeds.",
+    "ram": "Python allocation peak from tracemalloc; native WNTR/EPANET memory is not included."
+  },
+  "model_variants": [
+    {
+      "checkpoint": null,
+      "mode": "classical-exact",
+      "name": "deterministic-signature",
+      "status": "executed"
+    },
+    {
+      "checkpoint": null,
+      "mode": "hybrid",
+      "name": "small",
+      "status": "not_run_missing_checkpoint"
+    },
+    {
+      "checkpoint": null,
+      "mode": "hybrid",
+      "name": "medium",
+      "status": "not_run_missing_checkpoint"
+    },
+    {
+      "checkpoint": null,
+      "mode": "hybrid",
+      "name": "large",
+      "status": "not_run_missing_checkpoint"
+    }
+  ],
+  "promotion_gate": {
+    "checks": {
+      "authoritative_hashes_repeat": true,
+      "candidate_contraction": true,
+      "latency_seconds": true,
+      "localization_top1_accuracy": true,
+      "no_cache_ablation_measured": true,
+      "no_exact_verifier_fails_closed": true,
+      "replay_valid": true,
+      "safe_plan_acceptance": true,
+      "unsafe_plan_rejection": true
+    },
+    "passed": true,
+    "thresholds": {
+      "maximum_mean_latency_seconds": 30.0,
+      "minimum_candidate_contraction": 1.0,
+      "minimum_localization_top1_accuracy": 1.0,
+      "minimum_safe_plan_acceptance": 1.0,
+      "minimum_unsafe_plan_rejection": 1.0
+    }
+  },
+  "reliability": {
+    "approval_and_replay_success_rate": 1.0,
+    "authoritative_state_hashes_repeat_across_seeds": true
+  },
+  "runs": [
+    {
+      "authoritative_state_hashes": {
+        "safe": "5a7fc814e066408c9f02c6bf125fc0b77089b7ba2fe0ae649adb923a91f45181",
+        "unsafe": "cb8f98761c87e06e90b58e984e3b62b48b740d68fc9a9187ba6d647aed2fa5c3"
+      },
+      "metrics": {
+        "approval_pause": 1.0,
+        "candidate_contraction": 3.0,
+        "entropy_reduction_bits": 1.947230922881923,
+        "exposure_reduction_mg": 14723.174527437892,
+        "latency_seconds": 3.1574450000189245,
+        "localization_top1_accuracy": 1.0,
+        "logical_cache_hit_rate": 0.0,
+        "peak_python_tracemalloc_mb": 2.001523017883301,
+        "replay_valid": 1.0,
+        "safe_plan_acceptance": 1.0,
+        "true_source_probability": 0.9940198136146235,
+        "unsafe_plan_rejection": 1.0
+      },
+      "result_sha256": "92968abc79e3fb06d346404db45ee9cbc396ac056a220e6f4c18acf806925736",
+      "seed": 2026
+    },
+    {
+      "authoritative_state_hashes": {
+        "safe": "5a7fc814e066408c9f02c6bf125fc0b77089b7ba2fe0ae649adb923a91f45181",
+        "unsafe": "cb8f98761c87e06e90b58e984e3b62b48b740d68fc9a9187ba6d647aed2fa5c3"
+      },
+      "metrics": {
+        "approval_pause": 1.0,
+        "candidate_contraction": 3.0,
+        "entropy_reduction_bits": 1.9487979163535658,
+        "exposure_reduction_mg": 14723.174527437892,
+        "latency_seconds": 0.6388062001205981,
+        "localization_top1_accuracy": 1.0,
+        "logical_cache_hit_rate": 1.0,
+        "peak_python_tracemalloc_mb": 0.7510042190551758,
+        "replay_valid": 1.0,
+        "safe_plan_acceptance": 1.0,
+        "true_source_probability": 0.9942314845775396,
+        "unsafe_plan_rejection": 1.0
+      },
+      "result_sha256": "f8963a75226a19f0c5e94b0e41ea69a762553d4d4056b789efeb440c1005c013",
+      "seed": 2027
+    },
+    {
+      "authoritative_state_hashes": {
+        "safe": "5a7fc814e066408c9f02c6bf125fc0b77089b7ba2fe0ae649adb923a91f45181",
+        "unsafe": "cb8f98761c87e06e90b58e984e3b62b48b740d68fc9a9187ba6d647aed2fa5c3"
+      },
+      "metrics": {
+        "approval_pause": 1.0,
+        "candidate_contraction": 3.0,
+        "entropy_reduction_bits": 1.9481955797511246,
+        "exposure_reduction_mg": 14723.174527437892,
+        "latency_seconds": 0.7340502999722958,
+        "localization_top1_accuracy": 1.0,
+        "logical_cache_hit_rate": 1.0,
+        "peak_python_tracemalloc_mb": 0.7441329956054688,
+        "replay_valid": 1.0,
+        "safe_plan_acceptance": 1.0,
+        "true_source_probability": 0.9941502973894095,
+        "unsafe_plan_rejection": 1.0
+      },
+      "result_sha256": "db272c186367d92f93ccaf42ac6976cedc0e3d4ef7c0c38e60b17eb7a5949065",
+      "seed": 2028
+    }
+  ],
+  "schema_version": "hydroswarm-evaluation-v1"
+}

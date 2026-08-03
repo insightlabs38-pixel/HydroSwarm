@@ -1,0 +1,25 @@
+{
+  "schema_version": "hydroswarm-evaluation-config-v1",
+  "seeds": [2026, 2027, 2028],
+  "modes": ["classical-exact", "hybrid"],
+  "model_variants": ["small", "medium", "large"],
+  "baselines": ["uniform_prior"],
+  "ablations": ["no_active_sampling", "no_exact_verifier", "no_cache"],
+  "metrics": [
+    "localization_top1_accuracy",
+    "candidate_contraction",
+    "entropy_reduction_bits",
+    "unsafe_plan_rejection",
+    "safe_plan_acceptance",
+    "latency_seconds",
+    "peak_python_tracemalloc_mb",
+    "logical_cache_hit_rate"
+  ],
+  "promotion_gate": {
+    "minimum_localization_top1_accuracy": 1.0,
+    "minimum_candidate_contraction": 1.0,
+    "minimum_unsafe_plan_rejection": 1.0,
+    "minimum_safe_plan_acceptance": 1.0,
+    "maximum_mean_latency_seconds": 30.0
+  }
+}

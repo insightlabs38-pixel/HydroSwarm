@@ -1,0 +1,132 @@
+; Filename: hydroswarm-demo
+; WNTR: 1.5.0
+; Created: 2026-08-03 00:00:00 UTC (frozen fixture)
+[TITLE]
+
+[JUNCTIONS]
+;ID                      Elevation       Demand Pattern                 
+ J1                      314.96062992    126.80258513 diurnal                    ;
+ J2                       331.3648294    158.50323141 diurnal                    ;
+ J3                      351.04986877    103.02710042 diurnal                    ;
+ J4                      337.92650919    142.65290827 diurnal                    ;
+
+[RESERVOIRS]
+;ID                                   Head                  Pattern
+ R1                      433.07086614                            ;
+
+[TANKS]
+;ID                              Elevation           Init Level            Min Level            Max Level             Diameter           Min Volume Volume Curve         Overflow            
+ T1                       331.3648294     26.24671916      6.56167979     45.93175853     52.49343832               0                                             ;
+
+[PIPES]
+;ID                   Node1                Node2                              Length             Diameter            Roughness           Minor Loss               Status
+ P_R1_J1              R1                   J1                       3280.839895    13.779527559             120               0                 Open   ;
+ P_J1_J2              J1                   J2                      3444.8818898    11.811023622             115               0                 Open   ;
+ P_J2_J3              J2                   J3                       3937.007874     9.842519685             110               0                 Open   ;
+ P_J3_J4              J3                   J4                      4429.1338583     9.842519685             110               0                 Open   ;
+ P_J4_J1              J4                   J1                      3608.9238845    11.811023622             115               0                 Open   ;
+ P_J2_T1              J2                   T1                      2788.7139108     9.842519685             115               0                 Open   ;
+ P_T1_J4              T1                   J4                      2952.7559055     9.842519685             115               0                 Open   ;
+
+[PUMPS]
+;ID                   Node1                Node2                Properties          
+
+[VALVES]
+;ID                   Node1                Node2                            Diameter Type              Setting           Minor Loss
+
+[TAGS]
+;type      name       tag       
+
+[DEMANDS]
+;ID        Demand     Pattern   
+
+[STATUS]
+;ID        Setting   
+
+[PATTERNS]
+;ID        Multipliers
+
+diurnal 0.620000 0.560000 0.520000 0.500000 0.550000 0.720000
+diurnal 1.000000 1.220000 1.180000 1.050000 0.980000 1.020000
+diurnal 1.080000 1.040000 0.980000 0.960000 1.080000 1.280000
+diurnal 1.380000 1.240000 1.080000 0.940000 0.800000 0.700000
+
+[CURVES]
+;ID         X-Value      Y-Value     
+
+[CONTROLS]
+
+[RULES]
+
+[ENERGY]
+GLOBAL PRICE           0.0000
+
+[EMITTERS]
+;ID        Flow coefficient
+
+[QUALITY]
+
+[SOURCES]
+;Node      Type       Quality    Pattern   
+
+[REACTIONS]
+;Type           Pipe/Tank               Coefficient
+
+ ORDER BULK 1
+ ORDER TANK 1
+ ORDER WALL 1
+ GLOBAL BULK 0.0000    
+ GLOBAL WALL 0.0000    
+
+[MIXING]
+;Tank ID             Model Fraction
+
+[TIMES]
+DURATION             04:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+PATTERN START        00:00:00
+REPORT TIMESTEP      01:00:00
+REPORT START         00:00:00
+START CLOCKTIME      00:00:00 AM
+RULE TIMESTEP        00:06:00
+STATISTIC            NONE      
+
+[REPORT]
+
+[OPTIONS]
+UNITS                GPM                 
+HEADLOSS             H-W                 
+SPECIFIC GRAVITY     1
+VISCOSITY            1
+TRIALS               200
+ACCURACY             0.001
+CHECKFREQ            2
+MAXCHECK             10
+UNBALANCED           STOP                
+PATTERN              1                   
+DEMAND MULTIPLIER    1
+EMITTER EXPONENT     0.5
+QUALITY              NONE                
+DIFFUSIVITY          1
+TOLERANCE            0.01
+
+[COORDINATES]
+;Node      X-Coord    Y-Coord   
+R1                  0.000000000          0.000000000
+J1               1000.000000000          0.000000000
+J2               2000.000000000          0.000000000
+J3               3000.000000000        650.000000000
+J4               1750.000000000       1250.000000000
+T1               2650.000000000       1450.000000000
+
+[VERTICES]
+;Link      X-Coord    Y-Coord   
+
+[LABELS]
+
+[BACKDROP]
+UNITS    NONE
+
+[END]

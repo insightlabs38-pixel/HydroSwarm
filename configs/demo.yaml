@@ -1,0 +1,10 @@
+{
+  "schema_version": "hydroswarm-demo-config-v1",
+  "fixture": "data/frozen/golden_scenario.json",
+  "manifest": "data/frozen/manifest.json",
+  "result": "reports/results/golden_result.json",
+  "bind_host": "127.0.0.1",
+  "offline": true,
+  "requires_operator_approval": true,
+  "allow_physical_actuation": false
+}

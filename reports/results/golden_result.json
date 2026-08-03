@@ -1,0 +1,511 @@
+{
+  "consequences": {
+    "exposure_reduction_mg": 14723.174527437892,
+    "no_response": {
+      "containment_time_minutes": 120.0,
+      "contaminant_mass_consumed_mg": 2541415.967878744,
+      "contaminated_pipe_extent_m": 2250.00000000624,
+      "minimum_pressure_m": 10.923052787780762,
+      "operation_count": 0,
+      "population_impacted": 1.0,
+      "pressure_violation_minutes": 0.0,
+      "service_availability": 1.0,
+      "unserved_demand_l": 0.0,
+      "volume_above_threshold_l": 20160.00095754862
+    },
+    "safe_alternative": {
+      "containment_time_minutes": 120.0,
+      "contaminant_mass_consumed_mg": 2526692.793351306,
+      "contaminated_pipe_extent_m": 2250.00000000624,
+      "minimum_pressure_m": 10.716442108154297,
+      "operation_count": 1,
+      "population_impacted": 1.0,
+      "pressure_violation_minutes": 0.0,
+      "service_availability": 1.0,
+      "unserved_demand_l": 0.0,
+      "volume_above_threshold_l": 20160.00095754862
+    }
+  },
+  "explanations": {
+    "COMPARE_PLANS": "Selected plan Flush downstream J4 changes modeled contaminant consumption by 14723.174527437892 mg, with 0.0 pressure-violation minutes and 100.0% service availability.",
+    "WHAT_CHANGED": "The candidate set changed from 4 to 1. J1 was removed: inconsistent with active sample. J3 was removed: inconsistent with active sample. J4 was removed: inconsistent with active sample.",
+    "WHY_PLAN_REJECTED": "Plan Close sole reservoir feeder was rejected by exact simulation: PRESSURE_BELOW_MINIMUM.",
+    "WHY_SAMPLE": "Sample J2 because its expected information gain is 1.0 bits."
+  },
+  "fixture_manifest": {
+    "artifacts": {
+      "golden_network.inp": {
+        "bytes": 4576,
+        "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
+      },
+      "golden_scenario.json": {
+        "bytes": 490,
+        "sha256": "1780c4f4161395015aba4a28696fd94ed8fe71831b3b6806748a9aaa4017b4d0"
+      }
+    },
+    "generator": "hydroswarm.evaluation.golden.freeze_golden_inputs",
+    "schema_version": "hydroswarm-golden-v1"
+  },
+  "localization": {
+    "candidate_contraction": 3,
+    "information_gain_by_node_bits": {
+      "J1": 0.8112781244591329,
+      "J2": 1.0,
+      "J3": 0.8112781244591329,
+      "J4": 1.0
+    },
+    "initial_credible_region": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ],
+    "initial_entropy_bits": 2.0,
+    "initial_probabilities": {
+      "J1": 0.25,
+      "J2": 0.25,
+      "J3": 0.25,
+      "J4": 0.25
+    },
+    "posterior_credible_region": [
+      "J2"
+    ],
+    "posterior_entropy_bits": 0.052769077118077164,
+    "posterior_probabilities": {
+      "J1": 0.0059801813911791474,
+      "J2": 0.9940198136146235,
+      "J3": 2.4970986279891085e-09,
+      "J4": 2.4970986279891085e-09
+    },
+    "sample_node": "J2",
+    "sample_observed_mg_l": 125.86401338755819
+  },
+  "network": {
+    "links": 7,
+    "nodes": 6
+  },
+  "operational_summary": "Source: J2 (99.4%). Candidate region: J2. Next sample: J2. Plan: Flush downstream J4. Exposure reduction: 14723.174527437892 mg. Pressure violations: 0.0 min. Service: 100.0%. OPERATOR APPROVAL PENDING. Research decision support only; follow utility procedures.",
+  "plans": {
+    "generated_count": 3,
+    "no_response": {
+      "plan": {
+        "actions": [
+          {
+            "action_type": "END_PLAN",
+            "duration_minutes": 0,
+            "flow_rate_lps": null,
+            "start_minute": 0,
+            "target_id": null
+          }
+        ],
+        "created_at": "2026-08-03T00:00:00Z",
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "model_version": "golden-deterministic-v1",
+        "name": "No response",
+        "plan_id": "b7938d68-16f2-52de-a2f1-dab1e0436cff",
+        "requires_operator_approval": true
+      },
+      "verification": {
+        "abstention_reason": null,
+        "consequences": {
+          "containment_time_minutes": null,
+          "contaminant_mass_consumed_mg": 0.0,
+          "contaminated_pipe_extent_m": 0.0,
+          "minimum_pressure_m": 10.923048106041392,
+          "operation_count": 0,
+          "population_impacted": 0.0,
+          "pressure_violation_minutes": 0.0,
+          "service_availability": 1.0,
+          "unserved_demand_l": 0.0,
+          "volume_above_threshold_l": 0.0
+        },
+        "decision": "VERIFIED",
+        "plan_id": "b7938d68-16f2-52de-a2f1-dab1e0436cff",
+        "rejection_codes": [],
+        "simulator": "WNTRSimulator",
+        "simulator_version": "1.5.0",
+        "state_hash": "960f3da1b59c72152602f3159df20fae30960fb71dda671b3f6bd485d3a1ee34",
+        "verified_at": "2026-08-03T00:00:00Z"
+      }
+    },
+    "safe": {
+      "plan": {
+        "actions": [
+          {
+            "action_type": "FLUSH_NODE",
+            "duration_minutes": 45,
+            "flow_rate_lps": 3.0,
+            "start_minute": 0,
+            "target_id": "J4"
+          }
+        ],
+        "created_at": "2026-08-03T00:00:00Z",
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "model_version": "golden-deterministic-v1",
+        "name": "Flush downstream J4",
+        "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+        "requires_operator_approval": true
+      },
+      "verification": {
+        "abstention_reason": null,
+        "consequences": {
+          "containment_time_minutes": null,
+          "contaminant_mass_consumed_mg": 0.0,
+          "contaminated_pipe_extent_m": 0.0,
+          "minimum_pressure_m": 10.716441643190947,
+          "operation_count": 1,
+          "population_impacted": 0.0,
+          "pressure_violation_minutes": 0.0,
+          "service_availability": 1.0,
+          "unserved_demand_l": 1.1342177197448677e-07,
+          "volume_above_threshold_l": 0.0
+        },
+        "decision": "VERIFIED",
+        "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+        "rejection_codes": [],
+        "simulator": "WNTRSimulator",
+        "simulator_version": "1.5.0",
+        "state_hash": "5a7fc814e066408c9f02c6bf125fc0b77089b7ba2fe0ae649adb923a91f45181",
+        "verified_at": "2026-08-03T00:00:00Z"
+      }
+    },
+    "unsafe": {
+      "plan": {
+        "actions": [
+          {
+            "action_type": "CLOSE_PIPE",
+            "duration_minutes": 60,
+            "flow_rate_lps": null,
+            "start_minute": 0,
+            "target_id": "P_R1_J1"
+          }
+        ],
+        "created_at": "2026-08-03T00:00:00Z",
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "model_version": "golden-deterministic-v1",
+        "name": "Close sole reservoir feeder",
+        "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+        "requires_operator_approval": true
+      },
+      "verification": {
+        "abstention_reason": null,
+        "consequences": {
+          "containment_time_minutes": null,
+          "contaminant_mass_consumed_mg": 0.0,
+          "contaminated_pipe_extent_m": 0.0,
+          "minimum_pressure_m": 1.8282292377330691,
+          "operation_count": 1,
+          "population_impacted": 0.0,
+          "pressure_violation_minutes": 60.0,
+          "service_availability": 0.9529094653337101,
+          "unserved_demand_l": 15617.5758238703,
+          "volume_above_threshold_l": 0.0
+        },
+        "decision": "REJECTED",
+        "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+        "rejection_codes": [
+          "PRESSURE_BELOW_MINIMUM"
+        ],
+        "simulator": "WNTRSimulator",
+        "simulator_version": "1.5.0",
+        "state_hash": "cb8f98761c87e06e90b58e984e3b62b48b740d68fc9a9187ba6d647aed2fa5c3",
+        "verified_at": "2026-08-03T00:00:00Z"
+      }
+    }
+  },
+  "result_sha256": "92968abc79e3fb06d346404db45ee9cbc396ac056a220e6f4c18acf806925736",
+  "runtime": {
+    "cache_enabled": true,
+    "elapsed_seconds": 0.1671508001163602,
+    "exact_simulation_runs": 0
+  },
+  "schema_version": "hydroswarm-golden-v1",
+  "seed": 2026,
+  "source": {
+    "profile": {
+      "duration_minutes": 60,
+      "start_minute": 0,
+      "strength_mg_min": 10.0
+    },
+    "true": "J2"
+  },
+  "workflow": {
+    "approval_pause_state": "HUMAN_APPROVAL",
+    "completed_replay_state": "COMPLETE",
+    "completed_state": "COMPLETE",
+    "event_count": 21,
+    "events": [
+      {
+        "event_hash": "3980b2895da89e0cbe97e540657bf66ca5b445f299fcfd339617a1f8f4887eb5",
+        "event_type": "network_loaded",
+        "from_state": "IDLE",
+        "payload": {
+          "node_count": 6
+        },
+        "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "sequence": 0,
+        "to_state": "NETWORK_LOADED"
+      },
+      {
+        "event_hash": "f4991255ba946587e4b8a630aaa3a73c96d15d581571e4137b2fa0648b0c7e1a",
+        "event_type": "network_validated",
+        "from_state": "NETWORK_LOADED",
+        "payload": {},
+        "previous_hash": "3980b2895da89e0cbe97e540657bf66ca5b445f299fcfd339617a1f8f4887eb5",
+        "sequence": 1,
+        "to_state": "NETWORK_VALIDATED"
+      },
+      {
+        "event_hash": "d8917d089af85176f8ae7aaf83230f5332c805110491d5ffed3755683a7a4cec",
+        "event_type": "incident_loaded",
+        "from_state": "NETWORK_VALIDATED",
+        "payload": {},
+        "previous_hash": "f4991255ba946587e4b8a630aaa3a73c96d15d581571e4137b2fa0648b0c7e1a",
+        "sequence": 2,
+        "to_state": "INCIDENT_LOADED"
+      },
+      {
+        "event_hash": "05e49f992579ef29ed4a81112bf537542bef2e05bc242e294e9c9ff723042872",
+        "event_type": "data_quality_check",
+        "from_state": "INCIDENT_LOADED",
+        "payload": {},
+        "previous_hash": "d8917d089af85176f8ae7aaf83230f5332c805110491d5ffed3755683a7a4cec",
+        "sequence": 3,
+        "to_state": "DATA_QUALITY_CHECK"
+      },
+      {
+        "event_hash": "7a9766e1d0a8a1fc0f8b37ed0fa872149f6c84586b8a185a98b9234e33208d72",
+        "event_type": "data_quality_accepted",
+        "from_state": "DATA_QUALITY_CHECK",
+        "payload": {
+          "usable_observations": 1
+        },
+        "previous_hash": "05e49f992579ef29ed4a81112bf537542bef2e05bc242e294e9c9ff723042872",
+        "sequence": 4,
+        "to_state": "HYDRAULIC_STATE_ESTIMATION"
+      },
+      {
+        "event_hash": "65b421eca11b35917d77292d55f9f48d59a1f42d92e4080bb94e35b7d478a79a",
+        "event_type": "hydraulic_state_estimated",
+        "from_state": "HYDRAULIC_STATE_ESTIMATION",
+        "payload": {},
+        "previous_hash": "7a9766e1d0a8a1fc0f8b37ed0fa872149f6c84586b8a185a98b9234e33208d72",
+        "sequence": 5,
+        "to_state": "SOURCE_LOCALIZATION"
+      },
+      {
+        "event_hash": "ec0cc4ac6a2c9258c854b88458c48acc592b5aefd4eee5cb0850f0f49ac891e5",
+        "event_type": "source_localized",
+        "from_state": "SOURCE_LOCALIZATION",
+        "payload": {
+          "candidate_region": [
+            "J1",
+            "J2",
+            "J3",
+            "J4"
+          ],
+          "evidence_sufficient": false,
+          "ood_level": "NORMAL",
+          "probabilities": {
+            "J1": 0.25,
+            "J2": 0.25,
+            "J3": 0.25,
+            "J4": 0.25
+          }
+        },
+        "previous_hash": "65b421eca11b35917d77292d55f9f48d59a1f42d92e4080bb94e35b7d478a79a",
+        "sequence": 6,
+        "to_state": "EVIDENCE_CHECK"
+      },
+      {
+        "event_hash": "d49561803f38534a2e2efb0ada8306845d8cdee750b187dcc44cfe37883551e2",
+        "event_type": "more_evidence_required",
+        "from_state": "EVIDENCE_CHECK",
+        "payload": {},
+        "previous_hash": "ec0cc4ac6a2c9258c854b88458c48acc592b5aefd4eee5cb0850f0f49ac891e5",
+        "sequence": 7,
+        "to_state": "SAMPLE_SELECTION"
+      },
+      {
+        "event_hash": "b5ed1999dc3e2b253eedac469203aab15b6cbda7300e4770e452cde0b2a76dac",
+        "event_type": "sample_recommended",
+        "from_state": "SAMPLE_SELECTION",
+        "payload": {
+          "alternatives": [
+            "J1",
+            "J3"
+          ],
+          "expected_information_gain": 1.0,
+          "node_id": "J2"
+        },
+        "previous_hash": "d49561803f38534a2e2efb0ada8306845d8cdee750b187dcc44cfe37883551e2",
+        "sequence": 8,
+        "to_state": "SAMPLE_SELECTION"
+      },
+      {
+        "event_hash": "241b955a457c20aa32388f6de018d2d9a7031c5306547aaa63c7cb882345e773",
+        "event_type": "sample_received",
+        "from_state": "SAMPLE_SELECTION",
+        "payload": {
+          "node_id": "J2"
+        },
+        "previous_hash": "b5ed1999dc3e2b253eedac469203aab15b6cbda7300e4770e452cde0b2a76dac",
+        "sequence": 9,
+        "to_state": "SOURCE_UPDATE"
+      },
+      {
+        "event_hash": "33a802a1600be27ca35626982958af7fccda7ec4d790b49f63a350ab05b1235a",
+        "event_type": "source_update_ready",
+        "from_state": "SOURCE_UPDATE",
+        "payload": {},
+        "previous_hash": "241b955a457c20aa32388f6de018d2d9a7031c5306547aaa63c7cb882345e773",
+        "sequence": 10,
+        "to_state": "SOURCE_LOCALIZATION"
+      },
+      {
+        "event_hash": "e5e2add2a8ac4d28f7a9b93487364eb8ab3591fb8a82ee788d2853ff47c09dfe",
+        "event_type": "source_localized",
+        "from_state": "SOURCE_LOCALIZATION",
+        "payload": {
+          "candidate_region": [
+            "J2"
+          ],
+          "evidence_sufficient": true,
+          "ood_level": "NORMAL",
+          "probabilities": {
+            "J1": 0.0059801813911791474,
+            "J2": 0.9940198136146235,
+            "J3": 2.4970986279891085e-09,
+            "J4": 2.4970986279891085e-09
+          }
+        },
+        "previous_hash": "33a802a1600be27ca35626982958af7fccda7ec4d790b49f63a350ab05b1235a",
+        "sequence": 11,
+        "to_state": "EVIDENCE_CHECK"
+      },
+      {
+        "event_hash": "ed7196678ef8f3454b4b824fc08ab2ba99c2d25adf522f076c549a76faf5af98",
+        "event_type": "evidence_sufficient",
+        "from_state": "EVIDENCE_CHECK",
+        "payload": {},
+        "previous_hash": "e5e2add2a8ac4d28f7a9b93487364eb8ab3591fb8a82ee788d2853ff47c09dfe",
+        "sequence": 12,
+        "to_state": "PLAN_GENERATION"
+      },
+      {
+        "event_hash": "b49bebd42988c4ce81e92edb00c0656e1ccf22d1baa7158b0a9bebf495a209f7",
+        "event_type": "plans_generated",
+        "from_state": "PLAN_GENERATION",
+        "payload": {
+          "count": 2,
+          "plans": [
+            {
+              "actions": [
+                {
+                  "target": "P_R1_J1",
+                  "type": "CLOSE_PIPE"
+                }
+              ],
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142"
+            },
+            {
+              "actions": [
+                {
+                  "target": "J4",
+                  "type": "FLUSH_NODE"
+                }
+              ],
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd"
+            }
+          ]
+        },
+        "previous_hash": "ed7196678ef8f3454b4b824fc08ab2ba99c2d25adf522f076c549a76faf5af98",
+        "sequence": 13,
+        "to_state": "CONSTRAINT_CHECK"
+      },
+      {
+        "event_hash": "f9e5bb4d3d6c17ea7376fdb4c6dd51f5c39b4853c96d30e01bd6215f33e6c19f",
+        "event_type": "constraint_check_passed",
+        "from_state": "CONSTRAINT_CHECK",
+        "payload": {},
+        "previous_hash": "b49bebd42988c4ce81e92edb00c0656e1ccf22d1baa7158b0a9bebf495a209f7",
+        "sequence": 14,
+        "to_state": "WNTR_VERIFY"
+      },
+      {
+        "event_hash": "3cb5b39269845894d5336233a30f09ba7ff8699eaa25a1aea207c131fe255287",
+        "event_type": "plan_verified",
+        "from_state": "WNTR_VERIFY",
+        "payload": {
+          "decision": "REJECTED",
+          "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+          "rejection_codes": [
+            "PRESSURE_BELOW_MINIMUM"
+          ],
+          "state_hash": "cb8f98761c87e06e90b58e984e3b62b48b740d68fc9a9187ba6d647aed2fa5c3"
+        },
+        "previous_hash": "f9e5bb4d3d6c17ea7376fdb4c6dd51f5c39b4853c96d30e01bd6215f33e6c19f",
+        "sequence": 15,
+        "to_state": "WNTR_VERIFY"
+      },
+      {
+        "event_hash": "5e7b9df2865ad55702a62d780b44ffbda6e8e3ab079d641d68757487fb5aee2c",
+        "event_type": "plan_verified",
+        "from_state": "WNTR_VERIFY",
+        "payload": {
+          "decision": "VERIFIED",
+          "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+          "rejection_codes": [],
+          "state_hash": "5a7fc814e066408c9f02c6bf125fc0b77089b7ba2fe0ae649adb923a91f45181"
+        },
+        "previous_hash": "3cb5b39269845894d5336233a30f09ba7ff8699eaa25a1aea207c131fe255287",
+        "sequence": 16,
+        "to_state": "WNTR_VERIFY"
+      },
+      {
+        "event_hash": "8191289f6f16b5d34b95c4337aab6808f48e5e4c07a41955c99c02a2c689da69",
+        "event_type": "verified_plans_available",
+        "from_state": "WNTR_VERIFY",
+        "payload": {},
+        "previous_hash": "5e7b9df2865ad55702a62d780b44ffbda6e8e3ab079d641d68757487fb5aee2c",
+        "sequence": 17,
+        "to_state": "PLAN_COMPARISON"
+      },
+      {
+        "event_hash": "3868243fcda3012acc627d3ece76f37e582fe5e9ca382539438c13709a4a4d2f",
+        "event_type": "plan_selected",
+        "from_state": "PLAN_COMPARISON",
+        "payload": {
+          "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd"
+        },
+        "previous_hash": "8191289f6f16b5d34b95c4337aab6808f48e5e4c07a41955c99c02a2c689da69",
+        "sequence": 18,
+        "to_state": "HUMAN_APPROVAL"
+      },
+      {
+        "event_hash": "506c528616812c31d1b17fa110d5ce8de8a4ecd2a5b5d21000db7d86bade7bc1",
+        "event_type": "human_approved",
+        "from_state": "HUMAN_APPROVAL",
+        "payload": {
+          "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd"
+        },
+        "previous_hash": "3868243fcda3012acc627d3ece76f37e582fe5e9ca382539438c13709a4a4d2f",
+        "sequence": 19,
+        "to_state": "SIMULATE_RESPONSE"
+      },
+      {
+        "event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
+        "event_type": "response_simulated",
+        "from_state": "SIMULATE_RESPONSE",
+        "payload": {},
+        "previous_hash": "506c528616812c31d1b17fa110d5ce8de8a4ecd2a5b5d21000db7d86bade7bc1",
+        "sequence": 20,
+        "to_state": "COMPLETE"
+      }
+    ],
+    "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
+    "pause_replay_state": "HUMAN_APPROVAL",
+    "sampling_pause_state": "SAMPLE_SELECTION",
+    "selected_plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd"
+  }
+}

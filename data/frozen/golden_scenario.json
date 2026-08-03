@@ -1,0 +1,21 @@
+{
+  "candidate_sources": [
+    "J1",
+    "J2",
+    "J3",
+    "J4"
+  ],
+  "contamination_threshold_mg_l": 0.001,
+  "energy_price_per_kwh": 0.12,
+  "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+  "initial_sensor": "R1",
+  "network_id": "golden-network-v1",
+  "sample_time_seconds": 3600,
+  "schema_version": "hydroswarm-golden-v1",
+  "source_profile": {
+    "duration_minutes": 60,
+    "start_minute": 0,
+    "strength_mg_min": 10.0
+  },
+  "true_source": "J2"
+}
