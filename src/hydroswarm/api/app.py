@@ -3,17 +3,21 @@
 from __future__ import annotations
 
 import hashlib
+from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
+import networkx as nx
+
+from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from hydroswarm import __version__
 from hydroswarm.domain import (
     ActionType,
+    CandidateSet,
     IncidentCreate,
     IncidentState,
     OperationalAction,
@@ -22,12 +26,23 @@ from hydroswarm.domain import (
     PlanVerification,
     SensorObservation,
 )
+from hydroswarm.explanation import (
+    EvidenceBundle,
+    ExplanationIntent,
+    deterministic_operational_summary,
+    explain,
+)
+from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController
+from hydroswarm.inference import IncidentAnalysisResult
+from hydroswarm.preprocessing import SensorSeries
 from hydroswarm.storage import AuditEvent
 from hydroswarm.networks import MAX_INP_BYTES, NetworkImportError, NetworkImporter
 from hydroswarm.simulation import HydraulicSimulator, PlanVerifier
 from hydroswarm.simulation.wrapper import wntr
 
 from .state import (
+    AnalysisResponse,
+    ApiSettings,
     ApprovalReceipt,
     ApprovalRequest,
     IncidentExport,
@@ -40,7 +55,7 @@ from .state import (
     SampleRecommendation,
     ServiceStatus,
     Verifier,
-    deterministic_candidates,
+    demo_candidates,
     utc_now,
 )
 
@@ -51,10 +66,15 @@ def create_app(
     ledger_path: str | Path | None = None,
     database_path: str | Path | None = None,
     network_directory: str | Path | None = None,
+    pipeline_factory: object | None = None,
+    swarm_factory: object | None = None,
+    settings: ApiSettings | None = None,
     max_request_bytes: int = MAX_INP_BYTES + 256 * 1024,
 ) -> FastAPI:
     """Create a fully local app; deployment must bind it to ``127.0.0.1``."""
 
+    settings = settings or ApiSettings(maximum_request_bytes=max_request_bytes)
+    max_request_bytes = settings.maximum_request_bytes
     app = FastAPI(
         title="HydroSwarm API",
         version=__version__,
@@ -65,6 +85,8 @@ def create_app(
         ledger_path=ledger_path,
         database_path=database_path,
         network_directory=network_directory,
+        pipeline_factory=pipeline_factory,
+        swarm_factory=swarm_factory,
     )
     app.state.runtime = runtime_state
     app.state.network_importer = NetworkImporter(
@@ -105,6 +127,146 @@ def create_app(
         except KeyError as error:
             raise HTTPException(status_code=404, detail="plan not found") from error
 
+    def bind_pipeline(record: IncidentRuntime) -> object | None:
+        if record.pipeline is not None:
+            return record.pipeline
+        factory = runtime().pipeline_factory
+        if factory is None:
+            return None
+        if hasattr(factory, "analyze"):
+            record.pipeline = factory
+        else:
+            path = runtime().store.network_path(record.state.network_id)
+            record.pipeline = factory(runtime().networks[record.state.network_id], path)
+        return record.pipeline
+
+    def sensor_series(record: IncidentRuntime) -> tuple[SensorSeries, ...]:
+        grouped: dict[str, list[SensorObservation]] = defaultdict(list)
+        for item in record.state.observations:
+            grouped[item.node_id].append(item)
+        origin = record.create.detected_at
+        result: list[SensorSeries] = []
+        for node_id, items in sorted(grouped.items()):
+            items.sort(key=lambda item: item.observed_at)
+            result.append(SensorSeries(
+                node_id=node_id,
+                timestamps_seconds=tuple((item.observed_at - origin).total_seconds() for item in items),
+                concentration_mg_l=tuple(item.concentration_mg_l for item in items),
+                pressure_m=tuple(item.pressure_m for item in items),
+                health=tuple(item.quality for item in items),
+                missing=tuple(item.missing for item in items),
+                drift=tuple(item.drift_flag for item in items),
+                delayed=tuple(item.received_at > item.observed_at for item in items),
+            ))
+        return tuple(result)
+
+    def analysis_response(record: IncidentRuntime) -> AnalysisResponse:
+        item = record.analysis
+        if isinstance(item, IncidentAnalysisResult):
+            return AnalysisResponse(
+                incident_id=record.state.incident_id,
+                runtime_mode=item.runtime_mode.value,
+                fallback_reasons=record.fallback_reasons,
+                node_alignment=item.node_alignment,
+                classical_belief=dict(item.classical_belief),
+                neural_belief=dict(item.neural_belief) if item.neural_belief else None,
+                fused_belief=dict(item.fused_belief),
+                candidate_nodes=item.conformal_candidate_nodes,
+                calibrated=item.calibrated,
+                ood_level=item.ood_level.value,
+                disagreement_js=item.fusion_diagnostics.disagreement_js if item.fusion_diagnostics else None,
+                evidence_sufficient=item.evidence_sufficient,
+                planning_allowed=item.planning_allowed,
+                control_action=item.control_action.value,
+                recommended_sample=item.sample_result.recommended_node if item.sample_result else None,
+                posterior_history=tuple({
+                    "round_index": snap.round_index,
+                    "observation_count": snap.observation_count,
+                    "candidate_nodes": snap.candidate_nodes,
+                    "entropy_bits": snap.entropy_bits,
+                    "evidence_hash": snap.evidence_hash,
+                } for snap in item.posterior_history),
+                provenance_hashes=dict(item.provenance_hashes),
+                latencies_ms=dict(item.latencies_ms),
+            )
+        if isinstance(item, dict):
+            return AnalysisResponse.model_validate(item)
+        raise HTTPException(status_code=409, detail="incident has not been analyzed")
+
+    def perform_analysis(record: IncidentRuntime) -> AnalysisResponse:
+        record.progress = {"state": "RUNNING", "progress": 0.1, "message": "hybrid analysis"}
+        pipeline = bind_pipeline(record)
+        if pipeline is not None:
+            series = sensor_series(record)
+            previous = record.analysis if isinstance(record.analysis, IncidentAnalysisResult) else None
+            network = pipeline.simulator.network
+            if previous is None:
+                analysis = pipeline.analyze(
+                    record.state.incident_id, network, series,
+                    sample_budget_remaining=record.create.maximum_samples - record.state.sample_count,
+                )
+            else:
+                analysis = pipeline.reanalyze_after_sample(
+                    previous, network, series,
+                    sample_budget_remaining=record.create.maximum_samples - record.state.sample_count,
+                )
+            record.analysis = analysis
+            record.runtime_mode = analysis.runtime_mode.value
+            reasons = list(analysis.planning_suppression_reasons)
+            if analysis.neural_failure:
+                reasons.append(f"NEURAL_FAILURE:{analysis.neural_failure}")
+            record.fallback_reasons = tuple(dict.fromkeys(reasons))
+            candidates = analysis.conformal_candidate_nodes or tuple(
+                node for node, _ in sorted(analysis.fused_belief.items(), key=lambda pair: -pair[1])[:3]
+            )
+            record.state = record.state.model_copy(update={
+                "status": "PLANNING" if analysis.planning_allowed else "SAMPLING",
+                "candidates": CandidateSet(
+                    node_probabilities=dict(analysis.fused_belief), node_ids=candidates,
+                    calibrated=analysis.calibrated,
+                ),
+                "disagreement_js": analysis.fusion_diagnostics.disagreement_js if analysis.fusion_diagnostics else None,
+                "ood_level": analysis.ood_level,
+            })
+        else:
+            if not settings.demo_fallback_enabled:
+                raise HTTPException(status_code=503, detail="hybrid pipeline artifacts unavailable")
+            candidates = demo_candidates(record.state.observations)
+            record.runtime_mode = "DEMO_FALLBACK"
+            record.fallback_reasons = ("HYBRID_PIPELINE_NOT_CONFIGURED", "UNVERIFIED_DEMO_ANALYSIS")
+            record.state = record.state.model_copy(update={"status": "SAMPLING", "candidates": candidates})
+            record.analysis = {
+                "incident_id": record.state.incident_id,
+                "runtime_mode": record.runtime_mode,
+                "fallback_reasons": record.fallback_reasons,
+                "node_alignment": tuple(candidates.node_probabilities),
+                "classical_belief": candidates.node_probabilities,
+                "neural_belief": None,
+                "fused_belief": candidates.node_probabilities,
+                "candidate_nodes": candidates.node_ids,
+                "calibrated": False,
+                "ood_level": "CAUTION",
+                "disagreement_js": None,
+                "evidence_sufficient": False,
+                "planning_allowed": False,
+                "control_action": "REQUEST_SAMPLE",
+                "recommended_sample": candidates.node_ids[0],
+                "posterior_history": ({"round_index": record.state.sample_count, "observation_count": len(record.state.observations), "candidate_nodes": candidates.node_ids, "entropy_bits": 0.0, "evidence_hash": runtime().state_hash(record.state)},),
+                "provenance_hashes": {"evidence": runtime().state_hash(record.state)},
+                "latencies_ms": {},
+            }
+        record.progress = {"state": "COMPLETE", "progress": 1.0, "message": record.runtime_mode}
+        runtime().append_event(
+            record, event_type="HYBRID_ANALYSIS_COMPLETED", actor="SWARM_CONTROLLER",
+            payload={
+                "runtime_mode": record.runtime_mode,
+                "fallback_reasons": list(record.fallback_reasons),
+                "candidate_nodes": list(record.state.candidates.node_ids),
+            },
+        )
+        runtime().persist(record)
+        return analysis_response(record)
+
     @app.get(
         "/api/health",
         response_model=ServiceStatus,
@@ -124,10 +286,31 @@ def create_app(
         except Exception:
             database_ready = False
         verifier_ready = runtime().verifier is not None or wntr is not None
-        checks = {"database": database_ready, "authoritative_verifier": verifier_ready}
-        mode = "injected-verifier" if runtime().verifier is not None else "authoritative-wntr"
+        pipeline_dependency = runtime().pipeline_factory
+        pipeline_ready = pipeline_dependency is not None and (
+            hasattr(pipeline_dependency, "analyze") or callable(pipeline_dependency)
+        )
+        deferred_pipeline = callable(pipeline_dependency) and not hasattr(
+            pipeline_dependency, "analyze"
+        )
+        checks = {
+            "database": database_ready,
+            "authoritative_verifier": verifier_ready,
+            "hybrid_pipeline": pipeline_ready,
+            "signature_artifact": deferred_pipeline
+            or getattr(pipeline_dependency, "signature_artifact", None) is not None,
+            "calibration_artifact": deferred_pipeline
+            or getattr(pipeline_dependency, "calibration_artifact", None) is not None,
+            "model_or_classical_safe_mode": pipeline_ready,
+            "model_worker": runtime().jobs is not None,
+        }
+        mode = (
+            "hybrid-ready" if pipeline_ready
+            else "injected-verifier" if runtime().verifier is not None
+            else "authoritative-wntr"
+        )
         response = ServiceStatus(
-            status="ready" if all(checks.values()) else "not_ready",
+            status="ready" if database_ready and verifier_ready else "not_ready",
             version=__version__,
             mode=mode,
             checks=checks,
@@ -226,26 +409,42 @@ def create_app(
     def analyze_incident(incident_id: UUID) -> IncidentState:
         record = incident_or_404(incident_id)
         try:
-            candidates = deterministic_candidates(record.state.observations)
+            perform_analysis(record)
         except ValueError as error:
             raise HTTPException(status_code=409, detail=str(error)) from error
-        runtime().append_event(
-            record,
-            event_type="ANALYSIS_STARTED",
-            actor="HYDRO_SENTINEL",
-            payload={"observation_count": len(record.state.observations)},
-        )
-        record.state = record.state.model_copy(
-            update={"status": "SAMPLING", "candidates": candidates}
-        )
-        runtime().append_event(
-            record,
-            event_type="SOURCE_LOCALIZED",
-            actor="HYDRO_SENTINEL",
-            payload={"candidate_nodes": list(candidates.node_ids)},
-        )
-        runtime().persist(record)
         return record.state
+
+    @app.get("/api/incidents/{incident_id}/analysis", response_model=AnalysisResponse)
+    def get_analysis(incident_id: UUID) -> AnalysisResponse:
+        return analysis_response(incident_or_404(incident_id))
+
+    @app.post("/api/incidents/{incident_id}/analyze/jobs")
+    def queue_analysis(incident_id: UUID):
+        record = incident_or_404(incident_id)
+        if runtime().jobs is None:
+            raise HTTPException(status_code=503, detail="worker queue unavailable")
+        def job(progress, cancelled):
+            progress(0.15, "loading network and artifacts")
+            if cancelled.is_set():
+                return {}
+            response = perform_analysis(record)
+            progress(0.95, "persisting analysis")
+            return response.model_dump(mode="json")
+        return runtime().jobs.submit(incident_id, "HYBRID_ANALYSIS", job)
+
+    @app.get("/api/jobs/{job_id}")
+    def get_job(job_id: UUID):
+        item = runtime().jobs.get(job_id) if runtime().jobs else None
+        if item is None:
+            raise HTTPException(status_code=404, detail="job not found")
+        return item
+
+    @app.post("/api/jobs/{job_id}/cancel")
+    def cancel_job(job_id: UUID):
+        item = runtime().jobs.cancel(job_id) if runtime().jobs else None
+        if item is None:
+            raise HTTPException(status_code=404, detail="job not found")
+        return item
 
     @app.post(
         "/api/incidents/{incident_id}/samples/recommend",
@@ -257,12 +456,26 @@ def create_app(
             raise HTTPException(status_code=409, detail="analyze incident first")
         if record.state.sample_count >= record.create.maximum_samples:
             raise HTTPException(status_code=409, detail="sampling budget exhausted")
-        nodes = record.state.candidates.node_ids
-        recommendation = SampleRecommendation(
-            node_id=nodes[0],
-            expected_information_gain=1.0 / len(nodes),
-            alternatives=nodes[1:3],
-        )
+        analysis = record.analysis
+        if isinstance(analysis, IncidentAnalysisResult) and analysis.sample_result:
+            sampled = analysis.sample_result
+            if sampled.stop or sampled.recommended_node is None:
+                raise HTTPException(status_code=409, detail=sampled.stop_reason or "sampling stopped")
+            selected = next(item for item in sampled.ranked if item.node_id == sampled.recommended_node)
+            recommendation = SampleRecommendation(
+                node_id=sampled.recommended_node,
+                expected_information_gain=selected.expected_information_gain_bits,
+                alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
+                runtime_mode=record.runtime_mode,
+                fallback_reasons=record.fallback_reasons,
+            )
+        else:
+            nodes = record.state.candidates.node_ids
+            recommendation = SampleRecommendation(
+                node_id=nodes[0], expected_information_gain=max(record.state.candidates.node_probabilities.values()),
+                alternatives=nodes[1:3], runtime_mode=record.runtime_mode,
+                fallback_reasons=record.fallback_reasons,
+            )
         runtime().append_event(
             record,
             event_type="SAMPLE_RECOMMENDED",
@@ -292,7 +505,10 @@ def create_app(
                 "sample_count": record.state.sample_count + 1,
             }
         )
-        runtime().persist(record)
+        if record.analysis is not None:
+            perform_analysis(record)
+        else:
+            runtime().persist(record)
         return record.state
 
     @app.post(
@@ -305,21 +521,21 @@ def create_app(
         record = incident_or_404(incident_id)
         if record.state.candidates is None:
             raise HTTPException(status_code=409, detail="analyze incident first")
-        target_nodes = record.state.candidates.node_ids
-        plans = [
-            OperationalPlan(
-                incident_id=incident_id,
-                name=f"Monitor candidate {index + 1}",
-                actions=(
-                    OperationalAction(
-                        action_type=ActionType.MONITOR_NODE,
-                        target_id=target_nodes[index % len(target_nodes)],
-                    ),
-                ),
-                model_version="hydroswarm-api-0.1.0",
-            )
-            for index in range(request.count)
-        ]
+        if isinstance(record.analysis, IncidentAnalysisResult):
+            if not record.analysis.planning_allowed:
+                raise HTTPException(
+                    status_code=409,
+                    detail={"reason": "PLANNING_SUPPRESSED", "codes": record.fallback_reasons},
+                )
+            plans = [item.plan for item in record.analysis.plan_proposals[: request.count]]
+        else:
+            # Explicit demo plans are structured but remain unverified until an authority is injected.
+            target_nodes = record.state.candidates.node_ids
+            plans = [OperationalPlan(
+                incident_id=incident_id, name=f"candidate {index + 1} demo fallback",
+                actions=(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id=target_nodes[index % len(target_nodes)]),),
+                model_version="DEMO_FALLBACK_UNVERIFIED",
+            ) for index in range(request.count)]
         record.plans.update({plan.plan_id: plan for plan in plans})
         record.state = record.state.model_copy(
             update={"status": "PLANNING", "approval_pending": False}
@@ -328,7 +544,11 @@ def create_app(
             record,
             event_type="PLANS_GENERATED",
             actor="HYDRO_STRATEGIST",
-            payload={"plan_ids": [str(plan.plan_id) for plan in plans]},
+            payload={
+                "plan_ids": [str(plan.plan_id) for plan in plans],
+                "runtime_mode": record.runtime_mode,
+                "fallback_reasons": list(record.fallback_reasons),
+            },
         )
         runtime().persist(record)
         return plans
@@ -349,7 +569,12 @@ def create_app(
                     status_code=503,
                     detail="authoritative WNTR verification is unavailable",
                 )
-            verification = PlanVerifier(HydraulicSimulator(network_path)).verify(plan)
+            verification = PlanVerifier(
+                HydraulicSimulator(
+                    network_path,
+                    exact_simulation_budget=settings.exact_plan_simulation_limit,
+                )
+            ).verify(plan)
         if verification.plan_id != plan_id:
             raise HTTPException(status_code=500, detail="verifier returned the wrong plan_id")
         record.verifications[plan_id] = verification
@@ -368,6 +593,8 @@ def create_app(
                 "plan_id": str(plan_id),
                 "decision": verification.decision.value,
                 "rejection_codes": list(verification.rejection_codes),
+                "runtime_mode": record.runtime_mode,
+                "fallback_reasons": list(record.fallback_reasons),
             },
             simulator_version=verification.simulator_version,
         )
@@ -437,7 +664,176 @@ def create_app(
             plans=tuple(record.plans.values()),
             verifications=tuple(record.verifications.values()),
             events=tuple(runtime().ledger.events(incident_id)),
+            analysis=(analysis_response(record).model_dump(mode="json") if record.analysis else None),
         )
+
+    def evidence_bundle(record: IncidentRuntime) -> EvidenceBundle:
+        analysis = analysis_response(record)
+        leading = max(analysis.fused_belief, key=analysis.fused_belief.get) if analysis.fused_belief else None
+        verification = next(
+            (item for item in record.verifications.values() if item.decision == PlanDecision.VERIFIED),
+            None,
+        )
+        rejected = next(
+            (item for item in record.verifications.values() if item.decision == PlanDecision.REJECTED),
+            None,
+        )
+        consequence = verification.consequences if verification else None
+        before_after = record.analysis.before_after if isinstance(record.analysis, IncidentAnalysisResult) else None
+        return EvidenceBundle(
+            source_node=leading,
+            source_probability=analysis.fused_belief.get(leading) if leading else None,
+            candidate_region=analysis.candidate_nodes,
+            candidate_coverage=sum(analysis.fused_belief.get(node, 0.0) for node in analysis.candidate_nodes),
+            recommended_sample=analysis.recommended_sample,
+            information_gain_bits=(
+                record.analysis.sample_result.ranked[0].expected_information_gain_bits
+                if isinstance(record.analysis, IncidentAnalysisResult) and record.analysis.sample_result and record.analysis.sample_result.ranked
+                else None
+            ),
+            candidates_before=len(before_after.previous_candidates) if before_after else None,
+            candidates_after=len(before_after.current_candidates) if before_after else None,
+            selected_plan=str(verification.plan_id) if verification else None,
+            rejected_plan=str(rejected.plan_id) if rejected else None,
+            rejection_codes=rejected.rejection_codes if rejected else (),
+            exposure_reduction_mg=None,
+            pressure_violation_minutes=consequence.pressure_violation_minutes if consequence else None,
+            service_availability=consequence.service_availability if consequence else None,
+            disagreement_js=analysis.disagreement_js,
+            ood_level=analysis.ood_level,
+            approval_pending=record.state.approval_pending,
+            abstention_reason=", ".join(record.fallback_reasons) or None,
+            supporting_sensors=tuple(item.sensor_id for item in record.state.observations if not item.missing),
+            removed_candidates={node: "new evidence reduced calibrated region" for node in before_after.removed_candidates} if before_after else None,
+        )
+
+    @app.post("/api/incidents/{incident_id}/workflow")
+    def run_swarm_workflow(incident_id: UUID):
+        record = incident_or_404(incident_id)
+        if record.analysis is None:
+            perform_analysis(record)
+        if record.swarm is not None:
+            return record.swarm.run()
+        analysis = analysis_response(record)
+        candidate_region = record.state.candidates.node_ids
+
+        sentinel = HydroSentinel(inference=lambda _state: {
+            "top_candidates": [
+                {"node_id": node, "probability": probability}
+                for node, probability in sorted(analysis.fused_belief.items(), key=lambda pair: -pair[1])
+                if probability > 0
+            ],
+            "candidate_region": candidate_region,
+            "evidence_sufficient": analysis.planning_allowed or record.runtime_mode == "DEMO_FALLBACK",
+            "uncertainty": 1.0 - max(analysis.fused_belief.values()),
+            "ood_level": analysis.ood_level,
+        })
+        scout = HydroScout(inference=lambda _state: {
+            "action": "SAMPLE" if analysis.recommended_sample else "STOP",
+            "node_id": analysis.recommended_sample,
+            "expected_information_gain": 0.01 if analysis.recommended_sample else 0.0,
+            "reason": "hybrid pipeline recommendation",
+        })
+        proposals = (
+            [item.plan for item in record.analysis.plan_proposals]
+            if isinstance(record.analysis, IncidentAnalysisResult)
+            else list(record.plans.values())
+        )
+        if not proposals and record.runtime_mode == "DEMO_FALLBACK":
+            target = candidate_region[0]
+            proposals = [OperationalPlan(
+                incident_id=incident_id,
+                name="candidate 1 demo fallback",
+                actions=(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id=target),),
+                model_version="DEMO_FALLBACK_UNVERIFIED",
+            )]
+        strategist = HydroStrategist(inference=lambda state: {
+            "plans": [{"plan": plan, "estimated_value": 0.5} for plan in proposals],
+            "revision_round": int(state.get("planning_round", 0)),
+        })
+
+        if runtime().verifier is not None:
+            class InjectedVerifier:
+                def prescreen(self, plan):
+                    return ()
+
+                def verify(self, plan):
+                    return runtime().verifier(plan, record.state)
+            authority = InjectedVerifier()
+            graph = nx.MultiDiGraph()
+            graph.add_nodes_from(runtime().networks[record.state.network_id].metadata.get("node_ids", ()))
+            network = graph
+        else:
+            path = runtime().store.network_path(record.state.network_id)
+            if not path or wntr is None:
+                raise HTTPException(status_code=503, detail="authoritative WNTR workflow unavailable")
+            authority = PlanVerifier(
+                HydraulicSimulator(
+                    path,
+                    exact_simulation_budget=settings.exact_plan_simulation_limit,
+                )
+            )
+            network = authority.simulator.network
+        record.swarm = (
+            runtime().swarm_factory(sentinel, scout, strategist, authority)
+            if runtime().swarm_factory
+            else SwarmController(
+                sentinel=sentinel, scout=scout, strategist=strategist, verifier=authority
+            )
+        )
+        record.swarm.start(network, record.state)
+        result = record.swarm.run()
+        if result.selected_plan:
+            record.plans[result.selected_plan.plan_id] = result.selected_plan
+        if result.verification:
+            record.verifications[result.verification.plan_id] = result.verification
+        runtime().append_event(
+            record, event_type="SWARM_WORKFLOW_UPDATED", actor="SWARM_CONTROLLER",
+            payload={"fsm_state": result.state.value, "runtime_mode": analysis.runtime_mode,
+                     "fallback_reasons": list(analysis.fallback_reasons)},
+        )
+        runtime().persist(record)
+        return result
+
+    @app.get("/api/incidents/{incident_id}/summary")
+    def incident_summary(incident_id: UUID) -> dict[str, object]:
+        record = incident_or_404(incident_id)
+        return {
+            "summary": deterministic_operational_summary(evidence_bundle(record)),
+            "runtime_mode": record.runtime_mode,
+            "fallback_reasons": record.fallback_reasons,
+        }
+
+    @app.get("/api/incidents/{incident_id}/explanations/{intent}")
+    def incident_explanation(incident_id: UUID, intent: ExplanationIntent):
+        return explain(intent, evidence_bundle(incident_or_404(incident_id)))
+
+    @app.websocket("/ws/incidents/{incident_id}")
+    async def incident_websocket(websocket: WebSocket, incident_id: UUID) -> None:
+        try:
+            record = runtime().incidents[incident_id]
+        except KeyError:
+            await websocket.close(code=4404)
+            return
+        await websocket.accept()
+        try:
+            await websocket.send_json({
+                "incident_id": str(incident_id),
+                "status": record.state.status,
+                "progress": record.progress,
+                "runtime_mode": record.runtime_mode,
+                "fallback_reasons": record.fallback_reasons,
+            })
+            while True:
+                await websocket.receive_text()
+                await websocket.send_json({"status": record.state.status, "progress": record.progress})
+        except WebSocketDisconnect:
+            return
+
+    @app.on_event("shutdown")
+    def shutdown_worker() -> None:
+        if runtime().jobs:
+            runtime().jobs.close()
 
     return app
 

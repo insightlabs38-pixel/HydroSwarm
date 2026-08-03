@@ -87,22 +87,35 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
     analyzed = client.post(f"/api/incidents/{incident_id}/analyze")
     assert analyzed.status_code == 200
     assert analyzed.json()["candidates"]["node_ids"] == ["J1"]
+    analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
+    assert analysis["runtime_mode"] == "DEMO_FALLBACK"
+    assert analysis["fallback_reasons"] == [
+        "HYBRID_PIPELINE_NOT_CONFIGURED",
+        "UNVERIFIED_DEMO_ANALYSIS",
+    ]
     recommendation = client.post(
         f"/api/incidents/{incident_id}/samples/recommend"
     )
     assert recommendation.json()["node_id"] == "J1"
+    assert recommendation.json()["runtime_mode"] == "DEMO_FALLBACK"
 
     added = client.post(
         f"/api/incidents/{incident_id}/samples",
         json=_observation("S2", "J2"),
     )
     assert added.json()["sample_count"] == 1
+    assert (
+        client.get(f"/api/incidents/{incident_id}/analysis")
+        .json()["posterior_history"][0]["observation_count"]
+        == 2
+    )
 
     plans_response = client.post(
         f"/api/incidents/{incident_id}/plans/generate", json={"count": 2}
     )
     assert plans_response.status_code == 200
     unsafe_plan, safe_plan = plans_response.json()
+    assert unsafe_plan["model_version"] == "DEMO_FALLBACK_UNVERIFIED"
 
     premature = client.post(
         f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/approve",
