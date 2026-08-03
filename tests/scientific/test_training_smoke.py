@@ -1,0 +1,102 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import torch
+
+from hydroswarm.model import HydroCore
+from hydroswarm.training import (
+    CurriculumStage,
+    GovernedScenarioDataset,
+    ScenarioExample,
+    Trainer,
+    TrainingConfig,
+)
+
+
+def _tiny_model() -> HydroCore:
+    return HydroCore(
+        node_feature_dim=3,
+        temporal_feature_dim=2,
+        quality_feature_dim=2,
+        edge_feature_dim=2,
+        d_model=32,
+        nhead=4,
+        dim_feedforward=64,
+        num_layers=1,
+        modality_layers=1,
+        latent_tokens=64,
+        adapter_dims=(32, 32, 32),
+        dropout=0.0,
+    )
+
+
+def _dataset() -> GovernedScenarioDataset:
+    examples = []
+    for index in range(2):
+        generator = torch.Generator().manual_seed(100 + index)
+        examples.append(
+            ScenarioExample(
+                scenario_id=f"smoke-{index}",
+                network_id="Net1",
+                split="train",
+                seed=index,
+                seed_family=f"smoke-family-{index}",
+                stage=CurriculumStage.CLEAN,
+                inputs={
+                    "node_features": torch.randn(3, 3, generator=generator),
+                    "temporal_features": torch.randn(2, 3, 2, generator=generator),
+                    "quality_features": torch.randn(2, 3, 2, generator=generator),
+                    "travel_time": torch.tensor([0.0, 1.0, 2.0]),
+                    "reservoir_reachability": torch.tensor([1.0, 0.5, 0.0]),
+                    "demand_centrality": torch.tensor([0.1, 0.2, 0.3]),
+                    "node_mask": torch.ones(3, dtype=torch.bool),
+                },
+                targets={"source_node": torch.tensor(index)},
+            )
+        )
+    return GovernedScenarioDataset(examples, expected_split="train")
+
+
+def _config(epochs: int) -> TrainingConfig:
+    return TrainingConfig(
+        seed=7,
+        epochs=epochs,
+        batch_size=1,
+        gradient_accumulation_steps=2,
+        learning_rate=1e-3,
+        warmup_steps=0,
+        checkpoint_every_epochs=1,
+        early_stopping_patience=0,
+        maximum_runtime_seconds=60,
+        minimum_free_disk_gb=0,
+        gradnorm_logging=True,
+    )
+
+
+def test_cpu_smoke_training_checkpoint_export_and_resume(tmp_path: Path) -> None:
+    first = Trainer(
+        _tiny_model(),
+        _dataset(),
+        config=_config(1),
+        run_root=tmp_path / "runs",
+        workdir=tmp_path,
+    ).fit()
+    checkpoint = Path(first.final_checkpoint)
+    assert (checkpoint / "model.safetensors").is_file()
+    assert (checkpoint / "optimizer_state.pt").is_file()
+    assert Path(first.export_path).is_file()
+    assert json.loads((Path(first.run_directory) / "status.json").read_text())["state"] == "COMPLETED"
+
+    resumed = Trainer(
+        _tiny_model(),
+        _dataset(),
+        config=_config(2),
+        run_root=tmp_path / "runs",
+        workdir=tmp_path,
+    ).fit(resume_from=checkpoint)
+    assert resumed.epochs_completed == 2
+    assert resumed.global_steps > first.global_steps
+    assert Path(resumed.final_checkpoint, "model.safetensors").is_file()
+
