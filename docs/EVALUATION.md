@@ -1,0 +1,23 @@
+# Evaluation Protocol
+
+Report distributions and failure cases, not only averages.
+
+| Capability | Required measurements |
+|---|---|
+| Localization | top-1, top-3, MRR, conformal coverage, set size, calibration error |
+| Sampling | information gain/sample, candidate reduction, samples to resolution, delay/cost |
+| Plans | validity/rejection rate, exposure, service, min pressure, violation minutes, regret |
+| Reliability | sensor-fault quality, OOD/abstention quality, unsafe non-abstention, recovery |
+| Scale | latency, peak RAM, cache hit rate, disk and runtime by network size |
+
+Baselines are classical-only, neural-only, shared HydroCore, specialist adapters, and hybrid
+fusion. Required ablations include static versus dynamic graphs, fixed versus active
+sampling, verifier removed versus enabled, uncertainty control removed versus enabled, and
+seen versus completely held-out networks. Removing the verifier is evaluation-only; it
+must never be a product runtime option.
+
+The golden end-to-end scenario should begin with a broad candidate set, select an
+informative sample, show contraction, reject an unsafe plan due to a simulated constraint,
+verify an alternative, compare both to no response, explain evidence changes, require
+operator approval, and replay the immutable event sequence with Wi-Fi disabled.
+
