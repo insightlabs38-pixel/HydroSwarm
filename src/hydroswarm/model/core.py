@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import TypedDict
+from typing import Required, TypedDict
 
 import torch
 from torch import Tensor, nn
@@ -21,9 +21,9 @@ from .layers import LatentHydraulicBlock
 
 
 class HydroBatch(TypedDict, total=False):
-    node_features: Tensor
-    temporal_features: Tensor
-    quality_features: Tensor
+    node_features: Required[Tensor]
+    temporal_features: Required[Tensor]
+    quality_features: Required[Tensor]
     travel_time: Tensor
     reservoir_reachability: Tensor
     demand_centrality: Tensor
@@ -352,7 +352,8 @@ class HydroCore(nn.Module):
         )
 
     def parameter_report(self) -> ParameterReport:
-        count = lambda module: sum(parameter.numel() for parameter in module.parameters())
+        def count(module: nn.Module) -> int:
+            return sum(parameter.numel() for parameter in module.parameters())
         encoders = sum(
             count(module)
             for module in (

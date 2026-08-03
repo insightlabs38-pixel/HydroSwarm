@@ -5,7 +5,6 @@ import hashlib
 import pytest
 import torch
 
-from hydroswarm.model import HydroCore
 from hydroswarm.training import (
     AgentTrajectory,
     CurriculumSchedule,

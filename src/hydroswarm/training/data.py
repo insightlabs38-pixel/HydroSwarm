@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import IntEnum
 import hashlib
 import json
-from pathlib import Path
-from typing import Any
 
 import torch
 from torch import Tensor

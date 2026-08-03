@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
-from typing import Hashable, Iterable, Mapping
+from typing import Iterable, Mapping
 
 from .dynamic_graph import DirectedHydraulicGraph, NodeId
 

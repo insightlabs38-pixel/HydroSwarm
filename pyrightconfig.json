@@ -1,0 +1,21 @@
+{
+  "include": ["src"],
+  "exclude": ["frontend", "data", "experiments", "reports"],
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.12",
+  "reportMissingTypeStubs": false,
+  "reportMissingImports": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownArgumentType": false,
+  "reportArgumentType": false,
+  "reportAssignmentType": false,
+  "reportAttributeAccessIssue": false,
+  "reportCallIssue": false,
+  "reportGeneralTypeIssues": false,
+  "reportIndexIssue": false,
+  "reportOperatorIssue": false,
+  "reportOptionalCall": false,
+  "reportOptionalMemberAccess": false,
+  "reportReturnType": false
+}

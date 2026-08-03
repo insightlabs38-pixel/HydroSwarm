@@ -6,7 +6,7 @@ import copy
 import hashlib
 import json
 import platform
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Mapping, Sequence

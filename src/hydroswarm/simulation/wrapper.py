@@ -375,7 +375,6 @@ class HydraulicSimulator:
         graph = nx.MultiDiGraph(timestamp_seconds=state.timestamp_seconds)
         reservoirs = set(model.reservoir_name_list)
         for node_name in model.node_name_list:
-            node = model.get_node(node_name)
             graph.add_node(
                 node_name,
                 pressure_m=state.pressure_m.get(node_name, 0.0),

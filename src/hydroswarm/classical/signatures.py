@@ -7,11 +7,11 @@ import json
 from dataclasses import asdict, dataclass
 from itertools import product
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Protocol, Sequence
+from typing import Any, Mapping, Protocol, Sequence
 
 import networkx as nx
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import ArrayLike
 
 from hydroswarm.classical.prior import BayesianPosterior, SignatureLibrary, bayesian_source_posterior
 

@@ -8,20 +8,37 @@ version = "0.1.0"
 description = "Offline neuro-hydraulic decision support for drinking-water contamination incidents"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 dependencies = [
   "fastapi>=0.115",
   "networkx>=3.4",
   "numpy>=2.0",
+  "pandas>=2.2",
   "pydantic>=2.10",
+  "psutil>=6.1",
+  "python-multipart>=0.0.20",
+  "pyyaml>=6.0",
+  "safetensors>=0.5",
   "torch>=2.5",
+  "typer>=0.15",
   "uvicorn>=0.34",
   "wntr>=1.3",
 ]
 
 [project.optional-dependencies]
 console = ["streamlit>=1.41"]
-dev = ["httpx>=0.28", "pytest>=8.3", "pytest-cov>=6", "ruff>=0.9"]
+dev = [
+  "build>=1.2",
+  "hypothesis>=6.120",
+  "httpx>=0.28",
+  "pip-audit>=2.8",
+  "pre-commit>=4.0",
+  "pyright>=1.1.390",
+  "pytest>=8.3",
+  "pytest-cov>=6",
+  "ruff>=0.9",
+]
 
 [project.scripts]
 hydroswarm = "hydroswarm.cli:main"
@@ -39,4 +56,13 @@ line-length = 100
 target-version = "py312"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.coverage.run]
+branch = true
+source = ["hydroswarm"]
+
+[tool.coverage.report]
+fail_under = 60
+show_missing = true
+skip_covered = true

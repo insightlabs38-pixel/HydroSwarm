@@ -18,7 +18,11 @@ def test_self_test_validates_dependencies_network_sqlite_and_model() -> None:
     assert report["network"] == {"nodes": 6, "links": 7, "reservoirs": 1, "tanks": 1}
     assert report["sqlite"] == "ok"
     assert report["model_parameters"] > 0
-    assert report["inference_run"] is False
+    assert report["inference_run"] is True
+    assert report["simulation_run"] is True
+    assert len(report["inference_sha256"]) == 64
+    assert len(report["simulation_sha256"]) == 64
+    assert report["offline_ready"] is True
 
 
 def test_main_self_test_prints_machine_readable_result(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
@@ -47,4 +51,3 @@ def test_start_uses_localhost_and_default_port(monkeypatch: pytest.MonkeyPatch, 
 def test_start_rejects_invalid_port_without_launching(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(cli.subprocess, "run", lambda *_args, **_kwargs: pytest.fail("must not launch"))
     assert cli.main(["start", "--port", "0"]) == 2
-

@@ -1,0 +1,62 @@
+name: HydroSwarm CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-quality:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install locked environment
+        run: uv sync --all-extras --dev
+      - name: Package build and editable installation
+        run: uv build
+      - name: Compile
+        run: uv run python -m compileall -q src
+      - name: Lint
+        run: uv run ruff check src tests
+      - name: Type-check
+        run: uv run pyright
+      - name: Scientific and application tests with coverage
+        run: uv run pytest --cov=hydroswarm --cov-report=term-missing --cov-report=xml
+      - name: Offline self-test
+        run: uv run hydroswarm self-test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.os }}
+          path: coverage.xml
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test -- --run
+      - run: npm run build
+

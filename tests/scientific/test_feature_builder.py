@@ -1,4 +1,3 @@
-import networkx as nx
 
 from hydroswarm.classical.state_estimation import HydraulicStateEstimator, OperationalTelemetry
 from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder, SensorSeries

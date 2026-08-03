@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from hydroswarm.domain import CandidateSet, IncidentCreate, IncidentState, OperationalPlan, PlanVerification
+from hydroswarm.domain import IncidentCreate, IncidentState, OperationalPlan, PlanVerification
 from hydroswarm.storage.database import Database
 from hydroswarm.storage.migrations import migrate
 
