@@ -1,0 +1,10 @@
+{
+  "cpu_count": 8,
+  "dataset_manifest_hash": "d6fe9f91601a0b1c1abde5025f71419777c2572fa6333b595dd516cd064859b6",
+  "git_commit": "b7746308a7df6beb029715f9f0144a3c365f2675",
+  "platform": "Windows-10-10.0.19045-SP0",
+  "processor": "Intel64 Family 6 Model 126 Stepping 5, GenuineIntel",
+  "python": "3.12.10",
+  "ram_bytes": 12614754304,
+  "started_at": "2026-08-03T21:04:10.225948+00:00"
+}

@@ -29,10 +29,18 @@ def main() -> int:
     parser.add_argument("--training-seconds", type=float, required=True)
     parser.add_argument("--status", choices=("trained", "partial"), required=True)
     args = parser.parse_args()
-    source = args.checkpoint / "model.safetensors"
-    trainer_state = json.loads(
-        (args.checkpoint / "trainer_state.json").read_text(encoding="utf-8")
-    )
+    if args.checkpoint.is_dir():
+        source = args.checkpoint / "model.safetensors"
+        trainer_state = json.loads(
+            (args.checkpoint / "trainer_state.json").read_text(encoding="utf-8")
+        )
+    else:
+        source = args.checkpoint
+        summary = json.loads((source.parent / "summary.json").read_text(encoding="utf-8"))
+        trainer_state = {
+            key: summary[key]
+            for key in ("best_epoch", "best_validation_loss", "epochs_completed", "global_steps")
+        }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(source, args.output)
     with safe_open(args.output, framework="pt", device="cpu") as artifact:

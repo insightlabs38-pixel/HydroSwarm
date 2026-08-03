@@ -1,0 +1,59 @@
+; Independent seven-junction branched-loop topology for transfer evaluation only
+[TITLE]
+HydroSwarm independent branched-loop safety experiment
+
+[JUNCTIONS]
+;ID  Elevation  Demand  Pattern
+ JA   312        70      diurnal
+ JB   318        85      diurnal
+ JC   320        65      diurnal
+ JD   327        60      diurnal
+ JE   330        55      diurnal
+ JF   322        75      diurnal
+ JG   335        45      diurnal
+
+[RESERVOIRS]
+;ID  Head
+ R2   430
+
+[PIPES]
+;ID       Node1 Node2 Length Diameter Roughness MinorLoss Status
+ P_R2_JA   R2    JA    2200   14       120       0         Open
+ P_JA_JB   JA    JB    1800   10       115       0         Open
+ P_JA_JC   JA    JC    2100   12       118       0         Open
+ P_JB_JD   JB    JD    2400   8        110       0         Open
+ P_JC_JE   JC    JE    2600   8        108       0         Open
+ P_JD_JF   JD    JF    1900   8        110       0         Open
+ P_JE_JF   JE    JF    1700   8        110       0         Open
+ P_JC_JG   JC    JG    2300   6        105       0         Open
+
+[PATTERNS]
+diurnal 0.70 0.65 0.60 0.68 0.82 1.05
+diurnal 1.20 1.15 1.05 0.95 0.88 0.80
+diurnal 0.78 0.75 0.72 0.76 0.85 1.00
+diurnal 1.10 1.08 1.00 0.92 0.84 0.76
+
+[TIMES]
+DURATION             04:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+REPORT TIMESTEP      01:00:00
+
+[OPTIONS]
+UNITS                GPM
+HEADLOSS             H-W
+QUALITY              NONE
+ACCURACY             0.001
+
+[COORDINATES]
+R2   0     600
+JA   900   600
+JB   1800  100
+JC   1800  1000
+JD   2900  100
+JE   2900  1000
+JF   3800  550
+JG   2700  1550
+
+[END]

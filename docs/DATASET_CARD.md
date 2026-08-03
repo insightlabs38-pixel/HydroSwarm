@@ -16,10 +16,11 @@ and occupies 23,289,090 bytes before excluding regenerable NPZ/Parquet binaries 
 Canonical tensor manifests use the exact production feature builder and schema hash.
 
 This corpus is not a substitute for utility datasets. Its five named regimes share one
-topology, so the held-out result measures hydraulic-parameter shift rather than topology
-transfer. Future evaluation must add independently structured networks such as C-Town,
-prevent seed-family, source-ID, future-observation, and simulator-label leakage, and
-quarantine nonfinite or nondeterministic scenarios.
+topology, so the primary held-out result measures hydraulic-parameter shift rather than
+topology transfer. A separate committed `branched-loop.inp` graph has seven junctions and
+eight links with different connectivity. Its 70-scenario evaluation is never mixed into
+training, validation, calibration, or the locked primary test split. It is a small safety
+experiment, not a second training topology or utility dataset.
 
 Recommended storage for expanded experiments is NumPy/Zarr for arrays, Parquet for tables,
 JSONL for manifests/events, `.inp` for networks, and safetensors for checkpoints. Do not

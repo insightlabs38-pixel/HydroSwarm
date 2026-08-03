@@ -1,0 +1,182 @@
+{
+  "bootstrap_samples": 2000,
+  "calibration": {
+    "artifact": "reports\\results\\hydrocore-m-calibration.json",
+    "artifact_sha256": "e4249d0a8ffd72293b3b5f4ea0f66e33f5d190bc009aaa2ee8e0ab43e31c63e6",
+    "fit_report": {
+      "coverage": 0.925,
+      "coverage_by_condition": {
+        "ADVERSARIAL": 0.84375,
+        "CLEAN": 1.0,
+        "DEGRADED": 0.96875,
+        "OPERATIONAL": 0.9375,
+        "SHIFT": 0.875
+      },
+      "coverage_by_network": {
+        "high-storage-c": 0.925,
+        "low-head-b": 0.925,
+        "low-storage-d": 0.925,
+        "reference-a": 0.925
+      },
+      "examples": 160,
+      "expected_calibration_error": 0.03615109243851962,
+      "mean_set_size": 0.9375
+    },
+    "fit_split": "calibration",
+    "held_out_report": {
+      "coverage": 0.91,
+      "coverage_by_condition": {
+        "ADVERSARIAL": 0.95,
+        "CLEAN": 0.9,
+        "DEGRADED": 0.85,
+        "OPERATIONAL": 0.875,
+        "SHIFT": 0.975
+      },
+      "coverage_by_network": {
+        "held-out-high-head": 0.91
+      },
+      "examples": 200,
+      "expected_calibration_error": 0.03665272156145079,
+      "mean_set_size": 0.93
+    }
+  },
+  "comparisons": {
+    "classical": {
+      "mean_confidence": 0.6112810969352722,
+      "mean_reciprocal_rank": 0.9516666666666665,
+      "top1": {
+        "ci95_high": 0.95,
+        "ci95_low": 0.875,
+        "estimate": 0.915
+      },
+      "top3_accuracy": 0.99
+    },
+    "hydrocore_m_hybrid": {
+      "mean_confidence": 0.9388616681098938,
+      "mean_reciprocal_rank": 0.9654166666666667,
+      "top1": {
+        "ci95_high": 0.97,
+        "ci95_low": 0.905,
+        "estimate": 0.94
+      },
+      "top3_accuracy": 0.995
+    },
+    "hydrocore_m_neural": {
+      "duration_accuracy": 0.355,
+      "sensor_fault_element_accuracy": 0.9483333333333334,
+      "source_localization": {
+        "mean_confidence": 0.9583719372749329,
+        "mean_reciprocal_rank": 0.9679166666666668,
+        "top1": {
+          "ci95_high": 0.975,
+          "ci95_low": 0.91,
+          "estimate": 0.945
+        },
+        "top3_accuracy": 0.995
+      },
+      "start_time_accuracy": 0.27,
+      "strength_accuracy": 0.455
+    },
+    "hydrocore_s_hybrid": {
+      "mean_confidence": 0.926365077495575,
+      "mean_reciprocal_rank": 0.97625,
+      "top1": {
+        "ci95_high": 0.985,
+        "ci95_low": 0.93,
+        "estimate": 0.96
+      },
+      "top3_accuracy": 0.995
+    },
+    "hydromono_s": {
+      "duration_accuracy": 0.415,
+      "sensor_fault_element_accuracy": 0.9483333333333334,
+      "source_localization": {
+        "mean_confidence": 0.9562242031097412,
+        "mean_reciprocal_rank": 0.96875,
+        "top1": {
+          "ci95_high": 0.975,
+          "ci95_low": 0.914875,
+          "estimate": 0.945
+        },
+        "top3_accuracy": 0.995
+      },
+      "start_time_accuracy": 0.195,
+      "strength_accuracy": 0.325
+    }
+  },
+  "cost_adjusted": {
+    "hydrocore_m": {
+      "top1_per_mean_scenario_ms": 0.039488409885038364,
+      "top1_per_million_parameters": 0.07619824153810464
+    },
+    "hydromono_s": {
+      "top1_per_mean_scenario_ms": 0.107344840653343,
+      "top1_per_million_parameters": 0.23722993756459493
+    }
+  },
+  "hydrocore_s_neural_profile": {
+    "duration_accuracy": 0.425,
+    "sensor_fault_element_accuracy": 0.9483333333333334,
+    "source_localization": {
+      "mean_confidence": 0.9501153826713562,
+      "mean_reciprocal_rank": 0.96875,
+      "top1": {
+        "ci95_high": 0.975,
+        "ci95_low": 0.91,
+        "estimate": 0.945
+      },
+      "top3_accuracy": 0.995
+    },
+    "start_time_accuracy": 0.205,
+    "strength_accuracy": 0.34
+  },
+  "model_sha256": {
+    "hydrocore_m": "b60e96427b826b7780e0635e41ffb3d0b45673324d9e4007369bd51a7eaf9df3",
+    "hydrocore_s": "85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423",
+    "hydromono_s": "f18bc24e6a21370415a5a98367c81d99ba8bcbc1998ab3c61cca8569ca5ddacb"
+  },
+  "parameter_counts": {
+    "hydrocore_m": 12401861,
+    "hydrocore_s": 4040645,
+    "hydromono_s": 3983477
+  },
+  "promotion_gate": {
+    "meaningful_operational_gain": false,
+    "medium_hybrid_top1_change_vs_small": -0.020000000000000018,
+    "medium_profile_macro_change_vs_small": 0.036666666666666736,
+    "recommendation": "do_not_promote"
+  },
+  "schema_version": 1,
+  "test_examples": 200,
+  "test_split_sha256": "9dda76aed10c71d68803b808323fdb640498689b180de655c79b72fe07b67826",
+  "timing": {
+    "hydrocore_m": {
+      "batches": 25.0,
+      "mean_batch_latency_ms": 191.4485800266266,
+      "mean_scenario_latency_ms": 23.931072503328323,
+      "p95_batch_latency_ms": 297.59704023599613,
+      "rss_delta_bytes": -630784.0,
+      "rss_end_bytes": 510947328.0,
+      "rss_start_bytes": 511578112.0
+    },
+    "hydrocore_s": {
+      "batches": 13.0,
+      "mean_batch_latency_ms": 137.49342315042247,
+      "mean_scenario_latency_ms": 8.937072504777461,
+      "p95_batch_latency_ms": 149.5810200460255,
+      "rss_delta_bytes": 8962048.0,
+      "rss_end_bytes": 519909376.0,
+      "rss_start_bytes": 510947328.0
+    },
+    "hydromono_s": {
+      "batches": 13.0,
+      "mean_batch_latency_ms": 135.43698467457523,
+      "mean_scenario_latency_ms": 8.80340400384739,
+      "p95_batch_latency_ms": 143.4662802144885,
+      "rss_delta_bytes": 167936.0,
+      "rss_end_bytes": 520077312.0,
+      "rss_start_bytes": 519909376.0
+    }
+  },
+  "training_decisions_used_test": false
+}

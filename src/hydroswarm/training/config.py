@@ -31,6 +31,7 @@ class TrainingConfig:
     deterministic: bool = True
     gradnorm_logging: bool = True
     pcgrad_enabled: bool = False
+    profile_ordinal_weight: float = 0.0
     task_weights: dict[str, float] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -58,8 +59,12 @@ class TrainingConfig:
         ):
             if getattr(self, name) <= 0:
                 raise ValueError(f"{name} must be positive")
-        if self.weight_decay < 0 or self.minimum_free_disk_gb < 0:
-            raise ValueError("weight decay and disk threshold cannot be negative")
+        if (
+            self.weight_decay < 0
+            or self.minimum_free_disk_gb < 0
+            or self.profile_ordinal_weight < 0
+        ):
+            raise ValueError("weight decay, disk threshold, and ordinal weight cannot be negative")
         if self.early_stopping_patience < 0:
             raise ValueError("early_stopping_patience cannot be negative")
         if any(value < 0 for value in self.task_weights.values()):
@@ -80,4 +85,3 @@ class TrainingConfig:
         if unknown:
             raise ValueError(f"unknown training settings: {sorted(unknown)}")
         return cls(**values)
-

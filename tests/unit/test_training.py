@@ -81,6 +81,9 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "plan_value": torch.tensor([[0.2, 0.4]], requires_grad=True),
         "plan_validity_logits": torch.tensor([[[3.0, 0.0], [0.0, 3.0]]], requires_grad=True),
         "ood_logits": torch.tensor([[3.0, 0.0, 0.0]], requires_grad=True),
+        "start_time_logits": torch.zeros(1, 12, requires_grad=True),
+        "duration_logits": torch.zeros(1, 8, requires_grad=True),
+        "relative_strength_logits": torch.zeros(1, 4, requires_grad=True),
         "sensor_fault_logits": torch.zeros(1, 2, requires_grad=True),
         "residual_prediction": torch.zeros(1, 2, requires_grad=True),
         "reconstruction_prediction": torch.ones(1, 2, requires_grad=True),
@@ -91,11 +94,19 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "plan_value": torch.tensor([[0.0, 0.5]]),
         "plan_validity": torch.tensor([[0, 1]]),
         "ood": torch.tensor([0]),
+        "start_time": torch.tensor([3]),
+        "duration": torch.tensor([2]),
+        "relative_strength": torch.tensor([1]),
         "sensor_fault": torch.zeros(1, 2),
         "residual": torch.ones(1, 2),
         "reconstruction": torch.zeros(1, 2),
     }
-    result = compute_multitask_loss(outputs, targets, task_weights={"residual": 2.0})
+    result = compute_multitask_loss(
+        outputs,
+        targets,
+        task_weights={"residual": 2.0},
+        profile_ordinal_weight=0.4,
+    )
     assert set(result.tasks) == set(targets)
     assert torch.isfinite(result.total)
     result.total.backward()
@@ -107,4 +118,5 @@ def test_training_config_is_strict_cpu_fp32() -> None:
         TrainingConfig(device="cuda")
     with pytest.raises(ValueError, match="FP32"):
         TrainingConfig(fp32=False)
-
+    with pytest.raises(ValueError, match="ordinal"):
+        TrainingConfig(profile_ordinal_weight=-0.1)

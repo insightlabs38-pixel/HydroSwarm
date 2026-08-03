@@ -100,3 +100,33 @@ def test_cpu_smoke_training_checkpoint_export_and_resume(tmp_path: Path) -> None
     assert resumed.global_steps > first.global_steps
     assert Path(resumed.final_checkpoint, "model.safetensors").is_file()
 
+
+def test_runtime_budget_exports_best_completed_epoch(tmp_path: Path, monkeypatch) -> None:
+    trainer = Trainer(
+        _tiny_model(),
+        _dataset(),
+        config=_config(2),
+        run_root=tmp_path / "budget-runs",
+        workdir=tmp_path,
+    )
+    original = trainer._train_epoch
+    calls = 0
+
+    def budgeted_epoch(dataset, *, epoch: int, started: float) -> float:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise TimeoutError("maximum training runtime exceeded")
+        return original(dataset, epoch=epoch, started=started)
+
+    monkeypatch.setattr(trainer, "_train_epoch", budgeted_epoch)
+    summary = trainer.fit()
+
+    assert summary.stop_reason == "runtime_budget"
+    assert summary.epochs_completed == 1
+    assert summary.best_epoch == 0
+    assert summary.final_checkpoint == ""
+    assert Path(summary.export_path).is_file()
+    status = json.loads((Path(summary.run_directory) / "status.json").read_text())
+    assert status["state"] == "COMPLETED"
+    assert status["stop_reason"] == "runtime_budget"

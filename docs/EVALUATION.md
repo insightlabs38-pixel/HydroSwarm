@@ -18,12 +18,18 @@ must never be a product runtime option.
 
 ## Executed learned matrix
 
-`reports/results/learning-evaluation-final.json` evaluates 200 withheld hydraulic-regime
-incidents with 2,000-sample bootstrap confidence intervals. Classical-only, HydroCore-S,
-HydroMono-S, hybrid fusion, and partial HydroCore-M share the same scenarios and source
-budget. Hybrid reaches 96.0% top-1 versus 91.5% classical; HydroCore-S and HydroMono-S tie
-at 94.5%. Conformal calibration uses a separate 160-scenario split and reaches 91.0%
-held-out coverage at alpha 0.1. The result does not cover independent-topology transfer.
+`reports/results/medium-evaluation-final.json` performs the locked 200-incident,
+2,000-bootstrap comparison across classical, HydroCore-M neural, HydroCore-M hybrid,
+HydroCore-S hybrid, and HydroMono-S. The original test tensor hash is checked before use.
+No test result enters training or checkpoint selection. M calibration is refit only on the
+160-scenario calibration split. M neural reaches 94.5%, M hybrid 94.0%, S hybrid 96.0%,
+HydroMono-S 94.5%, and classical 91.5%. M therefore remains unpromoted.
+
+`reports/results/topology-transfer-m.json` evaluates 70 new incidents on a genuinely
+different seven-junction branched-loop EPANET graph without neural fine-tuning. Classical,
+M neural, and M hybrid reach 35.7%, 47.1%, and 44.3%. Coverage is 27.1% with mean set size
+0.41. The unseen topology hash forces `CAUTION` and planning suppression; the experiment
+supports the safety boundary rather than a transfer-performance claim.
 
 The golden end-to-end scenario should begin with a broad candidate set, select an
 informative sample, show contraction, reject an unsafe plan due to a simulated constraint,

@@ -54,17 +54,28 @@ unseen-topology or field—evidence.
 | Classical signature baseline | 91.5% | 87.5–95.0% |
 | HydroMono-S | 94.5% | 91.5–97.5% |
 | HydroCore-S neural | 94.5% | 91.0–97.5% |
-| HydroSwarm hybrid | **96.0%** | **93.0–98.5%** |
-| HydroCore-M partial (2 epochs) | 94.0% | 90.5–97.0% |
+| HydroCore-M neural (17 epochs) | 94.5% | 91.0–97.5% |
+| HydroCore-M hybrid | 94.0% | 90.5–97.0% |
+| HydroCore-S hybrid | **96.0%** | **93.0–98.5%** |
 
 The hybrid improves top-1 by 4.5 percentage points over the identical-scenario classical
-baseline. HydroCore-S does not outperform equal-budget HydroMono-S in this run, and M is
-not converged. Held-out conformal coverage is 91.0% at α=0.1 with mean candidate-set size
-0.92 and ECE 0.0269. Start-time (20.5%), duration (42.5%), and strength-bin (34.0%)
-accuracy remain weak and are not used as strong claims. See
+baseline. HydroCore-M trained for 17 complete epochs/1,500 steps under a fixed 2,400-second
+budget. It does not pass promotion: its hybrid result is two points below S and its mean
+scenario latency is 23.93 ms versus 8.94 ms for S. M improves start-time accuracy from
+20.5% to 27.0% and strength-bin accuracy from 34.0% to 45.5%, but duration falls from
+42.5% to 35.5%; these heads remain exploratory. M calibration, fit only on the calibration
+split, reaches 91.0% held-out coverage with mean set size 0.93 and ECE 0.0367. See
 [learning-evaluation-final.json](reports/results/learning-evaluation-final.json), the
+[M comparison](reports/results/medium-evaluation-final.json),
 [dataset report](data/learning-v1/dataset-report.json), and the
-[experiment registry](experiments/learning-v1/registry.json).
+[M experiment registry](experiments/learning-v2/hydrocore_m/registry.json).
+
+A separate 70-scenario experiment uses a genuinely different seven-junction branched-loop
+EPANET graph; no M weights are fitted on it. Classical, M neural, and M hybrid top-1 are
+35.7%, 47.1%, and 44.3%. Conformal coverage drops to 27.1% with mean set size 0.41. The
+unseen topology hash produces `CAUTION` with novelty 1.0 and suppresses planning. This is
+evidence of fail-closed behavior, not topology-transfer capability. See the
+[topology-transfer report](reports/results/topology-transfer-m.json).
 
 The promoted 4.04M-parameter S checkpoint is 16.19 MB, hash-verified, and executes through
 the default API in `FULL_HYBRID` mode with compatible calibration and provenance. The

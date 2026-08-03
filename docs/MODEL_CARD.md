@@ -27,16 +27,19 @@ coefficient based on sensor health, missingness, residuals, hydraulic uncertaint
 entropy, OOD score, and Jensen-Shannon disagreement. Split-conformal candidate sets target
 90% marginal coverage. On 200 held-out hydraulic-shift scenarios, coverage is 91.0%, mean
 set size is 0.92, and ECE is 0.0269.
-High disagreement, OOD evidence, poor sensor health, invalid networks, or failure to find a
-safe plan forces inspection or abstention.
+High disagreement, OOD evidence, poor sensor health, invalid networks, an unseen topology
+hash, or failure to find a safe plan forces inspection or abstention.
 
 ## Limitations
 
-- A trained HydroCore-S checkpoint and equal-budget HydroMono-S checkpoint are bundled;
-  HydroCore-M is a clearly labeled two-epoch partial checkpoint and L is untrained.
-- Held-out evidence uses one topology under a withheld hydraulic regime, not an unseen
-  topology or real utility network.
-- Start-time, duration, and strength-bin heads remain weak (20.5%, 42.5%, and 34.0%).
+- A trained HydroCore-S checkpoint and equal-budget HydroMono-S checkpoint are bundled.
+  HydroCore-M completed 17 epochs under a 2,400-second budget but failed its promotion gate;
+  its candidate weights remain outside the runtime default. L is untrained.
+- The primary held-out evidence uses one topology under a withheld hydraulic regime. A
+  separate seven-junction transfer experiment correctly enters `CAUTION`, but its low
+  accuracy and 27.1% conformal coverage do not establish cross-topology capability.
+- M start-time and strength-bin accuracy improve to 27.0% and 45.5%, while duration falls
+  to 35.5%. All three profile heads remain weak and exploratory.
 - Synthetic performance does not imply utility-network performance.
 - Source strength and mass consequences depend on assumptions about contaminant behavior.
 - Conformal coverage is marginal on the calibration distribution, not a per-incident or
@@ -45,7 +48,8 @@ safe plan forces inspection or abstention.
 
 ## Promotion gate
 
-The 24.5M model should only replace the promoted S or classical fallback if held-out testing
+Any larger model should only replace the promoted S or classical fallback if held-out testing
 shows a meaningful operational gain: at least five percentage points better incident
 resolution, 20% fewer samples at matched localization, 30% fewer invalid plans, improved
-unseen-network robustness/calibration, or lower verified-plan regret.
+unseen-network robustness/calibration, or lower verified-plan regret. M did not meet this
+gate: hybrid top-1 was 94.0% versus 96.0% for S, with 2.7x higher mean inference latency.

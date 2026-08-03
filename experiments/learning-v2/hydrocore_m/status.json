@@ -1,0 +1,6 @@
+{
+  "recovered_from_legacy_timeout": true,
+  "state": "COMPLETED",
+  "stop_reason": "runtime_budget",
+  "updated_at": "2026-08-03T21:45:20.140232+00:00"
+}

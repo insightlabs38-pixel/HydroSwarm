@@ -437,6 +437,7 @@ class HybridInferencePipeline:
             "ood_detection",
             lambda: self.ood_detector.evaluate(
                 node_count=len(node_ids),
+                network_hash=network_hash,
                 state=estimated,
                 sensor_series=sensor_series,
                 latent=latent,

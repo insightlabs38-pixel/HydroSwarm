@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — 2026-08-03
+## 0.2.0 - 2026-08-03
 
 - Added deterministic bounded swarm orchestration and specialist agents.
 - Added secure persistent EPANET imports and authoritative WNTR verification.
@@ -13,7 +13,12 @@
   bootstrap evaluation.
 - Added default trained-asset loading with checksum/schema validation and classical-safe
   fallback; validated the promoted checkpoint through the full hybrid pipeline.
+- Completed a fixed-budget 17-epoch HydroCore-M run with corrected profile label spaces,
+  ordinal-aware objectives, calibration-only refitting, and a locked 2,000-bootstrap test.
+  M did not pass promotion, so HydroCore-S remains the default.
+- Added a genuinely different seven-junction EPANET topology experiment and unseen-hash
+  OOD policy; low transfer coverage correctly produces `CAUTION` and suppresses planning.
 
-## 0.1.0 — 2026-08-03
+## 0.1.0 - 2026-08-03
 
 - Initial HydroSwarm scientific and local-application foundation.

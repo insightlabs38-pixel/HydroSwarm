@@ -1,0 +1,30 @@
+{
+  "batch_size": 4,
+  "checkpoint_every_epochs": 30,
+  "deterministic": true,
+  "device": "cpu",
+  "early_stopping_patience": 6,
+  "epochs": 30,
+  "fp32": true,
+  "gradient_accumulation_steps": 2,
+  "gradient_clip_norm": 1.0,
+  "gradnorm_logging": false,
+  "learning_rate": 0.0002,
+  "maximum_runtime_seconds": 2400,
+  "minimum_delta": 0.001,
+  "minimum_free_disk_gb": 0.25,
+  "num_workers": 0,
+  "pcgrad_enabled": false,
+  "profile_ordinal_weight": 0.4,
+  "scheduler": "cosine",
+  "seed": 31874,
+  "task_weights": {
+    "duration": 0.8,
+    "relative_strength": 0.8,
+    "sensor_fault": 0.4,
+    "source_node": 1.0,
+    "start_time": 1.0
+  },
+  "warmup_steps": 20,
+  "weight_decay": 0.01
+}

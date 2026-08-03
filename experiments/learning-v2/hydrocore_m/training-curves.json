@@ -1,0 +1,223 @@
+[
+  {
+    "batches": 40,
+    "epoch": 0,
+    "final_learning_rate": 0.0002,
+    "mean_task_losses": {
+      "duration": 1.3153889894485473,
+      "relative_strength": 1.2304824084043502,
+      "sensor_fault": 0.16928032534196974,
+      "source_node": 0.5581579066812992,
+      "start_time": 1.6257639780640603
+    },
+    "mean_training_loss": 4.288331234455109
+  },
+  {
+    "batches": 80,
+    "epoch": 1,
+    "final_learning_rate": 0.00019991110182465032,
+    "mean_task_losses": {
+      "duration": 1.1729791648685932,
+      "relative_strength": 1.1723732709884644,
+      "sensor_fault": 0.049177749129012224,
+      "source_node": 0.47446468714624646,
+      "start_time": 1.5611117154359817
+    },
+    "mean_training_loss": 3.9315294861793517
+  },
+  {
+    "batches": 120,
+    "epoch": 2,
+    "final_learning_rate": 0.00019944481853548335,
+    "mean_task_losses": {
+      "duration": 1.141142317155997,
+      "relative_strength": 1.1915111353000005,
+      "sensor_fault": 0.12390001257881522,
+      "source_node": 0.25046103609881054,
+      "start_time": 1.4742738977074623
+    },
+    "mean_training_loss": 3.6404177367687227
+  },
+  {
+    "batches": 160,
+    "epoch": 3,
+    "final_learning_rate": 0.00019820494141215104,
+    "mean_task_losses": {
+      "duration": 1.1626454599201679,
+      "relative_strength": 1.1672299034893512,
+      "sensor_fault": 0.1552127809380181,
+      "source_node": 0.269348169490695,
+      "start_time": 1.4540145121514798
+    },
+    "mean_training_loss": 3.649348098039627
+  },
+  {
+    "batches": 200,
+    "epoch": 4,
+    "final_learning_rate": 0.00019567488620406983,
+    "mean_task_losses": {
+      "duration": 1.1442464193701745,
+      "relative_strength": 1.1568505656719208,
+      "sensor_fault": 0.1669005510210991,
+      "source_node": 0.24611269960005303,
+      "start_time": 1.4235266661643982
+    },
+    "mean_training_loss": 3.5772772109508515
+  },
+  {
+    "batches": 200,
+    "epoch": 5,
+    "final_learning_rate": 0.0001920824925271838,
+    "mean_task_losses": {
+      "duration": 1.1578631597757338,
+      "relative_strength": 1.1383375120162964,
+      "sensor_fault": 0.16646393628790976,
+      "source_node": 0.22458530984004027,
+      "start_time": 1.3492798015475274
+    },
+    "mean_training_loss": 3.4774112582206724
+  },
+  {
+    "batches": 200,
+    "epoch": 6,
+    "final_learning_rate": 0.0001874676489891461,
+    "mean_task_losses": {
+      "duration": 1.158399563729763,
+      "relative_strength": 1.1067121514678002,
+      "sensor_fault": 0.16679094832390548,
+      "source_node": 0.1982222874922445,
+      "start_time": 1.2462750110030174
+    },
+    "mean_training_loss": 3.323303108215332
+  },
+  {
+    "batches": 200,
+    "epoch": 7,
+    "final_learning_rate": 0.00018188159710183594,
+    "mean_task_losses": {
+      "duration": 1.1500571271777154,
+      "relative_strength": 1.1015169310569763,
+      "sensor_fault": 0.16361728213727475,
+      "source_node": 0.17355853768531232,
+      "start_time": 1.175153680741787
+    },
+    "mean_training_loss": 3.215418418645859
+  },
+  {
+    "batches": 200,
+    "epoch": 8,
+    "final_learning_rate": 0.0001753863623146066,
+    "mean_task_losses": {
+      "duration": 1.156917558312416,
+      "relative_strength": 1.0623581670224667,
+      "sensor_fault": 0.17076835142448543,
+      "source_node": 0.16957853192972835,
+      "start_time": 1.102812948524952
+    },
+    "mean_training_loss": 3.1161194574832916
+  },
+  {
+    "batches": 200,
+    "epoch": 9,
+    "final_learning_rate": 0.0001680540653066891,
+    "mean_task_losses": {
+      "duration": 1.1399032425880433,
+      "relative_strength": 1.0467783312499523,
+      "sensor_fault": 0.15917417076416313,
+      "source_node": 0.15214792149054118,
+      "start_time": 1.0740865416824819
+    },
+    "mean_training_loss": 3.0392494213581087
+  },
+  {
+    "batches": 200,
+    "epoch": 10,
+    "final_learning_rate": 0.00015996612118590603,
+    "mean_task_losses": {
+      "duration": 1.137518281340599,
+      "relative_strength": 0.9858103094995022,
+      "sensor_fault": 0.15906179778277874,
+      "source_node": 0.17820957262098092,
+      "start_time": 1.036597954146564
+    },
+    "mean_training_loss": 2.977095145583153
+  },
+  {
+    "batches": 200,
+    "epoch": 11,
+    "final_learning_rate": 0.0001512123354854955,
+    "mean_task_losses": {
+      "duration": 1.1442234912514686,
+      "relative_strength": 0.8972930058836937,
+      "sensor_fault": 0.16210041728802024,
+      "source_node": 0.14631595734816075,
+      "start_time": 1.0329647408798337
+    },
+    "mean_training_loss": 2.877334097623825
+  },
+  {
+    "batches": 200,
+    "epoch": 12,
+    "final_learning_rate": 0.00014188990699676184,
+    "mean_task_losses": {
+      "duration": 1.1317573755979538,
+      "relative_strength": 0.8529231583327055,
+      "sensor_fault": 0.1549934720247984,
+      "source_node": 0.13704365488647455,
+      "start_time": 1.0231161792948842
+    },
+    "mean_training_loss": 2.809901678562164
+  },
+  {
+    "batches": 200,
+    "epoch": 13,
+    "final_learning_rate": 0.00013210234850972964,
+    "mean_task_losses": {
+      "duration": 1.1241957971453667,
+      "relative_strength": 0.8042742243781685,
+      "sensor_fault": 0.1550824541412294,
+      "source_node": 0.13085238540241334,
+      "start_time": 0.9923481012880803
+    },
+    "mean_training_loss": 2.7280095154047013
+  },
+  {
+    "batches": 200,
+    "epoch": 14,
+    "final_learning_rate": 0.0001219583374454963,
+    "mean_task_losses": {
+      "duration": 1.1011796635389328,
+      "relative_strength": 0.8114918872341513,
+      "sensor_fault": 0.15522475132718683,
+      "source_node": 0.1314709758994286,
+      "start_time": 1.0208992350101471
+    },
+    "mean_training_loss": 2.7445973849296568
+  },
+  {
+    "batches": 200,
+    "epoch": 15,
+    "final_learning_rate": 0.00011157050914243614,
+    "mean_task_losses": {
+      "duration": 1.0951082164049148,
+      "relative_strength": 0.7389183150883764,
+      "sensor_fault": 0.15041847409680487,
+      "source_node": 0.1379297498150322,
+      "start_time": 0.9861920253187418
+    },
+    "mean_training_loss": 2.6515104115009307
+  },
+  {
+    "batches": 200,
+    "epoch": 16,
+    "final_learning_rate": 0.00010105420619515798,
+    "mean_task_losses": {
+      "duration": 1.0678506201505662,
+      "relative_strength": 0.7134688779897987,
+      "sensor_fault": 0.1453215183969587,
+      "source_node": 0.11171816706235405,
+      "start_time": 0.9609082287270576
+    },
+    "mean_training_loss": 2.5558106315135958
+  }
+]

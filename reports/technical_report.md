@@ -140,10 +140,12 @@ bounded interruption. A language decoder, when used, is trained against fixed ev
 intents with the operational latent detached so fluent text cannot alter scientific heads.
 
 HydroCore-S and HydroMono-S each completed eight epochs and 600 optimizer steps on CPU in
-385 and 397 seconds respectively. HydroCore-M completed a two-epoch, 60-step feasibility
-run in 112 seconds using gradient accumulation; it is not converged. Published experiment
-records include per-epoch training curves, task losses, configuration, environment,
-dataset hash, and safe model weights without optimizer pickle state.
+385 and 397 seconds respectively. HydroCore-M completed 17 epochs and 1,500 optimizer
+steps under a predefined 2,400-second budget. Checkpoint selection used validation only;
+the original test hashes remained frozen. Profile losses ignore architecturally reserved
+classes outside the governed 4/3/3 label spaces and add an ordinal-aware penalty. Published
+records include curves, task losses, configuration, environment, dataset hash, and safe
+candidate weights without optimizer state.
 
 ## 9. Uncertainty, OOD, and abstention
 
@@ -152,8 +154,9 @@ versioned against model, feature schema, and dataset manifest hashes. Reports in
 coverage, mean set size, expected calibration error, and condition/network breakdowns.
 Invalid artifacts fail closed.
 
-OOD assessment combines feature-range departure, missingness, energy score, classical and
-neural disagreement, and physical residuals. Severe OOD or invalid calibration suppresses
+OOD assessment combines feature-range departure, missingness, energy score, topology-hash
+novelty, classical/neural disagreement, and physical residuals. An unseen validated-set
+topology forces at least CAUTION. Severe OOD or invalid calibration suppresses
 confident planning. Dynamic trust favors classical evidence under sensor/model conflict and
 neural residual correction only within validated conditions. Abstention is visible to the
 operator and changes the controller path.
@@ -202,16 +205,22 @@ this report.
 
 A governed learned benchmark evaluates 200 withheld hydraulic-regime incidents. The
 classical signature baseline reaches 91.5 percent top-1 accuracy (95 percent bootstrap CI
-87.5–95.0). HydroCore-S and equal-budget HydroMono-S each reach 94.5 percent. Hybrid fusion
-reaches 96.0 percent (93.0–98.5), a 4.5-point improvement over classical. HydroCore-M
-partial reaches 94.0 percent but is not a converged comparison. Because HydroCore-S and
-HydroMono tie, this experiment does not establish an adapter advantage.
+87.5-95.0). HydroCore-S and equal-budget HydroMono-S each reach 94.5 percent. S hybrid
+fusion reaches 96.0 percent (93.0-98.5), a 4.5-point improvement over classical. The
+budget-complete M candidate reaches 94.5 percent neural-only and 94.0 percent hybrid, with
+23.93 ms mean scenario latency versus 8.94 ms for S. M therefore fails its operational
+promotion gate and S remains the runtime default.
 
-Held-out conformal coverage is 91.0 percent at alpha 0.1, mean candidate-set size is 0.92,
-and ECE is 0.0269. Sensor-fault element accuracy is 94.8 percent. Event-profile heads remain
-weak: start-time 20.5 percent, duration 42.5 percent, and strength-bin 34.0 percent. The
-default factory executes the promoted checkpoint in FULL_HYBRID mode with validated model,
-feature-schema, calibration, signature, and network hashes.
+M conformal calibration, fit only on 160 calibration cases, reaches 91.0 percent test
+coverage, mean set size 0.93, and ECE 0.0367. M start-time and strength-bin accuracy improve
+from 20.5 to 27.0 percent and 34.0 to 45.5 percent; duration falls from 42.5 to 35.5 percent.
+These heads remain exploratory.
+
+A separate 70-case evaluation uses a genuinely different seven-junction branched-loop
+topology without neural fine-tuning. Classical, M neural, and M hybrid top-1 are 35.7,
+47.1, and 44.3 percent. Coverage collapses to 27.1 percent with mean set size 0.41. The
+unseen hash produces CAUTION with novelty 1.0 and suppresses planning. This supports the
+fail-closed safety story, not a topology-transfer claim.
 
 A separate seeded HydroCore-S FP32 runtime profile uses random weights solely to measure
 execution behavior. On the current four-thread CPU host, 128-node inference measures 31.00
@@ -226,8 +235,9 @@ Removing exact verification fails the promotion gate by design: a proposal canno
 VERIFIED. Disabling the signature cache is actually executed and increases repeated-run
 latency. Removing active sampling leaves the broad source set unchanged. The final
 equal-budget HydroMono ablation ties HydroCore-S at 94.5 percent; a specialist-adapter gain
-is therefore not established. HydroCore-L, learned Scout/Strategist, language-gradient,
-quantization, and independent-topology ablations remain unrun.
+is therefore not established. M does not improve hybrid localization or cost-adjusted
+performance. HydroCore-L, learned Scout/Strategist, language-gradient, and quantization
+ablations remain unrun.
 
 Important failure cases include non-identifiable sensor layouts, stale hydraulic state,
 unknown controls, cache mismatch, unit error, timing jitter, frozen or drifting sensors,

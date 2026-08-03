@@ -145,19 +145,23 @@ def build(source: Path, results_path: Path, target: Path) -> None:
     ))
     styles.add(ParagraphStyle(
         "H1x", parent=styles["Heading1"], fontName="Helvetica-Bold", fontSize=17,
-        leading=21, textColor=NAVY, spaceBefore=12, spaceAfter=8, keepWithNext=True,
+        leading=21, textColor=NAVY, spaceBefore=10, spaceAfter=6, keepWithNext=True,
     ))
     styles.add(ParagraphStyle(
         "H2x", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=11,
         leading=14, textColor=BLUE, spaceBefore=9, spaceAfter=5, keepWithNext=True,
     ))
     styles.add(ParagraphStyle(
-        "Bodyx", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.65,
-        leading=12.35, textColor=INK, spaceAfter=6.5, alignment=TA_LEFT,
+        "Bodyx", parent=styles["BodyText"], fontName="Helvetica", fontSize=8.5,
+        leading=12.0, textColor=INK, spaceAfter=6.0, alignment=TA_LEFT,
     ))
     styles.add(ParagraphStyle(
         "Bulletx", parent=styles["Bodyx"], leftIndent=14, firstLineIndent=-8,
         bulletIndent=3, spaceAfter=4,
+    ))
+    styles.add(ParagraphStyle(
+        "Referencex", parent=styles["Bulletx"], fontSize=6.8, leading=8.0,
+        spaceAfter=1.0,
     ))
     text = source.read_text(encoding="utf-8")
     results = json.loads(results_path.read_text(encoding="utf-8"))
@@ -198,6 +202,7 @@ def build(source: Path, results_path: Path, target: Path) -> None:
     story.extend([Spacer(1, 0.42 * inch), cover, PageBreak()])
 
     paragraph: list[str] = []
+    current_heading = ""
 
     def flush() -> None:
         if paragraph:
@@ -213,6 +218,7 @@ def build(source: Path, results_path: Path, target: Path) -> None:
         if stripped.startswith("## "):
             flush()
             heading = stripped[3:]
+            current_heading = heading
             story.append(Paragraph(_inline(heading), styles["H1x"]))
             if heading == "3. System architecture":
                 story.extend([ArchitectureFlow(), Spacer(1, 8)])
@@ -226,7 +232,8 @@ def build(source: Path, results_path: Path, target: Path) -> None:
             story.append(Paragraph(_inline(stripped), styles["Bodyx"]))
         elif stripped.startswith("- "):
             flush()
-            story.append(Paragraph(_inline(stripped[2:]), styles["Bulletx"], bulletText="-"))
+            style = styles["Referencex"] if current_heading == "19. References" else styles["Bulletx"]
+            story.append(Paragraph(_inline(stripped[2:]), style, bulletText="-"))
         else:
             paragraph.append(stripped)
     flush()

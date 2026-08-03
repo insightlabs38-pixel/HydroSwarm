@@ -1,0 +1,11 @@
+{
+  "best_epoch": 16,
+  "best_validation_loss": 2.491603434085846,
+  "epochs_completed": 17,
+  "export_path": "C:\\Users\\prshe\\firmware-mind\\HydroSwarm\\experiments\\runs\\learning-v2-medium-convergence\\20260803T210410Z-ba1e3eea\\model-export.safetensors",
+  "final_checkpoint": "",
+  "global_steps": 1500,
+  "run_directory": "C:\\Users\\prshe\\firmware-mind\\HydroSwarm\\experiments\\runs\\learning-v2-medium-convergence\\20260803T210410Z-ba1e3eea",
+  "stop_reason": "runtime_budget",
+  "stopped_early": false
+}

@@ -1,0 +1,77 @@
+{
+  "audits": {
+    "train": {
+      "class_counts": {
+        "duration": {
+          "0": 253,
+          "1": 271,
+          "2": 276
+        },
+        "relative_strength": {
+          "0": 259,
+          "1": 266,
+          "2": 275
+        },
+        "start_time": {
+          "0": 188,
+          "1": 209,
+          "2": 194,
+          "3": 209
+        }
+      },
+      "imbalance_ratio": {
+        "duration": 1.0909090909090908,
+        "relative_strength": 1.0617760617760619,
+        "start_time": 1.1117021276595744
+      },
+      "rows": 800
+    },
+    "validation": {
+      "class_counts": {
+        "duration": {
+          "0": 57,
+          "1": 65,
+          "2": 38
+        },
+        "relative_strength": {
+          "0": 43,
+          "1": 50,
+          "2": 67
+        },
+        "start_time": {
+          "0": 44,
+          "1": 36,
+          "2": 40,
+          "3": 40
+        }
+      },
+      "imbalance_ratio": {
+        "duration": 1.7105263157894737,
+        "relative_strength": 1.558139534883721,
+        "start_time": 1.2222222222222223
+      },
+      "rows": 160
+    }
+  },
+  "decision_data": [
+    "train",
+    "validation"
+  ],
+  "profile_label_space": {
+    "duration": 3,
+    "relative_strength": 3,
+    "start_time": 4
+  },
+  "schema_version": 1,
+  "test_labels_inspected": false,
+  "test_split_lock": {
+    "scenario_manifest_sha256": "07096851c6e505ecd7a151c71b312d17942af023f16396d76a136df572ddc089",
+    "tensor_manifest_sha256": "9dda76aed10c71d68803b808323fdb640498689b180de655c79b72fe07b67826"
+  },
+  "training_budget": {
+    "early_stopping_patience": 6,
+    "maximum_epochs": 30,
+    "maximum_runtime_seconds": 2400,
+    "minimum_delta": 0.001
+  }
+}

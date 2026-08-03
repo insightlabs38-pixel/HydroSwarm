@@ -16,6 +16,13 @@ class MultiTaskLoss:
     tasks: Mapping[str, Tensor]
 
 
+PROFILE_CLASS_COUNTS = {
+    "start_time": 4,
+    "duration": 3,
+    "relative_strength": 3,
+}
+
+
 def _cross_entropy(logits: Tensor, target: Tensor) -> Tensor:
     flattened_target = target.long().reshape(-1)
     valid = flattened_target != -100
@@ -23,6 +30,36 @@ def _cross_entropy(logits: Tensor, target: Tensor) -> Tensor:
         return logits.sum() * 0.0
     flattened_logits = logits.reshape(-1, logits.shape[-1])
     return F.cross_entropy(flattened_logits[valid], flattened_target[valid])
+
+
+def _ordinal_classification_loss(
+    logits: Tensor,
+    target: Tensor,
+    *,
+    class_count: int,
+    ordinal_weight: float,
+) -> Tensor:
+    """Combine categorical fit with distance-aware supervision over ordered bins."""
+
+    usable_logits = logits[..., :class_count]
+    flattened_target = target.long().reshape(-1)
+    valid = (flattened_target != -100) & (flattened_target >= 0) & (
+        flattened_target < class_count
+    )
+    if not valid.any():
+        return usable_logits.sum() * 0.0
+    flattened_logits = usable_logits.reshape(-1, class_count)[valid]
+    valid_target = flattened_target[valid]
+    categorical = F.cross_entropy(flattened_logits, valid_target)
+    if ordinal_weight == 0:
+        return categorical
+    positions = torch.linspace(
+        0.0, 1.0, class_count, device=flattened_logits.device, dtype=flattened_logits.dtype
+    )
+    expected_position = (torch.softmax(flattened_logits, dim=-1) * positions).sum(dim=-1)
+    target_position = valid_target.to(flattened_logits.dtype) / max(class_count - 1, 1)
+    ordinal = F.smooth_l1_loss(expected_position, target_position)
+    return categorical + ordinal_weight * ordinal
 
 
 def _masked_mse(prediction: Tensor, target: Tensor) -> Tensor:
@@ -39,6 +76,7 @@ def compute_multitask_loss(
     targets: Mapping[str, Tensor],
     *,
     task_weights: Mapping[str, float] | None = None,
+    profile_ordinal_weight: float = 0.0,
 ) -> MultiTaskLoss:
     """Compute every task for which both a semantic prediction and target exist."""
 
@@ -46,9 +84,6 @@ def compute_multitask_loss(
     losses: dict[str, Tensor] = {}
     classifications = {
         "source_node": "source_node_logits",
-        "start_time": "start_time_logits",
-        "duration": "duration_logits",
-        "relative_strength": "relative_strength_logits",
         "sample_node": "sample_node_logits",
         "action": "action_logits",
         "action_pointer": "action_pointer_logits",
@@ -68,6 +103,15 @@ def compute_multitask_loss(
     for task, output_name in classifications.items():
         if task in targets and output_name in outputs:
             losses[task] = _cross_entropy(outputs[output_name], targets[task])
+    for task, class_count in PROFILE_CLASS_COUNTS.items():
+        output_name = f"{task}_logits"
+        if task in targets and output_name in outputs:
+            losses[task] = _ordinal_classification_loss(
+                outputs[output_name],
+                targets[task],
+                class_count=class_count,
+                ordinal_weight=profile_ordinal_weight,
+            )
     for task, output_name in regressions.items():
         if task in targets and output_name in outputs:
             losses[task] = _masked_mse(outputs[output_name], targets[task])

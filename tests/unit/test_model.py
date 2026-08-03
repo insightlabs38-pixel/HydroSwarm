@@ -56,6 +56,10 @@ def test_forward_handles_missing_sensors_and_node_masks() -> None:
     assert torch.count_nonzero(output["hidden_state"][~node_mask]) == 0
     assert torch.count_nonzero(output["strategist"][~node_mask]) == 0
     assert torch.all(output["source_node_logits"][~source_mask] < -1e20)
+    floor = torch.finfo(torch.float32).min
+    assert torch.all(output["start_time_logits"][..., 4:] == floor)
+    assert torch.all(output["duration_logits"][..., 3:] == floor)
+    assert torch.all(output["relative_strength_logits"][..., 3:] == floor)
 
 
 def test_all_missing_observations_are_safe() -> None:

@@ -37,8 +37,8 @@ reported separately in `learning-evaluation-final.json`.
 - RAM: Python allocation peak from tracemalloc; native WNTR/EPANET memory is not included.
 - Confidence intervals: 95% normal-approximation interval over configured repeated seeds.
 - The golden report's legacy neural matrix is not the learning benchmark. HydroCore-S,
-  HydroMono-S, hybrid fusion, and partial HydroCore-M were run on the governed held-out
-  corpus; L remains untrained.
+  HydroMono-S, and the budget-complete HydroCore-M candidate were run on the governed
+  held-out corpus; L remains untrained.
 - This fixture is a regression benchmark, not evidence of field performance.
 
 ## Learned held-out hydraulic-shift benchmark
@@ -48,4 +48,9 @@ reported separately in `learning-evaluation-final.json`.
 - HydroMono-S top-1: 94.5% [91.5%, 97.5%].
 - Hybrid top-1: 96.0% [93.0%, 98.5%], +4.5 points over classical.
 - Held-out conformal coverage: 91.0%; mean set size 0.92; ECE 0.0269.
-- Limitation: one topology, withheld hydraulic regime; not field or unseen-topology proof.
+- HydroCore-M neural/hybrid: 94.5% / 94.0%; M was not promoted because S hybrid reaches
+  96.0% at substantially lower latency.
+- M profile heads: start 27.0%, duration 35.5%, strength 45.5%; still exploratory.
+- Independent topology: classical 35.7%, M neural 47.1%, M hybrid 44.3%; coverage 27.1%,
+  mean set size 0.41, `CAUTION`, planning suppressed.
+- Limitation: synthetic reference networks only; not field or cross-utility proof.

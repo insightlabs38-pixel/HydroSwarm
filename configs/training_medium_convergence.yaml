@@ -1,0 +1,28 @@
+training:
+  seed: 31874
+  epochs: 30
+  batch_size: 4
+  gradient_accumulation_steps: 2
+  learning_rate: 0.0002
+  weight_decay: 0.01
+  gradient_clip_norm: 1.0
+  warmup_steps: 20
+  scheduler: cosine
+  checkpoint_every_epochs: 30
+  early_stopping_patience: 6
+  minimum_delta: 0.001
+  maximum_runtime_seconds: 2400
+  minimum_free_disk_gb: 0.25
+  num_workers: 0
+  device: cpu
+  fp32: true
+  deterministic: true
+  gradnorm_logging: false
+  pcgrad_enabled: false
+  profile_ordinal_weight: 0.4
+  task_weights:
+    source_node: 1.0
+    start_time: 1.0
+    duration: 0.8
+    relative_strength: 0.8
+    sensor_fault: 0.4

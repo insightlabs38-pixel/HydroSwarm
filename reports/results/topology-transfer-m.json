@@ -1,0 +1,80 @@
+{
+  "bootstrap_samples": 2000,
+  "classical_signature_templates_fit_on_transfer_topology": true,
+  "conformal": {
+    "calibration_origin": "current-topology calibration split only",
+    "coverage": 0.2714285714285714,
+    "mean_candidate_set_size": 0.4142857142857143
+  },
+  "examples": 70,
+  "experiment": "independent_topology_transfer",
+  "limitations": [
+    "This is a small synthetic transfer experiment, not field validation.",
+    "The classical signature library uses simulator templates from the new topology; neural weights do not.",
+    "CAUTION suppresses planning even when localization is correct."
+  ],
+  "network": {
+    "junctions": 7,
+    "links": 8,
+    "path": "data\\topology-transfer\\branched-loop.inp",
+    "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed",
+    "topology_hashes_differ": true,
+    "trained_topology_hash": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+    "transfer_topology_hash": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056"
+  },
+  "neural_finetuning_on_transfer_topology": false,
+  "neural_training_topologies": 1,
+  "ood": {
+    "network_novelty": 1.0,
+    "planning_suppressed": true,
+    "state": "CAUTION"
+  },
+  "results": {
+    "classical": {
+      "mean_confidence": 0.30816760659217834,
+      "mean_reciprocal_rank": 0.5238095238095237,
+      "top1": {
+        "ci95_high": 0.4714285714285714,
+        "ci95_low": 0.24285714285714285,
+        "estimate": 0.35714285714285715
+      },
+      "top3_accuracy": 0.5571428571428572
+    },
+    "hydrocore_m_hybrid": {
+      "mean_confidence": 0.6224378943443298,
+      "mean_reciprocal_rank": 0.6030272108843537,
+      "top1": {
+        "ci95_high": 0.5571428571428572,
+        "ci95_low": 0.32857142857142857,
+        "estimate": 0.44285714285714284
+      },
+      "top3_accuracy": 0.6571428571428571
+    },
+    "hydrocore_m_neural": {
+      "duration_accuracy": 0.3,
+      "sensor_fault_element_accuracy": 0.9178571428571428,
+      "source_localization": {
+        "mean_confidence": 0.7138720154762268,
+        "mean_reciprocal_rank": 0.631938775510204,
+        "top1": {
+          "ci95_high": 0.5857142857142857,
+          "ci95_low": 0.35714285714285715,
+          "estimate": 0.4714285714285714
+        },
+        "top3_accuracy": 0.7
+      },
+      "start_time_accuracy": 0.04285714285714286,
+      "strength_accuracy": 0.35714285714285715
+    }
+  },
+  "schema_version": 1,
+  "timing": {
+    "batches": 9.0,
+    "mean_batch_latency_ms": 263.6767555442121,
+    "mean_scenario_latency_ms": 33.9012971413987,
+    "p95_batch_latency_ms": 702.2895601578055,
+    "rss_delta_bytes": 55627776.0,
+    "rss_end_bytes": 478973952.0,
+    "rss_start_bytes": 423346176.0
+  }
+}

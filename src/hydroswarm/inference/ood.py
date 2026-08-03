@@ -28,6 +28,7 @@ class OODReference:
     latent_scale: float = 1.0
     minimum_nodes: int = 1
     maximum_nodes: int = 10_000
+    validated_network_hashes: tuple[str, ...] = ()
     caution_threshold: float = 0.45
     outside_threshold: float = 0.75
 
@@ -40,10 +41,36 @@ class OODDetector:
     def _clip(value: float) -> float:
         return float(np.clip(value, 0.0, 1.0))
 
+    def topology_novelty(self, *, node_count: int, network_hash: str | None = None) -> float:
+        """Return maximum novelty for a graph outside the explicitly validated hash set."""
+
+        if self.reference.validated_network_hashes and network_hash is not None:
+            if network_hash not in self.reference.validated_network_hashes:
+                return 1.0
+        if node_count < self.reference.minimum_nodes:
+            return self._clip(
+                (self.reference.minimum_nodes - node_count)
+                / max(1, self.reference.minimum_nodes)
+            )
+        if node_count > self.reference.maximum_nodes:
+            return self._clip(
+                (node_count - self.reference.maximum_nodes)
+                / max(1, self.reference.maximum_nodes)
+            )
+        return 0.0
+
+    def topology_level(self, *, node_count: int, network_hash: str | None = None) -> OODLevel:
+        return (
+            OODLevel.CAUTION
+            if self.topology_novelty(node_count=node_count, network_hash=network_hash) > 0
+            else OODLevel.NORMAL
+        )
+
     def evaluate(
         self,
         *,
         node_count: int,
+        network_hash: str | None = None,
         state: EstimatedHydraulicState,
         sensor_series: Sequence[SensorSeries],
         latent: np.ndarray | None = None,
@@ -68,16 +95,9 @@ class OODDetector:
             energy = self._clip(1.0 - float(np.max(neural_probabilities)))
         else:
             energy = 0.25
-        if node_count < self.reference.minimum_nodes:
-            network_novelty = self._clip(
-                (self.reference.minimum_nodes - node_count) / max(1, self.reference.minimum_nodes)
-            )
-        elif node_count > self.reference.maximum_nodes:
-            network_novelty = self._clip(
-                (node_count - self.reference.maximum_nodes) / max(1, self.reference.maximum_nodes)
-            )
-        else:
-            network_novelty = 0.0
+        network_novelty = self.topology_novelty(
+            node_count=node_count, network_hash=network_hash
+        )
         demand_shift = self._clip(float(state.residuals.mismatch_scores.get("demand", 0.0)))
         qualities = [item.health[-1] for item in sensor_series]
         missing = [float(item.missing[-1]) for item in sensor_series]
@@ -105,4 +125,6 @@ class OODDetector:
             level = OODLevel.CAUTION
         else:
             level = OODLevel.NORMAL
+        if network_novelty > 0 and level == OODLevel.NORMAL:
+            level = OODLevel.CAUTION
         return components, level

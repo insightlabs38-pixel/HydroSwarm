@@ -11,6 +11,7 @@ import traceback
 from typing import Mapping
 
 import numpy as np
+from safetensors.torch import load_file
 import torch
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
@@ -32,7 +33,9 @@ class TrainingSummary:
     epochs_completed: int
     global_steps: int
     best_validation_loss: float
+    best_epoch: int
     stopped_early: bool
+    stop_reason: str
     final_checkpoint: str
     export_path: str
 
@@ -179,7 +182,10 @@ class Trainer:
             self.artifacts.check_disk(self.config.minimum_free_disk_gb)
             output = self.model(self._to_cpu_float(inputs))
             result = compute_multitask_loss(
-                output, targets, task_weights=self.config.task_weights
+                output,
+                targets,
+                task_weights=self.config.task_weights,
+                profile_ordinal_weight=self.config.profile_ordinal_weight,
             )
             if not torch.isfinite(result.total):
                 raise FloatingPointError("non-finite multitask loss")
@@ -239,7 +245,10 @@ class Trainer:
             losses.append(
                 float(
                     compute_multitask_loss(
-                        output, targets, task_weights=self.config.task_weights
+                        output,
+                        targets,
+                        task_weights=self.config.task_weights,
+                        profile_ordinal_weight=self.config.profile_ordinal_weight,
                     ).total
                 )
             )
@@ -249,8 +258,11 @@ class Trainer:
         started = time.monotonic()
         start_epoch = 0
         best = math.inf
+        best_epoch = -1
+        best_global_step = 0
         stale_epochs = 0
         stopped_early = False
+        runtime_budget_reached = False
         final_checkpoint = ""
         try:
             if resume_from is not None:
@@ -268,13 +280,31 @@ class Trainer:
             for epoch in range(start_epoch, self.config.epochs):
                 stage = self.curriculum.stage_for_epoch(epoch)
                 epoch_dataset = self.train_dataset.stages_through(stage)
-                train_loss = self._train_epoch(epoch_dataset, epoch=epoch, started=started)
+                try:
+                    train_loss = self._train_epoch(
+                        epoch_dataset, epoch=epoch, started=started
+                    )
+                except TimeoutError:
+                    runtime_budget_reached = True
+                    break
                 validation_loss = self._validate(epoch=epoch)
                 criterion = train_loss if math.isnan(validation_loss) else validation_loss
                 improved = criterion < best - self.config.minimum_delta
                 if improved:
                     best = criterion
+                    best_epoch = epoch
+                    best_global_step = self.global_step
                     stale_epochs = 0
+                    export_model(
+                        self.model,
+                        self.artifacts.path / "best-model.safetensors",
+                        metadata={
+                            "epoch": str(epoch),
+                            "validation_loss": str(criterion),
+                            "global_step": str(self.global_step),
+                            "manifest_hash": self.train_dataset.manifest_hash,
+                        },
+                    )
                 else:
                     stale_epochs += 1
                 epochs_completed = epoch + 1
@@ -307,7 +337,11 @@ class Trainer:
                 ):
                     stopped_early = True
                     break
-            if not final_checkpoint:
+            if runtime_budget_reached:
+                # Periodic checkpoints remain available for resuming, but none is
+                # misrepresented as a clean end-of-run optimizer checkpoint.
+                final_checkpoint = ""
+            if not final_checkpoint and not runtime_budget_reached:
                 checkpoint = self.artifacts.path / "checkpoints" / "checkpoint-final"
                 final_checkpoint = str(
                     save_checkpoint(
@@ -320,25 +354,36 @@ class Trainer:
                         best_validation_loss=best,
                     )
                 )
+            best_model_path = self.artifacts.path / "best-model.safetensors"
+            if best_model_path.exists():
+                self.model.load_state_dict(load_file(best_model_path, device="cpu"), strict=True)
             export_path = export_model(
                 self.model,
                 self.artifacts.path / "model-export.safetensors",
                 metadata={
                     "manifest_hash": self.train_dataset.manifest_hash,
-                    "global_steps": str(self.global_step),
+                    "global_steps": str(best_global_step or self.global_step),
                 },
             )
             summary = TrainingSummary(
                 run_directory=str(self.artifacts.path),
                 epochs_completed=epochs_completed,
-                global_steps=self.global_step,
+                global_steps=best_global_step or self.global_step,
                 best_validation_loss=best,
+                best_epoch=best_epoch,
                 stopped_early=stopped_early,
+                stop_reason=(
+                    "runtime_budget"
+                    if runtime_budget_reached
+                    else "validation_convergence"
+                    if stopped_early
+                    else "maximum_epochs"
+                ),
                 final_checkpoint=final_checkpoint,
                 export_path=str(export_path),
             )
             atomic_json(self.artifacts.path / "summary.json", asdict(summary))
-            self.artifacts.status("COMPLETED")
+            self.artifacts.status("COMPLETED", stop_reason=summary.stop_reason)
             return summary
         except Exception as error:
             failure = {
@@ -349,4 +394,3 @@ class Trainer:
             atomic_json(self.artifacts.path / "failure.json", failure)
             self.artifacts.status("FAILED", error=failure["message"])
             raise
-

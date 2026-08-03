@@ -253,6 +253,14 @@ class HydroCore(nn.Module):
             raise ValueError(f"{key} must be [batch, features] or [batch, sequence, features]")
         return projection(value)
 
+    @staticmethod
+    def _profile_logits(head: nn.Module, pooled: Tensor, class_count: int) -> Tensor:
+        """Mask architecturally reserved outputs that are not governed label classes."""
+
+        logits = head(pooled)
+        classes = torch.arange(logits.shape[-1], device=logits.device)
+        return logits.masked_fill(classes >= class_count, torch.finfo(logits.dtype).min)
+
     def forward(self, batch: HydroBatch) -> HydroOutput:
         required = ("node_features", "temporal_features", "quality_features")
         missing = [name for name in required if name not in batch]
@@ -345,9 +353,11 @@ class HydroCore(nn.Module):
             node_mask=node_mask,
             source_node_logits=source_logits,
             source_region_logits=self.source_region_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
-            start_time_logits=self.profile_heads["start_time"](pooled),
-            duration_logits=self.profile_heads["duration"](pooled),
-            relative_strength_logits=self.profile_heads["relative_strength"](pooled),
+            start_time_logits=self._profile_logits(self.profile_heads["start_time"], pooled, 4),
+            duration_logits=self._profile_logits(self.profile_heads["duration"], pooled, 3),
+            relative_strength_logits=self._profile_logits(
+                self.profile_heads["relative_strength"], pooled, 3
+            ),
             evidence_sufficiency=self.evidence_head(pooled),
             sensor_fault_logits=self.sensor_fault_head(sentinel_nodes).squeeze(-1),
             sample_node_logits=self.sample_node_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
