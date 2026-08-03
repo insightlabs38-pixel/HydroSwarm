@@ -1,0 +1,15 @@
+{
+  "seed": 2026,
+  "periods": 96,
+  "step_minutes": 15,
+  "source_node": "J1",
+  "contamination_start_step": 16,
+  "contamination_duration_steps": 20,
+  "source_concentration": 1.0,
+  "sensor_noise_std": 0.012,
+  "drift_per_step": 0.00015,
+  "missing_probability": 0.06,
+  "sensor_delay_steps": 1,
+  "flow_reversal_period_steps": 32,
+  "flow_reversal_duration_steps": 4
+}
