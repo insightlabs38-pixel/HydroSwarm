@@ -13,7 +13,10 @@ WORKDIR /app
 RUN useradd --create-home --uid 10001 hydroswarm
 COPY pyproject.toml README.md LICENSE ./
 COPY src/ src/
-RUN python -m pip install --no-cache-dir .
+# Force the CPU wheel in the local decision-support image; the default Linux PyPI
+# resolution can pull multi-gigabyte CUDA components that this runtime never uses.
+RUN python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu "torch>=2.5" \
+ && python -m pip install --no-cache-dir .
 COPY --from=frontend /build/frontend/dist frontend/dist
 COPY configs/ configs/
 RUN mkdir -p /data && chown -R hydroswarm:hydroswarm /app /data
