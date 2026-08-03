@@ -1,12 +1,24 @@
+import { lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchIncidentWithFallback } from './api';
-import { AuditPage } from './pages/AuditPage';
-import { BenchmarkPage } from './pages/BenchmarkPage';
-import { Overview } from './pages/Overview';
-import { TopologyPage } from './pages/TopologyPage';
-import { ValidationPage } from './pages/ValidationPage';
 import { useConsoleStore, type Page } from './store';
 import { StatusBadge } from './components/StatusBadge';
+
+const Overview = lazy(() =>
+  import('./pages/Overview').then((module) => ({ default: module.Overview })),
+);
+const AuditPage = lazy(() =>
+  import('./pages/AuditPage').then((module) => ({ default: module.AuditPage })),
+);
+const ValidationPage = lazy(() =>
+  import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
+);
+const BenchmarkPage = lazy(() =>
+  import('./pages/BenchmarkPage').then((module) => ({ default: module.BenchmarkPage })),
+);
+const TopologyPage = lazy(() =>
+  import('./pages/TopologyPage').then((module) => ({ default: module.TopologyPage })),
+);
 
 const pages: { id: Page; label: string }[] = [
   { id: 'overview', label: 'Incident' },
@@ -89,11 +101,19 @@ export default function App() {
         </button>
       </nav>
       <main id="main-content">
-        {page === 'overview' && <Overview incident={incident} />}
-        {page === 'audit' && <AuditPage incident={incident} />}
-        {page === 'validation' && <ValidationPage incident={incident} />}
-        {page === 'benchmarks' && <BenchmarkPage incident={incident} />}
-        {page === 'topology' && <TopologyPage incident={incident} />}
+        <Suspense
+          fallback={
+            <div className="page-loading" role="status">
+              Loading local console view…
+            </div>
+          }
+        >
+          {page === 'overview' && <Overview incident={incident} />}
+          {page === 'audit' && <AuditPage incident={incident} />}
+          {page === 'validation' && <ValidationPage incident={incident} />}
+          {page === 'benchmarks' && <BenchmarkPage incident={incident} />}
+          {page === 'topology' && <TopologyPage incident={incident} />}
+        </Suspense>
       </main>
       <footer>
         <span>Decision support only · No autonomous control</span>

@@ -1,12 +1,18 @@
+import { lazy, Suspense } from 'react';
 import type { IncidentView } from '../types';
 import { Counterfactuals } from '../components/Counterfactuals';
 import { EvidencePanel } from '../components/EvidencePanel';
-import { HydraulicChart } from '../components/HydraulicChart';
-import { OperationalMap } from '../components/OperationalMap';
 import { Panel } from '../components/Panel';
 import { PlanTable } from '../components/PlanTable';
 import { StatusBadge } from '../components/StatusBadge';
 import { Timeline } from '../components/Timeline';
+
+const OperationalMap = lazy(() =>
+  import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
+);
+const HydraulicChart = lazy(() =>
+  import('../components/HydraulicChart').then((module) => ({ default: module.HydraulicChart })),
+);
 
 export function Overview({ incident }: { incident: IncidentView }) {
   const leading = incident.candidates[0];
@@ -47,7 +53,15 @@ export function Overview({ incident }: { incident: IncidentView }) {
       </section>
 
       <Panel title="Live network" eyebrow="2D HYDRAULIC STATE" className="map-panel">
-        <OperationalMap incident={incident} />
+        <Suspense
+          fallback={
+            <div className="visual-loading" role="status">
+              Loading offline network renderer…
+            </div>
+          }
+        >
+          <OperationalMap incident={incident} />
+        </Suspense>
       </Panel>
       <aside className="right-rail" aria-label="Incident evidence and actions">
         <Panel title="Source candidates" eyebrow="SENTINEL">
@@ -109,7 +123,15 @@ export function Overview({ incident }: { incident: IncidentView }) {
         eyebrow="OBSERVED EVIDENCE"
         className="hydraulic-panel"
       >
-        <HydraulicChart />
+        <Suspense
+          fallback={
+            <div className="chart visual-loading" role="status">
+              Loading hydraulic chart…
+            </div>
+          }
+        >
+          <HydraulicChart />
+        </Suspense>
       </Panel>
       <Panel title="Incident replay" eyebrow="AUDITABLE SEQUENCE" className="timeline-panel">
         <Timeline events={incident.audit} />
