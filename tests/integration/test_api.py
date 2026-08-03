@@ -164,3 +164,43 @@ def test_api_enforces_schema_and_validated_network(tmp_path) -> None:
     )
     assert extras.status_code == 422
 
+
+def test_default_runtime_disables_manual_networks_and_restricts_cors(tmp_path) -> None:
+    client = TestClient(create_app(database_path=tmp_path / "runtime.db"))
+    readiness = client.get("/api/readiness")
+    assert readiness.status_code == 200
+    assert readiness.json()["mode"] == "authoritative-wntr"
+    assert readiness.json()["checks"]["authoritative_verifier"] is True
+
+    manual = client.post(
+        "/api/networks/untrusted/validate",
+        json={"node_ids": ["J1"], "link_count": 0},
+    )
+    assert manual.status_code == 409
+
+    remote = client.get("/api/health", headers={"Origin": "https://remote.example"})
+    assert "access-control-allow-origin" not in remote.headers
+    local = client.get("/api/health", headers={"Origin": "http://127.0.0.1:8765"})
+    assert local.headers["access-control-allow-origin"] == "http://127.0.0.1:8765"
+
+
+def test_request_size_limit_fails_before_body_processing(tmp_path) -> None:
+    client = TestClient(create_app(database_path=tmp_path / "runtime.db", max_request_bytes=64))
+    response = client.post(
+        "/api/incidents",
+        content=b"{}",
+        headers={"content-type": "application/json", "content-length": "65"},
+    )
+    assert response.status_code == 413
+
+
+def test_readiness_fails_closed_without_wntr(tmp_path, monkeypatch) -> None:
+    import importlib
+
+    app_module = importlib.import_module("hydroswarm.api.app")
+    monkeypatch.setattr(app_module, "wntr", None)
+    client = TestClient(create_app(database_path=tmp_path / "runtime.db"))
+    response = client.get("/api/readiness")
+    assert response.status_code == 503
+    assert response.json()["status"] == "not_ready"
+    assert response.json()["checks"]["authoritative_verifier"] is False

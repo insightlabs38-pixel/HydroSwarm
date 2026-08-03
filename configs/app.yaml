@@ -1,0 +1,17 @@
+runtime:
+  mode: offline
+  bind_host: 127.0.0.1
+  port: 8765
+  database_path: data/generated/hydroswarm.db
+  network_directory: data/generated/networks
+  readiness: authoritative-wntr
+
+security:
+  max_request_bytes: 5505024
+  network_upload_bytes: 5242880
+  allowed_network_extension: .inp
+  cors_origins:
+    - http://127.0.0.1:8765
+    - http://localhost:8765
+  redact_local_paths: true
+

@@ -7,8 +7,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 import hashlib
 from pathlib import Path
-import tempfile
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -21,7 +20,7 @@ from hydroswarm.domain import (
     PlanVerification,
     SensorObservation,
 )
-from hydroswarm.storage import AuditEvent, AuditLedger
+from hydroswarm.storage import AuditEvent, AuditLedger, Database, ScenarioStore
 
 
 class ApiModel(BaseModel):
@@ -29,9 +28,11 @@ class ApiModel(BaseModel):
 
 
 class ServiceStatus(ApiModel):
-    status: Literal["ok", "ready"]
+    status: Literal["ok", "ready", "not_ready"]
     offline: Literal[True] = True
     version: str
+    mode: str | None = None
+    checks: dict[str, bool] | None = None
 
 
 class NetworkValidationRequest(ApiModel):
@@ -41,10 +42,16 @@ class NetworkValidationRequest(ApiModel):
 
 class NetworkRecord(ApiModel):
     network_id: str
+    name: str
+    version: int = Field(ge=1)
+    sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     node_count: int
     link_count: int
-    valid: Literal[True] = True
+    valid: bool = True
     validated_at: datetime
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    geojson: dict[str, Any] = Field(default_factory=lambda: {"type": "FeatureCollection", "features": []})
+    validation_errors: tuple[str, ...] = ()
 
 
 class SampleRecommendation(ApiModel):
@@ -98,18 +105,41 @@ class IncidentRuntime:
 @dataclass(slots=True)
 class RuntimeState:
     ledger: AuditLedger
-    verifier: Verifier
+    store: ScenarioStore
+    verifier: Verifier | None
+    network_directory: Path
     networks: dict[str, NetworkRecord] = field(default_factory=dict)
     incidents: dict[UUID, IncidentRuntime] = field(default_factory=dict)
 
     @classmethod
     def create(
-        cls, *, verifier: Verifier, ledger_path: str | Path | None = None
+        cls,
+        *,
+        verifier: Verifier | None,
+        ledger_path: str | Path | None = None,
+        database_path: str | Path | None = None,
+        network_directory: str | Path | None = None,
     ) -> RuntimeState:
-        if ledger_path is None:
-            directory = Path(tempfile.mkdtemp(prefix="hydroswarm-api-"))
-            ledger_path = directory / "audit.sqlite3"
-        return cls(ledger=AuditLedger(ledger_path), verifier=verifier)
+        path = database_path or ledger_path
+        database = Database(path)
+        store = ScenarioStore(database)
+        directory = (
+            Path(network_directory).expanduser().resolve()
+            if network_directory
+            else database.path.parent / "networks"
+        )
+        directory.mkdir(parents=True, exist_ok=True)
+        return cls(
+            ledger=AuditLedger(database.path),
+            store=store,
+            verifier=verifier,
+            network_directory=directory,
+            networks=store.load_networks(),
+            incidents=store.load_incidents(),
+        )
+
+    def persist(self, runtime: IncidentRuntime) -> None:
+        self.store.save_incident(runtime)
 
     @staticmethod
     def state_hash(state: IncidentState) -> str:
@@ -159,4 +189,3 @@ def deterministic_candidates(observations: tuple[SensorObservation, ...]) -> Can
         node_ids=tuple(usable_nodes),
         calibrated=False,
     )
-
