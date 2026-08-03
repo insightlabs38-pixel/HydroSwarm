@@ -13,5 +13,6 @@ build/
 *.db-shm
 *.db-wal
 .streamlit/
+tmp/
 data/generated/
 models/checkpoints/
