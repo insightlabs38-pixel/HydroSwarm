@@ -1,0 +1,166 @@
+{
+  "calibration": {
+    "artifact": "reports\\results\\hydrocore-s-calibration.json",
+    "artifact_sha256": "062643e940a4c546f0046fafc92935ada7df5527ee120a0c302709c53afb76dc",
+    "fitted_report": {
+      "coverage": 0.925,
+      "coverage_by_condition": {
+        "ADVERSARIAL": 0.90625,
+        "CLEAN": 0.96875,
+        "DEGRADED": 0.96875,
+        "OPERATIONAL": 0.9375,
+        "SHIFT": 0.84375
+      },
+      "coverage_by_network": {
+        "high-storage-c": 0.925,
+        "low-head-b": 0.925,
+        "low-storage-d": 0.925,
+        "reference-a": 0.925
+      },
+      "examples": 160,
+      "expected_calibration_error": 0.03963382837935118,
+      "mean_set_size": 0.94375
+    },
+    "held_out_report": {
+      "coverage": 0.91,
+      "coverage_by_condition": {
+        "ADVERSARIAL": 0.925,
+        "CLEAN": 0.925,
+        "DEGRADED": 0.825,
+        "OPERATIONAL": 0.9,
+        "SHIFT": 0.975
+      },
+      "coverage_by_network": {
+        "held-out-high-head": 0.91
+      },
+      "examples": 200,
+      "expected_calibration_error": 0.02692108663080671,
+      "mean_set_size": 0.92
+    }
+  },
+  "central_claim": {
+    "absolute_top1_change": 0.04499999999999993,
+    "hybrid_improves_over_classical": true,
+    "statement": "Hybrid improved held-out hydraulic-family top-1 accuracy over the classical signature baseline."
+  },
+  "clean_checkpoint_reload_exact": true,
+  "corpus_report_sha256": "199662247aa7c18cf68fe4cc2b555769ef98e1570684b69cb8d3581c500bbe62",
+  "held_out_hydraulic_family": {
+    "classical_signature": {
+      "mean_confidence": 0.6112810969352722,
+      "mean_reciprocal_rank": 0.9516666666666665,
+      "top1": {
+        "ci95_high": 0.95,
+        "ci95_low": 0.875,
+        "estimate": 0.915
+      },
+      "top3_accuracy": 0.99
+    },
+    "hybrid": {
+      "mean_confidence": 0.926365077495575,
+      "mean_reciprocal_rank": 0.97625,
+      "top1": {
+        "ci95_high": 0.985,
+        "ci95_low": 0.93,
+        "estimate": 0.96
+      },
+      "top3_accuracy": 0.995
+    },
+    "hydrocore_m_partial": {
+      "duration_accuracy": 0.385,
+      "sensor_fault_element_accuracy": 0.9483333333333334,
+      "source_localization": {
+        "mean_confidence": 0.9021006226539612,
+        "mean_reciprocal_rank": 0.9641666666666667,
+        "top1": {
+          "ci95_high": 0.97,
+          "ci95_low": 0.905,
+          "estimate": 0.94
+        },
+        "top3_accuracy": 1.0
+      },
+      "start_time_accuracy": 0.32,
+      "strength_accuracy": 0.33
+    },
+    "hydrocore_m_partial_timing_and_rss": {
+      "batches": 25.0,
+      "mean_batch_latency_ms": 195.4332960024476,
+      "mean_scenario_latency_ms": 24.42916200030595,
+      "p95_batch_latency_ms": 242.58428011089563,
+      "rss_delta_bytes": 5033984.0,
+      "rss_end_bytes": 525697024.0,
+      "rss_start_bytes": 520663040.0
+    },
+    "hydrocore_s_neural": {
+      "duration_accuracy": 0.425,
+      "sensor_fault_element_accuracy": 0.9483333333333334,
+      "source_localization": {
+        "mean_confidence": 0.9501153826713562,
+        "mean_reciprocal_rank": 0.96875,
+        "top1": {
+          "ci95_high": 0.975,
+          "ci95_low": 0.91,
+          "estimate": 0.945
+        },
+        "top3_accuracy": 0.995
+      },
+      "start_time_accuracy": 0.205,
+      "strength_accuracy": 0.34
+    },
+    "hydromono": {
+      "duration_accuracy": 0.415,
+      "sensor_fault_element_accuracy": 0.9483333333333334,
+      "source_localization": {
+        "mean_confidence": 0.9562242031097412,
+        "mean_reciprocal_rank": 0.96875,
+        "top1": {
+          "ci95_high": 0.975,
+          "ci95_low": 0.914875,
+          "estimate": 0.945
+        },
+        "top3_accuracy": 0.995
+      },
+      "start_time_accuracy": 0.195,
+      "strength_accuracy": 0.325
+    },
+    "hydromono_timing_and_rss": {
+      "batches": 13.0,
+      "mean_batch_latency_ms": 157.88723850766053,
+      "mean_scenario_latency_ms": 10.262670502997935,
+      "p95_batch_latency_ms": 243.8215598464011,
+      "rss_delta_bytes": 27217920.0,
+      "rss_end_bytes": 489807872.0,
+      "rss_start_bytes": 462589952.0
+    },
+    "neural_contribution_mean_l1": 0.6660568118095398,
+    "timing_and_rss": {
+      "batches": 13.0,
+      "mean_batch_latency_ms": 145.04442299501255,
+      "mean_scenario_latency_ms": 9.427887494675815,
+      "p95_batch_latency_ms": 168.53443980216977,
+      "rss_delta_bytes": 8392704.0,
+      "rss_end_bytes": 440500224.0,
+      "rss_start_bytes": 432107520.0
+    }
+  },
+  "hydrocore_m_partial_checkpoint_sha256": "d3fee771c4f243fabf3787b8c5076d0712e889d50c85697316a1bea369d04c43",
+  "hydrocore_s_checkpoint_sha256": "85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423",
+  "hydromono_checkpoint_sha256": "f18bc24e6a21370415a5a98367c81d99ba8bcbc1998ab3c61cca8569ca5ddacb",
+  "schema_version": 1,
+  "validation": {
+    "duration_accuracy": 0.3375,
+    "sensor_fault_element_accuracy": 0.9583333333333334,
+    "source_localization": {
+      "mean_confidence": 0.9560502767562866,
+      "mean_reciprocal_rank": 0.9791666666666667,
+      "top1": {
+        "ci95_high": 0.9875,
+        "ci95_low": 0.93125,
+        "estimate": 0.9625
+      },
+      "top3_accuracy": 1.0
+    },
+    "start_time_accuracy": 0.41875,
+    "strength_accuracy": 0.34375
+  }
+}

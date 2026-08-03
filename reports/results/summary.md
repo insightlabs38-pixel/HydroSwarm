@@ -2,7 +2,8 @@
 
 Promotion gate: **PASS**
 
-All values below were produced by the frozen WNTR fixture. Missing neural checkpoints are reported as not run.
+All values below were produced by the frozen WNTR fixture. Learned-model evidence is
+reported separately in `learning-evaluation-final.json`.
 
 | Metric | Mean | 95% normal CI |
 | --- | ---: | ---: |
@@ -35,5 +36,16 @@ All values below were produced by the frozen WNTR fixture. Missing neural checkp
 
 - RAM: Python allocation peak from tracemalloc; native WNTR/EPANET memory is not included.
 - Confidence intervals: 95% normal-approximation interval over configured repeated seeds.
-- Small, medium, and large neural variants were not run because no trained checkpoint was supplied.
+- The golden report's legacy neural matrix is not the learning benchmark. HydroCore-S,
+  HydroMono-S, hybrid fusion, and partial HydroCore-M were run on the governed held-out
+  corpus; L remains untrained.
 - This fixture is a regression benchmark, not evidence of field performance.
+
+## Learned held-out hydraulic-shift benchmark
+
+- Classical signature top-1: 91.5% [87.5%, 95.0%].
+- HydroCore-S neural top-1: 94.5% [91.0%, 97.5%].
+- HydroMono-S top-1: 94.5% [91.5%, 97.5%].
+- Hybrid top-1: 96.0% [93.0%, 98.5%], +4.5 points over classical.
+- Held-out conformal coverage: 91.0%; mean set size 0.92; ECE 0.0269.
+- Limitation: one topology, withheld hydraulic regime; not field or unseen-topology proof.

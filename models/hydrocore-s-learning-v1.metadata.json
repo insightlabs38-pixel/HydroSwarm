@@ -1,0 +1,22 @@
+{
+  "architecture": "hydrocore",
+  "bytes": 16186380,
+  "calibration_manifest_sha256": "d8193e8761eb404cc4a8cb11c92417b5adc77315ea1d8cc288bf0d65530f43d0",
+  "corpus_report_sha256": "7065516ac3e5a0462f110d8eb296b54281909090293b68373a2fcf410df894d3",
+  "feature_schema_sha256": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "feature_schema_version": "hydroswarm-features-v2",
+  "optimizer_state_included": false,
+  "parameter_count": 4040645,
+  "promoted_at": "2026-08-03T20:06:53.613365+00:00",
+  "schema_version": 1,
+  "sha256": "85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423",
+  "tensor_count": 237,
+  "trainer_state": {
+    "best_validation_loss": 1.3886472642421723,
+    "epoch": 7,
+    "global_step": 600
+  },
+  "training_seconds": 385.1270589,
+  "training_status": "trained",
+  "variant": "small"
+}

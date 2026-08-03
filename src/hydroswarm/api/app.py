@@ -41,6 +41,7 @@ from hydroswarm.storage import AuditEvent
 from hydroswarm.networks import MAX_INP_BYTES, NetworkImportError, NetworkImporter
 from hydroswarm.simulation import HydraulicSimulator, PlanVerifier
 from hydroswarm.simulation.wrapper import wntr
+from hydroswarm.runtime import DefaultPipelineFactory
 
 from .state import (
     AnalysisResponse,
@@ -303,19 +304,24 @@ def create_app(
         deferred_pipeline = callable(pipeline_dependency) and not hasattr(
             pipeline_dependency, "analyze"
         )
+        trained_assets = getattr(pipeline_dependency, "trained_assets_ready", None)
+        asset_aware = isinstance(trained_assets, bool)
         checks = {
             "database": database_ready,
             "authoritative_verifier": verifier_ready,
             "hybrid_pipeline": pipeline_ready,
-            "signature_artifact": deferred_pipeline
+            "signature_artifact": bool(trained_assets) if asset_aware else deferred_pipeline
             or getattr(pipeline_dependency, "signature_artifact", None) is not None,
-            "calibration_artifact": deferred_pipeline
+            "calibration_artifact": bool(trained_assets) if asset_aware else deferred_pipeline
             or getattr(pipeline_dependency, "calibration_artifact", None) is not None,
+            "trained_checkpoint": bool(trained_assets) if asset_aware else False,
             "model_or_classical_safe_mode": pipeline_ready,
             "model_worker": runtime().jobs is not None,
         }
         mode = (
-            "hybrid-ready" if pipeline_ready
+            "hybrid-trained-ready" if trained_assets is True
+            else "classical-safe-ready" if asset_aware and pipeline_ready
+            else "hybrid-ready" if pipeline_ready
             else "injected-verifier" if runtime().verifier is not None
             else "authoritative-wntr"
         )
@@ -854,4 +860,4 @@ def create_app(
     return app
 
 
-app = create_app()
+app = create_app(pipeline_factory=DefaultPipelineFactory())

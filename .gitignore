@@ -15,4 +15,12 @@ build/
 .streamlit/
 tmp/
 data/generated/
+data/learning-v1/scenarios/**/*.npz
+data/learning-v1/scenarios/**/*.parquet
+data/learning-v1/tensors/
+data/learning-v1/tensors-canonical/
+data/learning-v1/tensors-canonical-v2/
+data/learning-v1/canonical-tensor-report.json
+data/learning-v1/canonical-tensor-report-v2.json
 models/checkpoints/
+experiments/runs/

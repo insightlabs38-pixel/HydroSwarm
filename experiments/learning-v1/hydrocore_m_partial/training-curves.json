@@ -1,0 +1,28 @@
+[
+  {
+    "batches": 40,
+    "epoch": 0,
+    "final_learning_rate": 0.00029795419551040833,
+    "mean_task_losses": {
+      "duration": 1.34514819085598,
+      "relative_strength": 1.2880492970347404,
+      "sensor_fault": 0.11899873474612832,
+      "source_node": 0.5027064472436905,
+      "start_time": 1.9422248959541322
+    },
+    "mean_training_loss": 2.1636036187410355
+  },
+  {
+    "batches": 80,
+    "epoch": 1,
+    "final_learning_rate": 0.00025159223574386114,
+    "mean_task_losses": {
+      "duration": 1.1970075689256192,
+      "relative_strength": 1.1647758200764655,
+      "sensor_fault": 0.04839857046026737,
+      "source_node": 0.3179072037921287,
+      "start_time": 1.5143356055021286
+    },
+    "mean_training_loss": 1.698748129606247
+  }
+]

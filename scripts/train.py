@@ -10,7 +10,7 @@ import sys
 
 import torch
 
-from hydroswarm.model import HydroCore
+from hydroswarm.model import HydroCore, HydroMono, NoAdapterHydroCore
 from hydroswarm.training import (
     CurriculumStage,
     GovernedScenarioDataset,
@@ -52,6 +52,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--validation-manifest", type=Path)
     parser.add_argument("--run-root", type=Path, default=Path("experiments/runs"))
     parser.add_argument("--variant", choices=("small", "medium", "large"), default="small")
+    parser.add_argument(
+        "--architecture",
+        choices=("hydrocore", "hydromono", "no-adapter"),
+        default="hydrocore",
+    )
     parser.add_argument("--resume-from", type=Path)
     return parser
 
@@ -65,7 +70,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.validation_manifest
         else None
     )
-    model = HydroCore.from_variant(args.variant)
+    model_type = {
+        "hydrocore": HydroCore,
+        "hydromono": HydroMono,
+        "no-adapter": NoAdapterHydroCore,
+    }[args.architecture]
+    model = model_type.from_variant(args.variant)
     trainer = Trainer(
         model,
         train,

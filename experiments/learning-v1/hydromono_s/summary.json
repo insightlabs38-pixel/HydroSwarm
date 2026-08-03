@@ -1,0 +1,9 @@
+{
+  "best_validation_loss": 1.3807872414588929,
+  "epochs_completed": 8,
+  "export_path": "experiments\\runs\\learning-v4-hydromono\\20260803T195614Z-97e6d7ba\\model-export.safetensors",
+  "final_checkpoint": "experiments\\runs\\learning-v4-hydromono\\20260803T195614Z-97e6d7ba\\checkpoints\\checkpoint-0008",
+  "global_steps": 600,
+  "run_directory": "experiments\\runs\\learning-v4-hydromono\\20260803T195614Z-97e6d7ba",
+  "stopped_early": false
+}

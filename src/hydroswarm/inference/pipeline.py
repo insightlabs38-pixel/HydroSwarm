@@ -90,6 +90,7 @@ class HybridInferencePipeline:
         simulator: Any,
         signature_artifact: SignatureArtifact,
         model: Any | None,
+        model_hash: str | None = None,
         calibration_artifact: CalibrationArtifact | None = None,
         state_estimator: HydraulicStateEstimator | None = None,
         feature_builder: HydraulicFeatureBuilder | None = None,
@@ -122,7 +123,7 @@ class HybridInferencePipeline:
         self._evidence: dict[UUID, tuple[EvidenceSnapshot, ...]] = {}
         self._changes: dict[UUID, tuple[EvidenceChange, ...]] = {}
         self._cache: dict[tuple[UUID, str], IncidentAnalysisResult] = {}
-        self._model_hash = self._fingerprint_model(model)
+        self._model_hash = model_hash or self._fingerprint_model(model)
 
     @staticmethod
     def _fingerprint_model(model: Any | None) -> str:

@@ -1,0 +1,24 @@
+{
+  "build_seconds": 5.583340900018811,
+  "canonical_runtime_compatible": true,
+  "feature_schema_sha256": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "feature_schema_version": "hydroswarm-features-v2",
+  "manifest_sha256": {
+    "calibration": "d8193e8761eb404cc4a8cb11c92417b5adc77315ea1d8cc288bf0d65530f43d0",
+    "test": "9dda76aed10c71d68803b808323fdb640498689b180de655c79b72fe07b67826",
+    "train": "dbf8ed18d3c386edb5efbbf9914e567febe019205d5cfd2f6144961f3ec5a5d4",
+    "validation": "3a3b014b037089a2d58fe2dd185206dd637d0cf0bdf517efe5779f24d16bda53"
+  },
+  "node_feature_shape_counts": {
+    "(6, 19)": 1320
+  },
+  "runtime_builder": "hydroswarm.preprocessing.HydraulicFeatureBuilder",
+  "schema_version": 1,
+  "source_scenario_report_sha256": "199662247aa7c18cf68fe4cc2b555769ef98e1570684b69cb8d3581c500bbe62",
+  "split_counts": {
+    "calibration": 160,
+    "test": 200,
+    "train": 800,
+    "validation": 160
+  }
+}

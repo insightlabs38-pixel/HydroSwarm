@@ -1,0 +1,50 @@
+{
+  "curriculum_stage_counts": {
+    "ADVERSARIAL": 264,
+    "CLEAN": 264,
+    "DEGRADED": 264,
+    "OPERATIONAL": 264,
+    "SHIFT": 264
+  },
+  "generated_at": "2026-08-03T19:08:12.204853+00:00",
+  "generation_seconds": 285.7715837000869,
+  "held_out_network_family": "held-out-high-head",
+  "hydraulic_regimes": 5,
+  "limitations": [
+    "The five named families are hydraulic regimes of one reference topology, not five independent utility topologies.",
+    "Held-out results therefore measure hydraulic-family shift, not topology-family transfer or field performance."
+  ],
+  "network_families": [
+    "reference-a",
+    "low-head-b",
+    "high-storage-c",
+    "low-storage-d",
+    "held-out-high-head"
+  ],
+  "quarantined_scenarios": 0,
+  "replay_validation_rate": 1.0,
+  "scenario_count": 1320,
+  "schema_version": 1,
+  "signature_file_sha256": "7f2b2088d8333a17a5d37164dc8dd6ddd95d9fda7a40b55db7a06b581203b98d",
+  "signature_library_sha256": "5d8957e155b4877008fe61af5b71fc59ec37855741eb9399602164fc6b2413d0",
+  "source_index_counts": {
+    "0": 330,
+    "1": 330,
+    "2": 330,
+    "3": 330
+  },
+  "split_counts": {
+    "calibration": 160,
+    "test": 200,
+    "train": 800,
+    "validation": 160
+  },
+  "storage_bytes": 23289090,
+  "tensor_manifest_sha256": {
+    "calibration": "39a7f88ae729e4d0a3be6f6738acbfc88ff655b22350c381c74d4f67e79e2cb2",
+    "test": "f4437609824dc70cf4a1299143b5e9917a44411d889d29a8ca444a672194c7ad",
+    "train": "a99ab7ccc355cb0c5d3804822e8d2deb304b2913a4ed90b3133b1073ee7bc2a8",
+    "validation": "ba84eba41fa4f8cc1e1528649be3dd2a2e7484ef19a0d96049a08e5c8550b964"
+  },
+  "topology_families": 1
+}

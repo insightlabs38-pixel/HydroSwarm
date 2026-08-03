@@ -96,6 +96,7 @@ def _pipeline(model) -> tuple[HybridInferencePipeline, object]:
         simulator=HydraulicSimulator(network),
         signature_artifact=_artifact(),
         model=model,
+        model_hash=model_hash,
         calibration_artifact=calibration,
         maximum_planning_candidates=1,
     )
@@ -115,6 +116,7 @@ def test_hybrid_result_aligns_native_beliefs_and_records_provenance() -> None:
     assert result.fusion_diagnostics is not None
     assert "classical_trust=" in result.trust_rationale
     assert result.runtime_mode == HybridRuntimeMode.FULL_HYBRID
+    assert result.provenance_hashes["model"] == pipeline._model_hash
     assert all(len(value) == 64 for value in result.provenance_hashes.values() if value != "none")
 
 

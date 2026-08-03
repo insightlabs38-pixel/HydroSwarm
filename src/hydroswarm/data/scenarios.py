@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass
 from enum import StrEnum
 from pathlib import Path
 from typing import Any, Mapping, Sequence
-from uuid import UUID, uuid4
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 import numpy as np
 import pandas as pd
@@ -32,6 +32,7 @@ class CurriculumStage(StrEnum):
 class DatasetSplit(StrEnum):
     TRAIN = "train"
     VALIDATION = "validation"
+    CALIBRATION = "calibration"
     TEST = "test"
 
 
@@ -40,6 +41,7 @@ class ScenarioGenerationConfig:
     seed: int
     network_id: str
     network_family: str
+    split: DatasetSplit | None = None
     stage: CurriculumStage = CurriculumStage.OPERATIONAL
     source_node: str | None = None
     start_time_bins_min: tuple[int, ...] = (0, 60, 120, 240)
@@ -139,7 +141,9 @@ class WNTRScenarioGenerator:
 
     def generate(self, network: Any, config: ScenarioGenerationConfig) -> GeneratedScenario:
         rng = np.random.default_rng(config.seed)
-        split = self.split_planner.assign(config.network_family, config.seed)
+        split = config.split or self.split_planner.assign(config.network_family, config.seed)
+        if config.network_family in self.split_planner.held_out and split != DatasetSplit.TEST:
+            raise ValueError("a held-out network family may only belong to the test split")
         model = copy.deepcopy(network)
         junctions = tuple(sorted(model.junction_name_list))
         if not junctions:
@@ -168,9 +172,14 @@ class WNTRScenarioGenerator:
         replay_payload = {
             "seed": config.seed, "network": network_sha256(network), "source": source,
             "start": start, "duration": duration, "strength": strength,
-            "demand": demand_regime, "sensors": sensors,
+            "demand": demand_regime, "sensors": sensors, "stage": config.stage.value,
+            "split": split.value, "network_family": config.network_family,
         }
         replay_hash = hashlib.sha256(json.dumps(replay_payload, sort_keys=True).encode()).hexdigest()
+        scenario_id = uuid5(
+            NAMESPACE_URL,
+            f"https://hydroswarm.local/scenarios/{replay_hash}",
+        )
         array_hash = hashlib.sha256(
             truth.tobytes() + observed.tobytes() + observation_mask.tobytes()
         ).hexdigest()
@@ -182,7 +191,7 @@ class WNTRScenarioGenerator:
             "missing_topology_element": config.stage == CurriculumStage.ADVERSARIAL,
         }
         manifest = ScenarioManifest(
-            scenario_id=uuid4(), split=split, stage=config.stage, network_id=config.network_id,
+            scenario_id=scenario_id, split=split, stage=config.stage, network_id=config.network_id,
             network_family=config.network_family, network_sha256=network_sha256(network), seed=config.seed,
             seed_family=config.seed // 100, simulator_version=simulator.simulator_version,
             generator_version=GENERATOR_VERSION,
@@ -319,6 +328,58 @@ class ScenarioDatasetWriter:
             "stage": [scenario.manifest.stage.value], "artifact": [artifact.name],
         }).to_parquet(split_root / f"{scenario.manifest.scenario_id}.parquet", index=False)
         return artifact
+
+
+def load_generated_scenarios(
+    root: str | Path, split: DatasetSplit
+) -> tuple[GeneratedScenario, ...]:
+    """Load governed scenario artifacts with manifest and array validation."""
+
+    dataset_root = Path(root)
+    manifest_path = dataset_root / "manifests" / f"{split.value}.jsonl"
+    scenarios: list[GeneratedScenario] = []
+    with manifest_path.open(encoding="utf-8") as stream:
+        for line_number, line in enumerate(stream, 1):
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+                incident_record = record.pop("incident")
+                incident_record["source_nodes"] = tuple(incident_record["source_nodes"])
+                incident = IncidentTruth(**incident_record)
+                record["scenario_id"] = UUID(record["scenario_id"])
+                record["split"] = DatasetSplit(record["split"])
+                record["stage"] = CurriculumStage(record["stage"])
+                record["sensor_nodes"] = tuple(record["sensor_nodes"])
+                record["incident"] = incident
+                manifest = ScenarioManifest(**record)
+                artifact = dataset_root / split.value / f"{manifest.scenario_id}.npz"
+                with np.load(artifact, allow_pickle=False) as arrays:
+                    scenario = GeneratedScenario(
+                        manifest=manifest,
+                        timestamps_seconds=arrays["timestamps_seconds"],
+                        truth_concentration=arrays["truth_concentration"],
+                        observed_concentration=arrays["observed_concentration"],
+                        observation_mask=arrays["observation_mask"],
+                        frozen_mask=arrays["frozen_mask"],
+                        communication_outage_mask=arrays["communication_outage_mask"],
+                        timestamp_jitter_seconds=arrays["timestamp_jitter_seconds"],
+                        sensor_nodes=manifest.sensor_nodes,
+                        flow_reversal_mask=arrays["flow_reversal_mask"],
+                    )
+                ScenarioValidator().validate(scenario)
+                if hashlib.sha256(
+                    scenario.truth_concentration.tobytes()
+                    + scenario.observed_concentration.tobytes()
+                    + scenario.observation_mask.tobytes()
+                ).hexdigest() != manifest.artifact_sha256:
+                    raise ValueError("scenario array checksum mismatch")
+                scenarios.append(scenario)
+            except (KeyError, TypeError, ValueError, OSError, json.JSONDecodeError) as error:
+                raise ValueError(
+                    f"invalid {split.value} scenario manifest line {line_number}: {error}"
+                ) from error
+    return tuple(scenarios)
 
 
 def validate_split_integrity(manifests: Sequence[ScenarioManifest]) -> None:

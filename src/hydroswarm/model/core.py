@@ -39,6 +39,7 @@ class HydroBatch(TypedDict, total=False):
     verifier_feedback: Tensor
     residual_features: Tensor
     classical_prior: Tensor
+    source_candidate_mask: Tensor
 
 
 class HydroOutput(TypedDict, total=False):
@@ -201,6 +202,7 @@ class HydroCore(nn.Module):
 
         # Semantic heads expose the actual scientific tasks rather than anonymous widths.
         self.source_node_head = RoleHead(d_model, 1)
+        self.prior_logit_scale = nn.Parameter(torch.tensor(0.54132485))
         self.source_region_head = RoleHead(d_model, 1)
         self.sensor_fault_head = RoleHead(d_model, 1)
         self.sample_node_head = RoleHead(d_model, 1)
@@ -320,6 +322,20 @@ class HydroCore(nn.Module):
         pointer_logits = torch.einsum(
             "bqd,bnd->bqn", self.pointer_query(plan_hidden), role_hidden["strategist"]
         ).masked_fill(~node_mask[:, None, :], torch.finfo(hidden.dtype).min)
+        source_mask = batch.get("source_candidate_mask", node_mask).bool()
+        if source_mask.shape != (batch_size, nodes):
+            raise ValueError("source_candidate_mask must have shape [batch, nodes]")
+        if not torch.all(source_mask.any(dim=1)):
+            raise ValueError("every graph requires at least one source candidate")
+        source_logits = self.source_node_head(sentinel_nodes).squeeze(-1)
+        if prior is not None:
+            prior_mass = prior.float().clamp_min(1e-8)
+            source_logits = source_logits + torch.nn.functional.softplus(
+                self.prior_logit_scale
+            ) * torch.log(prior_mass)
+        source_logits = source_logits.masked_fill(
+            ~source_mask, torch.finfo(hidden.dtype).min
+        )
         return HydroOutput(
             hidden_state=hidden,
             latent_state=latents,
@@ -327,7 +343,7 @@ class HydroCore(nn.Module):
             scout=role_outputs["scout"],
             strategist=role_outputs["strategist"],
             node_mask=node_mask,
-            source_node_logits=self.source_node_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
+            source_node_logits=source_logits,
             source_region_logits=self.source_region_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
             start_time_logits=self.profile_heads["start_time"](pooled),
             duration_logits=self.profile_heads["duration"](pooled),

@@ -11,7 +11,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 
-FEATURE_SCHEMA_VERSION = "hydroswarm-features-v1"
+FEATURE_SCHEMA_VERSION = "hydroswarm-features-v2"
 
 NODE_FEATURE_NAMES = (
     "node_type",

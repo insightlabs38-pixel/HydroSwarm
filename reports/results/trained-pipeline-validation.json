@@ -1,0 +1,60 @@
+{
+  "calibrated": true,
+  "candidate_nodes": [
+    "J2"
+  ],
+  "classical_belief": {
+    "J1": 0.0,
+    "J2": 1.0,
+    "J3": 0.0,
+    "J4": 0.0,
+    "R1": 0.0,
+    "T1": 0.0
+  },
+  "control_action": "GENERATE_PLANS",
+  "expected_source": "J2",
+  "factory_fallback_reason": null,
+  "factory_trained_assets_ready": true,
+  "fused_belief": {
+    "J1": 0.0,
+    "J2": 1.0,
+    "J3": 0.0,
+    "J4": 0.0,
+    "R1": 0.0,
+    "T1": 0.0
+  },
+  "fused_top_source": "J2",
+  "latencies_ms": {
+    "active_sampling": 0.0,
+    "belief_fusion": 0.30380021780729294,
+    "classical_localization": 0.9049996733665466,
+    "dynamic_graph": 1.1315997689962387,
+    "feature_building": 2.9217000119388103,
+    "hydraulic_simulation": 31.76600020378828,
+    "neural_inference": 1085.294300224632,
+    "ood_detection": 0.1266002655029297,
+    "planning": 4.467600025236607,
+    "state_estimation": 0.11150026693940163
+  },
+  "neural_belief": {
+    "J1": 1.346383344437842e-13,
+    "J2": 0.9999999999997113,
+    "J3": 2.7610122579769594e-14,
+    "J4": 1.265034477564158e-13,
+    "R1": 0.0,
+    "T1": 0.0
+  },
+  "neural_failure": null,
+  "ood_level": "NORMAL",
+  "provenance_hashes": {
+    "calibration": "062643e940a4c546f0046fafc92935ada7df5527ee120a0c302709c53afb76dc",
+    "evidence": "71b18e0c7ed44b936d96eaf45701c853e9231c77052888f2d964ce2b003a61f4",
+    "feature_schema": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "model": "85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423",
+    "network": "05840153b12763142ff8468e36ea6f3dd20dbf240edda09b5c0760512caf552d",
+    "signature_artifact": "24801eab564bd1ec6b19f545b074d420e24008b13a477ff9951a6a251f0470e8"
+  },
+  "runtime_mode": "FULL_HYBRID",
+  "schema_version": 1,
+  "source_correct": true
+}

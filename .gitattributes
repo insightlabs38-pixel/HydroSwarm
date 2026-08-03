@@ -2,3 +2,6 @@ output/releases/ export-ignore
 tmp/ export-ignore
 build/ export-ignore
 dist/ export-ignore
+*.pdf binary
+*.safetensors binary
+*.zip binary

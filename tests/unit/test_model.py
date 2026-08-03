@@ -28,6 +28,7 @@ def test_forward_handles_missing_sensors_and_node_masks() -> None:
     node_mask = torch.tensor([[True, True, False, True], [True, True, True, False]])
     sensor_mask = torch.ones(2, 3, 4, dtype=torch.bool)
     sensor_mask[0, :, 3] = False
+    source_mask = torch.tensor([[True, False, False, True], [True, True, False, False]])
 
     with torch.no_grad():
         output = model(
@@ -40,6 +41,10 @@ def test_forward_handles_missing_sensors_and_node_masks() -> None:
                 "demand_centrality": torch.rand(2, 4),
                 "node_mask": node_mask,
                 "sensor_mask": sensor_mask,
+                "source_candidate_mask": source_mask,
+                "classical_prior": torch.tensor(
+                    [[0.8, 0.1, 0.0, 0.1], [0.2, 0.8, 0.0, 0.0]]
+                ),
             }
         )
 
@@ -50,6 +55,7 @@ def test_forward_handles_missing_sensors_and_node_masks() -> None:
     assert torch.isfinite(output["hidden_state"]).all()
     assert torch.count_nonzero(output["hidden_state"][~node_mask]) == 0
     assert torch.count_nonzero(output["strategist"][~node_mask]) == 0
+    assert torch.all(output["source_node_logits"][~source_mask] < -1e20)
 
 
 def test_all_missing_observations_are_safe() -> None:

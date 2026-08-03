@@ -1,0 +1,43 @@
+{
+  "experiments": {
+    "hydrocore_m_partial": {
+      "best_validation_loss": 1.6801577389240265,
+      "dataset_manifest_sha256": "d6fe9f91601a0b1c1abde5025f71419777c2572fa6333b595dd516cd064859b6",
+      "epochs_completed": 2,
+      "global_steps": 60,
+      "limitations": [
+        "Only two curriculum epochs; not a converged medium-model result."
+      ],
+      "metrics_sha256": "5d0db5924f43138858faa8716578b9b02c17481c43d3e6d31b281722502af6cf",
+      "optimizer_state_published": false,
+      "resume_supported": true,
+      "training_curve_sha256": "08fa8807d8c2438be43e0d06b1455df69a50da877729a7152bb445e6fc6f9b01",
+      "training_status": "partial"
+    },
+    "hydrocore_s": {
+      "best_validation_loss": 1.3886472642421723,
+      "dataset_manifest_sha256": "d6fe9f91601a0b1c1abde5025f71419777c2572fa6333b595dd516cd064859b6",
+      "epochs_completed": 8,
+      "global_steps": 600,
+      "limitations": [],
+      "metrics_sha256": "5b816748abc6eba24b09466a9d6f9b58e6de6e1402fb01de29d9ed5861f734cd",
+      "optimizer_state_published": false,
+      "resume_supported": true,
+      "training_curve_sha256": "695a256a5407bb911351375946d421c503653a385fb4b5b497f9ef06bff918ab",
+      "training_status": "trained"
+    },
+    "hydromono_s": {
+      "best_validation_loss": 1.3807872414588929,
+      "dataset_manifest_sha256": "d6fe9f91601a0b1c1abde5025f71419777c2572fa6333b595dd516cd064859b6",
+      "epochs_completed": 8,
+      "global_steps": 600,
+      "limitations": [],
+      "metrics_sha256": "16ee49bcda2e35fb9d466eb86e61c001172973c0f479cfc1e3c45d48a637177b",
+      "optimizer_state_published": false,
+      "resume_supported": true,
+      "training_curve_sha256": "ec1302777d7e3ed0c4d60ddba48700b7bd9d9081873e577f68decf742404f913",
+      "training_status": "trained"
+    }
+  },
+  "schema_version": 1
+}

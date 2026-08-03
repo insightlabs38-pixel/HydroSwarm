@@ -133,6 +133,15 @@ class HydraulicFeatureBuilder:
                 float(isolation.get(node_id, 0)),
             ])
         node_values = DEFAULT_FEATURE_SCHEMA.validate_node_array(node_rows)
+        node_values[:, 6] = np.log1p(np.maximum(node_values[:, 6], 0.0))
+        node_values = node_values / np.asarray(
+            [
+                3.0, 200.0, 0.02, 0.02, 100.0, 200.0, 5.0, 1.0, 1.0,
+                86_400.0, 1.0, 1.0, 86_400.0, 1.0, 1.0, 1.0, 10_000.0,
+                10_000.0, 10.0,
+            ],
+            dtype=np.float32,
+        )
         if self.node_normalization:
             if self.node_normalization.schema_version != DEFAULT_FEATURE_SCHEMA.version:
                 raise ValueError("node normalization schema version is incompatible")
@@ -146,19 +155,29 @@ class HydraulicFeatureBuilder:
             length = float(getattr(link, "length", 0.0))
             diameter = float(getattr(link, "diameter", 0.0))
             flow = float(attributes.get("flow_m3s", 0.0))
+            velocity = float(attributes.get("velocity_mps", 0.0))
+            travel_time = float(attributes.get("travel_time_seconds", 0.0))
+            if not math.isfinite(velocity):
+                velocity = 0.0
+            if not math.isfinite(travel_time):
+                travel_time = 24.0 * 3_600.0
             edge_pairs.append((str(start), str(end)))
             kind = type(link).__name__.lower()
             edge_rows.append([
                 1.0 if "pipe" in kind else 2.0 if "pump" in kind else 3.0,
                 length, diameter, float(getattr(link, "roughness", 0.0)), abs(flow),
-                1.0, float(attributes.get("velocity_mps", 0.0)),
-                float(attributes.get("travel_time_seconds", 0.0)),
+                1.0, velocity, travel_time,
                 float("valve" not in kind or str(getattr(link, "status", "Open")).lower() != "closed"),
                 float("pump" not in kind or str(getattr(link, "status", "Open")).lower() != "closed"),
                 float(getattr(link, "start_node_name", str(start)) != str(start)),
                 float(attributes.get("operable", True)), math.pi * (diameter / 2) ** 2 * length,
             ])
         edge_values = DEFAULT_FEATURE_SCHEMA.validate_edge_array(edge_rows)
+        edge_values = edge_values / np.asarray(
+            [3.0, 10_000.0, 2.0, 200.0, 0.1, 1.0, 5.0, 86_400.0, 1.0,
+             1.0, 1.0, 1.0, 100_000.0],
+            dtype=np.float32,
+        )
         edge_index, edge_values = align_edges(edge_pairs, edge_values, node_ids)
         if self.edge_normalization:
             if self.edge_normalization.schema_version != DEFAULT_FEATURE_SCHEMA.version:
@@ -182,14 +201,14 @@ class HydraulicFeatureBuilder:
                 pressure = series.pressure_m[source_index]
                 age = now - timestamp
                 temporal[time_index, node_index] = [
-                    concentration if concentration is not None else np.nan,
-                    pressure if pressure is not None else np.nan,
-                    age, float(series.missing[source_index]), float(series.drift[source_index]),
+                    np.log1p(max(concentration, 0.0)) if concentration is not None else np.nan,
+                    pressure / 100.0 if pressure is not None else np.nan,
+                    age / 86_400.0, float(series.missing[source_index]), float(series.drift[source_index]),
                     float(series.delayed[source_index]),
                 ]
                 quality[time_index, node_index] = [
                     series.health[source_index], float(series.missing[source_index]),
-                    float(series.drift[source_index]), age,
+                    float(series.drift[source_index]), age / 86_400.0,
                 ]
         sample = GraphSample(
             node_features=torch.as_tensor(node_values, dtype=self.dtype, device=self.device),
@@ -202,6 +221,11 @@ class HydraulicFeatureBuilder:
         batch = pad_graph_batch([sample])
         batch["classical_prior"] = torch.as_tensor(
             [[classical_prior.get(node, 0.0) for node in node_ids]], dtype=self.dtype, device=self.device
+        )
+        batch["source_candidate_mask"] = torch.as_tensor(
+            [[node in network.junction_name_list for node in node_ids]],
+            dtype=torch.bool,
+            device=self.device,
         )
         batch["travel_time"] = torch.as_tensor([[reservoir_distance[node] for node in node_ids]], dtype=self.dtype, device=self.device)
         batch["reservoir_reachability"] = torch.as_tensor(
@@ -216,4 +240,3 @@ class HydraulicFeatureBuilder:
             node_ids=node_ids, batch=batch, feature_schema_version=DEFAULT_FEATURE_SCHEMA.version,
             feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         )
-

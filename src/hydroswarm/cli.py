@@ -37,6 +37,7 @@ def run_self_test() -> dict[str, Any]:
             dependencies[name] = "importable"
 
     from hydroswarm.model import HydroCore
+    from hydroswarm.runtime import DefaultPipelineFactory
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
     from hydroswarm.simulation.wrapper import HydraulicSimulator
 
@@ -109,6 +110,8 @@ def run_self_test() -> dict[str, Any]:
         except OSError:
             port_available = False
     frontend_dist = workspace / "frontend" / "dist" / "index.html"
+    trained_factory = DefaultPipelineFactory(workspace)
+    trained_assets_ready = trained_factory.trained_assets_ready
 
     return {
         "ok": True,
@@ -121,6 +124,10 @@ def run_self_test() -> dict[str, Any]:
         },
         "sqlite": "ok",
         "model_parameters": parameter_count,
+        "trained_assets": {
+            "ready": trained_assets_ready,
+            "fallback_reason": trained_factory.fallback_reason,
+        },
         "inference_run": True,
         "inference_sha256": inference_hash,
         "simulation_run": True,
