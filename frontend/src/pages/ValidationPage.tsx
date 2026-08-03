@@ -9,29 +9,29 @@ export function ValidationPage({ incident }: { incident: IncidentView }) {
         <p className="eyebrow">SCIENTIFIC VALIDATION</p>
         <h1>Benchmarks and operating range</h1>
         <p>
-          Held-out incidents, robustness conditions, and unseen-network transfer. No
-          production-safety claim.
+          Frozen regression, deterministic replay, scientific unit tests, and explicitly missing
+          checkpoint evaluations. No production-safety claim.
         </p>
       </header>
       <div className="validation-summary">
         <article>
-          <strong>6,400</strong>
-          <span>test incidents</span>
+          <strong>3</strong>
+          <span>seeded golden runs</span>
         </article>
         <article>
-          <strong>6</strong>
-          <span>networks tested</span>
+          <strong>1</strong>
+          <span>frozen network</span>
         </article>
         <article>
-          <strong>C-Town</strong>
-          <span>unseen network</span>
+          <strong>NOT RUN</strong>
+          <span>neural checkpoint evaluation</span>
         </article>
         <article>
-          <strong>1.8 GB</strong>
-          <span>peak RAM</span>
+          <strong>1.17 MB</strong>
+          <span>Python allocation peak only</span>
         </article>
       </div>
-      <Panel title="Operational benchmark table" eyebrow="HYBRID HYDROSWARM-M">
+      <Panel title="Operational benchmark table" eyebrow="FROZEN WNTR REGRESSION">
         <div className="table-scroll">
           <table className="benchmark-table">
             <caption>Current frozen evaluation results</caption>
@@ -63,18 +63,19 @@ export function ValidationPage({ incident }: { incident: IncidentView }) {
       <div className="validation-grid">
         <Panel title="Robustness sweep" eyebrow="IMPERFECT EVIDENCE">
           <ul className="check-list">
-            <li>Missing sensors — evaluated</li>
-            <li>Noise and drift — evaluated</li>
-            <li>Delayed observations — evaluated</li>
-            <li>Demand uncertainty — evaluated</li>
-            <li>Flow reversal — evaluated</li>
-            <li>OOD incident — abstained</li>
+            <li>Missing sensors - scientific tests pass</li>
+            <li>Noise and drift - scientific tests pass</li>
+            <li>Delayed observations - controller tests pass</li>
+            <li>Demand uncertainty - reconciliation tests pass</li>
+            <li>Flow reversal - graph regression tests pass</li>
+            <li>OOD evidence - abstention tests pass</li>
           </ul>
         </Panel>
         <Panel title="Known limitations" eyebrow="HONEST BOUNDARY">
           <ul className="warning-list">
             <li>Single-species simulated incidents only</li>
-            <li>Unseen-network gap remains 13.2 points</li>
+            <li>No trained checkpoint or unseen-network neural result is included</li>
+            <li>Frozen proof uses one compact reference network</li>
             <li>No autonomous actuator control</li>
             <li>Candidate coverage is marginal, not per-incident</li>
             <li>Human engineering review is mandatory</li>

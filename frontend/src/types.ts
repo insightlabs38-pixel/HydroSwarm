@@ -58,7 +58,7 @@ export interface Benchmark {
   metric: string;
   value: string;
   comparison: string;
-  status: 'PASS' | 'WATCH';
+  status: 'PASS' | 'WATCH' | 'NOT RUN';
 }
 
 export interface IncidentView {

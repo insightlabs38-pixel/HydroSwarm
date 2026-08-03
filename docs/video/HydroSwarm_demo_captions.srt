@@ -1,0 +1,39 @@
+1
+00:00:00,000 --> 00:00:25,000
+A water-quality alert rarely identifies its source. Sparse evidence, changing flow, and unsafe interventions make the next decision hard.
+
+2
+00:00:25,000 --> 00:00:50,000
+HydroSwarm runs locally. Hydraulic physics and source signatures combine with a compact graph-time model. Uncertainty controls sampling, and WNTR verifies every plan.
+
+3
+00:00:50,000 --> 00:01:25,000
+This frozen scenario begins with four equally plausible source nodes. These results come from WNTR and the checked-in backend, not a map overlay.
+
+4
+00:01:25,000 --> 00:01:55,000
+Scout selects J2 with one bit of measured information gain. When the simulated sample arrives, the source set contracts from four nodes to one and J2 reaches 99.4 percent posterior probability.
+
+5
+00:01:55,000 --> 00:02:20,000
+Strategist proposes bounded alternatives. The default WNTR path rejects a sole-feeder closure because pressure falls below the configured minimum.
+
+6
+00:02:20,000 --> 00:02:40,000
+A controlled J4 flush passes the modeled pressure and service checks, but it still cannot execute and must wait for a person.
+
+7
+00:02:40,000 --> 00:03:10,000
+Separate exact simulations estimate 2,541,416 milligrams consumed with no response and 2,526,693 milligrams for the verified alternative: a modeled reduction of 14,723 milligrams.
+
+8
+00:03:10,000 --> 00:03:35,000
+Every explanation is grounded in typed evidence: measurements, posterior revisions, sensitivity, simulator outcomes, abstention state, and an immutable event history.
+
+9
+00:03:35,000 --> 00:03:50,000
+Three seeded golden runs pass the regression gate. Neural checkpoints are explicitly reported as not run, because no governed checkpoint is included.
+
+10
+00:03:50,000 --> 00:04:00,000
+HydroSwarm operates offline. It is research decision support, not chemistry identification or autonomous control. Localize the risk. Choose the evidence. Verify the response.

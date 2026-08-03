@@ -9,32 +9,32 @@ export function BenchmarkPage({ incident }: { incident: IncidentView }) {
         <p className="eyebrow">FROZEN EVALUATION RUN</p>
         <h1>Operational benchmarks</h1>
         <p>
-          End-to-end outcomes for localization, evidence efficiency, plan safety, transfer, runtime,
-          and memory.
+          End-to-end outcomes regenerated from three seeded runs of the checked-in WNTR golden
+          fixture. This is regression evidence, not field performance.
         </p>
       </header>
       <div className="validation-summary">
         <article>
-          <strong>438 ms</strong>
-          <span>CPU inference</span>
+          <strong>1.51 s</strong>
+          <span>mean golden runtime</span>
         </article>
         <article>
-          <strong>90.8%</strong>
-          <span>candidate coverage</span>
+          <strong>99.41%</strong>
+          <span>true-source posterior</span>
         </article>
         <article>
-          <strong>1.8</strong>
-          <span>median samples</span>
+          <strong>1.0 bit</strong>
+          <span>sample information gain</span>
         </article>
         <article>
-          <strong>7.1%</strong>
-          <span>invalid plans</span>
+          <strong>14,723 mg</strong>
+          <span>modeled reduction</span>
         </article>
       </div>
-      <Panel title="Benchmark evidence" eyebrow="SEEN + UNSEEN NETWORKS">
+      <Panel title="Benchmark evidence" eyebrow="MEASURED + MISSING MADE EXPLICIT">
         <div className="table-scroll">
           <table className="benchmark-table">
-            <caption>Frozen simulator-derived metrics; not live incident values</caption>
+            <caption>Measured frozen WNTR metrics; neural checkpoints explicitly not run</caption>
             <thead>
               <tr>
                 <th>Metric</th>

@@ -45,15 +45,13 @@ test('keyboard-operable navigation exposes audit and validation state', async ()
   renderApp();
   await screen.findByText('Verified response awaiting approval');
   await user.click(screen.getByRole('button', { name: 'Audit' }));
-  expect(
-    await screen.findByRole('heading', { name: 'Incident audit and replay' }),
-  ).toBeVisible();
+  expect(await screen.findByRole('heading', { name: 'Incident audit and replay' })).toBeVisible();
   expect(screen.getByText('PLAN REJECTED')).toBeVisible();
   await user.click(screen.getByRole('button', { name: 'Validation' }));
   expect(
     await screen.findByRole('heading', { name: 'Benchmarks and operating range' }),
   ).toBeVisible();
-  expect(screen.getByText('Unseen network Top-3')).toBeVisible();
+  expect(screen.getByText('HydroCore S / M / L checkpoint')).toBeVisible();
   await user.click(screen.getByRole('button', { name: /Reduced motion off/ }));
   expect(screen.getByRole('button', { name: /Reduced motion on/ })).toHaveAttribute(
     'aria-pressed',
