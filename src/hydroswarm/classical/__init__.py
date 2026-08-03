@@ -25,6 +25,13 @@ from .screening import (
     SensorObservation,
     screen_candidates,
 )
+from .state_estimation import (
+    EstimatedHydraulicState,
+    HydraulicStateEstimator,
+    OperationalTelemetry,
+    StateResidualReport,
+    ValueRange,
+)
 
 __all__ = [
     "AbstentionMetrics",
@@ -33,11 +40,16 @@ __all__ = [
     "CandidateSetMetrics",
     "DirectedHydraulicGraph",
     "HydraulicLink",
+    "HydraulicStateEstimator",
+    "EstimatedHydraulicState",
     "NodeId",
     "PressureViolationMetrics",
+    "OperationalTelemetry",
     "ScreeningResult",
     "SensorObservation",
     "SignatureLibrary",
+    "StateResidualReport",
+    "ValueRange",
     "abstention_quality",
     "bayesian_source_posterior",
     "build_dynamic_graph",
@@ -49,4 +61,3 @@ __all__ = [
     "pressure_violations",
     "screen_candidates",
 ]
-
