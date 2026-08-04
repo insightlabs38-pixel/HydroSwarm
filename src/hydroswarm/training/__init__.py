@@ -33,6 +33,7 @@ from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_s
 from .scout_labels import ScoutLabel, build_signature_artifact_for_network, generate_scout_label
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
+from .strategist_labels import StrategistLabel, generate_strategist_labels
 from .targets_v2 import (
     TARGETS_BY_CATEGORY,
     TARGETS_V2,
@@ -78,6 +79,7 @@ __all__ = [
     "RunHandle",
     "ScenarioExample",
     "ScoutLabel",
+    "StrategistLabel",
     "ShardedScenarioDataset",
     "TargetSchemaError",
     "TargetSpec",
@@ -107,6 +109,7 @@ __all__ = [
     "cross_split_leakage",
     "export_model",
     "generate_scout_label",
+    "generate_strategist_labels",
     "load_checkpoint",
     "load_policy",
     "load_scenario_examples_jsonl",
