@@ -24,6 +24,7 @@ from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_s
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
+from .variable_collate import collate_variable_topology
 
 __all__ = [
     "AgentTrajectory",
@@ -51,6 +52,7 @@ __all__ = [
     "by_network",
     "by_source_node",
     "collate_scenarios",
+    "collate_variable_topology",
     "composite_key",
     "compute_multitask_loss",
     "cross_split_leakage",

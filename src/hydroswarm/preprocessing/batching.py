@@ -58,6 +58,20 @@ def _seconds(value: datetime | float) -> float:
     return float(value)
 
 
+#: Optional per-node scalar inputs HydroCore reads via batch.get(key, zeros)
+#: (see hydroswarm.model.core.HydroCore.forward). Kept as an explicit list
+#: rather than auto-detected from tensor shape, since temporal/quality
+#: tensors also have a leading dimension that can coincide with node count
+#: for small graphs and would otherwise be misclassified.
+NODE_SCALAR_FEATURE_KEYS = (
+    "travel_time",
+    "reservoir_reachability",
+    "demand_centrality",
+    "classical_prior",
+    "source_candidate_mask",
+)
+
+
 @dataclass(frozen=True, slots=True)
 class GraphSample:
     node_features: Tensor
@@ -66,6 +80,7 @@ class GraphSample:
     edge_index: Tensor
     edge_features: Tensor
     timestamps: Tensor | None = None
+    node_scalar_features: dict[str, Tensor] | None = None
 
     def __post_init__(self) -> None:
         nodes = self.node_features.shape[0]
@@ -81,6 +96,10 @@ class GraphSample:
             raise ValueError("edge_features rows must match edge_index")
         if self.edge_index.numel() and (self.edge_index.min() < 0 or self.edge_index.max() >= nodes):
             raise ValueError("edge_index contains an invalid node index")
+        if self.node_scalar_features is not None:
+            for key, value in self.node_scalar_features.items():
+                if value.shape[0] != nodes:
+                    raise ValueError(f"node_scalar_features[{key!r}] must have shape [nodes, ...]")
 
 
 def pad_graph_batch(samples: Sequence[GraphSample]) -> dict[str, Tensor]:
@@ -133,6 +152,28 @@ def pad_graph_batch(samples: Sequence[GraphSample]) -> dict[str, Tensor]:
             if sample.timestamps.shape != (steps,):
                 raise ValueError("timestamps must have one value per time step")
             timestamps[index, :steps] = sample.timestamps
+
+    scalar_keys = {
+        key
+        for sample in samples
+        if sample.node_scalar_features is not None
+        for key in sample.node_scalar_features
+    }
+    padded_scalars: dict[str, Tensor] = {}
+    for key in scalar_keys:
+        example_shape = next(
+            sample.node_scalar_features[key].shape[1:]
+            for sample in samples
+            if sample.node_scalar_features is not None and key in sample.node_scalar_features
+        )
+        values = torch.zeros(batch, max_nodes, *example_shape, device=device)
+        for index, sample in enumerate(samples):
+            if sample.node_scalar_features is None or key not in sample.node_scalar_features:
+                continue  # left as zero, masked out by node_mask like any other padding
+            feature = sample.node_scalar_features[key]
+            values[index, : feature.shape[0]] = feature
+        padded_scalars[key] = values
+
     return {
         "node_features": node,
         "temporal_features": temporal,
@@ -144,4 +185,5 @@ def pad_graph_batch(samples: Sequence[GraphSample]) -> dict[str, Tensor]:
         "quality_mask": quality_mask,
         "edge_mask": edge_mask,
         "timestamps": timestamps,
+        **padded_scalars,
     }
