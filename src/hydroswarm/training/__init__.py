@@ -14,15 +14,19 @@ from .data import (
     validate_split_isolation,
 )
 from .losses import MultiTaskLoss, compute_multitask_loss, task_gradient_norms
+from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
 
 __all__ = [
     "AgentTrajectory",
     "CurriculumSchedule",
     "CurriculumStage",
+    "ExperimentRegistry",
     "GovernedScenarioDataset",
     "MultiTaskLoss",
+    "RegistryError",
     "RunArtifacts",
+    "RunHandle",
     "ScenarioExample",
     "Trainer",
     "TrainingConfig",
