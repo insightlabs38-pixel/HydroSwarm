@@ -1,0 +1,76 @@
+{
+  "schema_version": "hydroswarm-split-policy-v3",
+  "applies_to": "agent/gcp-multitopology-v3 overnight run (overnight-plan.txt Task 0.8)",
+  "split_roles": {
+    "train": {
+      "purpose": "optimization only",
+      "forbidden": ["checkpoint selection", "early stopping", "calibration fitting", "hyperparameter comparison"]
+    },
+    "validation": {
+      "purpose": "checkpoint selection and early stopping",
+      "forbidden": ["gradient updates", "calibration fitting", "final architecture claims"]
+    },
+    "calibration": {
+      "purpose": "conformal and threshold fitting, only after checkpoint selection is final",
+      "forbidden": ["gradient updates", "checkpoint selection", "architecture comparison"]
+    },
+    "development_holdout": {
+      "purpose": "architecture comparison and repeated iteration",
+      "forbidden": ["gradient updates"],
+      "note": "may be used repeatedly across the experiment matrix (E0-E10); it is explicitly the iteration surface, unlike the locked test"
+    },
+    "ood_development": {
+      "purpose": "OOD threshold and abstention-behavior development",
+      "forbidden": ["gradient updates", "use as the final OOD test"]
+    },
+    "locked_final_test": {
+      "purpose": "opened exactly once, after a final configuration is selected",
+      "forbidden": [
+        "any tuning or retuning based on its results",
+        "opening before reports/results/v3/final-selection.json exists",
+        "opening more than once",
+        "inspecting partial results during the run"
+      ]
+    },
+    "locked_topology_test": {
+      "purpose": "held-out topology generalization / safety-boundary check",
+      "forbidden": ["fine-tuning on that topology", "calibration fitting on that topology"]
+    }
+  },
+  "final_test_authorization": {
+    "may_run_when_all_true": [
+      "the selected configuration is recorded in the experiment registry",
+      "no further architecture or hyperparameter tuning is planned",
+      "all required tests pass (pytest, ruff, pyright, frontend lint/test/build)",
+      "manifest hashes match between the registry record and the on-disk locked-test manifest",
+      "calibration was fit without any locked test data",
+      "reports/results/v3/final-selection.json exists before the test command starts"
+    ],
+    "after_viewing_results": [
+      "do not retune architecture, hyperparameters, or calibration against locked-test results",
+      "report negative results honestly",
+      "preserve all outputs immutably",
+      "record in the experiment registry that the locked test was opened, with its run_id"
+    ]
+  },
+  "final_selection_record": {
+    "path": "reports/results/v3/final-selection.json",
+    "must_contain": [
+      "selected_architecture",
+      "selected_checkpoint_hash",
+      "seed_or_ensemble",
+      "selection_metrics",
+      "selection_reason",
+      "calibration_artifact",
+      "no_further_tuning_commitment"
+    ]
+  },
+  "never_permitted": [
+    "altering, regenerating, relabeling, or inspecting locked test outcomes to make an architectural decision",
+    "modifying historical result files to make current performance appear better",
+    "replacing a failed evaluation with a hard-coded value",
+    "promoting a new default checkpoint automatically",
+    "overwriting the currently promoted HydroCore-S artifact",
+    "training HydroCore-L without all S/M work complete and an explicit machine-readable decision record"
+  ]
+}

@@ -19,6 +19,7 @@ from .losses import MultiTaskLoss, compute_multitask_loss, task_gradient_norms
 from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
 from .sharded_data import ShardedScenarioDataset, write_shards
+from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
 
 __all__ = [
@@ -38,8 +39,10 @@ __all__ = [
     "TrainingSummary",
     "TrajectoryStep",
     "GroupBalancedSampler",
+    "SplitPolicyViolation",
     "audit_corpus",
     "audit_split",
+    "authorize_locked_final_test",
     "by_curriculum_stage",
     "by_network",
     "by_source_node",
@@ -49,6 +52,7 @@ __all__ = [
     "cross_split_leakage",
     "export_model",
     "load_checkpoint",
+    "load_policy",
     "load_scenario_examples_jsonl",
     "save_checkpoint",
     "set_deterministic_seed",
