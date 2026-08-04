@@ -44,6 +44,13 @@ from .targets_v2 import (
     validate_targets_v2,
 )
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
+from .trajectory_v2 import (
+    TRAJECTORY_SCHEMA_VERSION,
+    FullTrajectory,
+    RemainingBudgets,
+    TrajectoryIntegrityError,
+    TrajectoryState,
+)
 from .variable_collate import collate_variable_topology
 
 __all__ = [
@@ -51,6 +58,7 @@ __all__ = [
     "TARGETS_BY_CATEGORY",
     "TARGETS_V2",
     "TARGETS_V2_SCHEMA_VERSION",
+    "TRAJECTORY_SCHEMA_VERSION",
     "AbstentionOutcome",
     "AgentTrajectory",
     "CurriculumSchedule",
@@ -58,11 +66,13 @@ __all__ = [
     "EventCause",
     "ExpectedBehavior",
     "ExperimentRegistry",
+    "FullTrajectory",
     "GovernedScenarioDataset",
     "MultiTaskLoss",
     "NextStep",
     "OODCategory",
     "RegistryError",
+    "RemainingBudgets",
     "RunArtifacts",
     "RunHandle",
     "ScenarioExample",
@@ -73,6 +83,8 @@ __all__ = [
     "Trainer",
     "TrainingConfig",
     "TrainingSummary",
+    "TrajectoryIntegrityError",
+    "TrajectoryState",
     "TrajectoryStep",
     "EquivarianceReport",
     "GroupBalancedSampler",
