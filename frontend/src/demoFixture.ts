@@ -248,9 +248,9 @@ export const demoIncident: IncidentView = {
     },
     {
       metric: 'HydroCore S / M / L checkpoint',
-      value: 'Not run',
-      comparison: 'governed checkpoint absent',
-      status: 'NOT RUN',
+      value: 'S promoted (96.0% top-1) · M rejected · L not trained',
+      comparison: 'see governed model evaluation table',
+      status: 'PASS',
     },
   ],
   explanation:

@@ -1,6 +1,7 @@
 import type { IncidentView } from '../types';
 import { Panel } from '../components/Panel';
 import { StatusBadge } from '../components/StatusBadge';
+import { ModelGovernanceTable } from '../components/ModelGovernanceTable';
 
 export function BenchmarkPage({ incident }: { incident: IncidentView }) {
   return (
@@ -31,10 +32,13 @@ export function BenchmarkPage({ incident }: { incident: IncidentView }) {
           <span>modeled reduction</span>
         </article>
       </div>
+      <Panel title="Model evaluation and promotion" eyebrow="GOVERNED RESULTS">
+        <ModelGovernanceTable />
+      </Panel>
       <Panel title="Benchmark evidence" eyebrow="MEASURED + MISSING MADE EXPLICIT">
         <div className="table-scroll">
           <table className="benchmark-table">
-            <caption>Measured frozen WNTR metrics; neural checkpoints explicitly not run</caption>
+            <caption>Measured frozen WNTR metrics</caption>
             <thead>
               <tr>
                 <th>Metric</th>
