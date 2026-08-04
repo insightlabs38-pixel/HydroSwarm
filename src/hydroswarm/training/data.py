@@ -161,7 +161,7 @@ class ScenarioExample:
     def __post_init__(self) -> None:
         if not self.scenario_id or not self.network_id or not self.seed_family:
             raise ValueError("scenario, network, and seed-family IDs are required")
-        if self.split not in {"train", "validation", "test", "calibration"}:
+        if self.split not in {"train", "validation", "test", "calibration", "development_holdout"}:
             raise ValueError("unsupported dataset split")
         if self.seed < 0:
             raise ValueError("scenario seed cannot be negative")

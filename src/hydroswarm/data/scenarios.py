@@ -58,6 +58,17 @@ class DatasetSplit(StrEnum):
     VALIDATION = "validation"
     CALIBRATION = "calibration"
     TEST = "test"
+    #: overnight-plan.txt Phase 5 (Cycle A/B's "development holdout" /
+    #: "disposable development holdout"). Distinct from TEST, which is the
+    #: locked final test governed by configs/evaluation_policy_v3.json
+    #: ("opened exactly once... forbidden: any tuning based on its
+    #: results"). DEVELOPMENT_HOLDOUT matches that policy's
+    #: "development_holdout" role: "architecture comparison and repeated
+    #: iteration... explicitly the iteration surface, unlike the locked
+    #: test." Generating Cycle A/B data must never label this data TEST --
+    #: doing so would make ordinary architecture-comparison iteration
+    #: indistinguishable from opening the locked test.
+    DEVELOPMENT_HOLDOUT = "development_holdout"
 
 
 @dataclass(frozen=True, slots=True)

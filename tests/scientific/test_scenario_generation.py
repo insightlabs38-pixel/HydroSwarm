@@ -88,6 +88,49 @@ def test_deterministic_ids_calibration_split_and_tensor_bridge() -> None:
     assert example.inputs["classical_prior"].sum().item() == pytest.approx(1.0)
 
 
+def test_development_holdout_split_is_distinct_from_locked_test() -> None:
+    # overnight-plan.txt Phase 5's Cycle A/B "development holdout" is the
+    # governed architecture-comparison iteration surface
+    # (configs/evaluation_policy_v3.json's "development_holdout" role),
+    # never the once-only locked final test -- generating it under
+    # DatasetSplit.TEST would make ordinary iteration indistinguishable
+    # from opening the locked test.
+    assert DatasetSplit.DEVELOPMENT_HOLDOUT != DatasetSplit.TEST
+    assert DatasetSplit.DEVELOPMENT_HOLDOUT.value == "development_holdout"
+
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(
+            seed=77_000,
+            network_id="reference",
+            network_family="reference",
+            split=DatasetSplit.DEVELOPMENT_HOLDOUT,
+            stage=CurriculumStage.CLEAN,
+        ),
+    )
+    assert scenario.manifest.split == DatasetSplit.DEVELOPMENT_HOLDOUT
+
+    train_scenarios = [
+        generator.generate(
+            network,
+            ScenarioGenerationConfig(
+                seed=78_000 + index * 100,
+                network_id="reference",
+                network_family="reference",
+                split=DatasetSplit.TRAIN,
+                stage=CurriculumStage.CLEAN,
+                source_node=source,
+            ),
+        )
+        for index, source in enumerate(sorted(network.junction_name_list))
+    ]
+    library = fit_signature_library(train_scenarios, tuple(sorted(network.junction_name_list)))
+    example = scenario_to_example(scenario, network, library)
+    assert example.split == "development_holdout"
+
+
 def test_normal_event_type_produces_negligible_concentration() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
