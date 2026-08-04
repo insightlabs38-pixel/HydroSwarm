@@ -33,6 +33,19 @@ its metadata, or the calibration artifact.
 
 ## Gate not yet run
 
-`npm run test:e2e` (Playwright) and `python -m build --wheel --no-isolation` are Phase 9
-final-validation gates per the plan and were not run during Phase 0 baseline recording;
-they will be run again at end-of-run alongside the rest of Phase 9.
+`python -m build --wheel --no-isolation` is a Phase 9 final-validation gate per the plan and
+was not run during Phase 0 baseline recording; it will run at end-of-run alongside the rest
+of Phase 9.
+
+## Update after Bundle C (commit `2067571`)
+
+| Command | Result | Notes |
+|---|---|---|
+| `python -m pytest -q` | **270 passed** | up from 98 at baseline (1 pre-existing failure fixed, 172 new tests added across Bundle A/B) |
+| `python -m ruff check src tests scripts` | **Pass** | |
+| `python -m pyright` | **Pass** | |
+| `npm run lint` (frontend) | **Pass** | |
+| `npm run test -- --run` (frontend, vitest) | **Pass** | 24 tests, up from 4 (api.ts mode logic, ModelGovernanceTable, identifier-independence, failure injection) |
+| `npm run build` (frontend) | **Pass** | |
+| `npx playwright test` (frontend, e2e, real Chromium) | **Pass** | 10 tests, up from 1 -- run and verified in this session (browsers were pre-cached at `~/.cache/ms-playwright`); 2 real screenshot baselines committed under `frontend/tests/e2e/visual-regression.spec.ts-snapshots/` |
+| HydroCore-S checkpoint load | **Pass** | re-verified unchanged: same hash, feature-schema, calibration |

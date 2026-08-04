@@ -126,6 +126,42 @@
       "title": "Verified Strategist training labels",
       "commit": "63e060b",
       "summary": "Discovered hydroswarm.planning.response.generate_response_plans already produces almost exactly the plan's bounded template list with a guaranteed no-response comparator, and prescreen_top_plans already bounds the exact-simulation budget. Added generate_strategist_labels() gluing these to the real PlanVerifier (WNTR) -- plan_validity is read only from the verifier's own decision, confirmed by a test that independently re-verifies every label. 7 new tests including a deliberately unsafe plan WNTR correctly rejects with real rejection codes. This closes Bundle B in full (Tasks 1.1-1.5, 2.1-2.6)."
+    },
+    {
+      "task": "3.1",
+      "title": "Separate live/replay/demo/error data modes",
+      "commit": "eb066d7",
+      "summary": "Core P0 fix: fetchIncident() previously spread the entire demoIncident fixture, overwrote a handful of fields with real API data, and labeled the result source:'api', so a live-reachable incident would silently render frozen map/plans/evidence/benchmarks/explanation while claiming to be live. Replaced with four explicit RuntimeMode values (LIVE/REPLAY/DEMO_FALLBACK/ERROR) shown in the header. fetchIncident() now throws LiveViewIncompleteError naming exactly which fields the current API doesn't yet expose rather than silently substituting fixture content -- LIVE is never claimed for incomplete data. New IncidentUnavailableError/ERROR mode with a Retry button, distinct from total-outage DEMO_FALLBACK. 6 new tests including a real env-stubbed live-incident-configured path."
+    },
+    {
+      "task": "3.3 (partial) + 3.5",
+      "title": "Remove hard-coded identifiers; fix calibration language",
+      "commit": "eb066d7",
+      "summary": "Removed hard-coded node/plan IDs from OperationalMap's aria-label/screen-reader summary, EvidencePanel's Before/After titles, TopologyPage's aria-label, Overview's Why Plan B?/Review Plan B approval/Why was Plan A rejected? -- all now derived from incident data. New identifier-independence test renders the full app against a fixture with entirely different node/plan IDs/order and asserts none of the old hard-coded strings leak through (the plan's exact stated test). Replaced mislabeled 'calibrated candidate coverage {target}%' with separate conformal target / calibration validity / candidate-set size / measured coverage fields."
+    },
+    {
+      "task": "3.4 (partial)",
+      "title": "Disable unwired controls with explicit reasons",
+      "commit": "7f3582e",
+      "summary": "Four buttons (Review Plan B approval, Review sample request, Export incident JSON, Verify hash chain) had no onClick handler at all. Disabled with explicit title reasons rather than appearing functional while doing nothing. Also replaced an unconditional 'Chain status: VALID' claim (no actual verification behind it) with an honest 'not independently verified by this console yet'."
+    },
+    {
+      "task": "3.6",
+      "title": "Render governed model evaluation and promotion evidence",
+      "commit": "e9f52fa",
+      "summary": "ValidationPage/BenchmarkPage claimed 'NOT RUN' neural checkpoint evaluation and 'no trained checkpoint included' -- false; HydroCore-S hybrid is promoted at 96.0% top-1. Added public/model-governance.json, every value individually verified against the real governed reports/results/*.json (source file hashes recorded in the artifact), and ModelGovernanceTable rendering Model/Parameters/Top-1/ECE/Latency/Decision, with an honest 'not evaluated' for HydroCore-L rather than a fabricated number. 5 new tests."
+    },
+    {
+      "task": "3.7",
+      "title": "Operational UI visual regression coverage",
+      "commit": "85fe3a0",
+      "summary": "Real Playwright/Chromium coverage: 1366x768 and 1920x1080 screenshots with committed baseline images, keyboard-only navigation, reduced-motion (toggle + emulated media), DEMO_FALLBACK banner, selected-plan sync, no horizontal overflow. Found and fixed real test flakiness: Overview's plan table sits behind the same Suspense boundary as lazy-loaded map/chart chunks, so `locator.count()` (which does not auto-wait) raced against chunk loading in a real browser. Verified stable across repeated runs."
+    },
+    {
+      "task": "3.8",
+      "title": "Safe failure-injection demonstrations",
+      "commit": "2067571",
+      "summary": "?failure=<category> query parameter covering all nine plan-specified categories (missing_checkpoint, corrupt_checkpoint_hash, incompatible_feature_schema, corrupt_calibration, unknown_topology, wntr_timeout, incomplete_simulator_output, severe_sensor_dropout, no_valid_plan). Each renders ERROR mode with the exact, distinct reason named, never a false LIVE/VERIFIED state. 12 new unit tests plus one real-browser Playwright test. This completes Bundle C except Task 3.2 (full backend `/incidents/{id}/view` contract), which received a narrower interim treatment (fetchIncident documents and throws on exactly the fields it can't yet provide, rather than a full new endpoint) -- see follow-up.md."
     }
   ]
 }

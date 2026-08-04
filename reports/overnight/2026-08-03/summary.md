@@ -7,8 +7,8 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `63e060b` (Bundle B complete in full; still running)
-- Commits created: 27 (see `git log --oneline main..agent/gcp-multitopology-v3`)
+- Ending commit: `2067571` (Bundle C complete, except Task 3.2's interim treatment; still running)
+- Commits created: 33 (see `git log --oneline main..agent/gcp-multitopology-v3`)
 - Working tree: clean at branch creation
 
 ## Completed tasks
@@ -20,9 +20,9 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
   equivariance). This was the plan's explicitly highest-priority technical change.
 - [x] Phase 2.1-2.6 (Bundle B complete: targets_v2 contract, Sentinel/Scout/Strategist label generation
   against the real simulator/classical/planning/WNTR stack, OOD categories, trajectory serialization)
-- [ ] Bundle C (frontend live/demo data integrity, Tasks 3.1-3.8) — next up, in progress
-- [ ] Phase 3 (Bundle C: frontend live/demo integrity)
-- [ ] Phase 4 (Bundle D: configurable HydroCore)
+- [x] Phase 3 / Bundle C (frontend live/demo data integrity, Tasks 3.1, 3.3(partial), 3.4(partial), 3.5,
+  3.6, 3.7, 3.8 complete; Task 3.2 given a narrower interim treatment -- see Follow-up)
+- [ ] Phase 4 (Bundle D: configurable HydroCore) — next up
 - [ ] Cycle A
 - [ ] Cycle B
 - [ ] S architecture screening
@@ -33,7 +33,7 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [ ] final selection
 - [ ] locked final test
 
-## Tests (current, after Bundle A)
+## Tests (current, after Bundle C)
 
 See `test-results.md` for full detail.
 
@@ -43,8 +43,9 @@ See `test-results.md` for full detail.
 | `ruff check src tests scripts` | pass | |
 | `pyright` | pass | |
 | `npm run lint` | pass | |
-| `npm run test -- --run` | pass (4 tests) | |
+| `npm run test -- --run` (vitest) | pass (24 tests, up from 4) | |
 | `npm run build` | pass | |
+| `npx playwright test` (e2e) | pass (10 tests, up from 1) | real Chromium, includes 2 committed screenshot baselines |
 | HydroCore-S checkpoint load | pass | hash, feature-schema, and calibration all validate |
 
 ## Datasets generated
@@ -92,10 +93,30 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
   missingness mask had already marked absent, violating the corpus's finite/missing
   invariant. Caught by a targeted high-missingness regression test before it could
   corrupt generated data.
+- Bundle C's core P0 bug (frontend silently presenting partial live data as fully live) was
+  real and exactly as the plan described: `fetchIncident()` spread the entire demo fixture
+  and overwrote only ~8 of ~20 IncidentView fields with live data while labeling the result
+  `source: 'api'`. Fixed by refusing to claim LIVE until the API response is genuinely
+  complete (Task 3.2's future work), rather than partially patching the merge.
+- Found and fixed real Playwright test flakiness while building Task 3.7's coverage:
+  `locator.count()` does not auto-wait the way `toBeVisible()` does, so checking it
+  immediately after only the (Suspense-external) header banner appeared raced against
+  lazy-loaded map/chart chunks in a real browser. This would have made any future e2e test
+  relying on the plan table intermittently fail for reasons unrelated to the code under
+  test if not caught here.
+- The project's own governed model results (HydroCore-S hybrid promoted, 96.0% top-1) were
+  being actively contradicted by the frontend's validation/benchmark pages ("NOT RUN" /
+  "no trained checkpoint included") -- likely stale copy left over from before the model was
+  trained. Fixed with real, source-hash-verified numbers (Task 3.6).
 
 ## Remaining blockers
 
 - None currently. The one pre-existing test failure was fixed (see below).
+- Task 3.2 (a complete `/incidents/{id}/view` backend contract) was not implemented in full;
+  `fetchIncident()` instead documents and throws on exactly the fields the current API
+  doesn't provide. This means LIVE mode cannot actually be reached yet even against a
+  running backend -- DEMO_FALLBACK (or ERROR, if an incident ID is configured but the API
+  itself is unreachable/misconfigured) is always what renders today. See follow-up.md.
 
 ## Exact commands to continue
 
@@ -104,9 +125,12 @@ cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
 python -m pytest -q   # expect 270 passed
+cd frontend && npm run test -- --run   # expect 24 passed
+npx playwright test                     # expect 10 passed
 ```
 
-See `follow-up.md` for the specific next task (Bundle C: frontend live/demo data integrity).
+See `follow-up.md` for the specific next task (Bundle D: configurable HydroCore architecture,
+or completing Task 3.2's full backend contract).
 
 ## Every training job's status
 

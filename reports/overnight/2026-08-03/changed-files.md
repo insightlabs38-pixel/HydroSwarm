@@ -69,4 +69,22 @@ Sentinel target derivation (event_presence/event_cause/evidence_sufficiency/mask
 WNTR simulation. No file under `data/learning-v1/`, `models/`, or any historical
 `reports/results/*.json` was modified. Bundle B (Tasks 1.1-1.5, 2.1-2.6) is now complete.
 
+## Bundle C (frontend live/demo data integrity), commits eb066d7..2067571
+
+`frontend/src/api.ts` (rewritten: RuntimeMode-aware fetch, LiveViewIncompleteError,
+IncidentUnavailableError, failure injection), `frontend/src/types.ts` (RuntimeMode,
+IncidentView.mode/modeReason/calibrationValid/measuredCoverage), `frontend/src/App.tsx`
+(mode badge, ERROR/REPLAY banners, Retry action), `frontend/src/demoFixture.ts` (mode
+fields, corrected benchmark row), `frontend/src/pages/Overview.tsx`,
+`frontend/src/components/{EvidencePanel,OperationalMap}.tsx`,
+`frontend/src/pages/TopologyPage.tsx` (dynamic identifiers, disabled unwired controls),
+`frontend/src/pages/{ValidationPage,BenchmarkPage}.tsx` (governance table, corrected
+claims/limitations), `frontend/src/pages/AuditPage.tsx` (disabled unwired controls, honest
+chain-status text). New: `frontend/src/components/ModelGovernanceTable.tsx`,
+`frontend/public/model-governance.json`. New tests: `frontend/tests/api.test.ts`,
+`frontend/tests/IdentifierIndependence.test.tsx`, `frontend/tests/ModelGovernanceTable.test.tsx`,
+`frontend/tests/e2e/visual-regression.spec.ts` (+ 2 committed screenshot baselines). 45 new
+frontend tests (24 unit + 10 e2e, up from 4 unit + 1 e2e). No backend Python file changed in
+this bundle.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.
