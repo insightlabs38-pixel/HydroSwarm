@@ -5,7 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import json
-from typing import Iterable
+from pathlib import Path
+from typing import Any, Iterable
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -132,6 +133,113 @@ class NormalizationStats:
         return np.nan_to_num(normalized, nan=0.0, posinf=0.0, neginf=0.0).astype(
             np.float32
         )
+
+    def _payload(self) -> dict[str, Any]:
+        return {
+            "schema_version": self.schema_version,
+            "feature_names": list(self.feature_names),
+            "mean": self.mean.tolist(),
+            "scale": self.scale.tolist(),
+        }
+
+    @property
+    def fingerprint(self) -> str:
+        text = json.dumps(self._payload(), indent=2, sort_keys=True) + "\n"
+        return hashlib.sha256(text.encode()).hexdigest()
+
+    def save(self, path: str | Path) -> str:
+        """Persist as a governed JSON artifact plus a `.sha256` sidecar
+        (matching the existing reports/results/*.json / *.json.sha256
+        convention). Returns the artifact hash so callers can record it
+        alongside a run's provenance (e.g. ExperimentRegistry.manifest_hashes
+        or a checkpoint's metadata)."""
+
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        text = json.dumps(self._payload(), indent=2, sort_keys=True) + "\n"
+        path.write_text(text, encoding="utf-8")
+        digest = hashlib.sha256(text.encode()).hexdigest()
+        path.with_suffix(path.suffix + ".sha256").write_text(digest + "\n", encoding="utf-8")
+        return digest
+
+    @classmethod
+    def load(cls, path: str | Path) -> NormalizationStats:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        return cls(
+            feature_names=tuple(payload["feature_names"]),
+            mean=np.asarray(payload["mean"], dtype=np.float32),
+            scale=np.asarray(payload["scale"], dtype=np.float32),
+            schema_version=payload["schema_version"],
+        )
+
+
+class FeatureScope:
+    ABSOLUTE = "absolute"
+    TOPOLOGY_RELATIVE = "topology_relative"
+
+
+@dataclass(frozen=True, slots=True)
+class FeatureSemantics:
+    unit: str
+    scope: str
+    notes: str = ""
+
+    def __post_init__(self) -> None:
+        if self.scope not in (FeatureScope.ABSOLUTE, FeatureScope.TOPOLOGY_RELATIVE):
+            raise ValueError(f"unknown feature scope: {self.scope}")
+
+
+# Task 0.6 requires documenting, per feature, whether it is a physically
+# absolute quantity (comparable across any topology -- e.g. concentration
+# thresholds, typical pipe velocity ranges) or a topology-relative quantity
+# whose meaningful scale depends on that network's size/terrain/demand (e.g.
+# raw elevation, travel time, graph distance). Fitting normalization on the
+# training split only (never on validation/calibration/development/OOD/
+# locked test) is enforced procedurally by scripts/fit_normalization.py,
+# which only accepts a single manifest labeled split="train"; this table is
+# the accompanying documentation of what each fitted statistic actually
+# represents.
+NODE_FEATURE_SEMANTICS: dict[str, FeatureSemantics] = {
+    "node_type": FeatureSemantics("category", FeatureScope.ABSOLUTE, "junction/tank/reservoir enum"),
+    "elevation": FeatureSemantics(
+        "meters", FeatureScope.TOPOLOGY_RELATIVE, "meaningful only relative to that network's own reference elevation"
+    ),
+    "base_demand": FeatureSemantics("m3/s", FeatureScope.TOPOLOGY_RELATIVE, "scales with network size"),
+    "current_demand": FeatureSemantics("m3/s", FeatureScope.TOPOLOGY_RELATIVE, "scales with network size"),
+    "pressure": FeatureSemantics("meters (head)", FeatureScope.ABSOLUTE, "operating pressure ranges are comparable across networks"),
+    "hydraulic_head": FeatureSemantics(
+        "meters", FeatureScope.TOPOLOGY_RELATIVE, "inherits elevation's topology dependency"
+    ),
+    "estimated_concentration": FeatureSemantics("mg/L", FeatureScope.ABSOLUTE, "contamination thresholds are absolute health quantities"),
+    "sensor_presence": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "sensor_health": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "measurement_age": FeatureSemantics("seconds", FeatureScope.ABSOLUTE, "sensor staleness has an absolute operational meaning"),
+    "missingness": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "classical_source_prior": FeatureSemantics("probability [0,1]", FeatureScope.ABSOLUTE),
+    "arrival_time_residual": FeatureSemantics("seconds", FeatureScope.TOPOLOGY_RELATIVE, "depends on network scale/travel time"),
+    "positive_sensor_consistency": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "negative_sensor_consistency": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "hydraulic_zone": FeatureSemantics("category", FeatureScope.ABSOLUTE, "structural zone id"),
+    "distance_to_reservoir": FeatureSemantics("graph hops or meters", FeatureScope.TOPOLOGY_RELATIVE, "depends on network scale"),
+    "distance_to_sensor": FeatureSemantics("graph hops or meters", FeatureScope.TOPOLOGY_RELATIVE, "depends on network scale"),
+    "isolation_region": FeatureSemantics("category", FeatureScope.ABSOLUTE, "structural region id"),
+}
+
+EDGE_FEATURE_SEMANTICS: dict[str, FeatureSemantics] = {
+    "pipe_type": FeatureSemantics("category", FeatureScope.ABSOLUTE),
+    "length": FeatureSemantics("meters", FeatureScope.TOPOLOGY_RELATIVE, "scales with network size"),
+    "diameter": FeatureSemantics("millimeters", FeatureScope.ABSOLUTE, "standard pipe diameters are comparable across networks"),
+    "roughness": FeatureSemantics("Hazen-Williams C", FeatureScope.ABSOLUTE, "standard material property range"),
+    "flow_magnitude": FeatureSemantics("m3/s", FeatureScope.TOPOLOGY_RELATIVE, "scales with network demand"),
+    "flow_direction": FeatureSemantics("sign {-1,0,1}", FeatureScope.ABSOLUTE, "structural, not a magnitude"),
+    "velocity": FeatureSemantics("m/s", FeatureScope.ABSOLUTE, "safe operating velocity ranges are comparable across networks"),
+    "estimated_travel_time": FeatureSemantics("seconds", FeatureScope.TOPOLOGY_RELATIVE, "depends on network scale"),
+    "valve_state": FeatureSemantics("category", FeatureScope.ABSOLUTE),
+    "pump_state": FeatureSemantics("category", FeatureScope.ABSOLUTE),
+    "flow_reversal": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "current_operability": FeatureSemantics("indicator [0,1]", FeatureScope.ABSOLUTE),
+    "pipe_volume": FeatureSemantics("m3", FeatureScope.TOPOLOGY_RELATIVE, "depends on pipe length and diameter"),
+}
 
 
 DEFAULT_FEATURE_SCHEMA = FeatureSchema()
