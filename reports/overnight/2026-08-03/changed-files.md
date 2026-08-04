@@ -34,4 +34,17 @@ pre-existing-bug fix: `data/frozen/manifest.json` (commit `19468ac`). 65 new tes
 `tests/scientific/test_training_smoke.py`. No file under `data/learning-v1/`, `models/`, or
 any historical `reports/results/*.json` (pre-existing, non-v3) was modified.
 
+## Tasks 1.1-1.5 (variable-topology corpus architecture), commits 22bae5d..7bdf4f5
+
+`src/hydroswarm/training/data.py` gained `TopologyMetadata`, `manifest_entry()`,
+`resolve_source_node_id()` and a `ScenarioExample.topology` field (optional, backward
+compatible). New modules: `training/variable_collate.py`, `training/permutation.py`,
+`classical/signature_registry.py`, `simulation/context_cache.py`. Small additions to
+`preprocessing/batching.py` (`node_scalar_features` on `GraphSample`,
+`NODE_SCALAR_FEATURE_KEYS`). `sharded_data.py`'s `_IndexEntry` extended to carry topology
+metadata through sharded storage. One correctness fix in `data.py`
+(`source_node_id_for_local_index`). 63 new tests across 5 new test files plus additions to
+`test_sharded_data.py` and `test_topology_metadata.py`. No file under `data/learning-v1/`,
+`models/`, or any historical `reports/results/*.json` was modified.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

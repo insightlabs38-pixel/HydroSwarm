@@ -54,6 +54,42 @@
       "title": "Locked split and final-test policy",
       "commit": "1c3b55b",
       "summary": "configs/evaluation_policy_v3.json: machine-readable split roles and the exact Stage 6/7 locked-final-test preconditions. hydroswarm.training.authorize_locked_final_test() enforces those preconditions as a real guard (SplitPolicyViolation) rather than leaving them as prose. docs/EVALUATION_V3_POLICY.md is the human-readable companion. 6 new tests. This closes Bundle A -- the stop-gate before variable-topology/large-corpus work."
+    },
+    {
+      "task": "1.1",
+      "title": "Topology-aware example metadata and graph-local labels",
+      "commit": "22bae5d (+ correctness fix in dfa5b60)",
+      "summary": "TopologyMetadata carries topology_hash, network_hash, node_ids, edge_ids, source_candidate_ids, hydraulic_state_hash, signature_library_hash, target/feature schema versions; validated on construction. ScenarioExample.topology is optional and fully backward compatible (full 163-test suite passed unchanged when added). resolve_source_node_id() maps a graph-local source_node index back to its real node ID. manifest_entry() is now topology-aware and shared between GovernedScenarioDataset and ShardedScenarioDataset. 19 new tests, later +1 regression test after fixing a real bug (see below)."
+    },
+    {
+      "task": "1.2",
+      "title": "Per-topology signature registry",
+      "commit": "60949b1",
+      "summary": "SignatureRegistry indexes existing SignatureCache artifacts by (topology_hash, hydraulic_regime_hash) via a small atomic JSON pointer index. register() rejects fit_split != \"train\". lookup() returns None on a miss or key-digest mismatch (cannot cross topology hashes); require() fails closed with a clear error. 8 new tests, including a real end-to-end SignatureBuilder simulation."
+    },
+    {
+      "task": "1.3",
+      "title": "Variable-size topology batch collation",
+      "commit": "80c1aeb",
+      "summary": "Extended GraphSample/pad_graph_batch with node_scalar_features so travel_time/reservoir_reachability/demand_centrality/classical_prior/source_candidate_mask pad alongside node_features. collate_variable_topology() bridges ScenarioExample to this padded format; edge_index stays local per-example ([batch,2,edges]), never offset into a shared graph. 6 new tests, including a real HydroCore forward pass and a numerical proof that padding does not change a valid node's prediction versus running it unpadded alone."
+    },
+    {
+      "task": "1.4",
+      "title": "Scenario-specific hydraulic graph contexts",
+      "commit": "14e4224",
+      "summary": "Confirmed (with a real WNTR network, not a fake) that HydraulicSimulator.state_hash() already changes when valve/pump state is mutated, so a per-scenario caller already avoids the plan's \"single shared context\" failure mode. Added ScenarioHydraulicContextKey (adds simulation_timestamp_seconds and state_estimator_config_hash, which state_hash() cannot see) and HydraulicContextCache with explicit hit/miss counting and fail-closed corruption handling. 8 new tests."
+    },
+    {
+      "task": "1.1 correctness fix",
+      "title": "Fix source_node index mapping to use full node_ids space",
+      "commit": "dfa5b60",
+      "summary": "Found and fixed a real bug in the Task 1.1 work: source_node_id_for_local_index() indexed source_candidate_ids instead of node_ids. Every existing test happened to set them equal, masking the bug; a network with a genuine partial candidate subset would have silently resolved the wrong real-world node ID. Added a regression test with a strict subset that fails under the old implementation."
+    },
+    {
+      "task": "1.5",
+      "title": "Graph permutation augmentation and equivariance enforcement",
+      "commit": "7bdf4f5",
+      "summary": "permute_example() rearranges node ordering, remapping edge_index/source_node/node-indexed targets/topology metadata so real-world semantic identity survives (verified directly, not assumed). measure_equivariance() runs a model on original vs permuted input, maps back via the inverse permutation, and reports max logit difference, prediction agreement, and any non-equivariant input key. Empirical finding: HydroCore-S IS permutation-equivariant -- across 6 random permutations, source-logit differences stay under 1e-4 and predictions always agree, zero non-equivariant keys detected. 11 new tests. This completes Tasks 1.1-1.5, the plan's highest-priority technical change (variable-topology corpus architecture)."
     }
   ]
 }

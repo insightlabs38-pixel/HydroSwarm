@@ -6,12 +6,12 @@ per-run provenance once Task 0.2 lands.
 
 ## Execution order (per overnight-plan.txt and operator instructions)
 
-1. Phase 0 — baseline (this report) — **in progress**
+1. Phase 0 — baseline (this report) — **complete**
 2. Bundle A (0.2-0.8) — experiment registry, job runner, lazy/sharded data, label audit,
-   normalization, balanced sampler, split policy — **not started**
-3. Bundle B (1.1-1.5, 2.1-2.6) — variable-topology metadata/signatures/collation/hydraulic
-   context/permutation tests, targets_v2 contract + Sentinel/Scout/Strategist/OOD/trajectory
-   labels — **not started**
+   normalization, balanced sampler, split policy — **complete**
+3. Bundle B (1.1-1.5) — variable-topology metadata/signatures/collation/hydraulic
+   context/permutation tests — **complete**. Bundle B (2.1-2.6) — targets_v2 contract +
+   Sentinel/Scout/Strategist/OOD/trajectory labels — **not started, next up**
 4. Bundle C (3.1-3.8) — live/demo UI separation — **not started**
 5. Bundle D (4.0-4.6) — configurable HydroCore architecture — **not started**
 6. Cycle A corpus + E0/E3/E4/E9 smoke jobs — **not started**
