@@ -19,6 +19,14 @@ from .data import (
 )
 from .label_audit import audit_corpus, audit_split, cross_split_leakage
 from .losses import MultiTaskLoss, compute_multitask_loss, task_gradient_norms
+from .ood_categories import (
+    OOD_CATEGORY_BEHAVIOR,
+    AbstentionOutcome,
+    ExpectedBehavior,
+    OODCategory,
+    classify_abstention_outcome,
+    topology_calibration_is_valid,
+)
 from .permutation import EquivarianceReport, measure_equivariance, permute_example
 from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
@@ -39,17 +47,21 @@ from .trainer import Trainer, TrainingSummary, set_deterministic_seed
 from .variable_collate import collate_variable_topology
 
 __all__ = [
+    "OOD_CATEGORY_BEHAVIOR",
     "TARGETS_BY_CATEGORY",
     "TARGETS_V2",
     "TARGETS_V2_SCHEMA_VERSION",
+    "AbstentionOutcome",
     "AgentTrajectory",
     "CurriculumSchedule",
     "CurriculumStage",
     "EventCause",
+    "ExpectedBehavior",
     "ExperimentRegistry",
     "GovernedScenarioDataset",
     "MultiTaskLoss",
     "NextStep",
+    "OODCategory",
     "RegistryError",
     "RunArtifacts",
     "RunHandle",
@@ -72,6 +84,7 @@ __all__ = [
     "by_network",
     "by_source_node",
     "check_schema_version",
+    "classify_abstention_outcome",
     "collate_scenarios",
     "collate_variable_topology",
     "composite_key",
@@ -88,6 +101,7 @@ __all__ = [
     "save_checkpoint",
     "set_deterministic_seed",
     "task_gradient_norms",
+    "topology_calibration_is_valid",
     "validate_split_isolation",
     "validate_targets_v2",
     "write_shards",
