@@ -8,6 +8,7 @@ from enum import IntEnum
 import hashlib
 import json
 from pathlib import Path
+from typing import Any
 
 import torch
 from torch import Tensor
@@ -53,6 +54,88 @@ class AgentTrajectory:
 
 
 @dataclass(frozen=True, slots=True)
+class TopologyMetadata:
+    """Per-example, graph-local topology provenance (overnight-plan.txt Task 1.1).
+
+    Every example owns its own node/edge ordering instead of assuming all
+    networks share the same junction IDs and node order. ``source_node`` (and
+    any other node-indexed target) is a local index into ``node_ids``/
+    ``source_candidate_ids``, never a global class identity -- node names
+    must never be treated as global classes, and no learned global node-ID
+    embedding may be introduced on top of this metadata.
+    """
+
+    topology_hash: str
+    network_hash: str
+    node_ids: tuple[str, ...]
+    edge_ids: tuple[tuple[str, str], ...]
+    source_candidate_ids: tuple[str, ...]
+    hydraulic_state_hash: str
+    signature_library_hash: str
+    target_schema_version: str
+    feature_schema_version: str
+
+    def __post_init__(self) -> None:
+        if not self.topology_hash or not self.network_hash:
+            raise ValueError("topology_hash and network_hash are required")
+        if len(set(self.node_ids)) != len(self.node_ids):
+            raise ValueError("node_ids must be unique")
+        node_set = set(self.node_ids)
+        missing_edge_endpoints = {
+            endpoint
+            for source, target in self.edge_ids
+            for endpoint in (source, target)
+            if endpoint not in node_set
+        }
+        if missing_edge_endpoints:
+            raise ValueError(f"edge endpoints missing from node_ids: {sorted(missing_edge_endpoints)}")
+        missing_candidates = set(self.source_candidate_ids) - node_set
+        if missing_candidates:
+            raise ValueError(f"source_candidate_ids missing from node_ids: {sorted(missing_candidates)}")
+
+    @property
+    def node_count(self) -> int:
+        return len(self.node_ids)
+
+    @property
+    def edge_count(self) -> int:
+        return len(self.edge_ids)
+
+    def local_index(self, node_id: str) -> int:
+        return self.node_ids.index(node_id)
+
+    def source_node_id_for_local_index(self, index: int) -> str:
+        return self.source_candidate_ids[index]
+
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "topology_hash": self.topology_hash,
+            "network_hash": self.network_hash,
+            "node_ids": list(self.node_ids),
+            "edge_ids": [list(pair) for pair in self.edge_ids],
+            "source_candidate_ids": list(self.source_candidate_ids),
+            "hydraulic_state_hash": self.hydraulic_state_hash,
+            "signature_library_hash": self.signature_library_hash,
+            "target_schema_version": self.target_schema_version,
+            "feature_schema_version": self.feature_schema_version,
+        }
+
+    @classmethod
+    def from_json(cls, payload: Mapping[str, Any]) -> "TopologyMetadata":
+        return cls(
+            topology_hash=payload["topology_hash"],
+            network_hash=payload["network_hash"],
+            node_ids=tuple(payload["node_ids"]),
+            edge_ids=tuple(tuple(pair) for pair in payload["edge_ids"]),
+            source_candidate_ids=tuple(payload["source_candidate_ids"]),
+            hydraulic_state_hash=payload["hydraulic_state_hash"],
+            signature_library_hash=payload["signature_library_hash"],
+            target_schema_version=payload["target_schema_version"],
+            feature_schema_version=payload["feature_schema_version"],
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class ScenarioExample:
     scenario_id: str
     network_id: str
@@ -63,6 +146,7 @@ class ScenarioExample:
     inputs: Mapping[str, Tensor]
     targets: Mapping[str, Tensor]
     trajectory: AgentTrajectory | None = None
+    topology: TopologyMetadata | None = None
 
     def __post_init__(self) -> None:
         if not self.scenario_id or not self.network_id or not self.seed_family:
@@ -75,6 +159,36 @@ class ScenarioExample:
             raise ValueError("scenario inputs and targets cannot be empty")
         if any(not isinstance(value, Tensor) for value in (*self.inputs.values(), *self.targets.values())):
             raise TypeError("scenario inputs and targets must be tensors")
+
+
+def manifest_entry(example: ScenarioExample) -> dict[str, Any]:
+    """The governance-relevant fields hashed into manifest_hash. Shared
+    between GovernedScenarioDataset and ShardedScenarioDataset so both
+    produce identical hashes for identical example sets, and topology-aware
+    since Task 1.1: two datasets with the same scenario/seed metadata but
+    different topology_hash values must not hash identically."""
+
+    return {
+        "scenario_id": example.scenario_id,
+        "network_id": example.network_id,
+        "split": example.split,
+        "seed": example.seed,
+        "seed_family": example.seed_family,
+        "stage": example.stage.name,
+        "topology_hash": example.topology.topology_hash if example.topology else None,
+        "network_hash": example.topology.network_hash if example.topology else None,
+    }
+
+
+def resolve_source_node_id(example: ScenarioExample) -> str | None:
+    """Map a (graph-local) source_node target back to its original node ID,
+    for verification/reporting. Returns None if the example carries no
+    topology metadata or no source_node target."""
+
+    if example.topology is None or "source_node" not in example.targets:
+        return None
+    local_index = int(example.targets["source_node"])
+    return example.topology.source_node_id_for_local_index(local_index)
 
 
 class GovernedScenarioDataset(Dataset[ScenarioExample]):
@@ -103,17 +217,7 @@ class GovernedScenarioDataset(Dataset[ScenarioExample]):
 
     @property
     def manifest_hash(self) -> str:
-        entries = [
-            {
-                "scenario_id": example.scenario_id,
-                "network_id": example.network_id,
-                "split": example.split,
-                "seed": example.seed,
-                "seed_family": example.seed_family,
-                "stage": example.stage.name,
-            }
-            for example in self._examples
-        ]
+        entries = [manifest_entry(example) for example in self._examples]
         payload = json.dumps(entries, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(payload.encode()).hexdigest()
 
@@ -149,6 +253,11 @@ def load_scenario_examples_jsonl(path: str | Path) -> list[ScenarioExample]:
                         stage=CurriculumStage[record["stage"]],
                         inputs={key: torch.tensor(value) for key, value in record["inputs"].items()},
                         targets={key: torch.tensor(value) for key, value in record["targets"].items()},
+                        topology=(
+                            TopologyMetadata.from_json(record["topology"])
+                            if record.get("topology") is not None
+                            else None
+                        ),
                     )
                 )
             except (KeyError, TypeError, ValueError) as error:

@@ -12,6 +12,8 @@ from hydroswarm.training.data import (
     CurriculumStage,
     GovernedScenarioDataset,
     ScenarioExample,
+    TopologyMetadata,
+    resolve_source_node_id,
     validate_split_isolation,
 )
 
@@ -218,3 +220,33 @@ def test_manifest_and_index_are_valid_json(tmp_path) -> None:
     assert manifest["schema_version"] == 1
     for line in (tmp_path / "shards" / "index.jsonl").read_text().splitlines():
         json.loads(line)
+
+
+def test_topology_metadata_round_trips_through_sharded_storage(tmp_path) -> None:
+    topology = TopologyMetadata(
+        topology_hash="topo-shard",
+        network_hash="net-shard",
+        node_ids=("J1", "J2", "J3"),
+        edge_ids=(("J1", "J2"), ("J2", "J3")),
+        source_candidate_ids=("J1", "J2", "J3"),
+        hydraulic_state_hash="state-shard",
+        signature_library_hash="sig-shard",
+        target_schema_version="targets_v1",
+        feature_schema_version="hydroswarm-features-v2",
+    )
+    example = ScenarioExample(
+        scenario_id="topo-example",
+        network_id="net-shard",
+        split="train",
+        seed=0,
+        seed_family="fam-topo",
+        stage=CurriculumStage.CLEAN,
+        inputs={"node_features": torch.zeros(3, 2)},
+        targets={"source_node": torch.tensor(2)},
+        topology=topology,
+    )
+    write_shards([example], tmp_path / "shards", shard_size=5)
+    dataset = ShardedScenarioDataset(tmp_path / "shards", expected_split="train")
+    recovered = dataset[0]
+    assert recovered.topology == topology
+    assert resolve_source_node_id(recovered) == "J3"

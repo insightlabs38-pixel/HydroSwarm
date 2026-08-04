@@ -43,7 +43,7 @@ from safetensors import safe_open
 from safetensors.torch import save_file
 from torch.utils.data import Dataset
 
-from .data import CurriculumStage, ScenarioExample
+from .data import CurriculumStage, ScenarioExample, TopologyMetadata
 
 SCHEMA_VERSION = 1
 DEFAULT_SHARD_SIZE = 256
@@ -69,6 +69,7 @@ class _IndexEntry:
     local_index: int
     input_keys: tuple[str, ...]
     target_keys: tuple[str, ...]
+    topology: TopologyMetadata | None = None
 
     def to_json(self) -> dict[str, Any]:
         return {
@@ -82,6 +83,7 @@ class _IndexEntry:
             "local_index": self.local_index,
             "input_keys": list(self.input_keys),
             "target_keys": list(self.target_keys),
+            "topology": self.topology.to_json() if self.topology is not None else None,
         }
 
     @classmethod
@@ -97,6 +99,11 @@ class _IndexEntry:
             local_index=int(payload["local_index"]),
             input_keys=tuple(payload["input_keys"]),
             target_keys=tuple(payload["target_keys"]),
+            topology=(
+                TopologyMetadata.from_json(payload["topology"])
+                if payload.get("topology") is not None
+                else None
+            ),
         )
 
 
@@ -144,6 +151,7 @@ def write_shards(
                     local_index=local_index,
                     input_keys=tuple(sorted(example.inputs)),
                     target_keys=tuple(sorted(example.targets)),
+                    topology=example.topology,
                 )
             )
         save_file(tensors, str(shard_path))
@@ -269,6 +277,7 @@ class ShardedScenarioDataset(Dataset[ScenarioExample]):
             stage=CurriculumStage[entry.stage],
             inputs=inputs,
             targets=targets,
+            topology=entry.topology,
         )
 
     @property
@@ -281,6 +290,16 @@ class ShardedScenarioDataset(Dataset[ScenarioExample]):
                 "seed": self._entries[position].seed,
                 "seed_family": self._entries[position].seed_family,
                 "stage": self._entries[position].stage,
+                "topology_hash": (
+                    self._entries[position].topology.topology_hash
+                    if self._entries[position].topology is not None
+                    else None
+                ),
+                "network_hash": (
+                    self._entries[position].topology.network_hash
+                    if self._entries[position].topology is not None
+                    else None
+                ),
             }
             for position in self._indices
         ]
