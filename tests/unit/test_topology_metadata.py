@@ -125,6 +125,20 @@ def test_source_node_id_maps_to_correct_local_index_and_back() -> None:
     assert resolve_source_node_id(example) == "J2"
 
 
+def test_source_node_id_uses_full_node_ids_space_not_the_candidate_subset() -> None:
+    # source_candidate_ids is a strict subset of node_ids here (J2 is not a
+    # candidate). source_node is still a local index into the FULL node_ids
+    # space -- matching how HydroCore's source_node_logits cover every node
+    # position, with source_candidate_mask separately marking eligibility --
+    # so it must map through node_ids, not through the shorter
+    # source_candidate_ids list (which would silently misalign).
+    topology = _topology(node_ids=("J1", "J2", "J3"), source_candidate_ids=("J1", "J3"))
+    assert topology.source_node_id_for_local_index(2) == "J3"
+
+    example = _example("s2", topology=topology, source_local_index=2)
+    assert resolve_source_node_id(example) == "J3"
+
+
 def test_resolve_source_node_id_returns_none_without_topology_metadata() -> None:
     example = ScenarioExample(
         scenario_id="no-topo",

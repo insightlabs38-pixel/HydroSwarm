@@ -59,10 +59,16 @@ class TopologyMetadata:
 
     Every example owns its own node/edge ordering instead of assuming all
     networks share the same junction IDs and node order. ``source_node`` (and
-    any other node-indexed target) is a local index into ``node_ids``/
-    ``source_candidate_ids``, never a global class identity -- node names
-    must never be treated as global classes, and no learned global node-ID
-    embedding may be introduced on top of this metadata.
+    any other node-indexed target) is a local index into the *full*
+    ``node_ids`` space -- matching how HydroCore's source_node_logits covers
+    every node position and source_candidate_mask (also full node_ids-length)
+    separately marks which of those positions are eligible -- never a global
+    class identity. ``source_candidate_ids`` is the (possibly strict) subset
+    of ``node_ids`` that are actually valid candidates, kept as an explicit
+    audit field rather than requiring every caller to re-derive it from a
+    mask; it is deliberately NOT the index space source_node counts into.
+    No learned global node-ID embedding may be introduced on top of this
+    metadata.
     """
 
     topology_hash: str
@@ -105,7 +111,11 @@ class TopologyMetadata:
         return self.node_ids.index(node_id)
 
     def source_node_id_for_local_index(self, index: int) -> str:
-        return self.source_candidate_ids[index]
+        """Map a source_node target (a full node_ids-space local index) back
+        to its original node ID. Deliberately indexes node_ids, not
+        source_candidate_ids, which may be a strict subset."""
+
+        return self.node_ids[index]
 
     def to_json(self) -> dict[str, Any]:
         return {
