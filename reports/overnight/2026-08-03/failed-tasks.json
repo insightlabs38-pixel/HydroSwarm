@@ -6,8 +6,8 @@
       "title": "Frozen golden-scenario artifact size mismatch",
       "detail": "tests/frozen/test_frozen_artifacts.py::test_frozen_manifest_matches_checked_in_inputs fails: data/frozen/golden_scenario.json is 469 bytes on disk but data/frozen/manifest.json declares 490 bytes. Present on main at the starting commit 5697f91, before this run made any changes.",
       "root_cause": "not yet diagnosed",
-      "status": "recorded, not yet fixed (Phase 0 forbids source edits before baseline recording)",
-      "plan": "Diagnose and fix as its own small, independently tested commit early in Bundle A, without touching any locked test data or historical result files. If the fix requires regenerating data/frozen/golden_scenario.json, that file is a frozen fixture, not locked test data, so regenerating it under test coverage is in scope; the manifest hash/size will be updated to match, and the diff will be reviewed for correctness rather than blindly re-stamped."
+      "status": "fixed in commit 19468ac",
+      "resolution": "Regenerated the golden fixture in an isolated temp directory via the existing deterministic generator (hydroswarm.evaluation.golden.freeze_golden_inputs); the reproduced golden_scenario.json was byte-identical to the committed one (469 bytes), confirming fixture content was always correct. Only data/frozen/manifest.json's recorded bytes/sha256 for that one entry were stale since the file's original commit (697c992). Corrected the two stale fields to the actual measured values. No fixture content, locked test data, or historical result file was changed. Full pytest -q now passes 98/98, ruff and pyright remain clean."
     }
   ]
 }

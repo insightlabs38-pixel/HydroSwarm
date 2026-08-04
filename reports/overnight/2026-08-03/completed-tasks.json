@@ -4,8 +4,56 @@
     {
       "task": "0.1",
       "title": "Create isolated branch and baseline report",
-      "commit": "pending-first-commit",
+      "commit": "a3ccd25",
       "summary": "Created agent/gcp-multitopology-v3 from main@5697f91. Recorded environment, ran all pre-implementation test/lint/build gates, verified the promoted HydroCore-S checkpoint loads with a valid hash/schema/calibration match. No source files were changed before this record was written."
+    },
+    {
+      "task": "pre-existing bug fix",
+      "title": "Fix stale golden_scenario.json checksum in data/frozen/manifest.json",
+      "commit": "19468ac",
+      "summary": "Regenerated the golden fixture in isolation and confirmed it was byte-identical to the committed file; only the manifest's recorded bytes/sha256 were stale. Corrected those two fields. pytest -q now 98/98 passing."
+    },
+    {
+      "task": "0.2",
+      "title": "Immutable experiment registry and run provenance",
+      "commit": "f67b0a6",
+      "summary": "Added hydroswarm.training.ExperimentRegistry: append-only JSONL ledger with opened/closed events carrying every field the plan requires (run_id, parent_run_id, purpose, git commit + dirty-worktree status, architecture/variant, resolved config, seed, per-split manifest hashes, feature/target schema hashes, topology hashes, host/CPU/thread settings, peak RSS via getrusage, checkpoint hashes, selected checkpoint, selection metric, locked-test-opened flag, exit status). Duplicate run_ids and unknown parent_run_ids are rejected; resumed runs preserve lineage via ExperimentRegistry.lineage(). 9 new tests. Not yet wired into scripts/train.py (deferred to avoid touching Trainer internals in the same commit; will be wired when Bundle E smoke jobs launch real training runs)."
+    },
+    {
+      "task": "0.3",
+      "title": "GCP-safe resumable job runner",
+      "commit": "ace2808",
+      "summary": "Added hydroswarm.training.job_runner (launch/attach/poll/terminate/mark_finished): detached subprocess supervision with overlap rejection, a pre-launch disk guard, atomic status.json, and SIGTERM-then-SIGKILL termination, since this container has no systemd/tmux available. Added an opt-in Trainer.install_signal_handlers()/_shutdown_requested flag so a supervised training job actually stops cleanly (saves a resumable checkpoint) on SIGTERM instead of being killed mid-write, reusing the existing tested runtime-budget stop path. 7 new tests (6 job_runner + 1 SIGTERM end-to-end)."
+    },
+    {
+      "task": "0.4",
+      "title": "Sharded lazy dataset backend",
+      "commit": "9cf1d98",
+      "summary": "Added hydroswarm.training.ShardedScenarioDataset + write_shards: per-shard mmap-backed safetensors with a lightweight JSONL index (only metadata loaded at construction, tensors loaded lazily per __getitem__), per-shard + index-level sha256 verification, and a manifest_hash/stages_through surface identical to GovernedScenarioDataset. Verified as a real drop-in for Trainer with an actual training step (not just structural typing), verified worker-safe under DataLoader(num_workers=2) via fork, and verified pickle/deepcopy-safe (open shard handles excluded from __getstate__). 16 new tests. This is the stop-gate the plan requires before any 10k+ example corpus generation begins."
+    },
+    {
+      "task": "0.5",
+      "title": "Target/label audit tooling and sanity baselines",
+      "commit": "ecd34ac",
+      "summary": "Added hydroswarm.training.label_audit: per-split target class histograms, missingness, impossible-label detection, duplicate/near-duplicate detection, finite-value validation, network/source balance, and cross_split_leakage(). Sanity baselines (random/majority/classical-prior) computed only for decision_splits, never for locked test. scripts/audit_labels.py ran against the real learning-v1 corpus (reports/results/v3/label-audit-learning-v1.json): 0 violations of any kind, classical-prior baseline 81-85% vs 25% random/majority. 12 new tests."
+    },
+    {
+      "task": "0.6",
+      "title": "Training-only normalization",
+      "commit": "ad8b256",
+      "summary": "Added NormalizationStats.save()/.load()/.fingerprint (governed JSON artifact + .sha256 sidecar) on top of the pre-existing fit()/transform(). scripts/fit_normalization.py's --split flag only accepts \"train\" and hard-fails if the manifest disagrees, so normalization cannot be fit on non-train data even by mistake. Documented all 19 node and 13 edge features as absolute vs topology-relative with units (NODE_FEATURE_SEMANTICS/EDGE_FEATURE_SEMANTICS), completeness enforced by a test. Ran against the real learning-v1 train split (800 examples); artifacts committed under reports/results/v3/normalization/. 13 new tests."
+    },
+    {
+      "task": "0.7",
+      "title": "Topology-balanced curriculum sampler",
+      "commit": "b2bba5d",
+      "summary": "Added GroupBalancedSampler: every group (topology/network, source node, curriculum stage, or any composite) gets equal total sampling weight regardless of group size, so a large topology cannot dominate purely because it has more generated scenarios. Verified as a real DataLoader sampler and with an empirical 20k-draw statistical check. 9 new tests."
+    },
+    {
+      "task": "0.8",
+      "title": "Locked split and final-test policy",
+      "commit": "1c3b55b",
+      "summary": "configs/evaluation_policy_v3.json: machine-readable split roles and the exact Stage 6/7 locked-final-test preconditions. hydroswarm.training.authorize_locked_final_test() enforces those preconditions as a real guard (SplitPolicyViolation) rather than leaving them as prose. docs/EVALUATION_V3_POLICY.md is the human-readable companion. 6 new tests. This closes Bundle A -- the stop-gate before variable-topology/large-corpus work."
     }
   ]
 }
