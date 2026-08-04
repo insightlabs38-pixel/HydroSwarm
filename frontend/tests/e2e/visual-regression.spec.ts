@@ -84,6 +84,15 @@ test.describe('data-mode banners', () => {
     await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
     await expect(page.getByText('DEMO_FALLBACK', { exact: false })).toBeVisible();
   });
+
+  test('failure injection (Task 3.8) renders ERROR mode with a Retry action, never a false LIVE state', async ({ page }) => {
+    await page.goto('/?failure=no_valid_plan');
+    await expect(page.getByText('INCIDENT UNAVAILABLE')).toBeVisible();
+    await expect(page.getByText(/no_valid_plan/)).toBeVisible();
+    await expect(page.getByText(/abstention, not forcing a plan through/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Retry' })).toBeVisible();
+    await expect(page.getByText('LIVE', { exact: true })).toHaveCount(0);
+  });
 });
 
 test.describe('selected-plan synchronization', () => {

@@ -4,6 +4,57 @@ import type { AuditEvent, IncidentView } from './types';
 const API_BASE = import.meta.env.VITE_API_BASE ?? '/api';
 const INCIDENT_ID = import.meta.env.VITE_INCIDENT_ID as string | undefined;
 
+/**
+ * Controlled failure-injection demonstration (overnight-plan.txt Task 3.8).
+ * Selected via the `?failure=<category>` query parameter so an operator or
+ * judge can deterministically see the console's fail-closed behavior for
+ * each governed failure category without needing a live backend in that
+ * state. Every category renders as ERROR mode with the exact reason named
+ * -- never a false VERIFIED/LIVE state.
+ */
+export const FAILURE_INJECTION_CATEGORIES = [
+  'missing_checkpoint',
+  'corrupt_checkpoint_hash',
+  'incompatible_feature_schema',
+  'corrupt_calibration',
+  'unknown_topology',
+  'wntr_timeout',
+  'incomplete_simulator_output',
+  'severe_sensor_dropout',
+  'no_valid_plan',
+] as const;
+
+export type FailureInjectionCategory = (typeof FAILURE_INJECTION_CATEGORIES)[number];
+
+const FAILURE_INJECTION_REASONS: Record<FailureInjectionCategory, string> = {
+  missing_checkpoint:
+    'No trained checkpoint is present at the configured path. Falling back to classical-only mode is not simulated here; this demonstration shows the fail-closed ERROR state instead of a false LIVE result.',
+  corrupt_checkpoint_hash:
+    "The checkpoint's SHA-256 does not match its recorded metadata. Refusing to load a checkpoint that may have been tampered with or corrupted.",
+  incompatible_feature_schema:
+    "The checkpoint's feature schema hash does not match this build's DEFAULT_FEATURE_SCHEMA. Refusing to run inference with mismatched feature semantics.",
+  corrupt_calibration:
+    'The calibration artifact failed hash or schema validation against the loaded checkpoint. Refusing to report a calibrated candidate set without valid calibration.',
+  unknown_topology:
+    "This network's topology hash is not in the validated set and no broader validated calibration artifact covers it. Calibration is invalid; planning is suppressed (CAUTION).",
+  wntr_timeout:
+    'The exact WNTR/EPANET verification simulation exceeded its timeout. No plan may be labeled VERIFIED without a completed authoritative simulation.',
+  incomplete_simulator_output:
+    'WNTR returned incomplete results for this scenario (missing timesteps or nodes). Refusing to compute consequences from a partial simulation.',
+  severe_sensor_dropout:
+    'Too few sensors are reporting valid observations to form a trustworthy candidate set. Evidence is insufficient; planning is suppressed.',
+  no_valid_plan:
+    'Every generated response plan was rejected by exact WNTR verification. Correct behavior here is abstention, not forcing a plan through.',
+};
+
+function injectedFailure(): FailureInjectionCategory | null {
+  if (typeof window === 'undefined') return null;
+  const requested = new URLSearchParams(window.location.search).get('failure');
+  return (FAILURE_INJECTION_CATEGORIES as readonly string[]).includes(requested ?? '')
+    ? (requested as FailureInjectionCategory)
+    : null;
+}
+
 interface ApiIncidentState {
   incident_id: string;
   network_id: string;
@@ -116,6 +167,14 @@ export async function fetchIncident(signal?: AbortSignal): Promise<IncidentView>
 }
 
 export async function fetchIncidentWithFallback(signal?: AbortSignal): Promise<IncidentView> {
+  const failure = injectedFailure();
+  if (failure) {
+    return {
+      ...demoIncident,
+      mode: 'ERROR',
+      modeReason: `[Failure injection: ${failure}] ${FAILURE_INJECTION_REASONS[failure]}`,
+    };
+  }
   try {
     return await fetchIncident(signal);
   } catch (error) {
