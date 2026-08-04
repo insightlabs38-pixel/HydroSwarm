@@ -26,13 +26,22 @@ class EdgeAwareGraphConv(nn.Module):
         self.activation = make_activation(activation)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(
+    def _aggregate(
         self,
         hidden: Tensor,
         edge_index: Tensor | None,
         edge_features: Tensor | None,
         edge_mask: Tensor | None,
+        *,
+        reverse: bool = False,
     ) -> Tensor:
+        """Compute the message-passing update (pre-residual). `reverse`
+        swaps which endpoint is treated as source vs. target, used by
+        DualChannelGraphConv's upstream-diagnostic channel (overnight-
+        plan.txt Task 4.3) to reuse this same convolution logic against
+        the reversed edge direction without a separate reversed-edge-
+        feature set."""
+
         batch, nodes, width = hidden.shape
         normalized_hidden = self.norm(hidden)
         aggregate = hidden.new_zeros(batch, nodes, width)
@@ -54,10 +63,11 @@ class EdgeAwareGraphConv(nn.Module):
             )
             if valid.shape != (batch, edge_index.shape[-1]):
                 raise ValueError("edge_mask must have shape [batch, edges]")
+            source_row, target_row = (1, 0) if reverse else (0, 1)
             for batch_index in range(batch):
                 selected = valid[batch_index]
-                source = edge_index[batch_index, 0, selected].long()
-                target = edge_index[batch_index, 1, selected].long()
+                source = edge_index[batch_index, source_row, selected].long()
+                target = edge_index[batch_index, target_row, selected].long()
                 if source.numel() == 0:
                     continue
                 if source.min() < 0 or source.max() >= nodes or target.min() < 0 or target.max() >= nodes:
@@ -69,8 +79,58 @@ class EdgeAwareGraphConv(nn.Module):
                 degree[batch_index].index_add_(
                     0, target, torch.ones(target.numel(), 1, device=hidden.device)
                 )
-        update = self.output(self.activation(aggregate / degree.clamp_min(1.0)))
+        return self.output(self.activation(aggregate / degree.clamp_min(1.0)))
+
+    def forward(
+        self,
+        hidden: Tensor,
+        edge_index: Tensor | None,
+        edge_features: Tensor | None,
+        edge_mask: Tensor | None,
+    ) -> Tensor:
+        update = self._aggregate(hidden, edge_index, edge_features, edge_mask, reverse=False)
         return hidden + self.dropout(update)
+
+
+class DualChannelGraphConv(nn.Module):
+    """Separately parameterized downstream-transport and upstream-
+    diagnostic convolutions, fused with a learned gate (overnight-plan.txt
+    Task 4.3). The upstream channel reuses the same edge features with the
+    edge direction reversed (source/target swapped) rather than a separate
+    reversed-edge-feature set -- documented as the bounded design choice
+    this task made, not an oversight."""
+
+    def __init__(
+        self,
+        d_model: int,
+        edge_feature_dim: int,
+        *,
+        dropout: float,
+        normalization: str,
+        activation: str,
+    ) -> None:
+        super().__init__()
+        self.downstream = EdgeAwareGraphConv(
+            d_model, edge_feature_dim, dropout=dropout, normalization=normalization, activation=activation
+        )
+        self.upstream = EdgeAwareGraphConv(
+            d_model, edge_feature_dim, dropout=dropout, normalization=normalization, activation=activation
+        )
+        self.gate = nn.Linear(2 * d_model, d_model)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(
+        self,
+        hidden: Tensor,
+        edge_index: Tensor | None,
+        edge_features: Tensor | None,
+        edge_mask: Tensor | None,
+    ) -> Tensor:
+        downstream_update = self.downstream._aggregate(hidden, edge_index, edge_features, edge_mask, reverse=False)
+        upstream_update = self.upstream._aggregate(hidden, edge_index, edge_features, edge_mask, reverse=True)
+        gate = torch.sigmoid(self.gate(torch.cat((downstream_update, upstream_update), dim=-1)))
+        combined = gate * downstream_update + (1.0 - gate) * upstream_update
+        return hidden + self.dropout(combined)
 
 
 class LatentHydraulicBlock(nn.Module):
@@ -84,9 +144,15 @@ class LatentHydraulicBlock(nn.Module):
         dropout: float,
         normalization: str,
         activation: str,
+        message_direction: str = "forward_only",
     ) -> None:
         super().__init__()
-        self.local = EdgeAwareGraphConv(
+        if message_direction not in ("forward_only", "dual_gated"):
+            raise ValueError(
+                f"message_direction must be 'forward_only' or 'dual_gated', got {message_direction!r}"
+            )
+        conv_cls = DualChannelGraphConv if message_direction == "dual_gated" else EdgeAwareGraphConv
+        self.local = conv_cls(
             d_model,
             edge_feature_dim,
             dropout=dropout,

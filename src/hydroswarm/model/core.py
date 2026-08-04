@@ -117,6 +117,13 @@ PRIOR_MODES: tuple[PriorMode, ...] = get_args(PriorMode)
 IncidentPooling = Literal["mean", "latent", "attention", "source_conditioned"]
 INCIDENT_POOLING_MODES: tuple[IncidentPooling, ...] = get_args(IncidentPooling)
 
+#: overnight-plan.txt Task 4.3. "forward_only" (default) matches the
+#: original single-direction transport convolution. "dual_gated" adds a
+#: separately parameterized upstream-diagnostic channel over the reversed
+#: edge direction, fused with a learned gate (see layers.DualChannelGraphConv).
+MessageDirection = Literal["forward_only", "dual_gated"]
+MESSAGE_DIRECTIONS: tuple[MessageDirection, ...] = get_args(MessageDirection)
+
 
 class ArchitectureCompatibilityError(Exception):
     """Raised when a checkpoint's recorded architecture config does not
@@ -155,6 +162,13 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             f"checkpoint was trained with incident_pooling={recorded_incident_pooling!r} but "
             f"this model instance is configured with incident_pooling={model.incident_pooling!r}"
         )
+    recorded_message_direction = metadata.get("message_direction")
+    if recorded_message_direction is not None and recorded_message_direction != model.message_direction:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with message_direction={recorded_message_direction!r} but "
+            f"this model instance is configured with message_direction={model.message_direction!r}; "
+            "dual_gated adds separate upstream/gate parameters that forward_only does not have"
+        )
 
 
 class HydroCore(nn.Module):
@@ -189,6 +203,7 @@ class HydroCore(nn.Module):
         use_adapters: bool = True,
         prior_mode: PriorMode = "feature_and_logit",
         incident_pooling: IncidentPooling = "mean",
+        message_direction: MessageDirection = "forward_only",
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -205,12 +220,17 @@ class HydroCore(nn.Module):
             raise ValueError(
                 f"incident_pooling must be one of {INCIDENT_POOLING_MODES}, got {incident_pooling!r}"
             )
+        if message_direction not in MESSAGE_DIRECTIONS:
+            raise ValueError(
+                f"message_direction must be one of {MESSAGE_DIRECTIONS}, got {message_direction!r}"
+            )
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
         self.use_adapters = use_adapters
         self.prior_mode = prior_mode
         self.incident_pooling = incident_pooling
+        self.message_direction = message_direction
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -263,6 +283,7 @@ class HydroCore(nn.Module):
                     dropout=dropout,
                     normalization=normalization,
                     activation=activation,
+                    message_direction=message_direction,
                 )
                 for _ in range(num_layers)
             ]
@@ -334,6 +355,7 @@ class HydroCore(nn.Module):
             "architecture_version": ARCHITECTURE_VERSION,
             "prior_mode": self.prior_mode,
             "incident_pooling": self.incident_pooling,
+            "message_direction": self.message_direction,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
