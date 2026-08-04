@@ -5,8 +5,8 @@
       "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
     },
     "golden_scenario.json": {
-      "bytes": 490,
-      "sha256": "1780c4f4161395015aba4a28696fd94ed8fe71831b3b6806748a9aaa4017b4d0"
+      "bytes": 469,
+      "sha256": "ad7a80496f3501d0e53b0a6aac80cad349b73b7c97b9ae7698a28e57a8c76a06"
     }
   },
   "generator": "hydroswarm.evaluation.golden.freeze_golden_inputs",
