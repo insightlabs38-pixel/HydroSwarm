@@ -15,6 +15,7 @@ from .data import (
 )
 from .losses import MultiTaskLoss, compute_multitask_loss, task_gradient_norms
 from .registry import ExperimentRegistry, RegistryError, RunHandle
+from .sharded_data import ShardedScenarioDataset, write_shards
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
 
 __all__ = [
@@ -28,6 +29,7 @@ __all__ = [
     "RunArtifacts",
     "RunHandle",
     "ScenarioExample",
+    "ShardedScenarioDataset",
     "Trainer",
     "TrainingConfig",
     "TrainingSummary",
@@ -40,5 +42,6 @@ __all__ = [
     "set_deterministic_seed",
     "task_gradient_norms",
     "validate_split_isolation",
+    "write_shards",
 ]
 
