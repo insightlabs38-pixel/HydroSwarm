@@ -57,4 +57,16 @@ test files. No file under `data/learning-v1/`, `models/`, or any historical
 `reports/results/*.json` was modified. Tasks 2.2-2.4 (the actual label *generation* against
 the simulator/classical/planning stack, as opposed to the schema work here) are not started.
 
+## Tasks 2.2-2.4 (Sentinel/Scout/Strategist label generation, closing Bundle B), commits dff8122..63e060b
+
+`src/hydroswarm/data/scenarios.py` gained `EventType` and generator support for
+normal/sensor-fault-only scenarios (negligible-strength injection, forced fault
+injection). `src/hydroswarm/training/corpus.py` gained `assign_source_regions()` and
+Sentinel target derivation (event_presence/event_cause/evidence_sufficiency/masking) in
+`scenario_to_example()`. New modules: `training/scout_labels.py`,
+`training/strategist_labels.py`. 28 new tests across 3 new test files plus additions to
+`test_scenario_generation.py`, all exercised against the real reference network with real
+WNTR simulation. No file under `data/learning-v1/`, `models/`, or any historical
+`reports/results/*.json` was modified. Bundle B (Tasks 1.1-1.5, 2.1-2.6) is now complete.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

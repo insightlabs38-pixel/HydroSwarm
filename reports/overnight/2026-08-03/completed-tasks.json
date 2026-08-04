@@ -107,7 +107,25 @@
       "task": "2.6",
       "title": "Multi-step incident trajectory serialization",
       "commit": "541c72c",
-      "summary": "TrajectoryState/FullTrajectory add a richer companion to the existing lightweight AgentTrajectory audit record, reusing the validated domain schemas (IncidentState, OperationalAction, PlanVerification) rather than duplicating their fields: observation history, candidates, remaining budgets, previous/selected actions, and verifier feedback. FullTrajectory verifies both contiguity and a hash chain between consecutive steps. 9 new tests, including a broken-hash-chain rejection. This closes Bundle B's schema/infrastructure scope (1.1-1.5, 2.1, 2.5, 2.6); Tasks 2.2-2.4 (actual Sentinel/Scout/Strategist label generation against the real simulator/classical/planning stack) remain as the next major body of work and are described in follow-up.md."
+      "summary": "TrajectoryState/FullTrajectory add a richer companion to the existing lightweight AgentTrajectory audit record, reusing the validated domain schemas (IncidentState, OperationalAction, PlanVerification) rather than duplicating their fields: observation history, candidates, remaining budgets, previous/selected actions, and verifier feedback. FullTrajectory verifies both contiguity and a hash chain between consecutive steps. 9 new tests, including a broken-hash-chain rejection."
+    },
+    {
+      "task": "2.2",
+      "title": "Complete Sentinel supervision (event_presence/event_cause/evidence_sufficiency/source_region)",
+      "commit": "dff8122 (generator EventType support) + 26bccc9 (corpus target derivation)",
+      "summary": "Added EventType (CONTAMINATION/NORMAL/SENSOR_FAULT_ONLY) to the scenario generator using a negligible (not exactly zero) injection strength so NORMAL/SENSOR_FAULT_ONLY scenarios reuse the identical simulation path -- verified empirically (~1e-7 vs ~64 mg/L for a real injection). SENSOR_FAULT_ONLY forces a deterministic fault since the existing degradation is probabilistic. scenario_to_example() derives event_presence/event_cause/evidence_sufficiency/source_region deterministically and masks source_node/source_region/start_time/duration/relative_strength via targets_v2's _mask convention when event_presence is false. Found and fixed a real bug during verification (forced-fault logic smuggling finite values into missing-marked slots). 16 new tests total across both commits."
+    },
+    {
+      "task": "2.3",
+      "title": "Supervised Scout decision states",
+      "commit": "f545a46",
+      "summary": "Discovered hydroswarm.sampling.active.rank_sample_locations already implemented nearly everything Task 2.3 asks for (candidate enumeration, EIG, candidate reduction, delay/cost/redundancy/accessibility, stop decision) and was already tested. Added the missing glue: build_signature_artifact_for_network() (real WNTR-backed signature fitting, cached) and generate_scout_label() (reindexes a scenario's observations onto the signature grid, computes a Bayesian posterior, calls the existing ranker). Deliberately not merged into ScenarioExample.targets since Scout supervision is sequential; documented as future TrajectoryState integration. 8 new tests against real WNTR simulation."
+    },
+    {
+      "task": "2.4",
+      "title": "Verified Strategist training labels",
+      "commit": "63e060b",
+      "summary": "Discovered hydroswarm.planning.response.generate_response_plans already produces almost exactly the plan's bounded template list with a guaranteed no-response comparator, and prescreen_top_plans already bounds the exact-simulation budget. Added generate_strategist_labels() gluing these to the real PlanVerifier (WNTR) -- plan_validity is read only from the verifier's own decision, confirmed by a test that independently re-verifies every label. 7 new tests including a deliberately unsafe plan WNTR correctly rejects with real rejection codes. This closes Bundle B in full (Tasks 1.1-1.5, 2.1-2.6)."
     }
   ]
 }

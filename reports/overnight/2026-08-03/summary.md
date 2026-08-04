@@ -7,10 +7,8 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `541c72c` (Bundle B schema/infra scope complete; still running)
-- Commits created: 22 (a3ccd25, 19468ac, f67b0a6, ace2808, 9cf1d98, ecd34ac, ad8b256, b2bba5d,
-  1c3b55b, 7d5d84a, 22bae5d, 60949b1, 80c1aeb, 14e4224, dfa5b60, 7bdf4f5, 17643ab, 9dd7942,
-  ca955a8, 541c72c, and 2 report-refresh commits)
+- Ending commit: `63e060b` (Bundle B complete in full; still running)
+- Commits created: 27 (see `git log --oneline main..agent/gcp-multitopology-v3`)
 - Working tree: clean at branch creation
 
 ## Completed tasks
@@ -20,10 +18,9 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [x] Phase 1.1-1.5 (Bundle B: variable-topology corpus architecture — topology metadata, per-topology
   signature registry, variable-size collation, scenario-specific hydraulic context caching, permutation
   equivariance). This was the plan's explicitly highest-priority technical change.
-- [x] Phase 2.1, 2.5, 2.6 (Bundle B: targets_v2 contract, OOD categories, trajectory serialization —
-  schema/governance/infrastructure scope)
-- [ ] Phase 2.2-2.4 (Bundle B: actual Sentinel/Scout/Strategist label *generation* against the real
-  simulator/classical/planning stack) — next up, see Follow-up
+- [x] Phase 2.1-2.6 (Bundle B complete: targets_v2 contract, Sentinel/Scout/Strategist label generation
+  against the real simulator/classical/planning/WNTR stack, OOD categories, trajectory serialization)
+- [ ] Bundle C (frontend live/demo data integrity, Tasks 3.1-3.8) — next up, in progress
 - [ ] Phase 3 (Bundle C: frontend live/demo integrity)
 - [ ] Phase 4 (Bundle D: configurable HydroCore)
 - [ ] Cycle A
@@ -42,7 +39,7 @@ See `test-results.md` for full detail.
 
 | Command | Result | Notes |
 |---|---|---|
-| `pytest -q` | 242 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 144 new tests added across Bundle A + Bundle B schema/infra scope |
+| `pytest -q` | 270 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 172 new tests added across Bundle A + Bundle B (complete) |
 | `ruff check src tests scripts` | pass | |
 | `pyright` | pass | |
 | `npm run lint` | pass | |
@@ -82,6 +79,19 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
 - The label-audit tool run against the real learning-v1 corpus found zero data-quality
   issues (0 duplicates, 0 impossible labels, 0 leakage) and a classical-signature-prior
   sanity baseline of 81-85%, consistent with the existing governed 91.5% classical result.
+- Tasks 2.2-2.4 (Sentinel/Scout/Strategist label generation) turned out to build on
+  substantially more existing, already-tested infrastructure than expected:
+  `hydroswarm.sampling.active.rank_sample_locations` and
+  `hydroswarm.planning.response.generate_response_plans`/`prescreen_top_plans` already
+  implemented nearly everything those tasks describe. The work was writing the glue
+  connecting them to governed scenario/corpus data, not building new subsystems, and every
+  test in this stretch ran against the real reference network with real WNTR simulation
+  (no mocked simulator).
+- Found and fixed a second real bug during Task 2.2 verification: the forced sensor-fault
+  injection for SENSOR_FAULT_ONLY scenarios could write a finite value into a slot the
+  missingness mask had already marked absent, violating the corpus's finite/missing
+  invariant. Caught by a targeted high-missingness regression test before it could
+  corrupt generated data.
 
 ## Remaining blockers
 
@@ -93,11 +103,10 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q   # expect 242 passed
+python -m pytest -q   # expect 270 passed
 ```
 
-See `follow-up.md` for the specific next task (2.2: Sentinel label generation) and what
-investigation it needs before implementation.
+See `follow-up.md` for the specific next task (Bundle C: frontend live/demo data integrity).
 
 ## Every training job's status
 
