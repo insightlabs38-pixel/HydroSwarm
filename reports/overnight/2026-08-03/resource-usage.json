@@ -1,0 +1,30 @@
+{
+  "baseline_snapshot_utc": "2026-08-04T00:00:00Z",
+  "disk": {
+    "total_gib": 242,
+    "used_gib_at_start": 35,
+    "available_gib_at_start": 207
+  },
+  "directory_sizes_at_start": {
+    "data": "21M",
+    "experiments": "49M",
+    "reports": "220K",
+    "models": "78M",
+    "output": "75M",
+    "src": "1.8M",
+    "tests": "776K",
+    "frontend": "296M (includes node_modules after npm ci)"
+  },
+  "memory": {
+    "total_gib": 62,
+    "available_gib_at_start": 60
+  },
+  "cpu": {
+    "vcpus": 16,
+    "model": "AMD EPYC 7B12"
+  },
+  "notes": [
+    "This file will be updated with disk/RAM deltas after each major data-generation or training phase, per plan requirement to record disk usage before and after large generation phases.",
+    "No dataset generation or training has run yet at this snapshot; this is the Phase 0 baseline."
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "schema_version": 0,
+  "note": "Placeholder pre-registry snapshot recorded during Phase 0. The governed, immutable, append-only experiment registry required by Task 0.2 (run IDs, parent-run lineage, config/manifest/schema hashes, checkpoint hashes, exit status, locked-test-opened flag, etc.) has not been implemented yet. Once implemented it will live at a stable path referenced from here (expected: experiments/registry/ or similar, versioned separately from this daily report) and this file will be replaced with either a real index or a pointer to it.",
+  "runs": []
+}

@@ -1,0 +1,45 @@
+{
+  "recorded_at_commit": "5697f912667fa236ece784a98f141c8162ff6bf8",
+  "purpose": "Baseline immutable artifacts that this run must never overwrite, relabel, or silently mutate. Hashes recorded here before any implementation work started; re-verify against this table before declaring the run complete.",
+  "immutable_baseline_artifacts": [
+    {
+      "path": "models/hydrocore-s-learning-v1.safetensors",
+      "sha256": "85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423",
+      "role": "promoted default runtime checkpoint (HydroCore-S hybrid, 4.04M params)"
+    },
+    {
+      "path": "models/hydromono-s-learning-v1.safetensors",
+      "sha256": "f18bc24e6a21370415a5a98367c81d99ba8bcbc1998ab3c61cca8569ca5ddacb",
+      "role": "equal-budget HydroMono-S control checkpoint"
+    },
+    {
+      "path": "models/hydrocore-m-learning-v1-partial.safetensors",
+      "sha256": "d3fee771c4f243fabf3787b8c5076d0712e889d50c85697316a1bea369d04c43",
+      "role": "two-epoch HydroCore-M feasibility artifact (not converged, not promoted)"
+    },
+    {
+      "path": "data/learning-v1/dataset-report.json",
+      "sha256": "4f7a44dea9bd176082a483f12ab0c1d1ebaf2b02ea979ca791a9147e0372251a",
+      "role": "immutable learning-v1 corpus report (1,320 WNTR scenarios)"
+    },
+    {
+      "path": "data/learning-v1/canonical-tensor-report-v3.json",
+      "sha256": "6d98405c3dc34a163f196fbd7c678fcd3e49e7f514983e556dcdee8c550cd671",
+      "role": "immutable learning-v1 canonical tensor report"
+    },
+    {
+      "path": "reports/results/hydrocore-s-calibration.json",
+      "sha256": "4a44d42b3b06dc09f1ff67d1de89cd99b5fea567cef1a9161b3a5c39511b37d4",
+      "role": "current promoted calibration artifact, validated at runtime against the checkpoint hash"
+    }
+  ],
+  "new_versioned_roots_to_use_instead_of_mutating_baseline": [
+    "data/learning-v2 (multi-topology corpus)",
+    "experiments/learning-v3",
+    "reports/results/v3"
+  ],
+  "notes": [
+    "All hashes above match their own committed .sha256 sidecar files where present (models/*.metadata.json sha256 field; reports/results/*.json.sha256 files).",
+    "This table will be re-checked at end-of-run to confirm none of these artifacts changed."
+  ]
+}

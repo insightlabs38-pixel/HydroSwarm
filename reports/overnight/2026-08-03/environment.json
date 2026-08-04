@@ -1,0 +1,44 @@
+{
+  "recorded_at_commit": "5697f912667fa236ece784a98f141c8162ff6bf8",
+  "recorded_at_utc": "2026-08-04",
+  "branch": "agent/gcp-multitopology-v3",
+  "operating_system": {
+    "name": "Debian GNU/Linux 13 (trixie)",
+    "kernel": "7.0.0-1008-gcp #8-Ubuntu SMP PREEMPT Thu Jul 2 19:07:22 UTC 2026 x86_64",
+    "note": "Plan specifies Ubuntu 24.04 LTS on the e2-standard-16 primary VM; actual guest OS observed here is Debian 13 trixie inside a container running on a GCP host kernel. Hardware shape matches the plan's target VM."
+  },
+  "gcp": {
+    "on_gcp": true,
+    "zone": "europe-west1-b",
+    "project_number": "312713138741",
+    "note": "europe-west1 matches plan's recommended Belgium region."
+  },
+  "hardware": {
+    "cpu_model": "AMD EPYC 7B12",
+    "vcpus": 16,
+    "ram_total_gib": 62,
+    "ram_available_gib_at_start": 60,
+    "disk_total_gib": 242,
+    "disk_available_gib_at_start": 207,
+    "note": "Matches plan target (16 vCPU / 64GB RAM / 250GB disk, e2-standard-16 shape)."
+  },
+  "toolchain": {
+    "python": "3.12.13",
+    "python_path": "/usr/local/bin/python3",
+    "node": "v20.19.2",
+    "npm": "9.2.0",
+    "uv": "0.12.1",
+    "torch": "2.13.0+cu130",
+    "wntr": "1.5.0",
+    "pytest": "9.1.1",
+    "pyright": "1.1.411",
+    "numpy": "2.4.6",
+    "fastapi": "0.141.1",
+    "pydantic": "2.13.4"
+  },
+  "notes": [
+    "hydroswarm package is not pip-installed (no .venv); pytest resolves it via pythonpath=src from pyproject.toml. Ad hoc scripts must set PYTHONPATH=src.",
+    "git repository at /workspace/HydroSwarm is owned by uid 1001/gid 1002 but the agent runs as root/uid 0, which trips git's dubious-ownership guard. All git invocations in this run use a per-command `-c safe.directory=/workspace/HydroSwarm` flag rather than writing a global safe.directory config entry, per the instruction not to modify git config.",
+    "frontend node_modules were not present at session start; installed via `npm ci` (306 packages, 0 vulnerabilities). npm reported an EBADENGINE warning for @mapbox/jsonlint-lines-primitives which wants node>=22 while node 20.19.2 is installed; non-fatal, all frontend gates passed anyway."
+  ]
+}
