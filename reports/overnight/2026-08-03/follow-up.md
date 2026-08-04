@@ -22,6 +22,17 @@ still running in the background):
 4. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
    selection completing first -- "only after selecting strongest S architecture" per the
    plan -- so it cannot start early no matter how much idle capacity exists.
+5. **Phase 8 (frontend UX, Tasks 8.1/8.3/8.4) is a candidate independent thread not yet
+   scoped.** Task 8.2 (model-governance view) already exists (`ModelGovernanceTable.tsx`).
+   Tasks 8.1 (simplified decision-rail workspace layout), 8.3 (validated-vs-unseen-topology
+   comparison view), and 8.4 (a scripted "RUN VERIFIED INCIDENT DEMONSTRATION" guided judge
+   mode) do not appear implemented yet (checked via grep for their plan-specified strings/
+   concepts -- none found in `frontend/src`). These are genuinely independent of Bundle F/G's
+   training results (they consume the same `IncidentView`/demo-fixture data already wired up),
+   so they're a legitimate next thread if picked up before Bundle F training finishes -- not
+   started this session because they're substantial new UI features (new components, new
+   interaction flows, likely new visual-regression baselines) that deserve their own scoping
+   pass rather than a rushed addition alongside active job supervision.
 
 ## Exact command to resume
 
