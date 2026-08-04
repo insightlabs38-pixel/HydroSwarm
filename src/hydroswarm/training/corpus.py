@@ -9,15 +9,20 @@ import json
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+import networkx as nx
 import numpy as np
 import torch
 
 from hydroswarm.classical import HydraulicStateEstimator, OperationalTelemetry
-from hydroswarm.data.scenarios import GeneratedScenario
+from hydroswarm.data.scenarios import EventType, GeneratedScenario
 from hydroswarm.preprocessing import HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.simulation.wrapper import HydraulicSimulator
 
 from .data import CurriculumStage, ScenarioExample
+from .targets_v2 import EventCause
+
+#: Number of source_region buckets (see assign_source_regions).
+SOURCE_REGION_COUNT = 3
 
 
 STAGE_MAP = {
@@ -60,6 +65,37 @@ class FeatureContext:
 
     state: Any
     graph: Any
+
+
+def assign_source_regions(network: Any, *, num_regions: int = SOURCE_REGION_COUNT) -> dict[str, int]:
+    """Deterministic hop-distance-from-reservoir/tank region partition.
+
+    Nodes at similar hydraulic distance from the network's feed points tend
+    to share travel-time and contamination-spread characteristics, so
+    grouping by hop-distance band is a reasonable, fully-deterministic proxy
+    for source_region -- it depends only on static network structure, never
+    on any particular incident, so it cannot leak incident-specific
+    information and is identical for a given network across every scenario.
+    """
+
+    graph = network.to_graph().to_undirected()
+    feed_points = [node for node in (*network.reservoir_name_list, *network.tank_name_list) if node in graph]
+    if not feed_points:
+        feed_points = [sorted(graph.nodes)[0]] if graph.nodes else []
+
+    distances: dict[str, int] = {}
+    for feed_point in feed_points:
+        for node, distance in nx.single_source_shortest_path_length(graph, feed_point).items():
+            if node not in distances or distance < distances[node]:
+                distances[node] = distance
+
+    junctions = sorted(network.junction_name_list)
+    unique_distances = sorted({distances.get(node, 0) for node in junctions})
+    bucket_of_distance = {
+        distance: min(num_regions - 1, (index * num_regions) // max(len(unique_distances), 1))
+        for index, distance in enumerate(unique_distances)
+    }
+    return {node: bucket_of_distance[distances.get(node, 0)] for node in junctions}
 
 
 def build_feature_context(network: Any) -> FeatureContext:
@@ -116,6 +152,53 @@ def fit_signature_library(
     return SignatureLibrary(tuple(node_ids), signatures, digest)
 
 
+#: Canonical integer ordering for the event_cause target.
+EVENT_CAUSE_INDEX: dict[EventCause, int] = {cause: index for index, cause in enumerate(EventCause)}
+
+
+def _event_cause(scenario: GeneratedScenario) -> EventCause:
+    """Deterministic event_cause derivation from the generator's event_type
+    and model_mismatch flags -- never a hand label. AMBIGUOUS is not yet
+    produced by the generator (it needs a scenario that genuinely combines
+    multiple confounders); this is a documented limitation, not an
+    oversight."""
+
+    event_type = scenario.manifest.event_type
+    if event_type == EventType.CONTAMINATION.value:
+        return EventCause.CONTAMINATION
+    if event_type == EventType.SENSOR_FAULT_ONLY.value:
+        return EventCause.SENSOR_FAULT
+    # event_type == "normal": distinguish a genuinely quiet network from one
+    # where the hydraulic model itself disagrees with the (still
+    # contamination-free) telemetry.
+    if scenario.manifest.model_mismatch.get("valve_telemetry_incorrect") or scenario.manifest.model_mismatch.get(
+        "missing_topology_element"
+    ):
+        return EventCause.HYDRAULIC_MISMATCH
+    return EventCause.NORMAL
+
+
+def _evidence_sufficiency(series: Sequence[SensorSeries], *, health_threshold: float = 0.75) -> bool:
+    """Documented deterministic rule (overnight-plan.txt Task 2.2): evidence
+    is sufficient when at least half of all (sensor, timestep) health
+    readings clear health_threshold and at least two distinct sensors ever
+    clear it. This is the sensor-health-based subset of the plan's full
+    rule (which also references calibrated candidate-set size, posterior
+    entropy, disagreement, and OOD state) -- those additional signals only
+    exist once a live controller loop runs over a corpus example (see
+    TrajectoryState, Task 2.6), and are not available at pure corpus-
+    generation time. Extending this rule to the full combination is future
+    work once trajectory-based generation exists.
+    """
+
+    all_health = [value for item in series for value in item.health]
+    if not all_health:
+        return False
+    healthy_fraction = sum(1 for value in all_health if value >= health_threshold) / len(all_health)
+    sensors_ever_healthy = sum(1 for item in series if any(value >= health_threshold for value in item.health))
+    return healthy_fraction >= 0.5 and sensors_ever_healthy >= 2
+
+
 def scenario_to_example(
     scenario: GeneratedScenario,
     network: Any,
@@ -164,11 +247,27 @@ def scenario_to_example(
     )
     node_ids = built.node_ids
     positions = {node_id: index for index, node_id in enumerate(node_ids)}
-    source = positions[scenario.manifest.incident.source_nodes[0]]
     start_bins = (0, 60, 120, 240)
     duration_bins = (30, 60, 120)
     strength_bins = (0.5, 1.0, 2.0)
     split = scenario.manifest.split.value
+
+    event_presence = scenario.manifest.event_type == EventType.CONTAMINATION.value
+    cause = _event_cause(scenario)
+    regions = assign_source_regions(network)
+    if event_presence:
+        source_node_id = scenario.manifest.incident.source_nodes[0]
+        source = positions[source_node_id]
+        source_region = regions[source_node_id]
+        start_time = start_bins.index(scenario.manifest.incident.start_minute)
+        duration = duration_bins.index(scenario.manifest.incident.duration_minutes)
+        relative_strength = strength_bins.index(scenario.manifest.incident.relative_strength)
+    else:
+        # No real source exists for a normal/sensor-fault-only scenario;
+        # these are placeholders masked out by the *_mask companions below,
+        # never invented labels a loss could train against.
+        source = source_region = start_time = duration = relative_strength = 0
+
     return ScenarioExample(
         scenario_id=str(scenario.manifest.scenario_id),
         network_id=scenario.manifest.network_id,
@@ -179,9 +278,18 @@ def scenario_to_example(
         inputs={key: value.squeeze(0) for key, value in built.batch.items()},
         targets={
             "source_node": torch.tensor(source),
-            "start_time": torch.tensor(start_bins.index(scenario.manifest.incident.start_minute)),
-            "duration": torch.tensor(duration_bins.index(scenario.manifest.incident.duration_minutes)),
-            "relative_strength": torch.tensor(strength_bins.index(scenario.manifest.incident.relative_strength)),
+            "source_node_mask": torch.tensor(event_presence),
+            "source_region": torch.tensor(source_region),
+            "source_region_mask": torch.tensor(event_presence),
+            "start_time": torch.tensor(start_time),
+            "start_time_mask": torch.tensor(event_presence),
+            "duration": torch.tensor(duration),
+            "duration_mask": torch.tensor(event_presence),
+            "relative_strength": torch.tensor(relative_strength),
+            "relative_strength_mask": torch.tensor(event_presence),
+            "event_presence": torch.tensor(event_presence),
+            "event_cause": torch.tensor(EVENT_CAUSE_INDEX[cause]),
+            "evidence_sufficiency": torch.tensor(_evidence_sufficiency(series)),
             "sensor_fault": torch.tensor([
                 float(
                     node_id in scenario.sensor_nodes
