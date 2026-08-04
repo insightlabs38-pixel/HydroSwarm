@@ -22,6 +22,17 @@ PROFILE_CLASS_COUNTS = {
     "relative_strength": 3,
 }
 
+#: overnight-plan.txt Task 4.5: "Loss weights are explicit" and
+#: "Auxiliary predictions are not shown as authoritative product
+#: outputs" -- these three tasks are self-supervised/forecasting signal
+#: intended to shape the shared backbone representation, not to compete
+#: with the primary scientific objectives on equal footing. Applied only
+#: as a *default*; task_weights always takes precedence, so a caller that
+#: wants equal weighting (e.g. an ablation explicitly studying auxiliary
+#: objective strength) can still request it explicitly.
+AUXILIARY_TASKS = frozenset({"sensor_reconstruction", "future_concentration", "travel_time"})
+AUXILIARY_TASK_DEFAULT_WEIGHT = 0.1
+
 
 def _cross_entropy(logits: Tensor, target: Tensor) -> Tensor:
     flattened_target = target.long().reshape(-1)
@@ -100,7 +111,7 @@ def compute_multitask_loss(
         "plan_value": "plan_value",
         "information_gain": "expected_information_gain",
         "residual": "residual_prediction",
-        "reconstruction": "reconstruction_prediction",
+        "sensor_reconstruction": "sensor_reconstruction_prediction",
         "future_concentration": "future_concentration_prediction",
         "pressure": "pressure_prediction",
         "flow": "flow_prediction",
@@ -147,7 +158,11 @@ def compute_multitask_loss(
         )
     if not losses:
         raise ValueError("no compatible model outputs and training targets")
-    weighted = [loss * float(weights.get(name, 1.0)) for name, loss in losses.items()]
+
+    def _default_weight(name: str) -> float:
+        return AUXILIARY_TASK_DEFAULT_WEIGHT if name in AUXILIARY_TASKS else 1.0
+
+    weighted = [loss * float(weights.get(name, _default_weight(name))) for name, loss in losses.items()]
     return MultiTaskLoss(total=torch.stack(weighted).sum(), tasks=losses)
 
 

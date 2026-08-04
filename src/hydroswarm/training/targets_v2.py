@@ -275,12 +275,50 @@ TARGETS_V2: dict[str, TargetSpec] = {
             source_of_truth="Deterministic controller policy, not a hand label.",
             maskable=False,
         ),
+        _spec(
+            category="auxiliary",
+            name="sensor_reconstruction",
+            definition="Reconstructed node quality/concentration signal at nodes whose sensor "
+            "reading was masked as missing, frozen, or dropped in the input -- a "
+            "self-supervised denoising objective (Task 4.5), never an authoritative product "
+            "output.",
+            unit="mg/L, per node, shape [node_count]",
+            masking_rule="Masked (no ground truth) for any node that was never actually "
+            "observed by the corpus generator at any point in the scenario.",
+            source_of_truth="The corpus generator's own unmasked simulation output, used only "
+            "as training supervision -- never available at inference/production time.",
+        ),
+        _spec(
+            category="auxiliary",
+            name="future_concentration",
+            definition="Concentration at a fixed future horizon beyond the observation "
+            "window, per node -- an auxiliary forecasting objective (Task 4.5), never an "
+            "authoritative product output.",
+            unit="mg/L, per node, shape [node_count]",
+            masking_rule="Masked for scenarios/nodes where the corpus generator's simulation "
+            "horizon does not extend far enough past the observation window to supply ground "
+            "truth.",
+            source_of_truth="Exact WNTR/EPANET simulation continued past the observation "
+            "window (training-only future truth).",
+        ),
+        _spec(
+            category="auxiliary",
+            name="travel_time",
+            definition="Hydraulic travel time from the true contamination source to each "
+            "node -- an auxiliary structural-awareness objective (Task 4.5), never an "
+            "authoritative product output.",
+            unit="seconds, per node, shape [node_count]",
+            masking_rule="Masked for nodes hydraulically unreachable from the source, and for "
+            "every node on NORMAL/SENSOR_FAULT_ONLY (non-contamination) scenarios where no "
+            "source exists.",
+            source_of_truth="Exact WNTR/EPANET hydraulic simulation trace.",
+        ),
     )
 }
 
 TARGETS_BY_CATEGORY: dict[str, tuple[str, ...]] = {
     category: tuple(spec.name for spec in TARGETS_V2.values() if spec.category == category)
-    for category in ("sentinel", "scout", "strategist", "control")
+    for category in ("sentinel", "scout", "strategist", "control", "auxiliary")
 }
 
 

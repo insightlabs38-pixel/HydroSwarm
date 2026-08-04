@@ -67,6 +67,9 @@ class HydroOutput(TypedDict, total=False):
     event_presence_logits: Tensor
     event_cause_logits: Tensor
     next_step_logits: Tensor
+    sensor_reconstruction_prediction: Tensor
+    future_concentration_prediction: Tensor
+    travel_time_prediction: Tensor
 
 
 @dataclass(frozen=True)
@@ -155,6 +158,16 @@ NEXT_STEP_CLASS_COUNT = 4
 #: initialized and silently unused) when disabled.
 EVENT_CONTROL_HEADS_DEFAULT = False
 
+#: overnight-plan.txt Task 4.5: exactly three auxiliary objectives --
+#: masked sensor reconstruction, future concentration prediction, and
+#: travel-time prediction -- "do not add all planned auxiliary heads in
+#: this overnight run." Same net-new-parameters compatibility concern as
+#: EVENT_CONTROL_HEADS_DEFAULT, so gated the same way. Their predictions
+#: are explicitly non-authoritative training signal (see
+#: AUXILIARY_TASKS/AUXILIARY_TASK_DEFAULT_WEIGHT in training.losses) and
+#: must never be surfaced to a user as a product decision.
+AUXILIARY_HEADS_DEFAULT = False
+
 
 class ArchitectureCompatibilityError(Exception):
     """Raised when a checkpoint's recorded architecture config does not
@@ -208,6 +221,14 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             "enabling it adds event_presence/event_cause/next_step head parameters that a "
             "checkpoint trained without them does not have"
         )
+    recorded_auxiliary_heads = metadata.get("auxiliary_heads")
+    if recorded_auxiliary_heads is not None and recorded_auxiliary_heads != model.auxiliary_heads:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with auxiliary_heads={recorded_auxiliary_heads!r} but "
+            f"this model instance is configured with auxiliary_heads={model.auxiliary_heads!r}; "
+            "enabling it adds sensor_reconstruction/future_concentration/travel_time head "
+            "parameters that a checkpoint trained without them does not have"
+        )
 
 
 class HydroCore(nn.Module):
@@ -244,6 +265,7 @@ class HydroCore(nn.Module):
         incident_pooling: IncidentPooling = "mean",
         message_direction: MessageDirection = "forward_only",
         event_control_heads: bool = EVENT_CONTROL_HEADS_DEFAULT,
+        auxiliary_heads: bool = AUXILIARY_HEADS_DEFAULT,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -272,6 +294,7 @@ class HydroCore(nn.Module):
         self.incident_pooling = incident_pooling
         self.message_direction = message_direction
         self.event_control_heads = event_control_heads
+        self.auxiliary_heads = auxiliary_heads
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -371,6 +394,13 @@ class HydroCore(nn.Module):
             self.event_presence_head = RoleHead(d_model, 1)
             self.event_cause_head = RoleHead(d_model, EVENT_CAUSE_CLASS_COUNT)
             self.next_step_head = RoleHead(d_model, NEXT_STEP_CLASS_COUNT)
+        # overnight-plan.txt Task 4.5: optional, configuration-controlled
+        # auxiliary objectives. Only constructed when auxiliary_heads is
+        # enabled -- see AUXILIARY_HEADS_DEFAULT's docstring.
+        if self.auxiliary_heads:
+            self.sensor_reconstruction_head = RoleHead(d_model, 1)
+            self.future_concentration_head = RoleHead(d_model, 1)
+            self.travel_time_head = RoleHead(d_model, 1)
         self.action_head = RoleHead(d_model, action_vocabulary_size)
         self.plan_value_head = RoleHead(d_model, 1)
         self.plan_validity_head = RoleHead(d_model, 2)
@@ -407,6 +437,7 @@ class HydroCore(nn.Module):
             "incident_pooling": self.incident_pooling,
             "message_direction": self.message_direction,
             "event_control_heads": self.event_control_heads,
+            "auxiliary_heads": self.auxiliary_heads,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -584,6 +615,16 @@ class HydroCore(nn.Module):
             output["event_presence_logits"] = self.event_presence_head(incident_context).squeeze(-1)
             output["event_cause_logits"] = self.event_cause_head(incident_context)
             output["next_step_logits"] = self.next_step_head(incident_context)
+        if self.auxiliary_heads:
+            output["sensor_reconstruction_prediction"] = (
+                self.sensor_reconstruction_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, 0.0)
+            )
+            output["future_concentration_prediction"] = (
+                self.future_concentration_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, 0.0)
+            )
+            output["travel_time_prediction"] = (
+                self.travel_time_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, 0.0)
+            )
         return output
 
     def parameter_count(self, *, trainable_only: bool = False) -> int:
@@ -631,6 +672,12 @@ class HydroCore(nn.Module):
         )
         if self.event_control_heads:
             heads += count(self.event_presence_head) + count(self.event_cause_head) + count(self.next_step_head)
+        if self.auxiliary_heads:
+            heads += (
+                count(self.sensor_reconstruction_head)
+                + count(self.future_concentration_head)
+                + count(self.travel_time_head)
+            )
         return ParameterReport(
             total=self.parameter_count(),
             trainable=self.parameter_count(trainable_only=True),

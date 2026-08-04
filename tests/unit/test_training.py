@@ -86,7 +86,7 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "relative_strength_logits": torch.zeros(1, 4, requires_grad=True),
         "sensor_fault_logits": torch.zeros(1, 2, requires_grad=True),
         "residual_prediction": torch.zeros(1, 2, requires_grad=True),
-        "reconstruction_prediction": torch.ones(1, 2, requires_grad=True),
+        "sensor_reconstruction_prediction": torch.ones(1, 2, requires_grad=True),
     }
     targets = {
         "source_node": torch.tensor([0]),
@@ -99,7 +99,7 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "relative_strength": torch.tensor([1]),
         "sensor_fault": torch.zeros(1, 2),
         "residual": torch.ones(1, 2),
-        "reconstruction": torch.zeros(1, 2),
+        "sensor_reconstruction": torch.zeros(1, 2),
     }
     result = compute_multitask_loss(
         outputs,

@@ -18,7 +18,7 @@ from hydroswarm.training import (
 def test_every_target_has_complete_governance_fields() -> None:
     for name, spec in TARGETS_V2.items():
         assert spec.name == name
-        assert spec.category in ("sentinel", "scout", "strategist", "control")
+        assert spec.category in ("sentinel", "scout", "strategist", "control", "auxiliary")
         assert spec.definition
         assert spec.unit
         assert spec.masking_rule
@@ -41,6 +41,7 @@ def test_contract_covers_every_plan_specified_target() -> None:
         "scout": {"sample_node", "information_gain", "candidate_reduction", "should_continue_sampling"},
         "strategist": {"action_template", "target_pointer", "plan_validity", "plan_value", "consequence_vector"},
         "control": {"ood_class", "next_step"},
+        "auxiliary": {"sensor_reconstruction", "future_concentration", "travel_time"},
     }
     for category, names in expected.items():
         assert set(TARGETS_BY_CATEGORY[category]) == names
