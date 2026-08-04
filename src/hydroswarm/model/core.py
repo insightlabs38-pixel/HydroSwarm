@@ -64,6 +64,9 @@ class HydroOutput(TypedDict, total=False):
     plan_validity_logits: Tensor
     uncertainty: Tensor
     ood_logits: Tensor
+    event_presence_logits: Tensor
+    event_cause_logits: Tensor
+    next_step_logits: Tensor
 
 
 @dataclass(frozen=True)
@@ -124,6 +127,34 @@ INCIDENT_POOLING_MODES: tuple[IncidentPooling, ...] = get_args(IncidentPooling)
 MessageDirection = Literal["forward_only", "dual_gated"]
 MESSAGE_DIRECTIONS: tuple[MessageDirection, ...] = get_args(MessageDirection)
 
+#: overnight-plan.txt Task 4.4. Class counts and index order for the
+#: event/next-step control heads must exactly match
+#: hydroswarm.training.targets_v2.EventCause / NextStep's enum member
+#: order (CONTAMINATION, SENSOR_FAULT, HYDRAULIC_MISMATCH, AMBIGUOUS,
+#: NORMAL / COLLECT_SAMPLE, INSPECT_SENSOR, GENERATE_PLANS, ABSTAIN). Not
+#: imported directly to avoid a model<->training import cycle. For
+#: event_cause, hydroswarm.training.corpus.EVENT_CAUSE_INDEX (built via
+#: enumerate(EventCause)) is the actual label encoder and this count is
+#: checked against it by tests/unit/test_event_control_heads.py; next_step
+#: label generation is not yet built (governed by the deterministic
+#: controller policy from a later task), so only the head shape is fixed
+#: here, matching len(NextStep).
+EVENT_CAUSE_CLASS_COUNT = 5
+NEXT_STEP_CLASS_COUNT = 4
+
+#: overnight-plan.txt Task 4.0's explicit compatibility requirement: "The
+#: updated architecture must not silently load incompatible weights with
+#: missing or randomly initialized safety-critical heads." Unlike
+#: prior_mode/incident_pooling/message_direction (each already an
+#: existing pathway made configurable), the Task 4.4 event/next-step
+#: heads are net-new parameters with no prior existence in the promoted
+#: checkpoint, so -- following the same "default reproduces the
+#: checkpoint-compatible original module graph exactly" convention used
+#: by every other Task 4.x flag -- they are gated behind this flag rather
+#: than always constructed, and are simply absent (not randomly
+#: initialized and silently unused) when disabled.
+EVENT_CONTROL_HEADS_DEFAULT = False
+
 
 class ArchitectureCompatibilityError(Exception):
     """Raised when a checkpoint's recorded architecture config does not
@@ -169,6 +200,14 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             f"this model instance is configured with message_direction={model.message_direction!r}; "
             "dual_gated adds separate upstream/gate parameters that forward_only does not have"
         )
+    recorded_event_control_heads = metadata.get("event_control_heads")
+    if recorded_event_control_heads is not None and recorded_event_control_heads != model.event_control_heads:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with event_control_heads={recorded_event_control_heads!r} but "
+            f"this model instance is configured with event_control_heads={model.event_control_heads!r}; "
+            "enabling it adds event_presence/event_cause/next_step head parameters that a "
+            "checkpoint trained without them does not have"
+        )
 
 
 class HydroCore(nn.Module):
@@ -204,6 +243,7 @@ class HydroCore(nn.Module):
         prior_mode: PriorMode = "feature_and_logit",
         incident_pooling: IncidentPooling = "mean",
         message_direction: MessageDirection = "forward_only",
+        event_control_heads: bool = EVENT_CONTROL_HEADS_DEFAULT,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -231,6 +271,7 @@ class HydroCore(nn.Module):
         self.prior_mode = prior_mode
         self.incident_pooling = incident_pooling
         self.message_direction = message_direction
+        self.event_control_heads = event_control_heads
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -321,6 +362,15 @@ class HydroCore(nn.Module):
         self.evidence_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Sigmoid())
         self.uncertainty_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Softplus())
         self.ood_head = RoleHead(d_model, 3)
+        # overnight-plan.txt Task 4.4: incident-level control heads for the
+        # targets_v2 event_presence/event_cause/next_step contract. Only
+        # constructed when event_control_heads is enabled -- see
+        # EVENT_CONTROL_HEADS_DEFAULT's docstring for why this is gated
+        # rather than unconditional.
+        if self.event_control_heads:
+            self.event_presence_head = RoleHead(d_model, 1)
+            self.event_cause_head = RoleHead(d_model, EVENT_CAUSE_CLASS_COUNT)
+            self.next_step_head = RoleHead(d_model, NEXT_STEP_CLASS_COUNT)
         self.action_head = RoleHead(d_model, action_vocabulary_size)
         self.plan_value_head = RoleHead(d_model, 1)
         self.plan_validity_head = RoleHead(d_model, 2)
@@ -356,6 +406,7 @@ class HydroCore(nn.Module):
             "prior_mode": self.prior_mode,
             "incident_pooling": self.incident_pooling,
             "message_direction": self.message_direction,
+            "event_control_heads": self.event_control_heads,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -504,7 +555,7 @@ class HydroCore(nn.Module):
                 torch.cat((source_context, sensor_context, global_context), dim=-1)
             )
 
-        return HydroOutput(
+        output = HydroOutput(
             hidden_state=hidden,
             latent_state=latents,
             sentinel=role_outputs["sentinel"],
@@ -529,6 +580,11 @@ class HydroCore(nn.Module):
             uncertainty=self.uncertainty_head(incident_context),
             ood_logits=self.ood_head(incident_context),
         )
+        if self.event_control_heads:
+            output["event_presence_logits"] = self.event_presence_head(incident_context).squeeze(-1)
+            output["event_cause_logits"] = self.event_cause_head(incident_context)
+            output["next_step_logits"] = self.next_step_head(incident_context)
+        return output
 
     def parameter_count(self, *, trainable_only: bool = False) -> int:
         return sum(
@@ -573,6 +629,8 @@ class HydroCore(nn.Module):
                 self.pointer_query,
             )
         )
+        if self.event_control_heads:
+            heads += count(self.event_presence_head) + count(self.event_cause_head) + count(self.next_step_head)
         return ParameterReport(
             total=self.parameter_count(),
             trainable=self.parameter_count(trainable_only=True),

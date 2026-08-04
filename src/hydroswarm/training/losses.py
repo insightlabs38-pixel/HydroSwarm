@@ -89,6 +89,12 @@ def compute_multitask_loss(
         "action_pointer": "action_pointer_logits",
         "plan_validity": "plan_validity_logits",
         "ood": "ood_logits",
+        # overnight-plan.txt Task 4.4: only present in outputs when the
+        # model was built with event_control_heads=True, so these are
+        # silently skipped (like every other entry here) for models built
+        # without them.
+        "event_cause": "event_cause_logits",
+        "next_step": "next_step_logits",
     }
     regressions = {
         "plan_value": "plan_value",
@@ -124,6 +130,16 @@ def compute_multitask_loss(
             )
             if valid.any()
             else outputs["sensor_fault_logits"].sum() * 0.0
+        )
+    if "event_presence" in targets and "event_presence_logits" in outputs:
+        presence_target = targets["event_presence"].float()
+        valid = torch.isfinite(presence_target) & (presence_target >= 0)
+        losses["event_presence"] = (
+            F.binary_cross_entropy_with_logits(
+                outputs["event_presence_logits"].float()[valid], presence_target[valid]
+            )
+            if valid.any()
+            else outputs["event_presence_logits"].sum() * 0.0
         )
     if "evidence_sufficiency" in targets and "evidence_sufficiency" in outputs:
         losses["evidence_sufficiency"] = F.binary_cross_entropy(

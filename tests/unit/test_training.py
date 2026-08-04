@@ -112,6 +112,28 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
     result.total.backward()
 
 
+def test_multitask_loss_covers_event_control_heads_when_present() -> None:
+    # overnight-plan.txt Task 4.4: event_cause/event_presence losses only
+    # fire when both the model output (event_control_heads=True) and the
+    # target are present; next_step has no label generator yet, so it
+    # must be silently absent from result.tasks rather than raising.
+    outputs = {
+        "source_node_logits": torch.tensor([[3.0, 0.0]], requires_grad=True),
+        "event_presence_logits": torch.tensor([2.0], requires_grad=True),
+        "event_cause_logits": torch.tensor([[3.0, 0.0, 0.0, 0.0, 0.0]], requires_grad=True),
+    }
+    targets = {
+        "source_node": torch.tensor([0]),
+        "event_presence": torch.tensor([1.0]),
+        "event_cause": torch.tensor([0]),
+    }
+    result = compute_multitask_loss(outputs, targets)
+    assert set(result.tasks) == {"source_node", "event_presence", "event_cause"}
+    assert "next_step" not in result.tasks
+    assert torch.isfinite(result.total)
+    result.total.backward()
+
+
 def test_training_config_is_strict_cpu_fp32() -> None:
     assert TrainingConfig().device == "cpu"
     with pytest.raises(ValueError, match="CPU-only"):
