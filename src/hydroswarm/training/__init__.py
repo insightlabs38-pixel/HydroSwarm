@@ -17,6 +17,7 @@ from .data import (
 from .label_audit import audit_corpus, audit_split, cross_split_leakage
 from .losses import MultiTaskLoss, compute_multitask_loss, task_gradient_norms
 from .registry import ExperimentRegistry, RegistryError, RunHandle
+from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
 
@@ -36,9 +37,14 @@ __all__ = [
     "TrainingConfig",
     "TrainingSummary",
     "TrajectoryStep",
+    "GroupBalancedSampler",
     "audit_corpus",
     "audit_split",
+    "by_curriculum_stage",
+    "by_network",
+    "by_source_node",
     "collate_scenarios",
+    "composite_key",
     "compute_multitask_loss",
     "cross_split_leakage",
     "export_model",
