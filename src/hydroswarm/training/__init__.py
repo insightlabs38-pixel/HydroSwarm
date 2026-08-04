@@ -24,21 +24,39 @@ from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
+from .targets_v2 import (
+    TARGETS_BY_CATEGORY,
+    TARGETS_V2,
+    TARGETS_V2_SCHEMA_VERSION,
+    EventCause,
+    NextStep,
+    TargetSchemaError,
+    TargetSpec,
+    check_schema_version,
+    validate_targets_v2,
+)
 from .trainer import Trainer, TrainingSummary, set_deterministic_seed
 from .variable_collate import collate_variable_topology
 
 __all__ = [
+    "TARGETS_BY_CATEGORY",
+    "TARGETS_V2",
+    "TARGETS_V2_SCHEMA_VERSION",
     "AgentTrajectory",
     "CurriculumSchedule",
     "CurriculumStage",
+    "EventCause",
     "ExperimentRegistry",
     "GovernedScenarioDataset",
     "MultiTaskLoss",
+    "NextStep",
     "RegistryError",
     "RunArtifacts",
     "RunHandle",
     "ScenarioExample",
     "ShardedScenarioDataset",
+    "TargetSchemaError",
+    "TargetSpec",
     "TopologyMetadata",
     "Trainer",
     "TrainingConfig",
@@ -53,6 +71,7 @@ __all__ = [
     "by_curriculum_stage",
     "by_network",
     "by_source_node",
+    "check_schema_version",
     "collate_scenarios",
     "collate_variable_topology",
     "composite_key",
@@ -70,6 +89,7 @@ __all__ = [
     "set_deterministic_seed",
     "task_gradient_norms",
     "validate_split_isolation",
+    "validate_targets_v2",
     "write_shards",
 ]
 
