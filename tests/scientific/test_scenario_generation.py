@@ -6,6 +6,7 @@ import pytest
 from hydroswarm.data.scenarios import (
     CurriculumStage,
     DatasetSplit,
+    EventType,
     ScenarioDatasetWriter,
     ScenarioGenerationConfig,
     SplitPlanner,
@@ -85,3 +86,78 @@ def test_deterministic_ids_calibration_split_and_tensor_bridge() -> None:
     assert example.inputs["temporal_features"].shape == (25, 6, 6)
     assert example.inputs["edge_features"].shape[-1] == 13
     assert example.inputs["classical_prior"].sum().item() == pytest.approx(1.0)
+
+
+def test_normal_event_type_produces_negligible_concentration() -> None:
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(
+            seed=500, network_id="ref", network_family="reference", event_type=EventType.NORMAL,
+            frozen_probability=0.0, communication_outage_probability=0.0,
+        ),
+    )
+    assert scenario.manifest.event_type == "normal"
+    assert scenario.truth_concentration.max() < 1e-4
+    assert not scenario.frozen_mask.any()
+    assert not scenario.communication_outage_mask.any()
+
+
+def test_sensor_fault_only_event_type_forces_a_fault_with_negligible_concentration() -> None:
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(
+            seed=501, network_id="ref", network_family="reference", event_type=EventType.SENSOR_FAULT_ONLY,
+            frozen_probability=0.0, communication_outage_probability=0.0,
+        ),
+    )
+    assert scenario.manifest.event_type == "sensor_fault_only"
+    assert scenario.truth_concentration.max() < 1e-4
+    assert scenario.frozen_mask.any()
+
+
+def test_sensor_fault_only_does_not_smuggle_finite_values_into_missing_slots() -> None:
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    # High missingness so the forced-fault carry-forward logic must contend
+    # with NaN gaps.
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(
+            seed=502, network_id="ref", network_family="reference", event_type=EventType.SENSOR_FAULT_ONLY,
+            frozen_probability=0.0, communication_outage_probability=0.0, missing_probability=0.4,
+        ),
+    )
+    observed = scenario.observed_concentration
+    mask = scenario.observation_mask
+    assert np.all(np.isfinite(observed[mask]))
+    assert not np.any(np.isfinite(observed[~mask]))
+
+
+def test_contamination_event_type_is_unaffected_default() -> None:
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(seed=503, network_id="ref", network_family="reference"),
+    )
+    assert scenario.manifest.event_type == "contamination"
+    assert scenario.truth_concentration.max() > 1.0  # a real, non-negligible injection
+
+
+def test_event_type_is_part_of_the_replay_hash() -> None:
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    normal = generator.generate(
+        network,
+        ScenarioGenerationConfig(seed=504, network_id="ref", network_family="reference", event_type=EventType.NORMAL),
+    )
+    contamination = generator.generate(
+        network,
+        ScenarioGenerationConfig(seed=504, network_id="ref", network_family="reference", event_type=EventType.CONTAMINATION),
+    )
+    assert normal.manifest.replay_sha256 != contamination.manifest.replay_sha256
+    assert normal.manifest.scenario_id != contamination.manifest.scenario_id

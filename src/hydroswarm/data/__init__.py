@@ -4,6 +4,7 @@ from .synthetic import SyntheticConfig, SyntheticDataset, generate_synthetic_dat
 from .scenarios import (
     CurriculumStage,
     DatasetSplit,
+    EventType,
     HardNegativePlanStore,
     ScenarioDatasetWriter,
     ScenarioGenerationConfig,
@@ -16,6 +17,7 @@ from .scenarios import (
 __all__ = [
     "CurriculumStage",
     "DatasetSplit",
+    "EventType",
     "HardNegativePlanStore",
     "ScenarioDatasetWriter",
     "ScenarioGenerationConfig",

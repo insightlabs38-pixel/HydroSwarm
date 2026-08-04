@@ -29,6 +29,30 @@ class CurriculumStage(StrEnum):
     ADVERSARIAL = "adversarial"
 
 
+class EventType(StrEnum):
+    """What kind of event this scenario represents (overnight-plan.txt Task
+    2.2's "required normal and fault-only examples"). CONTAMINATION is the
+    existing default behavior: a real source injection. NORMAL and
+    SENSOR_FAULT_ONLY use a negligible (not exactly zero -- the simulator
+    requires strength > 0) injection strength so the resulting concentration
+    is indistinguishable from no contamination, while still exercising the
+    identical simulation code path; hydroswarm.training.corpus derives
+    event_presence/event_cause targets_v2 labels from this field rather than
+    from the (in these cases meaningless) injected source/timing/strength.
+    """
+
+    CONTAMINATION = "contamination"
+    NORMAL = "normal"
+    SENSOR_FAULT_ONLY = "sensor_fault_only"
+
+
+#: Injection strength used for NORMAL/SENSOR_FAULT_ONLY scenarios. Must be
+#: strictly positive (IncidentSource enforces this), but is small enough
+#: that resulting concentrations are indistinguishable from zero at any
+#: realistic detection threshold.
+NEGLIGIBLE_STRENGTH_MG_MIN = 1e-9
+
+
 class DatasetSplit(StrEnum):
     TRAIN = "train"
     VALIDATION = "validation"
@@ -43,6 +67,7 @@ class ScenarioGenerationConfig:
     network_family: str
     split: DatasetSplit | None = None
     stage: CurriculumStage = CurriculumStage.OPERATIONAL
+    event_type: EventType = EventType.CONTAMINATION
     source_node: str | None = None
     start_time_bins_min: tuple[int, ...] = (0, 60, 120, 240)
     duration_bins_min: tuple[int, ...] = (30, 60, 120)
@@ -90,6 +115,7 @@ class ScenarioManifest:
     artifact_sha256: str
     replay_sha256: str
     created_with_python: str
+    event_type: str = "contamination"
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,14 +179,16 @@ class WNTRScenarioGenerator:
             raise ValueError("configured source must be a junction")
         start = int(rng.choice(config.start_time_bins_min))
         duration = int(rng.choice(config.duration_bins_min))
-        strength = float(rng.choice(config.strength_bins))
+        is_contamination = config.event_type == EventType.CONTAMINATION
+        strength = float(rng.choice(config.strength_bins)) if is_contamination else 0.0
+        injection_strength = strength if is_contamination else NEGLIGIBLE_STRENGTH_MG_MIN / config.base_strength_mg_min
         demand_regime = float(rng.choice(config.demand_regimes))
         self._randomize_hydraulics(model, config, rng, demand_regime)
         sensor_count = min(max(1, config.sensor_count), len(junctions))
         sensors = tuple(sorted(map(str, rng.choice(junctions, size=sensor_count, replace=False))))
         simulator = HydraulicSimulator(model)
         simulation = simulator.simulate_incident(
-            source, strength_mg_min=config.base_strength_mg_min * strength,
+            source, strength_mg_min=config.base_strength_mg_min * injection_strength,
             start_minute=start, duration_minutes=duration,
         )
         frame = simulation.concentration_mg_l.loc[:, list(sensors)]
@@ -168,12 +196,17 @@ class WNTRScenarioGenerator:
         observed, observation_mask, frozen_mask, outage_mask, jitter = self._degrade(
             truth, np.asarray(frame.index, dtype=float), config, rng
         )
+        if config.event_type == EventType.SENSOR_FAULT_ONLY:
+            observed, observation_mask, frozen_mask, outage_mask = self._force_sensor_fault(
+                observed, observation_mask, frozen_mask, outage_mask, rng
+            )
         reversals = self._flow_reversals(simulator, np.asarray(frame.index, dtype=int), model.link_name_list)
         replay_payload = {
             "seed": config.seed, "network": network_sha256(network), "source": source,
             "start": start, "duration": duration, "strength": strength,
             "demand": demand_regime, "sensors": sensors, "stage": config.stage.value,
             "split": split.value, "network_family": config.network_family,
+            "event_type": config.event_type.value,
         }
         replay_hash = hashlib.sha256(json.dumps(replay_payload, sort_keys=True).encode()).hexdigest()
         scenario_id = uuid5(
@@ -198,6 +231,7 @@ class WNTRScenarioGenerator:
             incident=IncidentTruth((source,), start, duration, strength, "pulse", demand_regime),
             sensor_nodes=sensors, model_mismatch=mismatch, artifact_sha256=array_hash,
             replay_sha256=replay_hash, created_with_python=platform.python_version(),
+            event_type=config.event_type.value,
         )
         result = GeneratedScenario(
             manifest, np.asarray(frame.index, dtype=np.int64), truth, observed, observation_mask,
@@ -262,6 +296,51 @@ class WNTRScenarioGenerator:
         observed = np.maximum(0.0, observed)
         observed[~mask] = np.nan
         return observed.astype(np.float32), mask, frozen, outage, jitter.astype(np.float32)
+
+    @staticmethod
+    def _force_sensor_fault(
+        observed: np.ndarray,
+        observation_mask: np.ndarray,
+        frozen_mask: np.ndarray,
+        outage_mask: np.ndarray,
+        rng: np.random.Generator,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Guarantee at least one sensor fault for EventType.SENSOR_FAULT_ONLY.
+
+        _degrade()'s frozen/outage injection is probabilistic (governed by
+        frozen_probability/communication_outage_probability), so most seeds
+        would otherwise produce zero faults -- indistinguishable from a
+        NORMAL scenario. Deterministically freezes one column (chosen by rng,
+        so still seed-reproducible) if _degrade did not already fault one.
+
+        Runs after _degrade() has already applied its missingness mask
+        (observed[~mask] = nan), so simply carrying `observed[start-1]`
+        forward could smuggle a finite value into an already-missing slot.
+        Instead this finds the nearest earlier finite reading to carry
+        forward as the "stale" frozen value, and marks the frozen span as
+        observed (a frozen sensor still reports a value -- just a wrong,
+        stale one -- it does not go missing).
+        """
+
+        observed = observed.copy()
+        frozen_mask = frozen_mask.copy()
+        observation_mask = observation_mask.copy()
+        if frozen_mask.any() or outage_mask.any():
+            return observed, observation_mask, frozen_mask, outage_mask
+        if observed.shape[0] <= 2 or observed.shape[1] == 0:
+            return observed, observation_mask, frozen_mask, outage_mask
+        column = int(rng.integers(0, observed.shape[1]))
+        start = int(rng.integers(1, observed.shape[0] - 1))
+        finite_positions = np.flatnonzero(np.isfinite(observed[:, column]))
+        if finite_positions.size == 0:
+            return observed, observation_mask, frozen_mask, outage_mask
+        earlier = finite_positions[finite_positions <= start]
+        reference_index = int(earlier[-1]) if earlier.size else int(finite_positions[0])
+        frozen_value = observed[reference_index, column]
+        observed[start:, column] = frozen_value
+        frozen_mask[start:, column] = True
+        observation_mask[start:, column] = True
+        return observed, observation_mask, frozen_mask, outage_mask
 
     @staticmethod
     def _flow_reversals(simulator: HydraulicSimulator, timestamps: np.ndarray, links: Sequence[str]) -> np.ndarray:
