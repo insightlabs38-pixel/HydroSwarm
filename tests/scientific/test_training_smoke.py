@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import signal
 from pathlib import Path
@@ -14,6 +15,7 @@ from hydroswarm.training import (
     ScenarioExample,
     Trainer,
     TrainingConfig,
+    collate_variable_topology,
 )
 
 
@@ -61,6 +63,39 @@ def _dataset() -> GovernedScenarioDataset:
     return GovernedScenarioDataset(examples, expected_split="train")
 
 
+def _variable_topology_dataset() -> GovernedScenarioDataset:
+    # Two examples with genuinely different node counts (3 vs 5), the way
+    # a real multi-topology corpus (e.g. Cycle A) mixes examples from
+    # different networks within one split -- collate_scenarios (plain
+    # torch.stack) cannot batch these; collate_variable_topology pads to
+    # the batch's max node/edge count instead.
+    examples = []
+    for index, nodes in enumerate((3, 5)):
+        generator = torch.Generator().manual_seed(200 + index)
+        edges = [(node, node + 1) for node in range(nodes - 1)]
+        edge_index = torch.tensor(edges, dtype=torch.long).T if edges else torch.zeros(2, 0, dtype=torch.long)
+        examples.append(
+            ScenarioExample(
+                scenario_id=f"vartopo-{index}",
+                network_id=f"net-{nodes}",
+                split="train",
+                seed=index,
+                seed_family=f"vartopo-family-{index}",
+                stage=CurriculumStage.CLEAN,
+                inputs={
+                    "node_features": torch.randn(nodes, 3, generator=generator),
+                    "temporal_features": torch.randn(2, nodes, 2, generator=generator),
+                    "quality_features": torch.randn(2, nodes, 2, generator=generator),
+                    "edge_index": edge_index,
+                    "edge_features": torch.randn(len(edges), 2, generator=generator),
+                    "source_candidate_mask": torch.ones(nodes, dtype=torch.bool),
+                },
+                targets={"source_node": torch.tensor(0)},
+            )
+        )
+    return GovernedScenarioDataset(examples, expected_split="train")
+
+
 def _config(epochs: int) -> TrainingConfig:
     return TrainingConfig(
         seed=7,
@@ -101,6 +136,25 @@ def test_cpu_smoke_training_checkpoint_export_and_resume(tmp_path: Path) -> None
     assert resumed.epochs_completed == 2
     assert resumed.global_steps > first.global_steps
     assert Path(resumed.final_checkpoint, "model.safetensors").is_file()
+
+
+def test_trainer_accepts_a_custom_collate_fn_for_variable_topology_batches(tmp_path: Path) -> None:
+    # Bundle E smoke-job prerequisite: a genuinely multi-topology corpus
+    # (different node counts within one split) requires
+    # collate_variable_topology, which the pre-existing Trainer had no way
+    # to select -- it hardcoded collate_scenarios (plain torch.stack),
+    # which raises on mismatched shapes. This proves the override actually
+    # reaches the DataLoader and produces a normal, finite-loss run.
+    summary = Trainer(
+        _tiny_model(),
+        _variable_topology_dataset(),
+        config=_config(1),
+        run_root=tmp_path / "runs",
+        workdir=tmp_path,
+        collate_fn=collate_variable_topology,
+    ).fit()
+    assert Path(summary.final_checkpoint, "model.safetensors").is_file()
+    assert math.isfinite(summary.best_validation_loss)
 
 
 def test_runtime_budget_exports_best_completed_epoch(tmp_path: Path, monkeypatch) -> None:

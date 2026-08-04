@@ -9,7 +9,7 @@ import random
 import signal
 import time
 import traceback
-from typing import Mapping
+from typing import Callable, Mapping, Sequence
 
 import numpy as np
 from safetensors.torch import load_file
@@ -23,9 +23,12 @@ from .config import TrainingConfig
 from .data import (
     CurriculumSchedule,
     GovernedScenarioDataset,
+    ScenarioExample,
     collate_scenarios,
 )
 from .losses import compute_multitask_loss, task_gradient_norms
+
+CollateFn = Callable[[Sequence[ScenarioExample]], tuple[dict[str, Tensor], dict[str, Tensor]]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,6 +88,7 @@ class Trainer:
         validation_dataset: GovernedScenarioDataset | None = None,
         curriculum: CurriculumSchedule | None = None,
         workdir: str | Path = ".",
+        collate_fn: CollateFn = collate_scenarios,
     ) -> None:
         if config.pcgrad_enabled and config.gradient_accumulation_steps != 1:
             raise ValueError("PCGrad requires gradient_accumulation_steps=1")
@@ -92,6 +96,7 @@ class Trainer:
         self.train_dataset = train_dataset
         self.validation_dataset = validation_dataset
         self.config = config
+        self.collate_fn = collate_fn
         self.curriculum = curriculum or CurriculumSchedule.progressive()
         self.artifacts = RunArtifacts.create(
             run_root,
@@ -141,7 +146,7 @@ class Trainer:
             batch_size=self.config.batch_size,
             shuffle=shuffle,
             num_workers=self.config.num_workers,
-            collate_fn=collate_scenarios,
+            collate_fn=self.collate_fn,
             generator=generator,
             worker_init_fn=_worker_seed if self.config.num_workers else None,
             persistent_workers=bool(self.config.num_workers),
