@@ -25,13 +25,20 @@ export function AuditPage({ incident }: { incident: IncidentView }) {
         </ol>
       </Panel>
       <div className="audit-actions">
-        <button type="button" className="primary-action">
+        {/* Not yet wired to the export/replay API (overnight-plan.txt Task
+            3.4): disabled with an explicit reason rather than appearing
+            functional while doing nothing on click. Chain validity is not
+            asserted here since this console does not yet independently
+            verify the hash chain client-side -- asserting VALID
+            unconditionally would be exactly the false-VERIFIED-state
+            problem the plan prohibits. */}
+        <button type="button" className="primary-action" disabled title="Export is not yet connected to the live API">
           Export incident JSON
         </button>
-        <button type="button">Verify hash chain</button>
-        <span>
-          Chain status: <strong>VALID</strong>
-        </span>
+        <button type="button" disabled title="Hash-chain verification is not yet connected to the live API">
+          Verify hash chain
+        </button>
+        <span>Chain status: not independently verified by this console yet</span>
       </div>
     </div>
   );

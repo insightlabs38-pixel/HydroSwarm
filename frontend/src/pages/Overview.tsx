@@ -52,7 +52,12 @@ export function Overview({ incident }: { incident: IncidentView }) {
             {incident.approvalPending ? 'HUMAN APPROVAL PENDING' : 'NO APPROVAL PENDING'}
           </StatusBadge>
           {incident.approvalPending && pendingPlan && (
-            <button type="button" className="primary-action">
+            <button
+              type="button"
+              className="primary-action"
+              disabled
+              title="Plan approval is not yet connected to the live API"
+            >
               Review {pendingPlan.name} approval
             </button>
           )}
@@ -103,7 +108,12 @@ export function Overview({ incident }: { incident: IncidentView }) {
             </span>
           </div>
           <p>{incident.recommendedSample.rationale}</p>
-          <button type="button" className="primary-action">
+          <button
+            type="button"
+            className="primary-action"
+            disabled
+            title="Sample-request review is not yet connected to the live API"
+          >
             Review sample request
           </button>
         </Panel>
