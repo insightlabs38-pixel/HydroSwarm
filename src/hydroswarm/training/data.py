@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 import hashlib
 import json
+from pathlib import Path
 
 import torch
 from torch import Tensor
@@ -119,6 +120,40 @@ class GovernedScenarioDataset(Dataset[ScenarioExample]):
     def stages_through(self, stage: CurriculumStage) -> GovernedScenarioDataset:
         selected = [example for example in self._examples if example.stage <= stage]
         return GovernedScenarioDataset(selected, expected_split=self.expected_split)
+
+
+def load_scenario_examples_jsonl(path: str | Path) -> list[ScenarioExample]:
+    """Parse the canonical-tensor JSONL schema shared by data/learning-v1 and
+    scripts/train.py::load_dataset into a plain list of ScenarioExample.
+
+    Kept separate from GovernedScenarioDataset construction so callers that
+    only need governance metadata and target values (e.g. the label/target
+    audit tooling) are not forced to also satisfy split-uniqueness
+    invariants meant for training splits.
+    """
+
+    examples: list[ScenarioExample] = []
+    with Path(path).open(encoding="utf-8") as stream:
+        for line_number, line in enumerate(stream, 1):
+            if not line.strip():
+                continue
+            record = json.loads(line)
+            try:
+                examples.append(
+                    ScenarioExample(
+                        scenario_id=record["scenario_id"],
+                        network_id=record["network_id"],
+                        split=record["split"],
+                        seed=int(record["seed"]),
+                        seed_family=record["seed_family"],
+                        stage=CurriculumStage[record["stage"]],
+                        inputs={key: torch.tensor(value) for key, value in record["inputs"].items()},
+                        targets={key: torch.tensor(value) for key, value in record["targets"].items()},
+                    )
+                )
+            except (KeyError, TypeError, ValueError) as error:
+                raise ValueError(f"invalid manifest line {line_number} in {path}: {error}") from error
+    return examples
 
 
 def validate_split_isolation(*datasets: GovernedScenarioDataset) -> None:
