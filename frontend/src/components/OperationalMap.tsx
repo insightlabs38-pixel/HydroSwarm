@@ -23,6 +23,9 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
     () => new Map(incident.nodes.map((node) => [node.id, node])),
     [incident],
   );
+  const leadingCandidate = incident.candidates[0];
+  const secondaryCandidate = incident.candidates[1];
+  const recommendedPlan = incident.plans.find((plan) => plan.status === 'RECOMMENDED');
 
   useEffect(() => {
     if (!container.current) return;
@@ -226,7 +229,7 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
       <div
         ref={container}
         className="map-canvas"
-        aria-label="2D water network map showing flow, contamination, candidate sources, sample J123, and response actions"
+        aria-label={`2D water network map showing flow, contamination, candidate sources, sample ${incident.recommendedSample.nodeId}, and response actions`}
         role="img"
       />
       <div className="map-legend" aria-label="Map legend">
@@ -241,8 +244,20 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
         </span>
       </div>
       <p className="sr-only">
-        Leading source J117 at 76 percent. Candidate region also includes J121. Recommended sample
-        J123. Plan B closes P4 and flushes J131.
+        {leadingCandidate && (
+          <>
+            Leading source {leadingCandidate.nodeId} at {Math.round(leadingCandidate.probability * 100)}{' '}
+            percent.{' '}
+          </>
+        )}
+        {secondaryCandidate && <>Candidate region also includes {secondaryCandidate.nodeId}. </>}
+        Recommended sample {incident.recommendedSample.nodeId}.{' '}
+        {recommendedPlan && (
+          <>
+            Recommended plan: {recommendedPlan.name} ({recommendedPlan.actions} action
+            {recommendedPlan.actions === 1 ? '' : 's'}).
+          </>
+        )}
       </p>
     </div>
   );

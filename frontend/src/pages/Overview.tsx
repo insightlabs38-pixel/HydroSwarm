@@ -19,6 +19,8 @@ export function Overview({ incident }: { incident: IncidentView }) {
   const sensors = incident.nodes.flatMap((node) =>
     node.sensor ? [{ ...node.sensor, nodeId: node.id }] : [],
   );
+  const pendingPlan = incident.plans.find((plan) => plan.status === 'RECOMMENDED');
+  const rejectedPlan = incident.plans.find((plan) => plan.status === 'REJECTED');
   return (
     <div className="overview-grid">
       <section className="decision-banner" aria-labelledby="incident-heading">
@@ -30,8 +32,13 @@ export function Overview({ incident }: { incident: IncidentView }) {
               : incident.status}
           </h1>
           <p>
-            Leading source region <strong>{leading.nodeId}</strong> · calibrated candidate coverage{' '}
+            Leading source region <strong>{leading.nodeId}</strong> · candidate set size{' '}
+            <strong>{incident.candidates.length}</strong> · conformal target{' '}
             {Math.round(incident.candidateCoverage * 100)}%
+            {incident.calibrationValid ? '' : ' (calibration invalid for this network)'}
+            {typeof incident.measuredCoverage === 'number' && (
+              <> · held-out measured coverage {Math.round(incident.measuredCoverage * 100)}%</>
+            )}
           </p>
         </div>
         <div className="decision-badges">
@@ -44,9 +51,9 @@ export function Overview({ incident }: { incident: IncidentView }) {
           <StatusBadge tone={incident.approvalPending ? 'warn' : 'good'}>
             {incident.approvalPending ? 'HUMAN APPROVAL PENDING' : 'NO APPROVAL PENDING'}
           </StatusBadge>
-          {incident.approvalPending && (
+          {incident.approvalPending && pendingPlan && (
             <button type="button" className="primary-action">
-              Review Plan B approval
+              Review {pendingPlan.name} approval
             </button>
           )}
         </div>
@@ -154,7 +161,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
         <PlanTable plans={incident.plans} />
       </Panel>
       <Panel
-        title="Why Plan B?"
+        title={pendingPlan ? `Why ${pendingPlan.name}?` : 'Verified explanation'}
         eyebrow="VERIFIED EXPLANATION"
         className="wide-panel explanation-panel"
       >
@@ -164,10 +171,23 @@ export function Overview({ incident }: { incident: IncidentView }) {
           role="group"
           aria-label="Available explanation questions"
         >
-          <button type="button">Why this source?</button>
-          <button type="button">Why this sample?</button>
-          <button type="button">Why was Plan A rejected?</button>
-          <button type="button">What uncertainty remains?</button>
+          {/* Not yet wired to the explanation API (overnight-plan.txt Task
+              3.4): disabled with an explicit reason rather than appearing
+              functional while doing nothing on click. */}
+          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+            Why this source?
+          </button>
+          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+            Why this sample?
+          </button>
+          {rejectedPlan && (
+            <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+              Why was {rejectedPlan.name} rejected?
+            </button>
+          )}
+          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+            What uncertainty remains?
+          </button>
         </div>
       </Panel>
     </div>

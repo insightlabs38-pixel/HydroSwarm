@@ -18,14 +18,15 @@ function CandidateBars({ title, values }: { title: string; values: IncidentView[
 }
 
 export function EvidencePanel({ incident }: { incident: IncidentView }) {
+  const sampleNodeId = incident.recommendedSample.nodeId;
   return (
     <div>
       <div className="evidence-grid">
-        <CandidateBars title="Before J123" values={incident.evidence.before} />
+        <CandidateBars title={`Before ${sampleNodeId}`} values={incident.evidence.before} />
         <div className="evidence-arrow" aria-hidden="true">
           →
         </div>
-        <CandidateBars title="After J123" values={incident.evidence.after} />
+        <CandidateBars title={`After ${sampleNodeId}`} values={incident.evidence.after} />
       </div>
       <div className="metric-strip" aria-label="Evidence change summary">
         <span>

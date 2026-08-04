@@ -3,6 +3,20 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchIncidentWithFallback } from './api';
 import { useConsoleStore, type Page } from './store';
 import { StatusBadge } from './components/StatusBadge';
+import type { RuntimeMode } from './types';
+
+function modeTone(mode: RuntimeMode): 'good' | 'warn' | 'danger' | 'info' {
+  switch (mode) {
+    case 'LIVE':
+      return 'good';
+    case 'REPLAY':
+      return 'info';
+    case 'DEMO_FALLBACK':
+      return 'warn';
+    case 'ERROR':
+      return 'danger';
+  }
+}
 
 const Overview = lazy(() =>
   import('./pages/Overview').then((module) => ({ default: module.Overview })),
@@ -63,6 +77,9 @@ export default function App() {
         </div>
         <div className="header-status">
           <StatusBadge tone="good">OFFLINE · LOCAL</StatusBadge>
+          <StatusBadge tone={modeTone(incident.mode)}>
+            <span aria-label={`Data mode ${incident.mode}`}>{incident.mode}</span>
+          </StatusBadge>
           <span
             className="runtime"
             aria-label={`Inference runtime ${incident.runtimeMs} milliseconds`}
@@ -71,13 +88,25 @@ export default function App() {
           </span>
         </div>
       </header>
-      {incident.source === 'demo-fallback' && (
+      {incident.mode === 'DEMO_FALLBACK' && (
         <div className="fallback-banner" role="status">
           <strong>DETERMINISTIC DEMO FALLBACK</strong>
-          <span>
-            Live API unavailable or no incident configured. Values below are a frozen,
-            simulator-derived fixture—not live telemetry.
-          </span>
+          <span>{incident.modeReason}</span>
+        </div>
+      )}
+      {incident.mode === 'REPLAY' && (
+        <div className="fallback-banner" role="status">
+          <strong>REPLAY</strong>
+          <span>{incident.modeReason ?? 'Showing a selected stored trajectory, not live telemetry.'}</span>
+        </div>
+      )}
+      {incident.mode === 'ERROR' && (
+        <div className="error-banner" role="alert">
+          <strong>INCIDENT UNAVAILABLE</strong>
+          <span>{incident.modeReason ?? 'The configured incident could not be loaded.'}</span>
+          <button type="button" onClick={() => query.refetch()}>
+            Retry
+          </button>
         </div>
       )}
       <nav className="app-nav" aria-label="Operator console pages">

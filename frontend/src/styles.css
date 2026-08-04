@@ -215,6 +215,26 @@ h3 {
   color: #ffe0aa;
   border-bottom: 1px solid #7b5b26;
 }
+.error-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.48rem 1rem;
+  font-size: 0.72rem;
+  background: #4a1f1c;
+  color: #ffb3ab;
+  border-bottom: 1px solid #7b332c;
+}
+.error-banner button {
+  border: 1px solid #ffb3ab;
+  border-radius: 4px;
+  background: none;
+  color: #ffb3ab;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.7rem;
+}
 .app-nav {
   padding: 0 1.2rem;
   display: flex;

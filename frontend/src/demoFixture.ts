@@ -4,13 +4,16 @@ export const demoIncident: IncidentView = {
   id: 'HS-0041',
   networkId: 'Net3',
   status: 'APPROVAL',
-  source: 'demo-fallback',
+  mode: 'DEMO_FALLBACK',
+  modeReason: 'Live API unavailable or no incident configured. Values shown are a frozen, simulator-derived fixture, not live telemetry.',
   offline: true,
   runtimeMs: 438,
   modelVersion: 'HydroSwarm-M 0.9.2',
   ood: 'NORMAL',
   approvalPending: true,
   candidateCoverage: 0.9,
+  calibrationValid: true,
+  measuredCoverage: 0.91,
   disagreement: 0.08,
   nodes: [
     {

@@ -5,6 +5,8 @@ import { Panel } from '../components/Panel';
 
 export function TopologyPage({ incident }: { incident: IncidentView }) {
   const ref = useRef<HTMLDivElement>(null);
+  const reservoir = incident.nodes.find((node) => node.kind === 'reservoir');
+  const leadingCandidate = incident.candidates[0];
   useEffect(() => {
     if (!ref.current) return;
     const instance = cytoscape({
@@ -63,7 +65,9 @@ export function TopologyPage({ incident }: { incident: IncidentView }) {
           ref={ref}
           className="topology-canvas"
           role="img"
-          aria-label="Directed topology from reservoir R1 through candidate source J117 toward sample J123 and flush node J131"
+          aria-label={`Directed topology${reservoir ? ` from reservoir ${reservoir.id}` : ''}${
+            leadingCandidate ? ` through candidate source ${leadingCandidate.nodeId}` : ''
+          } toward sample ${incident.recommendedSample.nodeId}`}
         />
       </Panel>
     </div>
