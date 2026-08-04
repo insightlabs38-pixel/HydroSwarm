@@ -1,6 +1,7 @@
 """Deterministic water-network construction helpers."""
 
 from .network import NetworkDefinition, build_networkx_network, build_wntr_network
+from .context_cache import HydraulicContextCache, ScenarioHydraulicContextKey
 from .consequences import (
     PlanOutcome,
     RankedPlanOutcome,
@@ -25,9 +26,11 @@ from .wrapper import (
 )
 
 __all__ = [
+    "HydraulicContextCache",
     "HydraulicEvaluation",
     "HydraulicSimulator",
     "HydraulicState",
+    "ScenarioHydraulicContextKey",
     "IncidentSimulation",
     "IncidentSource",
     "IncidentSourceProfile",
