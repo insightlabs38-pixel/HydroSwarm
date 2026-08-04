@@ -1,0 +1,74 @@
+{
+  "cache_hit_rate": "not applicable: single generation pass, no cache reuse measured",
+  "counts_by_topology": {
+    "branched-loop": 1275,
+    "golden-reference": 1275
+  },
+  "cross_split_leakage": {
+    "scenario_id_leaks": [],
+    "seed_family_leaks": [],
+    "topology_leak_note": "topology_hash does not exist yet (added in Task 1.1); until then, leakage across genuinely different topologies cannot be distinguished from expected network_id reuse across splits within a single topology's hydraulic-regime variants."
+  },
+  "curriculum_stage_counts": {
+    "ADVERSARIAL": 510,
+    "CLEAN": 510,
+    "DEGRADED": 510,
+    "OPERATIONAL": 510,
+    "SHIFT": 510
+  },
+  "cycle": "A",
+  "duplicate_scenario_id_estimate": 0,
+  "event_cause_counts": {
+    "0": 1804,
+    "1": 372,
+    "2": 126,
+    "4": 248
+  },
+  "generated_at": "2026-08-04T18:34:47.723117+00:00",
+  "generation_seconds": 178.42484268800035,
+  "limitations": [
+    "Cycle A is explicitly a smoke corpus per the plan and must not be used for final architecture or promotion claims.",
+    "The two topologies differ genuinely in graph structure (4 vs 7 junctions, tank vs no tank, different loop shape) rather than being hydraulic-regime variants of one graph.",
+    "ScenarioExample.topology (Task 1.1's TopologyMetadata) is not populated by this generator; collate_variable_topology does not require it for training (padding/masking is shape-driven, not identity-driven), but resolve_source_node_id and permutation-equivariance tooling that need explicit node-ID metadata should attach TopologyMetadata separately if used against this corpus."
+  ],
+  "purpose": "variable-topology pipeline validation, target coverage validation, one-epoch training, shape/memory tests -- not for final claims",
+  "quarantined_scenarios": 0,
+  "replay_validation_rate": 1.0,
+  "scenario_count": 2550,
+  "schema_version": 1,
+  "sensor_fault_positive_rate": 0.057091504212688,
+  "signature_library_sha256_by_topology": {
+    "branched-loop": "47b9f5deae1d9087ef1141e613ee80115fba3fb66c31839c6db99a4d85ebd3cc",
+    "golden-reference": "8b58b5bcbcf649c623095107dba6fad413cf1a9c2a589e75decd178042e5829c"
+  },
+  "split_counts": {
+    "calibration": 250,
+    "development_holdout": 300,
+    "train": 1750,
+    "validation": 250
+  },
+  "storage_bytes": 40812392,
+  "tensor_shard_manifests": {
+    "calibration": {
+      "shards": 1,
+      "total_examples": 250
+    },
+    "development_holdout": {
+      "shards": 2,
+      "total_examples": 300
+    },
+    "train": {
+      "shards": 7,
+      "total_examples": 1750
+    },
+    "validation": {
+      "shards": 1,
+      "total_examples": 250
+    }
+  },
+  "topology_families": 2,
+  "topology_node_counts": {
+    "branched-loop": 8,
+    "golden-reference": 6
+  }
+}

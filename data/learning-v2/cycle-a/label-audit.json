@@ -1,0 +1,513 @@
+{
+  "cross_split_leakage": {
+    "scenario_id_leaks": [],
+    "seed_family_leaks": [],
+    "topology_leak_note": "topology_hash does not exist yet (added in Task 1.1); until then, leakage across genuinely different topologies cannot be distinguished from expected network_id reuse across splits within a single topology's hydraulic-regime variants."
+  },
+  "decision_splits": [
+    "train",
+    "validation",
+    "calibration"
+  ],
+  "splits": {
+    "calibration": {
+      "count": 250,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 125,
+        "golden-reference": 125
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.508,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.44,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.19642857142857142
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 250,
+        "overall_positive_rate": 0.049714285880327225,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.06400000303983688,
+            0.01600000075995922,
+            0.00800000037997961,
+            0.06400000303983688,
+            0.04800000041723251,
+            0.07999999821186066,
+            0.03200000151991844,
+            0.0
+          ],
+          "golden-reference": [
+            0.11999999731779099,
+            0.10400000214576721,
+            0.1120000034570694,
+            0.04800000041723251,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 48,
+          "1": 13,
+          "2": 13,
+          "3": 13,
+          "4": 13,
+          "5": 13,
+          "6": 12
+        },
+        "golden-reference": {
+          "0": 62,
+          "1": 25,
+          "2": 19,
+          "3": 19
+        }
+      },
+      "split": "calibration",
+      "target_class_histograms": {
+        "duration": {
+          "0": 137,
+          "1": 53,
+          "2": 60
+        },
+        "relative_strength": {
+          "0": 127,
+          "1": 53,
+          "2": 70
+        },
+        "source_node": {
+          "0": 110,
+          "1": 38,
+          "2": 32,
+          "3": 32,
+          "4": 13,
+          "5": 13,
+          "6": 12
+        },
+        "start_time": {
+          "0": 121,
+          "1": 47,
+          "2": 47,
+          "3": 35
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "development_holdout": {
+      "count": 300,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "8a8fe75b-8881-5681-a3ba-c5f689c153ef",
+          "ee79059a-29b4-5e00-b19a-3523f8bf5d18"
+        ],
+        [
+          "9d31f02c-8ae8-521a-b746-01b20f535d19",
+          "ef1c515d-2603-5cfa-91a4-706acc2fbe4b"
+        ]
+      ],
+      "network_balance": {
+        "branched-loop": 150,
+        "golden-reference": 150
+      },
+      "sanity_baselines": {
+        "note": "split 'development_holdout' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 300,
+        "overall_positive_rate": 0.06190476194024086,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.05999999865889549,
+            0.09333333373069763,
+            0.046666666865348816,
+            0.06666667014360428,
+            0.0533333346247673,
+            0.03999999910593033,
+            0.07333333045244217,
+            0.0
+          ],
+          "golden-reference": [
+            0.1133333370089531,
+            0.1066666692495346,
+            0.09333333373069763,
+            0.11999999731779099,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 58,
+          "1": 16,
+          "2": 16,
+          "3": 15,
+          "4": 15,
+          "5": 15,
+          "6": 15
+        },
+        "golden-reference": {
+          "0": 73,
+          "1": 31,
+          "2": 23,
+          "3": 23
+        }
+      },
+      "split": "development_holdout",
+      "target_class_histograms": {
+        "duration": {
+          "0": 162,
+          "1": 75,
+          "2": 63
+        },
+        "relative_strength": {
+          "0": 158,
+          "1": 74,
+          "2": 68
+        },
+        "source_node": {
+          "0": 131,
+          "1": 47,
+          "2": 39,
+          "3": 38,
+          "4": 15,
+          "5": 15,
+          "6": 15
+        },
+        "start_time": {
+          "0": 146,
+          "1": 54,
+          "2": 45,
+          "3": 55
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "train": {
+      "count": 1750,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "0e02395f-124c-5667-b4b5-8492414fc829",
+          "319b1b87-e44b-533b-829b-db5086e367b8"
+        ],
+        [
+          "0fb7794f-76a9-5572-a718-2b7fd4b3984d",
+          "237b7f6b-553f-57d5-b5c5-ca6090498c3e",
+          "75664b8e-37a6-54be-8a91-75c660b9b34c",
+          "88c292c1-1705-58a1-b8ad-beed38fc825f"
+        ],
+        [
+          "10a3ceaf-426a-570e-841f-63aa0b9b7140",
+          "92067134-63b3-5448-bef0-9539b0b867f8"
+        ],
+        [
+          "143dd0de-fbce-5760-b0ad-c28f624f98dd",
+          "dff988c4-9a04-59ae-93e8-aa25b64bf126"
+        ],
+        [
+          "15175144-6aca-53d3-902d-1d5a1e9a190c",
+          "2484fe9f-558d-5d27-bd34-9b899e58241a",
+          "422d3b43-bb72-59be-bee1-77fd81dea72e",
+          "5e7dcdd5-a03c-5a31-87b9-b1839d86a0e4",
+          "743693e2-3fda-524a-ba1a-ae5bf0d3c1bf",
+          "bdedc84e-3876-505a-9ea1-c07f498cd614",
+          "d5b01236-23d6-51e8-bb60-a8d7c3d45797"
+        ],
+        [
+          "1595da42-778e-53db-891f-9eae0abe1d8c",
+          "8b9ea8ff-2736-5711-9497-65541950ef84",
+          "cd310c9a-f868-5491-a501-5ca370afddd2",
+          "d1cfb24c-eb21-53b7-a632-8c40cb6cc588"
+        ],
+        [
+          "1cc7af8d-068a-598e-a544-06583aeb6716",
+          "98c3a4e2-bdf4-5daa-88f2-86a5a902d057",
+          "9e261eea-f708-5160-a3fd-e9266356b9c7"
+        ],
+        [
+          "280e5020-7e0f-54b7-8216-70a218ac0ae9",
+          "59926b0a-02ae-5bd6-9208-d28b05595eeb"
+        ],
+        [
+          "2fa78b26-c850-541a-a3f2-9118bc9d707b",
+          "ff17759f-91d2-57a3-861b-3c2023fdcaaa"
+        ],
+        [
+          "459d78ee-6bcb-5369-8242-1958b41a7d2e",
+          "e5f317e7-8b65-54a3-b898-c553357ea90d"
+        ],
+        [
+          "4c32b6c9-3d9e-5d65-9626-b3ee967aeadd",
+          "6db50e2f-1d30-55c7-bfc0-57e3c60c5e49",
+          "90b67e3f-5995-5363-8e8e-c1f70d6a64a9"
+        ],
+        [
+          "77af8af2-0f13-56fd-9647-11481fdcc303",
+          "b0edc80a-77b6-5f65-90ff-284c1f6f14e7"
+        ],
+        [
+          "77e56358-794f-571e-9962-32f8018a6b56",
+          "a7d7fe62-5d48-5647-a0f5-798d1c8aaa58",
+          "f482742e-4cd2-569c-a34a-6ec12b4f6c04",
+          "fc141675-ff2c-53af-b19b-f7a7bb092a00"
+        ],
+        [
+          "860b5d7e-d65f-560a-8ca4-af68f5413c84",
+          "ea34ae03-679c-54af-9a95-8a8751a78e92"
+        ],
+        [
+          "8e0162cc-12f0-597d-ad0b-f3c8178bf268",
+          "f8083fa9-8235-59a5-86c3-830fe5070341"
+        ],
+        [
+          "c8ff9701-4fdd-5d6a-b6e8-ab794a310851",
+          "d36368e4-153d-5a5b-9ba6-8e8e2dfb8e95",
+          "e29c02d8-cf12-568c-9872-b1278d554483"
+        ]
+      ],
+      "network_balance": {
+        "branched-loop": 875,
+        "golden-reference": 875
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.5154285714285715,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.44685714285714284,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.19642857142857142
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1750,
+        "overall_positive_rate": 0.054938774555921555,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.05257142707705498,
+            0.04571428522467613,
+            0.05485714226961136,
+            0.061714284121990204,
+            0.061714284121990204,
+            0.050285715609788895,
+            0.06628571450710297,
+            0.0
+          ],
+          "golden-reference": [
+            0.07657142728567123,
+            0.09485714137554169,
+            0.09371428936719894,
+            0.11085714399814606,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 347,
+          "1": 88,
+          "2": 88,
+          "3": 88,
+          "4": 88,
+          "5": 88,
+          "6": 88
+        },
+        "golden-reference": {
+          "0": 435,
+          "1": 176,
+          "2": 132,
+          "3": 132
+        }
+      },
+      "split": "train",
+      "target_class_histograms": {
+        "duration": {
+          "0": 910,
+          "1": 426,
+          "2": 414
+        },
+        "relative_strength": {
+          "0": 951,
+          "1": 401,
+          "2": 398
+        },
+        "source_node": {
+          "0": 782,
+          "1": 264,
+          "2": 220,
+          "3": 220,
+          "4": 88,
+          "5": 88,
+          "6": 88
+        },
+        "start_time": {
+          "0": 810,
+          "1": 360,
+          "2": 281,
+          "3": 299
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "validation": {
+      "count": 250,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 125,
+        "golden-reference": 125
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.52,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.44,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.19642857142857142
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 250,
+        "overall_positive_rate": 0.062285713851451874,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.0560000017285347,
+            0.03200000151991844,
+            0.07999999821186066,
+            0.07999999821186066,
+            0.0560000017285347,
+            0.06400000303983688,
+            0.06400000303983688,
+            0.0
+          ],
+          "golden-reference": [
+            0.1599999964237213,
+            0.04800000041723251,
+            0.12800000607967377,
+            0.10400000214576721,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 48,
+          "1": 13,
+          "2": 13,
+          "3": 13,
+          "4": 13,
+          "5": 13,
+          "6": 12
+        },
+        "golden-reference": {
+          "0": 62,
+          "1": 25,
+          "2": 19,
+          "3": 19
+        }
+      },
+      "split": "validation",
+      "target_class_histograms": {
+        "duration": {
+          "0": 118,
+          "1": 58,
+          "2": 74
+        },
+        "relative_strength": {
+          "0": 122,
+          "1": 56,
+          "2": 72
+        },
+        "source_node": {
+          "0": 110,
+          "1": 38,
+          "2": 32,
+          "3": 32,
+          "4": 13,
+          "5": 13,
+          "6": 12
+        },
+        "start_time": {
+          "0": 118,
+          "1": 50,
+          "2": 44,
+          "3": 38
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    }
+  }
+}

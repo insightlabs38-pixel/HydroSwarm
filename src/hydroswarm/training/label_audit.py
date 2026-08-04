@@ -135,14 +135,37 @@ def _class_histogram(examples: Sequence[ScenarioExample], target_key: str) -> di
 
 
 def _sensor_fault_prevalence(examples: Sequence[ScenarioExample]) -> dict[str, Any] | None:
+    """Overall and per-network-node fault-positive rates.
+
+    ``sensor_fault`` is node-indexed with a per-example node count, so a
+    genuinely multi-topology corpus (different networks, different node
+    counts within the same split) cannot be ``torch.stack``ed across
+    examples the way a single-topology corpus like learning-v1 could --
+    node index 2 also isn't the same physical node across two different
+    topologies, so a single "per_node_positive_rate" list would be
+    meaningless if it mixed them. ``overall_positive_rate`` is computed by
+    concatenation (shape-agnostic); per-node rates are reported separately
+    per network_id, where node identity is actually consistent.
+    """
+
     present = [example for example in examples if "sensor_fault" in example.targets]
     if not present:
         return None
-    stacked = torch.stack([example.targets["sensor_fault"].float() for example in present])
+    all_values = torch.cat([example.targets["sensor_fault"].float().reshape(-1) for example in present])
+    per_network: dict[str, list[float]] = {}
+    grouped: dict[str, list[ScenarioExample]] = {}
+    for example in present:
+        grouped.setdefault(example.network_id, []).append(example)
+    for network_id, group in grouped.items():
+        shapes = {tuple(example.targets["sensor_fault"].shape) for example in group}
+        if len(shapes) != 1:
+            continue  # inconsistent node count even within one network_id; skip rather than guess
+        stacked = torch.stack([example.targets["sensor_fault"].float() for example in group])
+        per_network[network_id] = [float(value) for value in stacked.mean(dim=0)]
     return {
         "examples_with_target": len(present),
-        "overall_positive_rate": float(stacked.mean()),
-        "per_node_positive_rate": [float(value) for value in stacked.mean(dim=0)],
+        "overall_positive_rate": float(all_values.mean()),
+        "per_node_positive_rate_by_network": dict(sorted(per_network.items())),
     }
 
 

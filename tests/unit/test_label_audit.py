@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 import torch
 
 from hydroswarm.training import audit_corpus, audit_split, cross_split_leakage
@@ -54,6 +55,27 @@ def test_audit_split_reports_counts_and_balance() -> None:
     assert report["network_balance"] == {"net1": 2, "net2": 1}
     assert report["source_balance_by_network"]["net1"] == {"0": 1, "1": 1}
     assert report["target_class_histograms"]["source_node"] == {"0": 2, "1": 1}
+
+
+def test_sensor_fault_prevalence_handles_mixed_node_counts_across_topologies() -> None:
+    # Regression: a genuinely multi-topology corpus (Cycle A) has examples
+    # with different sensor_fault lengths across network_id (different
+    # node counts). The old implementation unconditionally torch.stack-ed
+    # every example's sensor_fault target regardless of network_id, which
+    # raises RuntimeError the moment two topologies' node counts differ --
+    # caught by actually running Cycle A generation, not by a pre-existing
+    # test, since every prior test used a single shared node count.
+    examples = [
+        _example("a", network_id="topology-a", sensor_fault=[1.0, 0.0, 0.0, 0.0, 0.0]),
+        _example("b", network_id="topology-a", sensor_fault=[0.0, 1.0, 0.0, 0.0, 0.0]),
+        _example("c", network_id="topology-b", sensor_fault=[1.0, 0.0, 1.0]),
+    ]
+    report = audit_split("train", examples, compute_baselines=True)  # must not raise
+    prevalence = report["sensor_fault_prevalence"]
+    assert prevalence["examples_with_target"] == 3
+    assert prevalence["overall_positive_rate"] == pytest.approx((1 + 1 + 2) / (5 + 5 + 3))
+    assert prevalence["per_node_positive_rate_by_network"]["topology-a"] == [0.5, 0.5, 0.0, 0.0, 0.0]
+    assert prevalence["per_node_positive_rate_by_network"]["topology-b"] == [1.0, 0.0, 1.0]
 
 
 def test_duplicate_scenario_ids_detected() -> None:
