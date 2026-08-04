@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Required, TypedDict
+from typing import Literal, Required, TypedDict, get_args
 
 import torch
 from torch import Tensor, nn
@@ -92,6 +92,53 @@ MODEL_VARIANTS: dict[str, ModelVariant] = {
     "large": ModelVariant(360, 8, 1080, 8, 96),
 }
 
+#: Bumped whenever a change could make a checkpoint silently produce
+#: different results if loaded with mismatched config, even when
+#: load_state_dict's shape check alone would not catch it (overnight-
+#: plan.txt Task 4.0). prior_mode is the first such case: the
+#: prior_projection/prior_logit_scale parameters exist regardless of mode
+#: (so checkpoint tensors are unaffected and old checkpoints remain
+#: loadable), but which of them the forward pass actually *uses* is
+#: config-only, so a mismatched prior_mode would load successfully yet
+#: silently compute different outputs than training used.
+ARCHITECTURE_VERSION = "hydrocore-v2"
+
+PriorMode = Literal["none", "feature_only", "logit_only", "feature_and_logit"]
+PRIOR_MODES: tuple[PriorMode, ...] = get_args(PriorMode)
+
+
+class ArchitectureCompatibilityError(Exception):
+    """Raised when a checkpoint's recorded architecture config does not
+    match the model instance it is being loaded into, for a config
+    dimension that load_state_dict's tensor-shape check would not itself
+    catch (e.g. prior_mode)."""
+
+
+def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, object]) -> None:
+    """Raise ArchitectureCompatibilityError if `metadata` (as recorded in a
+    checkpoint's own metadata at export time, e.g. via
+    HydroCore.architecture_config()) does not match `model`'s actual
+    configuration. Call this before or after load_state_dict when loading a
+    checkpoint whose provenance is not otherwise already pinned (e.g. by a
+    checkpoint-hash check against a known-good promoted artifact) --
+    load_state_dict's tensor-shape check alone would not catch a prior_mode
+    mismatch, since prior_mode does not change any parameter's shape."""
+
+    recorded_version = metadata.get("architecture_version")
+    if recorded_version is not None and recorded_version != ARCHITECTURE_VERSION:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint architecture_version {recorded_version!r} does not match this "
+            f"build's {ARCHITECTURE_VERSION!r}; a migration path must be defined before "
+            "loading a checkpoint from a different architecture version"
+        )
+    recorded_prior_mode = metadata.get("prior_mode")
+    if recorded_prior_mode is not None and recorded_prior_mode != model.prior_mode:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with prior_mode={recorded_prior_mode!r} but this model "
+            f"instance is configured with prior_mode={model.prior_mode!r}; loading it would "
+            "silently compute different outputs than training used"
+        )
+
 
 class HydroCore(nn.Module):
     """Edge-aware local graph model with bounded global latent attention."""
@@ -123,6 +170,7 @@ class HydroCore(nn.Module):
         strategist_output_dim: int = 3,
         adapter_dims: tuple[int, int, int] = (32, 48, 64),
         use_adapters: bool = True,
+        prior_mode: PriorMode = "feature_and_logit",
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -133,10 +181,13 @@ class HydroCore(nn.Module):
             raise ValueError("plan_queries must be between 1 and 8")
         if not 0 <= dropout < 1:
             raise ValueError("dropout must be in [0, 1)")
+        if prior_mode not in PRIOR_MODES:
+            raise ValueError(f"prior_mode must be one of {PRIOR_MODES}, got {prior_mode!r}")
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
         self.use_adapters = use_adapters
+        self.prior_mode = prior_mode
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -239,6 +290,19 @@ class HydroCore(nn.Module):
         }
         return cls(**values)  # type: ignore[arg-type]
 
+    def architecture_config(self) -> dict[str, object]:
+        """Config dimensions load_state_dict's shape check would not itself
+        catch if mismatched (overnight-plan.txt Task 4.0). Callers persist
+        this into checkpoint metadata (see export_model's `metadata` arg)
+        so verify_architecture_compatibility() can detect a checkpoint
+        being loaded into a model configured differently than it was
+        trained with."""
+
+        return {
+            "architecture_version": ARCHITECTURE_VERSION,
+            "prior_mode": self.prior_mode,
+        }
+
     @staticmethod
     def _optional_context(
         batch: HydroBatch, key: str, projection: nn.Linear, batch_size: int, device: torch.device
@@ -300,7 +364,8 @@ class HydroCore(nn.Module):
         if prior is not None:
             if prior.shape != (batch_size, nodes):
                 raise ValueError("classical_prior must have shape [batch, nodes]")
-            hidden = hidden + self.prior_projection(torch.nan_to_num(prior.float()).unsqueeze(-1))
+            if self.prior_mode in ("feature_only", "feature_and_logit"):
+                hidden = hidden + self.prior_projection(torch.nan_to_num(prior.float()).unsqueeze(-1))
         context = self._optional_context(batch, "role_features", self.role_projection, batch_size, node_features.device)
         context += self._optional_context(batch, "previous_actions", self.action_projection, batch_size, node_features.device)
         context += self._optional_context(batch, "verifier_feedback", self.verifier_projection, batch_size, node_features.device)
@@ -336,7 +401,7 @@ class HydroCore(nn.Module):
         if not torch.all(source_mask.any(dim=1)):
             raise ValueError("every graph requires at least one source candidate")
         source_logits = self.source_node_head(sentinel_nodes).squeeze(-1)
-        if prior is not None:
+        if prior is not None and self.prior_mode in ("logit_only", "feature_and_logit"):
             prior_mass = prior.float().clamp_min(1e-8)
             source_logits = source_logits + torch.nn.functional.softplus(
                 self.prior_logit_scale
