@@ -116,6 +116,15 @@ def compute_multitask_loss(
         "pressure": "pressure_prediction",
         "flow": "flow_prediction",
         "travel_time": "travel_time_prediction",
+        # overnight-plan.txt Task 4.6: only present in outputs when the
+        # model was built with consequence_prescreening_heads=True.
+        # Output name equals target name here (same convention as
+        # plan_value above), not a *_prediction suffix.
+        "exposure_proxy": "exposure_proxy",
+        "pressure_risk_proxy": "pressure_risk_proxy",
+        "service_loss_proxy": "service_loss_proxy",
+        "containment_time_proxy": "containment_time_proxy",
+        "plan_regret_proxy": "plan_regret_proxy",
     }
     for task, output_name in classifications.items():
         if task in targets and output_name in outputs:

@@ -70,6 +70,11 @@ class HydroOutput(TypedDict, total=False):
     sensor_reconstruction_prediction: Tensor
     future_concentration_prediction: Tensor
     travel_time_prediction: Tensor
+    exposure_proxy: Tensor
+    pressure_risk_proxy: Tensor
+    service_loss_proxy: Tensor
+    containment_time_proxy: Tensor
+    plan_regret_proxy: Tensor
 
 
 @dataclass(frozen=True)
@@ -168,6 +173,27 @@ EVENT_CONTROL_HEADS_DEFAULT = False
 #: must never be surfaced to a user as a product decision.
 AUXILIARY_HEADS_DEFAULT = False
 
+#: overnight-plan.txt Task 4.6: optional plan-consequence prescreening
+#: proxies -- exposure, pressure-risk, service-loss, containment-time,
+#: and plan-regret -- computed per candidate plan to potentially reduce
+#: the number of expensive exact WNTR simulations by ranking candidates.
+#: "They must never replace WNTR verification" and "not exposed as
+#: verified consequences": PlanVerifier's exact simulation remains the
+#: sole authoritative source for plan_validity/consequence_vector: these
+#: heads produce a separate, clearly-named *_proxy output that a caller
+#: could use only to prioritize which candidates to actually simulate.
+#: Same net-new-parameters compatibility concern as
+#: EVENT_CONTROL_HEADS_DEFAULT/AUXILIARY_HEADS_DEFAULT, so gated the same
+#: way.
+CONSEQUENCE_PRESCREENING_HEADS_DEFAULT = False
+CONSEQUENCE_PROXY_NAMES: tuple[str, ...] = (
+    "exposure_proxy",
+    "pressure_risk_proxy",
+    "service_loss_proxy",
+    "containment_time_proxy",
+    "plan_regret_proxy",
+)
+
 
 class ArchitectureCompatibilityError(Exception):
     """Raised when a checkpoint's recorded architecture config does not
@@ -229,6 +255,18 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             "enabling it adds sensor_reconstruction/future_concentration/travel_time head "
             "parameters that a checkpoint trained without them does not have"
         )
+    recorded_consequence_prescreening = metadata.get("consequence_prescreening_heads")
+    if (
+        recorded_consequence_prescreening is not None
+        and recorded_consequence_prescreening != model.consequence_prescreening_heads
+    ):
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with consequence_prescreening_heads="
+            f"{recorded_consequence_prescreening!r} but this model instance is configured "
+            f"with consequence_prescreening_heads={model.consequence_prescreening_heads!r}; "
+            "enabling it adds five plan consequence-proxy head parameters that a checkpoint "
+            "trained without them does not have"
+        )
 
 
 class HydroCore(nn.Module):
@@ -266,6 +304,7 @@ class HydroCore(nn.Module):
         message_direction: MessageDirection = "forward_only",
         event_control_heads: bool = EVENT_CONTROL_HEADS_DEFAULT,
         auxiliary_heads: bool = AUXILIARY_HEADS_DEFAULT,
+        consequence_prescreening_heads: bool = CONSEQUENCE_PRESCREENING_HEADS_DEFAULT,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -295,6 +334,7 @@ class HydroCore(nn.Module):
         self.message_direction = message_direction
         self.event_control_heads = event_control_heads
         self.auxiliary_heads = auxiliary_heads
+        self.consequence_prescreening_heads = consequence_prescreening_heads
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -401,6 +441,16 @@ class HydroCore(nn.Module):
             self.sensor_reconstruction_head = RoleHead(d_model, 1)
             self.future_concentration_head = RoleHead(d_model, 1)
             self.travel_time_head = RoleHead(d_model, 1)
+        # overnight-plan.txt Task 4.6: optional, non-authoritative plan
+        # consequence-prescreening proxies, applied to the same per-plan
+        # representation (plan_hidden) that action/plan_value/
+        # plan_validity already use. Only constructed when
+        # consequence_prescreening_heads is enabled -- see
+        # CONSEQUENCE_PRESCREENING_HEADS_DEFAULT's docstring.
+        if self.consequence_prescreening_heads:
+            self.consequence_proxy_heads = nn.ModuleDict(
+                {name: RoleHead(d_model, 1) for name in CONSEQUENCE_PROXY_NAMES}
+            )
         self.action_head = RoleHead(d_model, action_vocabulary_size)
         self.plan_value_head = RoleHead(d_model, 1)
         self.plan_validity_head = RoleHead(d_model, 2)
@@ -438,6 +488,7 @@ class HydroCore(nn.Module):
             "message_direction": self.message_direction,
             "event_control_heads": self.event_control_heads,
             "auxiliary_heads": self.auxiliary_heads,
+            "consequence_prescreening_heads": self.consequence_prescreening_heads,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -625,6 +676,9 @@ class HydroCore(nn.Module):
             output["travel_time_prediction"] = (
                 self.travel_time_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, 0.0)
             )
+        if self.consequence_prescreening_heads:
+            for name, head in self.consequence_proxy_heads.items():
+                output[name] = head(plan_hidden).squeeze(-1)  # type: ignore[literal-required]
         return output
 
     def parameter_count(self, *, trainable_only: bool = False) -> int:
@@ -678,6 +732,8 @@ class HydroCore(nn.Module):
                 + count(self.future_concentration_head)
                 + count(self.travel_time_head)
             )
+        if self.consequence_prescreening_heads:
+            heads += count(self.consequence_proxy_heads)
         return ParameterReport(
             total=self.parameter_count(),
             trainable=self.parameter_count(trainable_only=True),

@@ -252,6 +252,60 @@ TARGETS_V2: dict[str, TargetSpec] = {
             source_of_truth="Exact WNTR/EPANET simulation (PlanVerifier).",
         ),
         _spec(
+            category="strategist",
+            name="exposure_proxy",
+            definition="Non-authoritative pre-simulation estimate of consequence_vector's "
+            "exposure_mg component, used only to rank candidate plans before deciding which "
+            "ones are worth the cost of exact WNTR verification (Task 4.6). Never itself a "
+            "verified consequence.",
+            unit="mg (ranking proxy, calibrated or clearly labeled as such)",
+            masking_rule="Same as action_template.",
+            source_of_truth="Supervised from PlanVerifier's exact consequence_vector output "
+            "(Task 2.4) -- the proxy learns to approximate the exact simulation, never "
+            "replaces it.",
+        ),
+        _spec(
+            category="strategist",
+            name="pressure_risk_proxy",
+            definition="Non-authoritative pre-simulation estimate of "
+            "consequence_vector's pressure_violation_minutes component (Task 4.6).",
+            unit="pressure-violation minutes (ranking proxy)",
+            masking_rule="Same as action_template.",
+            source_of_truth="Supervised from PlanVerifier's exact consequence_vector output "
+            "(Task 2.4).",
+        ),
+        _spec(
+            category="strategist",
+            name="service_loss_proxy",
+            definition="Non-authoritative pre-simulation estimate of "
+            "consequence_vector's service_availability component, expressed as loss (1 - "
+            "availability) (Task 4.6).",
+            unit="fraction in [0, 1] (ranking proxy)",
+            masking_rule="Same as action_template.",
+            source_of_truth="Supervised from PlanVerifier's exact consequence_vector output "
+            "(Task 2.4).",
+        ),
+        _spec(
+            category="strategist",
+            name="containment_time_proxy",
+            definition="Non-authoritative pre-simulation estimate of "
+            "consequence_vector's containment_time_s component (Task 4.6).",
+            unit="seconds (ranking proxy)",
+            masking_rule="Same as action_template.",
+            source_of_truth="Supervised from PlanVerifier's exact consequence_vector output "
+            "(Task 2.4).",
+        ),
+        _spec(
+            category="strategist",
+            name="plan_regret_proxy",
+            definition="Non-authoritative pre-simulation estimate of plan_value's regret "
+            "term against the best bounded valid plan (Task 4.6).",
+            unit="dimensionless value-scale proxy, same scale as plan_value",
+            masking_rule="Same as action_template; undefined wherever plan_value itself is "
+            "undefined.",
+            source_of_truth="Supervised from PlanVerifier-derived plan_value (Task 2.4).",
+        ),
+        _spec(
             category="control",
             name="ood_class",
             definition="OOD category for this example, or in-distribution. See Task 2.5's "
