@@ -1,5 +1,6 @@
 export type OodLevel = 'NORMAL' | 'CAUTION' | 'OUTSIDE_VALIDATED_RANGE';
-export type PlanStatus = 'REJECTED' | 'RECOMMENDED' | 'VALID';
+/** PENDING: generated but not yet run through WNTR/EPANET verification. */
+export type PlanStatus = 'PENDING' | 'REJECTED' | 'RECOMMENDED' | 'VALID';
 
 /**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
@@ -80,6 +81,34 @@ export interface Benchmark {
   status: 'PASS' | 'WATCH' | 'NOT RUN';
 }
 
+/** Mirrors the backend's ConsequenceMetrics (Pydantic) field-for-field,
+ * camelCased -- the exact simulated outcome of running one specific plan
+ * (overnight-plan.txt Task 3.2's "counterfactual consequences"). */
+export interface ConsequenceView {
+  populationImpacted: number;
+  contaminantMassConsumedMg: number;
+  volumeAboveThresholdL: number;
+  contaminatedPipeExtentM: number;
+  minimumPressureM: number;
+  pressureViolationMinutes: number;
+  unservedDemandL: number;
+  serviceAvailability: number;
+  operationCount: number;
+  containmentTimeMinutes: number | null;
+}
+
+/** Mirrors the backend's ProvenanceView -- every hash/version an operator
+ * needs to trust an IncidentView response (overnight-plan.txt Task 3.2). */
+export interface Provenance {
+  networkHash: string;
+  featureSchemaHash: string;
+  modelCheckpointHash: string;
+  calibrationVersion: string;
+  calibrationHash: string;
+  simulator: string | null;
+  simulatorVersion: string | null;
+}
+
 export interface IncidentView {
   id: string;
   networkId: string;
@@ -92,6 +121,7 @@ export interface IncidentView {
   offline: boolean;
   runtimeMs: number;
   modelVersion: string;
+  provenance: Provenance;
   ood: OodLevel;
   approvalPending: boolean;
   /** Conformal target used to size the calibrated candidate set (e.g. 0.9
@@ -125,6 +155,16 @@ export interface IncidentView {
     nodesRemoved: number;
   };
   plans: Plan[];
+  /** Operator-approved plan id, sourced from the audit ledger's
+   * PLAN_APPROVED event -- null until a human has actually approved one. */
+  selectedPlanId: string | null;
+  /** The top strategist-ranked proposal, before any approval decision. May
+   * differ from selectedPlanId, and may itself end up REJECTED on
+   * verification -- see Plan.status, not this field, for that outcome. */
+  recommendedPlanId: string | null;
+  /** Simulated outcome of every plan that underwent WNTR/EPANET
+   * verification, keyed by plan id (overnight-plan.txt Task 3.2). */
+  counterfactuals: Record<string, ConsequenceView>;
   audit: AuditEvent[];
   benchmarks: Benchmark[];
   explanation: string;

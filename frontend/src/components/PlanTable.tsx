@@ -2,7 +2,7 @@ import { useConsoleStore } from '../store';
 import type { Plan } from '../types';
 import { StatusBadge } from './StatusBadge';
 
-const tone = { REJECTED: 'danger', RECOMMENDED: 'good', VALID: 'info' } as const;
+const tone = { REJECTED: 'danger', RECOMMENDED: 'good', VALID: 'info', PENDING: 'warn' } as const;
 
 export function PlanTable({ plans }: { plans: Plan[] }) {
   const { selectedPlan, selectPlan } = useConsoleStore();

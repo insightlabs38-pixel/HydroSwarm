@@ -53,56 +53,125 @@ describe('fetchIncidentWithFallback', () => {
   });
 });
 
+/** Minimal but structurally complete ApiIncidentView payload (overnight-plan.txt
+ * Task 3.2), for exercising fetchIncident()/viewFromApi() against the real
+ * GET /incidents/{id}/view contract. */
+function apiIncidentViewFixture(): unknown {
+  return {
+    schema_version: 1,
+    incident_id: 'test-incident-id',
+    network_id: 'net-x',
+    runtime_mode: 'FULL_HYBRID',
+    data_mode: 'LIVE',
+    controller_state: 'PLANNING',
+    provenance: {
+      network_hash: 'n'.repeat(64),
+      feature_schema_hash: 'f'.repeat(64),
+      model_version: 'hydrocore-hybrid-v1',
+      model_checkpoint_hash: 'm'.repeat(64),
+      calibration_version: 'hydroswarm-calibration-v1',
+      calibration_hash: 'c'.repeat(64),
+      simulator: 'wntr',
+      simulator_version: '1.2.0',
+    },
+    candidates: {
+      node_probabilities: { J1: 0.7, J2: 0.3 },
+      node_ids: ['J1', 'J2'],
+      coverage_target: 0.9,
+      measured_coverage: 0.91,
+      calibrated: true,
+    },
+    disagreement_js: 0.05,
+    ood_level: 'NORMAL',
+    calibration_alpha: 0.1,
+    nodes: [
+      { node_id: 'J1', node_type: 'junction', elevation_m: 10, coordinates: [1, 2], probability: 0.7, concentration_mg_l: 0.3, candidate: true },
+      { node_id: 'J2', node_type: 'junction', elevation_m: 12, coordinates: [3, 4], probability: 0.3, concentration_mg_l: 0.1, candidate: true },
+    ],
+    links: [{ link_id: 'P1', link_type: 'pipe', start_node: 'J1', end_node: 'J2' }],
+    sensor_health: [
+      { sensor_id: 'S1', node_id: 'J1', health: 'HEALTHY', quality: 0.98, observed_at: new Date().toISOString(), received_at: new Date().toISOString(), pressure_m: 28, concentration_mg_l: 0.3 },
+    ],
+    sample_recommendation: { node_id: 'J2', expected_information_gain: 0.4, alternatives: [] },
+    plans: [
+      {
+        plan: { plan_id: 'plan-a', name: 'Isolate J2', actions: [{ action_type: 'CLOSE_PIPE', target_id: 'P1' }] },
+        verification: { decision: 'VERIFIED', rejection_codes: [], abstention_reason: null },
+      },
+    ],
+    selected_plan_id: null,
+    recommended_plan_id: 'plan-a',
+    counterfactual_consequences: {
+      'plan-a': {
+        population_impacted: 10,
+        contaminant_mass_consumed_mg: 5,
+        volume_above_threshold_l: 2,
+        contaminated_pipe_extent_m: 100,
+        minimum_pressure_m: 20,
+        pressure_violation_minutes: 0,
+        unserved_demand_l: 0,
+        service_availability: 0.99,
+        operation_count: 1,
+        containment_time_minutes: 12,
+      },
+    },
+    explanations: [{ intent: 'WHY_SOURCE', text: 'J1 is the leading source.' }],
+    audit_events: [
+      { sequence: 1, timestamp: '2026-08-03T08:00:00', event_type: 'INCIDENT_CREATED', actor: 'OPERATOR', payload: {} },
+    ],
+    runtime_metrics_ms: { hydraulic_simulation: 12.5, neural_inference: 3.2 },
+  };
+}
+
 describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)', () => {
-  test('throws LiveViewIncompleteError rather than silently merging demo fixture content', async () => {
+  test('maps a complete /view response into a LIVE IncidentView', async () => {
     vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
     vi.stubGlobal(
       'fetch',
       vi.fn((url: string) => {
         if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
-        if (String(url).includes('/events')) return Promise.resolve(jsonResponse([]));
-        return Promise.resolve(
-          jsonResponse({
-            incident_id: 'test-incident-id',
-            network_id: 'net-x',
-            status: 'SAMPLING',
-            ood_level: 'NORMAL',
-            approval_pending: false,
-            disagreement_js: null,
-            candidates: null,
-          }),
-        );
+        return Promise.resolve(jsonResponse(apiIncidentViewFixture()));
       }),
     );
-    const { fetchIncident, LiveViewIncompleteError } = await import('../src/api');
-    await expect(fetchIncident()).rejects.toBeInstanceOf(LiveViewIncompleteError);
+    const { fetchIncident } = await import('../src/api');
+    const incident = await fetchIncident();
+    expect(incident.mode).toBe('LIVE');
+    expect(incident.id).toBe('test-incident-id');
+    expect(incident.nodes).toHaveLength(2);
+    expect(incident.plans).toHaveLength(1);
+    expect(incident.plans[0].status).toBe('RECOMMENDED');
+    expect(incident.recommendedPlanId).toBe('plan-a');
+    expect(incident.counterfactuals['plan-a'].serviceAvailability).toBe(0.99);
+    expect(incident.provenance.calibrationHash).toBe('c'.repeat(64));
   });
 
-  test('fetchIncidentWithFallback explains exactly which fields are missing, not a generic message', async () => {
+  test('fetchIncidentWithFallback returns the live-mapped incident, not the demo fixture', async () => {
     vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
     vi.stubGlobal(
       'fetch',
       vi.fn((url: string) => {
         if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
-        if (String(url).includes('/events')) return Promise.resolve(jsonResponse([]));
-        return Promise.resolve(
-          jsonResponse({
-            incident_id: 'test-incident-id',
-            network_id: 'net-x',
-            status: 'SAMPLING',
-            ood_level: 'NORMAL',
-            approval_pending: false,
-            disagreement_js: null,
-            candidates: null,
-          }),
-        );
+        return Promise.resolve(jsonResponse(apiIncidentViewFixture()));
+      }),
+    );
+    const { fetchIncidentWithFallback } = await import('../src/api');
+    const incident = await fetchIncidentWithFallback();
+    expect(incident.mode).toBe('LIVE');
+    expect(incident.id).toBe('test-incident-id');
+  });
+
+  test('falls back to DEMO_FALLBACK when the /view response is malformed', async () => {
+    vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
+        return Promise.resolve(jsonResponse({ not: 'a valid incident view' }));
       }),
     );
     const { fetchIncidentWithFallback } = await import('../src/api');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('DEMO_FALLBACK');
-    expect(incident.modeReason).toMatch(/nodes/);
-    expect(incident.modeReason).toMatch(/plans/);
   });
 });
 
