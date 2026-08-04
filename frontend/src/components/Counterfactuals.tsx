@@ -1,29 +1,52 @@
 import type { Plan } from '../types';
 
+interface Branch {
+  key: string;
+  label: string;
+  exposure: number;
+  service: number;
+  pressure: number;
+  time: number;
+  recommended: boolean;
+}
+
 export function Counterfactuals({ plans }: { plans: Plan[] }) {
-  const noResponse = { id: 'NO RESPONSE', exposure: 0, service: 1, pressure: 0, time: 120 };
-  const branches = [
+  // A fixed, non-computed comparison baseline for taking no action -- no
+  // backend endpoint computes a genuine no-response WNTR consequence yet
+  // (same known gap as Plan.exposureReduction, see api.ts's viewFromApi
+  // comment). Shown identically in every mode as an explicit reference
+  // point, never as a substitute for a real per-incident plan.
+  const noResponse: Branch = {
+    key: 'no-response',
+    label: 'No response',
+    exposure: 0,
+    service: 1,
+    pressure: 0,
+    time: 120,
+    recommended: false,
+  };
+  // Every plan the incident actually has, in whatever order they arrived --
+  // not a hard-coded "first two" (overnight-plan.txt Task 3.3: "hard-coded
+  // recommended branch" and "ensure plan order can change without breaking
+  // the UI"). "Recommended" styling follows the plan's real status, not
+  // its position.
+  const branches: Branch[] = [
     noResponse,
-    {
-      id: 'PLAN A',
-      exposure: plans[0].exposureReduction,
-      service: plans[0].serviceAvailability,
-      pressure: plans[0].pressureViolations,
-      time: plans[0].containmentMinutes,
-    },
-    {
-      id: 'PLAN B',
-      exposure: plans[1].exposureReduction,
-      service: plans[1].serviceAvailability,
-      pressure: plans[1].pressureViolations,
-      time: plans[1].containmentMinutes,
-    },
+    ...plans.map((plan) => ({
+      key: plan.id,
+      label: plan.name,
+      exposure: plan.exposureReduction,
+      service: plan.serviceAvailability,
+      pressure: plan.pressureViolations,
+      time: plan.containmentMinutes,
+      recommended: plan.status === 'RECOMMENDED',
+    })),
   ];
   return (
     <div className="branch-grid">
       {branches.map((branch) => (
-        <article key={branch.id} className={branch.id === 'PLAN B' ? 'recommended-branch' : ''}>
-          <h3>{branch.id}</h3>
+        <article key={branch.key} className={branch.recommended ? 'recommended-branch' : ''}>
+          <h3>{branch.label}</h3>
           <div className="spread-visual" aria-hidden="true">
             <i style={{ width: `${100 - branch.exposure * 100}%` }} />
           </div>
