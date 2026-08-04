@@ -120,4 +120,31 @@ promoted checkpoint's loadability under `DefaultPipelineFactory` was re-verified
 single commit in this bundle, not just once at the end. No frontend file changed in this
 bundle.
 
+## Bundle E (Cycle A corpus + architecture smoke jobs), commits `4d75a6b..0606586`
+
+`src/hydroswarm/data/scenarios.py`: added `DatasetSplit.DEVELOPMENT_HOLDOUT`.
+`src/hydroswarm/training/data.py`: `ScenarioExample.split` validator accepts it.
+`scripts/generate_cycle_a_corpus.py` (new): generates the 2,550-scenario, 2-topology Cycle A
+corpus into `data/learning-v2/cycle-a/` (manifests/signatures/reports committed, ~4.5MB; raw
+scenario/tensor binaries gitignored, ~55MB). `src/hydroswarm/training/label_audit.py`: fixed
+`_sensor_fault_prevalence` to handle mixed node counts across topologies (real bug, found by
+actually running Cycle A generation). `src/hydroswarm/training/trainer.py`: `Trainer` accepts
+an optional `collate_fn` (default unchanged), needed for `collate_variable_topology` against
+genuinely multi-topology batches. `src/hydroswarm/training/losses.py`: `compute_multitask_loss`
+now applies targets_v2's `f"{task}_mask"` companions via a new `_apply_target_mask` helper (real
+bug: masked placeholder labels were being silently trained against), and wires `source_region`
+to a loss for the first time (a real head/target pair that had never been connected).
+`src/hydroswarm/model/core.py`: squeezed `evidence_sufficiency`'s output shape to match its real
+scalar-per-example target (real bug: `[batch, 1]` vs. `[batch]` crashed the first real
+model-output-into-loss run). `scripts/run_architecture_smoke_jobs.py` (new): Stage 1
+smoke/failure screening for E0/E3/E4/E9 -- 6 real `Trainer.fit()` + resume + checkpoint-reload
+runs, all passed. New/changed test files: `tests/scientific/test_scenario_generation.py`,
+`tests/unit/test_label_audit.py`, `tests/scientific/test_training_smoke.py`,
+`tests/unit/test_training.py`. `experiments/registry/bundle-e-smoke.jsonl` (real provenance
+ledger) and `reports/results/v3/architecture-smoke-jobs.json` committed;
+`experiments/runs/bundle-e-smoke/` (~1.3GB checkpoints) gitignored. No file under
+`data/learning-v1/`, `models/`, or any historical `reports/results/*.json` was modified; the
+promoted checkpoint's loadability was re-verified after every commit in this bundle. No frontend
+file changed in this bundle.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

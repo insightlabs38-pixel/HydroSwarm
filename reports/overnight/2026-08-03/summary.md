@@ -7,8 +7,8 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `d0a0b42` (Bundle D complete; still running)
-- Commits created: 38 (see `git log --oneline main..agent/gcp-multitopology-v3`)
+- Ending commit: `0606586` (Bundle E complete; still running)
+- Commits created: 44 (see `git log --oneline main..agent/gcp-multitopology-v3`)
 - Working tree: clean at branch creation
 
 ## Completed tasks
@@ -27,8 +27,10 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
   message channels, event/next-step control heads, three auxiliary objectives, non-authoritative
   plan consequence prescreening -- every new flag defaults to exactly reproducing the promoted
   checkpoint's original behavior, verified after each task)
-- [ ] Cycle A — next up
-- [ ] Cycle B
+- [x] Bundle E (Cycle A corpus: 2,550 scenarios across 2 genuinely different topologies; Stage 1
+  smoke/failure screening for E0/E3/E4/E9 -- 6 real training runs, all passed: no NaNs, every
+  supervised head received gradients, every run resumed correctly)
+- [ ] Cycle B — next up
 - [ ] S architecture screening
 - [ ] S finalist training
 - [ ] M training/evaluation
@@ -37,37 +39,80 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [ ] final selection
 - [ ] locked final test
 
-## Tests (current, after Bundle D)
+## Tests (current, after Bundle E)
 
 See `test-results.md` for full detail.
 
 | Command | Result | Notes |
 |---|---|---|
-| `pytest -q` | 349 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 251 new tests added across Bundle A + Bundle B + Bundle D |
+| `pytest -q` | 355 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 257 new tests added across Bundle A + Bundle B + Bundle D + Bundle E |
 | `ruff check src tests scripts` | pass | |
 | `pyright` | pass | |
 | `npm run lint` | pass | |
-| `npm run test -- --run` (vitest) | pass (24 tests, up from 4) | unchanged since Bundle C; Bundle D touched no frontend code |
+| `npm run test -- --run` (vitest) | pass (24 tests, up from 4) | unchanged since Bundle C; Bundles D/E touched no frontend code |
 | `npm run build` | pass | |
 | `npx playwright test` (e2e) | pass (10 tests, up from 1) | real Chromium, includes 2 committed screenshot baselines |
-| HydroCore-S checkpoint load | pass | hash, feature-schema, and calibration all validate; re-verified after every Task 4.x commit |
+| HydroCore-S checkpoint load | pass | hash, feature-schema, and calibration all validate; re-verified after every Task 4.x and Bundle E commit |
 
 ## Datasets generated
 
-None yet (Bundle A is data-infrastructure; Cycle A/B/C generation is Bundle E/F/Phase 5).
+**Cycle A** (`data/learning-v2/cycle-a/`, ~2,550 scenarios): 1,750 train / 250 validation / 250
+calibration / 300 development_holdout, split evenly across two genuinely different topologies
+(golden reference: 4 junctions/1 reservoir/1 tank/one loop; branched-loop: 7 junctions/1
+reservoir/no tank/a different loop, already committed at
+`data/topology-transfer/branched-loop.inp`). Generated in ~3 minutes. Manifests, signatures,
+`dataset-report.json`, and `label-audit.json` are committed (~4.5MB); raw scenario arrays and
+tensor shards (~55MB, regenerable) are gitignored. See `data/learning-v2/cycle-a/dataset-report.json`
+for full counts/balance/leakage detail.
 
 ## Experiments completed
 
-None yet (no training runs launched; Bundle A built the registry/job-runner/sampler
-infrastructure those runs will use).
+**Bundle E Stage 1 smoke/failure screening** (6 real training runs against a 200-train/50-validation
+Cycle A subset): E0 (baseline), E3 (source-conditioned pooling), E4 (dual-gated message channels),
+and three of E9's four internal prior/fusion comparisons (none/feature_only/logit_only -- the
+fourth, feature_and_logit, is E0 itself). Every run: validation loss decreased between the initial
+2-epoch pass and a resumed 3rd epoch, zero NaNs anywhere (loss, gradients, or exported checkpoint
+weights), every supervised head present in the batch received a nonzero gradient, every resume
+correctly advanced global_steps and epochs_completed. Full sweep: ~2m24s CPU time. Report:
+`reports/results/v3/architecture-smoke-jobs.json`. Provenance: `experiments/registry/bundle-e-smoke.jsonl`
+(real `ExperimentRegistry` open/close records with git commit, manifest hashes, resolved config,
+host/CPU/RAM). Run checkpoints (~1.3GB, disposable smoke artifacts) are gitignored under
+`experiments/runs/bundle-e-smoke/`.
 
 ## Metrics obtained
 
-None yet (baseline HydroCore-S hybrid governed result remains the current reference:
-96.0% top-1, ECE 0.0269, 8.94ms latency, per the plan's existing governed results table).
+None for final claims yet (baseline HydroCore-S hybrid governed result remains the current
+reference: 96.0% top-1, ECE 0.0269, 8.94ms latency, per the plan's existing governed results
+table). Bundle E's smoke-job validation losses (`reports/results/v3/architecture-smoke-jobs.json`)
+are explicitly *not* comparable architecture-selection metrics -- 200-example subset, 2-3 epochs,
+Cycle A is a smoke corpus by design -- they only prove the training loop itself works correctly
+for each configuration.
 
 ## Important findings
 
+- Bundle E's real-corpus, real-training-loop work surfaced three genuine correctness bugs that
+  every prior synthetic-fixture test had missed, each caught only by actually running the full
+  pipeline end to end against real multi-topology data for the first time:
+  1. `label_audit._sensor_fault_prevalence` unconditionally `torch.stack`ed every example's
+     `sensor_fault` target across a whole split, which assumes one shared node count -- true for
+     every corpus that existed before Cycle A, false the moment a split genuinely mixes two
+     topologies. Fixed by computing the overall rate via concatenation and per-node rates grouped
+     by `network_id`.
+  2. `compute_multitask_loss` never read any of targets_v2's `f"{task}_mask"` companion tensors at
+     all, so `corpus.py`'s placeholder values (0) for `source_node`/`source_region`/`start_time`/
+     `duration`/`relative_strength` on NORMAL/SENSOR_FAULT_ONLY scenarios were silently trained
+     against as if they were real labels -- roughly 30% of Cycle A's examples. Fixed with
+     `_apply_target_mask`, folding the mask into the `-100` "ignore this position" sentinel the
+     loss functions already understood. `source_region` was also found to have no loss wired to it
+     at all (a real head, a real corpus-emitted target, zero supervision) and is now wired.
+  3. `HydroCore.evidence_head`'s output was never squeezed (`[batch, 1]`) unlike the otherwise
+     structurally identical `event_presence_logits` (`[batch]`, correctly squeezed), so the first
+     real forward-pass-into-loss run crashed with a shape mismatch the moment a real corpus target
+     was used instead of a hand-matched synthetic one.
+  All three are fixed, each with a dedicated regression test proving both the original failure
+  mode and the fix (see commits `76cb9a8`, `470a042`, `0606586`). This is exactly Cycle A's stated
+  purpose ("target coverage validation... shape and memory tests") working as intended -- these
+  bugs would otherwise have silently corrupted Cycle B/C training at 8,000-40,000-scenario scale.
 - HydroCore-S is empirically permutation-equivariant: no non-equivariant input feature
   was found across 6 random node-order permutations (source-logit differences <1e-4,
   predictions always agree). This is a positive, load-bearing result for multi-topology
@@ -145,17 +190,20 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q   # expect 349 passed
+python -m pytest -q   # expect 355 passed
 cd frontend && npm run test -- --run   # expect 24 passed
 npx playwright test                     # expect 10 passed
 ```
 
-See `follow-up.md` for the specific next task (Phase 5 / Bundle E: Cycle A corpus generation,
+See `follow-up.md` for the specific next task (Phase 5 / Bundle F: Cycle B corpus generation,
 or completing Task 3.2's full backend contract).
 
 ## Every training job's status
 
-None launched yet; see `training-jobs.md`.
+Bundle E's 6 smoke-screening jobs (E0/E3/E4/E9-none/E9-feature_only/E9-logit_only) all
+completed successfully; see `training-jobs.md` and
+`reports/results/v3/architecture-smoke-jobs.json`. None are still running. No Bundle F/G/H
+training has been launched yet.
 
 ## Locked final test
 

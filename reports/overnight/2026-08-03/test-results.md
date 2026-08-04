@@ -59,3 +59,14 @@ of Phase 9.
 | `python -m pyright` | **Pass** | |
 | `npm run lint` / `npm run test -- --run` / `npm run build` / `npx playwright test` (frontend) | **unchanged** | Bundle D touched no frontend code; not re-run this update, no reason to expect a change |
 | HydroCore-S checkpoint load | **Pass** | re-verified after *every* Task 4.x commit (7a5492d, 0bddd71, 6c2d712, f4974b8, 6474a69, d0a0b42), not just once at the end -- each new architecture flag's default value leaves `DefaultPipelineFactory().trained_assets_ready` True with the same hash/schema/calibration match |
+
+## Update after Bundle E (commit `0606586`)
+
+| Command | Result | Notes |
+|---|---|---|
+| `python -m pytest -q` | **355 passed** | up from 349 after Bundle D (6 new tests: 1 development_holdout split test, 1 label_audit multi-topology regression test, 1 Trainer custom-collate_fn test, 2 target-mask-companion tests, 1 evidence_sufficiency shape/loss test) |
+| `python -m ruff check src tests scripts` | **Pass** | |
+| `python -m pyright` | **Pass** | |
+| `npm run lint` / `npm run test -- --run` / `npm run build` / `npx playwright test` (frontend) | **unchanged** | Bundle E touched no frontend code |
+| HydroCore-S checkpoint load | **Pass** | re-verified after every Bundle E commit; the `evidence_sufficiency` output-shape fix changes a forward-pass convention only, no parameter shapes |
+| Real end-to-end training (new this bundle) | **Pass** | 6 real `Trainer.fit()` runs (E0/E3/E4/E9-none/E9-feature_only/E9-logit_only) against real Cycle A data: finite loss throughout, every present supervised head received nonzero gradient, every run resumed correctly from its own checkpoint, every exported checkpoint reloaded with all-finite weights and passed `verify_architecture_compatibility` against its own recorded config. See `reports/results/v3/architecture-smoke-jobs.json`. |

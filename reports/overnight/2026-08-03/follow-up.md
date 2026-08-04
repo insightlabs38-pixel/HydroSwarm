@@ -1,44 +1,32 @@
 # Follow-up / next actions
 
-Updated live throughout the run. As of Bundle D completion (commit `d0a0b42`):
+Updated live throughout the run. As of Bundle E completion (commit `0606586`):
 
 ## Immediate next steps (in dependency order)
 
-1. **Phase 5 / Bundle E — Cycle A corpus generation.** Code-side prerequisites are now fully
-   complete: Bundle B's variable-topology/lazy-loading/target-schema/label-audit
-   infrastructure, and Bundle D's configurable HydroCore architecture (every new flag
-   defaults to the checkpoint-compatible original behavior, so smoke/screening jobs can
-   ablate `prior_mode`/`incident_pooling`/`message_direction` without needing a from-scratch
-   checkpoint). This has not been attempted yet: it requires actually generating multiple
-   genuinely-different training topologies (only the single reference network has been used
-   in every test so far) and running real multi-topology WNTR generation at scale -- a
-   substantial, long-running (likely many-hour) undertaking best run as a background job via
-   `hydroswarm.training.job_runner` (Task 0.3).
-2. **Task 3.2 — complete incident-view API contract.** Still not fully implemented.
-   `fetchIncident()` currently throws `LiveViewIncompleteError` naming exactly which fields
-   are missing (nodes, links, recommendedSample, evidence, plans, benchmarks, explanation)
-   rather than silently substituting fixture content -- this closed the dangerous bug, but
-   means LIVE mode can never actually be reached yet, even against a running, healthy
-   backend. To close this: add a `GET /api/incidents/{id}/view` FastAPI endpoint (see
-   `src/hydroswarm/api/app.py`, `src/hydroswarm/api/state.py::IncidentRuntime`) that
-   assembles a complete response from the runtime's existing `state`/`plans`/`verifications`/
-   `analysis`, plus the network's stored `geojson` (already on `NetworkRecord`) for map node
-   coordinates. Then update `frontend/src/api.ts::fetchIncident()` to call it and remove the
-   `LiveViewIncompleteError` throw. Add matching Pydantic (backend) and TypeScript (frontend)
-   contract tests per the plan's Task 3.2 requirements. Independent of Bundle E (disjoint
-   code: model/corpus vs. frontend/API) -- can be picked up in parallel by a separate pass if
-   ever running two threads of work, but this run is proceeding to Bundle E first since it's
-   directly on the plan's critical path to a trained/selected architecture.
-3. Once real multi-topology corpora exist (Cycle A, then B, then C), Bundle D's new
-   architecture flags are ready to actually be exercised in training: the E0-E10 architecture
-   screening matrix (Phase 6) ablates exactly the flags Bundle D added
-   (`prior_mode`/`incident_pooling`/`message_direction`, plus `event_control_heads`/
-   `auxiliary_heads`/`consequence_prescreening_heads` once their labels exist). Label
-   generation for Task 4.4's `next_step`, Task 4.5's three auxiliary targets, and Task 4.6's
-   five consequence proxies was deliberately deferred out of Bundle D (see Bundle D's own
-   commits for the exact reasoning) -- these need real corpus-generation/PlanVerifier wiring
-   before those specific heads can be trained, not before Cycle A smoke jobs can start using
-   the rest of the architecture.
+1. **Phase 5 / Bundle F — Cycle B corpus generation and full updated S training.** Cycle A
+   proved the pipeline end to end (generation, sharding, label audit, real training loop, all
+   with real bugs found and fixed along the way -- see "Bundle E findings" below), so Bundle F
+   can proceed with confidence the underlying mechanics are sound. Cycle B needs 8,000-12,000
+   train / 1,000 validation / 1,000 calibration / 1,500-2,000 development_holdout / 300-500
+   per OOD shift category, across 3 training topologies + 1 development-OOD topology (Cycle A
+   only used 2 topologies total; Bundle F needs at least 2 more genuinely different networks
+   -- none exist in the repo yet beyond the golden reference and branched-loop, so new .inp
+   files need to be authored or imported before generation can start). Cycle B also requires
+   the full distribution-stratification (12 dimensions) and required-hard-negatives lists the
+   plan specifies for Cycle B specifically (Cycle A deliberately did not attempt these -- it
+   is a smoke corpus). This is a substantially longer-running job than Cycle A's ~3 minutes;
+   a real candidate for `hydroswarm.training.job_runner`-supervised background execution.
+   After Cycle B: run the full E0-E10 experiment matrix (not just the 4 Bundle E
+   smoke-screened), select the strongest updated S configuration(s), run source-only vs.
+   full-multitask diagnostics, fit calibration.
+2. **Task 3.2 — complete incident-view API contract.** Still not fully implemented (see prior
+   handoff updates for detail). Independent of Bundle F -- disjoint code (model/corpus vs.
+   frontend/API) -- can be picked up in parallel if ever running two threads of work, but this
+   run has been proceeding through the model/data critical path first.
+3. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
+   selection completing first -- "only after selecting strongest S architecture" per the
+   plan -- so it cannot start early no matter how much idle capacity exists.
 
 ## Exact command to resume
 
@@ -46,52 +34,63 @@ Updated live throughout the run. As of Bundle D completion (commit `d0a0b42`):
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q                        # expect 349 passed
+python -m pytest -q                        # expect 355 passed
 cd frontend && npm ci && npm run test -- --run   # expect 24 passed
 npx playwright install --with-deps chromium && npx playwright test  # expect 10 passed
 ```
 
+To inspect Cycle A or re-run the Bundle E smoke sweep:
+
+```bash
+export PYTHONPATH=src
+python scripts/generate_cycle_a_corpus.py --output data/learning-v2/cycle-a   # already run; will refuse to overwrite
+python scripts/run_architecture_smoke_jobs.py   # already run; ~2m24s, writes reports/results/v3/architecture-smoke-jobs.json
+```
+
+`experiments/runs/bundle-e-smoke/` (~1.3GB of disposable smoke-run checkpoints) is safe to
+delete once this report has been reviewed; it is gitignored and not referenced by anything
+downstream.
+
 ## Scope assessment for whoever picks this up next
 
 Phase 0, Bundle A (0.2-0.8), Bundle B in full (1.1-1.5, 2.1-2.6), Bundle C (3.1, 3.3 partial,
-3.4 partial, 3.5, 3.6, 3.7, 3.8; 3.2 given an interim treatment), and Bundle D in full
-(4.0-4.6) are complete, tested, and committed -- 38 commits, 296 new tests (251 backend + 45
-frontend), all gates green, zero baseline artifacts touched, every new scenario/
-label-generation test runs against the real reference network with real WNTR simulation (no
-simulator mocks), every new frontend test runs against real rendered output (JSDOM for unit,
-real Chromium for e2e, no snapshot-without-verification), and the promoted HydroCore-S
-checkpoint's loadability was independently re-verified after every single Bundle D commit,
-not just once at the end. This is substantive, real progress covering the entire
-code/infrastructure half of the plan, the frontend correctness half, and the model
-architecture half. What remains is Task 3.2's full backend contract and Phases 5-9, which
-require actually generating multiple genuinely-different topologies and running real
-multi-topology WNTR data generation at 10k-40k scenario scale plus real CPU training runs
+3.4 partial, 3.5, 3.6, 3.7, 3.8; 3.2 given an interim treatment), Bundle D in full (4.0-4.6),
+and Bundle E in full (Cycle A generation + Stage 1 smoke screening for E0/E3/E4/E9) are
+complete, tested, and committed -- 44 commits, 302 new tests (257 backend + 45 frontend), all
+gates green, zero baseline artifacts touched. This is substantive, real progress covering the
+entire code/infrastructure half of the plan, the frontend correctness half, the model
+architecture half, and now a first real (if intentionally small) proof that the full
+generate -> shard -> audit -> train -> resume -> reload pipeline works end to end. What
+remains is Task 3.2's full backend contract and Phases 5 (Cycle B/C)-9, which require
+authoring or importing at least 2 more genuinely different network topologies, running real
+multi-topology WNTR data generation at 10k-40k scenario scale, and real CPU training runs
 lasting many hours each -- substantially larger in wall-clock terms than anything completed
-so far, and the natural next phase for long-running background jobs via the job runner built
-in Bundle A.
+so far.
 
-## Bundle D scope notes (what was deliberately not done, and why)
+## Bundle E findings (what was caught, and why it mattered)
 
-- **Label generation for the new heads' targets was not attempted.** `event_cause`/
-  `event_presence` already had labels from Bundle B's corpus work and are wired into
-  `compute_multitask_loss`; `next_step` (Task 4.4), `sensor_reconstruction`/
-  `future_concentration`/`travel_time` (Task 4.5), and the five `*_proxy` targets (Task 4.6)
-  do not have generators yet. Each is registered in the governed `targets_v2` contract with
-  a real masking rule and source-of-truth, and each head's loss is wired to fire
-  automatically the moment a real target with that name appears in a training batch -- no
-  further model-side work is needed once Phase 5/6 corpus generation produces them.
-- **Inference-pipeline serialization of any Bundle D output was not attempted.**
-  `src/hydroswarm/inference/pipeline.py` (the human-approval-boundary-adjacent production
-  output path) was not touched by Bundle D at all. This was a deliberate scope decision: all
-  six new architecture flags default to `False`/original-behavior, so the promoted checkpoint
-  and current production pipeline are completely unaffected either way, and wiring new,
-  not-yet-trained heads into a boundary the plan explicitly says never to weaken felt like
-  the wrong thing to do speculatively, ahead of those heads actually being trained on real
-  data.
-- **The Task 4.6 ranking-quality / simulator-call-reduction evaluation harness was not
-  built.** That evaluation is only meaningful once a `consequence_prescreening_heads=True`
-  variant is actually trained on real `PlanVerifier` output, which requires Phase 5/6 corpus
-  and training work that hasn't started.
+Cycle A's stated purpose is exactly what it delivered: "variable-topology pipeline
+validation, target coverage validation... shape and memory tests." Three real correctness
+bugs were found and fixed only because this was the first time real multi-topology data and
+a real model actually flowed through the full training loop together (every prior test used
+either synthetic single-topology fixtures or hand-matched shapes on both sides of a boundary):
+
+1. `label_audit._sensor_fault_prevalence` assumed one shared node count per split
+   (`torch.stack` across the whole split) -- crashes the instant two topologies with
+   different junction counts are mixed. Fixed (commit `76cb9a8`).
+2. `compute_multitask_loss` never read targets_v2's `f"{task}_mask"` companions at all, so
+   `corpus.py`'s placeholder 0 labels for NORMAL/SENSOR_FAULT_ONLY scenarios (~30% of Cycle A)
+   were silently trained against as real labels. `source_region` was also found to have no
+   loss wired to it at all. Fixed (commit `470a042`).
+3. `HydroCore.evidence_head`'s output was never squeezed (`[batch,1]` vs. the real `[batch]`
+   target), crashing the first real forward-pass-into-loss run. Fixed (commit `0606586`).
+
+**Implication for whoever runs Cycle B/C**: these fixes are now in place and covered by
+regression tests, so Cycle B/C training should not hit the same issues. But this is a strong
+signal that *other* untested interactions between real multi-topology data and the training
+loop may still exist -- treat Cycle B's own Stage 1 smoke screening (before the full 3-6 epoch
+Stage 2 architecture screening) as a real gate, not a formality, precisely because it is what
+caught all three of the above.
 
 ## Open questions / risks noted so far
 
@@ -104,3 +103,7 @@ in Bundle A.
   directories outside the repo.
 - No remote push has occurred and none is planned unless explicitly requested; the plan only
   requires not pushing to main, and commits will stay local on `agent/gcp-multitopology-v3`.
+- Bundle F needs genuinely new network topologies (at least 2 more beyond golden-reference and
+  branched-loop) authored or imported before Cycle B generation can start -- this is real
+  authoring work (a valid, hydraulically-sane EPANET INP file), not a parameter tweak, and has
+  not been scoped yet.

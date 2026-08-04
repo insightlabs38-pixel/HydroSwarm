@@ -198,6 +198,24 @@
       "title": "Non-authoritative plan consequence prescreening (Bundle D complete)",
       "commit": "d0a0b42",
       "summary": "Added five *_proxy heads (exposure/pressure_risk/service_loss/containment_time/plan_regret) applied to the per-plan-query representation, gated behind consequence_prescreening_heads: bool = False. Registered as governed \"strategist\" targets alongside plan_value/consequence_vector/plan_validity, each explicitly documented non-authoritative and never replacing PlanVerifier's exact WNTR simulation. Wired into compute_multitask_loss (output name equals target name, same convention as plan_value). Deferred: label generation from real PlanVerifier output at corpus scale, and the ranking-quality/simulator-call-reduction evaluation harness Task 4.6 calls for -- both are Phase 5/6/7 work. 11 new tests. This completes Bundle D (Tasks 4.0-4.6): every new architecture flag verified to leave the promoted HydroCore-S checkpoint loadable at its default value; 349 backend tests, ruff clean, pyright clean."
+    },
+    {
+      "task": "Phase 5 Cycle A",
+      "title": "Generate the Cycle A smoke corpus across 2 genuine topologies",
+      "commit": "4d75a6b (development_holdout split) + 76cb9a8 (generation)",
+      "summary": "Added DatasetSplit.DEVELOPMENT_HOLDOUT, distinct from the locked-final-test TEST split, matching configs/evaluation_policy_v3.json's already-governed \"development_holdout\" role -- generating Cycle A's disposable dev-holdout under TEST would have made ordinary architecture-comparison iteration indistinguishable from opening the locked test. scripts/generate_cycle_a_corpus.py then generated 2,550 scenarios (1,750/250/250/300 train/validation/calibration/development_holdout) across the golden reference network and the independent branched-loop network (data/topology-transfer/branched-loop.inp) -- two genuinely different graph structures, closing a limitation scripts/prepare_training_corpus.py's own dataset-report.json had honestly flagged. Found and fixed a real bug while running this for the first time: label_audit._sensor_fault_prevalence assumed one shared node count across an entire split, which breaks the moment two topologies with different junction counts are mixed. Generated in ~3 minutes; ~4.5MB of manifests/signatures/reports committed, ~55MB of regenerable scenario/tensor binaries gitignored."
+    },
+    {
+      "task": "Bundle E training-loop fixes",
+      "title": "Wire Trainer for variable-topology batches; fix two real loss-masking/shape bugs",
+      "commit": "fc884b0 (Trainer.collate_fn) + 470a042 (target-mask fix) + 0606586 (evidence_sufficiency shape fix)",
+      "summary": "Trainer hardcoded collate_scenarios (plain torch.stack), which cannot batch examples with different node counts; added an optional collate_fn parameter (default unchanged) so collate_variable_topology can be selected. Preparing the first real training run against Cycle A then surfaced two further real bugs neither synthetic test fixtures nor Bundle B's schema work had caught: compute_multitask_loss never read any targets_v2 f\"{task}_mask\" companion, so corpus.py's placeholder 0 labels for NORMAL/SENSOR_FAULT_ONLY scenarios (~30% of Cycle A) were silently trained against as real labels -- fixed via a new _apply_target_mask helper, and source_region (a real head, a real corpus target, zero prior loss wiring) was connected for the first time; and HydroCore.evidence_head's output was never squeezed ([batch,1] vs. the real [batch] target), crashing the first real forward-pass-into-loss combination. 6 new regression tests across the three fixes."
+    },
+    {
+      "task": "Bundle E Stage 1",
+      "title": "Smoke/failure screening for E0, E3, E4, and E9 (Bundle E complete)",
+      "commit": "0606586",
+      "summary": "scripts/run_architecture_smoke_jobs.py ran 6 real training configurations (E0 baseline, E3 source_conditioned pooling, E4 dual_gated message channels, and 3 of E9's 4 internal prior/fusion comparisons) against a 200-train/50-validation Cycle A subset: an explicit pre-training gradient-flow check via task_gradient_norms, a real 2-epoch Trainer.fit(), a resume check (one more epoch from the exported checkpoint), and a checkpoint-reload/verify_architecture_compatibility check. All six passed every check -- zero NaNs, zero zero-gradient tasks, zero failed resumes, validation loss decreased in every case. Full sweep ~2m24s CPU time. Real ExperimentRegistry provenance recorded (experiments/registry/bundle-e-smoke.jsonl). This completes Bundle E (Cycle A generation + Stage 1 architecture smoke screening): 355 backend tests, ruff clean, pyright clean, promoted checkpoint verified loadable throughout."
     }
   ]
 }
