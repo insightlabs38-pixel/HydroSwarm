@@ -73,6 +73,26 @@ def _ordinal_classification_loss(
     return categorical + ordinal_weight * ordinal
 
 
+def _apply_target_mask(task: str, target: Tensor, targets: Mapping[str, Tensor]) -> Tensor:
+    """Fold a targets_v2 ``f"{task}_mask"`` companion (True = valid/observed,
+    per hydroswarm.training.targets_v2's documented convention) into the
+    ``-100`` "ignore this position" sentinel _cross_entropy and
+    _ordinal_classification_loss already understand.
+
+    Without this, a masked-out placeholder value (e.g. corpus.py sets
+    source_node/duration/etc. to 0 for a NORMAL/SENSOR_FAULT_ONLY scenario
+    where no real source or timing exists, precisely so it is *not* mistaken
+    for a real label) would otherwise be trained against directly, since
+    corpus.py's own values never contain -100 -- only the separate mask
+    tensor records that a placeholder was used.
+    """
+
+    mask = targets.get(f"{task}_mask")
+    if mask is None:
+        return target
+    return target.masked_fill(~mask.bool(), -100)
+
+
 def _masked_mse(prediction: Tensor, target: Tensor) -> Tensor:
     target = target.float()
     prediction = prediction.float()
@@ -95,6 +115,7 @@ def compute_multitask_loss(
     losses: dict[str, Tensor] = {}
     classifications = {
         "source_node": "source_node_logits",
+        "source_region": "source_region_logits",
         "sample_node": "sample_node_logits",
         "action": "action_logits",
         "action_pointer": "action_pointer_logits",
@@ -128,13 +149,13 @@ def compute_multitask_loss(
     }
     for task, output_name in classifications.items():
         if task in targets and output_name in outputs:
-            losses[task] = _cross_entropy(outputs[output_name], targets[task])
+            losses[task] = _cross_entropy(outputs[output_name], _apply_target_mask(task, targets[task], targets))
     for task, class_count in PROFILE_CLASS_COUNTS.items():
         output_name = f"{task}_logits"
         if task in targets and output_name in outputs:
             losses[task] = _ordinal_classification_loss(
                 outputs[output_name],
-                targets[task],
+                _apply_target_mask(task, targets[task], targets),
                 class_count=class_count,
                 ordinal_weight=profile_ordinal_weight,
             )

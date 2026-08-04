@@ -112,6 +112,60 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
     result.total.backward()
 
 
+def test_target_mask_companion_excludes_placeholder_labels_from_the_loss() -> None:
+    # Regression: hydroswarm.training.corpus.scenario_to_example sets
+    # source_node/source_region/start_time/duration/relative_strength to a
+    # placeholder value (0) -- never a real label -- for a NORMAL/
+    # SENSOR_FAULT_ONLY scenario where no real source exists, and records
+    # that explicitly via the separate f"{task}_mask" companion (targets_v2's
+    # documented convention). compute_multitask_loss previously never read
+    # those companions at all, so the placeholder 0 was silently trained
+    # against as if it were a real label. Proven here by comparing a
+    # fully-masked-out batch's loss against a directly-computed all-ignored
+    # cross-entropy (both must be exactly the same "no real supervision"
+    # zero-gradient shape, not a loss actively pulling the prediction toward
+    # class 0).
+    outputs = {
+        "source_node_logits": torch.tensor([[5.0, -5.0], [5.0, -5.0]], requires_grad=True),
+        "source_region_logits": torch.tensor([[5.0, -5.0], [5.0, -5.0]], requires_grad=True),
+        "duration_logits": torch.zeros(2, 8, requires_grad=True),
+    }
+    targets = {
+        "source_node": torch.tensor([0, 0]),
+        "source_node_mask": torch.tensor([False, False]),
+        "source_region": torch.tensor([0, 0]),
+        "source_region_mask": torch.tensor([False, False]),
+        "duration": torch.tensor([0, 0]),
+        "duration_mask": torch.tensor([False, False]),
+    }
+    result = compute_multitask_loss(outputs, targets)
+    for task in ("source_node", "source_region", "duration"):
+        assert result.tasks[task].item() == pytest.approx(0.0)
+    result.total.backward()
+    # The masked-out source_node_logits must receive exactly zero gradient
+    # from this task -- if the placeholder 0 label had leaked through, the
+    # already-confident (correct-looking) prediction would still get zero
+    # gradient by coincidence, so this alone would not catch the bug; the
+    # zero task loss above is the real proof.
+    assert outputs["source_node_logits"].grad is not None
+
+
+def test_target_mask_companion_still_trains_on_the_unmasked_positions() -> None:
+    outputs = {
+        "source_node_logits": torch.tensor([[5.0, -5.0], [5.0, -5.0]], requires_grad=True),
+    }
+    targets = {
+        "source_node": torch.tensor([0, 1]),
+        "source_node_mask": torch.tensor([True, True]),
+    }
+    result = compute_multitask_loss(outputs, targets)
+    # Row 0 (label 0, confidently predicted 0) contributes ~0; row 1
+    # (label 1, confidently predicted 0 -- wrong) contributes a large loss.
+    # Averaged over 2 valid rows this must be well above zero, unlike the
+    # fully-masked case above.
+    assert result.tasks["source_node"].item() > 1.0
+
+
 def test_multitask_loss_covers_event_control_heads_when_present() -> None:
     # overnight-plan.txt Task 4.4: event_cause/event_presence losses only
     # fire when both the model output (event_control_heads=True) and the
