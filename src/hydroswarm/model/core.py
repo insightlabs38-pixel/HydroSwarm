@@ -106,6 +106,17 @@ ARCHITECTURE_VERSION = "hydrocore-v2"
 PriorMode = Literal["none", "feature_only", "logit_only", "feature_and_logit"]
 PRIOR_MODES: tuple[PriorMode, ...] = get_args(PriorMode)
 
+#: overnight-plan.txt Task 4.2. "mean" (default) matches the original
+#: unconditional global mean pool, kept as the ablation baseline. "latent"
+#: pools the bounded global latent tokens instead of node states.
+#: "attention" learns a single query token that attention-pools over valid
+#: node states. "source_conditioned" combines a source-logit-weighted pool
+#: of Sentinel node states, an attention pool restricted to sensor-observed
+#: nodes, and a mean-pooled global latent context, projected down to
+#: d_model.
+IncidentPooling = Literal["mean", "latent", "attention", "source_conditioned"]
+INCIDENT_POOLING_MODES: tuple[IncidentPooling, ...] = get_args(IncidentPooling)
+
 
 class ArchitectureCompatibilityError(Exception):
     """Raised when a checkpoint's recorded architecture config does not
@@ -137,6 +148,12 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             f"checkpoint was trained with prior_mode={recorded_prior_mode!r} but this model "
             f"instance is configured with prior_mode={model.prior_mode!r}; loading it would "
             "silently compute different outputs than training used"
+        )
+    recorded_incident_pooling = metadata.get("incident_pooling")
+    if recorded_incident_pooling is not None and recorded_incident_pooling != model.incident_pooling:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with incident_pooling={recorded_incident_pooling!r} but "
+            f"this model instance is configured with incident_pooling={model.incident_pooling!r}"
         )
 
 
@@ -171,6 +188,7 @@ class HydroCore(nn.Module):
         adapter_dims: tuple[int, int, int] = (32, 48, 64),
         use_adapters: bool = True,
         prior_mode: PriorMode = "feature_and_logit",
+        incident_pooling: IncidentPooling = "mean",
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -183,11 +201,16 @@ class HydroCore(nn.Module):
             raise ValueError("dropout must be in [0, 1)")
         if prior_mode not in PRIOR_MODES:
             raise ValueError(f"prior_mode must be one of {PRIOR_MODES}, got {prior_mode!r}")
+        if incident_pooling not in INCIDENT_POOLING_MODES:
+            raise ValueError(
+                f"incident_pooling must be one of {INCIDENT_POOLING_MODES}, got {incident_pooling!r}"
+            )
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
         self.use_adapters = use_adapters
         self.prior_mode = prior_mode
+        self.incident_pooling = incident_pooling
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -220,6 +243,15 @@ class HydroCore(nn.Module):
         self.plan_query_tokens = nn.Parameter(torch.empty(plan_queries, d_model))
         nn.init.normal_(self.global_latents, std=0.02)
         nn.init.normal_(self.plan_query_tokens, std=0.02)
+
+        if incident_pooling in ("attention", "source_conditioned"):
+            self.incident_query = nn.Parameter(torch.empty(1, 1, d_model))
+            nn.init.normal_(self.incident_query, std=0.02)
+            self.incident_attention = nn.MultiheadAttention(
+                d_model, nhead, dropout=dropout, batch_first=True
+            )
+        if incident_pooling == "source_conditioned":
+            self.incident_context_projection = nn.Linear(3 * d_model, d_model)
 
         self.backbone = nn.ModuleList(
             [
@@ -301,7 +333,25 @@ class HydroCore(nn.Module):
         return {
             "architecture_version": ARCHITECTURE_VERSION,
             "prior_mode": self.prior_mode,
+            "incident_pooling": self.incident_pooling,
         }
+
+    def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
+        """Single learnable query attention-pools over positions where mask
+        is True. Rows with no valid position (mask.any(dim=1) is False)
+        are redirected to attend over position 0 only, matching the
+        existing safe_mask convention used for the backbone, so
+        MultiheadAttention never sees an all-masked row (which would
+        otherwise produce NaN)."""
+
+        batch_size = hidden.shape[0]
+        safe_mask = mask.clone()
+        safe_mask[~safe_mask.any(dim=1), 0] = True
+        query = self.incident_query.expand(batch_size, -1, -1)
+        pooled, _ = self.incident_attention(
+            query, hidden, hidden, key_padding_mask=~safe_mask, need_weights=False
+        )
+        return pooled.squeeze(1)
 
     @staticmethod
     def _optional_context(
@@ -409,6 +459,29 @@ class HydroCore(nn.Module):
         source_logits = source_logits.masked_fill(
             ~source_mask, torch.finfo(hidden.dtype).min
         )
+
+        # overnight-plan.txt Task 4.2: incident-level heads (timing/duration/
+        # strength/evidence-sufficiency/uncertainty/OOD) use incident_context
+        # rather than always the plain masked mean pool, per incident_pooling.
+        if self.incident_pooling == "mean":
+            incident_context = pooled
+        elif self.incident_pooling == "latent":
+            incident_context = latents.mean(dim=1)
+        elif self.incident_pooling == "attention":
+            incident_context = self._attention_pool(hidden, node_mask)
+        else:  # "source_conditioned"
+            source_weights = torch.softmax(source_logits, dim=-1)
+            source_context = torch.einsum("bn,bnd->bd", source_weights, sentinel_nodes)
+            sensor_observed = batch.get("sensor_mask")
+            sensor_node_mask = (
+                sensor_observed.any(dim=1) & node_mask if sensor_observed is not None else node_mask
+            )
+            sensor_context = self._attention_pool(hidden, sensor_node_mask)
+            global_context = latents.mean(dim=1)
+            incident_context = self.incident_context_projection(
+                torch.cat((source_context, sensor_context, global_context), dim=-1)
+            )
+
         return HydroOutput(
             hidden_state=hidden,
             latent_state=latents,
@@ -418,12 +491,12 @@ class HydroCore(nn.Module):
             node_mask=node_mask,
             source_node_logits=source_logits,
             source_region_logits=self.source_region_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
-            start_time_logits=self._profile_logits(self.profile_heads["start_time"], pooled, 4),
-            duration_logits=self._profile_logits(self.profile_heads["duration"], pooled, 3),
+            start_time_logits=self._profile_logits(self.profile_heads["start_time"], incident_context, 4),
+            duration_logits=self._profile_logits(self.profile_heads["duration"], incident_context, 3),
             relative_strength_logits=self._profile_logits(
-                self.profile_heads["relative_strength"], pooled, 3
+                self.profile_heads["relative_strength"], incident_context, 3
             ),
-            evidence_sufficiency=self.evidence_head(pooled),
+            evidence_sufficiency=self.evidence_head(incident_context),
             sensor_fault_logits=self.sensor_fault_head(sentinel_nodes).squeeze(-1),
             sample_node_logits=self.sample_node_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
             expected_information_gain=self.information_gain_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, 0.0),
@@ -431,8 +504,8 @@ class HydroCore(nn.Module):
             action_pointer_logits=pointer_logits,
             plan_value=self.plan_value_head(plan_hidden).squeeze(-1),
             plan_validity_logits=self.plan_validity_head(plan_hidden),
-            uncertainty=self.uncertainty_head(pooled),
-            ood_logits=self.ood_head(pooled),
+            uncertainty=self.uncertainty_head(incident_context),
+            ood_logits=self.ood_head(incident_context),
         )
 
     def parameter_count(self, *, trainable_only: bool = False) -> int:

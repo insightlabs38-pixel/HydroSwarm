@@ -3,6 +3,7 @@
 from .adapters import BottleneckAdapter, RoleHead
 from .core import (
     ARCHITECTURE_VERSION,
+    INCIDENT_POOLING_MODES,
     MODEL_VARIANTS,
     PRIOR_MODES,
     ArchitectureCompatibilityError,
@@ -10,6 +11,7 @@ from .core import (
     HydroCore,
     HydroMono,
     HydroOutput,
+    IncidentPooling,
     ModelVariant,
     NoAdapterHydroCore,
     ParameterReport,
@@ -21,6 +23,7 @@ from .layers import EdgeAwareGraphConv, LatentHydraulicBlock
 
 __all__ = [
     "ARCHITECTURE_VERSION",
+    "INCIDENT_POOLING_MODES",
     "MODEL_VARIANTS",
     "PRIOR_MODES",
     "ArchitectureCompatibilityError",
@@ -31,6 +34,7 @@ __all__ = [
     "HydroCore",
     "HydroMono",
     "HydroOutput",
+    "IncidentPooling",
     "LatentHydraulicBlock",
     "ModelVariant",
     "NoAdapterHydroCore",
