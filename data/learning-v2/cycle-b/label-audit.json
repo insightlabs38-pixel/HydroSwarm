@@ -1,0 +1,1000 @@
+{
+  "cross_split_leakage": {
+    "scenario_id_leaks": [],
+    "seed_family_leaks": [],
+    "topology_leak_note": "topology_hash does not exist yet (added in Task 1.1); until then, leakage across genuinely different topologies cannot be distinguished from expected network_id reuse across splits within a single topology's hydraulic-regime variants."
+  },
+  "decision_splits": [
+    "train",
+    "validation",
+    "calibration"
+  ],
+  "splits": {
+    "calibration": {
+      "count": 1000,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "145cf5e8-4302-5026-8c5b-e9c610f21007",
+          "43bc00b0-1b6d-5c05-a7f7-8682d1c3f0cc"
+        ],
+        [
+          "2a9f3923-ee00-5e33-877e-14d4606b87f8",
+          "ed046a14-3ae1-5a35-80c7-d7d0b36068f9"
+        ]
+      ],
+      "network_balance": {
+        "branched-loop": 333,
+        "golden-reference": 334,
+        "loop-grid": 333
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.467,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.424,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.17269642857142856
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1000,
+        "overall_positive_rate": 0.05166340619325638,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.048048049211502075,
+            0.054054055362939835,
+            0.054054055362939835,
+            0.036036036908626556,
+            0.057057056576013565,
+            0.06906907260417938,
+            0.07207207381725311,
+            0.0
+          ],
+          "golden-reference": [
+            0.08982036262750626,
+            0.08982036262750626,
+            0.10479041934013367,
+            0.08383233845233917,
+            0.0,
+            0.0
+          ],
+          "loop-grid": [
+            0.051051050424575806,
+            0.07207207381725311,
+            0.054054055362939835,
+            0.036036036908626556,
+            0.057057056576013565,
+            0.042042043060064316,
+            0.051051050424575806,
+            0.06606606394052505,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 130,
+          "1": 34,
+          "2": 34,
+          "3": 34,
+          "4": 33,
+          "5": 34,
+          "6": 34
+        },
+        "golden-reference": {
+          "0": 164,
+          "1": 68,
+          "2": 51,
+          "3": 51
+        },
+        "loop-grid": {
+          "0": 130,
+          "1": 34,
+          "2": 26,
+          "3": 26,
+          "4": 34,
+          "5": 33,
+          "6": 25,
+          "7": 25
+        }
+      },
+      "split": "calibration",
+      "target_class_histograms": {
+        "duration": {
+          "0": 523,
+          "1": 248,
+          "2": 229
+        },
+        "relative_strength": {
+          "0": 530,
+          "1": 245,
+          "2": 225
+        },
+        "source_node": {
+          "0": 424,
+          "1": 136,
+          "2": 111,
+          "3": 111,
+          "4": 67,
+          "5": 67,
+          "6": 59,
+          "7": 25
+        },
+        "start_time": {
+          "0": 463,
+          "1": 176,
+          "2": 188,
+          "3": 173
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "development_holdout": {
+      "count": 1750,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "039ca811-a5e0-5556-b246-f03ec568c770",
+          "b40c2abe-37dc-5bf4-b89e-31c8c034173e"
+        ],
+        [
+          "0c3b17e2-7d9d-5db4-b0dc-c32632035fb9",
+          "7a0e5fe4-f2eb-575b-bcf6-f7a9931ff278"
+        ],
+        [
+          "1125d1fc-55bb-53bd-b8e5-52d2addeafae",
+          "6655c0fd-bb19-50a2-a199-9230e77360aa"
+        ],
+        [
+          "2847a6d0-36ef-5e4b-bbc7-b2325a8e7b48",
+          "52e48bf1-5948-564c-a840-0321f84a95ab",
+          "c886114d-5168-560e-9814-5140fb2d2bd4"
+        ],
+        [
+          "388f9e8d-93fb-554a-9ac0-bc7709bec102",
+          "4a9871db-50d6-55fa-acdb-9b7e82e1a647"
+        ],
+        [
+          "48d05401-c1e7-5ed8-9ef2-5169bec8c31f",
+          "cb08bfe2-4d55-54e5-b4cc-5fcb63bbb590",
+          "f1a2c8fd-a73c-5812-9461-5c795b6c2230"
+        ],
+        [
+          "4a8360ff-46e8-5d28-96a4-7e5b9a0d93bf",
+          "f8f83c33-171e-5220-be8b-7368dde0ba2b"
+        ]
+      ],
+      "network_balance": {
+        "branched-loop": 583,
+        "golden-reference": 584,
+        "loop-grid": 583
+      },
+      "sanity_baselines": {
+        "note": "split 'development_holdout' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1750,
+        "overall_positive_rate": 0.04845322296023369,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.061749570071697235,
+            0.05488850921392441,
+            0.042881645262241364,
+            0.0531732402741909,
+            0.07375643402338028,
+            0.06518010050058365,
+            0.03945111483335495,
+            0.0
+          ],
+          "golden-reference": [
+            0.08219178020954132,
+            0.07876712083816528,
+            0.09075342118740082,
+            0.0976027399301529,
+            0.0,
+            0.0
+          ],
+          "loop-grid": [
+            0.04974270984530449,
+            0.051457975059747696,
+            0.04802744463086128,
+            0.05831903964281082,
+            0.042881645262241364,
+            0.051457975059747696,
+            0.03945111483335495,
+            0.032590050250291824,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 233,
+          "1": 59,
+          "2": 58,
+          "3": 58,
+          "4": 58,
+          "5": 58,
+          "6": 59
+        },
+        "golden-reference": {
+          "0": 291,
+          "1": 117,
+          "2": 88,
+          "3": 88
+        },
+        "loop-grid": {
+          "0": 232,
+          "1": 58,
+          "2": 44,
+          "3": 44,
+          "4": 59,
+          "5": 59,
+          "6": 44,
+          "7": 43
+        }
+      },
+      "split": "development_holdout",
+      "target_class_histograms": {
+        "duration": {
+          "0": 927,
+          "1": 384,
+          "2": 439
+        },
+        "relative_strength": {
+          "0": 907,
+          "1": 414,
+          "2": 429
+        },
+        "source_node": {
+          "0": 756,
+          "1": 234,
+          "2": 190,
+          "3": 190,
+          "4": 117,
+          "5": 117,
+          "6": 103,
+          "7": 43
+        },
+        "start_time": {
+          "0": 812,
+          "1": 303,
+          "2": 303,
+          "3": 332
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "ood-SEVERE_MISSINGNESS": {
+      "count": 400,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "sanity_baselines": {
+        "note": "split 'ood-SEVERE_MISSINGNESS' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 400,
+        "overall_positive_rate": 0.03849918395280838,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.04511278122663498,
+            0.03759398311376572,
+            0.09022556245326996,
+            0.030075188726186752,
+            0.015037594363093376,
+            0.05263157933950424,
+            0.05263157933950424,
+            0.0
+          ],
+          "golden-reference": [
+            0.05970149114727974,
+            0.08955223858356476,
+            0.0746268630027771,
+            0.03731343150138855,
+            0.0,
+            0.0
+          ],
+          "loop-grid": [
+            0.02255639061331749,
+            0.05263157933950424,
+            0.03759398311376572,
+            0.030075188726186752,
+            0.03759398311376572,
+            0.015037594363093376,
+            0.07518796622753143,
+            0.030075188726186752,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 49,
+          "1": 14,
+          "2": 14,
+          "3": 14,
+          "4": 14,
+          "5": 14,
+          "6": 14
+        },
+        "golden-reference": {
+          "0": 64,
+          "1": 28,
+          "2": 21,
+          "3": 21
+        },
+        "loop-grid": {
+          "0": 50,
+          "1": 14,
+          "2": 11,
+          "3": 11,
+          "4": 14,
+          "5": 13,
+          "6": 10,
+          "7": 10
+        }
+      },
+      "split": "ood-SEVERE_MISSINGNESS",
+      "target_class_histograms": {
+        "duration": {
+          "0": 202,
+          "1": 95,
+          "2": 103
+        },
+        "relative_strength": {
+          "0": 200,
+          "1": 110,
+          "2": 90
+        },
+        "source_node": {
+          "0": 163,
+          "1": 56,
+          "2": 46,
+          "3": 46,
+          "4": 28,
+          "5": 27,
+          "6": 24,
+          "7": 10
+        },
+        "start_time": {
+          "0": 181,
+          "1": 79,
+          "2": 77,
+          "3": 63
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "ood-UNSEEN_TOPOLOGY": {
+      "count": 400,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "3b6ba773-bd94-5610-9dea-dd8a3778aa74",
+          "bb46350d-fa2e-5538-be5d-0bd4198c5c80"
+        ]
+      ],
+      "network_balance": {
+        "coastal-branch": 400
+      },
+      "sanity_baselines": {
+        "note": "split 'ood-UNSEEN_TOPOLOGY' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 400,
+        "overall_positive_rate": 0.05218749865889549,
+        "per_node_positive_rate_by_network": {
+          "coastal-branch": [
+            0.0625,
+            0.042500000447034836,
+            0.07999999821186066,
+            0.08250000327825546,
+            0.07750000059604645,
+            0.07249999791383743,
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "coastal-branch": {
+          "0": 167,
+          "1": 47,
+          "2": 47,
+          "3": 47,
+          "4": 46,
+          "5": 46
+        }
+      },
+      "split": "ood-UNSEEN_TOPOLOGY",
+      "target_class_histograms": {
+        "duration": {
+          "0": 210,
+          "1": 94,
+          "2": 96
+        },
+        "relative_strength": {
+          "0": 223,
+          "1": 90,
+          "2": 87
+        },
+        "source_node": {
+          "0": 167,
+          "1": 47,
+          "2": 47,
+          "3": 47,
+          "4": 46,
+          "5": 46
+        },
+        "start_time": {
+          "0": 190,
+          "1": 78,
+          "2": 69,
+          "3": 63
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "train": {
+      "count": 9000,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "0071f333-5d9a-5830-b8b8-665a0b804365",
+          "128783e9-506d-57ea-b50a-b51863b0ea3d",
+          "140854fc-a151-5e13-b32c-a1737b6944d3",
+          "b719e76e-bfe1-5541-887b-44ffc1e50303",
+          "c6b4ded7-9879-500d-9a98-d7ba032894a0",
+          "eac0ef7c-69b6-57f4-96eb-aa1032c87a0e",
+          "fecd5934-9a8e-5f48-976d-444d91d8fe98"
+        ],
+        [
+          "02f6d8ad-babc-5524-bd18-9ea5ad801b4a",
+          "0516dcf1-6e93-5cf0-9648-4e25ca7a6fa6"
+        ],
+        [
+          "088edb53-1757-5c38-9424-05c20a00d51d",
+          "1cc7af8d-068a-598e-a544-06583aeb6716",
+          "32487c5e-9bbc-53e8-8308-af54c114063f",
+          "3ddedcea-d898-58ee-a4ca-8cf0021d3e71",
+          "72ecb89c-29d4-5223-ab9e-e8993dc9f2c1",
+          "73a78ef9-fcbe-54dd-b7ab-dec19d04051b",
+          "98c3a4e2-bdf4-5daa-88f2-86a5a902d057",
+          "9e261eea-f708-5160-a3fd-e9266356b9c7",
+          "cacab120-8fcd-534c-8a1c-e5d68dacff4b"
+        ],
+        [
+          "09d89dd7-054a-5e74-9deb-4cccf0978389",
+          "bfb04f81-81aa-596e-a53e-2a06bea4a4e0"
+        ],
+        [
+          "0a9df9b7-a8e3-5056-85d2-547b297169ce",
+          "0e10b28e-b79b-5680-a372-444100c044b7",
+          "298965a2-a410-5c6b-ab81-f6308cbe93d9",
+          "40998402-b6f4-5b26-bed9-687fa5d03d23",
+          "bfab1023-c89f-5c70-b88a-586204319fea",
+          "cd310c9a-f868-5491-a501-5ca370afddd2"
+        ],
+        [
+          "0b10501e-7ea1-56f2-b0c2-dac4dc8baa29",
+          "382fe534-6d0c-55fe-b91c-74ecf1769a49",
+          "7e796c47-f977-5e8d-9bbc-65e39057c1ac",
+          "ba2de2b2-61c6-5109-a415-9705d05770dc",
+          "db882a7e-a6d7-579d-9130-16bed0d03387"
+        ],
+        [
+          "0c80f034-0af2-5322-8264-c35f823e7cff",
+          "4424dbd2-0e8a-5ff2-838b-ede61151bc9e",
+          "5c0275d0-5adb-5052-81c8-3a48b8f59e96",
+          "5c6edabc-ec48-5fba-93a6-8092505d72b9",
+          "5e630b4a-7c07-58fd-8b1a-27e184928923",
+          "77e56358-794f-571e-9962-32f8018a6b56",
+          "a7d7fe62-5d48-5647-a0f5-798d1c8aaa58",
+          "c5686c9d-caa6-5597-abc0-ec7d3bd6487d",
+          "f9d8ccbb-c1e2-5fa6-8f85-4170a4811956",
+          "fc141675-ff2c-53af-b19b-f7a7bb092a00"
+        ],
+        [
+          "0f43bd67-b3e4-51c1-9608-11aaa332f48f",
+          "39475d32-1b34-58f0-a99c-d8106558e09f",
+          "4f88b175-7daa-524f-8bcb-8a2ac803fb91",
+          "514bfa73-d0df-53d3-a520-67904c15836c",
+          "782ea67f-8811-5ef5-bb75-3df24f22c7ac",
+          "b06d7752-3e8b-572e-885c-214fdbbbb130",
+          "ba4f0ce1-9040-5a6d-ac00-10231cd15956"
+        ],
+        [
+          "0fb7794f-76a9-5572-a718-2b7fd4b3984d",
+          "23d94c33-8a55-5e67-a7b0-7f66fdfc677c",
+          "2c3ba951-8a67-5707-a223-09d047dc031c",
+          "5e264d2b-f586-55b3-ac35-6b6e05aaf77b",
+          "88c292c1-1705-58a1-b8ad-beed38fc825f",
+          "b68b5559-ae10-5301-af8a-c9863abbaf18"
+        ],
+        [
+          "10a3ceaf-426a-570e-841f-63aa0b9b7140",
+          "3c7991e4-84af-5080-93d4-f0798190531a",
+          "4db3aa6c-2067-5419-8ab0-791ed881d80f",
+          "52942f72-a6dd-5673-b654-46a280af79f5",
+          "79bd347e-244b-56c8-8b71-5cb491d5ca75",
+          "a17ea359-9d2a-5194-afbe-3d2b9b464b11",
+          "c2749a17-1dde-59b4-b257-9852b75efb5c"
+        ],
+        [
+          "1221cc88-1500-5912-ae4e-e4b88a453e68",
+          "72a20240-6a9f-53a6-9d59-864f6e4fe7fb",
+          "e5f317e7-8b65-54a3-b898-c553357ea90d"
+        ],
+        [
+          "15175144-6aca-53d3-902d-1d5a1e9a190c",
+          "3b6fa74d-242d-53fa-8a81-6a9c7dd39afb",
+          "422d3b43-bb72-59be-bee1-77fd81dea72e",
+          "d5b01236-23d6-51e8-bb60-a8d7c3d45797",
+          "e8072d34-c5d3-560f-920b-3611f4b66c6e"
+        ],
+        [
+          "153719bd-4b31-5e3d-8f78-4036e789e5f8",
+          "58176713-11ee-5dee-8d98-cd86209bd4c4"
+        ],
+        [
+          "15e46cff-baf2-5147-bbf6-306af182a2cd",
+          "2a1b6075-df15-5e79-99a1-a69f0ffb0f85",
+          "96b8c91a-f27a-5801-be64-6ed3d6e0bb8a",
+          "b34b660b-3347-59ad-8521-aa63c8f166aa",
+          "c8ff9701-4fdd-5d6a-b6e8-ab794a310851",
+          "ccbcee85-43e3-5782-aa94-b5b10d35000e",
+          "d36368e4-153d-5a5b-9ba6-8e8e2dfb8e95",
+          "d5212a4b-c78d-52d1-abd1-42c5e80e0123"
+        ],
+        [
+          "17613728-2625-5386-ba3c-09fc9b4227f6",
+          "b1ec43d4-b62a-56e2-b6fd-07bac9fe112f"
+        ],
+        [
+          "17a917c2-7508-5ea9-a00b-227cd46075db",
+          "a7b0cb5b-2050-5168-823b-d48e5b097a60",
+          "f43f2627-cdeb-558e-9fe2-c65ff3d31054"
+        ],
+        [
+          "1a8c5971-415e-57aa-b860-4e3879675a2f",
+          "4e6d34b6-e7fc-596d-827a-a69d73386920",
+          "a9e42b56-79dd-5b91-af3e-e3447e502e34"
+        ],
+        [
+          "25286794-dfe6-5a64-a72d-234c927c9b18",
+          "d744a5b1-088e-534d-9983-fb79e078453f"
+        ],
+        [
+          "2bd0b92b-0156-5403-8f0d-de498ae429f3",
+          "ab71af24-737e-552e-84cb-19b182ed1fba"
+        ],
+        [
+          "2e00ef2f-40a3-50c6-86ac-a2237bb4a8a9",
+          "a3ae6f78-2aa3-559d-a783-a4f614e7cb7a",
+          "bd799cc0-becc-5597-9298-0dd660b55a2f"
+        ],
+        [
+          "33a985f3-caed-575b-ae7d-d23db071f861",
+          "368d973c-0200-5d82-9b28-b64e3d19328d"
+        ],
+        [
+          "3d0a0df0-e3d2-5710-bf01-a4be142a68d7",
+          "4acba372-587a-5a4d-9cfb-c031458b6b64"
+        ],
+        [
+          "430ec012-71a8-58ed-91dc-625ca54d9afa",
+          "5ead59cc-c3f6-5715-ab5a-579df3a5352b"
+        ],
+        [
+          "44d0577a-bb05-5e71-99d3-58e707ce9cbb",
+          "602bc5ff-863f-523d-b9af-c6cd09f7d98a"
+        ],
+        [
+          "477cab97-8a29-5a2a-a215-ed001e37f885",
+          "99ed832c-1177-5e23-a103-e17e4968302b"
+        ],
+        [
+          "482642ad-aebc-5dfc-9208-3ffae1442210",
+          "ddb3e21d-3861-52fb-8f88-8ffaedbca871"
+        ],
+        [
+          "4a8a7c7d-ae6e-5ef3-863d-5d001e7b840a",
+          "6f824402-3ee9-5031-aa5a-996198e41e6c"
+        ],
+        [
+          "4fe3386c-c5c2-50f1-ae51-b05b9e867c07",
+          "86acd01c-95bf-5d18-b005-2f83210c13d8",
+          "d51228a5-3c1d-5f17-bd9e-901335b14388"
+        ],
+        [
+          "53012bc6-0cda-5b76-b393-7e1af6d676db",
+          "c23c7da4-9ace-514a-93db-475bc2a99ca1"
+        ],
+        [
+          "5c05f324-bfb8-5581-94db-702860dc0063",
+          "5c4d849e-1e36-57e8-ab0e-779b1ac42331",
+          "c7cede59-6fca-5d20-b8a6-172829d69a71"
+        ],
+        [
+          "5e794dba-6f3e-515f-aa38-44ef62014d37",
+          "78d4aa38-48d9-5bc6-a7dd-1ccfe2983263",
+          "93023be1-064b-55ec-b697-77c01ed412fa",
+          "9fece112-bdc7-5923-872e-5c5166e71bb1",
+          "dff988c4-9a04-59ae-93e8-aa25b64bf126"
+        ],
+        [
+          "63091410-cd29-562c-bb12-5e41c194d408",
+          "abdc17f1-b135-5d6a-b442-3b0a566ede88",
+          "bf79a5bf-dff0-54f3-ba4d-3d694f7259d1"
+        ],
+        [
+          "652c90bf-c35f-5d05-b5eb-134f924d55fe",
+          "8432cf60-4bc0-5509-a995-789b77dcf6d5",
+          "8e4ff422-5023-56b9-a8fc-a54b28162d47",
+          "90b67e3f-5995-5363-8e8e-c1f70d6a64a9"
+        ],
+        [
+          "67aea622-2936-53df-bd05-0042a5391637",
+          "9d8f36d0-5877-5158-8665-afa0d99e4792",
+          "e1482be4-0850-5680-ae5b-9c0e797ceb19"
+        ],
+        [
+          "68a3e3e5-bfb8-56b3-9bc4-0fa976d8cefe",
+          "a57d36a9-a8a7-5570-8366-29e48d8fe2c5"
+        ],
+        [
+          "6eecdd09-bf6c-5c65-8d04-66558a26a3b1",
+          "7dc696a6-a3f0-5e37-93dc-b5bc3b40e4c8"
+        ],
+        [
+          "6ef5c535-460c-539b-894d-6c5397920649",
+          "c98a7278-1fda-5c56-b646-2255526e96bf"
+        ],
+        [
+          "75ee335a-3be6-5584-9ac0-5301d291570b",
+          "8e0162cc-12f0-597d-ad0b-f3c8178bf268",
+          "9089baad-a168-5672-8617-9ad8c2ea8d45",
+          "b040b1e4-ac0b-5d4f-a982-e346504ec305",
+          "f8083fa9-8235-59a5-86c3-830fe5070341"
+        ],
+        [
+          "7da05467-9e63-5525-b842-bedd498207bc",
+          "cf27a603-0cd2-5c1a-956c-e7795a178638"
+        ],
+        [
+          "86f259f8-48a7-53f1-92f7-c8314994a3af",
+          "c333fc74-ec58-5aa6-8a86-69025c45baf8"
+        ],
+        [
+          "9d15e8c9-da10-570f-b4a8-48390fb190f0",
+          "f2c7ff61-69bc-54e0-860f-92c120906815"
+        ],
+        [
+          "9e31f056-a292-55f3-993d-92256f66de8e",
+          "e9404d9e-1a2c-5c50-aced-aa2ad15fba6a"
+        ],
+        [
+          "f3409684-748e-51e3-81a5-005197919c8a",
+          "f7c28d10-e82a-5ff8-9ece-5f78b2674cc5"
+        ]
+      ],
+      "network_balance": {
+        "branched-loop": 3000,
+        "golden-reference": 3000,
+        "loop-grid": 3000
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.46266666666666667,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.43333333333333335,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.17261904761904762
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 9000,
+        "overall_positive_rate": 0.05201449245214462,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.05966666713356972,
+            0.0560000017285347,
+            0.059333331882953644,
+            0.06300000101327896,
+            0.05833333358168602,
+            0.04633333161473274,
+            0.0573333315551281,
+            0.0
+          ],
+          "golden-reference": [
+            0.09200000017881393,
+            0.10300000011920929,
+            0.09366666525602341,
+            0.09566666930913925,
+            0.0,
+            0.0
+          ],
+          "loop-grid": [
+            0.04833333194255829,
+            0.055666666477918625,
+            0.050333332270383835,
+            0.05433333292603493,
+            0.05133333429694176,
+            0.05299999937415123,
+            0.04766666516661644,
+            0.05133333429694176,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 1200,
+          "1": 300,
+          "2": 300,
+          "3": 300,
+          "4": 300,
+          "5": 300,
+          "6": 300
+        },
+        "golden-reference": {
+          "0": 1500,
+          "1": 600,
+          "2": 450,
+          "3": 450
+        },
+        "loop-grid": {
+          "0": 1200,
+          "1": 300,
+          "2": 225,
+          "3": 225,
+          "4": 300,
+          "5": 300,
+          "6": 225,
+          "7": 225
+        }
+      },
+      "split": "train",
+      "target_class_histograms": {
+        "duration": {
+          "0": 4765,
+          "1": 2138,
+          "2": 2097
+        },
+        "relative_strength": {
+          "0": 4849,
+          "1": 2061,
+          "2": 2090
+        },
+        "source_node": {
+          "0": 3900,
+          "1": 1200,
+          "2": 975,
+          "3": 975,
+          "4": 600,
+          "5": 600,
+          "6": 525,
+          "7": 225
+        },
+        "start_time": {
+          "0": 4278,
+          "1": 1597,
+          "2": 1553,
+          "3": 1572
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "validation": {
+      "count": 1000,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [
+        [
+          "01154100-714c-5ef4-950f-5fe2013a9596",
+          "6cc66950-1f54-5d56-9018-a356fc106315"
+        ],
+        [
+          "4a9e6016-f80c-5a4e-aa0b-f6b4b67075b9",
+          "96fdcba9-3211-5371-8f13-bf836e41f36c"
+        ],
+        [
+          "72017e0d-13f1-5064-95e6-c67ffc9c80a7",
+          "c4ded8d0-c8cf-57b9-a31e-2df31471af40"
+        ]
+      ],
+      "network_balance": {
+        "branched-loop": 333,
+        "golden-reference": 334,
+        "loop-grid": 333
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.445,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.424,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.17269642857142856
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1000,
+        "overall_positive_rate": 0.0506196990609169,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            0.051051050424575806,
+            0.051051050424575806,
+            0.051051050424575806,
+            0.06306306272745132,
+            0.057057056576013565,
+            0.03303303197026253,
+            0.06606606394052505,
+            0.0
+          ],
+          "golden-reference": [
+            0.10179640352725983,
+            0.11077844351530075,
+            0.08083832263946533,
+            0.08982036262750626,
+            0.0,
+            0.0
+          ],
+          "loop-grid": [
+            0.054054055362939835,
+            0.057057056576013565,
+            0.057057056576013565,
+            0.060060061514377594,
+            0.054054055362939835,
+            0.03903903812170029,
+            0.042042043060064316,
+            0.045045044273138046,
+            0.0
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 130,
+          "1": 34,
+          "2": 34,
+          "3": 34,
+          "4": 33,
+          "5": 34,
+          "6": 34
+        },
+        "golden-reference": {
+          "0": 164,
+          "1": 68,
+          "2": 51,
+          "3": 51
+        },
+        "loop-grid": {
+          "0": 130,
+          "1": 34,
+          "2": 26,
+          "3": 26,
+          "4": 34,
+          "5": 33,
+          "6": 25,
+          "7": 25
+        }
+      },
+      "split": "validation",
+      "target_class_histograms": {
+        "duration": {
+          "0": 515,
+          "1": 267,
+          "2": 218
+        },
+        "relative_strength": {
+          "0": 531,
+          "1": 249,
+          "2": 220
+        },
+        "source_node": {
+          "0": 424,
+          "1": 136,
+          "2": 111,
+          "3": 111,
+          "4": 67,
+          "5": 67,
+          "6": 59,
+          "7": 25
+        },
+        "start_time": {
+          "0": 468,
+          "1": 181,
+          "2": 166,
+          "3": 185
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    }
+  }
+}
