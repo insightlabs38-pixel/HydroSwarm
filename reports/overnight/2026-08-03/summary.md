@@ -7,8 +7,8 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `2067571` (Bundle C complete, except Task 3.2's interim treatment; still running)
-- Commits created: 33 (see `git log --oneline main..agent/gcp-multitopology-v3`)
+- Ending commit: `d0a0b42` (Bundle D complete; still running)
+- Commits created: 38 (see `git log --oneline main..agent/gcp-multitopology-v3`)
 - Working tree: clean at branch creation
 
 ## Completed tasks
@@ -22,8 +22,12 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
   against the real simulator/classical/planning/WNTR stack, OOD categories, trajectory serialization)
 - [x] Phase 3 / Bundle C (frontend live/demo data integrity, Tasks 3.1, 3.3(partial), 3.4(partial), 3.5,
   3.6, 3.7, 3.8 complete; Task 3.2 given a narrower interim treatment -- see Follow-up)
-- [ ] Phase 4 (Bundle D: configurable HydroCore) — next up
-- [ ] Cycle A
+- [x] Phase 4 / Bundle D (Tasks 4.0-4.6: architecture versioning + compatibility contract,
+  configurable classical-prior injection, source-conditioned incident pooling, dual hydraulic
+  message channels, event/next-step control heads, three auxiliary objectives, non-authoritative
+  plan consequence prescreening -- every new flag defaults to exactly reproducing the promoted
+  checkpoint's original behavior, verified after each task)
+- [ ] Cycle A — next up
 - [ ] Cycle B
 - [ ] S architecture screening
 - [ ] S finalist training
@@ -33,20 +37,20 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [ ] final selection
 - [ ] locked final test
 
-## Tests (current, after Bundle C)
+## Tests (current, after Bundle D)
 
 See `test-results.md` for full detail.
 
 | Command | Result | Notes |
 |---|---|---|
-| `pytest -q` | 270 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 172 new tests added across Bundle A + Bundle B (complete) |
+| `pytest -q` | 349 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 251 new tests added across Bundle A + Bundle B + Bundle D |
 | `ruff check src tests scripts` | pass | |
 | `pyright` | pass | |
 | `npm run lint` | pass | |
-| `npm run test -- --run` (vitest) | pass (24 tests, up from 4) | |
+| `npm run test -- --run` (vitest) | pass (24 tests, up from 4) | unchanged since Bundle C; Bundle D touched no frontend code |
 | `npm run build` | pass | |
 | `npx playwright test` (e2e) | pass (10 tests, up from 1) | real Chromium, includes 2 committed screenshot baselines |
-| HydroCore-S checkpoint load | pass | hash, feature-schema, and calibration all validate |
+| HydroCore-S checkpoint load | pass | hash, feature-schema, and calibration all validate; re-verified after every Task 4.x commit |
 
 ## Datasets generated
 
@@ -108,6 +112,23 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
   being actively contradicted by the frontend's validation/benchmark pages ("NOT RUN" /
   "no trained checkpoint included") -- likely stale copy left over from before the model was
   trained. Fixed with real, source-hash-verified numbers (Task 3.6).
+- Bundle D (Task 4.4 in particular) surfaced a real design constraint the plan implies but
+  doesn't spell out: Tasks 4.1-4.3 (prior_mode/incident_pooling/message_direction) could each
+  default to reproducing the promoted checkpoint's exact original behavior because each made
+  an *already-existing* pathway configurable. Task 4.4's event/next-step heads and Task 4.5's
+  auxiliary heads and Task 4.6's consequence proxies are net-new parameters with no prior
+  existence at all -- unconditional construction was tested and directly confirmed to break
+  `DefaultPipelineFactory().trained_assets_ready` (strict `load_state_dict` fails on missing
+  keys). All three were gated behind their own `*_heads: bool = False` flag instead, keeping
+  every Task 4.x flag's default exactly checkpoint-compatible; verified after every single
+  commit in Bundle D, not just at the end.
+- Auxiliary (Task 4.5) and consequence-prescreening (Task 4.6) label generation from real
+  corpus/PlanVerifier data, next_step's deterministic-controller-driven labels (Task 4.4),
+  inference-pipeline serialization of the new heads, and the ranking-quality evaluation
+  harness Task 4.6 calls for are all deliberately deferred to Phase 5/6/7 -- see follow-up.md.
+  The architecture/config/loss-wiring/checkpoint-compatibility work is complete and tested;
+  only the data/evaluation half of these three tasks remains, gated behind corpus generation
+  that hasn't started yet regardless.
 
 ## Remaining blockers
 
@@ -124,12 +145,12 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q   # expect 270 passed
+python -m pytest -q   # expect 349 passed
 cd frontend && npm run test -- --run   # expect 24 passed
 npx playwright test                     # expect 10 passed
 ```
 
-See `follow-up.md` for the specific next task (Bundle D: configurable HydroCore architecture,
+See `follow-up.md` for the specific next task (Phase 5 / Bundle E: Cycle A corpus generation,
 or completing Task 3.2's full backend contract).
 
 ## Every training job's status

@@ -87,4 +87,37 @@ chain-status text). New: `frontend/src/components/ModelGovernanceTable.tsx`,
 frontend tests (24 unit + 10 e2e, up from 4 unit + 1 e2e). No backend Python file changed in
 this bundle.
 
+## Bundle D (configurable HydroCore architecture, Tasks 4.0-4.6), commits 7a5492d..d0a0b42
+
+`src/hydroswarm/model/core.py`: `ARCHITECTURE_VERSION`, `architecture_config()`,
+`verify_architecture_compatibility()` (4.0); `prior_mode` (4.1); `incident_pooling` +
+`_attention_pool()` (4.2); `message_direction` threaded into the backbone (4.3);
+`event_control_heads` gating `event_presence_head`/`event_cause_head`/`next_step_head`
+(4.4); `auxiliary_heads` gating `sensor_reconstruction_head`/`future_concentration_head`/
+`travel_time_head` (4.5); `consequence_prescreening_heads` gating
+`consequence_proxy_heads` (5 proxies) (4.6). `HydroOutput` TypedDict grew a matching key
+per new output. `parameter_report()` updated to account for every conditionally-constructed
+head. `src/hydroswarm/model/layers.py`: `EdgeAwareGraphConv._aggregate(reverse=...)`
+refactor, new `DualChannelGraphConv` (4.3). `src/hydroswarm/model/__init__.py`: exports for
+`MessageDirection`/`MESSAGE_DIRECTIONS`/`DualChannelGraphConv`.
+`src/hydroswarm/training/targets_v2.py`: registered `sensor_reconstruction`/
+`future_concentration`/`travel_time` under a new `"auxiliary"` category (4.5), and
+`exposure_proxy`/`pressure_risk_proxy`/`service_loss_proxy`/`containment_time_proxy`/
+`plan_regret_proxy` under `"strategist"` (4.6). `src/hydroswarm/training/losses.py`:
+wired `event_cause`/`event_presence` (4.4), renamed the pre-existing unused
+`reconstruction`/`reconstruction_prediction` placeholder to
+`sensor_reconstruction`/`sensor_reconstruction_prediction` and confirmed
+`future_concentration`/`travel_time` already matched (4.5), added the five `*_proxy`
+regressions (4.6); added `AUXILIARY_TASKS`/`AUXILIARY_TASK_DEFAULT_WEIGHT` and the reduced
+default-weight logic in `compute_multitask_loss()` (4.5). New test files:
+`tests/unit/test_prior_mode.py` (11), `tests/unit/test_incident_pooling.py` (17),
+`tests/unit/test_message_direction.py` (15), `tests/unit/test_event_control_heads.py` (12),
+`tests/unit/test_auxiliary_heads.py` (12), `tests/unit/test_consequence_prescreening.py`
+(11); small additions to `tests/unit/test_targets_v2.py` and `tests/unit/test_training.py`
+for the new governed categories/tasks. 79 new/changed tests total. No file under
+`data/learning-v1/`, `models/`, or any historical `reports/results/*.json` was modified; the
+promoted checkpoint's loadability under `DefaultPipelineFactory` was re-verified after every
+single commit in this bundle, not just once at the end. No frontend file changed in this
+bundle.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

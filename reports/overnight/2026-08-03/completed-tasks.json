@@ -162,6 +162,42 @@
       "title": "Safe failure-injection demonstrations",
       "commit": "2067571",
       "summary": "?failure=<category> query parameter covering all nine plan-specified categories (missing_checkpoint, corrupt_checkpoint_hash, incompatible_feature_schema, corrupt_calibration, unknown_topology, wntr_timeout, incomplete_simulator_output, severe_sensor_dropout, no_valid_plan). Each renders ERROR mode with the exact, distinct reason named, never a false LIVE/VERIFIED state. 12 new unit tests plus one real-browser Playwright test. This completes Bundle C except Task 3.2 (full backend `/incidents/{id}/view` contract), which received a narrower interim treatment (fetchIncident documents and throws on exactly the fields it can't yet provide, rather than a full new endpoint) -- see follow-up.md."
+    },
+    {
+      "task": "4.0 + 4.1",
+      "title": "Architecture versioning and configurable classical-prior injection",
+      "commit": "7a5492d",
+      "summary": "Added ARCHITECTURE_VERSION, architecture_config(), verify_architecture_compatibility() (Task 4.0's explicit compatibility contract). Made the two previously-unconditional classical-prior injection paths (hidden-state feature, direct log-prior term on source logits) configurable via prior_mode (none/feature_only/logit_only/feature_and_logit, default reproduces the old behavior exactly). Both parameters exist regardless of mode -- zero checkpoint tensor shape change -- so the promoted HydroCore-S checkpoint reloads byte-identically; verify_architecture_compatibility() catches a prior_mode mismatch load_state_dict's shape check alone would miss. 11 new tests."
+    },
+    {
+      "task": "4.2",
+      "title": "Source-conditioned incident pooling",
+      "commit": "0bddd71",
+      "summary": "Made the incident-level heads' pooling (timing/duration/strength/evidence-sufficiency/uncertainty/OOD) configurable via incident_pooling (mean/latent/attention/source_conditioned, default \"mean\" exactly reproduces the prior masked-mean pool). attention/source_conditioned modes add new incident_query/incident_attention/incident_context_projection parameters only when selected -- default stays checkpoint-compatible. 17 new tests including permutation equivariance across all four modes."
+    },
+    {
+      "task": "4.3",
+      "title": "Dual hydraulic message channels",
+      "commit": "6c2d712",
+      "summary": "message_direction (forward_only/dual_gated, default \"forward_only\" exactly reproduces the original single-direction convolution). dual_gated adds a separately-parameterized upstream-diagnostic channel over the reversed edge direction (EdgeAwareGraphConv._aggregate(reverse=True), reusing the same edge features with source/target swapped rather than a separate reversed-edge-feature set), fused with a learned sigmoid gate (new DualChannelGraphConv). 15 new tests, including a direct proof the gate reduces exactly to the downstream-only update when driven to saturate, and permutation equivariance for both modes."
+    },
+    {
+      "task": "4.4",
+      "title": "Event classification and next-step advisory heads",
+      "commit": "f4974b8",
+      "summary": "Added event_presence_logits/event_cause_logits/next_step_logits, gated behind event_control_heads: bool = False (departs from 4.1-4.3's pattern since these are net-new parameters, not an existing pathway made configurable -- unconditional construction was tested and confirmed to break the promoted checkpoint's strict load, so it was gated instead). Wired event_cause (cross-entropy) and event_presence (binary cross-entropy) losses into compute_multitask_loss since corpus.py already emits those labels; next_step has no label generator yet. Deferred: inference-pipeline serialization and evaluation metrics, meaningful only once a trained event_control_heads=True variant exists. 12 new tests."
+    },
+    {
+      "task": "4.5",
+      "title": "Three configuration-controlled auxiliary objectives",
+      "commit": "6474a69",
+      "summary": "Added masked sensor reconstruction, future concentration prediction, and travel-time prediction -- exactly the three the plan specifies, gated behind auxiliary_heads: bool = False (same net-new-parameter rationale as 4.4). Registered all three as governed targets_v2 targets under a new \"auxiliary\" category. Added AUXILIARY_TASK_DEFAULT_WEIGHT=0.1 applied by compute_multitask_loss by default (task_weights still overrides) so these auxiliary objectives don't compete on equal footing with primary heads by default, per \"loss weights are explicit.\" Actual label generation deferred to Phase 5. 12 new tests."
+    },
+    {
+      "task": "4.6",
+      "title": "Non-authoritative plan consequence prescreening (Bundle D complete)",
+      "commit": "d0a0b42",
+      "summary": "Added five *_proxy heads (exposure/pressure_risk/service_loss/containment_time/plan_regret) applied to the per-plan-query representation, gated behind consequence_prescreening_heads: bool = False. Registered as governed \"strategist\" targets alongside plan_value/consequence_vector/plan_validity, each explicitly documented non-authoritative and never replacing PlanVerifier's exact WNTR simulation. Wired into compute_multitask_loss (output name equals target name, same convention as plan_value). Deferred: label generation from real PlanVerifier output at corpus scale, and the ranking-quality/simulator-call-reduction evaluation harness Task 4.6 calls for -- both are Phase 5/6/7 work. 11 new tests. This completes Bundle D (Tasks 4.0-4.6): every new architecture flag verified to leave the promoted HydroCore-S checkpoint loadable at its default value; 349 backend tests, ruff clean, pyright clean."
     }
   ]
 }

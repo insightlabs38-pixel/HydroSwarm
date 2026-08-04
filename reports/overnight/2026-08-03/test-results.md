@@ -49,3 +49,13 @@ of Phase 9.
 | `npm run build` (frontend) | **Pass** | |
 | `npx playwright test` (frontend, e2e, real Chromium) | **Pass** | 10 tests, up from 1 -- run and verified in this session (browsers were pre-cached at `~/.cache/ms-playwright`); 2 real screenshot baselines committed under `frontend/tests/e2e/visual-regression.spec.ts-snapshots/` |
 | HydroCore-S checkpoint load | **Pass** | re-verified unchanged: same hash, feature-schema, calibration |
+
+## Update after Bundle D (commit `d0a0b42`)
+
+| Command | Result | Notes |
+|---|---|---|
+| `python -m pytest -q` | **349 passed** | up from 270 after Bundle C (79 new tests across Tasks 4.0-4.6: 11 prior_mode + 17 incident_pooling + 15 message_direction + 12 event_control_heads + 12 auxiliary_heads + 11 consequence_prescreening + minor updates to pre-existing targets_v2/losses tests for the new governed categories/tasks) |
+| `python -m ruff check src tests scripts` | **Pass** | |
+| `python -m pyright` | **Pass** | |
+| `npm run lint` / `npm run test -- --run` / `npm run build` / `npx playwright test` (frontend) | **unchanged** | Bundle D touched no frontend code; not re-run this update, no reason to expect a change |
+| HydroCore-S checkpoint load | **Pass** | re-verified after *every* Task 4.x commit (7a5492d, 0bddd71, 6c2d712, f4974b8, 6474a69, d0a0b42), not just once at the end -- each new architecture flag's default value leaves `DefaultPipelineFactory().trained_assets_ready` True with the same hash/schema/calibration match |
