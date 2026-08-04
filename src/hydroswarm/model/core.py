@@ -651,7 +651,7 @@ class HydroCore(nn.Module):
             relative_strength_logits=self._profile_logits(
                 self.profile_heads["relative_strength"], incident_context, 3
             ),
-            evidence_sufficiency=self.evidence_head(incident_context),
+            evidence_sufficiency=self.evidence_head(incident_context).squeeze(-1),
             sensor_fault_logits=self.sensor_fault_head(sentinel_nodes).squeeze(-1),
             sample_node_logits=self.sample_node_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
             expected_information_gain=self.information_gain_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, 0.0),

@@ -27,3 +27,4 @@ data/learning-v2/**/scenarios/**/*.parquet
 data/learning-v2/**/tensors/**/*.safetensors
 models/checkpoints/
 experiments/runs/
+experiments/registry/*.lock

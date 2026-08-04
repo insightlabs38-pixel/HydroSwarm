@@ -87,6 +87,7 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "sensor_fault_logits": torch.zeros(1, 2, requires_grad=True),
         "residual_prediction": torch.zeros(1, 2, requires_grad=True),
         "sensor_reconstruction_prediction": torch.ones(1, 2, requires_grad=True),
+        "evidence_sufficiency": torch.tensor([0.7], requires_grad=True),
     }
     targets = {
         "source_node": torch.tensor([0]),
@@ -100,6 +101,7 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "sensor_fault": torch.zeros(1, 2),
         "residual": torch.ones(1, 2),
         "sensor_reconstruction": torch.zeros(1, 2),
+        "evidence_sufficiency": torch.tensor([1.0]),
     }
     result = compute_multitask_loss(
         outputs,
@@ -110,6 +112,48 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
     assert set(result.tasks) == set(targets)
     assert torch.isfinite(result.total)
     result.total.backward()
+
+
+def test_evidence_sufficiency_head_output_shape_matches_its_scalar_per_example_target() -> None:
+    # Regression: HydroCore.evidence_head ends in nn.Linear(d_model, 1)
+    # and its output was never squeezed, unlike event_presence_logits'
+    # identical squeeze(-1) for the same "one boolean per incident" shape
+    # -- so forward() returned [batch, 1] while corpus.py's real
+    # evidence_sufficiency target (and hence the collated batch target)
+    # is [batch]. F.binary_cross_entropy raises ValueError on that shape
+    # mismatch; this was never caught because no prior test exercised the
+    # real model's output against a real-shaped target together, only
+    # synthetic already-matching-shape fixtures on one side or the other.
+    from hydroswarm.model import HydroCore
+
+    model = HydroCore(
+        node_feature_dim=3,
+        temporal_feature_dim=2,
+        quality_feature_dim=2,
+        d_model=32,
+        nhead=4,
+        dim_feedforward=64,
+        num_layers=1,
+        modality_layers=1,
+        adapter_dims=(32, 32, 32),
+        dropout=0.0,
+    ).eval()
+    batch = {
+        "node_features": torch.randn(2, 4, 3),
+        "temporal_features": torch.randn(2, 3, 4, 2),
+        "quality_features": torch.randn(2, 3, 4, 2),
+        "source_candidate_mask": torch.ones(2, 4, dtype=torch.bool),
+    }
+    with torch.no_grad():
+        output = model(batch)
+    assert output["evidence_sufficiency"].shape == (2,)
+
+    target = torch.tensor([True, False])
+    loss = compute_multitask_loss(
+        {"evidence_sufficiency": output["evidence_sufficiency"]},
+        {"evidence_sufficiency": target},
+    )  # must not raise
+    assert torch.isfinite(loss.total)
 
 
 def test_target_mask_companion_excludes_placeholder_labels_from_the_loss() -> None:

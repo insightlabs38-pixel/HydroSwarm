@@ -1,0 +1,160 @@
+{
+  "corpus": "data/learning-v2/cycle-a",
+  "failures": {},
+  "results": {
+    "E0": {
+      "checkpoint_reload_ok": true,
+      "experiment": "E0",
+      "first_pass_best_validation_loss": 5.581747191292899,
+      "first_pass_epochs": 2,
+      "gradient_norms": {
+        "duration": 23.998486641976054,
+        "evidence_sufficiency": 15.657614024015446,
+        "relative_strength": 14.522836246450835,
+        "sensor_fault": 10.776804350990277,
+        "source_node": 2.054135010772926,
+        "source_region": 9.12392245818051,
+        "start_time": 18.341792460399954
+      },
+      "overrides": {},
+      "resume_ok": true,
+      "resumed_best_validation_loss": 5.321364879608154,
+      "resumed_epochs": 3,
+      "resumed_global_steps": 30,
+      "run_id": "20260804T185412Z-d5040873",
+      "wall_seconds": 23.734881588999997
+    },
+    "E3": {
+      "checkpoint_reload_ok": true,
+      "experiment": "E3",
+      "first_pass_best_validation_loss": 5.253490516117641,
+      "first_pass_epochs": 2,
+      "gradient_norms": {
+        "duration": 4.350319299008883,
+        "evidence_sufficiency": 31.008222388128008,
+        "relative_strength": 7.487861818590185,
+        "sensor_fault": 16.70372719744543,
+        "source_node": 3.086385794243645,
+        "source_region": 6.498953927448338,
+        "start_time": 19.0672076163515
+      },
+      "overrides": {
+        "incident_pooling": "source_conditioned"
+      },
+      "resume_ok": true,
+      "resumed_best_validation_loss": 4.949300834110805,
+      "resumed_epochs": 3,
+      "resumed_global_steps": 30,
+      "run_id": "20260804T185435Z-6f3d9552",
+      "wall_seconds": 22.046921830005886
+    },
+    "E4": {
+      "checkpoint_reload_ok": true,
+      "experiment": "E4",
+      "first_pass_best_validation_loss": 5.729480470929827,
+      "first_pass_epochs": 2,
+      "gradient_norms": {
+        "duration": 13.264687148531479,
+        "evidence_sufficiency": 29.37787441266766,
+        "relative_strength": 7.394270784587789,
+        "sensor_fault": 6.672538302391258,
+        "source_node": 2.6959572406376173,
+        "source_region": 6.612361994919394,
+        "start_time": 18.1219454072317
+      },
+      "overrides": {
+        "message_direction": "dual_gated"
+      },
+      "resume_ok": true,
+      "resumed_best_validation_loss": 5.169978550502232,
+      "resumed_epochs": 3,
+      "resumed_global_steps": 30,
+      "run_id": "20260804T185458Z-eedf2666",
+      "wall_seconds": 25.693521433997375
+    },
+    "E9-feature_only": {
+      "checkpoint_reload_ok": true,
+      "experiment": "E9-feature_only",
+      "first_pass_best_validation_loss": 5.760650907244001,
+      "first_pass_epochs": 2,
+      "gradient_norms": {
+        "duration": 9.5276355856498,
+        "evidence_sufficiency": 15.64373997318789,
+        "relative_strength": 5.975323322963358,
+        "sensor_fault": 16.192084544862603,
+        "source_node": 4.760619942912945,
+        "source_region": 6.38137663543421,
+        "start_time": 6.852213431212664
+      },
+      "overrides": {
+        "prior_mode": "feature_only"
+      },
+      "resume_ok": true,
+      "resumed_best_validation_loss": 4.847432681492397,
+      "resumed_epochs": 3,
+      "resumed_global_steps": 30,
+      "run_id": "20260804T185546Z-77b59d2c",
+      "wall_seconds": 22.749598587004584
+    },
+    "E9-logit_only": {
+      "checkpoint_reload_ok": true,
+      "experiment": "E9-logit_only",
+      "first_pass_best_validation_loss": 5.511929035186768,
+      "first_pass_epochs": 2,
+      "gradient_norms": {
+        "duration": 10.997653846550937,
+        "evidence_sufficiency": 20.24782228865622,
+        "relative_strength": 7.764434200102047,
+        "sensor_fault": 18.983705589936427,
+        "source_node": 2.3233912165411033,
+        "source_region": 7.045594747247089,
+        "start_time": 10.007390435891523
+      },
+      "overrides": {
+        "prior_mode": "logit_only"
+      },
+      "resume_ok": true,
+      "resumed_best_validation_loss": 5.247262954711914,
+      "resumed_epochs": 3,
+      "resumed_global_steps": 30,
+      "run_id": "20260804T185608Z-5d77d169",
+      "wall_seconds": 22.3007537759986
+    },
+    "E9-none": {
+      "checkpoint_reload_ok": true,
+      "experiment": "E9-none",
+      "first_pass_best_validation_loss": 6.3409978321620395,
+      "first_pass_epochs": 2,
+      "gradient_norms": {
+        "duration": 4.639761292567567,
+        "evidence_sufficiency": 28.35836116918234,
+        "relative_strength": 3.5531038823603347,
+        "sensor_fault": 20.149664453721787,
+        "source_node": 4.2325824304481605,
+        "source_region": 10.50122006773934,
+        "start_time": 16.20711189004421
+      },
+      "overrides": {
+        "prior_mode": "none"
+      },
+      "resume_ok": true,
+      "resumed_best_validation_loss": 5.377847943987165,
+      "resumed_epochs": 3,
+      "resumed_global_steps": 30,
+      "run_id": "20260804T185523Z-c5c147a6",
+      "wall_seconds": 22.485026823000226
+    }
+  },
+  "schema_version": 1,
+  "seed": 20260804,
+  "stage": "Bundle E Stage 1 -- smoke and failure screening",
+  "stop_gate": {
+    "all_jobs_reproducible": true,
+    "labels_receive_gradients": true,
+    "no_nans": true,
+    "passed": true
+  },
+  "train_subset": 200,
+  "validation_subset": 50,
+  "wall_seconds": 139.043126579003
+}
