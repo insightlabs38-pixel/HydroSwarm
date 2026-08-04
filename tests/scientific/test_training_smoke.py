@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import signal
 from pathlib import Path
 
 import torch
@@ -130,3 +132,33 @@ def test_runtime_budget_exports_best_completed_epoch(tmp_path: Path, monkeypatch
     status = json.loads((Path(summary.run_directory) / "status.json").read_text())
     assert status["state"] == "COMPLETED"
     assert status["stop_reason"] == "runtime_budget"
+
+
+def test_sigterm_stops_cleanly_and_saves_a_resumable_checkpoint(tmp_path: Path) -> None:
+    trainer = Trainer(
+        _tiny_model(),
+        _dataset(),
+        config=_config(5),
+        run_root=tmp_path / "sigterm-runs",
+        workdir=tmp_path,
+    )
+    trainer.install_signal_handlers()
+    original = trainer._train_epoch
+    calls = 0
+
+    def epoch_that_receives_sigterm(dataset, *, epoch: int, started: float) -> float:
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            os.kill(os.getpid(), signal.SIGTERM)
+        return original(dataset, epoch=epoch, started=started)
+
+    trainer._train_epoch = epoch_that_receives_sigterm
+    summary = trainer.fit()
+
+    assert trainer._shutdown_requested is True
+    assert summary.stop_reason == "runtime_budget"
+    assert summary.epochs_completed == 1
+    assert Path(summary.export_path).is_file()
+    status = json.loads((Path(summary.run_directory) / "status.json").read_text())
+    assert status["state"] == "COMPLETED"

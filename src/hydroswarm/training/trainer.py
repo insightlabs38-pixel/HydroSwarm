@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass
 import math
 from pathlib import Path
 import random
+import signal
 import time
 import traceback
 from typing import Mapping
@@ -112,6 +113,24 @@ class Trainer:
         ) * config.epochs
         self.scheduler = _scheduler(self.optimizer, config, max(optimizer_steps, 1))
         self.global_step = 0
+        self._shutdown_requested = False
+
+    def install_signal_handlers(self) -> None:
+        """Opt-in graceful-shutdown support for long unattended jobs (Task 0.3).
+
+        A SIGTERM (e.g. from a job supervisor or `systemctl stop`) sets a flag
+        that is observed at the same point the runtime budget is checked, so
+        the run stops after the current batch, saves a resumable checkpoint,
+        and exits through the ordinary `stop_reason="runtime_budget"` path
+        instead of being killed mid-write. Must be called from the main
+        thread; not installed automatically so tests and multi-Trainer
+        processes are unaffected unless they opt in.
+        """
+        signal.signal(signal.SIGTERM, self._handle_signal)
+
+    def _handle_signal(self, signum: int, frame: object) -> None:
+        del signum, frame
+        self._shutdown_requested = True
 
     def _loader(
         self, dataset: GovernedScenarioDataset, *, epoch: int, shuffle: bool
@@ -179,6 +198,8 @@ class Trainer:
         for batch_index, (inputs, targets) in enumerate(loader):
             if time.monotonic() - started > self.config.maximum_runtime_seconds:
                 raise TimeoutError("maximum training runtime exceeded")
+            if self._shutdown_requested:
+                raise TimeoutError("graceful shutdown requested via SIGTERM")
             self.artifacts.check_disk(self.config.minimum_free_disk_gb)
             output = self.model(self._to_cpu_float(inputs))
             result = compute_multitask_loss(
