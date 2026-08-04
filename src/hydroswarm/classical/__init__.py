@@ -43,6 +43,7 @@ from .signatures import (
     classify_trace_residual,
     localize_with_signatures,
 )
+from .signature_registry import SignatureRegistry, SignatureRegistryEntry, SignatureRegistryError
 
 __all__ = [
     "AbstentionMetrics",
@@ -65,6 +66,9 @@ __all__ = [
     "SignatureBuilder",
     "SignatureCache",
     "SignatureCacheKey",
+    "SignatureRegistry",
+    "SignatureRegistryEntry",
+    "SignatureRegistryError",
     "SourceHypothesis",
     "StateResidualReport",
     "ValueRange",
