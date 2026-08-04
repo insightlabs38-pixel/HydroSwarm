@@ -35,7 +35,8 @@ from hydroswarm.explanation import (
     explain,
 )
 from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController
-from hydroswarm.inference import IncidentAnalysisResult
+from hydroswarm.calibration.conformal import CALIBRATION_SCHEMA_VERSION
+from hydroswarm.inference import MODEL_VERSION, IncidentAnalysisResult
 from hydroswarm.preprocessing import SensorSeries
 from hydroswarm.storage import AuditEvent
 from hydroswarm.networks import MAX_INP_BYTES, NetworkImportError, NetworkImporter
@@ -48,14 +49,23 @@ from .state import (
     ApiSettings,
     ApprovalReceipt,
     ApprovalRequest,
+    EvidenceHistoryEntryView,
+    ExplanationPayload,
     IncidentExport,
     IncidentRuntime,
+    IncidentView,
+    NetworkLinkView,
+    NetworkNodeView,
     NetworkRecord,
     NetworkValidationRequest,
     PlanGenerationRequest,
+    PlanView,
+    ProvenanceView,
     ReplayResponse,
     RuntimeState,
     SampleRecommendation,
+    SampleRecommendationView,
+    SensorHealthView,
     ServiceStatus,
     Verifier,
     demo_candidates,
@@ -721,6 +731,183 @@ def create_app(
             abstention_reason=", ".join(record.fallback_reasons) or None,
             supporting_sensors=tuple(item.sensor_id for item in record.state.observations if not item.missing),
             removed_candidates={node: "new evidence reduced calibrated region" for node in before_after.removed_candidates} if before_after else None,
+        )
+
+    @app.get("/api/incidents/{incident_id}/view", response_model=IncidentView)
+    def get_incident_view(incident_id: UUID) -> IncidentView:
+        record = incident_or_404(incident_id)
+        analysis = record.analysis
+        if not isinstance(analysis, IncidentAnalysisResult):
+            # DEMO_FALLBACK / not-yet-analyzed states have no verified
+            # provenance (model/calibration hashes, sensor-grounded node
+            # topology) to report; a complete IncidentView must never be
+            # backed by unverified demo content (overnight-plan.txt Task 3.2).
+            raise HTTPException(
+                status_code=409,
+                detail=(
+                    "incident view requires a completed hybrid analysis "
+                    "(FULL_HYBRID or CLASSICAL_SAFE); analyze the incident with "
+                    "the hybrid pipeline configured before requesting /view"
+                ),
+            )
+        network = runtime().networks.get(record.state.network_id)
+        if network is None or "nodes" not in network.metadata or "links" not in network.metadata:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "network topology metadata is incomplete for a live incident "
+                    "view; import the network via /api/networks/import rather than "
+                    "manual /validate"
+                ),
+            )
+
+        candidate_nodes = set(analysis.conformal_candidate_nodes)
+        latest_observation: dict[str, SensorObservation] = {}
+        for item in record.state.observations:
+            current = latest_observation.get(item.node_id)
+            if current is None or item.observed_at >= current.observed_at:
+                latest_observation[item.node_id] = item
+
+        nodes = tuple(
+            NetworkNodeView(
+                node_id=entry["node_id"],
+                node_type=entry["node_type"],
+                elevation_m=entry["elevation_m"],
+                coordinates=tuple(entry["coordinates"][:2]) if len(entry["coordinates"]) >= 2 else (0.0, 0.0),
+                probability=analysis.fused_belief.get(entry["node_id"], 0.0),
+                concentration_mg_l=(
+                    latest_observation[entry["node_id"]].concentration_mg_l
+                    if entry["node_id"] in latest_observation
+                    else None
+                ),
+                candidate=entry["node_id"] in candidate_nodes,
+            )
+            for entry in network.metadata["nodes"]
+        )
+        links = tuple(
+            NetworkLinkView(
+                link_id=entry["link_id"],
+                link_type=entry["link_type"],
+                start_node=entry["start_node"],
+                end_node=entry["end_node"],
+            )
+            for entry in network.metadata["links"]
+        )
+        sensor_health = tuple(
+            SensorHealthView(
+                sensor_id=observation.sensor_id,
+                node_id=observation.node_id,
+                health=(
+                    "MISSING" if observation.missing
+                    else "DRIFT" if (observation.drift_flag or observation.frozen_flag)
+                    else "HEALTHY"
+                ),
+                quality=observation.quality,
+                observed_at=observation.observed_at,
+                received_at=observation.received_at,
+                pressure_m=observation.pressure_m,
+                concentration_mg_l=observation.concentration_mg_l,
+            )
+            for observation in latest_observation.values()
+        )
+
+        sample_recommendation: SampleRecommendationView | None = None
+        sampled = analysis.sample_result
+        if sampled is not None and not sampled.stop and sampled.recommended_node is not None:
+            selected = next(
+                (item for item in sampled.ranked if item.node_id == sampled.recommended_node), None
+            )
+            if selected is not None:
+                sample_recommendation = SampleRecommendationView(
+                    node_id=sampled.recommended_node,
+                    expected_information_gain=selected.expected_information_gain_bits,
+                    alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
+                )
+
+        evidence_history = tuple(
+            EvidenceHistoryEntryView(
+                round_index=snapshot.round_index,
+                observation_count=snapshot.observation_count,
+                valid_concentration_count=snapshot.valid_concentration_count,
+                sensor_nodes=snapshot.sensor_nodes,
+                evidence_hash=snapshot.evidence_hash,
+            )
+            for snapshot in analysis.evidence_history
+        )
+
+        plans = tuple(
+            PlanView(plan=plan, verification=record.verifications.get(plan.plan_id))
+            for plan in record.plans.values()
+        )
+        audit_events = tuple(runtime().ledger.events(incident_id))
+        # "Selected" means an operator actually approved it -- the audit
+        # ledger's PLAN_APPROVED payload is the sole authoritative record of
+        # which plan_id that was; a VERIFIED decision alone only means a
+        # candidate is eligible for approval, not that it was chosen.
+        selected_plan_id = next(
+            (
+                UUID(str(event.payload["plan_id"]))
+                for event in reversed(audit_events)
+                if event.event_type == "PLAN_APPROVED"
+            ),
+            None,
+        )
+        recommended_plan_id = (
+            analysis.plan_proposals[0].plan.plan_id if analysis.plan_proposals else None
+        )
+        counterfactual_consequences = {
+            str(plan_id): item.consequences
+            for plan_id, item in record.verifications.items()
+            if item.consequences is not None
+        }
+
+        bundle = evidence_bundle(record)
+        explanations = []
+        for intent in ExplanationIntent:
+            grounded = explain(intent, bundle)
+            explanations.append(ExplanationPayload(
+                intent=intent.value,
+                text=grounded.text,
+                facts=dict(grounded.facts),
+                limitations=grounded.limitations,
+            ))
+        explanations = tuple(explanations)
+
+        latest_verification = next(reversed(record.verifications.values()), None)
+        provenance = ProvenanceView(
+            network_hash=analysis.provenance_hashes.get("network", ""),
+            feature_schema_hash=analysis.provenance_hashes.get("feature_schema", ""),
+            model_version=MODEL_VERSION,
+            model_checkpoint_hash=analysis.provenance_hashes.get("model", ""),
+            calibration_version=CALIBRATION_SCHEMA_VERSION,
+            calibration_hash=analysis.provenance_hashes.get("calibration", "none"),
+            simulator=latest_verification.simulator if latest_verification else None,
+            simulator_version=latest_verification.simulator_version if latest_verification else None,
+        )
+
+        return IncidentView(
+            incident_id=record.state.incident_id,
+            network_id=record.state.network_id,
+            runtime_mode=analysis.runtime_mode.value,
+            controller_state=record.state.status,
+            generated_at=utc_now(),
+            provenance=provenance,
+            candidates=record.state.candidates,
+            disagreement_js=analysis.fusion_diagnostics.disagreement_js if analysis.fusion_diagnostics else None,
+            ood_level=analysis.ood_level.value,
+            calibration_alpha=analysis.calibration_alpha,
+            nodes=nodes,
+            links=links,
+            sensor_health=sensor_health,
+            sample_recommendation=sample_recommendation,
+            evidence_history=evidence_history,
+            plans=plans,
+            selected_plan_id=selected_plan_id,
+            recommended_plan_id=recommended_plan_id,
+            counterfactual_consequences=counterfactual_consequences,
+            explanations=explanations,
+            audit_events=audit_events,
+            runtime_metrics_ms=dict(analysis.latencies_ms),
         )
 
     @app.post("/api/incidents/{incident_id}/workflow")

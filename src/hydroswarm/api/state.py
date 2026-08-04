@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from hydroswarm.domain import (
     CandidateSet,
+    ConsequenceMetrics,
     IncidentCreate,
     IncidentState,
     OperationalPlan,
@@ -123,6 +124,113 @@ class AnalysisResponse(ApiModel):
     posterior_history: tuple[dict[str, Any], ...]
     provenance_hashes: dict[str, str]
     latencies_ms: dict[str, float]
+
+
+class NetworkNodeView(ApiModel):
+    node_id: str
+    node_type: str
+    elevation_m: float
+    coordinates: tuple[float, float]
+    probability: float = Field(ge=0.0, le=1.0)
+    concentration_mg_l: float | None = None
+    candidate: bool
+
+
+class NetworkLinkView(ApiModel):
+    link_id: str
+    link_type: str
+    start_node: str
+    end_node: str
+
+
+class SensorHealthView(ApiModel):
+    sensor_id: str
+    node_id: str
+    health: Literal["HEALTHY", "DRIFT", "MISSING"]
+    quality: float = Field(ge=0.0, le=1.0)
+    observed_at: datetime
+    received_at: datetime
+    pressure_m: float | None = None
+    concentration_mg_l: float | None = None
+
+
+class SampleRecommendationView(ApiModel):
+    node_id: str
+    expected_information_gain: float = Field(ge=0.0)
+    alternatives: tuple[str, ...] = ()
+
+
+class EvidenceHistoryEntryView(ApiModel):
+    round_index: int = Field(ge=0)
+    observation_count: int = Field(ge=0)
+    valid_concentration_count: int = Field(ge=0)
+    sensor_nodes: tuple[str, ...]
+    evidence_hash: str
+
+
+class PlanView(ApiModel):
+    plan: OperationalPlan
+    verification: PlanVerification | None = None
+
+
+class ExplanationPayload(ApiModel):
+    intent: str
+    text: str
+    facts: dict[str, Any]
+    limitations: tuple[str, ...]
+
+
+class ProvenanceView(ApiModel):
+    """Every hash/version an operator needs to trust this exact response.
+
+    ``simulator``/``simulator_version`` are only known once at least one plan
+    has undergone authoritative WNTR/EPANET verification for this incident;
+    they are None (not fabricated) until then.
+    """
+
+    network_hash: str
+    feature_schema_hash: str
+    model_version: str
+    model_checkpoint_hash: str
+    calibration_version: str
+    calibration_hash: str
+    simulator: str | None = None
+    simulator_version: str | None = None
+
+
+class IncidentView(ApiModel):
+    """A complete, versioned, live-only snapshot of one incident (overnight-plan.txt
+    Task 3.2). Every field here is sourced from live backend state produced by
+    the hybrid pipeline for this incident; this schema is never populated from
+    demo/fixture content, and ``extra="forbid"`` plus non-Optional typing means
+    an assembler bug that fails to supply a required field raises a validation
+    error instead of silently shipping an incomplete view.
+    """
+
+    schema_version: Literal[1] = 1
+    incident_id: UUID
+    network_id: str
+    runtime_mode: Literal["FULL_HYBRID", "CLASSICAL_SAFE"]
+    data_mode: Literal["LIVE"] = "LIVE"
+    controller_state: Literal["DETECTED", "ANALYZING", "SAMPLING", "PLANNING", "APPROVAL", "CLOSED"]
+    generated_at: datetime
+    provenance: ProvenanceView
+    candidates: CandidateSet
+    disagreement_js: float | None = None
+    ood_level: str
+    calibration_alpha: float | None = None
+    nodes: tuple[NetworkNodeView, ...]
+    links: tuple[NetworkLinkView, ...]
+    sensor_health: tuple[SensorHealthView, ...]
+    sample_recommendation: SampleRecommendationView | None = None
+    evidence_history: tuple[EvidenceHistoryEntryView, ...]
+    plans: tuple[PlanView, ...]
+    selected_plan_id: UUID | None = None
+    recommended_plan_id: UUID | None = None
+    counterfactual_consequences: dict[str, ConsequenceMetrics]
+    explanations: tuple[ExplanationPayload, ...]
+    audit_events: tuple[AuditEvent, ...]
+    runtime_metrics_ms: dict[str, float]
 
 
 Verifier = Callable[[OperationalPlan, IncidentState], PlanVerification]

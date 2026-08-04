@@ -48,6 +48,13 @@ from .results import (
 )
 
 
+#: Architecture identifier surfaced in plan/provenance records and the
+#: incident-view API contract (overnight-plan.txt Task 3.2). Bump this when
+#: the hybrid architecture itself changes; checkpoint identity is tracked
+#: separately by ``self._model_hash``.
+MODEL_VERSION = "hydrocore-hybrid-v1"
+
+
 def _hash(payload: object) -> str:
     return hashlib.sha256(
         json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode()
@@ -281,7 +288,7 @@ class HybridInferencePipeline:
         )
         return PlanGenerationContext(
             incident_id=incident_id,
-            model_version="hydrocore-hybrid-v1",
+            model_version=MODEL_VERSION,
             probable_source_nodes=probable_nodes,
             isolatable_links=tuple(str(link) for link in network.pipe_name_list),
             downstream_flush_nodes=tuple(dict.fromkeys(downstream)),

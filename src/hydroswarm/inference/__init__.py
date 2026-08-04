@@ -11,7 +11,7 @@ from hydroswarm.inference.fusion import (
 )
 from hydroswarm.calibration import CalibrationArtifact, SplitConformalCalibrator
 from hydroswarm.inference.ood import OODComponents, OODDetector, OODReference
-from hydroswarm.inference.pipeline import HybridInferencePipeline, HybridPipeline
+from hydroswarm.inference.pipeline import MODEL_VERSION, HybridInferencePipeline, HybridPipeline
 from hydroswarm.inference.results import (
     EvidenceChange,
     EvidenceSnapshot,
@@ -31,6 +31,7 @@ __all__ = [
     "HybridPipeline",
     "HybridRuntimeMode",
     "IncidentAnalysisResult",
+    "MODEL_VERSION",
     "OODComponents",
     "OODDetector",
     "OODReference",
