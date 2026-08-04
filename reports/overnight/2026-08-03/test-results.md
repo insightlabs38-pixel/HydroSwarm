@@ -70,3 +70,18 @@ of Phase 9.
 | `npm run lint` / `npm run test -- --run` / `npm run build` / `npx playwright test` (frontend) | **unchanged** | Bundle E touched no frontend code |
 | HydroCore-S checkpoint load | **Pass** | re-verified after every Bundle E commit; the `evidence_sufficiency` output-shape fix changes a forward-pass convention only, no parameter shapes |
 | Real end-to-end training (new this bundle) | **Pass** | 6 real `Trainer.fit()` runs (E0/E3/E4/E9-none/E9-feature_only/E9-logit_only) against real Cycle A data: finite loss throughout, every present supervised head received nonzero gradient, every run resumed correctly from its own checkpoint, every exported checkpoint reloaded with all-finite weights and passed `verify_architecture_compatibility` against its own recorded config. See `reports/results/v3/architecture-smoke-jobs.json`. |
+
+## Update after Task 3.2 + Cycle B corpus landing (commit `bd944d5`)
+
+| Command | Result | Notes |
+|---|---|---|
+| `python -m pytest -q` | **363 passed** (occasionally 362 passed / 1 failed) | 4 new backend contract tests for `GET /incidents/{id}/view` on top of Bundle E's 355+4=359. The intermittent failure, `tests/scientific/test_scout_labels.py::test_information_gain_is_nonnegative_within_tolerance`, is a pre-existing test-infra issue: it seeds via Python's built-in `hash()` on a string, which is salted per-interpreter-invocation unless `PYTHONHASHSEED` is fixed (it isn't), so the exact scenario/seed combination it exercises differs every `pytest` process regardless of any code change. Confirmed unrelated to this session's changes: passes reliably in isolation (`pytest tests/scientific/test_scout_labels.py` and `pytest tests/scientific/`), and passed on 2 of 3 consecutive full-suite runs with identical code. Not modified -- out of scope for Task 3.2, and altering a physics-adjacent test's tolerance without being asked risks exactly the kind of safety-boundary weakening this run is instructed to avoid. |
+| `ruff check` (touched files: `api/app.py`, `api/state.py`, `inference/pipeline.py`, `inference/__init__.py`, new test file) | **Pass** | 0 issues |
+| `pyright` (touched files) | **Pass** | 0 errors, 0 warnings, 0 informations |
+| `npx tsc --noEmit` | **Pass** | narrower project scope than `tsc -b` |
+| `npm run build` (`tsc -b && vite build`) | **Pass** (after 1 fix) | `tsc -b`'s wider scope (includes `tests/`) caught a stale `IncidentView` object literal in `IdentifierIndependence.test.tsx` missing the new `provenance`/`selectedPlanId`/`recommendedPlanId`/`counterfactuals` fields -- `tsc --noEmit` alone did not catch this. Fixed in `bd944d5`. |
+| `npm run lint` | **Pass** | |
+| `npm run format:check` (prettier) | 11 pre-existing failures, 0 new | Confirmed via `git stash`: the same 11 files (none touched this session) were already unformatted before any Task 3.2 work began. `src/api.ts` was the only file this session's edits newly affected, and `prettier --write` was applied to it specifically (not the other 10 pre-existing files, which are out of scope). |
+| `npm run test -- --run` (vitest) | **Pass** | 25 tests, up from 24 (api.test.ts's 2 stale stub-throw tests replaced with 3 tests exercising the real `/view` contract: full mapping, fallback-still-LIVE, malformed-response-falls-back) |
+| `npx playwright test` (e2e, real Chromium) | **Pass**, 10/10 | one 1920x1080 visual-regression test needed a retry (~0.01% pixel diff at chart-marker anti-aliasing pixels); confirmed flaky and unrelated to this session's changes by rerunning it alone immediately afterward (passed) |
+| HydroCore-S checkpoint load | **Pass** | unaffected -- this bundle touched API/frontend code and the data corpus, not the model or checkpoint |

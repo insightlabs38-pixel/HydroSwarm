@@ -1,30 +1,25 @@
 # Follow-up / next actions
 
-Updated live throughout the run. As of Bundle E completion (commit `0606586`):
+Updated live throughout the run. As of this update (commit `bd944d5`; Stage 2 screening
+still running in the background):
 
 ## Immediate next steps (in dependency order)
 
-1. **Phase 5 / Bundle F — Cycle B corpus generation and full updated S training.** Cycle A
-   proved the pipeline end to end (generation, sharding, label audit, real training loop, all
-   with real bugs found and fixed along the way -- see "Bundle E findings" below), so Bundle F
-   can proceed with confidence the underlying mechanics are sound. Cycle B needs 8,000-12,000
-   train / 1,000 validation / 1,000 calibration / 1,500-2,000 development_holdout / 300-500
-   per OOD shift category, across 3 training topologies + 1 development-OOD topology (Cycle A
-   only used 2 topologies total; Bundle F needs at least 2 more genuinely different networks
-   -- none exist in the repo yet beyond the golden reference and branched-loop, so new .inp
-   files need to be authored or imported before generation can start). Cycle B also requires
-   the full distribution-stratification (12 dimensions) and required-hard-negatives lists the
-   plan specifies for Cycle B specifically (Cycle A deliberately did not attempt these -- it
-   is a smoke corpus). This is a substantially longer-running job than Cycle A's ~3 minutes;
-   a real candidate for `hydroswarm.training.job_runner`-supervised background execution.
-   After Cycle B: run the full E0-E10 experiment matrix (not just the 4 Bundle E
-   smoke-screened), select the strongest updated S configuration(s), run source-only vs.
-   full-multitask diagnostics, fit calibration.
-2. **Task 3.2 — complete incident-view API contract.** Still not fully implemented (see prior
-   handoff updates for detail). Independent of Bundle F -- disjoint code (model/corpus vs.
-   frontend/API) -- can be picked up in parallel if ever running two threads of work, but this
-   run has been proceeding through the model/data critical path first.
-3. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
+1. **Bundle F Stage 2 architecture screening (E0-E8) -- running now, not yet complete.**
+   Launched against the real Cycle B corpus (12,750 scenarios landed this session -- see
+   `summary.md`'s "Datasets generated"). E0 completed in ~21.7 minutes; E1-E8 remain, ~3-3.5
+   hours total at the observed per-experiment pace. See `training-jobs.md` for exact
+   monitor/resume commands. **This is the actively blocking item** -- everything else in Bundle
+   F depends on its ranking.
+2. **After Stage 2 completes**: read `reports/results/v3/stage2-architecture-screening.json`'s
+   `ranking`, select the strongest S configuration(s) by the predeclared score (declared before
+   any run, in the script's own docstring -- do not retune after seeing results), then run the
+   full E0-E10 matrix if the plan calls for entries beyond E0-E8, fit calibration artifacts
+   against the winner, and proceed to development-holdout/OOD evaluation.
+3. **Task 3.2 — complete incident-view API contract.** Done this session (backend endpoint +
+   schema, frontend wiring, contract tests) -- see `summary.md`'s "Task 3.2" section for full
+   detail. No longer a follow-up item.
+4. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
    selection completing first -- "only after selecting strongest S architecture" per the
    plan -- so it cannot start early no matter how much idle capacity exists.
 
@@ -34,38 +29,43 @@ Updated live throughout the run. As of Bundle E completion (commit `0606586`):
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q                        # expect 355 passed
-cd frontend && npm ci && npm run test -- --run   # expect 24 passed
+python -m pytest -q                        # expect 363 passed (see test-results.md re: 1 flaky pre-existing test)
+cd frontend && npm ci && npm run test -- --run   # expect 25 passed
 npx playwright install --with-deps chromium && npx playwright test  # expect 10 passed
 ```
 
-To inspect Cycle A or re-run the Bundle E smoke sweep:
+To check on or resume the actively-running Stage 2 screening job, see `training-jobs.md`'s
+exact commands (status check, relaunch-from-scratch, mark-finished + read ranking).
+
+To inspect Cycle A/B or re-run the Bundle E smoke sweep:
 
 ```bash
 export PYTHONPATH=src
 python scripts/generate_cycle_a_corpus.py --output data/learning-v2/cycle-a   # already run; will refuse to overwrite
+python scripts/generate_cycle_b_corpus.py --output data/learning-v2/cycle-b   # already run; will refuse to overwrite
 python scripts/run_architecture_smoke_jobs.py   # already run; ~2m24s, writes reports/results/v3/architecture-smoke-jobs.json
 ```
 
 `experiments/runs/bundle-e-smoke/` (~1.3GB of disposable smoke-run checkpoints) is safe to
 delete once this report has been reviewed; it is gitignored and not referenced by anything
-downstream.
+downstream. Do not delete `experiments/runs/bundle-f-stage2/` or `experiments/jobs/bundle-f-stage2/`
+until the Stage 2 job (see `training-jobs.md`) has completed and its report has been reviewed.
 
 ## Scope assessment for whoever picks this up next
 
-Phase 0, Bundle A (0.2-0.8), Bundle B in full (1.1-1.5, 2.1-2.6), Bundle C (3.1, 3.3 partial,
-3.4 partial, 3.5, 3.6, 3.7, 3.8; 3.2 given an interim treatment), Bundle D in full (4.0-4.6),
+Phase 0, Bundle A (0.2-0.8), Bundle B in full (1.1-1.5, 2.1-2.6), Bundle C in full (3.1-3.8,
+including Task 3.2's full backend contract, completed this session), Bundle D in full (4.0-4.6),
 and Bundle E in full (Cycle A generation + Stage 1 smoke screening for E0/E3/E4/E9) are
-complete, tested, and committed -- 44 commits, 302 new tests (257 backend + 45 frontend), all
-gates green, zero baseline artifacts touched. This is substantive, real progress covering the
-entire code/infrastructure half of the plan, the frontend correctness half, the model
-architecture half, and now a first real (if intentionally small) proof that the full
-generate -> shard -> audit -> train -> resume -> reload pipeline works end to end. What
-remains is Task 3.2's full backend contract and Phases 5 (Cycle B/C)-9, which require
-authoring or importing at least 2 more genuinely different network topologies, running real
-multi-topology WNTR data generation at 10k-40k scenario scale, and real CPU training runs
-lasting many hours each -- substantially larger in wall-clock terms than anything completed
-so far.
+complete, tested, and committed -- 48 commits, 306+ new tests (261 backend + 45 frontend), all
+gates green (modulo one pre-existing, unrelated, intermittent test -- see test-results.md), zero
+baseline artifacts touched. Bundle F's Cycle B corpus (12,750 scenarios across 4 topologies) has
+also landed this session, and Stage 2 architecture screening (E0-E8) is running now against it.
+This covers the entire code/infrastructure half of the plan, the entire frontend correctness
+half (including the one item that had only an interim treatment before), the model architecture
+half, and now real multi-topology corpus generation at the plan's target scale. What remains is
+the rest of Bundle F (Stage 2 completion, S finalist selection/training, calibration) and
+Phases 6-9, which require real CPU training runs lasting many hours each -- substantially larger
+in wall-clock terms than anything completed so far, and gated on Stage 2 finishing.
 
 ## Bundle E findings (what was caught, and why it mattered)
 
@@ -101,9 +101,9 @@ caught all three of the above.
   under the repository (e.g. `experiments/`, `reports/`) rather than assuming `/srv/hydroswarm`
   exists, and will document this deviation rather than silently creating root-level
   directories outside the repo.
-- No remote push has occurred and none is planned unless explicitly requested; the plan only
-  requires not pushing to main, and commits will stay local on `agent/gcp-multitopology-v3`.
-- Bundle F needs genuinely new network topologies (at least 2 more beyond golden-reference and
-  branched-loop) authored or imported before Cycle B generation can start -- this is real
-  authoring work (a valid, hydraulically-sane EPANET INP file), not a parameter tweak, and has
-  not been scoped yet.
+- This session pushed to `origin/agent/gcp-multitopology-v3` on GitHub (never to `main`) after
+  each independently validated milestone, per this run's operating instructions to push to
+  GitHub occasionally in addition to local commits.
+- Bundle F's two additional topologies (loop-grid for training, coastal-branch for
+  development-OOD) were authored and are already committed (`1a7cf15`); Cycle B generation used
+  them successfully. No longer an open item.

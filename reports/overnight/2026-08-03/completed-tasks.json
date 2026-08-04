@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-08-04T00:00:00Z",
+  "updated_at_utc": "2026-08-04T22:10:00Z",
   "completed": [
     {
       "task": "0.1",
@@ -216,6 +216,18 @@
       "title": "Smoke/failure screening for E0, E3, E4, and E9 (Bundle E complete)",
       "commit": "0606586",
       "summary": "scripts/run_architecture_smoke_jobs.py ran 6 real training configurations (E0 baseline, E3 source_conditioned pooling, E4 dual_gated message channels, and 3 of E9's 4 internal prior/fusion comparisons) against a 200-train/50-validation Cycle A subset: an explicit pre-training gradient-flow check via task_gradient_norms, a real 2-epoch Trainer.fit(), a resume check (one more epoch from the exported checkpoint), and a checkpoint-reload/verify_architecture_compatibility check. All six passed every check -- zero NaNs, zero zero-gradient tasks, zero failed resumes, validation loss decreased in every case. Full sweep ~2m24s CPU time. Real ExperimentRegistry provenance recorded (experiments/registry/bundle-e-smoke.jsonl). This completes Bundle E (Cycle A generation + Stage 1 architecture smoke screening): 355 backend tests, ruff clean, pyright clean, promoted checkpoint verified loadable throughout."
+    },
+    {
+      "task": "Bundle F data",
+      "title": "Cycle B corpus generation (Bundle F data landing)",
+      "commit": "66e71f6",
+      "summary": "scripts/generate_cycle_b_corpus.py generated 12,750 scenarios across 3 training topologies (golden-reference, branched-loop, loop-grid) plus 800 development-OOD holdout examples (UNSEEN_TOPOLOGY, SEVERE_MISSINGNESS) against a 4th topology (coastal-branch), split 9000/1000/1000/1750 train/validation/calibration/development_holdout. Label audit clean across every split (0 duplicate IDs, 0 finite-value violations, 0 impossible labels). Generation took ~15.5 minutes. Documented, non-blocking limitations recorded in dataset-report.json (split counts toward low-mid end of plan ranges; only 2 of ~10 OOD categories generated this pass; no ood_class per-example target yet; hard-negative pairs not attempted this pass)."
+    },
+    {
+      "task": "Task 3.2",
+      "title": "Complete incident-view API contract (backend + frontend)",
+      "commit": "580185e, ebd260c, bd944d5",
+      "summary": "Implemented GET /api/incidents/{incident_id}/view end to end, closing the item that previously had only an interim treatment. Backend: IncidentView Pydantic schema (all extra=forbid) covering every field the plan lists -- provenance hashes/versions, controller state, full map topology sourced only from imported-network metadata, sensor health, sample recommendation, evidence history, plans with verifications, audit-ledger-derived selected plan vs. strategist-recommended plan, per-plan counterfactual consequences, all 7 grounded explanation intents, audit events, runtime metrics. Fails closed (409 pre-analysis, 503 on incomplete topology metadata) rather than ever backing the response with DEMO_FALLBACK content. 4 new backend contract tests drive a real HybridInferencePipeline through the actual HTTP API. Frontend: viewFromApi() replaces the old LiveViewIncompleteError stub with a real mapping from the live response; IncidentView/demoFixture/PlanTable extended to match the backend schema field-for-field. Full pytest/ruff/pyright/eslint/tsc-build/vitest/playwright all green."
     }
   ]
 }

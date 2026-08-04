@@ -147,4 +147,44 @@ ledger) and `reports/results/v3/architecture-smoke-jobs.json` committed;
 promoted checkpoint's loadability was re-verified after every commit in this bundle. No frontend
 file changed in this bundle.
 
+## Cycle B corpus landing, commit `66e71f6`
+
+`data/learning-v2/cycle-b/`: manifests, per-topology signature libraries, `dataset-report.json`,
+`label-audit.json`, and tensor/scenario shard manifests for the 12,750-scenario Cycle B corpus
+(committed, ~200KB total across 21 files). Raw scenario arrays (`.npz`/`.parquet`) and tensor
+shards (`.safetensors`, ~200MB, regenerable via `scripts/generate_cycle_b_corpus.py`) remain
+gitignored per the existing `data/learning-v2/**` patterns in `.gitignore`. No source code
+changed in this commit.
+
+## Task 3.2 -- complete incident-view API contract, commits `580185e`, `ebd260c`, `bd944d5`
+
+**Backend** (`580185e`): `src/hydroswarm/api/state.py` gained `NetworkNodeView`,
+`NetworkLinkView`, `SensorHealthView`, `SampleRecommendationView`, `EvidenceHistoryEntryView`,
+`PlanView`, `ExplanationPayload`, `ProvenanceView`, and `IncidentView` Pydantic models (all
+`extra="forbid"`). `src/hydroswarm/api/app.py` gained `GET /api/incidents/{incident_id}/view`,
+assembling the response from live `IncidentAnalysisResult`/`IncidentRuntime` state only (409 if
+analysis hasn't completed via the real hybrid pipeline, 503 if the network lacks full topology
+metadata). `src/hydroswarm/inference/pipeline.py`/`__init__.py`: factored the
+`"hydrocore-hybrid-v1"` string literal (previously duplicated nowhere, but only used once
+inline) into a shared `MODEL_VERSION` constant, now referenced from both `PlanGenerationContext`
+construction and the new endpoint's provenance. New test file:
+`tests/integration/test_incident_view_contract.py` (4 tests, drives a real
+`HybridInferencePipeline` through the full HTTP API).
+
+**Frontend** (`ebd260c`, `bd944d5`): `frontend/src/api.ts` -- replaced the `fetchIncident()`
+stub (which threw `LiveViewIncompleteError` unconditionally) with a real call to `/view` plus
+`viewFromApi()`, a full snake_case-to-camelCase mapping function; removed the now-dead
+`ApiIncidentState` interface and `LiveViewIncompleteError` class. `frontend/src/types.ts`:
+added `Provenance`, `ConsequenceView`, and `IncidentView.provenance/selectedPlanId/
+recommendedPlanId/counterfactuals`; `PlanStatus` gained `PENDING`.
+`frontend/src/components/PlanTable.tsx`: added a `PENDING` tone. `frontend/src/demoFixture.ts`:
+populated the new required fields with clearly-synthetic frozen-demo values. Test files updated:
+`frontend/tests/api.test.ts` (replaced 2 stale stub-throw tests with 3 real-contract tests),
+`frontend/tests/IdentifierIndependence.test.tsx` (fixture updated for the new required fields,
+caught by `tsc -b`/`npm run build`'s wider project scope, not `tsc --noEmit` alone).
+
+No file under `data/learning-v1/`, `models/`, or any historical `reports/results/*.json` was
+modified in any of these commits; the promoted checkpoint's loadability is unaffected (these
+commits touch API/frontend/inference-constant code, not model architecture or weights).
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

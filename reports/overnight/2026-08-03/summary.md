@@ -7,9 +7,13 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `0606586` (Bundle E complete; still running)
-- Commits created: 44 (see `git log --oneline main..agent/gcp-multitopology-v3`)
-- Working tree: clean at branch creation
+- Ending commit: `bd944d5` (Cycle B corpus landed, Task 3.2 complete, Stage 2 architecture
+  screening running in the background; still running)
+- Commits created: 48 (see `git log --oneline main..agent/gcp-multitopology-v3`)
+- Working tree: clean except the actively-running Stage 2 job's own `experiments/jobs/` and
+  `experiments/registry/bundle-f-stage2.jsonl` (uncommitted until the job finishes -- see
+  "Every training job's status" below)
+- Pushed to `origin/agent/gcp-multitopology-v3` on GitHub through commit `bd944d5`
 
 ## Completed tasks
 
@@ -30,8 +34,15 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [x] Bundle E (Cycle A corpus: 2,550 scenarios across 2 genuinely different topologies; Stage 1
   smoke/failure screening for E0/E3/E4/E9 -- 6 real training runs, all passed: no NaNs, every
   supervised head received gradients, every run resumed correctly)
-- [ ] Cycle B — next up
-- [ ] S architecture screening
+- [x] Task 3.2 — complete `/incidents/{id}/view` API contract (backend Pydantic schema +
+  endpoint, frontend TS type + `viewFromApi` mapping + wiring, backend contract tests driving a
+  real `HybridInferencePipeline` through the HTTP API, frontend unit tests, full
+  build/lint/typecheck/vitest/playwright all green). Previously only had the interim
+  "throw rather than fake it" treatment; now fully implemented. See "Task 3.2" section below.
+- [x] Bundle F, Cycle B corpus generation (`data/learning-v2/cycle-b/`): 12,750 scenarios across
+  3 training topologies + 1 development-OOD topology. See "Datasets generated" below.
+- [ ] Bundle F, Stage 2 architecture screening (E0-E8) — **running now** in the background; see
+  "Every training job's status" below for exact resume/monitoring commands.
 - [ ] S finalist training
 - [ ] M training/evaluation
 - [ ] calibration/OOD evaluation
@@ -39,20 +50,21 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [ ] final selection
 - [ ] locked final test
 
-## Tests (current, after Bundle E)
+## Tests (current, after Task 3.2 + Cycle B landing)
 
 See `test-results.md` for full detail.
 
 | Command | Result | Notes |
 |---|---|---|
-| `pytest -q` | 355 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 257 new tests added across Bundle A + Bundle B + Bundle D + Bundle E |
-| `ruff check src tests scripts` | pass | |
-| `pyright` | pass | |
+| `pytest -q` | 363 passed | 4 new Task 3.2 backend contract tests added on top of Bundle E's 359. One unrelated scientific test (`test_information_gain_is_nonnegative_within_tolerance`) intermittently fails when the full suite runs -- confirmed pre-existing and unrelated: it seeds via Python's `hash()` on a string, which is salted per-interpreter-invocation (not fixed via `PYTHONHASHSEED`), so its pass/fail is randomized run-to-run regardless of any code change. Always passes in isolation and passed on 2 of 3 full-suite reruns during this session. Not touched -- weakening its tolerance would risk exactly the kind of physics-boundary weakening this run is instructed not to do; the real fix (seed it deterministically) is a pre-existing test-infra issue outside Task 3.2's scope. |
+| `ruff check` (touched files) | pass | |
+| `pyright` (touched files) | pass, 0 errors | |
 | `npm run lint` | pass | |
-| `npm run test -- --run` (vitest) | pass (24 tests, up from 4) | unchanged since Bundle C; Bundles D/E touched no frontend code |
-| `npm run build` | pass | |
-| `npx playwright test` (e2e) | pass (10 tests, up from 1) | real Chromium, includes 2 committed screenshot baselines |
-| HydroCore-S checkpoint load | pass | hash, feature-schema, and calibration all validate; re-verified after every Task 4.x and Bundle E commit |
+| `npx tsc --noEmit` / `npm run build` (`tsc -b && vite build`) | pass | note: `tsc -b` (build mode, includes tests/) caught a stale test fixture `--noEmit` alone did not, since its default project scope is narrower |
+| `npm run test -- --run` (vitest) | pass (25 tests, up from 24) | |
+| `npx playwright test` (e2e) | pass (10/10) | one 1920x1080 visual-regression test needed a retry (~0.01% pixel diff, chart-marker anti-aliasing) -- confirmed flaky/unrelated by rerunning it alone immediately after |
+| `npm run format:check` (prettier) | 11 pre-existing failures untouched, 0 new | baseline already had 11 unformatted files before this session (confirmed via `git stash`); `src/api.ts` was the only file this session's changes newly affected, and it is now formatted correctly |
+| HydroCore-S checkpoint load | pass | unchanged this session |
 
 ## Datasets generated
 
@@ -64,6 +76,22 @@ reservoir/no tank/a different loop, already committed at
 `dataset-report.json`, and `label-audit.json` are committed (~4.5MB); raw scenario arrays and
 tensor shards (~55MB, regenerable) are gitignored. See `data/learning-v2/cycle-a/dataset-report.json`
 for full counts/balance/leakage detail.
+
+**Cycle B** (`data/learning-v2/cycle-b/`, 12,750 scenarios, generated in ~15.5 minutes via
+`scripts/generate_cycle_b_corpus.py`): 9,000 train / 1,000 validation / 1,000 calibration / 1,750
+development_holdout across 3 training topologies (golden-reference, branched-loop, loop-grid --
+loop-grid newly authored for this cycle) plus 400 examples each for the `UNSEEN_TOPOLOGY` and
+`SEVERE_MISSINGNESS` OOD-holdout categories against a 4th development-OOD topology
+(coastal-branch). Label audit is clean across every split (0 duplicate scenario IDs, 0 finite-value
+violations, 0 impossible labels; a handful of near-duplicate groups flagged but not treated as
+errors, consistent with Cycle A). Documented, non-blocking limitations (full detail in
+`data/learning-v2/cycle-b/dataset-report.json`'s `limitations` list): split counts sit toward the
+low-to-mid end of the plan's stated ranges rather than the maximum; only 2 of ~10 governed
+`OODCategory` values were generated this pass; no `ood_class` per-example target exists yet
+(pre-existing generator gap, same category as bugs Bundle E found); the plan's required
+hard-negative list (hydraulically similar sources, graph symmetries, etc.) was not attempted this
+pass. Manifests/signatures/reports (~200KB) are committed; raw scenario arrays and tensor shards
+(~200MB, regenerable) are gitignored.
 
 ## Experiments completed
 
@@ -175,14 +203,47 @@ for each configuration.
   only the data/evaluation half of these three tasks remains, gated behind corpus generation
   that hasn't started yet regardless.
 
+## Task 3.2 (completed this session)
+
+`GET /api/incidents/{incident_id}/view` now exists end to end:
+
+- **Backend**: `IncidentView` Pydantic schema (`hydroswarm/api/state.py`) with every field the
+  plan lists -- incident/network IDs, runtime mode, data mode, model/checkpoint version+hash,
+  calibration version+hash, network hash, simulator+version, controller state, candidates with
+  coverage target/calibration validity, full map topology (nodes/links, sourced only from an
+  imported network's real metadata, never guessed), sensor health, sample recommendation,
+  evidence-round history, plans with verifications, selected (derived from the audit ledger's
+  `PLAN_APPROVED` event, not guessed) vs. recommended plan, per-plan counterfactual consequences,
+  all seven grounded explanation intents, audit events, and stage-level runtime metrics. Fails
+  closed: 409 if the incident hasn't completed a real hybrid analysis (DEMO_FALLBACK can never
+  back this endpoint), 503 if the network lacks full topology metadata (the legacy manual
+  `/validate` path). Every nested model is `extra="forbid"`.
+- **Backend tests**: `tests/integration/test_incident_view_contract.py` drives a real
+  `HybridInferencePipeline` (same fixture pattern as `tests/e2e/test_iterative_pipeline.py`)
+  through the actual HTTP API -- incident creation, two real reanalysis rounds, plan
+  generation/verification/approval -- then asserts every field of the response against the real
+  provenance hashes, imported topology, and audit trail. Plus two fail-closed tests (409 before
+  analysis, 503 for incomplete topology metadata).
+- **Frontend**: `viewFromApi()` in `frontend/src/api.ts` replaces the old
+  `LiveViewIncompleteError` stub, mapping the live response into the UI's `IncidentView` shape.
+  `IncidentView`/`demoFixture.ts` extended with `provenance`, `selectedPlanId`,
+  `recommendedPlanId`, `counterfactuals` to mirror the backend schema field-for-field.
+  `PlanStatus` gained a `PENDING` state for not-yet-verified plans. Two fields are honestly left
+  unfilled rather than fabricated (each with an inline comment): per-link flow (not yet threaded
+  through `IncidentAnalysisResult`) and `exposureReduction` (no no-response baseline is computed
+  server-side yet -- same pre-existing gap as `EvidenceBundle.exposure_reduction_mg`).
+  `benchmarks` stays empty in LIVE mode -- confirmed via `ModelGovernanceTable` that it's a
+  distinct, not-yet-live data source unrelated to this endpoint, not something this task covers.
+
+Commits: `580185e` (backend), `ebd260c` (frontend), `bd944d5` (test-fixture fix caught by
+`tsc -b`/`npm run build`, which checks `tests/` in a wider scope than `tsc --noEmit` alone).
+
 ## Remaining blockers
 
-- None currently. The one pre-existing test failure was fixed (see below).
-- Task 3.2 (a complete `/incidents/{id}/view` backend contract) was not implemented in full;
-  `fetchIncident()` instead documents and throws on exactly the fields the current API
-  doesn't provide. This means LIVE mode cannot actually be reached yet even against a
-  running backend -- DEMO_FALLBACK (or ERROR, if an incident ID is configured but the API
-  itself is unreachable/misconfigured) is always what renders today. See follow-up.md.
+- None. The one intermittent test failure (`test_information_gain_is_nonnegative_within_tolerance`)
+  is pre-existing, unrelated to this session's changes, and explained above under "Tests".
+- Stage 2 architecture screening (E0-E8) is running now in the background and has not finished;
+  see "Every training job's status" below for how to check on or resume it.
 
 ## Exact commands to continue
 
@@ -190,20 +251,25 @@ for each configuration.
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q   # expect 355 passed
-cd frontend && npm run test -- --run   # expect 24 passed
-npx playwright test                     # expect 10 passed
+python -m pytest -q   # expect 363 passed (occasionally 362/1 -- see Tests section)
+cd frontend && npm run test -- --run   # expect 25 passed
+npx playwright test                     # expect 10 passed (retry 1920x1080 visual-regression if it flakes)
 ```
 
-See `follow-up.md` for the specific next task (Phase 5 / Bundle F: Cycle B corpus generation,
-or completing Task 3.2's full backend contract).
+See `follow-up.md` and `training-jobs.md` for the active Stage 2 screening job's exact
+monitoring/resume commands.
 
 ## Every training job's status
 
 Bundle E's 6 smoke-screening jobs (E0/E3/E4/E9-none/E9-feature_only/E9-logit_only) all
 completed successfully; see `training-jobs.md` and
-`reports/results/v3/architecture-smoke-jobs.json`. None are still running. No Bundle F/G/H
-training has been launched yet.
+`reports/results/v3/architecture-smoke-jobs.json`.
+
+**Bundle F Stage 2 architecture screening (E0-E8) is running now** under
+`hydroswarm.training.job_runner`, launched against the real Cycle B corpus (not a smoke subset).
+Run directory: `experiments/jobs/bundle-f-stage2/` (status.json/job.log/job.pid). E0 (baseline)
+completed in ~21.7 minutes; E1-E8 remain. See `training-jobs.md` for the exact monitor/resume
+commands and current progress at handoff time.
 
 ## Locked final test
 

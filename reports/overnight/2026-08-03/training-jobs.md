@@ -34,9 +34,68 @@ export PYTHONPATH=src
 python scripts/run_architecture_smoke_jobs.py
 ```
 
-## No job currently active
+## Bundle F Stage 2 architecture screening (E0-E8) -- RUNNING
 
-Nothing is running in the background at handoff time. Bundle F (Cycle B corpus generation,
-8,000-12,000 train scenarios across 3 topologies + 1 dev-OOD topology) is the next
-long-running item and is the first candidate for `hydroswarm.training.job_runner`-supervised
-background execution, per the plan's guidance for genuinely long jobs.
+First real use of `hydroswarm.training.job_runner` (Task 0.3's resumable background-job
+supervisor) for a genuinely long job, per the plan's guidance. Launched against the full Cycle B
+corpus (9,000 train examples, 3 topologies), 4 epochs, batch size 16, seed `20260805`, one run
+per E0-E8 configuration, ranked by the predeclared score in
+`scripts/run_stage2_architecture_screening.py`'s docstring.
+
+| Field | Value |
+|---|---|
+| Run dir | `experiments/jobs/bundle-f-stage2/` |
+| Status file | `experiments/jobs/bundle-f-stage2/status.json` |
+| Log | `experiments/jobs/bundle-f-stage2/job.log` |
+| PID file | `experiments/jobs/bundle-f-stage2/job.pid` |
+| Registry | `experiments/registry/bundle-f-stage2.jsonl` (per-experiment `ExperimentRegistry` records) |
+| Final report (on completion) | `reports/results/v3/stage2-architecture-screening.json` |
+| Started | 2026-08-04T21:36:19Z |
+| Max runtime per experiment | 7200s (2 hours); no overall job-level cap -- 9 experiments sequentially in one process |
+| Progress at handoff | E0 (baseline) completed successfully in 1300.4s (~21.7 min); E1 in progress |
+
+**To check status:**
+
+```bash
+cd /workspace/HydroSwarm
+python3 -c "import json; print(json.load(open('experiments/jobs/bundle-f-stage2/status.json'))['state'])"
+tail -20 experiments/jobs/bundle-f-stage2/job.log
+```
+
+**To resume/relaunch if the job dies before completing** (the script itself has no
+per-experiment checkpointing -- a restart reruns all 9 experiments from scratch, since it writes
+its final report only once at the end; total observed pace is ~22 min/experiment so a full
+restart costs on the order of 3-3.5 hours, not prohibitive at this corpus size):
+
+```bash
+cd /workspace/HydroSwarm
+export PYTHONPATH=src
+python3 -c "
+import sys; sys.path.insert(0, 'src')
+from hydroswarm.training import job_runner
+command = [sys.executable, '-u', 'scripts/run_stage2_architecture_screening.py']
+handle = job_runner.launch(command, run_dir='experiments/jobs/bundle-f-stage2', workdir='.',
+    min_free_disk_gb=5.0, resume_command=command, env={'PYTHONPATH': 'src'})
+print(handle.pid)
+"
+```
+
+Once `state` is `COMPLETED`, mark it finished and inspect the ranking:
+
+```bash
+python3 -c "
+from hydroswarm.training import job_runner
+job_runner.mark_finished('experiments/jobs/bundle-f-stage2', exit_code=0)
+"
+python3 -c "
+import json
+report = json.load(open('reports/results/v3/stage2-architecture-screening.json'))
+print(report['ranking'])
+print(report['failures'])
+"
+```
+
+Next steps after this job completes: select the strongest S configuration(s) by the
+predeclared score, run source-only (E7) vs. full-multitask (E8) diagnostics already included in
+this sweep, fit calibration artifacts against the winner, then proceed to Bundle F's remaining
+evaluation phases per the plan.
