@@ -1,0 +1,67 @@
+; Independent six-junction elongated branch-with-loop topology, held out entirely from
+; Cycle B training (Bundle F's "development OOD" topology). Structurally distinct from
+; every training topology: has both a tank (like golden-reference) and a long branching
+; spur (like branched-loop) plus a small terminal loop, at a larger physical scale
+; (longer pipe runs) representing genuine distribution shift, not just a relabeling of
+; an existing training network.
+[TITLE]
+HydroSwarm independent coastal-branch topology, held out for development OOD
+
+[JUNCTIONS]
+;ID   Elevation  Demand  Pattern
+ CB1   288        50      diurnal
+ CB2   292        62      diurnal
+ CB3   296        68      diurnal
+ CB4   301        40      diurnal
+ CB5   305        45      diurnal
+ CB6   299        58      diurnal
+
+[RESERVOIRS]
+;ID  Head
+ R4   402
+
+[TANKS]
+;ID  Elevation  Init Level  Min Level  Max Level  Diameter  Min Volume  Volume Curve  Overflow
+ T2   296        7.5         2.0        18.0       14.0                                       ;
+
+[PIPES]
+;ID        Node1 Node2 Length Diameter Roughness MinorLoss Status
+ P_R4_CB1   R4    CB1   4200   16       120       0         Open
+ P_CB1_CB2  CB1   CB2   3600   12       116       0         Open
+ P_CB2_CB3  CB2   CB3   3300   10       112       0         Open
+ P_CB3_CB4  CB3   CB4   2800   8        108       0         Open
+ P_CB3_T2   CB3   T2    2200   10       114       0         Open
+ P_CB4_CB5  CB4   CB5   2100   6        104       0         Open
+ P_CB5_CB6  CB5   CB6   1900   6        104       0         Open
+ P_CB6_CB3  CB6   CB3   3100   6        104       0         Open
+
+[PATTERNS]
+diurnal 0.64 0.60 0.56 0.62 0.78 1.10
+diurnal 1.26 1.18 1.04 0.90 0.80 0.70
+diurnal 0.72 0.70 0.66 0.72 0.82 1.04
+diurnal 1.34 1.22 1.08 0.90 0.78 0.68
+
+[TIMES]
+DURATION             04:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+REPORT TIMESTEP      01:00:00
+
+[OPTIONS]
+UNITS                GPM
+HEADLOSS             H-W
+QUALITY              NONE
+ACCURACY             0.001
+
+[COORDINATES]
+R4    0     700
+CB1   1400  700
+CB2   2800  700
+CB3   4200  700
+CB4   5600  400
+CB5   6800  200
+CB6   6800  1000
+T2    4200  1800
+
+[END]

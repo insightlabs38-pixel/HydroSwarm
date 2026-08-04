@@ -28,3 +28,6 @@ data/learning-v2/**/tensors/**/*.safetensors
 models/checkpoints/
 experiments/runs/
 experiments/registry/*.lock
+/temp.inp
+/temp.bin
+/temp.rpt
