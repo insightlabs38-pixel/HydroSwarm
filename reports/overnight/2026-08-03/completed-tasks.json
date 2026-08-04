@@ -90,6 +90,24 @@
       "title": "Graph permutation augmentation and equivariance enforcement",
       "commit": "7bdf4f5",
       "summary": "permute_example() rearranges node ordering, remapping edge_index/source_node/node-indexed targets/topology metadata so real-world semantic identity survives (verified directly, not assumed). measure_equivariance() runs a model on original vs permuted input, maps back via the inverse permutation, and reports max logit difference, prediction agreement, and any non-equivariant input key. Empirical finding: HydroCore-S IS permutation-equivariant -- across 6 random permutations, source-logit differences stay under 1e-4 and predictions always agree, zero non-equivariant keys detected. 11 new tests. This completes Tasks 1.1-1.5, the plan's highest-priority technical change (variable-topology corpus architecture)."
+    },
+    {
+      "task": "2.1",
+      "title": "Governed targets_v2 contract",
+      "commit": "9dd7942",
+      "summary": "TARGETS_V2 defines every Sentinel/Scout/Strategist/control target with a definition, unit, explicit masking rule, and source of truth (completeness enforced by a test). EventCause and NextStep enums match the plan's class lists exactly. Masking uses the same _mask suffix convention as input masks; validate_targets_v2() rejects unknown keys, orphaned masks, masks on non-maskable targets, and non-boolean masks. check_schema_version() fails clearly on a version mismatch. 11 new tests, including a governance guardrail asserting plan_validity's contract text names WNTR, not a neural prediction, as its source of truth."
+    },
+    {
+      "task": "2.5",
+      "title": "Governed OOD categories and behavior targets",
+      "commit": "ca955a8",
+      "summary": "OODCategory covers the plan's exact list (unseen topology/sensor layout, extreme demand, tank-state shift, valve/pump mismatch, roughness mismatch, severe missingness, frozen/drifting sensor, timing outside range, unsupported element/invalid calibration) as a concept distinct from the existing OODDetector's coarse severity level. OOD_CATEGORY_BEHAVIOR states expected controller behavior per category; its own constructor enforces that planning may never be permitted while calibration is invalid. topology_calibration_is_valid() and classify_abstention_outcome() (false abstention / unsafe non-abstention) operationalize the plan's governance and metrics requirements as real functions. 13 new tests."
+    },
+    {
+      "task": "2.6",
+      "title": "Multi-step incident trajectory serialization",
+      "commit": "541c72c",
+      "summary": "TrajectoryState/FullTrajectory add a richer companion to the existing lightweight AgentTrajectory audit record, reusing the validated domain schemas (IncidentState, OperationalAction, PlanVerification) rather than duplicating their fields: observation history, candidates, remaining budgets, previous/selected actions, and verifier feedback. FullTrajectory verifies both contiguity and a hash chain between consecutive steps. 9 new tests, including a broken-hash-chain rejection. This closes Bundle B's schema/infrastructure scope (1.1-1.5, 2.1, 2.5, 2.6); Tasks 2.2-2.4 (actual Sentinel/Scout/Strategist label generation against the real simulator/classical/planning stack) remain as the next major body of work and are described in follow-up.md."
     }
   ]
 }

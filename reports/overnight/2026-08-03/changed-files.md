@@ -47,4 +47,14 @@ metadata through sharded storage. One correctness fix in `data.py`
 `test_sharded_data.py` and `test_topology_metadata.py`. No file under `data/learning-v1/`,
 `models/`, or any historical `reports/results/*.json` was modified.
 
+## Tasks 2.1, 2.5, 2.6 (targets_v2 schema/governance scope), commits 9dd7942..541c72c
+
+New modules: `training/targets_v2.py` (TARGETS_V2 contract, EventCause/NextStep enums),
+`training/ood_categories.py` (OODCategory taxonomy, expected behavior, abstention
+classification), `training/trajectory_v2.py` (TrajectoryState/FullTrajectory, reusing
+`domain.IncidentState`/`OperationalAction`/`PlanVerification`). 33 new tests across 3 new
+test files. No file under `data/learning-v1/`, `models/`, or any historical
+`reports/results/*.json` was modified. Tasks 2.2-2.4 (the actual label *generation* against
+the simulator/classical/planning stack, as opposed to the schema work here) are not started.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

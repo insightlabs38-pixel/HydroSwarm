@@ -7,9 +7,10 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `7bdf4f5` (Tasks 1.1-1.5 complete; still running)
-- Commits created: 18 (a3ccd25, 19468ac, f67b0a6, ace2808, 9cf1d98, ecd34ac, ad8b256, b2bba5d,
-  1c3b55b, 7d5d84a, 22bae5d, 60949b1, 80c1aeb, 14e4224, dfa5b60, 7bdf4f5, and 2 report-refresh commits)
+- Ending commit: `541c72c` (Bundle B schema/infra scope complete; still running)
+- Commits created: 22 (a3ccd25, 19468ac, f67b0a6, ace2808, 9cf1d98, ecd34ac, ad8b256, b2bba5d,
+  1c3b55b, 7d5d84a, 22bae5d, 60949b1, 80c1aeb, 14e4224, dfa5b60, 7bdf4f5, 17643ab, 9dd7942,
+  ca955a8, 541c72c, and 2 report-refresh commits)
 - Working tree: clean at branch creation
 
 ## Completed tasks
@@ -19,7 +20,10 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [x] Phase 1.1-1.5 (Bundle B: variable-topology corpus architecture — topology metadata, per-topology
   signature registry, variable-size collation, scenario-specific hydraulic context caching, permutation
   equivariance). This was the plan's explicitly highest-priority technical change.
-- [ ] Phase 2.1-2.6 (Bundle B: targets_v2) — next up
+- [x] Phase 2.1, 2.5, 2.6 (Bundle B: targets_v2 contract, OOD categories, trajectory serialization —
+  schema/governance/infrastructure scope)
+- [ ] Phase 2.2-2.4 (Bundle B: actual Sentinel/Scout/Strategist label *generation* against the real
+  simulator/classical/planning stack) — next up, see Follow-up
 - [ ] Phase 3 (Bundle C: frontend live/demo integrity)
 - [ ] Phase 4 (Bundle D: configurable HydroCore)
 - [ ] Cycle A
@@ -38,7 +42,7 @@ See `test-results.md` for full detail.
 
 | Command | Result | Notes |
 |---|---|---|
-| `pytest -q` | 209 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 111 new tests added across Bundle A + Tasks 1.1-1.5 |
+| `pytest -q` | 242 passed | started at 1 failed/97 passed; pre-existing failure fixed in `19468ac`; 144 new tests added across Bundle A + Bundle B schema/infra scope |
 | `ruff check src tests scripts` | pass | |
 | `pyright` | pass | |
 | `npm run lint` | pass | |
@@ -89,8 +93,11 @@ None yet (baseline HydroCore-S hybrid governed result remains the current refere
 cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
-python -m pytest -q
+python -m pytest -q   # expect 242 passed
 ```
+
+See `follow-up.md` for the specific next task (2.2: Sentinel label generation) and what
+investigation it needs before implementation.
 
 ## Every training job's status
 
