@@ -148,13 +148,14 @@ TARGETS_V2: dict[str, TargetSpec] = {
             category="sentinel",
             name="sensor_fault",
             definition="Per-node indicator of whether that node's sensor is faulty "
-            "(frozen, drifting, or in communication outage) in this scenario.",
+            "(frozen, drifting, in communication outage, or unit-mismatched) in this scenario.",
             unit="boolean per node, shape [node_count]",
-            masking_rule="Never masked for nodes with a sensor_presence=1 input feature; "
-            "undefined (and should be excluded from loss) for nodes with no sensor.",
+            masking_rule="Masked (sensor_fault_mask=False) for nodes with no sensor -- the "
+            "placeholder value at those positions is never a real 'healthy' observation "
+            "and must be excluded from loss, prevalence statistics, and audits alike.",
             source_of_truth="Scenario generator ground truth (which sensors were corrupted "
             "and how).",
-            maskable=False,
+            maskable=True,
         ),
         _spec(
             category="sentinel",

@@ -162,6 +162,52 @@ def test_sensor_fault_only_event_type_forces_a_fault_with_negligible_concentrati
     assert scenario.frozen_mask.any()
 
 
+def test_drift_and_unit_mismatch_faults_are_recorded_in_their_own_masks() -> None:
+    """core-issues.txt repair item 3: drift and unit-mismatch faults were
+    injected into observed readings but never recorded in any mask, so
+    they were structurally invisible to sensor_fault supervision no matter
+    how large they were. Forces both deterministically (a large
+    drift_per_hour, unit_mismatch_probability=1.0) rather than relying on
+    the small defaults, which can sit right at the quantization boundary."""
+
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(
+            seed=502, network_id="ref", network_family="reference", event_type=EventType.NORMAL,
+            frozen_probability=0.0, communication_outage_probability=0.0,
+            drift_per_hour=1.0, unit_mismatch_probability=1.0,
+        ),
+    )
+    assert scenario.drift_mask.any()
+    assert scenario.unit_mismatch_mask.any()
+    assert scenario.drift_mask.shape == scenario.frozen_mask.shape
+    assert scenario.unit_mismatch_mask.shape == scenario.frozen_mask.shape
+    # unit_mismatch multiplies the whole column by 1000x from the first
+    # timestep, unlike frozen/outage which can start partway through.
+    assert scenario.unit_mismatch_mask.all(axis=0).any()
+
+
+def test_negligible_drift_does_not_falsely_mark_every_sensor_faulty() -> None:
+    """A near-zero drift rate must not trip drift_mask at all -- otherwise
+    every scenario, including deliberately clean ones, would appear to have
+    a sensor fault on every node forever."""
+
+    network = build_wntr_network()
+    generator = WNTRScenarioGenerator()
+    scenario = generator.generate(
+        network,
+        ScenarioGenerationConfig(
+            seed=503, network_id="ref", network_family="reference", event_type=EventType.NORMAL,
+            frozen_probability=0.0, communication_outage_probability=0.0,
+            drift_per_hour=0.0, unit_mismatch_probability=0.0,
+        ),
+    )
+    assert not scenario.drift_mask.any()
+    assert not scenario.unit_mismatch_mask.any()
+
+
 def test_sensor_fault_only_does_not_smuggle_finite_values_into_missing_slots() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()

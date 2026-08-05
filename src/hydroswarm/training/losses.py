@@ -165,6 +165,9 @@ def compute_multitask_loss(
     if "sensor_fault" in targets and "sensor_fault_logits" in outputs:
         fault_target = targets["sensor_fault"].float()
         valid = torch.isfinite(fault_target) & (fault_target >= 0)
+        fault_mask = targets.get("sensor_fault_mask")
+        if fault_mask is not None:
+            valid = valid & fault_mask.bool()
         losses["sensor_fault"] = (
             F.binary_cross_entropy_with_logits(
                 outputs["sensor_fault_logits"].float()[valid], fault_target[valid]

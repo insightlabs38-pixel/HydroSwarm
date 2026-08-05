@@ -141,6 +141,15 @@ class GeneratedScenario:
     timestamp_jitter_seconds: np.ndarray
     sensor_nodes: tuple[str, ...]
     flow_reversal_mask: np.ndarray
+    #: core-issues.txt repair item 3: drift and unit-mismatch faults are
+    #: injected by _degrade below (drift always, unit-mismatch
+    #: probabilistically) but previously had no recorded mask at all, so
+    #: hydroswarm.training.corpus's sensor_fault target -- whose own
+    #: definition already names "frozen, drifting, or in communication
+    #: outage" -- silently only ever checked two of the three named fault
+    #: types, plus unit-mismatch (not even named there).
+    drift_mask: np.ndarray
+    unit_mismatch_mask: np.ndarray
 
 
 class SplitPlanner:
@@ -204,7 +213,7 @@ class WNTRScenarioGenerator:
         )
         frame = simulation.concentration_mg_l.loc[:, list(sensors)]
         truth = frame.to_numpy(dtype=np.float32)
-        observed, observation_mask, frozen_mask, outage_mask, jitter = self._degrade(
+        observed, observation_mask, frozen_mask, outage_mask, jitter, drift_mask, unit_mismatch_mask = self._degrade(
             truth, np.asarray(frame.index, dtype=float), config, rng
         )
         if config.event_type == EventType.SENSOR_FAULT_ONLY:
@@ -247,6 +256,7 @@ class WNTRScenarioGenerator:
         result = GeneratedScenario(
             manifest, np.asarray(frame.index, dtype=np.int64), truth, observed, observation_mask,
             frozen_mask, outage_mask, jitter, sensors, reversals,
+            drift_mask, unit_mismatch_mask,
         )
         ScenarioValidator().validate(result)
         return result
@@ -276,13 +286,24 @@ class WNTRScenarioGenerator:
     def _degrade(
         truth: np.ndarray, timestamps: np.ndarray, config: ScenarioGenerationConfig,
         rng: np.random.Generator,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         observed = truth.astype(np.float64, copy=True)
         noise_scale = 0.0 if config.stage == CurriculumStage.CLEAN else config.sensor_noise_std
         observed += rng.normal(0.0, noise_scale, observed.shape)
         hours = (timestamps - timestamps[0]) / 3600.0
         directions = rng.choice([-1.0, 1.0], size=observed.shape[1])
-        observed += hours[:, None] * config.drift_per_hour * directions[None, :]
+        drift = hours[:, None] * config.drift_per_hour * directions[None, :]
+        observed += drift
+        # A sensor is only "faulty from drift" once the accumulated offset
+        # is large enough to be distinguishable from measurement resolution
+        # (config.quantization_step, applied just below) -- not from the
+        # first instant any nonzero drift exists, which would mark every
+        # sensor in every scenario as faulty forever.
+        drift_mask = (
+            np.abs(drift) >= config.quantization_step
+            if config.quantization_step > 0
+            else np.zeros_like(drift, dtype=bool)
+        )
         if config.quantization_step > 0:
             observed = np.round(observed / config.quantization_step) * config.quantization_step
         missing_probability = 0.0 if config.stage == CurriculumStage.CLEAN else config.missing_probability
@@ -300,13 +321,18 @@ class WNTRScenarioGenerator:
                 stop = min(observed.shape[0], start + max(1, observed.shape[0] // 8))
                 mask[start:stop, column] = False
                 outage[start:stop, column] = True
+        unit_mismatch = np.zeros(observed.shape, dtype=bool)
         for column in range(observed.shape[1]):
             if rng.random() < config.unit_mismatch_probability:
                 observed[:, column] *= 1000.0
+                unit_mismatch[:, column] = True
         jitter = rng.normal(0.0, 5.0 if config.stage != CurriculumStage.CLEAN else 0.0, observed.shape)
         observed = np.maximum(0.0, observed)
         observed[~mask] = np.nan
-        return observed.astype(np.float32), mask, frozen, outage, jitter.astype(np.float32)
+        return (
+            observed.astype(np.float32), mask, frozen, outage, jitter.astype(np.float32),
+            drift_mask, unit_mismatch,
+        )
 
     @staticmethod
     def _force_sensor_fault(
@@ -370,7 +396,8 @@ class ScenarioValidator:
         shapes = {
             scenario.truth_concentration.shape, scenario.observed_concentration.shape,
             scenario.observation_mask.shape, scenario.frozen_mask.shape,
-            scenario.communication_outage_mask.shape,
+            scenario.communication_outage_mask.shape, scenario.drift_mask.shape,
+            scenario.unit_mismatch_mask.shape,
         }
         if len(shapes) != 1:
             raise ValueError("scenario arrays are not aligned")
@@ -402,6 +429,7 @@ class ScenarioDatasetWriter:
             communication_outage_mask=scenario.communication_outage_mask,
             timestamp_jitter_seconds=scenario.timestamp_jitter_seconds,
             flow_reversal_mask=scenario.flow_reversal_mask,
+            drift_mask=scenario.drift_mask, unit_mismatch_mask=scenario.unit_mismatch_mask,
         )
         manifest_dir = self.root / "manifests"
         manifest_dir.mkdir(parents=True, exist_ok=True)
@@ -456,6 +484,16 @@ def load_generated_scenarios(
                         timestamp_jitter_seconds=arrays["timestamp_jitter_seconds"],
                         sensor_nodes=manifest.sensor_nodes,
                         flow_reversal_mask=arrays["flow_reversal_mask"],
+                        # Immutable pre-repair archives (data/learning-v1) were
+                        # written before drift_mask/unit_mismatch_mask existed;
+                        # they must remain loadable without regenerating them,
+                        # so an absent key falls back to all-False (matching
+                        # the historical behavior these faults were never
+                        # recorded at all) rather than raising KeyError.
+                        drift_mask=arrays["drift_mask"] if "drift_mask" in arrays
+                        else np.zeros_like(arrays["frozen_mask"], dtype=bool),
+                        unit_mismatch_mask=arrays["unit_mismatch_mask"] if "unit_mismatch_mask" in arrays
+                        else np.zeros_like(arrays["frozen_mask"], dtype=bool),
                     )
                 ScenarioValidator().validate(scenario)
                 if hashlib.sha256(

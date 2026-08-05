@@ -30,8 +30,10 @@ from .data import ScenarioExample
 
 #: Target keys that are node-indexed (one value per node) rather than a
 #: single scalar per example, and therefore need the same padding as node
-#: inputs rather than a plain stack.
-NODE_INDEXED_TARGET_KEYS = ("sensor_fault",)
+#: inputs rather than a plain stack. sensor_fault_mask pads with False,
+#: which is correct for a padded position either way: it is not a real
+#: sensored node.
+NODE_INDEXED_TARGET_KEYS = ("sensor_fault", "sensor_fault_mask")
 
 
 def _example_to_graph_sample(example: ScenarioExample) -> GraphSample:
@@ -77,7 +79,10 @@ def collate_variable_topology(
     targets: dict[str, Tensor] = {}
     for key in sorted(target_keys):
         if key in NODE_INDEXED_TARGET_KEYS:
-            padded = torch.zeros(len(examples), max_nodes, device=examples[0].targets[key].device)
+            reference = examples[0].targets[key]
+            padded = torch.zeros(
+                len(examples), max_nodes, dtype=reference.dtype, device=reference.device
+            )
             for index, example in enumerate(examples):
                 value = example.targets[key]
                 padded[index, : value.shape[0]] = value

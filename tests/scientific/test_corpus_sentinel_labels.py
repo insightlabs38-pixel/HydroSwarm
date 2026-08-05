@@ -81,7 +81,18 @@ def test_normal_example_has_event_presence_false_and_masked_targets(network, sig
     assert bool(example.targets["duration_mask"]) is False
     assert bool(example.targets["relative_strength_mask"]) is False
     assert bool(example.targets["source_region_mask"]) is False
-    assert not bool(example.targets["sensor_fault"].any())
+    # sensor_fault is about instrument health, not about whether a
+    # contamination event occurred -- a NORMAL scenario is not forced to
+    # have zero faults (real drift alone, injected every scenario
+    # regardless of event_type, can legitimately trip it; see
+    # core-issues.txt repair item 3 / GeneratedScenario.drift_mask). What a
+    # NORMAL example genuinely guarantees is that sensor_fault_mask marks
+    # exactly the 3 configured sensor nodes (sensor_count=3 above) as real,
+    # and nothing else -- unsensored nodes must never be treated as valid
+    # "healthy" observations.
+    mask = example.targets["sensor_fault_mask"]
+    assert int(mask.sum()) == 3
+    assert not bool(mask.all())
 
 
 def test_sensor_fault_only_example_has_correct_cause_and_shows_the_fault(network, signature_library) -> None:

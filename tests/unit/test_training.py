@@ -210,6 +210,105 @@ def test_target_mask_companion_still_trains_on_the_unmasked_positions() -> None:
     assert result.tasks["source_node"].item() > 1.0
 
 
+def test_sensor_fault_mask_excludes_unsensored_nodes_from_the_loss() -> None:
+    # core-issues.txt repair item 3: an unsensored node's sensor_fault=0.0
+    # placeholder is not a real "healthy" observation and must not be
+    # trained against. Row 0 has a genuinely wrong, confident prediction
+    # at every position but sensor_fault_mask=False everywhere -- if the
+    # mask were ignored, this row alone would produce a large loss.
+    outputs = {"sensor_fault_logits": torch.tensor([[8.0, 8.0, 8.0]], requires_grad=True)}
+    targets = {
+        "sensor_fault": torch.tensor([[0.0, 0.0, 0.0]]),
+        "sensor_fault_mask": torch.tensor([[False, False, False]]),
+    }
+    result = compute_multitask_loss(outputs, targets)
+    assert result.tasks["sensor_fault"].item() == pytest.approx(0.0)
+
+
+def test_sensor_fault_mask_still_trains_on_real_sensor_positions() -> None:
+    outputs = {"sensor_fault_logits": torch.tensor([[8.0, 8.0, 8.0]], requires_grad=True)}
+    targets = {
+        "sensor_fault": torch.tensor([[0.0, 0.0, 0.0]]),
+        # Only position 1 has a real sensor; it is confidently (and
+        # wrongly) predicted faulty, so the masked loss must be well above
+        # zero even though positions 0 and 2 (also wrong) are excluded.
+        "sensor_fault_mask": torch.tensor([[False, True, False]]),
+    }
+    result = compute_multitask_loss(outputs, targets)
+    assert result.tasks["sensor_fault"].item() > 1.0
+
+
+def test_padding_a_batch_does_not_change_sensor_fault_loss_for_real_nodes() -> None:
+    """core-issues.txt repair item 3: 'a test proving graph padding does
+    not change sensor-fault loss'. Two real sensor positions (one healthy,
+    one faulty) must contribute the identical loss whether collated alone
+    or alongside a second, larger example -- the padded positions
+    (sensor_fault_mask=False, added by collate_variable_topology's
+    zero-fill) must contribute exactly nothing either way."""
+
+    from hydroswarm.model import HydroCore
+    from hydroswarm.training import CurriculumStage, ScenarioExample, collate_variable_topology
+
+    def _example(scenario_id: str, nodes: int, seed: int) -> ScenarioExample:
+        generator = torch.Generator().manual_seed(seed)
+        sensor_fault = torch.zeros(nodes)
+        sensor_fault_mask = torch.zeros(nodes, dtype=torch.bool)
+        sensor_fault[0], sensor_fault_mask[0] = 0.0, True  # healthy, real sensor
+        sensor_fault[1], sensor_fault_mask[1] = 1.0, True  # faulty, real sensor
+        edges = [(i, i + 1) for i in range(nodes - 1)]
+        edge_index = torch.tensor(edges, dtype=torch.long).T if edges else torch.zeros(2, 0, dtype=torch.long)
+        return ScenarioExample(
+            scenario_id=scenario_id, network_id="net", split="train", seed=seed,
+            seed_family=f"family-{scenario_id}", stage=CurriculumStage.CLEAN,
+            inputs={
+                "node_features": torch.randn(nodes, 3, generator=generator),
+                "temporal_features": torch.randn(2, nodes, 2, generator=generator),
+                "quality_features": torch.randn(2, nodes, 2, generator=generator),
+                "edge_index": edge_index,
+                "edge_features": torch.randn(len(edges), 2, generator=generator) if edges else torch.zeros(0, 2),
+                "source_candidate_mask": torch.ones(nodes, dtype=torch.bool),
+                "node_mask": torch.ones(nodes, dtype=torch.bool),
+            },
+            targets={
+                "source_node": torch.tensor(0),
+                "sensor_fault": sensor_fault,
+                "sensor_fault_mask": sensor_fault_mask,
+            },
+        )
+
+    model = HydroCore(
+        node_feature_dim=3, temporal_feature_dim=2, quality_feature_dim=2, edge_feature_dim=2,
+        d_model=32, nhead=4, dim_feedforward=64, num_layers=1, modality_layers=1,
+        latent_tokens=64, adapter_dims=(32, 32, 32), dropout=0.0,
+    ).eval()
+
+    small = _example("small", nodes=3, seed=1)
+    large = _example("large", nodes=7, seed=2)
+
+    with torch.no_grad():
+        alone_inputs, alone_targets = collate_variable_topology([small])
+        alone_output = model(alone_inputs)
+        padded_inputs, padded_targets = collate_variable_topology([small, large])
+        padded_output = model(padded_inputs)
+
+    alone_loss = compute_multitask_loss(
+        {"sensor_fault_logits": alone_output["sensor_fault_logits"]},
+        {"sensor_fault": alone_targets["sensor_fault"], "sensor_fault_mask": alone_targets["sensor_fault_mask"]},
+    )
+    # Isolate "small"'s own contribution from the padded batch by zeroing
+    # out "large"'s row before computing the loss -- compute_multitask_loss
+    # has no per-example breakdown, so this compares the two rows directly.
+    padded_logits_small_only = padded_output["sensor_fault_logits"][:1]
+    padded_targets_small_only = {
+        "sensor_fault": padded_targets["sensor_fault"][:1],
+        "sensor_fault_mask": padded_targets["sensor_fault_mask"][:1],
+    }
+    padded_loss = compute_multitask_loss(
+        {"sensor_fault_logits": padded_logits_small_only}, padded_targets_small_only
+    )
+    torch.testing.assert_close(alone_loss.total, padded_loss.total, atol=1e-5, rtol=1e-4)
+
+
 def test_multitask_loss_covers_event_control_heads_when_present() -> None:
     # overnight-plan.txt Task 4.4: event_cause/event_presence losses only
     # fire when both the model output (event_control_heads=True) and the

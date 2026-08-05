@@ -298,10 +298,24 @@ def scenario_to_example(
                         or scenario.communication_outage_mask[
                             :, scenario.sensor_nodes.index(node_id)
                         ].any()
+                        # core-issues.txt repair item 3: drift and unit-mismatch
+                        # are real, generated fault modes (see
+                        # GeneratedScenario.drift_mask/unit_mismatch_mask) that
+                        # this target's own definition already names
+                        # ("frozen, drifting, or in communication outage") but
+                        # previously never checked.
+                        or scenario.drift_mask[:, scenario.sensor_nodes.index(node_id)].any()
+                        or scenario.unit_mismatch_mask[:, scenario.sensor_nodes.index(node_id)].any()
                     )
                 )
                 for node_id in node_ids
             ]),
+            # core-issues.txt repair item 3: sensor_fault is only ever
+            # meaningful for a node that actually has a sensor -- an
+            # unsensored node's "0.0" above is a placeholder, not a real
+            # "healthy" observation, and must not be trained against or
+            # counted in prevalence/audit statistics as if it were one.
+            "sensor_fault_mask": torch.tensor([node_id in scenario.sensor_nodes for node_id in node_ids]),
         },
     )
 
