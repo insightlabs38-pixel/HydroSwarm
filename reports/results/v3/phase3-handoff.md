@@ -1,0 +1,191 @@
+# Phase 3 (rebuild and retrain) — live handoff report
+
+Branch: `agent/gcp-multitopology-v3`. This is a **living document**, updated as each
+milestone in core-issues.txt's Phase 3 (items 13-20) completes. See
+`core-issues-repair-report.md` for the completed Phase 1+2 repair pass this continues
+from, and `core-issues2.txt` (a separate, not-yet-started expansion pass covering Scout/
+Strategist/OOD/auxiliary supervision) for what comes after this.
+
+**The locked final test has not been opened. `final-selection.json` does not exist.**
+
+## Status summary (updated each milestone)
+
+| Item | Task | Status |
+|---|---|---|
+| 13 | Regenerate corrected Cycle B → `data/learning-v2/cycle-b2` | IN PROGRESS (generation running) |
+| 14 | Fit train-only normalization; rebuild normalized shards | not started |
+| 15 | Run all corpus gates | not started |
+| 15 | Corrected E0/E1/E2 screening | not started |
+| 16 | Select strongest two (validation + dev holdout only) | not started |
+| 17 | Fully train selected two, ≥2 seeds each | not started |
+| 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | not started |
+| 19 | Re-run HydroMono/no-adapter control | not started |
+| 20 | Decide on HydroCore-M | not started |
+
+## Prerequisite code changes (all committed, tested, pushed)
+
+These close gaps that Phase 3 needs and that the Phase 1+2 repair pass explicitly left
+open (`core-issues-repair-report.md`'s "Remaining known limitations": no governed
+normalization has ever been fit; Cycle B was never regenerated with the repair-item-1..7
+fixes in effect):
+
+- `3b58fa3` `feat(preprocessing): fit normalization from sharded Cycle A/B corpora` —
+  `scripts/fit_normalization.py` only ever read a JSONL manifest (learning-v1 format);
+  every learning-v2+ corpus is sharded safetensors. Added `--train-shards`.
+- `2ebb438` + `4e6ecdd` `feat/fix(preprocessing): rebuild sharded corpus tensors with
+  fitted normalization` — new `scripts/rebuild_normalized_shards.py`. Writes to a
+  sibling `tensors-normalized/` tree, not in place — `tensors/` (raw) must survive so
+  the normalization train-only-ownership gate can independently refit and compare.
+- `63ac528` `feat(training): add run_corpus_gates.py, the pre-training corpus gate
+  suite` — implements all nine gates core-issues.txt Phase 3 item 15 lists (shard
+  checksums, finite values, target/mask validation, split/seed-family/topology
+  leakage, topology provenance, normalization ownership, label audit, mask round-trip,
+  deterministic replay). Fails closed; tested end-to-end against a real small
+  multi-topology corpus including failure-injection tests.
+- `5b6d805` `feat(training): parameterize Stage 2-4 scripts to target any corpus root`
+  — `run_stage{2,3,4}_*.py` hardcoded `data/learning-v2/cycle-b/tensors`. Added
+  `--corpus-root`/`--tensors-dirname` (default unchanged) and, for Stage 2,
+  `--experiments` to select a subset of E0-E8 (core-issues.txt asks for a targeted
+  E0/E1/E2 re-screen here, not a full E0-E8 re-run).
+
+Full test suite: 433 passed (was 420 before this pass's additions; the 13 new tests are
+`test_fit_normalization.py`'s 4 new cases + `test_rebuild_normalized_shards.py`'s 4 +
+`test_run_corpus_gates.py`'s 5). `ruff`/`pyright` clean on every file touched.
+
+## Corpus regeneration (item 13)
+
+Command (same seed as the original `data/learning-v2/cycle-b`, `71000` — deliberate:
+the scenario RNG draws are unaffected by the Phase 1 repair fixes, which only changed
+how a scenario's own randomized network gets turned into features/masks/topology
+metadata, so reusing the seed keeps cycle-b2 directly comparable scenario-for-scenario
+against the preserved cycle-b, differing only in the corrected derived tensors):
+
+```bash
+export PYTHONPATH=src
+python scripts/generate_cycle_b_corpus.py --output data/learning-v2/cycle-b2 --seed 71000
+```
+
+Launched via the governed job runner (`hydroswarm.training.job_runner`) at
+`experiments/jobs/cycle-b2-generation/` (run dir has `status.json`/`job.log`/`job.pid`;
+resume command is the one above, unchanged, since this script refuses to run against a
+non-empty output directory rather than resuming partial output — a fresh full re-run is
+the only valid resume path if it did not complete).
+
+`data/learning-v2/cycle-b` (old corpus) and `reports/results/v3/{stage2-architecture-
+screening,stage3-finalist-training,stage4-controls-training}.json` +
+`finalist-selection-recommendation.md` (provisional Stage 2-4 artifacts) are untouched.
+
+## Exact commands to resume every remaining step
+
+```bash
+export PYTHONPATH=src
+
+# 13. regenerate (if not already complete/committed)
+python scripts/generate_cycle_b_corpus.py --output data/learning-v2/cycle-b2 --seed 71000
+
+# 14. fit train-only normalization, then rebuild normalized shards
+python scripts/fit_normalization.py \
+  --train-shards data/learning-v2/cycle-b2/tensors/train \
+  --node-output data/learning-v2/cycle-b2/normalization/node-normalization.json \
+  --edge-output data/learning-v2/cycle-b2/normalization/edge-normalization.json
+python scripts/rebuild_normalized_shards.py \
+  --corpus-dir data/learning-v2/cycle-b2 \
+  --node-normalization data/learning-v2/cycle-b2/normalization/node-normalization.json \
+  --edge-normalization data/learning-v2/cycle-b2/normalization/edge-normalization.json
+
+# 15. corpus gates -- stop immediately if this exits nonzero
+python scripts/run_corpus_gates.py --corpus-dir data/learning-v2/cycle-b2
+
+# 15 (screening). corrected E0/E1/E2 short screen
+python scripts/run_stage2_architecture_screening.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --experiments E0 E1 E2 \
+  --run-root experiments/runs/cycle-b2-stage2 \
+  --registry experiments/registry/cycle-b2-stage2.jsonl \
+  --output reports/results/v3/cycle-b2-stage2-screening.json
+
+# 17. full finalist training (edit FINALISTS in run_stage3_finalist_training.py to the
+#     top two from the step above before running -- do not retune after seeing results)
+python scripts/run_stage3_finalist_training.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --run-root experiments/runs/cycle-b2-stage3 \
+  --registry experiments/registry/cycle-b2-stage3.jsonl \
+  --output reports/results/v3/cycle-b2-stage3-finalist-training.json
+
+# 19. HydroMono / no-adapter control, same corpus
+python scripts/run_stage4_controls_training.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --run-root experiments/runs/cycle-b2-stage4 \
+  --registry experiments/registry/cycle-b2-stage4.jsonl \
+  --output reports/results/v3/cycle-b2-stage4-controls-training.json
+```
+
+Item 18 (fit calibration on the exact deployed dynamic hybrid predictor, not
+`fixed_weight_fusion`) requires a trained finalist checkpoint first; its own dedicated
+script and exact command will be added here once Stage 3 (item 17) completes. See
+"Calibration fix design notes" below for what this requires and why it is not a small
+change.
+
+## Calibration fix design notes (item 18, not yet implemented)
+
+The Phase 1+2 repair pass's `fixed_weight_fusion` (static-weight log-linear blend) is
+an explicitly-documented approximation of the real deployed fusion,
+`fuse_source_probabilities` (dynamic per-incident trust weighting from `TrustFeatures`:
+healthy-sensor fraction, missing rate, normalized hydraulic residual,
+`estimated.normalized_uncertainty`, neural/classical entropy, OOD score). The
+approximation exists because a stored `ScenarioExample`'s tensors do not preserve the
+live `HydraulicStateEstimator`/classical-localizer state needed to reconstruct
+`TrustFeatures` post hoc -- confirmed by inspection, not assumed:
+
+- `healthy_sensor_fraction`/`missing_rate` ARE reconstructable from stored
+  `quality_features` (health/missing channels) plus `sensor_fault_mask`.
+- `hydraulic_uncertainty` and the classical localizer's `residual_rmse` are NOT: corpus
+  generation's `build_feature_context` calls
+  `HydraulicStateEstimator().estimate(simulated, OperationalTelemetry())` with an
+  **empty** telemetry object (it only needs static graph-derived features, not a real
+  per-scenario state estimate), and the classical prior stored in `ScenarioExample`
+  comes from training's own lightweight per-node `SignatureLibrary.posterior()`
+  (`hydroswarm.training.corpus.SignatureLibrary`), not the runtime hypothesis-space
+  `SignatureArtifact` (`hydroswarm.classical.signatures.SignatureArtifact`, built from
+  `SourceHypothesis` combinations over start-time/duration/strength/demand-regime bins)
+  that `localize_with_signatures` actually reasons over in production.
+
+The correct fix is not a smarter formula over stored tensors -- it is re-running the
+real classical/estimation pipeline per calibration scenario:
+
+1. Build (or load from a `SignatureCache`) one real `SignatureArtifact` per training
+   topology via `SignatureBuilder(HydraulicSimulator(pristine_network),
+   SignatureCache(...)).build_or_load(...)`, using the same bins
+   `src/hydroswarm/runtime/defaults.py`'s production wiring actually uses
+   (`start_time_bins=(0, 60)`, `duration_bins=(30, 60)`, `strength_bins=(0.5, 1.0)`,
+   `demand_regimes=("nominal",)`) -- matching what will actually run in deployment is
+   the point, not spanning the training corpus's broader generation grid.
+2. For each calibration-split scenario, regenerate its exact scenario + randomized
+   network deterministically from its recorded seed (same mechanism as
+   `run_corpus_gates.py`'s `deterministic_replay` gate), build its real
+   `SensorSeries` list (mirrors `hydroswarm.training.corpus.scenario_to_example`'s
+   inline construction), and call the real, already-trained-checkpoint-wired
+   `HybridInferencePipeline.analyze(incident_id=..., network=randomized_network,
+   sensor_series=series, signature_artifact=artifact)` end to end -- the actual
+   production entry point, not a hand-assembled approximation of it.
+3. Extract the analysis result's fused belief per node, map to the graph-local
+   `source_node` index space, and fit `SplitConformalCalibrator` on those real fused
+   vectors with `fusion_config_hash=DYNAMIC_TRUST_FUSION_CONFIG` (not
+   `fixed_weight_fusion_config(...)`), truthfully reflecting that this calibration
+   matches what `HybridInferencePipeline` actually runs at inference time.
+
+This is real, bounded, implementable work (not a research problem) but is
+computationally comparable to a second corpus-generation-scale pass over the
+calibration split (one classical localization per example, real WNTR-backed), so it is
+scoped as its own script run after a finalist checkpoint exists, not folded into Stage
+3's own (still `fixed_weight_fusion`-based) per-seed calibration used there purely for
+finalist comparison.
+
+## Restrictions honored throughout
+
+- No work on `main`; everything above is on `agent/gcp-multitopology-v3`.
+- `data/learning-v2/cycle-b` (old corpus), all promoted checkpoints, and
+  `reports/results/v3/{stage2,stage3,stage4}*` provisional results are untouched.
+- Locked test data has not been touched or opened; `final-selection.json` does not
+  exist.
+- No destructive git/filesystem commands used.
