@@ -6,6 +6,14 @@ calibration, development, OOD, or locked-test data even by a typo. If a
 manifest file's own records disagree with the split it was invoked for, that
 is treated as a hard error rather than silently normalizing on the wrong
 data.
+
+Accepts either a small JSONL manifest (--train-manifest, the learning-v1
+canonical-tensor format) or a sharded corpus directory (--train-shards, the
+learning-v2+ Cycle A/B format written by hydroswarm.training.sharded_data.
+write_shards). Exactly one of the two must be given. The sharded path calls
+ShardedScenarioDataset.verify_shard_checksums() before reading any tensor
+data, so a corrupted or stale shard fails this tool rather than silently
+corrupting the fitted statistics.
 """
 
 from __future__ import annotations
@@ -17,12 +25,14 @@ from pathlib import Path
 import numpy as np
 
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA, NormalizationStats
-from hydroswarm.training import load_scenario_examples_jsonl
+from hydroswarm.training import ShardedScenarioDataset, load_scenario_examples_jsonl
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--train-manifest", type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--train-manifest", type=Path, help="JSONL manifest (learning-v1 canonical-tensor format)")
+    source.add_argument("--train-shards", type=Path, help="sharded corpus directory (learning-v2+ format)")
     parser.add_argument(
         "--split",
         choices=("train",),
@@ -36,7 +46,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    examples = load_scenario_examples_jsonl(args.train_manifest)
+    if args.train_shards is not None:
+        dataset = ShardedScenarioDataset(args.train_shards, expected_split="train")
+        dataset.verify_shard_checksums()
+        examples = [dataset[position] for position in range(len(dataset))]
+    else:
+        examples = load_scenario_examples_jsonl(args.train_manifest)
     wrong_split = sorted({example.split for example in examples} - {"train"})
     if wrong_split:
         raise SystemExit(
