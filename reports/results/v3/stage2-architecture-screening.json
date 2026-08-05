@@ -1,0 +1,309 @@
+{
+  "batch_size": 16,
+  "corpus": "data/learning-v2/cycle-b",
+  "epochs": 4,
+  "failures": {},
+  "ranking": [
+    "E2",
+    "E0",
+    "E1",
+    "E3",
+    "E6",
+    "E4",
+    "E8",
+    "E7",
+    "E5"
+  ],
+  "results": {
+    "E0": {
+      "best_validation_loss": 4.469629813754369,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T213632Z-3f379420/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8754071661237784,
+        "ece": 0.031104256268530035,
+        "mean_latency_seconds": 0.003569066527861099,
+        "mrr": 0.7959845664650225,
+        "sensor_fault_accuracy": 0.9537408894838614,
+        "source_top1": 0.6905537459283387,
+        "source_top3": 0.8754071661237784
+      },
+      "experiment": "E0",
+      "overrides": {},
+      "parameter_count": 4040645,
+      "run_id": "20260804T213632Z-4b63f978",
+      "score": 0.7782747192425359,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8764044943820225,
+        "ece": 0.03935038501375842,
+        "mean_latency_seconds": 0.0036574045862936247,
+        "mrr": 0.7957246522204388,
+        "sensor_fault_accuracy": 0.9530114226375909,
+        "source_top1": 0.6896067415730337,
+        "source_top3": 0.8764044943820225
+      },
+      "wall_seconds": 1300.4425980420056
+    },
+    "E1": {
+      "best_validation_loss": 4.377772070112682,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T215813Z-c0e8729e/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8737785016286646,
+        "ece": 0.02788134288127723,
+        "mean_latency_seconds": 0.0036690305278363777,
+        "mrr": 0.8016053978594695,
+        "sensor_fault_accuracy": 0.9825226833258962,
+        "source_top1": 0.7003257328990228,
+        "source_top3": 0.8737785016286646
+      },
+      "experiment": "E1",
+      "overrides": {
+        "prior_mode": "feature_only"
+      },
+      "parameter_count": 4040645,
+      "run_id": "20260804T215813Z-33033729",
+      "score": 0.7767784574523545,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8764044943820225,
+        "ece": 0.04094601131640792,
+        "mean_latency_seconds": 0.0035671478054855326,
+        "mrr": 0.7882122792937399,
+        "sensor_fault_accuracy": 0.9803997923156802,
+        "source_top1": 0.6769662921348315,
+        "source_top3": 0.8764044943820225
+      },
+      "wall_seconds": 1326.5767518299908
+    },
+    "E2": {
+      "best_validation_loss": 4.341542274232895,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T222019Z-5bf4dc99/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8705211726384365,
+        "ece": 0.036499549662057235,
+        "mean_latency_seconds": 0.003626164676447705,
+        "mrr": 0.7962511633317823,
+        "sensor_fault_accuracy": 0.9819277108433735,
+        "source_top1": 0.6913680781758957,
+        "source_top3": 0.8705211726384365
+      },
+      "experiment": "E2",
+      "overrides": {
+        "prior_mode": "logit_only"
+      },
+      "parameter_count": 4040645,
+      "run_id": "20260804T222019Z-73de2505",
+      "score": 0.779437404944402,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8721910112359551,
+        "ece": 0.03806614890443472,
+        "mean_latency_seconds": 0.0035380451349088355,
+        "mrr": 0.7932350187265917,
+        "sensor_fault_accuracy": 0.9803997923156802,
+        "source_top1": 0.6882022471910112,
+        "source_top3": 0.8721910112359551
+      },
+      "wall_seconds": 1262.601370342003
+    },
+    "E3": {
+      "best_validation_loss": 4.3685240102192715,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T224122Z-b5fbd204/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8729641693811075,
+        "ece": 0.027287714183330525,
+        "mean_latency_seconds": 0.003671969961159806,
+        "mrr": 0.7947582208779278,
+        "sensor_fault_accuracy": 0.9827457980068421,
+        "source_top1": 0.6872964169381107,
+        "source_top3": 0.8729641693811075
+      },
+      "experiment": "E3",
+      "overrides": {
+        "incident_pooling": "source_conditioned"
+      },
+      "parameter_count": 4299845,
+      "run_id": "20260804T224122Z-096b49b6",
+      "score": 0.7741549097088709,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8735955056179775,
+        "ece": 0.04526464825265865,
+        "mean_latency_seconds": 0.0036480859930273415,
+        "mrr": 0.7883778089887641,
+        "sensor_fault_accuracy": 0.9806593977154725,
+        "source_top1": 0.6797752808988764,
+        "source_top3": 0.8735955056179775
+      },
+      "wall_seconds": 1297.18415563101
+    },
+    "E4": {
+      "best_validation_loss": 4.325178903246683,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T230259Z-8e4b20cb/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8770358306188925,
+        "ece": 0.02574014323930397,
+        "mean_latency_seconds": 0.00465088437330809,
+        "mrr": 0.7992971537149061,
+        "sensor_fault_accuracy": 0.9738955823293173,
+        "source_top1": 0.6962540716612378,
+        "source_top3": 0.8770358306188925
+      },
+      "experiment": "E4",
+      "overrides": {
+        "message_direction": "dual_gated"
+      },
+      "parameter_count": 4642757,
+      "run_id": "20260804T230259Z-c944876d",
+      "score": 0.7708517891488033,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8637640449438202,
+        "ece": 0.03253843415570388,
+        "mean_latency_seconds": 0.0047783818273230624,
+        "mrr": 0.8023592161583735,
+        "sensor_fault_accuracy": 0.9718328141225338,
+        "source_top1": 0.7036516853932584,
+        "source_top3": 0.8637640449438202
+      },
+      "wall_seconds": 1451.2336292190012
+    },
+    "E5": {
+      "best_validation_loss": 4.2599711418151855,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T232710Z-55a5ee14/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8778501628664495,
+        "ece": 0.03300374031600817,
+        "mean_latency_seconds": 0.0048850567537997314,
+        "mrr": 0.7914359391965254,
+        "sensor_fault_accuracy": 0.9897367246764837,
+        "source_top1": 0.6815960912052117,
+        "source_top3": 0.8778501628664495
+      },
+      "experiment": "E5",
+      "overrides": {
+        "incident_pooling": "source_conditioned",
+        "message_direction": "dual_gated"
+      },
+      "parameter_count": 4901957,
+      "run_id": "20260804T232710Z-d25adc5a",
+      "score": 0.764726018061214,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8693820224719101,
+        "ece": 0.03749692846047743,
+        "mean_latency_seconds": 0.004801724733162758,
+        "mrr": 0.7935777822364902,
+        "sensor_fault_accuracy": 0.9889667705088265,
+        "source_top1": 0.6867977528089888,
+        "source_top3": 0.8693820224719101
+      },
+      "wall_seconds": 1492.298583197
+    },
+    "E6": {
+      "best_validation_loss": 4.227121633196634,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260804T235203Z-bd10f9dc/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8713355048859935,
+        "ece": 0.022521776489986243,
+        "mean_latency_seconds": 0.0046623257664936265,
+        "mrr": 0.796782418178998,
+        "sensor_fault_accuracy": 0.9999256284396847,
+        "source_top1": 0.6929967426710097,
+        "source_top3": 0.8713355048859935
+      },
+      "experiment": "E6",
+      "overrides": {
+        "auxiliary_heads": true,
+        "incident_pooling": "source_conditioned",
+        "message_direction": "dual_gated"
+      },
+      "parameter_count": 4903688,
+      "run_id": "20260804T235203Z-da58cbd5",
+      "score": 0.7726928698457091,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8735955056179775,
+        "ece": 0.03973682482172264,
+        "mean_latency_seconds": 0.004706397966214036,
+        "mrr": 0.8013075173889781,
+        "sensor_fault_accuracy": 1.0,
+        "source_top1": 0.699438202247191,
+        "source_top3": 0.8735955056179775
+      },
+      "wall_seconds": 1476.6936805489968
+    },
+    "E7": {
+      "best_validation_loss": 0.8382037485698386,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260805T001639Z-6d44fa6c/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8648208469055375,
+        "ece": 0.022902418437629246,
+        "mean_latency_seconds": 0.0036488135871188595,
+        "mrr": 0.7885353652861797,
+        "sensor_fault_accuracy": 0.8964747880410531,
+        "source_top1": 0.6815960912052117,
+        "source_top3": 0.8648208469055375
+      },
+      "experiment": "E7",
+      "overrides": {},
+      "parameter_count": 4040645,
+      "run_id": "20260805T001639Z-f2dfe596",
+      "score": 0.7679763970066787,
+      "task_weights": {
+        "duration": 0.0,
+        "evidence_sufficiency": 0.0,
+        "relative_strength": 0.0,
+        "sensor_fault": 0.0,
+        "source_region": 0.0,
+        "start_time": 0.0
+      },
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8679775280898876,
+        "ece": 0.037042561123210416,
+        "mean_latency_seconds": 0.003640068149829786,
+        "mrr": 0.7861841225254147,
+        "sensor_fault_accuracy": 0.891484942886812,
+        "source_top1": 0.6769662921348315,
+        "source_top3": 0.8679775280898876
+      },
+      "wall_seconds": 1280.3189581530023
+    },
+    "E8": {
+      "best_validation_loss": 5.47366788273766,
+      "checkpoint": "experiments/runs/bundle-f-stage2/20260805T003800Z-872ad5d2/checkpoints/checkpoint-0004",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8672638436482085,
+        "ece": 0.036366122189290355,
+        "mean_latency_seconds": 0.0037023573397797892,
+        "mrr": 0.7912498061113696,
+        "sensor_fault_accuracy": 0.9830432842481035,
+        "source_top1": 0.6832247557003257,
+        "source_top3": 0.8672638436482085
+      },
+      "experiment": "E8",
+      "overrides": {
+        "event_control_heads": true
+      },
+      "parameter_count": 4043727,
+      "run_id": "20260805T003800Z-943e3068",
+      "score": 0.7695729403036876,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8693820224719101,
+        "ece": 0.047958269903666494,
+        "mean_latency_seconds": 0.003765356773833951,
+        "mrr": 0.7861205858747994,
+        "sensor_fault_accuracy": 0.9805295950155763,
+        "source_top1": 0.675561797752809,
+        "source_top3": 0.8693820224719101
+      },
+      "wall_seconds": 1513.700196685997
+    }
+  },
+  "schema_version": 1,
+  "score_formula": "0.30*source_top1(val) + 0.15*source_top3(val) + 0.10*mrr(val) + 0.15*(1-ece(val)) + 0.10*candidate_coverage_at_3(val) + 0.10*source_top1(dev_holdout) + 0.05*sensor_fault_accuracy(val) + 0.05*normalized_inverse_latency",
+  "seed": 20260805,
+  "stage": "Bundle F Stage 2 -- architecture screening (E0-E8)",
+  "wall_seconds": 12401.073393617997
+}

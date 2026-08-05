@@ -28,6 +28,8 @@ data/learning-v2/**/tensors/**/*.safetensors
 models/checkpoints/
 experiments/runs/
 experiments/registry/*.lock
+experiments/jobs/*/job.lock
+experiments/jobs/*/job.pid
 /temp.inp
 /temp.bin
 /temp.rpt

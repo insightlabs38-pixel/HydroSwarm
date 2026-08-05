@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/usr/local/bin/python3",
+    "-u",
+    "scripts/run_stage2_architecture_screening.py"
+  ],
+  "ended_at": "2026-08-05T01:07:10.620061+00:00",
+  "exit_code": 0,
+  "log_path": "experiments/jobs/bundle-f-stage2/job.log",
+  "pid": 74624,
+  "resume_command": [
+    "/usr/local/bin/python3",
+    "-u",
+    "scripts/run_stage2_architecture_screening.py"
+  ],
+  "started_at": "2026-08-04T21:36:19.045840+00:00",
+  "state": "COMPLETED",
+  "workdir": "/workspace/HydroSwarm"
+}
