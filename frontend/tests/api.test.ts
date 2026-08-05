@@ -145,6 +145,26 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
     expect(incident.provenance.calibrationHash).toBe('c'.repeat(64));
   });
 
+  test('maps a null sample_recommendation to null, not a zero-filled placeholder', async () => {
+    // core-issues.txt: represent unknown/absent values as null, never a
+    // fabricated zero -- a genuinely absent recommendation must not become
+    // { nodeId: '', informationGain: 0, ... }, which a consumer could
+    // mistake for a real recommendation.
+    vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
+        return Promise.resolve(
+          jsonResponse({ ...apiIncidentViewFixture() as object, sample_recommendation: null }),
+        );
+      }),
+    );
+    const { fetchIncident } = await import('../src/api');
+    const incident = await fetchIncident();
+    expect(incident.recommendedSample).toBeNull();
+  });
+
   test('fetchIncidentWithFallback returns the live-mapped incident, not the demo fixture', async () => {
     vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
     vi.stubGlobal(
@@ -195,6 +215,44 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
     expect(incident.mode).toBe('ERROR');
     expect(incident.mode).not.toBe('LIVE');
     expect(incident.modeReason).toContain(category);
+  });
+
+  test.each([
+    'missing_checkpoint',
+    'no_valid_plan',
+  ] as const)(
+    '%s: ERROR mode carries no demo plans, candidates, or sample recommendation',
+    async (category) => {
+      // core-issues.txt: ERROR mode must not render demo plans, candidates,
+      // or operational recommendations -- previously this spread the whole
+      // fabricated demoIncident fixture and only overrode `mode`, so a
+      // full set of fake plans/candidates/recommendations rendered right
+      // alongside the error banner.
+      window.history.pushState(null, '', `/?failure=${category}`);
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
+      const { fetchIncidentWithFallback } = await import('../src/api');
+      const incident = await fetchIncidentWithFallback();
+      expect(incident.mode).toBe('ERROR');
+      expect(incident.plans).toEqual([]);
+      expect(incident.candidates).toEqual([]);
+      expect(incident.nodes).toEqual([]);
+      expect(incident.recommendedSample).toBeNull();
+      expect(incident.selectedPlanId).toBeNull();
+      expect(incident.recommendedPlanId).toBeNull();
+      expect(incident.benchmarks).toEqual([]);
+      expect(incident.audit).toEqual([]);
+    },
+  );
+
+  test('ERROR mode from an unresolvable incident also carries no demo content', async () => {
+    vi.unstubAllEnvs(); // a prior test in this file may have stubbed VITE_INCIDENT_ID
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
+    const { fetchIncidentWithFallback } = await import('../src/api');
+    const incident = await fetchIncidentWithFallback();
+    expect(incident.mode).toBe('ERROR');
+    expect(incident.plans).toEqual([]);
+    expect(incident.candidates).toEqual([]);
+    expect(incident.recommendedSample).toBeNull();
   });
 
   test('an unrecognized failure category is ignored, not silently accepted', async () => {

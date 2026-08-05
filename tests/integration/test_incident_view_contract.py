@@ -8,6 +8,7 @@ against a genuine IncidentAnalysisResult rather than the DEMO_FALLBACK path.
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import UTC, datetime, timedelta
 import hashlib
 from uuid import UUID
@@ -25,7 +26,7 @@ from hydroswarm.classical import (
     SignatureLibrary,
     SourceHypothesis,
 )
-from hydroswarm.domain import ConsequenceMetrics, PlanDecision, PlanVerification
+from hydroswarm.domain import CandidateSet, ConsequenceMetrics, PlanDecision, PlanVerification
 from hydroswarm.inference import MODEL_VERSION, HybridInferencePipeline
 from hydroswarm.preprocessing import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
@@ -199,6 +200,73 @@ def test_incident_view_requires_full_topology_metadata(tmp_path) -> None:
 
     response = client.get(f"/api/incidents/{incident_id}/view")
     assert response.status_code == 503
+
+
+def test_incident_view_fails_closed_on_a_missing_provenance_hash(tmp_path) -> None:
+    # core-issues.txt: "fail closed rather than returning empty provenance
+    # hashes." A missing/empty required provenance hash must refuse the
+    # view (500), never silently ship ProvenanceView(network_hash="", ...)
+    # as if that were a trustworthy value.
+    pipeline, network = _build_pipeline()
+    app = create_app(pipeline_factory=pipeline, database_path=tmp_path / "runtime.sqlite3")
+    client = TestClient(app)
+    imported = _import_network(client, network)
+
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": imported["network_id"],
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation("S1", "J1", 0.0, 0.0), _observation("S1", "J1", 3600.0, 0.78)],
+        },
+    )
+    incident_id = created.json()["incident_id"]
+    assert client.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+
+    record = app.state.runtime.incidents[UUID(incident_id)]
+    corrupted = dict(record.analysis.provenance_hashes)
+    del corrupted["model"]
+    record.analysis = dataclasses.replace(record.analysis, provenance_hashes=corrupted)
+
+    response = client.get(f"/api/incidents/{incident_id}/view")
+    assert response.status_code == 500
+    assert "provenance" in response.json()["detail"]
+
+
+def test_incident_view_fails_closed_on_a_dangling_candidate_node_reference(tmp_path) -> None:
+    # core-issues.txt: explicit runtime validation for the /view response.
+    # A candidate set referencing a node that does not exist in this
+    # incident's own topology is an assembler-consistency bug that per-field
+    # type checks alone would not catch -- it must not ship silently.
+    pipeline, network = _build_pipeline()
+    app = create_app(pipeline_factory=pipeline, database_path=tmp_path / "runtime.sqlite3")
+    client = TestClient(app)
+    imported = _import_network(client, network)
+
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": imported["network_id"],
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation("S1", "J1", 0.0, 0.0), _observation("S1", "J1", 3600.0, 0.78)],
+        },
+    )
+    incident_id = created.json()["incident_id"]
+    assert client.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+
+    record = app.state.runtime.incidents[UUID(incident_id)]
+    record.state = record.state.model_copy(
+        update={
+            "candidates": CandidateSet(
+                node_probabilities={"NOT-A-REAL-NODE": 1.0},
+                node_ids=("NOT-A-REAL-NODE",),
+            )
+        }
+    )
+
+    response = client.get(f"/api/incidents/{incident_id}/view")
+    assert response.status_code == 500
+    assert "unknown nodes" in response.json()["detail"]
 
 
 def test_incident_view_returns_complete_verified_contract(tmp_path) -> None:

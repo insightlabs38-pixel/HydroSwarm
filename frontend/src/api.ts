@@ -278,6 +278,11 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
   }));
 
   const sample = raw.sample_recommendation;
+  // core-issues.txt: "no sample recommended" (sampling budget exhausted,
+  // or active sampling found nothing further worth measuring) is a real,
+  // legitimate state -- represented as null, not a zero-filled
+  // placeholder object that a consumer could mistake for an actual
+  // recommendation of zero information gain at an empty node id.
   const recommendedSample = sample
     ? {
         nodeId: sample.node_id,
@@ -286,18 +291,7 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
         cost: 0,
         rationale: `Expected information gain ${sample.expected_information_gain.toFixed(2)} bits; alternatives: ${sample.alternatives.join(', ') || 'none'}.`,
       }
-    : {
-        // A real, legitimate state (sampling budget exhausted or the
-        // active-sampling stage found no further useful sample) -- not a
-        // missing/broken field, so it is represented honestly rather than
-        // by omitting recommendedSample (which every consumer assumes is
-        // present).
-        nodeId: '',
-        informationGain: 0,
-        delayMinutes: 0,
-        cost: 0,
-        rationale: 'No further sampling is recommended for this incident.',
-      };
+    : null;
 
   const whySource = raw.explanations.find((item) => item.intent === 'WHY_SOURCE');
 
@@ -372,24 +366,66 @@ export async function fetchIncident(signal?: AbortSignal): Promise<IncidentView>
   return viewFromApi(raw);
 }
 
+/** A genuinely empty, safe IncidentView for the ERROR mode -- core-issues.txt:
+ * "Ensure ERROR mode cannot render demo plans, candidates, or operational
+ * recommendations." Spreading `demoIncident` here (as this used to do) and
+ * merely overriding `mode` left every one of demoIncident's fabricated
+ * plans/candidates/sample-recommendation/benchmarks intact underneath the
+ * error banner -- an operator who missed the banner could act on fake
+ * content. Every substantive field here is empty/null/zero-length, never a
+ * fabricated value, so there is nothing but the error reason itself to
+ * render. */
+function errorIncidentView(reason: string): IncidentView {
+  return {
+    id: '',
+    networkId: '',
+    status: 'SAMPLING',
+    mode: 'ERROR',
+    modeReason: reason,
+    offline: true,
+    runtimeMs: 0,
+    modelVersion: '',
+    provenance: {
+      networkHash: '',
+      featureSchemaHash: '',
+      modelCheckpointHash: '',
+      calibrationVersion: '',
+      calibrationHash: '',
+      simulator: null,
+      simulatorVersion: null,
+    },
+    ood: 'NORMAL',
+    approvalPending: false,
+    candidateCoverage: 0,
+    calibrationValid: false,
+    disagreement: 0,
+    nodes: [],
+    links: [],
+    candidates: [],
+    recommendedSample: null,
+    evidence: { before: [], after: [], uncertaintyReduction: 0, nodesRemoved: 0 },
+    plans: [],
+    selectedPlanId: null,
+    recommendedPlanId: null,
+    counterfactuals: {},
+    audit: [],
+    benchmarks: [],
+    explanation: '',
+  };
+}
+
 export async function fetchIncidentWithFallback(signal?: AbortSignal): Promise<IncidentView> {
   const failure = injectedFailure();
   if (failure) {
-    return {
-      ...demoIncident,
-      mode: 'ERROR',
-      modeReason: `[Failure injection: ${failure}] ${FAILURE_INJECTION_REASONS[failure]}`,
-    };
+    return errorIncidentView(
+      `[Failure injection: ${failure}] ${FAILURE_INJECTION_REASONS[failure]}`,
+    );
   }
   try {
     return await fetchIncident(signal);
   } catch (error) {
     if (error instanceof IncidentUnavailableError) {
-      return {
-        ...demoIncident,
-        mode: 'ERROR',
-        modeReason: error.message,
-      };
+      return errorIncidentView(error.message);
     }
     // Network/health failure, or a live response that failed to parse into
     // a valid IncidentView: fall back to the clearly-labeled demo fixture

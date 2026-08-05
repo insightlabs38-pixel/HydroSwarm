@@ -141,13 +141,18 @@ export interface IncidentView {
   nodes: NetworkNode[];
   links: NetworkLink[];
   candidates: Candidate[];
+  /** Null is a real, legitimate state (sampling budget exhausted, or
+   * active sampling found no further useful sample) -- represented as
+   * null rather than a zero-filled placeholder object so no consumer can
+   * mistake "nothing recommended" for "a recommendation of zero
+   * information gain at an empty node id" (core-issues.txt). */
   recommendedSample: {
     nodeId: string;
     informationGain: number;
     delayMinutes: number;
     cost: number;
     rationale: string;
-  };
+  } | null;
   evidence: {
     before: Candidate[];
     after: Candidate[];

@@ -18,7 +18,7 @@ function CandidateBars({ title, values }: { title: string; values: IncidentView[
 }
 
 export function EvidencePanel({ incident }: { incident: IncidentView }) {
-  const sampleNodeId = incident.recommendedSample.nodeId;
+  const sampleNodeId = incident.recommendedSample?.nodeId ?? 'the recommended location';
   return (
     <div>
       <div className="evidence-grid">
@@ -36,9 +36,11 @@ export function EvidencePanel({ incident }: { incident: IncidentView }) {
         <span>
           <strong>{incident.evidence.nodesRemoved}</strong> candidate nodes removed
         </span>
-        <span>
-          <strong>{incident.recommendedSample.delayMinutes} min</strong> sample delay
-        </span>
+        {incident.recommendedSample && (
+          <span>
+            <strong>{incident.recommendedSample.delayMinutes} min</strong> sample delay
+          </span>
+        )}
       </div>
     </div>
   );

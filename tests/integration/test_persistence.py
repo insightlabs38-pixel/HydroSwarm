@@ -86,3 +86,48 @@ def test_runtime_reconstructs_complete_scenario_from_sqlite(tmp_path) -> None:
         "approvals": 1,
     }
 
+
+def test_a_new_sample_after_restart_still_triggers_reanalysis(tmp_path) -> None:
+    # core-issues.txt: record.analysis (the live IncidentAnalysisResult) is
+    # never persisted -- only record.state.candidates is. A restored
+    # incident's in-memory record.analysis is None even though it really
+    # was analyzed before the restart; adding a new sample must still
+    # trigger reanalysis rather than silently skip it just because the
+    # in-memory analysis object did not survive.
+    database = tmp_path / "runtime.db"
+    first = TestClient(create_app(verifier=_verifier, database_path=database))
+    assert first.post(
+        "/api/networks/persisted-network/validate",
+        json={"node_ids": ["J1", "J2"], "link_count": 1},
+    ).status_code == 200
+    created = first.post("/api/incidents", json=_incident_payload())
+    incident_id = created.json()["incident_id"]
+    assert first.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+    events_before_restart = first.get(f"/api/incidents/{incident_id}/events").json()
+    analyzed_count_before = sum(
+        1 for event in events_before_restart if event["event_type"] == "HYBRID_ANALYSIS_COMPLETED"
+    )
+    assert analyzed_count_before == 1
+
+    # Simulate a process restart: a fresh app/runtime backed by the same
+    # database. The restored IncidentRuntime.analysis is None; only
+    # state.candidates survived.
+    second = TestClient(create_app(verifier=_verifier, database_path=database))
+    added = second.post(
+        f"/api/incidents/{incident_id}/samples",
+        json={
+            "sensor_id": "S2",
+            "node_id": "J2",
+            "observed_at": NOW.isoformat(),
+            "received_at": NOW.isoformat(),
+            "concentration_mg_l": 0.3,
+            "pressure_m": 24.0,
+        },
+    )
+    assert added.status_code == 200
+    events_after = second.get(f"/api/incidents/{incident_id}/events").json()
+    analyzed_count_after = sum(
+        1 for event in events_after if event["event_type"] == "HYBRID_ANALYSIS_COMPLETED"
+    )
+    assert analyzed_count_after == analyzed_count_before + 1
+

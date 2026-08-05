@@ -91,32 +91,41 @@ export function Overview({ incident }: { incident: IncidentView }) {
             Classical ↔ neural disagreement: {(incident.disagreement * 100).toFixed(1)}% · low
           </p>
         </Panel>
-        <Panel
-          title={`Collect sample at ${incident.recommendedSample.nodeId}`}
-          eyebrow="RECOMMENDED NEXT ACTION"
-        >
-          <div className="sample-metrics">
-            <span>
-              <strong>{incident.recommendedSample.informationGain.toFixed(2)}</strong> information
-              gain
-            </span>
-            <span>
-              <strong>{incident.recommendedSample.delayMinutes}m</strong> delay
-            </span>
-            <span>
-              <strong>{incident.recommendedSample.cost.toFixed(1)}</strong> cost
-            </span>
-          </div>
-          <p>{incident.recommendedSample.rationale}</p>
-          <button
-            type="button"
-            className="primary-action"
-            disabled
-            title="Sample-request review is not yet connected to the live API"
+        {incident.recommendedSample ? (
+          <Panel
+            title={`Collect sample at ${incident.recommendedSample.nodeId}`}
+            eyebrow="RECOMMENDED NEXT ACTION"
           >
-            Review sample request
-          </button>
-        </Panel>
+            <div className="sample-metrics">
+              <span>
+                <strong>{incident.recommendedSample.informationGain.toFixed(2)}</strong>{' '}
+                information gain
+              </span>
+              <span>
+                <strong>{incident.recommendedSample.delayMinutes}m</strong> delay
+              </span>
+              <span>
+                <strong>{incident.recommendedSample.cost.toFixed(1)}</strong> cost
+              </span>
+            </div>
+            <p>{incident.recommendedSample.rationale}</p>
+            <button
+              type="button"
+              className="primary-action"
+              disabled
+              title="Sample-request review is not yet connected to the live API"
+            >
+              Review sample request
+            </button>
+          </Panel>
+        ) : (
+          <Panel title="No further sampling recommended" eyebrow="RECOMMENDED NEXT ACTION">
+            <p className="supporting">
+              The sampling budget is exhausted, or active sampling found no further useful
+              measurement for this incident.
+            </p>
+          </Panel>
+        )}
         <Panel title="Sensor health" eyebrow="DATA QUALITY">
           {sensors.map((sensor) => (
             <div className="sensor-row" key={sensor.id}>

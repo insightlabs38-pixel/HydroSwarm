@@ -212,6 +212,16 @@ def create_app(
             )
         if isinstance(item, dict):
             return AnalysisResponse.model_validate(item)
+        # core-issues.txt: distinguish "genuinely never analyzed" from
+        # "this incident's in-memory analysis did not survive a restart"
+        # (record.state.candidates, unlike record.analysis, is persisted
+        # and would still be populated in the latter case) -- an explicit,
+        # different error rather than one message covering both.
+        if record.state.candidates is not None:
+            raise HTTPException(
+                status_code=409,
+                detail="incident analysis did not survive a restart; POST /analyze to reanalyze",
+            )
         raise HTTPException(status_code=409, detail="incident has not been analyzed")
 
     def perform_analysis(record: IncidentRuntime) -> AnalysisResponse:
@@ -482,6 +492,16 @@ def create_app(
             raise HTTPException(status_code=409, detail="analyze incident first")
         if record.state.sample_count >= record.create.maximum_samples:
             raise HTTPException(status_code=409, detail="sampling budget exhausted")
+        # core-issues.txt: record.analysis (the live IncidentAnalysisResult)
+        # is never persisted to disk -- only record.state.candidates is. A
+        # process restart leaves record.analysis=None while
+        # state.candidates still shows this incident WAS analyzed, which
+        # would otherwise silently fall through to the stale-candidates
+        # branch below as if that were still current. Explicitly redo the
+        # analysis first rather than serve a recommendation derived from
+        # evidence that predates however long ago the restart happened.
+        if record.analysis is None:
+            perform_analysis(record)
         analysis = record.analysis
         if isinstance(analysis, IncidentAnalysisResult) and analysis.sample_result:
             sampled = analysis.sample_result
@@ -531,7 +551,12 @@ def create_app(
                 "sample_count": record.state.sample_count + 1,
             }
         )
-        if record.analysis is not None:
+        # core-issues.txt: record.state.candidates (persisted) is checked
+        # here too, not just the in-memory-only record.analysis -- a
+        # restored incident that was analyzed before a restart must still
+        # reanalyze on a new sample, not silently skip straight to persist
+        # as if it had never been analyzed at all.
+        if record.analysis is not None or record.state.candidates is not None:
             perform_analysis(record)
         else:
             runtime().persist(record)
@@ -747,6 +772,37 @@ def create_app(
             removed_candidates={node: "new evidence reduced calibrated region" for node in before_after.removed_candidates} if before_after else None,
         )
 
+    def _validate_incident_view(view: IncidentView) -> None:
+        """core-issues.txt: explicit runtime validation for the /view
+        response, beyond the type/range checks Pydantic already enforces
+        per-field. These are cross-field invariants an assembler bug could
+        violate silently -- a dangling plan/node reference would otherwise
+        ship to the operator console as if it were a valid selection."""
+
+        node_ids = {node.node_id for node in view.nodes}
+        plan_ids = {item.plan.plan_id for item in view.plans}
+        missing_candidate_nodes = set(view.candidates.node_ids) - node_ids
+        if missing_candidate_nodes:
+            raise HTTPException(
+                status_code=500,
+                detail=f"incident view candidates reference unknown nodes: {sorted(missing_candidate_nodes)}",
+            )
+        if view.selected_plan_id is not None and view.selected_plan_id not in plan_ids:
+            raise HTTPException(
+                status_code=500,
+                detail="incident view selected_plan_id does not reference a plan in this view",
+            )
+        if view.recommended_plan_id is not None and view.recommended_plan_id not in plan_ids:
+            raise HTTPException(
+                status_code=500,
+                detail="incident view recommended_plan_id does not reference a plan in this view",
+            )
+        if view.sample_recommendation is not None and view.sample_recommendation.node_id not in node_ids:
+            raise HTTPException(
+                status_code=500,
+                detail="incident view sample_recommendation references an unknown node",
+            )
+
     @app.get("/api/incidents/{incident_id}/view", response_model=IncidentView)
     def get_incident_view(incident_id: UUID) -> IncidentView:
         record = incident_or_404(incident_id)
@@ -888,18 +944,38 @@ def create_app(
         explanations = tuple(explanations)
 
         latest_verification = next(reversed(record.verifications.values()), None)
+        # core-issues.txt: fail closed rather than returning empty
+        # provenance hashes. HybridInferencePipeline.analyze() always
+        # populates network/feature_schema/model in provenance_hashes when
+        # it runs at all (see hydroswarm.inference.pipeline); a missing key
+        # here means something is fundamentally wrong with this analysis
+        # result, not that "" is a legitimate hash an operator should be
+        # asked to trust. calibration is a genuine exception: "none" is
+        # the pipeline's own explicit, meaningful sentinel for "no
+        # calibration artifact was configured", not a silent omission.
+        required_provenance = {
+            "network": analysis.provenance_hashes.get("network"),
+            "feature_schema": analysis.provenance_hashes.get("feature_schema"),
+            "model": analysis.provenance_hashes.get("model"),
+        }
+        missing_provenance = [key for key, value in required_provenance.items() if not value]
+        if missing_provenance:
+            raise HTTPException(
+                status_code=500,
+                detail=f"incident view is missing required provenance hashes: {missing_provenance}",
+            )
         provenance = ProvenanceView(
-            network_hash=analysis.provenance_hashes.get("network", ""),
-            feature_schema_hash=analysis.provenance_hashes.get("feature_schema", ""),
+            network_hash=required_provenance["network"],
+            feature_schema_hash=required_provenance["feature_schema"],
             model_version=MODEL_VERSION,
-            model_checkpoint_hash=analysis.provenance_hashes.get("model", ""),
+            model_checkpoint_hash=required_provenance["model"],
             calibration_version=CALIBRATION_SCHEMA_VERSION,
             calibration_hash=analysis.provenance_hashes.get("calibration", "none"),
             simulator=latest_verification.simulator if latest_verification else None,
             simulator_version=latest_verification.simulator_version if latest_verification else None,
         )
 
-        return IncidentView(
+        view = IncidentView(
             incident_id=record.state.incident_id,
             network_id=record.state.network_id,
             runtime_mode=analysis.runtime_mode.value,
@@ -923,6 +999,8 @@ def create_app(
             audit_events=audit_events,
             runtime_metrics_ms=dict(analysis.latencies_ms),
         )
+        _validate_incident_view(view)
+        return view
 
     @app.post("/api/incidents/{incident_id}/workflow")
     def run_swarm_workflow(incident_id: UUID):

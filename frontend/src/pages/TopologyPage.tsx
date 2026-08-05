@@ -67,7 +67,9 @@ export function TopologyPage({ incident }: { incident: IncidentView }) {
           role="img"
           aria-label={`Directed topology${reservoir ? ` from reservoir ${reservoir.id}` : ''}${
             leadingCandidate ? ` through candidate source ${leadingCandidate.nodeId}` : ''
-          } toward sample ${incident.recommendedSample.nodeId}`}
+          }${
+            incident.recommendedSample ? ` toward sample ${incident.recommendedSample.nodeId}` : ''
+          }`}
         />
       </Panel>
     </div>

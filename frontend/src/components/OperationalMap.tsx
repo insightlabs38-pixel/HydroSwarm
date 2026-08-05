@@ -160,7 +160,7 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
         id: 'sample',
         type: 'circle',
         source: 'nodes',
-        filter: ['==', ['get', 'id'], incident.recommendedSample.nodeId],
+        filter: ['==', ['get', 'id'], incident.recommendedSample?.nodeId ?? ''],
         paint: {
           'circle-radius': 13,
           'circle-color': 'rgba(0,0,0,0)',
@@ -229,7 +229,7 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
       <div
         ref={container}
         className="map-canvas"
-        aria-label={`2D water network map showing flow, contamination, candidate sources, sample ${incident.recommendedSample.nodeId}, and response actions`}
+        aria-label={`2D water network map showing flow, contamination, candidate sources${incident.recommendedSample ? `, sample ${incident.recommendedSample.nodeId}` : ''}, and response actions`}
         role="img"
       />
       <div className="map-legend" aria-label="Map legend">
@@ -251,7 +251,7 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
           </>
         )}
         {secondaryCandidate && <>Candidate region also includes {secondaryCandidate.nodeId}. </>}
-        Recommended sample {incident.recommendedSample.nodeId}.{' '}
+        {incident.recommendedSample && <>Recommended sample {incident.recommendedSample.nodeId}. </>}
         {recommendedPlan && (
           <>
             Recommended plan: {recommendedPlan.name} ({recommendedPlan.actions} action
