@@ -24,10 +24,37 @@ def _tiny_model() -> HydroCore:
     )
 
 
-def _example(scenario_id: str, *, nodes: int, edges: list[tuple[int, int]], source_local_index: int, seed: int) -> ScenarioExample:
+def _example(
+    scenario_id: str,
+    *,
+    nodes: int,
+    edges: list[tuple[int, int]],
+    source_local_index: int,
+    seed: int,
+    missing_at: tuple[int, int] | None = None,
+) -> ScenarioExample:
+    """Builds a ScenarioExample matching what corpus generation actually
+    stores in a shard: temporal_features/quality_features already
+    NaN-replaced-with-zero (via pad_graph_batch's own nan_to_num), plus the
+    separately-computed sensor_mask/quality_mask/node_mask/edge_mask that
+    were derived from the real (pre-nan_to_num) values at generation time.
+    `missing_at=(step, node)` marks one (step, node) pair as genuinely
+    unobserved -- zeroed in the feature tensors and False in both masks --
+    exactly like a real missing sensor reading."""
+
     generator = torch.Generator().manual_seed(seed)
     steps = 2
     edge_index = torch.tensor(edges, dtype=torch.long).T if edges else torch.zeros(2, 0, dtype=torch.long)
+    temporal = torch.randn(steps, nodes, 2, generator=generator)
+    quality = torch.randn(steps, nodes, 2, generator=generator)
+    sensor_mask = torch.ones(steps, nodes, dtype=torch.bool)
+    quality_mask = torch.ones(steps, nodes, dtype=torch.bool)
+    if missing_at is not None:
+        step, node = missing_at
+        temporal[step, node] = 0.0
+        quality[step, node] = 0.0
+        sensor_mask[step, node] = False
+        quality_mask[step, node] = False
     return ScenarioExample(
         scenario_id=scenario_id,
         network_id="net",
@@ -37,8 +64,8 @@ def _example(scenario_id: str, *, nodes: int, edges: list[tuple[int, int]], sour
         stage=CurriculumStage.CLEAN,
         inputs={
             "node_features": torch.randn(nodes, 3, generator=generator),
-            "temporal_features": torch.randn(steps, nodes, 2, generator=generator),
-            "quality_features": torch.randn(steps, nodes, 2, generator=generator),
+            "temporal_features": temporal,
+            "quality_features": quality,
             "edge_index": edge_index,
             "edge_features": torch.randn(len(edges), 2, generator=generator) if edges else torch.zeros(0, 2),
             "travel_time": torch.rand(nodes, generator=generator),
@@ -46,6 +73,9 @@ def _example(scenario_id: str, *, nodes: int, edges: list[tuple[int, int]], sour
             "demand_centrality": torch.rand(nodes, generator=generator),
             "source_candidate_mask": torch.ones(nodes, dtype=torch.bool),
             "node_mask": torch.ones(nodes, dtype=torch.bool),
+            "sensor_mask": sensor_mask,
+            "quality_mask": quality_mask,
+            "edge_mask": torch.ones(len(edges), dtype=torch.bool),
         },
         targets={
             "source_node": torch.tensor(source_local_index),
@@ -115,6 +145,54 @@ def test_padding_does_not_affect_valid_node_predictions() -> None:
 def test_collate_rejects_empty_batch() -> None:
     with pytest.raises(ValueError, match="empty"):
         collate_variable_topology([])
+
+
+def test_stored_sensor_and_quality_masks_survive_collation_not_rederived_as_all_true() -> None:
+    """Regression test (core-issues.txt repair item 1): collate_variable_topology
+    used to drop the shard's own sensor_mask/quality_mask/edge_mask entirely and
+    let pad_graph_batch re-derive them via torch.isfinite() on tensors that were
+    already NaN-replaced-with-zero at corpus-generation time -- isfinite(0.0) is
+    True, so a genuinely missing (step, node) reading silently became "observed"
+    the moment two examples were batched together."""
+
+    small = _small_example()  # nodes=3, no missing entries
+    large = _example(
+        "large-missing", nodes=6, edges=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)],
+        source_local_index=4, seed=2, missing_at=(1, 2),  # step 1, node 2 unobserved
+    )
+    inputs, _ = collate_variable_topology([small, large])
+
+    # The missing (step, node) pair must still read False after padding --
+    # not silently flipped to True by re-deriving from zero-filled data.
+    assert inputs["sensor_mask"][1, 1, 2].item() is False
+    assert inputs["quality_mask"][1, 1, 2].item() is False
+    # Every other real (non-padded, non-missing) position for this example
+    # must remain True -- the fix must not blank out unrelated positions.
+    assert inputs["sensor_mask"][1, 0, 2].item() is True
+    assert inputs["sensor_mask"][1, 1, 0].item() is True
+    # node_mask/edge_mask (shape-derived, not NaN-derived) still behave as
+    # documented by the existing padding test.
+    assert inputs["node_mask"][0].tolist() == [True, True, True, False, False, False]
+    assert inputs["edge_mask"][0].tolist() == [True, True, False, False, False]
+    # Padded rows beyond either example's real span stay False, as before.
+    assert inputs["sensor_mask"][0, :, 3:].any().item() is False
+
+
+def test_missing_sensor_mask_input_falls_back_to_isfinite_derivation() -> None:
+    """When an example genuinely has no precomputed mask (e.g. a plain
+    single-example construction, matching HydraulicFeatureBuilder.build's
+    own pad_graph_batch([sample]) call before any mask exists yet),
+    collation must still derive one from isfinite() rather than crash or
+    silently mark everything unobserved."""
+
+    example = _small_example()
+    del example.inputs["sensor_mask"]
+    del example.inputs["quality_mask"]
+    del example.inputs["edge_mask"]
+    inputs, _ = collate_variable_topology([example])
+    assert inputs["sensor_mask"][0].all().item() is True
+    assert inputs["quality_mask"][0].all().item() is True
+    assert inputs["edge_mask"][0].all().item() is True
 
 
 def test_collate_rejects_mismatched_target_keys() -> None:

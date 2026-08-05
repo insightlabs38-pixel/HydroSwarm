@@ -45,6 +45,19 @@ def _example_to_graph_sample(example: ScenarioExample) -> GraphSample:
         edge_features=inputs.get("edge_features", torch.zeros(0, 0)),
         timestamps=inputs.get("timestamps"),
         node_scalar_features=node_scalars or None,
+        # The real per-example masks were already computed once, correctly,
+        # against genuine NaNs at corpus-generation time (see
+        # HydraulicFeatureBuilder.build's own pad_graph_batch([sample])
+        # call) and are stored verbatim in the shard. inputs["temporal_features"]
+        # / inputs["quality_features"] above are that same generation
+        # pass's NaN-replaced-with-zero output, so re-deriving masks from
+        # them here via isfinite() would find nothing missing and produce
+        # an all-True mask -- pass the stored masks through instead of
+        # letting pad_graph_batch recompute them from already-sanitized data.
+        node_mask=inputs.get("node_mask"),
+        sensor_mask=inputs.get("sensor_mask"),
+        quality_mask=inputs.get("quality_mask"),
+        edge_mask=inputs.get("edge_mask"),
     )
 
 

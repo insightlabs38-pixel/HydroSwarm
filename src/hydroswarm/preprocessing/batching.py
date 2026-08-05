@@ -81,6 +81,22 @@ class GraphSample:
     edge_features: Tensor
     timestamps: Tensor | None = None
     node_scalar_features: dict[str, Tensor] | None = None
+    #: Pre-computed observation masks, in this sample's own (unpadded)
+    #: shape -- [nodes], [time, nodes], [time, nodes], [edges]
+    #: respectively. When provided, pad_graph_batch copies them directly
+    #: into the batch mask tensors instead of re-deriving sensor_mask/
+    #: quality_mask via torch.isfinite(...): the temporal/quality
+    #: features it pads are already NaN-replaced-with-zero by this same
+    #: function on a prior call (once per example, at corpus generation
+    #: time), so re-deriving from isfinite() on a second pass would find
+    #: no NaNs left to detect and silently produce an all-True mask.
+    #: Pass None (the default) only when a sample's own real NaNs are
+    #: still present and a mask has genuinely not been computed yet --
+    #: e.g. the single-example call inside HydraulicFeatureBuilder.build.
+    node_mask: Tensor | None = None
+    sensor_mask: Tensor | None = None
+    quality_mask: Tensor | None = None
+    edge_mask: Tensor | None = None
 
     def __post_init__(self) -> None:
         nodes = self.node_features.shape[0]
@@ -100,6 +116,15 @@ class GraphSample:
             for key, value in self.node_scalar_features.items():
                 if value.shape[0] != nodes:
                     raise ValueError(f"node_scalar_features[{key!r}] must have shape [nodes, ...]")
+        time_nodes = self.temporal_features.shape[:2]
+        if self.node_mask is not None and self.node_mask.shape != (nodes,):
+            raise ValueError("node_mask must have shape [nodes]")
+        if self.sensor_mask is not None and self.sensor_mask.shape != time_nodes:
+            raise ValueError("sensor_mask must have shape [time, nodes]")
+        if self.quality_mask is not None and self.quality_mask.shape != time_nodes:
+            raise ValueError("quality_mask must have shape [time, nodes]")
+        if self.edge_mask is not None and self.edge_mask.shape != (self.edge_index.shape[1],):
+            raise ValueError("edge_mask must have shape [edges]")
 
 
 def pad_graph_batch(samples: Sequence[GraphSample]) -> dict[str, Tensor]:
@@ -139,13 +164,25 @@ def pad_graph_batch(samples: Sequence[GraphSample]) -> dict[str, Tensor]:
         node[index, :nodes] = sample.node_features
         temporal[index, :steps, :nodes] = torch.nan_to_num(sample.temporal_features)
         quality[index, :steps, :nodes] = torch.nan_to_num(sample.quality_features)
-        node_mask[index, :nodes] = True
-        sensor_mask[index, :steps, :nodes] = torch.isfinite(sample.temporal_features).all(-1)
-        quality_mask[index, :steps, :nodes] = torch.isfinite(sample.quality_features).all(-1)
+        node_mask[index, :nodes] = (
+            sample.node_mask if sample.node_mask is not None else torch.ones(nodes, dtype=torch.bool)
+        )
+        sensor_mask[index, :steps, :nodes] = (
+            sample.sensor_mask
+            if sample.sensor_mask is not None
+            else torch.isfinite(sample.temporal_features).all(-1)
+        )
+        quality_mask[index, :steps, :nodes] = (
+            sample.quality_mask
+            if sample.quality_mask is not None
+            else torch.isfinite(sample.quality_features).all(-1)
+        )
         if edges:
             edge_index[index, :, :edges] = sample.edge_index
             edge[index, :edges] = sample.edge_features
-            edge_mask[index, :edges] = True
+            edge_mask[index, :edges] = (
+                sample.edge_mask if sample.edge_mask is not None else torch.ones(edges, dtype=torch.bool)
+            )
         if sample.timestamps is None:
             timestamps[index, :steps] = torch.arange(steps, device=device)
         else:
