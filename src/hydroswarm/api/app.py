@@ -586,6 +586,7 @@ def create_app(
     def verify_plan(incident_id: UUID, plan_id: UUID) -> PlanVerification:
         record = incident_or_404(incident_id)
         plan = plan_or_404(record, plan_id)
+        exact_runs_consumed = 0
         if runtime().verifier is not None:
             verification = runtime().verifier(plan, record.state)
         else:
@@ -595,12 +596,24 @@ def create_app(
                     status_code=503,
                     detail="authoritative WNTR verification is unavailable",
                 )
-            verification = PlanVerifier(
-                HydraulicSimulator(
-                    network_path,
-                    exact_simulation_budget=settings.exact_plan_simulation_limit,
+            # core-issues.txt: the exact-simulation budget belongs to the
+            # incident, not to this one HydraulicSimulator instance -- a
+            # fresh instance constructed on every /verify call must only
+            # ever be given what this incident has not already spent,
+            # never a full budget reset.
+            remaining_budget = max(
+                0, settings.exact_plan_simulation_limit - record.state.exact_simulations_used
+            )
+            if remaining_budget <= 0:
+                raise HTTPException(
+                    status_code=409,
+                    detail="exact simulation budget exhausted for this incident",
                 )
-            ).verify(plan)
+            simulator = HydraulicSimulator(network_path, exact_simulation_budget=remaining_budget)
+            try:
+                verification = PlanVerifier(simulator).verify(plan)
+            finally:
+                exact_runs_consumed = simulator.exact_runs
         if verification.plan_id != plan_id:
             raise HTTPException(status_code=500, detail="verifier returned the wrong plan_id")
         record.verifications[plan_id] = verification
@@ -609,6 +622,7 @@ def create_app(
             update={
                 "status": "APPROVAL" if verified else "PLANNING",
                 "approval_pending": verified,
+                "exact_simulations_used": record.state.exact_simulations_used + exact_runs_consumed,
             }
         )
         runtime().append_event(
@@ -955,6 +969,7 @@ def create_app(
             "revision_round": int(state.get("planning_round", 0)),
         })
 
+        real_simulator: HydraulicSimulator | None = None
         if runtime().verifier is not None:
             class InjectedVerifier:
                 def prescreen(self, plan):
@@ -970,12 +985,19 @@ def create_app(
             path = runtime().store.network_path(record.state.network_id)
             if not path or wntr is None:
                 raise HTTPException(status_code=503, detail="authoritative WNTR workflow unavailable")
-            authority = PlanVerifier(
-                HydraulicSimulator(
-                    path,
-                    exact_simulation_budget=settings.exact_plan_simulation_limit,
-                )
+            # core-issues.txt: same incident-level budget accounting as
+            # /verify -- a fresh HydraulicSimulator here must only ever be
+            # given what this incident has not already spent.
+            remaining_budget = max(
+                0, settings.exact_plan_simulation_limit - record.state.exact_simulations_used
             )
+            if remaining_budget <= 0:
+                raise HTTPException(
+                    status_code=409,
+                    detail="exact simulation budget exhausted for this incident",
+                )
+            real_simulator = HydraulicSimulator(path, exact_simulation_budget=remaining_budget)
+            authority = PlanVerifier(real_simulator)
             network = authority.simulator.network
         record.swarm = (
             runtime().swarm_factory(sentinel, scout, strategist, authority)
@@ -985,7 +1007,17 @@ def create_app(
             )
         )
         record.swarm.start(network, record.state)
-        result = record.swarm.run()
+        try:
+            result = record.swarm.run()
+        finally:
+            if real_simulator is not None and real_simulator.exact_runs:
+                record.state = record.state.model_copy(
+                    update={
+                        "exact_simulations_used": (
+                            record.state.exact_simulations_used + real_simulator.exact_runs
+                        )
+                    }
+                )
         if result.selected_plan:
             record.plans[result.selected_plan.plan_id] = result.selected_plan
         if result.verification:

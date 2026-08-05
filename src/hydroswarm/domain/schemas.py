@@ -175,4 +175,11 @@ class IncidentState(FrozenModel):
     ood_level: OODLevel = OODLevel.NORMAL
     sample_count: int = Field(default=0, ge=0, le=5)
     approval_pending: bool = False
+    #: core-issues.txt: cumulative real WNTR/EPANET exact-simulation runs
+    #: spent by this incident across its whole lifetime. Persisted here
+    #: (not left as a HydraulicSimulator instance attribute, which resets
+    #: to zero every time a fresh simulator is constructed for a new
+    #: request) so a caller cannot bypass the budget simply by triggering
+    #: another verify/plan request against the same incident.
+    exact_simulations_used: int = Field(default=0, ge=0)
 

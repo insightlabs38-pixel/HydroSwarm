@@ -6,6 +6,7 @@ import hashlib
 from fastapi.testclient import TestClient
 
 from hydroswarm.api import create_app
+from hydroswarm.api.state import ApiSettings
 from hydroswarm.simulation.network import build_wntr_network
 
 
@@ -87,6 +88,61 @@ def test_secure_inp_import_deduplicates_versions_and_returns_geojson(tmp_path) -
     assert verification.status_code == 200
     assert verification.json()["simulator"] == "WNTRSimulator"
     assert verification.json()["simulator"] != "deterministic-local-verifier"
+
+
+def test_exact_simulation_budget_is_tracked_per_incident_not_per_request(tmp_path) -> None:
+    # core-issues.txt: "Persist the exact-simulation budget per incident
+    # rather than per simulator instance." Before this fix, /verify built a
+    # fresh HydraulicSimulator(exact_simulation_budget=limit) on every call,
+    # so the budget silently reset every request -- an incident could
+    # accumulate unlimited real WNTR/EPANET runs by calling /verify
+    # repeatedly. With exact_plan_simulation_limit=1, a second /verify
+    # against the same incident must now be refused.
+    client = TestClient(
+        create_app(
+            database_path=tmp_path / "runtime.db",
+            network_directory=tmp_path / "networks",
+            settings=ApiSettings(exact_plan_simulation_limit=1),
+        )
+    )
+    content = _inp_bytes(tmp_path)
+    imported = client.post(
+        "/api/networks/import", files={"file": ("city.inp", content, "text/plain")}
+    ).json()
+
+    now = datetime(2026, 8, 3, tzinfo=UTC).isoformat()
+    incident = client.post(
+        "/api/incidents",
+        json={
+            "network_id": imported["network_id"],
+            "detected_at": now,
+            "observations": [
+                {
+                    "sensor_id": "S-J1",
+                    "node_id": "J1",
+                    "observed_at": now,
+                    "received_at": now,
+                    "concentration_mg_l": 0.1,
+                    "pressure_m": 25.0,
+                }
+            ],
+        },
+    ).json()
+    client.post(f"/api/incidents/{incident['incident_id']}/analyze")
+    plans = client.post(
+        f"/api/incidents/{incident['incident_id']}/plans/generate", json={"count": 2}
+    ).json()
+
+    first = client.post(
+        f"/api/incidents/{incident['incident_id']}/plans/{plans[0]['plan_id']}/verify"
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        f"/api/incidents/{incident['incident_id']}/plans/{plans[1]['plan_id']}/verify"
+    )
+    assert second.status_code == 409
+    assert "budget" in second.json()["detail"]
 
 
 def test_import_rejects_paths_extensions_oversize_and_unsafe_content(tmp_path) -> None:
