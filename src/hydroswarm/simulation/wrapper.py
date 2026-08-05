@@ -5,9 +5,9 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import multiprocessing
 import queue
 import tempfile
-import threading
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -287,22 +287,56 @@ class HydraulicSimulator:
         return model
 
     def _run_with_timeout(self, operation: str, function: Callable[[], Any]) -> Any:
-        results: queue.Queue[tuple[bool, Any]] = queue.Queue(maxsize=1)
+        """Run `function` with a hard wall-clock deadline in a real, killable
+        OS subprocess -- not a daemon thread (core-issues.txt: a thread that
+        exceeds its timeout cannot be forcibly stopped in Python and simply
+        keeps running in the background, consuming CPU for however long the
+        underlying EPANET/WNTR call takes, or forever if it is genuinely
+        hung).
 
-        def target() -> None:
+        Uses the "fork" start method deliberately, not "spawn": this call
+        sits on the live incident-analysis latency path (real profiling
+        shows single-digit milliseconds today), and spawn's from-scratch
+        interpreter/import cost (numpy/pandas/wntr/torch) turns that into
+        multiple seconds per call -- an unacceptable regression for a
+        function invoked on every hydraulic simulation. Forking a
+        multi-threaded parent (e.g. a live server) carries a narrow,
+        well-documented risk of a child inheriting a lock another thread
+        held at fork time; unlike the daemon-thread version this replaces,
+        that failure mode is still fully contained -- a wedged child is a
+        real OS process, so the timeout below still forcibly terminates it
+        and this call still raises SimulationTimeoutError rather than
+        hanging or leaking the process."""
+
+        context = multiprocessing.get_context("fork")
+        result_queue: multiprocessing.Queue = context.Queue(maxsize=1)
+
+        def _worker() -> None:
             try:
-                results.put((True, function()))
+                result_queue.put((True, function()))
             except BaseException as exc:  # propagate simulator failures to caller
-                results.put((False, exc))
+                result_queue.put((False, exc))
 
-        thread = threading.Thread(target=target, name=f"hydroswarm-{operation}", daemon=True)
-        thread.start()
-        thread.join(self.timeout_seconds)
-        if thread.is_alive():
+        process = context.Process(target=_worker, name=f"hydroswarm-{operation}", daemon=True)
+        process.start()
+        process.join(self.timeout_seconds)
+        if process.is_alive():
+            process.terminate()
+            process.join(5.0)
+            if process.is_alive():
+                process.kill()
+                process.join()
             raise SimulationTimeoutError(
                 f"{operation} exceeded the {self.timeout_seconds:g}-second timeout"
             )
-        succeeded, value = results.get_nowait()
+        try:
+            succeeded, value = result_queue.get_nowait()
+        except queue.Empty:
+            raise SimulationError(
+                f"{operation} worker exited without a result (exit code {process.exitcode})"
+            ) from None
+        finally:
+            process.join()
         if not succeeded:
             raise value
         return value
