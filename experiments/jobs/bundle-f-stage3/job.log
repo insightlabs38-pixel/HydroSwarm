@@ -1,0 +1,9 @@
+E2-seed20260810: OK (7221.4s, val_top1=0.732, stopped_early=False)
+E2-seed20260811: OK (7219.5s, val_top1=0.721, stopped_early=False)
+E0-seed20260810: OK (7219.3s, val_top1=0.718, stopped_early=False)
+E0-seed20260811: OK (7222.0s, val_top1=0.716, stopped_early=False)
+E1-seed20260810: OK (7221.6s, val_top1=0.725, stopped_early=False)
+E1-seed20260811: OK (7221.3s, val_top1=0.716, stopped_early=False)
+{
+  "failures": {}
+}

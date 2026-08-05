@@ -1,0 +1,526 @@
+{
+  "calibration_alpha": 0.1,
+  "corpus": "data/learning-v2/cycle-b",
+  "early_stopping_patience": 3,
+  "failures": {},
+  "finalists": {
+    "E0": {},
+    "E1": {
+      "prior_mode": "feature_only"
+    },
+    "E2": {
+      "prior_mode": "logit_only"
+    }
+  },
+  "max_epochs": 16,
+  "maximum_runtime_seconds_per_run": 7200.0,
+  "results": {
+    "E0": {
+      "20260810": {
+        "best_validation_loss": 3.3864872625895908,
+        "calibration_artifact_hash": "1e5eed845945f6e732936b5b7e1f4212633ac7b31ec580154f1226106ad261f2",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.019526140775342506,
+          "mean_set_size": 2.308988764044944
+        },
+        "checkpoint": "",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.236970684039088,
+          "measured_coverage": 0.8900651465798045
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8737785016286646,
+          "ece": 0.015114987711953019,
+          "examples": 1228,
+          "mean_latency_seconds": 0.003739890744290536,
+          "mrr": 0.8104108500077555,
+          "source_top1": 0.7166123778501629,
+          "source_top3": 0.8737785016286646
+        },
+        "epochs_completed": 13,
+        "finalist": "E0",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.4006849315068495,
+              "measured_coverage": 0.8972602739726028
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.886986301369863,
+              "ece": 0.051202893104047006,
+              "examples": 292,
+              "mean_latency_seconds": 0.003956995878515705,
+              "mrr": 0.7786815068493149,
+              "source_top1": 0.6506849315068494,
+              "source_top3": 0.886986301369863
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.5035714285714286,
+              "measured_coverage": 0.8071428571428572
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8357142857142857,
+              "ece": 0.10804818528039112,
+              "examples": 280,
+              "mean_latency_seconds": 0.0035509830311769163,
+              "mrr": 0.7049404761904762,
+              "source_top1": 0.5357142857142857,
+              "source_top3": 0.8357142857142857
+            }
+          }
+        },
+        "overrides": {},
+        "parameter_count": 4040645,
+        "run_id": "20260805T051444Z-b3178ac7",
+        "seed": 20260810,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.252808988764045,
+          "measured_coverage": 0.898876404494382
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8834269662921348,
+          "ece": 0.019834635172332287,
+          "examples": 712,
+          "mean_latency_seconds": 0.003710230881263291,
+          "mrr": 0.8130500936329588,
+          "source_top1": 0.7176966292134831,
+          "source_top3": 0.8834269662921348
+        },
+        "wall_seconds": 7219.316815642
+      },
+      "20260811": {
+        "best_validation_loss": 3.500711796775697,
+        "calibration_artifact_hash": "91991469aa1d49645dcb15514c22671047752898b1254a1487179c53517bed74",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.014337222517125495,
+          "mean_set_size": 2.327247191011236
+        },
+        "checkpoint": "",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.27442996742671,
+          "measured_coverage": 0.8916938110749185
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8762214983713354,
+          "ece": 0.015999497220842398,
+          "examples": 1228,
+          "mean_latency_seconds": 0.004028949799666665,
+          "mrr": 0.8068142159143787,
+          "source_top1": 0.7092833876221498,
+          "source_top3": 0.8762214983713354
+        },
+        "epochs_completed": 12,
+        "finalist": "E0",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.393835616438356,
+              "measured_coverage": 0.8938356164383562
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.886986301369863,
+              "ece": 0.057090284175252276,
+              "examples": 292,
+              "mean_latency_seconds": 0.0039606737453278295,
+              "mrr": 0.7796518264840182,
+              "source_top1": 0.6541095890410958,
+              "source_top3": 0.886986301369863
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.4571428571428573,
+              "measured_coverage": 0.775
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.825,
+              "ece": 0.11536697803863458,
+              "examples": 280,
+              "mean_latency_seconds": 0.0037637839888767692,
+              "mrr": 0.6746428571428572,
+              "source_top1": 0.48928571428571427,
+              "source_top3": 0.825
+            }
+          }
+        },
+        "overrides": {},
+        "parameter_count": 4040645,
+        "run_id": "20260805T071503Z-31640d5b",
+        "seed": 20260811,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.268258426966292,
+          "measured_coverage": 0.8904494382022472
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8834269662921348,
+          "ece": 0.013370637352881807,
+          "examples": 712,
+          "mean_latency_seconds": 0.004732772385497729,
+          "mrr": 0.8126254012841092,
+          "source_top1": 0.7162921348314607,
+          "source_top3": 0.8834269662921348
+        },
+        "wall_seconds": 7222.025030694989
+      }
+    },
+    "E1": {
+      "20260810": {
+        "best_validation_loss": 3.3926377939799477,
+        "calibration_artifact_hash": "2c36f77bd667e5a2d924961861f3861ec34e8800fdfab7de6e572da280af41da",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.030102294219151247,
+          "mean_set_size": 2.398876404494382
+        },
+        "checkpoint": "",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.3778501628664497,
+          "measured_coverage": 0.9087947882736156
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8778501628664495,
+          "ece": 0.026585995422900684,
+          "examples": 1228,
+          "mean_latency_seconds": 0.00423984434572327,
+          "mrr": 0.8071855126415387,
+          "source_top1": 0.7084690553745928,
+          "source_top3": 0.8778501628664495
+        },
+        "epochs_completed": 11,
+        "finalist": "E1",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.4726027397260273,
+              "measured_coverage": 0.8938356164383562
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8732876712328768,
+              "ece": 0.05471770240835944,
+              "examples": 292,
+              "mean_latency_seconds": 0.004190360776466486,
+              "mrr": 0.7746167645140247,
+              "source_top1": 0.6438356164383562,
+              "source_top3": 0.8732876712328768
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.8964285714285714,
+              "measured_coverage": 0.8785714285714286
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8642857142857143,
+              "ece": 0.09842048888759951,
+              "examples": 280,
+              "mean_latency_seconds": 0.0039234843125411445,
+              "mrr": 0.7206547619047619,
+              "source_top1": 0.5535714285714286,
+              "source_top3": 0.8642857142857143
+            }
+          }
+        },
+        "overrides": {
+          "prior_mode": "feature_only"
+        },
+        "parameter_count": 4040645,
+        "run_id": "20260805T091525Z-b4a37618",
+        "seed": 20260810,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.389044943820225,
+          "measured_coverage": 0.9073033707865169
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8778089887640449,
+          "ece": 0.02206727000099889,
+          "examples": 712,
+          "mean_latency_seconds": 0.004275671761472163,
+          "mrr": 0.8159293071161048,
+          "source_top1": 0.7247191011235955,
+          "source_top3": 0.8778089887640449
+        },
+        "wall_seconds": 7221.585679122989
+      },
+      "20260811": {
+        "best_validation_loss": 3.460155027253287,
+        "calibration_artifact_hash": "2251387899d4a4427794d7ce973b0776aac5cc5e79c12b1fab8347f40b6d1475",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.011204533466189865,
+          "mean_set_size": 2.3047752808988764
+        },
+        "checkpoint": "",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.267915309446254,
+          "measured_coverage": 0.8908794788273615
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8762214983713354,
+          "ece": 0.015272231572322768,
+          "examples": 1228,
+          "mean_latency_seconds": 0.004121931727094831,
+          "mrr": 0.8050120210950829,
+          "source_top1": 0.7052117263843648,
+          "source_top3": 0.8762214983713354
+        },
+        "epochs_completed": 12,
+        "finalist": "E1",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.4280821917808217,
+              "measured_coverage": 0.8835616438356164
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.9006849315068494,
+              "ece": 0.04789850554645878,
+              "examples": 292,
+              "mean_latency_seconds": 0.004165890297805188,
+              "mrr": 0.781979778212655,
+              "source_top1": 0.6575342465753424,
+              "source_top3": 0.9006849315068494
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.6964285714285716,
+              "measured_coverage": 0.8178571428571428
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.85,
+              "ece": 0.12846106801714213,
+              "examples": 280,
+              "mean_latency_seconds": 0.00385393904690058,
+              "mrr": 0.6918452380952381,
+              "source_top1": 0.5071428571428571,
+              "source_top3": 0.85
+            }
+          }
+        },
+        "overrides": {
+          "prior_mode": "feature_only"
+        },
+        "parameter_count": 4040645,
+        "run_id": "20260805T111547Z-63a4237f",
+        "seed": 20260811,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.2148876404494384,
+          "measured_coverage": 0.8918539325842697
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8651685393258427,
+          "ece": 0.015862774982880988,
+          "examples": 712,
+          "mean_latency_seconds": 0.0040769754891941245,
+          "mrr": 0.8086225922953452,
+          "source_top1": 0.7162921348314607,
+          "source_top3": 0.8651685393258427
+        },
+        "wall_seconds": 7221.278308392008
+      }
+    },
+    "E2": {
+      "20260810": {
+        "best_validation_loss": 3.4377680657401917,
+        "calibration_artifact_hash": "7ec6181bf196c9f458535f7ffd0a102b42e993f686f1808cffe79466385c9c97",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.02880422518922324,
+          "mean_set_size": 2.2387640449438204
+        },
+        "checkpoint": "",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.182410423452769,
+          "measured_coverage": 0.8835504885993485
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8745928338762216,
+          "ece": 0.027671051154016295,
+          "examples": 1228,
+          "mean_latency_seconds": 0.003620294804267114,
+          "mrr": 0.808487474794478,
+          "source_top1": 0.7117263843648208,
+          "source_top3": 0.8745928338762216
+        },
+        "epochs_completed": 13,
+        "finalist": "E2",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.2226027397260273,
+              "measured_coverage": 0.8732876712328768
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8767123287671232,
+              "ece": 0.04690905818588116,
+              "examples": 292,
+              "mean_latency_seconds": 0.0037264056436781597,
+              "mrr": 0.784050880626223,
+              "source_top1": 0.6643835616438356,
+              "source_top3": 0.8767123287671232
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.507142857142857,
+              "measured_coverage": 0.8214285714285714
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8428571428571429,
+              "ece": 0.1268089588199343,
+              "examples": 280,
+              "mean_latency_seconds": 0.0034010309299057034,
+              "mrr": 0.6817261904761904,
+              "source_top1": 0.48928571428571427,
+              "source_top3": 0.8428571428571429
+            }
+          }
+        },
+        "overrides": {
+          "prior_mode": "logit_only"
+        },
+        "parameter_count": 4040645,
+        "run_id": "20260805T011403Z-622efe03",
+        "seed": 20260810,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.143258426966292,
+          "measured_coverage": 0.8946629213483146
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8764044943820225,
+          "ece": 0.01858024977231294,
+          "examples": 712,
+          "mean_latency_seconds": 0.003558996509440568,
+          "mrr": 0.8182417067950777,
+          "source_top1": 0.7317415730337079,
+          "source_top3": 0.8764044943820225
+        },
+        "wall_seconds": 7221.425917239001
+      },
+      "20260811": {
+        "best_validation_loss": 3.3626563000300576,
+        "calibration_artifact_hash": "db6e65a72f6744e320c1325372842d556c3d6d5a4caa845c17a871d8fc4b0cd7",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.02676551615267269,
+          "mean_set_size": 2.258426966292135
+        },
+        "checkpoint": "",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.2100977198697067,
+          "measured_coverage": 0.8859934853420195
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8721498371335505,
+          "ece": 0.023202483909332026,
+          "examples": 1228,
+          "mean_latency_seconds": 0.004008783497819206,
+          "mrr": 0.811155382348379,
+          "source_top1": 0.7190553745928339,
+          "source_top3": 0.8721498371335505
+        },
+        "epochs_completed": 13,
+        "finalist": "E2",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.2945205479452055,
+              "measured_coverage": 0.8698630136986302
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8698630136986302,
+              "ece": 0.05076293764661436,
+              "examples": 292,
+              "mean_latency_seconds": 0.00358250201169577,
+              "mrr": 0.7798475212002609,
+              "source_top1": 0.6575342465753424,
+              "source_top3": 0.8698630136986302
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.4571428571428573,
+              "measured_coverage": 0.825
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8392857142857143,
+              "ece": 0.15229936768966063,
+              "examples": 280,
+              "mean_latency_seconds": 0.0033393955262649147,
+              "mrr": 0.6882738095238096,
+              "source_top1": 0.5,
+              "source_top3": 0.8392857142857143
+            }
+          }
+        },
+        "overrides": {
+          "prior_mode": "logit_only"
+        },
+        "parameter_count": 4040645,
+        "run_id": "20260805T031424Z-16371ff4",
+        "seed": 20260811,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.1980337078651684,
+          "measured_coverage": 0.8904494382022472
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8820224719101124,
+          "ece": 0.017849649271268517,
+          "examples": 712,
+          "mean_latency_seconds": 0.003578993091625225,
+          "mrr": 0.8157453852327449,
+          "source_top1": 0.7205056179775281,
+          "source_top3": 0.8820224719101124
+        },
+        "wall_seconds": 7219.478249628999
+      }
+    }
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260810,
+    20260811
+  ],
+  "stage": "Bundle F Stage 3 -- finalist training",
+  "wall_seconds": 43325.152283469
+}

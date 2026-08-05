@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/usr/local/bin/python3",
+    "-u",
+    "scripts/run_stage3_finalist_training.py"
+  ],
+  "ended_at": "2026-08-05T13:24:51.975515+00:00",
+  "exit_code": 0,
+  "log_path": "experiments/jobs/bundle-f-stage3/job.log",
+  "pid": 87092,
+  "resume_command": [
+    "/usr/local/bin/python3",
+    "-u",
+    "scripts/run_stage3_finalist_training.py"
+  ],
+  "started_at": "2026-08-05T01:13:50.394638+00:00",
+  "state": "COMPLETED",
+  "workdir": "/workspace/HydroSwarm"
+}
