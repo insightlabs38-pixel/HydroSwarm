@@ -12,10 +12,15 @@ import shutil
 from safetensors import safe_open
 
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
+from hydroswarm.tasks import validate_tasks
 
 
 def _hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _task_set(value: str) -> frozenset[str]:
+    return frozenset(token.strip() for token in value.split(",") if token.strip())
 
 
 def main() -> int:
@@ -28,7 +33,34 @@ def main() -> int:
     parser.add_argument("--calibration-manifest", type=Path, required=True)
     parser.add_argument("--training-seconds", type=float, required=True)
     parser.add_argument("--status", choices=("trained", "partial"), required=True)
+    parser.add_argument(
+        "--trained-tasks",
+        required=True,
+        help=(
+            "comma-separated runtime tasks genuinely optimized against real labels "
+            "for this checkpoint (see hydroswarm.tasks.RUNTIME_TASKS); e.g. 'sentinel'. "
+            "core-issues.txt repair item 8: HybridInferencePipeline ignores any task's "
+            "neural outputs that is not declared here."
+        ),
+    )
+    parser.add_argument(
+        "--validated-tasks",
+        required=True,
+        help=(
+            "comma-separated subset of --trained-tasks that has also passed "
+            "audit/calibration validation (e.g. label_audit, corpus gates)."
+        ),
+    )
     args = parser.parse_args()
+    trained_tasks = _task_set(args.trained_tasks)
+    validated_tasks = _task_set(args.validated_tasks)
+    validate_tasks(trained_tasks, label="--trained-tasks")
+    validate_tasks(validated_tasks, label="--validated-tasks")
+    if not validated_tasks <= trained_tasks:
+        raise ValueError(
+            f"--validated-tasks {sorted(validated_tasks)} must be a subset of "
+            f"--trained-tasks {sorted(trained_tasks)}"
+        )
     if args.checkpoint.is_dir():
         source = args.checkpoint / "model.safetensors"
         trainer_state = json.loads(
@@ -63,6 +95,8 @@ def main() -> int:
         "trainer_state": trainer_state,
         "promoted_at": datetime.now(UTC).isoformat(),
         "optimizer_state_included": False,
+        "trained_tasks": sorted(trained_tasks),
+        "validated_tasks": sorted(validated_tasks),
     }
     metadata_path = args.output.with_suffix(".metadata.json")
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")

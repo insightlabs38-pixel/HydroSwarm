@@ -7,7 +7,10 @@ reached a real deployment."""
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from hydroswarm.runtime.defaults import DefaultPipelineFactory
+from hydroswarm.simulation.wrapper import wntr
 
 
 def test_promoted_checkpoint_loads_successfully() -> None:
@@ -46,3 +49,20 @@ def test_promoted_checkpoint_calibration_still_validates_with_no_normalization()
 
     assert factory._calibrator.artifact.normalization_hash == NO_NORMALIZATION_SENTINEL
     assert factory._feature_builder.normalization_fingerprint == NO_NORMALIZATION_SENTINEL
+
+
+def test_promoted_checkpoint_declares_only_sentinel_as_a_trained_task() -> None:
+    """core-issues.txt repair item 8: the real promoted checkpoint's own
+    metadata.json now declares trained_tasks, and the real hybrid pipeline
+    built from it must actually gate Scout/Strategist/OOD accordingly --
+    not just the constant in isolation."""
+
+    factory = DefaultPipelineFactory()
+    assert factory.trained_assets_ready is True
+    assert factory.trained_tasks == frozenset({"sentinel"})
+
+    if wntr is None:
+        return
+    network_path = Path(__file__).resolve().parents[2] / "data" / "frozen" / "golden_network.inp"
+    pipeline = factory(None, network_path)
+    assert pipeline.trained_tasks == frozenset({"sentinel"})

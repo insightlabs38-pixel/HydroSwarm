@@ -36,6 +36,7 @@ from hydroswarm.planning import (
 )
 from hydroswarm.preprocessing import BuiltHydroBatch, HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.sampling import ActiveSamplingResult, SamplingConstraints, rank_sample_locations
+from hydroswarm.tasks import RUNTIME_TASKS, validate_tasks
 
 from .ood import OODDetector
 from .results import (
@@ -109,9 +110,18 @@ class HybridInferencePipeline:
         disagreement_threshold: float = 0.50,
         evidence_threshold: float = 0.55,
         clock: Callable[[], float] = time.perf_counter,
+        trained_tasks: frozenset[str] | None = None,
     ) -> None:
         if maximum_planning_candidates < 1:
             raise ValueError("maximum_planning_candidates must be positive")
+        # core-issues.txt repair item 8: `None` means "no gating" (every
+        # existing caller that predates this parameter, and every test that
+        # wires a fake model to exercise a head directly, keeps behaving
+        # exactly as before). Production wiring (runtime/defaults.py) always
+        # passes the checkpoint's own declared `trained_tasks`, which is the
+        # only place this actually needs to fail closed.
+        self.trained_tasks = RUNTIME_TASKS if trained_tasks is None else frozenset(trained_tasks)
+        validate_tasks(self.trained_tasks, label="trained_tasks")
         self.simulator = simulator
         self.signature_artifact = signature_artifact
         self.model = model
@@ -425,6 +435,16 @@ class HybridInferencePipeline:
             neural_logits = _array(model_output["source_node_logits"]).reshape(-1)[-len(node_ids):]
             neural_vector = _softmax(neural_logits)
             semantics = self._model_semantics(model_output, node_ids)
+            # core-issues.txt repair item 8: Scout (sample_node/
+            # information_gain heads) and Strategist (plan_value/
+            # plan_validity heads) never receive a real training label (see
+            # hydroswarm.tasks) -- their raw outputs must not perturb active
+            # sampling or plan ranking until a checkpoint actually declares
+            # those tasks trained.
+            if "scout" not in self.trained_tasks:
+                semantics = replace(semantics, expected_information_gain=None)
+            if "strategist" not in self.trained_tasks:
+                semantics = replace(semantics, plan_values=(), plan_validity=())
         except Exception as exc:
             latencies.setdefault("neural_inference", 0.0)
             runtime_mode = HybridRuntimeMode.CLASSICAL_SAFE
@@ -438,7 +458,12 @@ class HybridInferencePipeline:
         if "latent_state" in model_output:
             latent = _array(model_output["latent_state"]).mean(axis=tuple(range(_array(model_output["latent_state"]).ndim - 1)))
         ood_probabilities = None
-        if "ood_logits" in model_output:
+        # core-issues.txt repair item 8: the ood_head never receives a real
+        # ood_class label (see hydroswarm.tasks); until a checkpoint
+        # declares "ood" trained, OODDetector.evaluate falls back to its
+        # deterministic energy proxy (1 - max(neural_probabilities)) instead
+        # of this untrained head's output.
+        if "ood" in self.trained_tasks and "ood_logits" in model_output:
             ood_probabilities = _softmax(_array(model_output["ood_logits"]).reshape(-1)[-3:])
         ood_components, ood_level = stage(
             "ood_detection",

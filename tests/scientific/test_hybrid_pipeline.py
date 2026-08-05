@@ -135,6 +135,40 @@ def test_neural_failure_is_explicit_and_falls_back_to_classical_posterior() -> N
     assert result.fusion_diagnostics is None
 
 
+def test_scout_strategist_and_ood_neural_outputs_are_ignored_when_untrained() -> None:
+    # core-issues.txt repair item 8: PriorFollowingModel's
+    # expected_information_gain/plan_value/plan_validity_logits/ood_logits
+    # are exactly the outputs that must never influence a runtime decision
+    # until a checkpoint declares those tasks trained -- today no checkpoint
+    # does, because Scout/Strategist/OOD target generators do not exist.
+    pipeline, network = _pipeline(PriorFollowingModel())
+    pipeline.trained_tasks = frozenset({"sentinel"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert result.semantic_predictions.expected_information_gain is None
+    assert result.semantic_predictions.plan_values == ()
+    assert result.semantic_predictions.plan_validity == ()
+    # ood_logits=[4.0, 0.0, -4.0] softmaxes its last class near zero, which
+    # would otherwise pull ood_components.energy toward 0. Gated, energy
+    # must instead fall back to the deterministic 1 - max(neural belief).
+    assert result.neural_belief is not None
+    expected_energy = 1.0 - max(result.neural_belief.values())
+    assert result.ood_components.energy == pytest.approx(expected_energy, abs=1e-6)
+
+
+def test_scout_strategist_and_ood_neural_outputs_pass_through_when_declared_trained() -> None:
+    pipeline, network = _pipeline(PriorFollowingModel())
+    pipeline.trained_tasks = frozenset({"sentinel", "scout", "strategist", "ood"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert result.semantic_predictions.expected_information_gain is not None
+    assert result.semantic_predictions.plan_values != ()
+    assert result.semantic_predictions.plan_validity != ()
+    # With "ood" declared trained, ood_logits' near-zero last class must
+    # actually drive down ood_components.energy rather than falling back.
+    assert result.ood_components.energy < 0.05
+
+
 def test_disagreement_and_ood_fail_closed_before_planning() -> None:
     class ContrarianModel(PriorFollowingModel):
         def __call__(self, batch):

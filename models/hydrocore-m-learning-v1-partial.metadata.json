@@ -11,6 +11,9 @@
   "schema_version": 1,
   "sha256": "d3fee771c4f243fabf3787b8c5076d0712e889d50c85697316a1bea369d04c43",
   "tensor_count": 333,
+  "trained_tasks": [
+    "sentinel"
+  ],
   "trainer_state": {
     "best_validation_loss": 1.6801577389240265,
     "epoch": 1,
@@ -18,5 +21,8 @@
   },
   "training_seconds": 112.0968659,
   "training_status": "partial",
+  "validated_tasks": [
+    "sentinel"
+  ],
   "variant": "medium"
 }

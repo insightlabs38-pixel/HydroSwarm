@@ -17,6 +17,7 @@ from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA, NormalizationStats
 from hydroswarm.simulation import HydraulicSimulator
 from hydroswarm.simulation.wrapper import wntr
+from hydroswarm.tasks import validate_tasks
 
 
 def _sha256(path: Path) -> str:
@@ -58,6 +59,13 @@ class DefaultPipelineFactory:
         #: docstring) rather than load the checkpoint's own weights for it
         #: -- surfaced explicitly rather than silently absorbed.
         self.migrated_parameters: tuple[str, ...] = ()
+        # core-issues.txt repair item 8: fail closed when the checkpoint
+        # metadata is silent -- an old-style metadata.json with no
+        # "trained_tasks" key declares nothing beyond the always-on
+        # sentinel belief, which happens to be factually correct for every
+        # checkpoint promoted so far (Scout/Strategist/OOD target
+        # generators do not exist yet; see hydroswarm.tasks).
+        self.trained_tasks: frozenset[str] = frozenset()
 
     def _load_normalization(self, path: Path) -> NormalizationStats | None:
         return NormalizationStats.load(path) if path.exists() else None
@@ -73,6 +81,8 @@ class DefaultPipelineFactory:
                 raise ValueError("checkpoint checksum does not match metadata")
             if metadata["feature_schema_sha256"] != DEFAULT_FEATURE_SCHEMA.fingerprint:
                 raise ValueError("checkpoint feature schema is incompatible")
+            trained_tasks = frozenset(metadata.get("trained_tasks", ()))
+            validate_tasks(trained_tasks, label="checkpoint metadata trained_tasks")
             model = HydroCore.from_variant("small")
             migrated, migrated_parameters = load_state_dict_with_v2_migration(
                 model, load_file(self.model_path, device="cpu")
@@ -93,11 +103,13 @@ class DefaultPipelineFactory:
             self._model = model
             self._calibrator = calibrator
             self._feature_builder = feature_builder
+            self.trained_tasks = trained_tasks
         except (OSError, KeyError, TypeError, ValueError, RuntimeError, json.JSONDecodeError) as error:
             self._model = None
             self._calibrator = None
             self._feature_builder = None
             self.migrated_parameters = ()
+            self.trained_tasks = frozenset()
             self.fallback_reason = f"trained_assets_unavailable:{type(error).__name__}"
 
     @property
@@ -149,4 +161,5 @@ class DefaultPipelineFactory:
             model_hash=_sha256(self.model_path) if self._model is not None else None,
             calibration_artifact=calibration,
             feature_builder=self._feature_builder,
+            trained_tasks=self.trained_tasks,
         )
