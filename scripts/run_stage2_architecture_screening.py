@@ -91,6 +91,22 @@ def _load_dataset(split: str) -> GovernedScenarioDataset:
     return GovernedScenarioDataset(examples, expected_split=split)
 
 
+def _topology_hashes(*datasets: GovernedScenarioDataset) -> tuple[str, ...]:
+    """core-issues.txt repair item 5: real topology_hash provenance for the
+    experiment registry. Empty until Cycle B is regenerated with the
+    populated TopologyMetadata that repair item 5 also added (Phase 3, not
+    this repair pass) -- every example generated before that has
+    topology=None."""
+
+    hashes = {
+        example.topology.topology_hash
+        for dataset in datasets
+        for example in (dataset[index] for index in range(len(dataset)))
+        if example.topology is not None
+    }
+    return tuple(sorted(hashes))
+
+
 @torch.no_grad()
 def _evaluate_source_localization(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_size: int = 16) -> dict[str, Any]:
     model.eval()
@@ -214,6 +230,7 @@ def run_experiment(
         },
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         target_schema_hash=TARGETS_V2_SCHEMA_VERSION,
+        topology_hashes=_topology_hashes(train, validation, development_holdout),
         workdir=".",
     )
 

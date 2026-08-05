@@ -132,6 +132,36 @@ def test_source_node_index_is_within_masked_out_range_but_harmless_when_masked(n
     assert bool(example.targets["source_node_mask"]) is False
 
 
+def test_scenario_to_example_populates_non_null_topology_metadata(network, signature_library) -> None:
+    """core-issues.txt repair item 5: every generated example must carry a
+    real, non-null TopologyMetadata, not the None default (previously
+    scenario_to_example never constructed one at all)."""
+
+    example = _example(network, signature_library, event_type=EventType.CONTAMINATION)
+    topology = example.topology
+    assert topology is not None
+    assert topology.topology_hash
+    assert topology.network_hash
+    assert topology.hydraulic_state_hash
+    assert topology.signature_library_hash == signature_library.manifest_hash
+    assert topology.target_schema_version
+    assert topology.feature_schema_version
+    assert set(topology.node_ids) == set(network.node_name_list)
+    assert set(topology.source_candidate_ids) == set(network.junction_name_list)
+    assert topology.edge_ids
+    for start, end in topology.edge_ids:
+        assert start in topology.node_ids
+        assert end in topology.node_ids
+    # resolve_source_node_id (hydroswarm.training.data) depends directly on
+    # a populated topology -- confirm the whole chain actually works now,
+    # not just that the field is non-None.
+    from hydroswarm.training.data import resolve_source_node_id
+
+    resolved = resolve_source_node_id(example)
+    assert resolved is not None
+    assert resolved in topology.node_ids
+
+
 def test_two_scenarios_with_different_hydraulic_regimes_get_different_governed_contexts(network) -> None:
     """core-issues.txt repair item 4: each scenario's feature context must
     be built from ITS OWN randomized network (demand regime, roughness,

@@ -18,8 +18,8 @@ from hydroswarm.data.scenarios import EventType, GeneratedScenario
 from hydroswarm.preprocessing import HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.simulation.wrapper import HydraulicSimulator
 
-from .data import CurriculumStage, ScenarioExample
-from .targets_v2 import EventCause
+from .data import CurriculumStage, ScenarioExample, TopologyMetadata
+from .targets_v2 import TARGETS_V2_SCHEMA_VERSION, EventCause
 
 #: Number of source_region buckets (see assign_source_regions).
 SOURCE_REGION_COUNT = 3
@@ -103,6 +103,28 @@ def build_feature_context(network: Any) -> FeatureContext:
     simulated = simulator.calculate_state(3_600)
     state = HydraulicStateEstimator().estimate(simulated, OperationalTelemetry())
     return FeatureContext(state=state, graph=simulator.build_dynamic_graph(simulated))
+
+
+def _hydraulic_state_hash(state: Any) -> str:
+    """Fingerprints the estimated hydraulic state itself (pressure/demand/
+    flow/tank-level/pump/valve values) -- distinct from network_hash, which
+    fingerprints the network configuration that produced it
+    (HydraulicSimulator.state_hash()). Two scenarios could in principle
+    share a network_hash but differ in estimated state (different
+    telemetry/estimation inputs), or vice versa; this is core-issues.txt
+    repair item 5's hydraulic_state_hash field."""
+
+    payload = {
+        "pressure_m": {key: value.estimate for key, value in state.pressure_m.items()},
+        "demand_m3s": {key: value.estimate for key, value in state.demand_m3s.items()},
+        "flow_m3s": {key: value.estimate for key, value in state.flow_m3s.items()},
+        "tank_level_m": {key: value.estimate for key, value in state.tank_level_m.items()},
+        "pump_open": dict(state.pump_open),
+        "valve_open": dict(state.valve_open),
+    }
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
 
 
 def aligned_observations(
@@ -268,6 +290,33 @@ def scenario_to_example(
         # never invented labels a loss could train against.
         source = source_region = start_time = duration = relative_strength = 0
 
+    # core-issues.txt repair item 5: every generated example must carry its
+    # own non-null topology provenance, not the None default corpus
+    # generation left every example with previously.
+    edge_ids = tuple(
+        (network.get_link(name).start_node_name, network.get_link(name).end_node_name)
+        for name in sorted(network.link_name_list)
+    )
+    source_candidate_ids = tuple(node_id for node_id in node_ids if node_id in network.junction_name_list)
+    topology_metadata = TopologyMetadata(
+        # Stable across every scenario sharing this topology family: hashes
+        # the pristine network passed into WNTRScenarioGenerator.generate
+        # (see ScenarioManifest.network_sha256), not this scenario's own
+        # randomized hydraulics.
+        topology_hash=scenario.manifest.network_sha256,
+        # This scenario's own exact (possibly randomized) network
+        # configuration -- demand pattern, roughness, tank levels, pipe
+        # status -- as actually used to build its features (item 4).
+        network_hash=HydraulicSimulator(network).state_hash(),
+        node_ids=node_ids,
+        edge_ids=edge_ids,
+        source_candidate_ids=source_candidate_ids,
+        hydraulic_state_hash=_hydraulic_state_hash(context.state),
+        signature_library_hash=signature_library.manifest_hash,
+        target_schema_version=TARGETS_V2_SCHEMA_VERSION,
+        feature_schema_version=built.feature_schema_version,
+    )
+
     return ScenarioExample(
         scenario_id=str(scenario.manifest.scenario_id),
         network_id=scenario.manifest.network_id,
@@ -317,6 +366,7 @@ def scenario_to_example(
             # counted in prevalence/audit statistics as if it were one.
             "sensor_fault_mask": torch.tensor([node_id in scenario.sensor_nodes for node_id in node_ids]),
         },
+        topology=topology_metadata,
     )
 
 

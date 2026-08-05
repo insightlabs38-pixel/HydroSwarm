@@ -92,6 +92,7 @@ def run_control_seed(
         },
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         target_schema_hash=TARGETS_V2_SCHEMA_VERSION,
+        topology_hashes=stage3.topology_hashes(train, validation, calibration, development_holdout),
         workdir=".",
     )
 

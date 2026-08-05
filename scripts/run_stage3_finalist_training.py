@@ -78,6 +78,22 @@ def _load_dataset(split: str) -> GovernedScenarioDataset:
     return GovernedScenarioDataset(examples, expected_split=split)
 
 
+def topology_hashes(*datasets: GovernedScenarioDataset) -> tuple[str, ...]:
+    """core-issues.txt repair item 5: real topology_hash provenance for the
+    experiment registry. Empty for any corpus generated before that repair
+    landed (topology is None on every example until Cycle B is
+    regenerated) -- a real, non-empty result requires no code change here,
+    only regenerated data (Phase 3, not this repair pass)."""
+
+    hashes = {
+        example.topology.topology_hash
+        for dataset in datasets
+        for example in (dataset[index] for index in range(len(dataset)))
+        if example.topology is not None
+    }
+    return tuple(sorted(hashes))
+
+
 def _load_ood_dataset(category: str) -> GovernedScenarioDataset:
     # OOD-holdout shards are tagged split="development_holdout" (see
     # data/learning-v2/cycle-b/tensors/ood-*/index.jsonl) -- they are a
@@ -204,6 +220,7 @@ def run_finalist_seed(
         },
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         target_schema_hash=TARGETS_V2_SCHEMA_VERSION,
+        topology_hashes=topology_hashes(train, validation, calibration, development_holdout),
         workdir=".",
     )
 
