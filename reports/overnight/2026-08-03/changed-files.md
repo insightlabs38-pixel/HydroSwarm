@@ -187,4 +187,25 @@ No file under `data/learning-v1/`, `models/`, or any historical `reports/results
 modified in any of these commits; the promoted checkpoint's loadability is unaffected (these
 commits touch API/frontend/inference-constant code, not model architecture or weights).
 
+## Counterfactuals.tsx bug fix, commit `f3cb1d2`
+
+`frontend/src/components/Counterfactuals.tsx`: replaced hard-coded `plans[0]`/`plans[1]`
+positional access and literal "PLAN A"/"PLAN B" labels with a map over the real `plans` array,
+keyed by plan id, with `recommended-branch` styling derived from `plan.status === 'RECOMMENDED'`
+instead of a hard-coded name match. New test file `frontend/tests/Counterfactuals.test.tsx` (5
+tests). Regenerated the 2 committed visual-regression screenshot baselines under
+`frontend/tests/e2e/visual-regression.spec.ts-snapshots/` (reviewed before committing -- now
+correctly show all 3 demo plans instead of silently dropping the 3rd).
+
+## Bundle F Stage 2 completion + Stage 3 launch, commits `e6cc544`, `ddf6fd9`
+
+`experiments/jobs/bundle-f-stage2/{status.json,job.log}`, `experiments/registry/bundle-f-stage2.jsonl`,
+`reports/results/v3/stage2-architecture-screening.json`: completed job provenance and full
+results for all 9 Stage 2 configurations (`e6cc544`). `.gitignore`: added
+`experiments/jobs/*/job.lock` and `job.pid` (ephemeral, no historical value, same treatment as
+the existing `experiments/registry/*.lock` pattern). `scripts/run_stage3_finalist_training.py`
+(new, `ddf6fd9`): Stage 3 finalist training/calibration/evaluation script, reusing Stage 2's
+proven masked-aware prediction pattern rather than the older learning-v1-oriented
+`scripts/evaluate_learning.py`.
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-08-04T22:10:00Z",
+  "updated_at_utc": "2026-08-05T01:20:00Z",
   "completed": [
     {
       "task": "0.1",
@@ -228,6 +228,24 @@
       "title": "Complete incident-view API contract (backend + frontend)",
       "commit": "580185e, ebd260c, bd944d5",
       "summary": "Implemented GET /api/incidents/{incident_id}/view end to end, closing the item that previously had only an interim treatment. Backend: IncidentView Pydantic schema (all extra=forbid) covering every field the plan lists -- provenance hashes/versions, controller state, full map topology sourced only from imported-network metadata, sensor health, sample recommendation, evidence history, plans with verifications, audit-ledger-derived selected plan vs. strategist-recommended plan, per-plan counterfactual consequences, all 7 grounded explanation intents, audit events, runtime metrics. Fails closed (409 pre-analysis, 503 on incomplete topology metadata) rather than ever backing the response with DEMO_FALLBACK content. 4 new backend contract tests drive a real HybridInferencePipeline through the actual HTTP API. Frontend: viewFromApi() replaces the old LiveViewIncompleteError stub with a real mapping from the live response; IncidentView/demoFixture/PlanTable extended to match the backend schema field-for-field. Full pytest/ruff/pyright/eslint/tsc-build/vitest/playwright all green."
+    },
+    {
+      "task": "Bug fix",
+      "title": "Fix Counterfactuals.tsx hard-coded plan positions (Task 3.3 regression)",
+      "commit": "f3cb1d2",
+      "summary": "Found while scoping Task 8.1: Counterfactuals.tsx hard-coded plans[0]/plans[1] as literal PLAN A/PLAN B branches and hard-coded the recommended-branch styling to whichever was named PLAN B -- exactly what Task 3.3 required removing (hard-coded recommended branch; ensure plan order can change without breaking the UI), missed at the time and uncovered by zero prior tests (identifier-independence check looked for Plan A/Plan B, case-sensitive, never matching this all-caps text). Real impact: crashes on any incident with fewer than 2 plans, silently drops any 3rd+ plan, mislabels which branch is recommended whenever plan order/naming differs from the original demo fixture -- plausible now that the live /view endpoint returns plans in insertion order, not a fixed A/B pair. Fixed to derive every branch from the real plans array keyed by plan id, with recommended styling from plan.status. Added 5 regression tests; regenerated and visually reviewed the 2 committed screenshot baselines."
+    },
+    {
+      "task": "Bundle F Stage 2",
+      "title": "Complete architecture screening (E0-E8)",
+      "commit": "e6cc544",
+      "summary": "All 9 configurations trained successfully against the full Cycle B corpus, zero failures. Predeclared score ranking: E2 (0.7794) > E0 (0.7783) > E1 (0.7768) > E3 (0.7742) > E6 (0.7727) > E4 (0.7709) > E8 (0.7696) > E7 (0.7680) > E5 (0.7647). Top four scores span only 0.0052 -- noise-level at one seed/4 epochs. E7 (source-only) and E8 (full-multitask), the required diagnostic pair, both scored below baseline. Total wall time 12,401s (~3h27m)."
+    },
+    {
+      "task": "Bundle F Stage 3",
+      "title": "Launch finalist training script (E2/E0/E1, 2 seeds each)",
+      "commit": "ddf6fd9",
+      "summary": "Wrote and smoke-tested scripts/run_stage3_finalist_training.py: trains the top 3 Stage 2 finalists (selected mechanically from the predeclared score) with 2 seeds each to early stopping or a 2h ceiling, fits calibration per checkpoint on the calibration split only, evaluates on validation/development_holdout/both OOD-holdout categories. Verified via a scratch 1-epoch smoke run before launching the real 6-run background job. Job launched and running at handoff time; see training-jobs.md."
     }
   ]
 }

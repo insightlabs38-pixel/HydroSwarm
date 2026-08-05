@@ -7,13 +7,14 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `bd944d5` (Cycle B corpus landed, Task 3.2 complete, Stage 2 architecture
-  screening running in the background; still running)
-- Commits created: 48 (see `git log --oneline main..agent/gcp-multitopology-v3`)
-- Working tree: clean except the actively-running Stage 2 job's own `experiments/jobs/` and
-  `experiments/registry/bundle-f-stage2.jsonl` (uncommitted until the job finishes -- see
+- Ending commit: `ddf6fd9` (Cycle B corpus landed, Task 3.2 complete, a real hard-coded-plan
+  bug found and fixed, Stage 2 architecture screening completed, Stage 3 finalist training
+  running in the background; still running)
+- Commits created: 52 (see `git log --oneline main..agent/gcp-multitopology-v3`)
+- Working tree: clean except the actively-running Stage 3 job's own `experiments/jobs/` and
+  `experiments/registry/bundle-f-stage3.jsonl` (uncommitted until the job finishes -- see
   "Every training job's status" below)
-- Pushed to `origin/agent/gcp-multitopology-v3` on GitHub through commit `bd944d5`
+- Pushed to `origin/agent/gcp-multitopology-v3` on GitHub through commit `ddf6fd9`
 
 ## Completed tasks
 
@@ -41,9 +42,15 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
   "throw rather than fake it" treatment; now fully implemented. See "Task 3.2" section below.
 - [x] Bundle F, Cycle B corpus generation (`data/learning-v2/cycle-b/`): 12,750 scenarios across
   3 training topologies + 1 development-OOD topology. See "Datasets generated" below.
-- [ ] Bundle F, Stage 2 architecture screening (E0-E8) — **running now** in the background; see
-  "Every training job's status" below for exact resume/monitoring commands.
-- [ ] S finalist training
+- [x] fix(frontend): `Counterfactuals.tsx` derived its comparison branches from `plans[0]`/
+  `plans[1]` position and hard-coded "PLAN A"/"PLAN B" labels -- a real Task 3.3 violation
+  ("hard-coded recommended branch") with zero prior test coverage, found while scoping Task
+  8.1. Fixed, tested, screenshots regenerated and reviewed. See changed-files.md.
+- [x] Bundle F, Stage 2 architecture screening (E0-E8): all 9 configurations completed
+  successfully. Ranking: E2 > E0 > E1 > E3 > E6 > E4 > E8 > E7 > E5 (see training-jobs.md for
+  full scores). Top four scores span only 0.0052 -- noise-level at this budget.
+- [ ] Bundle F, Stage 3 finalist training (E2/E0/E1, 2 seeds each) — **running now** in the
+  background; see "Every training job's status" below for exact resume/monitoring commands.
 - [ ] M training/evaluation
 - [ ] calibration/OOD evaluation
 - [ ] full-trajectory benchmark
@@ -252,11 +259,11 @@ cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
 python -m pytest -q   # expect 363 passed (occasionally 362/1 -- see Tests section)
-cd frontend && npm run test -- --run   # expect 25 passed
+cd frontend && npm run test -- --run   # expect 30 passed (up from 25: +5 Counterfactuals.test.tsx)
 npx playwright test                     # expect 10 passed (retry 1920x1080 visual-regression if it flakes)
 ```
 
-See `follow-up.md` and `training-jobs.md` for the active Stage 2 screening job's exact
+See `follow-up.md` and `training-jobs.md` for the active Stage 3 finalist-training job's exact
 monitoring/resume commands.
 
 ## Every training job's status
@@ -265,11 +272,14 @@ Bundle E's 6 smoke-screening jobs (E0/E3/E4/E9-none/E9-feature_only/E9-logit_onl
 completed successfully; see `training-jobs.md` and
 `reports/results/v3/architecture-smoke-jobs.json`.
 
-**Bundle F Stage 2 architecture screening (E0-E8) is running now** under
-`hydroswarm.training.job_runner`, launched against the real Cycle B corpus (not a smoke subset).
-Run directory: `experiments/jobs/bundle-f-stage2/` (status.json/job.log/job.pid). E0 (baseline)
-completed in ~21.7 minutes; E1-E8 remain. See `training-jobs.md` for the exact monitor/resume
-commands and current progress at handoff time.
+**Bundle F Stage 2 architecture screening (E0-E8) completed successfully** -- all 9
+configurations, zero failures, ranking E2 > E0 > E1 > E3 > E6 > E4 > E8 > E7 > E5. See
+`training-jobs.md` and `reports/results/v3/stage2-architecture-screening.json`.
+
+**Bundle F Stage 3 finalist training is running now** under `hydroswarm.training.job_runner`,
+training the top three Stage 2 finalists (E2, E0, E1) with two seeds each. Run directory:
+`experiments/jobs/bundle-f-stage3/` (status.json/job.log/job.pid). See `training-jobs.md` for
+the exact monitor/resume commands and current progress at handoff time.
 
 ## Locked final test
 

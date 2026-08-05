@@ -1,28 +1,34 @@
 # Follow-up / next actions
 
-Updated live throughout the run. As of this update (commit `bd944d5`; Stage 2 screening
-still running in the background):
+Updated live throughout the run. As of this update (commit `ddf6fd9`; Stage 3 finalist
+training running in the background):
 
 ## Immediate next steps (in dependency order)
 
-1. **Bundle F Stage 2 architecture screening (E0-E8) -- running now, not yet complete.**
-   Launched against the real Cycle B corpus (12,750 scenarios landed this session -- see
-   `summary.md`'s "Datasets generated"). E0 completed in ~21.7 minutes; E1-E8 remain, ~3-3.5
-   hours total at the observed per-experiment pace. See `training-jobs.md` for exact
-   monitor/resume commands. **This is the actively blocking item** -- everything else in Bundle
-   F depends on its ranking.
-2. **After Stage 2 completes**: read `reports/results/v3/stage2-architecture-screening.json`'s
-   `ranking`, select the strongest S configuration(s) by the predeclared score (declared before
-   any run, in the script's own docstring -- do not retune after seeing results), then run the
-   full E0-E10 matrix if the plan calls for entries beyond E0-E8, fit calibration artifacts
-   against the winner, and proceed to development-holdout/OOD evaluation.
-3. **Task 3.2 — complete incident-view API contract.** Done this session (backend endpoint +
+1. **Bundle F Stage 2 architecture screening (E0-E8) is complete.** All 9 configurations
+   succeeded; predeclared-score ranking E2 > E0 > E1 > E3 > E6 > E4 > E8 > E7 > E5. Top four
+   scores span only 0.0052 (noise-level at one seed/4 epochs). See `training-jobs.md` and
+   `reports/results/v3/stage2-architecture-screening.json`. No longer a follow-up item.
+2. **Bundle F Stage 3 finalist training (E2/E0/E1, 2 seeds each) -- running now, not yet
+   complete.** Per the plan's "select up to three finalist configurations" (Stage 3), the top
+   three Stage 2 scores were carried forward mechanically rather than trusting the single
+   noise-level-margin winner. Each finalist/seed trains to early stopping or a 2h ceiling, fits
+   calibration on the calibration split, and evaluates on validation/development_holdout/both
+   OOD-holdout categories. See `training-jobs.md` for exact monitor/resume commands.
+   **This is the actively blocking item** -- final S-architecture selection depends on it.
+3. **After Stage 3 completes**: per the plan's Stage 6 ("Calibration and final selection"),
+   compare all 6 finalist/seed results (validation + development_holdout + OOD top-1/ECE/
+   coverage/set-size), select the single strongest S architecture, and record the decision.
+   From there: Stage 4 controls (HydroMono-S, no-adapter HydroCore-S, classical-only baseline)
+   and Stage 5 (updated HydroCore-M, gated on this selection) are the plan's next stages: not
+   started, and each is a substantial multi-hour training investment of its own.
+4. **Task 3.2 — complete incident-view API contract.** Done this session (backend endpoint +
    schema, frontend wiring, contract tests) -- see `summary.md`'s "Task 3.2" section for full
    detail. No longer a follow-up item.
-4. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
+5. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
    selection completing first -- "only after selecting strongest S architecture" per the
    plan -- so it cannot start early no matter how much idle capacity exists.
-5. **Phase 8 (frontend UX, Tasks 8.1/8.3/8.4) is a candidate independent thread not yet
+6. **Phase 8 (frontend UX, Tasks 8.1/8.3/8.4) is a candidate independent thread not yet
    scoped.** Task 8.2 (model-governance view) already exists (`ModelGovernanceTable.tsx`).
    Tasks 8.1 (simplified decision-rail workspace layout), 8.3 (validated-vs-unseen-topology
    comparison view), and 8.4 (a scripted "RUN VERIFIED INCIDENT DEMONSTRATION" guided judge
@@ -41,9 +47,12 @@ cd /workspace/HydroSwarm
 git -c safe.directory=/workspace/HydroSwarm checkout agent/gcp-multitopology-v3
 export PYTHONPATH=src
 python -m pytest -q                        # expect 363 passed (see test-results.md re: 1 flaky pre-existing test)
-cd frontend && npm ci && npm run test -- --run   # expect 25 passed
+cd frontend && npm ci && npm run test -- --run   # expect 30 passed
 npx playwright install --with-deps chromium && npx playwright test  # expect 10 passed
 ```
+
+To check on or resume the actively-running Stage 3 finalist-training job, see
+`training-jobs.md`'s exact commands.
 
 To check on or resume the actively-running Stage 2 screening job, see `training-jobs.md`'s
 exact commands (status check, relaunch-from-scratch, mark-finished + read ranking).

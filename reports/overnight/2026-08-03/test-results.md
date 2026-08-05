@@ -85,3 +85,14 @@ of Phase 9.
 | `npm run test -- --run` (vitest) | **Pass** | 25 tests, up from 24 (api.test.ts's 2 stale stub-throw tests replaced with 3 tests exercising the real `/view` contract: full mapping, fallback-still-LIVE, malformed-response-falls-back) |
 | `npx playwright test` (e2e, real Chromium) | **Pass**, 10/10 | one 1920x1080 visual-regression test needed a retry (~0.01% pixel diff at chart-marker anti-aliasing pixels); confirmed flaky and unrelated to this session's changes by rerunning it alone immediately afterward (passed) |
 | HydroCore-S checkpoint load | **Pass** | unaffected -- this bundle touched API/frontend code and the data corpus, not the model or checkpoint |
+
+## Update after Counterfactuals.tsx fix + Stage 2/3 training (commit `ddf6fd9`)
+
+| Command | Result | Notes |
+|---|---|---|
+| `npm run test -- --run` (vitest) | **Pass** | 30 tests, up from 25 (+5 `Counterfactuals.test.tsx`: real names render not "PLAN A"/"PLAN B", no crash with 0 or 1 plans, recommended styling follows `plan.status` not position, plan order can change without breaking which branch is marked recommended) |
+| `npm run lint` / `npx tsc --noEmit` / `npm run build` | **Pass** | |
+| `npx playwright test --update-snapshots` | **Pass**, 10/10 | 2 committed screenshot baselines regenerated (now show all 3 demo plans instead of silently dropping the 3rd) and visually reviewed before committing |
+| `ruff check` / `pyright` (`scripts/run_stage3_finalist_training.py`) | **Pass** | 0 issues, 0 errors |
+| Stage 2 architecture screening | **Pass**, 9/9 | see `training-jobs.md` for full detail |
+| Stage 3 script smoke verification | **Pass** | 1-epoch, 64/32/32/32-example scratch run (not committed) exercised the full training -> calibration-fit -> validation/dev-holdout/OOD-eval path without error before the real multi-hour job was launched |
