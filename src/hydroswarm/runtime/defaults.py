@@ -12,8 +12,9 @@ from safetensors.torch import load_file
 from hydroswarm.calibration import SplitConformalCalibrator
 from hydroswarm.classical import SignatureBuilder, SignatureCache, SignatureCacheKey
 from hydroswarm.inference import HybridInferencePipeline
-from hydroswarm.model import HydroCore
-from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
+from hydroswarm.model import HydroCore, load_state_dict_with_v2_migration
+from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
+from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA, NormalizationStats
 from hydroswarm.simulation import HydraulicSimulator
 from hydroswarm.simulation.wrapper import wntr
 
@@ -36,11 +37,30 @@ class DefaultPipelineFactory:
         self.calibration_path = (
             self.project_root / "reports" / "results" / "hydrocore-s-calibration.json"
         )
+        # core-issues.txt repair item 6: same governed normalization
+        # artifact convention as models/*.metadata.json -- absent today
+        # (no artifact has ever been fit; see
+        # scripts/fit_normalization.py), so this correctly stays None and
+        # HydraulicFeatureBuilder falls back to its fixed unit-scaling only,
+        # exactly matching how the currently promoted checkpoint was
+        # trained. Only a genuinely present, matching artifact activates
+        # governed normalization at runtime.
+        self.node_normalization_path = self.project_root / "models" / "node-normalization.json"
+        self.edge_normalization_path = self.project_root / "models" / "edge-normalization.json"
         self.signature_cache = self.project_root / "data" / "generated" / "signatures"
         self._model: HydroCore | None = None
         self._calibrator: SplitConformalCalibrator | None = None
+        self._feature_builder: HydraulicFeatureBuilder | None = None
         self._load_attempted = False
         self.fallback_reason: str | None = None
+        #: Non-empty only when load_state_dict_with_v2_migration actually
+        #: had to re-initialize a shape-incompatible head fresh (see its
+        #: docstring) rather than load the checkpoint's own weights for it
+        #: -- surfaced explicitly rather than silently absorbed.
+        self.migrated_parameters: tuple[str, ...] = ()
+
+    def _load_normalization(self, path: Path) -> NormalizationStats | None:
+        return NormalizationStats.load(path) if path.exists() else None
 
     def _load_assets(self) -> None:
         if self._load_attempted:
@@ -54,18 +74,30 @@ class DefaultPipelineFactory:
             if metadata["feature_schema_sha256"] != DEFAULT_FEATURE_SCHEMA.fingerprint:
                 raise ValueError("checkpoint feature schema is incompatible")
             model = HydroCore.from_variant("small")
-            model.load_state_dict(load_file(self.model_path, device="cpu"), strict=True)
+            migrated, migrated_parameters = load_state_dict_with_v2_migration(
+                model, load_file(self.model_path, device="cpu")
+            )
             model.eval()
+            if migrated:
+                self.migrated_parameters = migrated_parameters
+            feature_builder = HydraulicFeatureBuilder(
+                node_normalization=self._load_normalization(self.node_normalization_path),
+                edge_normalization=self._load_normalization(self.edge_normalization_path),
+            )
             calibrator = SplitConformalCalibrator.load(self.calibration_path)
             calibrator.artifact.validate_runtime(
                 model_hash=checkpoint_hash,
                 feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
+                normalization_hash=feature_builder.normalization_fingerprint,
             )
             self._model = model
             self._calibrator = calibrator
+            self._feature_builder = feature_builder
         except (OSError, KeyError, TypeError, ValueError, RuntimeError, json.JSONDecodeError) as error:
             self._model = None
             self._calibrator = None
+            self._feature_builder = None
+            self.migrated_parameters = ()
             self.fallback_reason = f"trained_assets_unavailable:{type(error).__name__}"
 
     @property
@@ -116,4 +148,5 @@ class DefaultPipelineFactory:
             model=self._model,
             model_hash=_sha256(self.model_path) if self._model is not None else None,
             calibration_artifact=calibration,
+            feature_builder=self._feature_builder,
         )

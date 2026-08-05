@@ -112,7 +112,26 @@ MODEL_VARIANTS: dict[str, ModelVariant] = {
 #: loadable), but which of them the forward pass actually *uses* is
 #: config-only, so a mismatched prior_mode would load successfully yet
 #: silently compute different outputs than training used.
-ARCHITECTURE_VERSION = "hydrocore-v2"
+#:
+#: v2 -> v3 (core-issues.txt repair item 2): source_region_head's output
+#: width changed from a fixed 1 (applied per node position -- never a
+#: real 3-way classification, see the head's own construction comment)
+#: to SOURCE_REGION_COUNT=3 applied to incident_context. A v2 checkpoint's
+#: source_region_head weights are shape-incompatible AND were never
+#: trained against a real label in the first place (the same bug meant
+#: the loss for this task was always optimizing a meaningless target) --
+#: see load_v2_source_region_head_migration for the one-time, narrowly-
+#: scoped load path that re-initializes exactly that one head rather
+#: than failing every v2 checkpoint's load entirely.
+ARCHITECTURE_VERSION = "hydrocore-v3"
+
+#: The exact parameter names load_v2_source_region_head_migration is
+#: allowed to drop from an old checkpoint and re-initialize fresh --
+#: never any other key, so an unrelated mismatch still fails closed.
+V2_TO_V3_RESHAPED_PARAMETERS = frozenset({
+    "source_region_head.network.1.weight",
+    "source_region_head.network.1.bias",
+})
 
 PriorMode = Literal["none", "feature_only", "logit_only", "feature_and_logit"]
 PRIOR_MODES: tuple[PriorMode, ...] = get_args(PriorMode)
@@ -267,6 +286,49 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             "enabling it adds five plan consequence-proxy head parameters that a checkpoint "
             "trained without them does not have"
         )
+
+
+def load_state_dict_with_v2_migration(
+    model: "HydroCore", state_dict: dict[str, Tensor]
+) -> tuple[bool, tuple[str, ...]]:
+    """Load a checkpoint, tolerating exactly one known, understood shape
+    change: v2's source_region_head (repair item 2, ARCHITECTURE_VERSION
+    v2 -> v3). Returns (migrated, dropped_keys) -- migrated is True only
+    when the v2 shape mismatch was actually encountered and handled;
+    dropped_keys names exactly which tensors were re-initialized fresh
+    rather than loaded, for the caller to record/surface, never silently.
+
+    Any mismatch outside V2_TO_V3_RESHAPED_PARAMETERS still raises --
+    this is a narrow, explicit migration path for one specific, already
+    audited architecture change, not a general strict=False escape hatch.
+    A v2 checkpoint's source_region_head weights are not just
+    shape-incompatible but were never trained against a real label in
+    the first place (the same bug meant this task's loss always
+    optimized a meaningless per-node target), so re-initializing them
+    fresh loses nothing a v2 checkpoint ever actually had.
+    """
+
+    try:
+        model.load_state_dict(state_dict, strict=True)
+        return False, ()
+    except RuntimeError as error:
+        message = str(error)
+        if "size mismatch" not in message:
+            raise
+        mismatched = {
+            key for key in V2_TO_V3_RESHAPED_PARAMETERS if f"for {key}:" in message
+        }
+        remaining_mismatch_markers = message.count("size mismatch for")
+        if mismatched != V2_TO_V3_RESHAPED_PARAMETERS or remaining_mismatch_markers != len(mismatched):
+            raise
+        filtered = {key: value for key, value in state_dict.items() if key not in mismatched}
+        result = model.load_state_dict(filtered, strict=False)
+        if set(result.missing_keys) != V2_TO_V3_RESHAPED_PARAMETERS or result.unexpected_keys:
+            raise RuntimeError(
+                "v2 migration produced unexpected missing/unexpected keys: "
+                f"missing={result.missing_keys!r} unexpected={result.unexpected_keys!r}"
+            ) from error
+        return True, tuple(sorted(mismatched))
 
 
 class HydroCore(nn.Module):

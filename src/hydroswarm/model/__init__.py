@@ -18,6 +18,7 @@ from .core import (
     NoAdapterHydroCore,
     ParameterReport,
     PriorMode,
+    load_state_dict_with_v2_migration,
     verify_architecture_compatibility,
 )
 from .encoders import GraphStructuralEncoder, QualityEncoder, StaticFeatureEncoder, TemporalEncoder
@@ -49,5 +50,6 @@ __all__ = [
     "RoleHead",
     "StaticFeatureEncoder",
     "TemporalEncoder",
+    "load_state_dict_with_v2_migration",
     "verify_architecture_compatibility",
 ]

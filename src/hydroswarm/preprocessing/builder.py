@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
@@ -45,6 +46,19 @@ class BuiltHydroBatch:
     batch: dict[str, torch.Tensor]
     feature_schema_version: str
     feature_schema_hash: str
+    #: core-issues.txt repair item 6: identity of whichever governed
+    #: node/edge NormalizationStats (if any) this batch was built with --
+    #: see HydraulicFeatureBuilder.normalization_fingerprint.
+    normalization_hash: str
+
+
+#: core-issues.txt repair item 6: the always-on hardcoded unit-scaling
+#: divisors in build() below are applied regardless of node_normalization/
+#: edge_normalization; this sentinel records "no *governed* (fitted)
+#: normalization layer is active on top of them" explicitly, rather than
+#: leaving that state unrecorded, which is indistinguishable from
+#: "nobody remembered to check."
+NO_NORMALIZATION_SENTINEL = hashlib.sha256(b"hydroswarm-normalization-none-v1").hexdigest()
 
 
 def _stable_category(value: str) -> float:
@@ -76,6 +90,25 @@ class HydraulicFeatureBuilder:
         self.edge_normalization = edge_normalization
         self.device = torch.device(device)
         self.dtype = dtype
+
+    @property
+    def normalization_fingerprint(self) -> str:
+        """A stable identity for whichever governed normalization this
+        builder applies -- NO_NORMALIZATION_SENTINEL when neither
+        node_normalization nor edge_normalization is set, so corpus
+        generation and live inference can be compared and a mismatch
+        caught (core-issues.txt repair item 6) rather than silently
+        drifting."""
+
+        if self.node_normalization is None and self.edge_normalization is None:
+            return NO_NORMALIZATION_SENTINEL
+        payload = {
+            "node": self.node_normalization.fingerprint if self.node_normalization else None,
+            "edge": self.edge_normalization.fingerprint if self.edge_normalization else None,
+        }
+        return hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
 
     def build(
         self,
@@ -239,4 +272,5 @@ class HydraulicFeatureBuilder:
         return BuiltHydroBatch(
             node_ids=node_ids, batch=batch, feature_schema_version=DEFAULT_FEATURE_SCHEMA.version,
             feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
+            normalization_hash=self.normalization_fingerprint,
         )

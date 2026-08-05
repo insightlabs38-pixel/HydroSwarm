@@ -11,6 +11,8 @@ from typing import Mapping, Sequence
 
 import numpy as np
 
+from hydroswarm.preprocessing.builder import NO_NORMALIZATION_SENTINEL
+
 
 CALIBRATION_SCHEMA_VERSION = "hydroswarm-calibration-v1"
 
@@ -44,6 +46,14 @@ class CalibrationArtifact:
     mondrian_scores: Mapping[str, tuple[float, ...]]
     network_scores: Mapping[str, tuple[float, ...]]
     report: CalibrationReport
+    #: core-issues.txt repair item 6: identity of the governed node/edge
+    #: NormalizationStats (HydraulicFeatureBuilder.normalization_fingerprint)
+    #: this calibration was fit against. Defaults to the explicit "no
+    #: governed normalization" sentinel rather than an empty string, so
+    #: every existing artifact (fit before this field existed) is
+    #: unambiguously "fit with no normalization layer active" -- the
+    #: literal truth for all of them -- rather than silently unset.
+    normalization_hash: str = NO_NORMALIZATION_SENTINEL
 
     @property
     def artifact_hash(self) -> str:
@@ -52,7 +62,12 @@ class CalibrationArtifact:
         ).hexdigest()
 
     def validate_runtime(
-        self, *, model_hash: str, feature_schema_hash: str, dataset_manifest_hash: str | None = None
+        self,
+        *,
+        model_hash: str,
+        feature_schema_hash: str,
+        dataset_manifest_hash: str | None = None,
+        normalization_hash: str | None = None,
     ) -> None:
         if self.schema_version != CALIBRATION_SCHEMA_VERSION:
             raise ValueError("unsupported calibration artifact schema")
@@ -60,6 +75,11 @@ class CalibrationArtifact:
             raise ValueError("calibration artifact is incompatible with model/features")
         if dataset_manifest_hash is not None and self.dataset_manifest_hash != dataset_manifest_hash:
             raise ValueError("calibration dataset manifest hash does not match")
+        if normalization_hash is not None and self.normalization_hash != normalization_hash:
+            raise ValueError(
+                "calibration artifact was fit against a different governed normalization "
+                "than the runtime feature builder is currently using"
+            )
 
 
 def _normalize(probabilities: Sequence[float]) -> np.ndarray:
@@ -111,6 +131,7 @@ class SplitConformalCalibrator:
         feature_schema_hash: str,
         dataset_manifest_hash: str,
         minimum_group_size: int = 10,
+        normalization_hash: str = NO_NORMALIZATION_SENTINEL,
     ) -> SplitConformalCalibrator:
         if not 0 < alpha < 1 or not examples:
             raise ValueError("alpha must be within (0,1) and examples non-empty")
@@ -135,12 +156,14 @@ class SplitConformalCalibrator:
             CALIBRATION_SCHEMA_VERSION, alpha, model_hash, feature_schema_hash, dataset_manifest_hash,
             tuple(scores), usable_conditions, usable_networks,
             CalibrationReport(0.0, 0.0, 0.0, {}, {}, len(examples)),
+            normalization_hash,
         )
         calibrator = cls(temporary)
         report = calibrator.evaluate(examples)
         return cls(CalibrationArtifact(
             CALIBRATION_SCHEMA_VERSION, alpha, model_hash, feature_schema_hash, dataset_manifest_hash,
             tuple(scores), usable_conditions, usable_networks, report,
+            normalization_hash,
         ))
 
     def candidate_set(

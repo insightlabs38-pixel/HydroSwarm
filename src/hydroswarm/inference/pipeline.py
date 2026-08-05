@@ -497,6 +497,7 @@ class HybridInferencePipeline:
                 calibration.validate_runtime(
                     model_hash=self._model_hash,
                     feature_schema_hash=built.feature_schema_hash,
+                    normalization_hash=built.normalization_hash,
                 )
             except ValueError:
                 calibrated = False
@@ -664,6 +665,7 @@ class HybridInferencePipeline:
             "network": network_hash,
             "signature_artifact": artifact.artifact_hash,
             "feature_schema": built.feature_schema_hash,
+            "normalization": built.normalization_hash,
             "model": self._model_hash,
             "calibration": calibration.artifact_hash if calibration else "none",
             "evidence": evidence_hash,

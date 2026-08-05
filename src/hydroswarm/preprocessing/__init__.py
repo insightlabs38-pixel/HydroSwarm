@@ -20,10 +20,11 @@ from .schema import (
     FeatureSemantics,
     NormalizationStats,
 )
-from .builder import BuiltHydroBatch, HydraulicFeatureBuilder, SensorSeries
+from .builder import NO_NORMALIZATION_SENTINEL, BuiltHydroBatch, HydraulicFeatureBuilder, SensorSeries
 
 __all__ = [
     "DEFAULT_FEATURE_SCHEMA",
+    "NO_NORMALIZATION_SENTINEL",
     "BuiltHydroBatch",
     "HydraulicFeatureBuilder",
     "EDGE_FEATURE_NAMES",

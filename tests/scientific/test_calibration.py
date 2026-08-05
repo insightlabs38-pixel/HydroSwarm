@@ -33,3 +33,31 @@ def test_fit_measure_save_load_and_ood_invalidation(tmp_path) -> None:
     path.write_text(path.read_text() + " ")
     with pytest.raises(ValueError, match="checksum"):
         SplitConformalCalibrator.load(path)
+
+
+def test_normalization_hash_defaults_to_the_no_normalization_sentinel() -> None:
+    from hydroswarm.preprocessing import NO_NORMALIZATION_SENTINEL
+
+    calibrator = SplitConformalCalibrator.fit(
+        examples(), alpha=0.1, model_hash="m", feature_schema_hash="f",
+        dataset_manifest_hash="d", minimum_group_size=2,
+    )
+    assert calibrator.artifact.normalization_hash == NO_NORMALIZATION_SENTINEL
+    # Compatible with a runtime reporting the same "no normalization" state.
+    calibrator.artifact.validate_runtime(
+        model_hash="m", feature_schema_hash="f", normalization_hash=NO_NORMALIZATION_SENTINEL,
+    )
+
+
+def test_validate_runtime_fails_closed_on_a_real_normalization_mismatch() -> None:
+    calibrator = SplitConformalCalibrator.fit(
+        examples(), alpha=0.1, model_hash="m", feature_schema_hash="f",
+        dataset_manifest_hash="d", minimum_group_size=2, normalization_hash="fitted-against-artifact-A",
+    )
+    with pytest.raises(ValueError, match="normalization"):
+        calibrator.artifact.validate_runtime(
+            model_hash="m", feature_schema_hash="f", normalization_hash="fitted-against-artifact-B",
+        )
+    # A caller that does not pass normalization_hash at all is unaffected
+    # (backward compatible with every existing call site).
+    calibrator.artifact.validate_runtime(model_hash="m", feature_schema_hash="f")

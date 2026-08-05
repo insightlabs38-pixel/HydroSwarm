@@ -16,6 +16,7 @@ import torch
 from hydroswarm.classical import HydraulicStateEstimator, OperationalTelemetry
 from hydroswarm.data.scenarios import EventType, GeneratedScenario
 from hydroswarm.preprocessing import HydraulicFeatureBuilder, SensorSeries
+from hydroswarm.preprocessing.schema import NormalizationStats
 from hydroswarm.simulation.wrapper import HydraulicSimulator
 
 from .data import CurriculumStage, ScenarioExample, TopologyMetadata
@@ -227,6 +228,8 @@ def scenario_to_example(
     signature_library: SignatureLibrary,
     *,
     feature_context: FeatureContext | None = None,
+    node_normalization: NormalizationStats | None = None,
+    edge_normalization: NormalizationStats | None = None,
 ) -> ScenarioExample:
     junction_ids = tuple(sorted(network.junction_name_list))
     if junction_ids != signature_library.node_ids:
@@ -259,7 +262,9 @@ def scenario_to_example(
         )
     prior_values = signature_library.posterior(scenario)
     prior = dict(zip(junction_ids, map(float, prior_values), strict=True))
-    built = HydraulicFeatureBuilder().build(
+    built = HydraulicFeatureBuilder(
+        node_normalization=node_normalization, edge_normalization=edge_normalization
+    ).build(
         network,
         context.graph,
         context.state,

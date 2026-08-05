@@ -10,9 +10,11 @@ from hydroswarm.preprocessing import (
     DEFAULT_FEATURE_SCHEMA,
     EDGE_FEATURE_NAMES,
     EDGE_FEATURE_SEMANTICS,
+    NO_NORMALIZATION_SENTINEL,
     NODE_FEATURE_NAMES,
     NODE_FEATURE_SEMANTICS,
     GraphSample,
+    HydraulicFeatureBuilder,
     NormalizationStats,
     align_edges,
     align_node_features,
@@ -70,6 +72,47 @@ def test_normalization_stats_save_load_round_trip_and_hash(tmp_path) -> None:
     np.testing.assert_array_equal(reloaded.mean, stats.mean)
     np.testing.assert_array_equal(reloaded.scale, stats.scale)
     assert reloaded.fingerprint == digest
+
+
+def test_builder_normalization_fingerprint_matches_when_the_same_artifact_is_used_twice(tmp_path) -> None:
+    """core-issues.txt repair item 6, the required train/runtime parity
+    test: a corpus-generation-side HydraulicFeatureBuilder and a live-
+    inference-side one, each independently constructed but loading the
+    SAME saved NormalizationStats artifact, must report identical
+    normalization_fingerprint -- the exact property that lets
+    CalibrationArtifact.validate_runtime catch a real mismatch."""
+
+    stats = NormalizationStats.fit(
+        np.random.default_rng(1).normal(size=(5, len(NODE_FEATURE_NAMES))).astype(np.float32),
+        NODE_FEATURE_NAMES,
+    )
+    saved_path = tmp_path / "node-normalization.json"
+    stats.save(saved_path)
+
+    generation_side = HydraulicFeatureBuilder(node_normalization=NormalizationStats.load(saved_path))
+    runtime_side = HydraulicFeatureBuilder(node_normalization=NormalizationStats.load(saved_path))
+
+    assert generation_side.normalization_fingerprint == runtime_side.normalization_fingerprint
+    assert generation_side.normalization_fingerprint != NO_NORMALIZATION_SENTINEL
+
+
+def test_builder_normalization_fingerprint_detects_a_real_mismatch() -> None:
+    a = HydraulicFeatureBuilder(
+        node_normalization=NormalizationStats.fit(
+            np.zeros((3, len(NODE_FEATURE_NAMES)), dtype=np.float32), NODE_FEATURE_NAMES
+        )
+    )
+    b = HydraulicFeatureBuilder(
+        node_normalization=NormalizationStats.fit(
+            np.ones((3, len(NODE_FEATURE_NAMES)), dtype=np.float32), NODE_FEATURE_NAMES
+        )
+    )
+    assert a.normalization_fingerprint != b.normalization_fingerprint
+
+
+def test_builder_with_no_normalization_reports_the_explicit_sentinel() -> None:
+    builder = HydraulicFeatureBuilder()
+    assert builder.normalization_fingerprint == NO_NORMALIZATION_SENTINEL
 
 
 def test_normalization_fingerprint_changes_when_statistics_differ() -> None:
