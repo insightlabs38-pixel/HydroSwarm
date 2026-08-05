@@ -411,7 +411,12 @@ class HydroCore(nn.Module):
         # Semantic heads expose the actual scientific tasks rather than anonymous widths.
         self.source_node_head = RoleHead(d_model, 1)
         self.prior_logit_scale = nn.Parameter(torch.tensor(0.54132485))
-        self.source_region_head = RoleHead(d_model, 1)
+        # Exactly 3 incident-level region classes (hydroswarm.training.corpus.
+        # SOURCE_REGION_COUNT) applied to incident_context, not a per-node
+        # width -- core-issues.txt repair item 2: this used to be RoleHead(
+        # d_model, 1) applied per node position, making "region" an
+        # accidental node index rather than a real 3-way classification.
+        self.source_region_head = RoleHead(d_model, 3)
         self.sensor_fault_head = RoleHead(d_model, 1)
         self.sample_node_head = RoleHead(d_model, 1)
         self.information_gain_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Softplus())
@@ -645,7 +650,7 @@ class HydroCore(nn.Module):
             strategist=role_outputs["strategist"],
             node_mask=node_mask,
             source_node_logits=source_logits,
-            source_region_logits=self.source_region_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
+            source_region_logits=self.source_region_head(incident_context),
             start_time_logits=self._profile_logits(self.profile_heads["start_time"], incident_context, 4),
             duration_logits=self._profile_logits(self.profile_heads["duration"], incident_context, 3),
             relative_strength_logits=self._profile_logits(

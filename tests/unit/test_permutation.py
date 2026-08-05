@@ -164,3 +164,39 @@ def test_graph_permutation_equivariance_holds_across_several_random_permutations
     )
     assert report.non_equivariant_keys == ()
     assert report.predicted_source_agrees
+
+
+def test_source_region_logits_are_a_fixed_three_way_incident_classification() -> None:
+    """core-issues.txt repair item 2: source_region_logits must be exactly 3
+    incident-level logits (hydroswarm.training.corpus.SOURCE_REGION_COUNT),
+    not one logit per node position -- shape must not scale with node count."""
+
+    model = _tiny_model()
+    small = _example(nodes=4, seed=1)
+    large = _example(nodes=9, seed=2)
+
+    with torch.no_grad():
+        small_output = model(collate_variable_topology([small])[0])
+        large_output = model(collate_variable_topology([large])[0])
+
+    assert small_output["source_region_logits"].shape == (1, 3)
+    assert large_output["source_region_logits"].shape == (1, 3)
+
+
+def test_source_region_logits_are_invariant_under_node_permutation() -> None:
+    """A genuine incident-level classification must not change at all when
+    nodes are relabeled/reordered -- unlike source_node_logits (which is
+    node-indexed and must permute equivariantly), source_region_logits has
+    no node axis to permute."""
+
+    model = _tiny_model()
+    example = _example(nodes=6, source_local_index=3, seed=7)
+    permutation = _random_permutation(6, seed=99)
+    permuted_example = permute_example(example, permutation)
+
+    model.eval()
+    with torch.no_grad():
+        original = model(collate_variable_topology([example])[0])["source_region_logits"]
+        permuted = model(collate_variable_topology([permuted_example])[0])["source_region_logits"]
+
+    torch.testing.assert_close(original, permuted, atol=1e-4, rtol=1e-4)
