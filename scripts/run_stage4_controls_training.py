@@ -217,15 +217,32 @@ def main() -> int:
     parser.add_argument("--run-root", type=Path, default=Path("experiments/runs/bundle-f-stage4"))
     parser.add_argument("--registry", type=Path, default=Path("experiments/registry/bundle-f-stage4.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("reports/results/v3/stage4-controls-training.json"))
+    parser.add_argument("--corpus-root", type=Path, default=stage3.CYCLE_B_ROOT)
+    parser.add_argument(
+        "--tensors-dirname",
+        default=stage3.TENSORS_DIRNAME,
+        help="subdirectory of --corpus-root holding sharded tensors (default: tensors; use "
+        "tensors-normalized for a corpus with governed normalization applied)",
+    )
     args = parser.parse_args()
 
-    train = stage3._load_dataset("train")
-    validation = stage3._load_dataset("validation")
-    calibration = stage3._load_dataset("calibration")
-    development_holdout = stage3._load_dataset("development_holdout")
+    train = stage3._load_dataset("train", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
+    validation = stage3._load_dataset(
+        "validation", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+    )
+    calibration = stage3._load_dataset(
+        "calibration", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+    )
+    development_holdout = stage3._load_dataset(
+        "development_holdout", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+    )
     ood_datasets = {
-        "UNSEEN_TOPOLOGY": stage3._load_ood_dataset("UNSEEN_TOPOLOGY"),
-        "SEVERE_MISSINGNESS": stage3._load_ood_dataset("SEVERE_MISSINGNESS"),
+        "UNSEEN_TOPOLOGY": stage3._load_ood_dataset(
+            "UNSEEN_TOPOLOGY", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+        ),
+        "SEVERE_MISSINGNESS": stage3._load_ood_dataset(
+            "SEVERE_MISSINGNESS", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+        ),
     }
     registry = ExperimentRegistry(args.registry)
 
@@ -257,7 +274,7 @@ def main() -> int:
             "(reports/results/v3/stage3-finalist-training.json), not repeated. Classical-only "
             "baseline requires no training (see finalist-selection-recommendation.md)."
         ),
-        "corpus": str(stage3.CYCLE_B_ROOT),
+        "corpus": str(args.corpus_root / args.tensors_dirname),
         "seeds": list(SEEDS),
         "max_epochs": stage3.MAX_EPOCHS,
         "early_stopping_patience": stage3.EARLY_STOPPING_PATIENCE,

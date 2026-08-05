@@ -56,6 +56,7 @@ from hydroswarm.training.registry import ExperimentRegistry
 from hydroswarm.training.targets_v2 import TARGETS_V2_SCHEMA_VERSION
 
 CYCLE_B_ROOT = Path("data/learning-v2/cycle-b")
+TENSORS_DIRNAME = "tensors"
 SEED = 20260805
 EPOCHS = 4
 BATCH_SIZE = 16
@@ -88,11 +89,11 @@ SOURCE_ONLY_TASK_WEIGHTS = {
 }
 
 
-def _load_dataset(split: str) -> ScenarioDatasetView:
+def _load_dataset(split: str, *, corpus_root: Path, tensors_dirname: str) -> ScenarioDatasetView:
     # core-issues.txt repair item 12: return the lazy, disk-backed dataset
     # directly -- see run_stage3_finalist_training.py's identical fix.
     # Verify shard checksums once, explicitly, before training.
-    dataset = ShardedScenarioDataset(CYCLE_B_ROOT / "tensors" / split, expected_split=split)
+    dataset = ShardedScenarioDataset(corpus_root / tensors_dirname / split, expected_split=split)
     dataset.verify_shard_checksums()
     return dataset
 
@@ -290,17 +291,35 @@ def main() -> int:
     parser.add_argument("--run-root", type=Path, default=Path("experiments/runs/bundle-f-stage2"))
     parser.add_argument("--registry", type=Path, default=Path("experiments/registry/bundle-f-stage2.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("reports/results/v3/stage2-architecture-screening.json"))
+    parser.add_argument("--corpus-root", type=Path, default=CYCLE_B_ROOT)
+    parser.add_argument(
+        "--tensors-dirname",
+        default=TENSORS_DIRNAME,
+        help="subdirectory of --corpus-root holding sharded tensors (default: tensors; use "
+        "tensors-normalized for a corpus with governed normalization applied)",
+    )
+    parser.add_argument(
+        "--experiments",
+        nargs="+",
+        default=list(EXPERIMENTS),
+        choices=list(EXPERIMENTS),
+        help="subset of E0-E8 to run (default: all). e.g. --experiments E0 E1 E2 for a "
+        "targeted re-screen after a corpus/pipeline correction.",
+    )
     args = parser.parse_args()
+    experiments = {name: EXPERIMENTS[name] for name in args.experiments}
 
-    train = _load_dataset("train")
-    validation = _load_dataset("validation")
-    development_holdout = _load_dataset("development_holdout")
+    train = _load_dataset("train", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
+    validation = _load_dataset("validation", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
+    development_holdout = _load_dataset(
+        "development_holdout", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+    )
     registry = ExperimentRegistry(args.registry)
 
     started = time.perf_counter()
     results: dict[str, Any] = {}
     failures: dict[str, str] = {}
-    for name, overrides in EXPERIMENTS.items():
+    for name, overrides in experiments.items():
         try:
             results[name] = run_experiment(
                 name, overrides, train=train, validation=validation,
@@ -319,7 +338,8 @@ def main() -> int:
     report = {
         "schema_version": 1,
         "stage": "Bundle F Stage 2 -- architecture screening (E0-E8)",
-        "corpus": str(CYCLE_B_ROOT),
+        "corpus": str(args.corpus_root / args.tensors_dirname),
+        "experiments_run": list(experiments),
         "epochs": EPOCHS,
         "batch_size": BATCH_SIZE,
         "seed": SEED,

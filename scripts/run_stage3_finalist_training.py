@@ -57,6 +57,7 @@ from hydroswarm.training.registry import ExperimentRegistry
 from hydroswarm.training.targets_v2 import TARGETS_V2_SCHEMA_VERSION
 
 CYCLE_B_ROOT = Path("data/learning-v2/cycle-b")
+TENSORS_DIRNAME = "tensors"
 BATCH_SIZE = 16
 MAX_EPOCHS = 16
 EARLY_STOPPING_PATIENCE = 3
@@ -83,7 +84,7 @@ FINALISTS: dict[str, dict[str, Any]] = {
 SEEDS: tuple[int, ...] = (20260810, 20260811)
 
 
-def _load_dataset(split: str) -> ScenarioDatasetView:
+def _load_dataset(split: str, *, corpus_root: Path, tensors_dirname: str) -> ScenarioDatasetView:
     # core-issues.txt repair item 12: return the lazy, disk-backed
     # ShardedScenarioDataset directly -- it already satisfies everything a
     # caller needs (manifest_hash, stages_through, indexing) without ever
@@ -91,7 +92,7 @@ def _load_dataset(split: str) -> ScenarioDatasetView:
     # way wrapping it in a GovernedScenarioDataset used to force. Verify
     # shard checksums explicitly here, once, before this dataset is ever
     # handed to a trainer -- construction itself stays metadata-only.
-    dataset = ShardedScenarioDataset(CYCLE_B_ROOT / "tensors" / split, expected_split=split)
+    dataset = ShardedScenarioDataset(corpus_root / tensors_dirname / split, expected_split=split)
     dataset.verify_shard_checksums()
     return dataset
 
@@ -112,12 +113,12 @@ def topology_hashes(*datasets: ScenarioDatasetView) -> tuple[str, ...]:
     return tuple(sorted(hashes))
 
 
-def _load_ood_dataset(category: str) -> ScenarioDatasetView:
+def _load_ood_dataset(category: str, *, corpus_root: Path, tensors_dirname: str) -> ScenarioDatasetView:
     # OOD-holdout shards are tagged split="development_holdout" (see
     # data/learning-v2/cycle-b/tensors/ood-*/index.jsonl) -- they are a
     # governed-OOD-category subset of that split, not a distinct split name.
     # core-issues.txt repair item 12: lazy, disk-backed -- see _load_dataset.
-    directory = CYCLE_B_ROOT / "tensors" / f"ood-{category}"
+    directory = corpus_root / tensors_dirname / f"ood-{category}"
     dataset = ShardedScenarioDataset(directory, expected_split="development_holdout")
     dataset.verify_shard_checksums()
     return dataset
@@ -387,15 +388,28 @@ def main() -> int:
     parser.add_argument("--run-root", type=Path, default=Path("experiments/runs/bundle-f-stage3"))
     parser.add_argument("--registry", type=Path, default=Path("experiments/registry/bundle-f-stage3.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("reports/results/v3/stage3-finalist-training.json"))
+    parser.add_argument("--corpus-root", type=Path, default=CYCLE_B_ROOT)
+    parser.add_argument(
+        "--tensors-dirname",
+        default=TENSORS_DIRNAME,
+        help="subdirectory of --corpus-root holding sharded tensors (default: tensors; use "
+        "tensors-normalized for a corpus with governed normalization applied)",
+    )
     args = parser.parse_args()
 
-    train = _load_dataset("train")
-    validation = _load_dataset("validation")
-    calibration = _load_dataset("calibration")
-    development_holdout = _load_dataset("development_holdout")
+    train = _load_dataset("train", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
+    validation = _load_dataset("validation", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
+    calibration = _load_dataset("calibration", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
+    development_holdout = _load_dataset(
+        "development_holdout", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+    )
     ood_datasets = {
-        "UNSEEN_TOPOLOGY": _load_ood_dataset("UNSEEN_TOPOLOGY"),
-        "SEVERE_MISSINGNESS": _load_ood_dataset("SEVERE_MISSINGNESS"),
+        "UNSEEN_TOPOLOGY": _load_ood_dataset(
+            "UNSEEN_TOPOLOGY", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+        ),
+        "SEVERE_MISSINGNESS": _load_ood_dataset(
+            "SEVERE_MISSINGNESS", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname
+        ),
     }
     registry = ExperimentRegistry(args.registry)
 
@@ -423,7 +437,7 @@ def main() -> int:
     report = {
         "schema_version": 1,
         "stage": "Bundle F Stage 3 -- finalist training",
-        "corpus": str(CYCLE_B_ROOT),
+        "corpus": str(args.corpus_root / args.tensors_dirname),
         "finalists": FINALISTS,
         "seeds": list(SEEDS),
         "max_epochs": MAX_EPOCHS,
