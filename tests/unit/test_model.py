@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import pytest
 import torch
 
-from hydroswarm.model import HydroCore, HydroMono, NoAdapterHydroCore
+from hydroswarm.model import (
+    ArchitectureCompatibilityError,
+    HydroCore,
+    HydroMono,
+    NoAdapterHydroCore,
+    verify_architecture_compatibility,
+)
 
 
 def _tiny_model() -> HydroCore:
@@ -96,6 +103,37 @@ def test_model_variants_meet_parameter_bands() -> None:
     assert 4_000_000 <= counts["small"] <= 6_000_000
     assert 12_000_000 <= counts["medium"] <= 15_000_000
     assert 24_000_000 <= counts["large"] <= 25_000_000
+
+
+def test_from_variant_records_the_variant_name_in_architecture_config() -> None:
+    # core-issues.txt repair item 9: a checkpoint's architecture_config()
+    # must declare which named variant it was built from -- a runtime
+    # loader needs this to reconstruct the model rather than assume a
+    # hardcoded default.
+    small = HydroCore.from_variant("small")
+    assert small.architecture_config()["variant"] == "small"
+    assert small.architecture_config()["use_adapters"] is True
+    # A model constructed directly (not via from_variant) has no named
+    # variant -- never fabricated as if it matched one of MODEL_VARIANTS.
+    direct = HydroCore(d_model=32, nhead=4, dim_feedforward=64, num_layers=1)
+    assert direct.architecture_config()["variant"] is None
+
+
+def test_verify_architecture_compatibility_rejects_use_adapters_mismatch() -> None:
+    kwargs = {
+        "node_feature_dim": 3,
+        "temporal_feature_dim": 2,
+        "quality_feature_dim": 2,
+        "d_model": 32,
+        "nhead": 4,
+        "dim_feedforward": 64,
+        "num_layers": 1,
+        "adapter_dims": (32, 32, 32),
+    }
+    model = HydroCore(**kwargs, use_adapters=True)
+    with pytest.raises(ArchitectureCompatibilityError, match="use_adapters"):
+        verify_architecture_compatibility(model, {"use_adapters": False})
+    verify_architecture_compatibility(model, {})  # missing field: accepted for old checkpoints
 
 
 def test_edge_inputs_context_and_semantic_heads() -> None:

@@ -7,10 +7,37 @@ reached a real deployment."""
 
 from __future__ import annotations
 
+import json
+import shutil
 from pathlib import Path
 
 from hydroswarm.runtime.defaults import DefaultPipelineFactory
 from hydroswarm.simulation.wrapper import wntr
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _copied_checkpoint_metadata(tmp_path: Path) -> tuple[Path, dict]:
+    """Copy the real promoted checkpoint's safetensors into an isolated
+    project root, and return that root plus a mutable copy of its real
+    metadata.json so a test can corrupt one field without touching the
+    tracked models/ directory."""
+
+    (tmp_path / "models").mkdir()
+    shutil.copyfile(
+        _REPO_ROOT / "models" / "hydrocore-s-learning-v1.safetensors",
+        tmp_path / "models" / "hydrocore-s-learning-v1.safetensors",
+    )
+    metadata = json.loads(
+        (_REPO_ROOT / "models" / "hydrocore-s-learning-v1.metadata.json").read_text(encoding="utf-8")
+    )
+    return tmp_path, metadata
+
+
+def _write_metadata(root: Path, metadata: dict) -> None:
+    (root / "models" / "hydrocore-s-learning-v1.metadata.json").write_text(
+        json.dumps(metadata), encoding="utf-8"
+    )
 
 
 def test_promoted_checkpoint_loads_successfully() -> None:
@@ -63,6 +90,52 @@ def test_promoted_checkpoint_declares_only_sentinel_as_a_trained_task() -> None:
 
     if wntr is None:
         return
-    network_path = Path(__file__).resolve().parents[2] / "data" / "frozen" / "golden_network.inp"
+    network_path = _REPO_ROOT / "data" / "frozen" / "golden_network.inp"
     pipeline = factory(None, network_path)
     assert pipeline.trained_tasks == frozenset({"sentinel"})
+
+
+def test_missing_architecture_config_fails_closed(tmp_path: Path) -> None:
+    """core-issues.txt repair item 9: a checkpoint that does not declare its
+    own architecture_config must never fall back to instantiating the
+    model with hardcoded constructor defaults -- it must refuse to load."""
+
+    root, metadata = _copied_checkpoint_metadata(tmp_path)
+    del metadata["architecture_config"]
+    _write_metadata(root, metadata)
+
+    factory = DefaultPipelineFactory(root)
+    assert factory.trained_assets_ready is False
+    assert factory.fallback_reason == "trained_assets_unavailable:KeyError"
+
+
+def test_stale_architecture_version_fails_closed(tmp_path: Path) -> None:
+    """architecture_version is the one architecture_config field the
+    runtime does not pass to HydroCore.from_variant (it is always this
+    build's ARCHITECTURE_VERSION constant, not a constructor knob), so a
+    checkpoint recorded against an older code version is the one mismatch
+    verify_architecture_compatibility can still actually observe here --
+    every other field is now structurally guaranteed to match, because the
+    model is built directly from them (repair item 9)."""
+
+    root, metadata = _copied_checkpoint_metadata(tmp_path)
+    metadata["architecture_config"]["architecture_version"] = "hydrocore-v2"
+    _write_metadata(root, metadata)
+
+    factory = DefaultPipelineFactory(root)
+    assert factory.trained_assets_ready is False
+    assert factory.fallback_reason == "trained_assets_unavailable:ArchitectureCompatibilityError"
+
+
+def test_normalization_hash_mismatch_against_checkpoint_metadata_fails_closed(tmp_path: Path) -> None:
+    """core-issues.txt repair item 9: normalization_hash is now also
+    checked directly against the checkpoint's own declared identity, not
+    only indirectly through calibration validation."""
+
+    root, metadata = _copied_checkpoint_metadata(tmp_path)
+    metadata["normalization_hash"] = "0" * 64
+    _write_metadata(root, metadata)
+
+    factory = DefaultPipelineFactory(root)
+    assert factory.trained_assets_ready is False
+    assert factory.fallback_reason == "trained_assets_unavailable:ValueError"

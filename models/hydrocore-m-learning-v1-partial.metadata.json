@@ -1,10 +1,22 @@
 {
   "architecture": "hydrocore",
+  "architecture_config": {
+    "architecture_version": "hydrocore-v3",
+    "auxiliary_heads": false,
+    "consequence_prescreening_heads": false,
+    "event_control_heads": false,
+    "incident_pooling": "mean",
+    "message_direction": "forward_only",
+    "prior_mode": "feature_and_logit",
+    "use_adapters": true,
+    "variant": "medium"
+  },
   "bytes": 49641108,
   "calibration_manifest_sha256": "d8193e8761eb404cc4a8cb11c92417b5adc77315ea1d8cc288bf0d65530f43d0",
   "corpus_report_sha256": "7065516ac3e5a0462f110d8eb296b54281909090293b68373a2fcf410df894d3",
   "feature_schema_sha256": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
   "feature_schema_version": "hydroswarm-features-v2",
+  "normalization_hash": "f9022e6322dfa58fdc8434a78c2c624b68acb4041e359684665eb444f5912cf7",
   "optimizer_state_included": false,
   "parameter_count": 12401861,
   "promoted_at": "2026-08-03T20:07:10.766281+00:00",
@@ -19,6 +31,7 @@
     "epoch": 1,
     "global_step": 60
   },
+  "training_provenance": null,
   "training_seconds": 112.0968659,
   "training_status": "partial",
   "validated_tasks": [

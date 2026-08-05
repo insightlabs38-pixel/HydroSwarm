@@ -10,7 +10,15 @@ from pathlib import Path
 import shutil
 
 from safetensors import safe_open
+from safetensors.torch import load_file
 
+from hydroswarm.model import HydroCore, load_state_dict_with_v2_migration
+from hydroswarm.model.core import (
+    INCIDENT_POOLING_MODES,
+    MESSAGE_DIRECTIONS,
+    PRIOR_MODES,
+)
+from hydroswarm.preprocessing.builder import NO_NORMALIZATION_SENTINEL
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.tasks import validate_tasks
 
@@ -34,6 +42,29 @@ def main() -> int:
     parser.add_argument("--training-seconds", type=float, required=True)
     parser.add_argument("--status", choices=("trained", "partial"), required=True)
     parser.add_argument(
+        "--use-adapters", action=argparse.BooleanOptionalAction, default=True,
+        help="must match how the checkpoint being promoted was actually constructed",
+    )
+    parser.add_argument("--prior-mode", choices=PRIOR_MODES, default="feature_and_logit")
+    parser.add_argument("--incident-pooling", choices=INCIDENT_POOLING_MODES, default="mean")
+    parser.add_argument("--message-direction", choices=MESSAGE_DIRECTIONS, default="forward_only")
+    parser.add_argument(
+        "--event-control-heads", action=argparse.BooleanOptionalAction, default=False
+    )
+    parser.add_argument("--auxiliary-heads", action=argparse.BooleanOptionalAction, default=False)
+    parser.add_argument(
+        "--consequence-prescreening-heads", action=argparse.BooleanOptionalAction, default=False
+    )
+    parser.add_argument(
+        "--normalization-hash",
+        default=NO_NORMALIZATION_SENTINEL,
+        help=(
+            "governed normalization artifact fingerprint this checkpoint was trained "
+            "against (see HydraulicFeatureBuilder.normalization_fingerprint); defaults to "
+            "the explicit no-normalization sentinel, matching every checkpoint trained so far."
+        ),
+    )
+    parser.add_argument(
         "--trained-tasks",
         required=True,
         help=(
@@ -51,7 +82,42 @@ def main() -> int:
             "audit/calibration validation (e.g. label_audit, corpus gates)."
         ),
     )
+    parser.add_argument(
+        "--registry-path",
+        type=Path,
+        default=None,
+        help=(
+            "ExperimentRegistry JSONL ledger to look up --registry-run-id in. "
+            "core-issues.txt repair item 9: when given, the run's own seed, "
+            "git_commit, manifest_hashes, and topology_hashes are copied verbatim "
+            "into this checkpoint's metadata -- one canonical source, not a second "
+            "hand-typed copy that can drift from what the registry actually recorded."
+        ),
+    )
+    parser.add_argument(
+        "--registry-run-id",
+        default=None,
+        help="run_id (in --registry-path) that produced the checkpoint being promoted",
+    )
     args = parser.parse_args()
+    if bool(args.registry_path) != bool(args.registry_run_id):
+        raise ValueError("--registry-path and --registry-run-id must be given together")
+    training_provenance: dict[str, object] | None = None
+    if args.registry_path is not None:
+        from hydroswarm.training.registry import ExperimentRegistry
+
+        run = ExperimentRegistry(args.registry_path).runs().get(args.registry_run_id)
+        if run is None:
+            raise ValueError(
+                f"run_id {args.registry_run_id!r} not found in registry {args.registry_path}"
+            )
+        training_provenance = {
+            "run_id": run["run_id"],
+            "seed": run["seed"],
+            "git_commit": run["git_commit"],
+            "manifest_hashes": run["manifest_hashes"],
+            "topology_hashes": run.get("topology_hashes", []),
+        }
     trained_tasks = _task_set(args.trained_tasks)
     validated_tasks = _task_set(args.validated_tasks)
     validate_tasks(trained_tasks, label="--trained-tasks")
@@ -78,10 +144,29 @@ def main() -> int:
     with safe_open(args.output, framework="pt", device="cpu") as artifact:
         tensor_count = len(artifact.keys())
         parameter_count = sum(artifact.get_tensor(key).numel() for key in artifact.keys())
+    # core-issues.txt repair item 9: actually construct and load the model
+    # the declared flags describe, rather than recording --architecture/
+    # --variant as opaque strings disconnected from what the tensors being
+    # promoted really are. This also means promotion itself now fails
+    # closed if the declared configuration cannot load these tensors,
+    # instead of silently copying bytes no one has verified load at all.
+    model = HydroCore.from_variant(
+        args.variant,
+        use_adapters=args.use_adapters,
+        prior_mode=args.prior_mode,
+        incident_pooling=args.incident_pooling,
+        message_direction=args.message_direction,
+        event_control_heads=args.event_control_heads,
+        auxiliary_heads=args.auxiliary_heads,
+        consequence_prescreening_heads=args.consequence_prescreening_heads,
+    )
+    load_state_dict_with_v2_migration(model, load_file(args.output, device="cpu"))
     metadata = {
         "schema_version": 1,
         "architecture": args.architecture,
+        "architecture_config": model.architecture_config(),
         "variant": args.variant,
+        "normalization_hash": args.normalization_hash,
         "training_status": args.status,
         "sha256": _hash(args.output),
         "bytes": args.output.stat().st_size,
@@ -97,6 +182,7 @@ def main() -> int:
         "optimizer_state_included": False,
         "trained_tasks": sorted(trained_tasks),
         "validated_tasks": sorted(validated_tasks),
+        "training_provenance": training_provenance,
     }
     metadata_path = args.output.with_suffix(".metadata.json")
     metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True), encoding="utf-8")

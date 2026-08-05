@@ -12,8 +12,13 @@ from safetensors.torch import load_file
 from hydroswarm.calibration import SplitConformalCalibrator
 from hydroswarm.classical import SignatureBuilder, SignatureCache, SignatureCacheKey
 from hydroswarm.inference import HybridInferencePipeline
-from hydroswarm.model import HydroCore, load_state_dict_with_v2_migration
-from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
+from hydroswarm.model import (
+    ArchitectureCompatibilityError,
+    HydroCore,
+    load_state_dict_with_v2_migration,
+    verify_architecture_compatibility,
+)
+from hydroswarm.preprocessing.builder import NO_NORMALIZATION_SENTINEL, HydraulicFeatureBuilder
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA, NormalizationStats
 from hydroswarm.simulation import HydraulicSimulator
 from hydroswarm.simulation.wrapper import wntr
@@ -83,7 +88,33 @@ class DefaultPipelineFactory:
                 raise ValueError("checkpoint feature schema is incompatible")
             trained_tasks = frozenset(metadata.get("trained_tasks", ()))
             validate_tasks(trained_tasks, label="checkpoint metadata trained_tasks")
-            model = HydroCore.from_variant("small")
+            # core-issues.txt repair item 9: instantiate the model from the
+            # checkpoint's own declared architecture_config rather than a
+            # hardcoded default constructor -- a checkpoint trained with a
+            # non-default prior_mode/pooling/message_direction/head-flag
+            # combination would otherwise load its tensors successfully
+            # (load_state_dict's shape check does not see these) into a
+            # model silently configured differently than it was trained
+            # with. Direct key access (not .get with a fallback) is
+            # deliberate: HydroCore.architecture_config() always returns
+            # every one of these keys, so a genuinely incomplete metadata
+            # record must fail closed (KeyError, caught below) rather than
+            # silently fall back to a constructor default itself.
+            architecture_config = metadata["architecture_config"]
+            variant = architecture_config["variant"]
+            if not isinstance(variant, str):
+                raise ValueError("checkpoint architecture_config has no named variant")
+            model = HydroCore.from_variant(
+                variant,
+                use_adapters=architecture_config["use_adapters"],
+                prior_mode=architecture_config["prior_mode"],
+                incident_pooling=architecture_config["incident_pooling"],
+                message_direction=architecture_config["message_direction"],
+                event_control_heads=architecture_config["event_control_heads"],
+                auxiliary_heads=architecture_config["auxiliary_heads"],
+                consequence_prescreening_heads=architecture_config["consequence_prescreening_heads"],
+            )
+            verify_architecture_compatibility(model, architecture_config)
             migrated, migrated_parameters = load_state_dict_with_v2_migration(
                 model, load_file(self.model_path, device="cpu")
             )
@@ -94,6 +125,12 @@ class DefaultPipelineFactory:
                 node_normalization=self._load_normalization(self.node_normalization_path),
                 edge_normalization=self._load_normalization(self.edge_normalization_path),
             )
+            recorded_normalization_hash = metadata.get("normalization_hash", NO_NORMALIZATION_SENTINEL)
+            if recorded_normalization_hash != feature_builder.normalization_fingerprint:
+                raise ValueError(
+                    "checkpoint metadata normalization_hash does not match the runtime "
+                    "feature builder's normalization artifact"
+                )
             calibrator = SplitConformalCalibrator.load(self.calibration_path)
             calibrator.artifact.validate_runtime(
                 model_hash=checkpoint_hash,
@@ -104,7 +141,15 @@ class DefaultPipelineFactory:
             self._calibrator = calibrator
             self._feature_builder = feature_builder
             self.trained_tasks = trained_tasks
-        except (OSError, KeyError, TypeError, ValueError, RuntimeError, json.JSONDecodeError) as error:
+        except (
+            OSError,
+            KeyError,
+            TypeError,
+            ValueError,
+            RuntimeError,
+            json.JSONDecodeError,
+            ArchitectureCompatibilityError,
+        ) as error:
             self._model = None
             self._calibrator = None
             self._feature_builder = None

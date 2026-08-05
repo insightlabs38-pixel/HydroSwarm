@@ -238,6 +238,13 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             f"build's {ARCHITECTURE_VERSION!r}; a migration path must be defined before "
             "loading a checkpoint from a different architecture version"
         )
+    recorded_use_adapters = metadata.get("use_adapters")
+    if recorded_use_adapters is not None and recorded_use_adapters != model.use_adapters:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with use_adapters={recorded_use_adapters!r} but this "
+            f"model instance is configured with use_adapters={model.use_adapters!r}; "
+            "BottleneckAdapter and nn.Identity have different parameter sets"
+        )
     recorded_prior_mode = metadata.get("prior_mode")
     if recorded_prior_mode is not None and recorded_prior_mode != model.prior_mode:
         raise ArchitectureCompatibilityError(
@@ -397,6 +404,12 @@ class HydroCore(nn.Module):
         self.event_control_heads = event_control_heads
         self.auxiliary_heads = auxiliary_heads
         self.consequence_prescreening_heads = consequence_prescreening_heads
+        # core-issues.txt repair item 9: set by from_variant() so a
+        # checkpoint's own architecture_config() records which named
+        # variant it was built from; a model constructed directly (e.g. the
+        # tiny configurations used throughout the test suite) has no named
+        # variant and stays None.
+        self.variant_name: str | None = None
         self.node_encoder = StaticFeatureEncoder(
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
@@ -538,7 +551,9 @@ class HydroCore(nn.Module):
             "modality_layers": configuration.modality_layers,
             **overrides,
         }
-        return cls(**values)  # type: ignore[arg-type]
+        instance = cls(**values)  # type: ignore[arg-type]
+        instance.variant_name = variant.lower()
+        return instance
 
     def architecture_config(self) -> dict[str, object]:
         """Config dimensions load_state_dict's shape check would not itself
@@ -546,10 +561,17 @@ class HydroCore(nn.Module):
         this into checkpoint metadata (see export_model's `metadata` arg)
         so verify_architecture_compatibility() can detect a checkpoint
         being loaded into a model configured differently than it was
-        trained with."""
+        trained with.
+
+        core-issues.txt repair item 9: `variant` and `use_adapters` were
+        added alongside the pre-existing dimensions above -- both are real
+        identity facts a runtime loader must reconstruct the model from,
+        not leave at their constructor defaults."""
 
         return {
             "architecture_version": ARCHITECTURE_VERSION,
+            "variant": self.variant_name,
+            "use_adapters": self.use_adapters,
             "prior_mode": self.prior_mode,
             "incident_pooling": self.incident_pooling,
             "message_direction": self.message_direction,
