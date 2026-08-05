@@ -1,10 +1,13 @@
 """Classical-neural fusion, calibration, and uncertainty control."""
 
 from hydroswarm.inference.fusion import (
+    DYNAMIC_TRUST_FUSION_CONFIG,
     ControlAction,
     FusionDiagnostics,
     TrustFeatures,
     conformal_candidate_set,
+    fixed_weight_fusion,
+    fixed_weight_fusion_config,
     fuse_source_probabilities,
     jensen_shannon_divergence,
     uncertainty_control,
@@ -22,6 +25,7 @@ from hydroswarm.inference.results import (
 )
 
 __all__ = [
+    "DYNAMIC_TRUST_FUSION_CONFIG",
     "ControlAction",
     "CalibrationArtifact",
     "EvidenceChange",
@@ -40,6 +44,8 @@ __all__ = [
     "SplitConformalCalibrator",
     "TrustFeatures",
     "conformal_candidate_set",
+    "fixed_weight_fusion",
+    "fixed_weight_fusion_config",
     "fuse_source_probabilities",
     "jensen_shannon_divergence",
     "uncertainty_control",

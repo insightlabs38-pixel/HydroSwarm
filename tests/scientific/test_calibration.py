@@ -61,3 +61,58 @@ def test_validate_runtime_fails_closed_on_a_real_normalization_mismatch() -> Non
     # A caller that does not pass normalization_hash at all is unaffected
     # (backward compatible with every existing call site).
     calibrator.artifact.validate_runtime(model_hash="m", feature_schema_hash="f")
+
+
+def test_fusion_config_hash_defaults_to_none_and_skips_the_check() -> None:
+    calibrator = SplitConformalCalibrator.fit(
+        examples(), alpha=0.1, model_hash="m", feature_schema_hash="f",
+        dataset_manifest_hash="d", minimum_group_size=2,
+    )
+    assert calibrator.artifact.fusion_config_hash is None
+    # A caller not passing fusion_config_hash at all is unaffected -- this is
+    # what every existing pipeline/test fixture predating repair item 10 does.
+    calibrator.artifact.validate_runtime(model_hash="m", feature_schema_hash="f")
+
+
+def test_validate_runtime_fails_closed_on_a_fusion_config_mismatch() -> None:
+    calibrator = SplitConformalCalibrator.fit(
+        examples(), alpha=0.1, model_hash="m", feature_schema_hash="f",
+        dataset_manifest_hash="d", minimum_group_size=2,
+        fusion_config_hash="fixed_weight_fusion-v1:neural_weight=0.6",
+    )
+    calibrator.artifact.validate_runtime(
+        model_hash="m", feature_schema_hash="f",
+        fusion_config_hash="fixed_weight_fusion-v1:neural_weight=0.6",
+    )
+    with pytest.raises(ValueError, match="fusion"):
+        calibrator.artifact.validate_runtime(
+            model_hash="m", feature_schema_hash="f",
+            fusion_config_hash="fuse_source_probabilities-v1",
+        )
+
+
+def test_validated_topology_hashes_defaults_to_empty_and_skips_the_check() -> None:
+    calibrator = SplitConformalCalibrator.fit(
+        examples(), alpha=0.1, model_hash="m", feature_schema_hash="f",
+        dataset_manifest_hash="d", minimum_group_size=2,
+    )
+    assert calibrator.artifact.validated_topology_hashes == ()
+    # An empty set means "not declared" -- every topology is accepted,
+    # never treated as if every topology were unknown.
+    calibrator.artifact.validate_runtime(
+        model_hash="m", feature_schema_hash="f", topology_hash="some-unseen-topology"
+    )
+
+
+def test_validate_runtime_fails_closed_on_an_unknown_topology() -> None:
+    calibrator = SplitConformalCalibrator.fit(
+        examples(), alpha=0.1, model_hash="m", feature_schema_hash="f",
+        dataset_manifest_hash="d", minimum_group_size=2,
+        topology_hashes=["net-1", "net-2", "net-1"],
+    )
+    assert calibrator.artifact.validated_topology_hashes == ("net-1", "net-2")
+    calibrator.artifact.validate_runtime(model_hash="m", feature_schema_hash="f", topology_hash="net-1")
+    with pytest.raises(ValueError, match="topology"):
+        calibrator.artifact.validate_runtime(
+            model_hash="m", feature_schema_hash="f", topology_hash="never-seen-topology"
+        )

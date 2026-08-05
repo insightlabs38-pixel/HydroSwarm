@@ -1,9 +1,12 @@
 import pytest
 
 from hydroswarm.inference.fusion import (
+    DYNAMIC_TRUST_FUSION_CONFIG,
     ControlAction,
     TrustFeatures,
     conformal_candidate_set,
+    fixed_weight_fusion,
+    fixed_weight_fusion_config,
     fuse_source_probabilities,
     jensen_shannon_divergence,
     uncertainty_control,
@@ -53,6 +56,38 @@ def test_fusion_applies_physical_mask_and_dynamic_trust() -> None:
         features=features(healthy_sensor_fraction=0.2, missing_rate=0.8),
     )[1]
     assert unhealthy.classical_trust < diagnostics.classical_trust
+
+
+def test_fixed_weight_fusion_blends_classical_and_neural_and_normalizes() -> None:
+    fused = fixed_weight_fusion([0.7, 0.2, 0.1], [0.1, 0.2, 0.7], neural_weight=0.6)
+    assert fused.sum() == pytest.approx(1.0)
+    # Purely classical (neural_weight=0) reproduces the classical vector.
+    assert fixed_weight_fusion([0.7, 0.2, 0.1], [0.1, 0.2, 0.7], neural_weight=0.0) == pytest.approx(
+        [0.7, 0.2, 0.1]
+    )
+    # Purely neural (neural_weight=1) reproduces the neural vector.
+    assert fixed_weight_fusion([0.7, 0.2, 0.1], [0.1, 0.2, 0.7], neural_weight=1.0) == pytest.approx(
+        [0.1, 0.2, 0.7]
+    )
+
+
+def test_fixed_weight_fusion_works_batched_and_unbatched_identically() -> None:
+    classical = [[0.7, 0.2, 0.1], [0.3, 0.3, 0.4]]
+    neural = [[0.1, 0.2, 0.7], [0.5, 0.25, 0.25]]
+    batched = fixed_weight_fusion(classical, neural)
+    for row_index in range(2):
+        single = fixed_weight_fusion(classical[row_index], neural[row_index])
+        assert single == pytest.approx(batched[row_index])
+
+
+def test_fixed_weight_fusion_rejects_out_of_range_weight() -> None:
+    with pytest.raises(ValueError, match="neural_weight"):
+        fixed_weight_fusion([0.5, 0.5], [0.5, 0.5], neural_weight=1.5)
+
+
+def test_fixed_weight_fusion_config_is_distinct_per_weight_and_from_dynamic_trust() -> None:
+    assert fixed_weight_fusion_config(0.6) != fixed_weight_fusion_config(0.5)
+    assert fixed_weight_fusion_config(0.6) != DYNAMIC_TRUST_FUSION_CONFIG
 
 
 def test_split_conformal_candidate_set_uses_finite_sample_quantile() -> None:

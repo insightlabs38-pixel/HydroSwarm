@@ -1,5 +1,5 @@
 {
-  "calibrated": true,
+  "calibrated": false,
   "candidate_nodes": [
     "J2"
   ],
@@ -26,33 +26,36 @@
   "fused_top_source": "J2",
   "latencies_ms": {
     "active_sampling": 0.0,
-    "belief_fusion": 0.30380021780729294,
-    "classical_localization": 0.9049996733665466,
-    "dynamic_graph": 1.1315997689962387,
-    "feature_building": 2.9217000119388103,
-    "hydraulic_simulation": 31.76600020378828,
-    "neural_inference": 1085.294300224632,
-    "ood_detection": 0.1266002655029297,
-    "planning": 4.467600025236607,
-    "state_estimation": 0.11150026693940163
+    "belief_fusion": 0.22322998847812414,
+    "classical_localization": 1.0104000102728605,
+    "dynamic_graph": 1.338920003036037,
+    "feature_building": 2.4555099953431636,
+    "hydraulic_simulation": 27.297280001221225,
+    "neural_inference": 353.15137400175445,
+    "ood_detection": 0.11826999252662063,
+    "planning": 0.0,
+    "state_estimation": 0.15204999363049865
   },
   "neural_belief": {
-    "J1": 1.346383344437842e-13,
+    "J1": 1.3463814184223962e-13,
     "J2": 0.9999999999997113,
-    "J3": 2.7610122579769594e-14,
-    "J4": 1.265034477564158e-13,
+    "J3": 2.761008308320068e-14,
+    "J4": 1.265030255063088e-13,
     "R1": 0.0,
     "T1": 0.0
   },
   "neural_failure": null,
   "ood_level": "NORMAL",
   "provenance_hashes": {
-    "calibration": "062643e940a4c546f0046fafc92935ada7df5527ee120a0c302709c53afb76dc",
+    "calibration": "fe746ec96cdf63d95700e5124f074921eeebc7ff090f93b636c6b2178d69cdb8",
     "evidence": "71b18e0c7ed44b936d96eaf45701c853e9231c77052888f2d964ce2b003a61f4",
     "feature_schema": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "fusion_config": "66ed8e658573c107b883ec0f46821ececb3d3b350445b695bc7335e0ad536d7c",
     "model": "85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423",
     "network": "05840153b12763142ff8468e36ea6f3dd20dbf240edda09b5c0760512caf552d",
-    "signature_artifact": "24801eab564bd1ec6b19f545b074d420e24008b13a477ff9951a6a251f0470e8"
+    "normalization": "f9022e6322dfa58fdc8434a78c2c624b68acb4041e359684665eb444f5912cf7",
+    "signature_artifact": "14ae164143ffb9105e737f6d88d3d1c61791b0e4ceca95a19491880f1ed7e50f",
+    "topology": "decd4ac707a3817115c7307940861dafac6d3fad34a3358179f20c7830a2cc79"
   },
   "runtime_mode": "FULL_HYBRID",
   "schema_version": 1,

@@ -22,7 +22,9 @@ from hydroswarm.classical import (
     localize_with_signatures,
 )
 from hydroswarm.calibration import CalibrationArtifact, SplitConformalCalibrator
+from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.inference.fusion import (
+    DYNAMIC_TRUST_FUSION_CONFIG,
     ControlAction,
     FusionDiagnostics,
     TrustFeatures,
@@ -111,6 +113,7 @@ class HybridInferencePipeline:
         evidence_threshold: float = 0.55,
         clock: Callable[[], float] = time.perf_counter,
         trained_tasks: frozenset[str] | None = None,
+        fusion_config_hash: str | None = None,
     ) -> None:
         if maximum_planning_candidates < 1:
             raise ValueError("maximum_planning_candidates must be positive")
@@ -122,6 +125,15 @@ class HybridInferencePipeline:
         # only place this actually needs to fail closed.
         self.trained_tasks = RUNTIME_TASKS if trained_tasks is None else frozenset(trained_tasks)
         validate_tasks(self.trained_tasks, label="trained_tasks")
+        # core-issues.txt repair item 10: `None` (the default) skips the
+        # fusion_config_hash check entirely -- every existing
+        # CalibrationArtifact test fixture and the currently-promoted
+        # checkpoint's own calibration.json predate this field and would
+        # otherwise be spuriously invalidated. Production wiring
+        # (runtime/defaults.py) passes DYNAMIC_TRUST_FUSION_CONFIG
+        # explicitly, since that is the one place this actually needs to
+        # fail closed on a real, deployed mismatch.
+        self.fusion_config_hash = fusion_config_hash
         self.simulator = simulator
         self.signature_artifact = signature_artifact
         self.model = model
@@ -376,6 +388,13 @@ class HybridInferencePipeline:
             if hasattr(self.simulator, "state_hash")
             else _hash(tuple(sorted(str(node) for node in network.node_name_list)))
         )
+        # core-issues.txt repair item 10: the STRUCTURAL topology identity
+        # (stable per named network family, unlike network_hash above which
+        # also captures this incident's randomized/live hydraulic state) --
+        # the same function hydroswarm.training.corpus uses to populate
+        # TopologyMetadata.topology_hash, so a CalibrationArtifact fit
+        # against real corpus examples can be checked against it here.
+        topology_hash = network_sha256(network)
         raw_state = stage("hydraulic_simulation", self.simulator.calculate_state)
         tank_levels = {name: raw_state.pressure_m.get(name, 0.0) for name in network.tank_name_list}
         estimated = stage(
@@ -523,6 +542,8 @@ class HybridInferencePipeline:
                     model_hash=self._model_hash,
                     feature_schema_hash=built.feature_schema_hash,
                     normalization_hash=built.normalization_hash,
+                    fusion_config_hash=self.fusion_config_hash,
+                    topology_hash=topology_hash,
                 )
             except ValueError:
                 calibrated = False
@@ -688,9 +709,11 @@ class HybridInferencePipeline:
         self._changes[incident_id] = comparison_history
         provenance = {
             "network": network_hash,
+            "topology": topology_hash,
             "signature_artifact": artifact.artifact_hash,
             "feature_schema": built.feature_schema_hash,
             "normalization": built.normalization_hash,
+            "fusion_config": _hash(DYNAMIC_TRUST_FUSION_CONFIG),
             "model": self._model_hash,
             "calibration": calibration.artifact_hash if calibration else "none",
             "evidence": evidence_hash,

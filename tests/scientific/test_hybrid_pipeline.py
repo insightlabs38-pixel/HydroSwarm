@@ -135,6 +135,23 @@ def test_neural_failure_is_explicit_and_falls_back_to_classical_posterior() -> N
     assert result.fusion_diagnostics is None
 
 
+def test_calibrated_by_default_when_neither_side_declares_a_fusion_config() -> None:
+    # core-issues.txt repair item 10: every existing CalibrationArtifact
+    # fixture (and this test's own _pipeline() helper) predates
+    # fusion_config_hash -- both default to None, so the check must be
+    # skipped rather than spuriously invalidating calibration.
+    pipeline, network = _pipeline(PriorFollowingModel())
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    assert result.calibrated is True
+
+
+def test_uncalibrated_when_pipeline_declares_a_fusion_config_the_artifact_never_recorded() -> None:
+    pipeline, network = _pipeline(PriorFollowingModel())
+    pipeline.fusion_config_hash = "fuse_source_probabilities-v1"
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    assert result.calibrated is False
+
+
 def test_scout_strategist_and_ood_neural_outputs_are_ignored_when_untrained() -> None:
     # core-issues.txt repair item 8: PriorFollowingModel's
     # expected_information_gain/plan_value/plan_validity_logits/ood_logits

@@ -54,6 +54,23 @@ class CalibrationArtifact:
     #: unambiguously "fit with no normalization layer active" -- the
     #: literal truth for all of them -- rather than silently unset.
     normalization_hash: str = NO_NORMALIZATION_SENTINEL
+    #: core-issues.txt repair item 10: identifies which fusion algorithm
+    #: produced the probability vectors this calibration was fit against
+    #: (see hydroswarm.inference.fusion's DYNAMIC_TRUST_FUSION_CONFIG /
+    #: fixed_weight_fusion_config). None means "not declared" -- every
+    #: artifact fit before this field existed was in fact fit on raw
+    #: neural probabilities with no fusion step at all, which is not the
+    #: same thing as either named config, so it is left unset rather than
+    #: mislabeled as one of them.
+    fusion_config_hash: str | None = None
+    #: core-issues.txt repair item 10: the structural topology hashes
+    #: (hydroswarm.data.scenarios.network_sha256; stable per named
+    #: topology family, unlike the per-scenario randomized-hydraulics
+    #: network_hash) actually present in the data this calibration was fit
+    #: against. Empty means "not declared" -- validate_runtime skips the
+    #: check entirely rather than treating an empty set as "every topology
+    #: is unknown".
+    validated_topology_hashes: tuple[str, ...] = ()
 
     @property
     def artifact_hash(self) -> str:
@@ -68,6 +85,8 @@ class CalibrationArtifact:
         feature_schema_hash: str,
         dataset_manifest_hash: str | None = None,
         normalization_hash: str | None = None,
+        fusion_config_hash: str | None = None,
+        topology_hash: str | None = None,
     ) -> None:
         if self.schema_version != CALIBRATION_SCHEMA_VERSION:
             raise ValueError("unsupported calibration artifact schema")
@@ -79,6 +98,20 @@ class CalibrationArtifact:
             raise ValueError(
                 "calibration artifact was fit against a different governed normalization "
                 "than the runtime feature builder is currently using"
+            )
+        if fusion_config_hash is not None and self.fusion_config_hash != fusion_config_hash:
+            raise ValueError(
+                "calibration artifact was fit against a different fusion configuration "
+                "than the one currently producing fused probabilities"
+            )
+        if (
+            topology_hash is not None
+            and self.validated_topology_hashes
+            and topology_hash not in self.validated_topology_hashes
+        ):
+            raise ValueError(
+                "calibration artifact was never fit against this network's topology; "
+                "an unknown topology must invalidate calibration"
             )
 
 
@@ -132,6 +165,8 @@ class SplitConformalCalibrator:
         dataset_manifest_hash: str,
         minimum_group_size: int = 10,
         normalization_hash: str = NO_NORMALIZATION_SENTINEL,
+        fusion_config_hash: str | None = None,
+        topology_hashes: Sequence[str] = (),
     ) -> SplitConformalCalibrator:
         if not 0 < alpha < 1 or not examples:
             raise ValueError("alpha must be within (0,1) and examples non-empty")
@@ -152,18 +187,19 @@ class SplitConformalCalibrator:
             correct.append(int(probabilities.argmax()) == item.true_index)
         usable_conditions = {key: tuple(value) for key, value in conditions.items() if len(value) >= minimum_group_size}
         usable_networks = {key: tuple(value) for key, value in networks.items() if len(value) >= minimum_group_size}
+        sorted_topology_hashes = tuple(sorted(set(topology_hashes)))
         temporary = CalibrationArtifact(
             CALIBRATION_SCHEMA_VERSION, alpha, model_hash, feature_schema_hash, dataset_manifest_hash,
             tuple(scores), usable_conditions, usable_networks,
             CalibrationReport(0.0, 0.0, 0.0, {}, {}, len(examples)),
-            normalization_hash,
+            normalization_hash, fusion_config_hash, sorted_topology_hashes,
         )
         calibrator = cls(temporary)
         report = calibrator.evaluate(examples)
         return cls(CalibrationArtifact(
             CALIBRATION_SCHEMA_VERSION, alpha, model_hash, feature_schema_hash, dataset_manifest_hash,
             tuple(scores), usable_conditions, usable_networks, report,
-            normalization_hash,
+            normalization_hash, fusion_config_hash, sorted_topology_hashes,
         ))
 
     def candidate_set(
@@ -232,6 +268,8 @@ class SplitConformalCalibrator:
         data["global_scores"] = tuple(data["global_scores"])
         data["mondrian_scores"] = {key: tuple(value) for key, value in data["mondrian_scores"].items()}
         data["network_scores"] = {key: tuple(value) for key, value in data["network_scores"].items()}
+        if "validated_topology_hashes" in data:
+            data["validated_topology_hashes"] = tuple(data["validated_topology_hashes"])
         data["report"] = CalibrationReport(**data["report"])
         return cls(CalibrationArtifact(**data))
 

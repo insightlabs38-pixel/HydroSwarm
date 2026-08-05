@@ -11,7 +11,7 @@ from safetensors.torch import load_file
 
 from hydroswarm.calibration import SplitConformalCalibrator
 from hydroswarm.classical import SignatureBuilder, SignatureCache, SignatureCacheKey
-from hydroswarm.inference import HybridInferencePipeline
+from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
 from hydroswarm.model import (
     ArchitectureCompatibilityError,
     HydroCore,
@@ -207,4 +207,5 @@ class DefaultPipelineFactory:
             calibration_artifact=calibration,
             feature_builder=self._feature_builder,
             trained_tasks=self.trained_tasks,
+            fusion_config_hash=DYNAMIC_TRUST_FUSION_CONFIG,
         )

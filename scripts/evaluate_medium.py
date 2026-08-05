@@ -15,13 +15,16 @@ from hydroswarm.model import HydroCore, HydroMono
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 
 from evaluate_learning import (
+    _CALIBRATION_FUSION_NEURAL_WEIGHT,
     _calibration_examples,
     _classification_metrics,
     _fuse,
     _hash,
     _model_report,
     _predict,
+    _topology_hashes,
 )
+from hydroswarm.inference.fusion import fixed_weight_fusion_config
 from train import load_dataset
 
 
@@ -64,7 +67,9 @@ def main() -> int:
 
     medium_calibration, _ = _predict(models["hydrocore_m"], calibration, batch_size=8)
     calibration_hybrid = _fuse(
-        medium_calibration["classical"], medium_calibration["source"]
+        medium_calibration["classical"],
+        medium_calibration["source"],
+        neural_weight=_CALIBRATION_FUSION_NEURAL_WEIGHT,
     )
     medium_hash = _hash(args.medium_model)
     calibration_manifest_hash = _hash(args.tensor_directory / "calibration.jsonl")
@@ -75,6 +80,8 @@ def main() -> int:
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         dataset_manifest_hash=calibration_manifest_hash,
         minimum_group_size=10,
+        fusion_config_hash=fixed_weight_fusion_config(_CALIBRATION_FUSION_NEURAL_WEIGHT),
+        topology_hashes=_topology_hashes(calibration),
     )
     calibrator.save(args.calibration_output)
 

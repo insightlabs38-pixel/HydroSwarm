@@ -11,6 +11,23 @@ from numpy.typing import ArrayLike, NDArray
 
 EPSILON = 1e-12
 
+#: core-issues.txt repair item 10: identifies fuse_source_probabilities'
+#: dynamic-trust fusion algorithm to CalibrationArtifact.fusion_config_hash.
+#: Bump whenever its formula changes in a way that would change its output
+#: for the same inputs -- a calibration fit against a since-changed formula
+#: must be treated as stale, not silently accepted.
+DYNAMIC_TRUST_FUSION_CONFIG = "fuse_source_probabilities-v1"
+
+
+def fixed_weight_fusion_config(neural_weight: float) -> str:
+    """The fusion_config_hash identity for a specific fixed_weight_fusion
+    weighting -- distinct from DYNAMIC_TRUST_FUSION_CONFIG so a calibration
+    fit with this approximation (see fixed_weight_fusion's docstring) is
+    never mistaken for one fit against the live dynamic-trust fusion the
+    deployed pipeline actually runs."""
+
+    return f"fixed_weight_fusion-v1:neural_weight={neural_weight!r}"
+
 
 class ControlAction(StrEnum):
     CONTINUE_ANALYSIS = "CONTINUE_ANALYSIS"
@@ -120,6 +137,43 @@ def fuse_source_probabilities(
         disagreement_js=divergence,
         masked_nodes=int((~mask).sum()),
     )
+
+
+def fixed_weight_fusion(
+    classical: ArrayLike, neural: ArrayLike, *, neural_weight: float = 0.6
+) -> NDArray[np.float64]:
+    """Static-weight log-linear blend of classical and neural source
+    probabilities: ``exp((1-w)*log(classical) + w*log(neural))``,
+    renormalized.
+
+    core-issues.txt repair item 10: conformal calibration must be fit on
+    the deployed hybrid predictor's fused output, not on neural
+    probabilities alone. The production runtime (HybridInferencePipeline
+    .analyze) fuses via ``fuse_source_probabilities``, whose dynamic
+    per-incident trust weighting needs live hydraulic-estimator state
+    (residuals, uncertainty) that a post-hoc governed-corpus tensor
+    (ScenarioExample) does not preserve. This fixed-weight blend is the
+    approximation already used by evaluate_medium.py's locked-test
+    comparison for exactly this purpose (accepted as representative of
+    "the hybrid predictor" for calibration/reporting there); reusing it
+    here for calibration-fitting scripts that work from stored tensors
+    closes the "neural-only calibration" defect without fabricating the
+    unavailable trust inputs. Works on both a single 1D probability
+    vector and a batch of them (fuses along the last axis either way).
+    """
+
+    if not 0.0 <= neural_weight <= 1.0:
+        raise ValueError("neural_weight must be within [0, 1]")
+    classical_array = np.asarray(classical, dtype=np.float64)
+    neural_array = np.asarray(neural, dtype=np.float64)
+    if classical_array.shape != neural_array.shape:
+        raise ValueError("classical and neural probability arrays must share a shape")
+    log_probability = (1.0 - neural_weight) * np.log(
+        np.clip(classical_array, 1e-8, 1.0)
+    ) + neural_weight * np.log(np.clip(neural_array, 1e-8, 1.0))
+    log_probability -= log_probability.max(axis=-1, keepdims=True)
+    values = np.exp(log_probability)
+    return values / values.sum(axis=-1, keepdims=True)
 
 
 def conformal_candidate_set(

@@ -43,6 +43,7 @@ import torch
 from hydroswarm.calibration.conformal import CalibrationExample, SplitConformalCalibrator, expected_calibration_error
 from hydroswarm.classical.metrics import candidate_set_metrics, localization_top_k, mean_reciprocal_rank
 from hydroswarm.inference import HybridInferencePipeline
+from hydroswarm.inference.fusion import fixed_weight_fusion, fixed_weight_fusion_config
 from hydroswarm.model import HydroCore
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.training import (
@@ -61,6 +62,11 @@ MAX_EPOCHS = 16
 EARLY_STOPPING_PATIENCE = 3
 MAXIMUM_RUNTIME_SECONDS = 7200.0
 CALIBRATION_ALPHA = 0.1
+#: core-issues.txt repair item 10: the fixed_weight_fusion weighting used
+#: to approximate the deployed hybrid predictor when fitting calibration
+#: from stored governed tensors (see fixed_weight_fusion's docstring for
+#: why the full dynamic-trust fusion cannot be reconstructed here).
+CALIBRATION_FUSION_NEURAL_WEIGHT = 0.6
 
 #: Top three from Stage 2's predeclared score, taken mechanically (no retuning after
 #: viewing results): E2 (0.7794) > E0 (0.7783) > E1 (0.7768).
@@ -106,10 +112,16 @@ def _load_ood_dataset(category: str) -> GovernedScenarioDataset:
 
 @torch.no_grad()
 def _predict_rows(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_size: int = BATCH_SIZE):
-    """Yield (example, node_ids, probabilities, latency_seconds) for every example with a
-    real source to localize -- masked NORMAL/SENSOR_FAULT_ONLY placeholders are skipped,
-    exactly as Stage 2's screening evaluation already does (see
-    hydroswarm.training.losses._apply_target_mask for the masking convention)."""
+    """Yield (example, node_ids, neural_probabilities, classical_probabilities,
+    latency_seconds) for every example with a real source to localize -- masked
+    NORMAL/SENSOR_FAULT_ONLY placeholders are skipped, exactly as Stage 2's
+    screening evaluation already does (see
+    hydroswarm.training.losses._apply_target_mask for the masking convention).
+
+    classical_probabilities is the same governed classical_prior tensor the
+    model itself receives as an input feature -- yielded alongside neural
+    probabilities so callers that need the fused hybrid prediction (see
+    core-issues.txt repair item 10) don't have to re-derive it."""
 
     model.eval()
     examples = [dataset[index] for index in range(len(dataset))]
@@ -120,6 +132,7 @@ def _predict_rows(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_s
         output = model(inputs)
         latency = (time.perf_counter() - started) / len(batch_examples)
         probabilities = torch.softmax(output["source_node_logits"], dim=-1)
+        classical_prior = inputs["classical_prior"]
         source_mask = targets.get("source_node_mask")
         for row in range(probabilities.shape[0]):
             if source_mask is not None and not bool(source_mask[row]):
@@ -128,17 +141,18 @@ def _predict_rows(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_s
                 batch_examples[row],
                 int(targets["source_node"][row].item()),
                 probabilities[row].numpy(),
+                classical_prior[row].numpy(),
                 latency,
             )
 
 
-def _localization_metrics(rows: list[tuple[Any, int, Any, float]]) -> dict[str, Any]:
+def _localization_metrics(rows: list[tuple[Any, int, Any, Any, float]]) -> dict[str, Any]:
     predictions: list[dict[int, float]] = []
     truths: list[int] = []
     correct_top1: list[bool] = []
     confidences: list[float] = []
     latencies: list[float] = []
-    for _example, truth, probability_row, latency in rows:
+    for _example, truth, probability_row, _classical_row, latency in rows:
         row_probabilities = {position: float(value) for position, value in enumerate(probability_row) if value > 0}
         predictions.append(row_probabilities)
         truths.append(truth)
@@ -161,12 +175,18 @@ def _localization_metrics(rows: list[tuple[Any, int, Any, float]]) -> dict[str, 
     }
 
 
-def _calibrated_metrics(calibrator: SplitConformalCalibrator, rows: list[tuple[Any, int, Any, float]]) -> dict[str, Any]:
+def _calibrated_metrics(calibrator: SplitConformalCalibrator, rows: list[tuple[Any, int, Any, Any, float]]) -> dict[str, Any]:
+    # core-issues.txt repair item 10: candidate_set must be queried against
+    # the same fused hybrid probability vector the calibrator was fit on,
+    # not the raw neural probability_row -- otherwise the calibrator's own
+    # measured coverage/set-size here would silently disagree with what it
+    # was actually fit against.
     covered = 0
     set_sizes: list[int] = []
-    for example, truth, probability_row, _latency in rows:
+    for example, truth, probability_row, classical_row, _latency in rows:
+        fused_row = fixed_weight_fusion(classical_row, probability_row)
         indices = calibrator.candidate_set(
-            probability_row, condition=example.stage.name, network_id=example.network_id,
+            fused_row, condition=example.stage.name, network_id=example.network_id,
         )
         set_sizes.append(len(indices))
         if truth in indices:
@@ -236,22 +256,43 @@ def run_finalist_seed(
 
     model_hash = HybridInferencePipeline._fingerprint_model(model)
 
+    # core-issues.txt repair item 10: fit conformal calibration on the fused
+    # hybrid probability vector (fixed_weight_fusion of the stored classical
+    # prior and the model's own neural probabilities), not on neural
+    # probabilities alone -- the deployed HybridInferencePipeline always
+    # thresholds a fused vector, never raw neural output.
     calibration_rows = list(_predict_rows(model, calibration))
     calibration_examples = [
         CalibrationExample(
-            probabilities=tuple(float(value) for value in probability_row),
+            probabilities=tuple(
+                float(value)
+                for value in fixed_weight_fusion(
+                    classical_row, probability_row, neural_weight=CALIBRATION_FUSION_NEURAL_WEIGHT
+                )
+            ),
             true_index=truth,
             condition=example.stage.name,
             network_id=example.network_id,
         )
-        for example, truth, probability_row, _latency in calibration_rows
+        for example, truth, probability_row, classical_row, _latency in calibration_rows
     ]
+    calibration_topology_hashes = tuple(
+        sorted(
+            {
+                example.topology.topology_hash
+                for example, *_rest in calibration_rows
+                if example.topology is not None
+            }
+        )
+    )
     calibrator = SplitConformalCalibrator.fit(
         calibration_examples,
         alpha=CALIBRATION_ALPHA,
         model_hash=model_hash,
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         dataset_manifest_hash=calibration.manifest_hash,
+        fusion_config_hash=fixed_weight_fusion_config(CALIBRATION_FUSION_NEURAL_WEIGHT),
+        topology_hashes=calibration_topology_hashes,
     )
     calibrator.save(run_dir / "calibration.json")
 

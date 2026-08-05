@@ -46,6 +46,7 @@ import run_stage3_finalist_training as stage3  # noqa: E402
 
 from hydroswarm.calibration.conformal import CalibrationExample, SplitConformalCalibrator  # noqa: E402
 from hydroswarm.inference import HybridInferencePipeline  # noqa: E402
+from hydroswarm.inference.fusion import fixed_weight_fusion, fixed_weight_fusion_config  # noqa: E402
 from hydroswarm.model import HydroCore  # noqa: E402
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA  # noqa: E402
 from hydroswarm.training import Trainer, TrainingConfig, collate_variable_topology  # noqa: E402
@@ -108,22 +109,40 @@ def run_control_seed(
 
     model_hash = HybridInferencePipeline._fingerprint_model(model)
 
+    # core-issues.txt repair item 10: fit on the fused hybrid probability
+    # vector, not raw neural probabilities -- see stage3's identical fix.
     calibration_rows = list(stage3._predict_rows(model, calibration))
     calibration_examples = [
         CalibrationExample(
-            probabilities=tuple(float(value) for value in probability_row),
+            probabilities=tuple(
+                float(value)
+                for value in fixed_weight_fusion(
+                    classical_row, probability_row, neural_weight=stage3.CALIBRATION_FUSION_NEURAL_WEIGHT
+                )
+            ),
             true_index=truth,
             condition=example.stage.name,
             network_id=example.network_id,
         )
-        for example, truth, probability_row, _latency in calibration_rows
+        for example, truth, probability_row, classical_row, _latency in calibration_rows
     ]
+    calibration_topology_hashes = tuple(
+        sorted(
+            {
+                example.topology.topology_hash
+                for example, *_rest in calibration_rows
+                if example.topology is not None
+            }
+        )
+    )
     calibrator = SplitConformalCalibrator.fit(
         calibration_examples,
         alpha=stage3.CALIBRATION_ALPHA,
         model_hash=model_hash,
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         dataset_manifest_hash=calibration.manifest_hash,
+        fusion_config_hash=fixed_weight_fusion_config(stage3.CALIBRATION_FUSION_NEURAL_WEIGHT),
+        topology_hashes=calibration_topology_hashes,
     )
     calibrator.save(run_dir / "calibration.json")
 

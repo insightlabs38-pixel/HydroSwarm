@@ -18,6 +18,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from hydroswarm.calibration.conformal import CalibrationExample, SplitConformalCalibrator
+from hydroswarm.inference.fusion import fixed_weight_fusion, fixed_weight_fusion_config
 from hydroswarm.model import HydroCore, HydroMono
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.training import GovernedScenarioDataset, collate_scenarios
@@ -25,8 +26,22 @@ from hydroswarm.training import GovernedScenarioDataset, collate_scenarios
 from train import load_dataset
 
 
+#: core-issues.txt repair item 10: matches _fuse's (fixed_weight_fusion's)
+#: default weighting, declared explicitly so the calibration artifact can
+#: record which fusion configuration it was fit against.
+_CALIBRATION_FUSION_NEURAL_WEIGHT = 0.6
+
+
 def _hash(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _topology_hashes(dataset: GovernedScenarioDataset) -> tuple[str, ...]:
+    return tuple(sorted({
+        example.topology.topology_hash
+        for example in (dataset[index] for index in range(len(dataset)))
+        if example.topology is not None
+    }))
 
 
 def _bootstrap_accuracy(
@@ -58,14 +73,12 @@ def _classification_metrics(probabilities: np.ndarray, labels: np.ndarray) -> di
     }
 
 
-def _fuse(classical: np.ndarray, neural: np.ndarray, neural_weight: float = 0.6) -> np.ndarray:
-    log_probability = (
-        (1.0 - neural_weight) * np.log(np.clip(classical, 1e-8, 1.0))
-        + neural_weight * np.log(np.clip(neural, 1e-8, 1.0))
-    )
-    log_probability -= log_probability.max(axis=1, keepdims=True)
-    values = np.exp(log_probability)
-    return values / values.sum(axis=1, keepdims=True)
+# core-issues.txt repair item 10: moved to hydroswarm.inference.fusion as
+# fixed_weight_fusion so calibration-fitting code (below and in
+# run_stage3_finalist_training.py) can reuse the exact same blend rather
+# than fitting on raw neural probabilities alone. Kept as a module-level
+# alias since evaluate_medium.py imports `_fuse` from this module by name.
+_fuse = fixed_weight_fusion
 
 
 @torch.no_grad()
@@ -187,23 +200,34 @@ def main() -> int:
     classical_test = predictions["test"]["classical"]
     neural_test = predictions["test"]["source"]
     labels = predictions["test"]["label_source"].astype(int)
-    hybrid_test = _fuse(classical_test, neural_test)
+    hybrid_test = _fuse(classical_test, neural_test, neural_weight=_CALIBRATION_FUSION_NEURAL_WEIGHT)
     checkpoint_path = args.hydrocore_checkpoint / "model.safetensors"
     checkpoint_hash = _hash(checkpoint_path)
     calibration_manifest_hash = _hash(
         args.corpus / args.tensor_directory / "calibration.jsonl"
     )
+    # core-issues.txt repair item 10: fit (and evaluate) conformal
+    # calibration on the fused hybrid probability vector -- the quantity
+    # HybridInferencePipeline.analyze() actually thresholds at runtime --
+    # not the raw neural softmax alone.
+    hybrid_calibration = _fuse(
+        predictions["calibration"]["classical"],
+        predictions["calibration"]["source"],
+        neural_weight=_CALIBRATION_FUSION_NEURAL_WEIGHT,
+    )
     calibrator = SplitConformalCalibrator.fit(
-        _calibration_examples(datasets["calibration"], predictions["calibration"]["source"]),
+        _calibration_examples(datasets["calibration"], hybrid_calibration),
         alpha=0.1,
         model_hash=checkpoint_hash,
         feature_schema_hash=DEFAULT_FEATURE_SCHEMA.fingerprint,
         dataset_manifest_hash=calibration_manifest_hash,
         minimum_group_size=10,
+        fusion_config_hash=fixed_weight_fusion_config(_CALIBRATION_FUSION_NEURAL_WEIGHT),
+        topology_hashes=_topology_hashes(datasets["calibration"]),
     )
     calibration_path = args.output.parent / "hydrocore-s-calibration.json"
     calibrator.save(calibration_path)
-    heldout_calibration = calibrator.evaluate(_calibration_examples(datasets["test"], neural_test))
+    heldout_calibration = calibrator.evaluate(_calibration_examples(datasets["test"], hybrid_test))
     fresh_model = _load_model("hydrocore", args.hydrocore_checkpoint)
     clean_load_exact = all(
         torch.equal(left, right)
