@@ -45,7 +45,23 @@ meaningful sacrifice for the OOD gain.
 behind the currently promoted checkpoint) is not best on any single metric, but has the best
 in-distribution calibration honesty (lowest val/dev ECE) and is competitive everywhere else.
 
-## Recommendation: E1 (prior_mode=feature_only)
+## Stage 4 control result (provisional, superseded by the pending repair pass)
+
+The no-adapter HydroCore-S / HydroMono-S control (`reports/results/v3/stage4-controls-training.json`,
+2 seeds, identical budget) landed essentially on par with E1: val top1 0.725 avg (seed810 0.722,
+seed811 0.728), OOD-unseen-topology top1 0.5305 avg (0.529, 0.532) -- statistically
+indistinguishable from E1's 0.5304. This is a real, if inconvenient, finding: at this corpus
+size and budget, the specialist bottleneck adapters are not clearly earning their added
+parameters over a plain shared backbone. **This entire Stage 3/4 result set (E0/E1/E2 and this
+control) is now flagged provisional**, pending a repair pass (see `/workspace/core-issues.txt`)
+that fixes confirmed defects in the training/data pipeline -- variable-topology mask
+preservation, source-region head shape, sensor-fault mask, per-scenario hydraulic context reuse,
+topology metadata population, and calibration fit against the fused (not neural-only) output,
+among others. None of these numbers should be treated as final, and no checkpoint from this
+result set is to be promoted, until the repair gates pass and screening is redone on the
+corrected pipeline.
+
+## Recommendation: E1 (prior_mode=feature_only) -- PROVISIONAL, pending repair pass
 
 This run recommends **E1** as the strongest S candidate to carry into Stage 4 controls and
 Stage 5, prioritizing out-of-distribution generalization over a marginal in-distribution

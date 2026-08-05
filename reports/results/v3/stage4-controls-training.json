@@ -1,0 +1,180 @@
+{
+  "calibration_alpha": 0.1,
+  "corpus": "data/learning-v2/cycle-b",
+  "early_stopping_patience": 3,
+  "failures": {},
+  "max_epochs": 16,
+  "maximum_runtime_seconds_per_run": 7200.0,
+  "note": "HydroMono-S and no-adapter HydroCore-S are architecturally identical in this codebase (verified: bit-identical state dicts from the same seed) -- trained once, applies to both names. Current-architecture baseline is E0 from Stage 3 (reports/results/v3/stage3-finalist-training.json), not repeated. Classical-only baseline requires no training (see finalist-selection-recommendation.md).",
+  "results": {
+    "no-adapter-S": {
+      "20260810": {
+        "best_validation_loss": 3.5319495976917326,
+        "calibration_artifact_hash": "d451bd6882285e42abb5d0149f5e21e20c62dc81a85b4f7b9303d34a2212bedc",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.019252337226926375,
+          "mean_set_size": 2.3707865168539324
+        },
+        "checkpoint": "",
+        "control": "no-adapter-S",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.300488599348534,
+          "measured_coverage": 0.8876221498371335
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8754071661237784,
+          "ece": 0.022684810155280666,
+          "examples": 1228,
+          "mean_latency_seconds": 0.004367928439265858,
+          "mrr": 0.8096537149061579,
+          "source_top1": 0.7157980456026058,
+          "source_top3": 0.8754071661237784
+        },
+        "epochs_completed": 11,
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.363013698630137,
+              "measured_coverage": 0.8904109589041096
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8732876712328768,
+              "ece": 0.030298109485270237,
+              "examples": 292,
+              "mean_latency_seconds": 0.004321676636312089,
+              "mrr": 0.7793093607305936,
+              "source_top1": 0.6541095890410958,
+              "source_top3": 0.8732876712328768
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.6,
+              "measured_coverage": 0.8392857142857143
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.825,
+              "ece": 0.07824443940605434,
+              "examples": 280,
+              "mean_latency_seconds": 0.004584957400889575,
+              "mrr": 0.696845238095238,
+              "source_top1": 0.5285714285714286,
+              "source_top3": 0.825
+            }
+          }
+        },
+        "parameter_count": 3983477,
+        "run_id": "20260805T133032Z-02735aab",
+        "seed": 20260810,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.300561797752809,
+          "measured_coverage": 0.8932584269662921
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8862359550561798,
+          "ece": 0.02689185462306054,
+          "examples": 712,
+          "mean_latency_seconds": 0.004519298401469109,
+          "mrr": 0.8159058988764044,
+          "source_top1": 0.7219101123595506,
+          "source_top3": 0.8862359550561798
+        },
+        "wall_seconds": 7224.348393086999
+      },
+      "20260811": {
+        "best_validation_loss": 3.4962154324092563,
+        "calibration_artifact_hash": "0e8c37c84c8f594e05189cf216784d25c613e18b3c6485d73ee47ee9387bc418",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.018973515420480574,
+          "mean_set_size": 2.324438202247191
+        },
+        "checkpoint": "",
+        "control": "no-adapter-S",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.285016286644951,
+          "measured_coverage": 0.8908794788273615
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8721498371335505,
+          "ece": 0.015203627609080474,
+          "examples": 1228,
+          "mean_latency_seconds": 0.00407812265996088,
+          "mrr": 0.802006747324337,
+          "source_top1": 0.7011400651465798,
+          "source_top3": 0.8721498371335505
+        },
+        "epochs_completed": 12,
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.4246575342465753,
+              "measured_coverage": 0.8972602739726028
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8732876712328768,
+              "ece": 0.033557875158443835,
+              "examples": 292,
+              "mean_latency_seconds": 0.004153759313314916,
+              "mrr": 0.7918338225701239,
+              "source_top1": 0.678082191780822,
+              "source_top3": 0.8732876712328768
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.392857142857143,
+              "measured_coverage": 0.8214285714285714
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8678571428571429,
+              "ece": 0.0885614223778248,
+              "examples": 280,
+              "mean_latency_seconds": 0.00393413595417899,
+              "mrr": 0.7064285714285715,
+              "source_top1": 0.5321428571428571,
+              "source_top3": 0.8678571428571429
+            }
+          }
+        },
+        "parameter_count": 3983477,
+        "run_id": "20260805T153056Z-b192c437",
+        "seed": 20260811,
+        "stop_reason": "runtime_budget",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.264044943820225,
+          "measured_coverage": 0.8960674157303371
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8862359550561798,
+          "ece": 0.025142347461052168,
+          "examples": 712,
+          "mean_latency_seconds": 0.003894504688841142,
+          "mrr": 0.819109483681113,
+          "source_top1": 0.7275280898876404,
+          "source_top3": 0.8862359550561798
+        },
+        "wall_seconds": 7220.855662866001
+      }
+    }
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260810,
+    20260811
+  ],
+  "stage": "Bundle F Stage 4 -- HydroMono / no-adapter control",
+  "wall_seconds": 14445.216113531991
+}
