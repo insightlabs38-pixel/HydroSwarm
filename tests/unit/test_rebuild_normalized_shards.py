@@ -95,22 +95,29 @@ def test_rebuild_applies_normalization_and_preserves_governance_metadata(tmp_pat
 
     for name, expected_hash in before.items():
         expected_split = "development_holdout" if name.startswith("ood-") else name
-        dataset = ShardedScenarioDataset(corpus_dir / "tensors" / name, expected_split=expected_split)
-        assert dataset.manifest_hash == expected_hash  # governance metadata untouched
-        dataset.verify_shard_checksums()  # rewritten shards are internally consistent
+        # raw tensors/ must survive untouched (needed later to independently
+        # recompute normalization stats for the train-only-ownership gate).
+        raw_dataset = ShardedScenarioDataset(corpus_dir / "tensors" / name, expected_split=expected_split)
+        assert raw_dataset.manifest_hash == expected_hash
+        raw_dataset.verify_shard_checksums()
 
-    rebuilt_train = ShardedScenarioDataset(corpus_dir / "tensors" / "train", expected_split="train")
-    first = rebuilt_train[0]
-    # feature index 0 of the original constant-value block was 0.0 (index 0's offset);
-    # after fitting on the very data that includes it, its normalized value is the
-    # most negative in the (zero-mean) distribution, i.e. clearly transformed, not raw.
-    assert not torch.allclose(first.inputs["node_features"], torch.zeros(3, _NODE_WIDTH))
-    assert torch.equal(first.inputs["node_mask"], torch.ones(3, dtype=torch.bool))  # non-feature tensors untouched
-    assert torch.equal(first.targets["source_node"], torch.tensor(0))
+        normalized_dataset = ShardedScenarioDataset(
+            corpus_dir / "tensors-normalized" / name, expected_split=expected_split
+        )
+        assert normalized_dataset.manifest_hash == expected_hash  # governance metadata untouched
+        normalized_dataset.verify_shard_checksums()
+
+    raw_train = ShardedScenarioDataset(corpus_dir / "tensors" / "train", expected_split="train")
+    rebuilt_train = ShardedScenarioDataset(corpus_dir / "tensors-normalized" / "train", expected_split="train")
+    raw_first, normalized_first = raw_train[0], rebuilt_train[0]
+    assert not torch.allclose(normalized_first.inputs["node_features"], raw_first.inputs["node_features"])
+    assert torch.equal(normalized_first.inputs["node_mask"], raw_first.inputs["node_mask"])  # non-feature untouched
+    assert torch.equal(normalized_first.targets["source_node"], raw_first.targets["source_node"])
 
     report = (corpus_dir / "normalization-rebuild-report.json").read_text(encoding="utf-8")
     assert "node_normalization_sha256" in report
     assert "ood-severe_missingness" in report
+    assert "tensors-normalized" in report
 
 
 def test_rebuild_fails_closed_on_corrupted_shard(tmp_path) -> None:
@@ -134,6 +141,25 @@ def test_rebuild_fails_closed_on_corrupted_shard(tmp_path) -> None:
                 "--corpus-dir", str(corpus_dir),
                 "--node-normalization", str(node_path),
                 "--edge-normalization", str(edge_path),
+            ]
+        )
+
+
+def test_rebuild_refuses_to_target_the_raw_tensors_directory(tmp_path) -> None:
+    corpus_dir = tmp_path / "cycle-b2"
+    _build_corpus(corpus_dir)
+    node_stats, edge_stats = _fit_stats(_examples(3, split="train"))
+    node_path, edge_path = tmp_path / "node.json", tmp_path / "edge.json"
+    node_stats.save(node_path)
+    edge_stats.save(edge_path)
+
+    with pytest.raises(SystemExit, match="raw corpus must survive"):
+        rebuild_normalized_shards.main(
+            [
+                "--corpus-dir", str(corpus_dir),
+                "--node-normalization", str(node_path),
+                "--edge-normalization", str(edge_path),
+                "--output-tensors-dirname", "tensors",
             ]
         )
 
