@@ -92,6 +92,34 @@ def test_missing_shard_file_is_rejected(tmp_path) -> None:
         ShardedScenarioDataset(tmp_path / "shards", expected_split="train")
 
 
+def test_verify_shard_checksums_rejects_a_corrupted_shard_that_still_exists(tmp_path) -> None:
+    # core-issues.txt repair item 12: a shard that is present but corrupted
+    # (truncated, bit-flipped, wrong bytes entirely) must not silently be
+    # trusted -- only its existence was ever checked before this fix, even
+    # though write_shards has always recorded each shard's real sha256.
+    # verify_shard_checksums is a separate, explicit call (not folded into
+    # __init__, which must stay metadata-only -- see
+    # test_dataset_construction_does_not_eagerly_read_any_shard_tensor_data)
+    # that a caller runs once before training.
+    examples = _examples(3)
+    write_shards(examples, tmp_path / "shards", shard_size=5)
+    shard_path = tmp_path / "shards" / "shard-00000.safetensors"
+    corrupted = bytearray(shard_path.read_bytes())
+    corrupted[-1] ^= 0xFF
+    shard_path.write_bytes(bytes(corrupted))
+
+    dataset = ShardedScenarioDataset(tmp_path / "shards", expected_split="train")
+    with pytest.raises(ValueError, match="checksum"):
+        dataset.verify_shard_checksums()
+
+
+def test_verify_shard_checksums_accepts_an_intact_dataset(tmp_path) -> None:
+    examples = _examples(3)
+    write_shards(examples, tmp_path / "shards", shard_size=5)
+    dataset = ShardedScenarioDataset(tmp_path / "shards", expected_split="train")
+    dataset.verify_shard_checksums()  # must not raise
+
+
 def test_wrong_split_examples_are_rejected(tmp_path) -> None:
     examples = _examples(2, split="train")
     write_shards(examples, tmp_path / "shards", shard_size=5)

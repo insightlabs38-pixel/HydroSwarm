@@ -23,7 +23,7 @@ from .checkpoint import export_model, load_checkpoint, save_checkpoint
 from .config import TrainingConfig
 from .data import (
     CurriculumSchedule,
-    GovernedScenarioDataset,
+    ScenarioDatasetView,
     ScenarioExample,
     collate_scenarios,
 )
@@ -94,11 +94,11 @@ class Trainer:
     def __init__(
         self,
         model: nn.Module,
-        train_dataset: GovernedScenarioDataset,
+        train_dataset: ScenarioDatasetView,
         *,
         config: TrainingConfig,
         run_root: str | Path,
-        validation_dataset: GovernedScenarioDataset | None = None,
+        validation_dataset: ScenarioDatasetView | None = None,
         curriculum: CurriculumSchedule | None = None,
         workdir: str | Path = ".",
         collate_fn: CollateFn = collate_scenarios,
@@ -151,7 +151,7 @@ class Trainer:
         self._shutdown_requested = True
 
     def _loader(
-        self, dataset: GovernedScenarioDataset, *, epoch: int, shuffle: bool
+        self, dataset: ScenarioDatasetView, *, epoch: int, shuffle: bool
     ) -> DataLoader:
         generator = torch.Generator().manual_seed(self.config.seed + epoch)
         return DataLoader(
@@ -206,7 +206,7 @@ class Trainer:
             parameter.grad = None if not values else torch.stack(values).mean(dim=0)
 
     def _train_epoch(
-        self, dataset: GovernedScenarioDataset, *, epoch: int, started: float
+        self, dataset: ScenarioDatasetView, *, epoch: int, started: float
     ) -> float:
         self.model.train()
         loader = self._loader(dataset, epoch=epoch, shuffle=True)

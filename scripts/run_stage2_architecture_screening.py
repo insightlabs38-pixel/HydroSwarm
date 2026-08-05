@@ -46,7 +46,7 @@ from hydroswarm.calibration.conformal import expected_calibration_error
 from hydroswarm.model import HydroCore
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.training import (
-    GovernedScenarioDataset,
+    ScenarioDatasetView,
     ShardedScenarioDataset,
     Trainer,
     TrainingConfig,
@@ -88,13 +88,16 @@ SOURCE_ONLY_TASK_WEIGHTS = {
 }
 
 
-def _load_dataset(split: str) -> GovernedScenarioDataset:
+def _load_dataset(split: str) -> ScenarioDatasetView:
+    # core-issues.txt repair item 12: return the lazy, disk-backed dataset
+    # directly -- see run_stage3_finalist_training.py's identical fix.
+    # Verify shard checksums once, explicitly, before training.
     dataset = ShardedScenarioDataset(CYCLE_B_ROOT / "tensors" / split, expected_split=split)
-    examples = [dataset[index] for index in range(len(dataset))]
-    return GovernedScenarioDataset(examples, expected_split=split)
+    dataset.verify_shard_checksums()
+    return dataset
 
 
-def _topology_hashes(*datasets: GovernedScenarioDataset) -> tuple[str, ...]:
+def _topology_hashes(*datasets: ScenarioDatasetView) -> tuple[str, ...]:
     """core-issues.txt repair item 5: real topology_hash provenance for the
     experiment registry. Empty until Cycle B is regenerated with the
     populated TopologyMetadata that repair item 5 also added (Phase 3, not
@@ -111,7 +114,7 @@ def _topology_hashes(*datasets: GovernedScenarioDataset) -> tuple[str, ...]:
 
 
 @torch.no_grad()
-def _evaluate_source_localization(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_size: int = 16) -> dict[str, Any]:
+def _evaluate_source_localization(model: HydroCore, dataset: ScenarioDatasetView, *, batch_size: int = 16) -> dict[str, Any]:
     model.eval()
     predictions: list[dict[int, float]] = []
     truths: list[int] = []
@@ -120,9 +123,11 @@ def _evaluate_source_localization(model: HydroCore, dataset: GovernedScenarioDat
     fault_correct = 0
     fault_total = 0
     latencies: list[float] = []
-    examples = [dataset[index] for index in range(len(dataset))]
-    for start in range(0, len(examples), batch_size):
-        batch_examples = examples[start : start + batch_size]
+    # core-issues.txt repair item 12: only ever materialize one batch's
+    # worth of examples at a time.
+    total = len(dataset)
+    for start in range(0, total, batch_size):
+        batch_examples = [dataset[index] for index in range(start, min(start + batch_size, total))]
         inputs, targets = collate_variable_topology(batch_examples)
         started = time.perf_counter()
         output = model(inputs)
@@ -198,9 +203,9 @@ def run_experiment(
     name: str,
     overrides: dict[str, Any],
     *,
-    train: GovernedScenarioDataset,
-    validation: GovernedScenarioDataset,
-    development_holdout: GovernedScenarioDataset,
+    train: ScenarioDatasetView,
+    validation: ScenarioDatasetView,
+    development_holdout: ScenarioDatasetView,
     run_root: Path,
     registry: ExperimentRegistry,
 ) -> dict[str, Any]:

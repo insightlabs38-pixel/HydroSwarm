@@ -47,7 +47,7 @@ from hydroswarm.inference.fusion import fixed_weight_fusion, fixed_weight_fusion
 from hydroswarm.model import HydroCore
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.training import (
-    GovernedScenarioDataset,
+    ScenarioDatasetView,
     ShardedScenarioDataset,
     Trainer,
     TrainingConfig,
@@ -83,13 +83,20 @@ FINALISTS: dict[str, dict[str, Any]] = {
 SEEDS: tuple[int, ...] = (20260810, 20260811)
 
 
-def _load_dataset(split: str) -> GovernedScenarioDataset:
+def _load_dataset(split: str) -> ScenarioDatasetView:
+    # core-issues.txt repair item 12: return the lazy, disk-backed
+    # ShardedScenarioDataset directly -- it already satisfies everything a
+    # caller needs (manifest_hash, stages_through, indexing) without ever
+    # materializing every ScenarioExample into a resident Python list, the
+    # way wrapping it in a GovernedScenarioDataset used to force. Verify
+    # shard checksums explicitly here, once, before this dataset is ever
+    # handed to a trainer -- construction itself stays metadata-only.
     dataset = ShardedScenarioDataset(CYCLE_B_ROOT / "tensors" / split, expected_split=split)
-    examples = [dataset[index] for index in range(len(dataset))]
-    return GovernedScenarioDataset(examples, expected_split=split)
+    dataset.verify_shard_checksums()
+    return dataset
 
 
-def topology_hashes(*datasets: GovernedScenarioDataset) -> tuple[str, ...]:
+def topology_hashes(*datasets: ScenarioDatasetView) -> tuple[str, ...]:
     """core-issues.txt repair item 5: real topology_hash provenance for the
     experiment registry. Empty for any corpus generated before that repair
     landed (topology is None on every example until Cycle B is
@@ -105,18 +112,19 @@ def topology_hashes(*datasets: GovernedScenarioDataset) -> tuple[str, ...]:
     return tuple(sorted(hashes))
 
 
-def _load_ood_dataset(category: str) -> GovernedScenarioDataset:
+def _load_ood_dataset(category: str) -> ScenarioDatasetView:
     # OOD-holdout shards are tagged split="development_holdout" (see
     # data/learning-v2/cycle-b/tensors/ood-*/index.jsonl) -- they are a
     # governed-OOD-category subset of that split, not a distinct split name.
+    # core-issues.txt repair item 12: lazy, disk-backed -- see _load_dataset.
     directory = CYCLE_B_ROOT / "tensors" / f"ood-{category}"
     dataset = ShardedScenarioDataset(directory, expected_split="development_holdout")
-    examples = [dataset[index] for index in range(len(dataset))]
-    return GovernedScenarioDataset(examples, expected_split="development_holdout")
+    dataset.verify_shard_checksums()
+    return dataset
 
 
 @torch.no_grad()
-def _predict_rows(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_size: int = BATCH_SIZE):
+def _predict_rows(model: HydroCore, dataset: ScenarioDatasetView, *, batch_size: int = BATCH_SIZE):
     """Yield (example, node_ids, neural_probabilities, classical_probabilities,
     latency_seconds) for every example with a real source to localize -- masked
     NORMAL/SENSOR_FAULT_ONLY placeholders are skipped, exactly as Stage 2's
@@ -128,10 +136,12 @@ def _predict_rows(model: HydroCore, dataset: GovernedScenarioDataset, *, batch_s
     probabilities so callers that need the fused hybrid prediction (see
     core-issues.txt repair item 10) don't have to re-derive it."""
 
+    # core-issues.txt repair item 12: only ever materialize one batch's
+    # worth of examples at a time, not the entire dataset up front.
     model.eval()
-    examples = [dataset[index] for index in range(len(dataset))]
-    for start in range(0, len(examples), batch_size):
-        batch_examples = examples[start : start + batch_size]
+    total = len(dataset)
+    for start in range(0, total, batch_size):
+        batch_examples = [dataset[index] for index in range(start, min(start + batch_size, total))]
         inputs, targets = collate_variable_topology(batch_examples)
         started = time.perf_counter()
         output = model(inputs)
@@ -208,11 +218,11 @@ def run_finalist_seed(
     overrides: dict[str, Any],
     seed: int,
     *,
-    train: GovernedScenarioDataset,
-    validation: GovernedScenarioDataset,
-    calibration: GovernedScenarioDataset,
-    development_holdout: GovernedScenarioDataset,
-    ood_datasets: dict[str, GovernedScenarioDataset],
+    train: ScenarioDatasetView,
+    validation: ScenarioDatasetView,
+    calibration: ScenarioDatasetView,
+    development_holdout: ScenarioDatasetView,
+    ood_datasets: dict[str, ScenarioDatasetView],
     run_root: Path,
     registry: ExperimentRegistry,
 ) -> dict[str, Any]:

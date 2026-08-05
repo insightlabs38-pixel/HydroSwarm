@@ -15,9 +15,11 @@ from hydroswarm.training import (
     CurriculumStage,
     GovernedScenarioDataset,
     ScenarioExample,
+    ShardedScenarioDataset,
     Trainer,
     TrainingConfig,
     collate_variable_topology,
+    write_shards,
 )
 
 
@@ -38,7 +40,7 @@ def _tiny_model() -> HydroCore:
     )
 
 
-def _dataset() -> GovernedScenarioDataset:
+def _smoke_examples() -> list[ScenarioExample]:
     examples = []
     for index in range(2):
         generator = torch.Generator().manual_seed(100 + index)
@@ -62,7 +64,11 @@ def _dataset() -> GovernedScenarioDataset:
                 targets={"source_node": torch.tensor(index)},
             )
         )
-    return GovernedScenarioDataset(examples, expected_split="train")
+    return examples
+
+
+def _dataset() -> GovernedScenarioDataset:
+    return GovernedScenarioDataset(_smoke_examples(), expected_split="train")
 
 
 def _variable_topology_dataset() -> GovernedScenarioDataset:
@@ -226,6 +232,29 @@ def test_sigterm_stops_cleanly_and_saves_a_resumable_checkpoint(tmp_path: Path) 
     assert Path(summary.export_path).is_file()
     status = json.loads((Path(summary.run_directory) / "status.json").read_text())
     assert status["state"] == "COMPLETED"
+
+
+def test_trainer_trains_directly_from_a_sharded_scenario_dataset(tmp_path: Path) -> None:
+    # core-issues.txt repair item 12: Trainer must accept a lazy,
+    # disk-backed ShardedScenarioDataset directly -- not require every
+    # caller to first materialize it into a GovernedScenarioDataset (an
+    # in-memory list of every ScenarioExample) purely to satisfy a type
+    # hint. This also exercises verify_shard_checksums as the Stage 2/3/4
+    # scripts now call it.
+    write_shards(_smoke_examples(), tmp_path / "shards", shard_size=1)
+    sharded = ShardedScenarioDataset(tmp_path / "shards", expected_split="train")
+    sharded.verify_shard_checksums()
+
+    summary = Trainer(
+        _tiny_model(),
+        sharded,
+        config=_config(1),
+        run_root=tmp_path / "runs",
+        workdir=tmp_path,
+    ).fit()
+
+    assert Path(summary.export_path).is_file()
+    assert math.isfinite(summary.best_validation_loss)
 
 
 def test_gradnorm_logging_only_runs_on_the_configured_batch_interval(tmp_path: Path) -> None:

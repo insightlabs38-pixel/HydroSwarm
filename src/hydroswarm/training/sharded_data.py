@@ -254,6 +254,28 @@ class ShardedScenarioDataset(Dataset[ScenarioExample]):
     def __len__(self) -> int:
         return len(self._indices)
 
+    def verify_shard_checksums(self) -> None:
+        """Read every shard file referenced by this dataset's manifest and
+        confirm its sha256 still matches what write_shards recorded
+        (core-issues.txt repair item 12).
+
+        Deliberately NOT called from __init__: construction must stay
+        metadata-only (see
+        test_dataset_construction_does_not_eagerly_read_any_shard_tensor_data),
+        so a shard file that exists but has never been read is not yet
+        proven intact. Callers that are about to spend a long training run
+        on this data (see the Stage 2/3/4 scripts) call this once, explicitly,
+        before Trainer.fit() -- "verify recorded shard checksums before
+        training", not "verify them by construction"."""
+
+        for shard in self.manifest["shards"]:
+            shard_path = self.shard_dir / shard["file"]
+            measured_shard_hash = _sha256_file(shard_path)
+            if measured_shard_hash != shard["sha256"]:
+                raise ValueError(
+                    f"shard checksum mismatch for {shard_path}: corpus is corrupted or stale"
+                )
+
     def _handle_for(self, shard_file: str) -> Any:
         handle = self._shard_handles.get(shard_file)
         if handle is None:

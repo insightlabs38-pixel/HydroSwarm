@@ -8,7 +8,7 @@ from enum import IntEnum
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 import torch
 from torch import Tensor
@@ -199,6 +199,35 @@ def resolve_source_node_id(example: ScenarioExample) -> str | None:
         return None
     local_index = int(example.targets["source_node"])
     return example.topology.source_node_id_for_local_index(local_index)
+
+
+@runtime_checkable
+class ScenarioDatasetView(Protocol):
+    """Structural interface shared by GovernedScenarioDataset and
+    hydroswarm.training.sharded_data.ShardedScenarioDataset (core-issues.txt
+    repair item 12).
+
+    Trainer and the Stage 2/3/4 scripts only ever need __len__,
+    __getitem__, manifest_hash, and stages_through -- both classes already
+    implement all four identically in spirit, but ShardedScenarioDataset
+    does so lazily (reading tensors from disk-backed shards on access)
+    while GovernedScenarioDataset holds every ScenarioExample resident in
+    memory. Typing call sites against this Protocol instead of the
+    concrete GovernedScenarioDataset class is what lets a lazy
+    ShardedScenarioDataset be passed to Trainer directly -- previously,
+    every caller materialized the entire corpus into a Python list purely
+    to satisfy this type hint, defeating disk-backed sharding entirely."""
+
+    expected_split: str
+
+    def __len__(self) -> int: ...
+
+    def __getitem__(self, index: int) -> ScenarioExample: ...
+
+    @property
+    def manifest_hash(self) -> str: ...
+
+    def stages_through(self, stage: CurriculumStage) -> "ScenarioDatasetView": ...
 
 
 class GovernedScenarioDataset(Dataset[ScenarioExample]):
