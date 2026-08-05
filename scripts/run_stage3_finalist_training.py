@@ -67,6 +67,11 @@ CALIBRATION_ALPHA = 0.1
 #: from stored governed tensors (see fixed_weight_fusion's docstring for
 #: why the full dynamic-trust fusion cannot be reconstructed here).
 CALIBRATION_FUSION_NEURAL_WEIGHT = 0.6
+#: core-issues.txt repair item 11: task_gradient_norms costs one extra
+#: torch.autograd.grad call per task loss (7-9 tasks) every batch it runs
+#: on -- computing it every 25th batch instead of every batch still gives
+#: a usable per-epoch trend at a fraction of the CPU cost.
+GRADNORM_LOG_EVERY_N_BATCHES = 25
 
 #: Top three from Stage 2's predeclared score, taken mechanically (no retuning after
 #: viewing results): E2 (0.7794) > E0 (0.7783) > E1 (0.7768).
@@ -222,6 +227,7 @@ def run_finalist_seed(
         checkpoint_every_epochs=4,
         early_stopping_patience=EARLY_STOPPING_PATIENCE,
         maximum_runtime_seconds=MAXIMUM_RUNTIME_SECONDS,
+        gradnorm_log_every_n_batches=GRADNORM_LOG_EVERY_N_BATCHES,
     )
     model = HydroCore.from_variant("small", **overrides)
 
@@ -311,10 +317,24 @@ def run_finalist_seed(
             "calibrated": _calibrated_metrics(calibrator, rows),
         }
 
+    # core-issues.txt repair item 11: summary.final_checkpoint is
+    # intentionally "" whenever the run was cut off before a clean
+    # end-of-run resumable save (see Trainer.fit's runtime_budget_reached
+    # handling) -- every one of Stage 3's finalist runs hits the 2-hour
+    # ceiling (see finalist-selection-recommendation.md), so this was
+    # closing every "success" run with an empty selected_checkpoint.
+    # summary.export_path is unconditional: it always points at the best
+    # validated model this run produced, whether or not training was cut
+    # short, so it is what "selected" must mean here.
     handle.close(
         exit_status="success",
-        checkpoint_paths=[summary.final_checkpoint],
-        selected_checkpoint=summary.final_checkpoint,
+        checkpoint_paths=tuple(dict.fromkeys(
+            path
+            for path in (summary.final_checkpoint, summary.last_resumable_checkpoint, summary.export_path)
+            if path
+        )),
+        checkpoint_hashes={summary.export_path: summary.export_sha256},
+        selected_checkpoint=summary.export_path,
         selection_metric={
             "validation": validation_metrics,
             "development_holdout": development_metrics,

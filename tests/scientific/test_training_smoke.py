@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import dataclasses
+import hashlib
 import json
 import math
 import os
@@ -183,6 +185,14 @@ def test_runtime_budget_exports_best_completed_epoch(tmp_path: Path, monkeypatch
     assert summary.best_epoch == 0
     assert summary.final_checkpoint == ""
     assert Path(summary.export_path).is_file()
+    # core-issues.txt repair item 11: final_checkpoint being "" must not
+    # mean losing the periodic checkpoint this run did save (epoch 0, with
+    # checkpoint_every_epochs=1), and export_path's own SHA-256 must be
+    # recorded alongside it rather than left for the caller to recompute
+    # (or, as the real bug was, never recorded at all).
+    assert summary.last_resumable_checkpoint != ""
+    assert (Path(summary.last_resumable_checkpoint) / "model.safetensors").is_file()
+    assert summary.export_sha256 == hashlib.sha256(Path(summary.export_path).read_bytes()).hexdigest()
     status = json.loads((Path(summary.run_directory) / "status.json").read_text())
     assert status["state"] == "COMPLETED"
     assert status["stop_reason"] == "runtime_budget"
@@ -216,3 +226,23 @@ def test_sigterm_stops_cleanly_and_saves_a_resumable_checkpoint(tmp_path: Path) 
     assert Path(summary.export_path).is_file()
     status = json.loads((Path(summary.run_directory) / "status.json").read_text())
     assert status["state"] == "COMPLETED"
+
+
+def test_gradnorm_logging_only_runs_on_the_configured_batch_interval(tmp_path: Path) -> None:
+    # core-issues.txt repair item 11: task_gradient_norms is expensive (one
+    # extra torch.autograd.grad call per task loss, every batch it runs
+    # on); gradnorm_log_every_n_batches=2 over this dataset's 2 batches per
+    # epoch must compute it for batch 0 only, not batch 1.
+    config = dataclasses.replace(_config(1), gradnorm_log_every_n_batches=2)
+    trainer = Trainer(
+        _tiny_model(), _dataset(), config=config, run_root=tmp_path / "runs", workdir=tmp_path,
+    )
+    trainer.fit()
+    metrics = [
+        json.loads(line)
+        for line in (trainer.artifacts.path / "metrics.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    by_batch = {entry["batch"]: entry["task_gradient_norms"] for entry in metrics if entry["epoch"] == 0}
+    assert by_batch[0] != {}
+    assert by_batch[1] == {}

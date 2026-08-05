@@ -75,6 +75,7 @@ def run_control_seed(
         checkpoint_every_epochs=4,
         early_stopping_patience=stage3.EARLY_STOPPING_PATIENCE,
         maximum_runtime_seconds=stage3.MAXIMUM_RUNTIME_SECONDS,
+        gradnorm_log_every_n_batches=stage3.GRADNORM_LOG_EVERY_N_BATCHES,
     )
     model = HydroCore.from_variant("small", use_adapters=False)
 
@@ -161,10 +162,19 @@ def run_control_seed(
             "calibrated": stage3._calibrated_metrics(calibrator, rows),
         }
 
+    # core-issues.txt repair item 11: see stage3's identical fix -- use
+    # summary.export_path (unconditionally populated) as the selected
+    # checkpoint, never summary.final_checkpoint (empty when this run hit
+    # the runtime budget ceiling before a clean end-of-run save).
     handle.close(
         exit_status="success",
-        checkpoint_paths=[summary.final_checkpoint],
-        selected_checkpoint=summary.final_checkpoint,
+        checkpoint_paths=tuple(dict.fromkeys(
+            path
+            for path in (summary.final_checkpoint, summary.last_resumable_checkpoint, summary.export_path)
+            if path
+        )),
+        checkpoint_hashes={summary.export_path: summary.export_sha256},
+        selected_checkpoint=summary.export_path,
         selection_metric={
             "validation": validation_metrics,
             "development_holdout": development_metrics,

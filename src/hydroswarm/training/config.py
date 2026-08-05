@@ -30,6 +30,14 @@ class TrainingConfig:
     fp32: bool = True
     deterministic: bool = True
     gradnorm_logging: bool = True
+    #: core-issues.txt repair item 11: task_gradient_norms runs one extra
+    #: torch.autograd.grad call per task loss (7-9 tasks) -- effectively
+    #: 7-9 extra backward passes -- every single batch by default. Set
+    #: above 1 to only compute it every Nth batch (still gives a usable
+    #: trend signal over an epoch at a fraction of the cost); default of 1
+    #: preserves the exact prior per-batch behavior for anything that does
+    #: not opt in.
+    gradnorm_log_every_n_batches: int = 1
     pcgrad_enabled: bool = False
     profile_ordinal_weight: float = 0.0
     task_weights: dict[str, float] = field(default_factory=dict)
@@ -40,6 +48,7 @@ class TrainingConfig:
             "batch_size": self.batch_size,
             "gradient_accumulation_steps": self.gradient_accumulation_steps,
             "checkpoint_every_epochs": self.checkpoint_every_epochs,
+            "gradnorm_log_every_n_batches": self.gradnorm_log_every_n_batches,
         }
         for name, value in positive_ints.items():
             if value <= 0:

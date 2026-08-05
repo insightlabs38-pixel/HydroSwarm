@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+import hashlib
 import math
 from pathlib import Path
 import random
@@ -42,6 +43,18 @@ class TrainingSummary:
     stop_reason: str
     final_checkpoint: str
     export_path: str
+    #: core-issues.txt repair item 11: the SHA-256 of export_path, computed
+    #: once here rather than leaving every caller to recompute it (and risk
+    #: some computing it, some not, the way registry close() calls
+    #: currently pass no checkpoint_hashes at all).
+    export_sha256: str
+    #: core-issues.txt repair item 11: the last periodic (or final)
+    #: resumable checkpoint actually saved this run, independent of
+    #: final_checkpoint -- which is intentionally "" when the run was cut
+    #: off before a clean end-of-run save, per the comment below. A run
+    #: that saved at least one periodic checkpoint before being cut off
+    #: must not lose that reference entirely.
+    last_resumable_checkpoint: str
 
 
 def set_deterministic_seed(seed: int, *, deterministic: bool = True) -> None:
@@ -217,7 +230,10 @@ class Trainer:
                 raise FloatingPointError("non-finite multitask loss")
             gradnorm = (
                 task_gradient_norms(result.tasks, self.model)
-                if self.config.gradnorm_logging
+                if (
+                    self.config.gradnorm_logging
+                    and batch_index % self.config.gradnorm_log_every_n_batches == 0
+                )
                 else {}
             )
             if self.config.pcgrad_enabled:
@@ -290,6 +306,7 @@ class Trainer:
         stopped_early = False
         runtime_budget_reached = False
         final_checkpoint = ""
+        last_resumable_checkpoint = ""
         try:
             if resume_from is not None:
                 state = load_checkpoint(
@@ -347,6 +364,7 @@ class Trainer:
                             best_validation_loss=best,
                         )
                     )
+                    last_resumable_checkpoint = final_checkpoint
                 atomic_json(
                     self.artifacts.path / "epoch_summary.json",
                     {
@@ -366,6 +384,8 @@ class Trainer:
             if runtime_budget_reached:
                 # Periodic checkpoints remain available for resuming, but none is
                 # misrepresented as a clean end-of-run optimizer checkpoint.
+                # last_resumable_checkpoint (see TrainingSummary) still points at
+                # whichever periodic checkpoint was actually saved, if any.
                 final_checkpoint = ""
             if not final_checkpoint and not runtime_budget_reached:
                 checkpoint = self.artifacts.path / "checkpoints" / "checkpoint-final"
@@ -380,6 +400,7 @@ class Trainer:
                         best_validation_loss=best,
                     )
                 )
+                last_resumable_checkpoint = final_checkpoint
             best_model_path = self.artifacts.path / "best-model.safetensors"
             if best_model_path.exists():
                 self.model.load_state_dict(load_file(best_model_path, device="cpu"), strict=True)
@@ -407,6 +428,8 @@ class Trainer:
                 ),
                 final_checkpoint=final_checkpoint,
                 export_path=str(export_path),
+                export_sha256=hashlib.sha256(Path(export_path).read_bytes()).hexdigest(),
+                last_resumable_checkpoint=last_resumable_checkpoint,
             )
             atomic_json(self.artifacts.path / "summary.json", asdict(summary))
             self.artifacts.status("COMPLETED", stop_reason=summary.stop_reason)

@@ -59,6 +59,9 @@ CYCLE_B_ROOT = Path("data/learning-v2/cycle-b")
 SEED = 20260805
 EPOCHS = 4
 BATCH_SIZE = 16
+#: core-issues.txt repair item 11: see run_stage3_finalist_training.py's
+#: identical constant/rationale.
+GRADNORM_LOG_EVERY_N_BATCHES = 25
 
 #: overnight-plan.txt's E0-E8. E7/E8 are training-regime variants of E0's
 #: architecture, not new architecture flags, so their "overrides" entry is
@@ -213,6 +216,7 @@ def run_experiment(
         checkpoint_every_epochs=EPOCHS,
         maximum_runtime_seconds=3600.0 * 2,
         task_weights=task_weights,
+        gradnorm_log_every_n_batches=GRADNORM_LOG_EVERY_N_BATCHES,
     )
     model = HydroCore.from_variant("small", **overrides)
 
@@ -246,10 +250,19 @@ def run_experiment(
     validation_metrics = _evaluate_source_localization(model, validation)
     dev_holdout_metrics = _evaluate_source_localization(model, development_holdout)
 
+    # core-issues.txt repair item 11: use summary.export_path (unconditionally
+    # populated) as the selected checkpoint, never summary.final_checkpoint
+    # (empty whenever this run hit the runtime budget ceiling before a clean
+    # end-of-run save).
     handle.close(
         exit_status="success",
-        checkpoint_paths=[summary.final_checkpoint],
-        selected_checkpoint=summary.final_checkpoint,
+        checkpoint_paths=tuple(dict.fromkeys(
+            path
+            for path in (summary.final_checkpoint, summary.last_resumable_checkpoint, summary.export_path)
+            if path
+        )),
+        checkpoint_hashes={summary.export_path: summary.export_sha256},
+        selected_checkpoint=summary.export_path,
         selection_metric={"validation": validation_metrics, "development_holdout": dev_holdout_metrics},
     )
 
@@ -258,7 +271,7 @@ def run_experiment(
         "overrides": overrides,
         "task_weights": task_weights,
         "run_id": handle.run_id,
-        "checkpoint": summary.final_checkpoint,
+        "checkpoint": summary.export_path,
         "best_validation_loss": summary.best_validation_loss,
         "validation_metrics": validation_metrics,
         "development_holdout_metrics": dev_holdout_metrics,
