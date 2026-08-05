@@ -36,6 +36,35 @@ from .data import ScenarioExample
 _DEFAULT_DECISION_SPLITS = ("train", "validation", "calibration")
 
 
+def _with_valid_target(examples: Sequence[ScenarioExample], key: str) -> list[ScenarioExample]:
+    """core-issues.txt repair item 7: examples that genuinely have `key`,
+    honoring its targets_v2 `f"{key}_mask"` companion when present.
+    Without this, a masked-out placeholder value (corpus.py writes 0 for
+    source_node/source_region/duration/etc. on a NORMAL/SENSOR_FAULT_ONLY
+    scenario, and sensor_fault=0.0 for an unsensored node) is silently
+    counted as a real label in every histogram/baseline/prevalence
+    statistic below -- exactly the bug this audit module exists to catch
+    for the model's own loss, but was itself still committing.
+
+    The mask may be a single scalar (event-level targets such as
+    source_node) or a per-node vector (sensor_fault_mask). Either way an
+    example is excluded here only when it has *no* valid observation at
+    all (``mask.any()`` is false); a partially-sensored vector mask with
+    at least one valid entry is left for the caller to index element-wise
+    (see ``_sensor_fault_prevalence``)."""
+
+    mask_key = f"{key}_mask"
+    result = []
+    for example in examples:
+        if key not in example.targets:
+            continue
+        mask = example.targets.get(mask_key)
+        if mask is not None and not bool(mask.any()):
+            continue
+        result.append(example)
+    return result
+
+
 def _finite_violations(examples: Sequence[ScenarioExample]) -> list[dict[str, str]]:
     violations = []
     for example in examples:
@@ -81,8 +110,16 @@ def _impossible_labels(examples: Sequence[ScenarioExample]) -> list[dict[str, An
     violations: list[dict[str, Any]] = []
     for example in examples:
         source_node = example.targets.get("source_node")
+        source_node_mask = example.targets.get("source_node_mask")
         candidate_mask = example.inputs.get("source_candidate_mask")
-        if source_node is not None and candidate_mask is not None:
+        # A masked-out source_node is a placeholder (corpus.py writes 0 for
+        # NORMAL/SENSOR_FAULT_ONLY scenarios with no real source at all) --
+        # checking it against source_candidate_mask would flag a "points at
+        # an infeasible candidate" violation for a value that was never
+        # claiming to be a real source in the first place.
+        if source_node is not None and candidate_mask is not None and (
+            source_node_mask is None or bool(source_node_mask)
+        ):
             index = int(source_node)
             if index < 0 or index >= candidate_mask.numel():
                 violations.append(
@@ -125,7 +162,7 @@ def _impossible_labels(examples: Sequence[ScenarioExample]) -> list[dict[str, An
 
 
 def _class_histogram(examples: Sequence[ScenarioExample], target_key: str) -> dict[str, int] | None:
-    present = [example for example in examples if target_key in example.targets]
+    present = _with_valid_target(examples, target_key)
     if not present:
         return None
     counts: Counter[int] = Counter()
@@ -135,7 +172,8 @@ def _class_histogram(examples: Sequence[ScenarioExample], target_key: str) -> di
 
 
 def _sensor_fault_prevalence(examples: Sequence[ScenarioExample]) -> dict[str, Any] | None:
-    """Overall and per-network-node fault-positive rates.
+    """Overall and per-network-node fault-positive rates, over sensored
+    node positions only.
 
     ``sensor_fault`` is node-indexed with a per-example node count, so a
     genuinely multi-topology corpus (different networks, different node
@@ -146,13 +184,25 @@ def _sensor_fault_prevalence(examples: Sequence[ScenarioExample]) -> dict[str, A
     meaningless if it mixed them. ``overall_positive_rate`` is computed by
     concatenation (shape-agnostic); per-node rates are reported separately
     per network_id, where node identity is actually consistent.
+
+    core-issues.txt repair item 7: an unsensored node's sensor_fault=0.0
+    placeholder is not a real "healthy" observation (see repair item 3's
+    sensor_fault_mask) and must not be counted here either -- otherwise
+    prevalence is diluted by however many unsensored nodes each corpus
+    happens to have (item 3's own generator randomizes sensor_count
+    3-5 per scenario, so this is not a fixed, ignorable dilution factor).
     """
 
-    present = [example for example in examples if "sensor_fault" in example.targets]
+    present = _with_valid_target(examples, "sensor_fault")
     if not present:
         return None
-    all_values = torch.cat([example.targets["sensor_fault"].float().reshape(-1) for example in present])
-    per_network: dict[str, list[float]] = {}
+    valid_terms: list[torch.Tensor] = []
+    for example in present:
+        fault = example.targets["sensor_fault"].float()
+        mask = example.targets.get("sensor_fault_mask")
+        valid_terms.append(fault if mask is None else fault[mask.bool()])
+    all_values = torch.cat([term.reshape(-1) for term in valid_terms])
+    per_network: dict[str, list[float | None]] = {}
     grouped: dict[str, list[ScenarioExample]] = {}
     for example in present:
         grouped.setdefault(example.network_id, []).append(example)
@@ -160,11 +210,20 @@ def _sensor_fault_prevalence(examples: Sequence[ScenarioExample]) -> dict[str, A
         shapes = {tuple(example.targets["sensor_fault"].shape) for example in group}
         if len(shapes) != 1:
             continue  # inconsistent node count even within one network_id; skip rather than guess
-        stacked = torch.stack([example.targets["sensor_fault"].float() for example in group])
-        per_network[network_id] = [float(value) for value in stacked.mean(dim=0)]
+        fault_stack = torch.stack([example.targets["sensor_fault"].float() for example in group])
+        mask_stack = torch.stack([
+            example.targets.get("sensor_fault_mask", torch.ones_like(example.targets["sensor_fault"], dtype=torch.bool)).bool()
+            for example in group
+        ])
+        sensored_count = mask_stack.sum(dim=0)
+        masked_sum = (fault_stack * mask_stack).sum(dim=0)
+        per_network[network_id] = [
+            float(total / count) if count > 0 else None
+            for total, count in zip(masked_sum, sensored_count, strict=True)
+        ]
     return {
         "examples_with_target": len(present),
-        "overall_positive_rate": float(all_values.mean()),
+        "overall_positive_rate": float(all_values.mean()) if all_values.numel() else None,
         "per_node_positive_rate_by_network": dict(sorted(per_network.items())),
     }
 
@@ -176,9 +235,7 @@ def _network_balance(examples: Sequence[ScenarioExample]) -> dict[str, int]:
 
 def _source_balance_by_network(examples: Sequence[ScenarioExample]) -> dict[str, dict[str, int]]:
     grouped: dict[str, Counter[int]] = {}
-    for example in examples:
-        if "source_node" not in example.targets:
-            continue
+    for example in _with_valid_target(examples, "source_node"):
         grouped.setdefault(example.network_id, Counter())[int(example.targets["source_node"])] += 1
     return {
         network_id: {str(value): count for value, count in sorted(counter.items())}
@@ -196,7 +253,7 @@ def _missingness(examples: Sequence[ScenarioExample], expected_target_keys: Sequ
 
 
 def _baseline_accuracies(examples: Sequence[ScenarioExample]) -> dict[str, Any]:
-    with_source = [example for example in examples if "source_node" in example.targets]
+    with_source = _with_valid_target(examples, "source_node")
     if not with_source:
         return {"note": "no source_node targets present in this split"}
 
@@ -307,6 +364,15 @@ def cross_split_leakage(splits: Mapping[str, Sequence[ScenarioExample]]) -> dict
     family_owner: dict[tuple[str, str], str] = {}
     scenario_leaks: list[dict[str, str]] = []
     family_leaks: list[dict[str, Any]] = []
+    # core-issues.txt repair item 7: topology_hash is now genuinely
+    # populated (repair item 5), so this can distinguish "the same
+    # network_id reused across splits for a different hydraulic-regime
+    # variant of one topology" (expected, not a leak) from "the same
+    # network_id secretly refers to two structurally different topologies"
+    # (a real leak/labeling bug) -- previously impossible to tell apart at
+    # all, and reported as such rather than silently assumed fine.
+    topology_hashes_by_network: dict[str, set[str]] = {}
+    examples_missing_topology = 0
     for split_name, examples in splits.items():
         for example in examples:
             if example.scenario_id in scenario_owner and scenario_owner[example.scenario_id] != split_name:
@@ -330,13 +396,30 @@ def cross_split_leakage(splits: Mapping[str, Sequence[ScenarioExample]]) -> dict
                 )
             else:
                 family_owner.setdefault(family, split_name)
+
+            if example.topology is None:
+                examples_missing_topology += 1
+            else:
+                topology_hashes_by_network.setdefault(example.network_id, set()).add(
+                    example.topology.topology_hash
+                )
+    topology_hash_conflicts = {
+        network_id: sorted(hashes)
+        for network_id, hashes in topology_hashes_by_network.items()
+        if len(hashes) > 1
+    }
     return {
         "scenario_id_leaks": scenario_leaks,
         "seed_family_leaks": family_leaks,
+        "topology_hash_conflicts": topology_hash_conflicts,
+        "examples_missing_topology_metadata": examples_missing_topology,
         "topology_leak_note": (
-            "topology_hash does not exist yet (added in Task 1.1); until then, leakage across "
-            "genuinely different topologies cannot be distinguished from expected network_id "
-            "reuse across splits within a single topology's hydraulic-regime variants."
+            "topology_hash_conflicts lists any network_id that resolved to more than one "
+            "distinct topology_hash across these splits -- a real leak/labeling bug, not "
+            "expected reuse. examples_missing_topology_metadata counts examples with no "
+            "TopologyMetadata at all (e.g. generated before repair item 5), for which this "
+            "check cannot run at all; a nonzero count here means topology-hash leakage may "
+            "still be silently undetected for those specific examples."
         ),
     }
 

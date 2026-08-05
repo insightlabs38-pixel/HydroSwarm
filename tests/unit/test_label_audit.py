@@ -17,11 +17,25 @@ def _example(
     candidate_count: int = 4,
     classical_prior: list[float] | None = None,
     sensor_fault: list[float] | None = None,
+    sensor_fault_mask: list[bool] | None = None,
     duration: int = 1,
+    event_present: bool | None = None,
 ) -> ScenarioExample:
     mask = torch.ones(candidate_count)
     prior = torch.tensor(classical_prior) if classical_prior is not None else torch.full((candidate_count,), 1 / candidate_count)
     fault = torch.tensor(sensor_fault) if sensor_fault is not None else torch.zeros(5)
+    targets: dict[str, torch.Tensor] = {
+        "source_node": torch.tensor(source_node),
+        "duration": torch.tensor(duration),
+        "relative_strength": torch.tensor(0),
+        "start_time": torch.tensor(0),
+        "sensor_fault": fault,
+    }
+    if sensor_fault_mask is not None:
+        targets["sensor_fault_mask"] = torch.tensor(sensor_fault_mask, dtype=torch.bool)
+    if event_present is not None:
+        for key in ("source_node", "duration", "relative_strength", "start_time"):
+            targets[f"{key}_mask"] = torch.tensor(event_present)
     return ScenarioExample(
         scenario_id=scenario_id,
         network_id=network_id,
@@ -34,13 +48,7 @@ def _example(
             "source_candidate_mask": mask,
             "classical_prior": prior,
         },
-        targets={
-            "source_node": torch.tensor(source_node),
-            "duration": torch.tensor(duration),
-            "relative_strength": torch.tensor(0),
-            "start_time": torch.tensor(0),
-            "sensor_fault": fault,
-        },
+        targets=targets,
     )
 
 
@@ -175,6 +183,52 @@ def test_cross_split_leakage_clean_when_no_overlap() -> None:
     )
     assert report["scenario_id_leaks"] == []
     assert report["seed_family_leaks"] == []
+
+
+def test_masked_event_target_placeholders_do_not_appear_in_histograms_or_balance_or_baselines() -> None:
+    # core-issues.txt repair item 7: a NORMAL scenario stores placeholder
+    # event targets (source_node=0, duration=0, ...) with their *_mask
+    # companions set False. Those placeholders must not be countable as if
+    # they were real observed labels.
+    real = _example("real-1", network_id="net1", source_node=2, candidate_count=4, event_present=True)
+    placeholder_a = _example("placeholder-a", network_id="net1", source_node=0, candidate_count=4, event_present=False)
+    placeholder_b = _example("placeholder-b", network_id="net2", source_node=0, candidate_count=4, event_present=False)
+    report = audit_split("train", [real, placeholder_a, placeholder_b], compute_baselines=True)
+
+    assert report["target_class_histograms"]["source_node"] == {"2": 1}
+    assert report["source_balance_by_network"] == {"net1": {"2": 1}}
+    # net2 has no valid source_node observation at all -> absent, not zeroed.
+    assert "net2" not in report["source_balance_by_network"]
+    baselines = report["sanity_baselines"]
+    assert baselines["majority_source"]["accuracy"] == 1.0
+    assert baselines["majority_source"]["majority_class"] == 2
+
+
+def test_masked_sensor_fault_placeholder_does_not_affect_prevalence() -> None:
+    # An unsensored node's sensor_fault entry is a masked placeholder and
+    # must not be countable as a real observed positive or negative.
+    example = _example(
+        "a",
+        network_id="net1",
+        sensor_fault=[1.0, 0.0, 1.0, 0.0, 0.0],
+        sensor_fault_mask=[True, True, False, False, False],
+    )
+    report = audit_split("train", [example], compute_baselines=True)
+    prevalence = report["sensor_fault_prevalence"]
+    # Only the first two entries are observed: one positive, one negative.
+    assert prevalence["overall_positive_rate"] == pytest.approx(0.5)
+    assert prevalence["per_node_positive_rate_by_network"]["net1"] == [1.0, 0.0, None, None, None]
+
+
+def test_impossible_labels_skips_masked_out_placeholder_source_node() -> None:
+    # A masked-out source_node placeholder pointing at index 1 while
+    # candidate 1 is itself masked out must NOT be flagged as "points at
+    # an infeasible candidate" -- it is a well-formed placeholder, not a
+    # genuine label pointing at a masked candidate.
+    example = _example("masked-placeholder", source_node=1, candidate_count=3, event_present=False)
+    example.inputs["source_candidate_mask"][1] = 0.0
+    report = audit_split("train", [example], compute_baselines=False)
+    assert not any(v["scenario_id"] == "masked-placeholder" for v in report["impossible_labels"])
 
 
 def test_audit_corpus_assembles_all_splits_and_leakage() -> None:
