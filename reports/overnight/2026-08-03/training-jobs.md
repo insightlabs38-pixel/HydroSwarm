@@ -58,41 +58,59 @@ under `experiments/runs/bundle-f-stage2/`.
 To re-run from scratch: `python3 scripts/run_stage2_architecture_screening.py` (no per-experiment
 resume; a full restart costs ~3.5h at the observed pace).
 
-## Bundle F Stage 3 finalist training (E2/E0/E1, 2 seeds each) -- RUNNING
+## Bundle F Stage 3 finalist training (E2/E0/E1, 2 seeds each) -- COMPLETED
 
-Trains the top three Stage 2 finalists with two seeds each, to early stopping (patience=3) or a
-documented 2-hour-per-run ceiling, then fits calibration per checkpoint (calibration split only)
-and evaluates on validation/development_holdout/both OOD-holdout categories. See
-`scripts/run_stage3_finalist_training.py`'s module docstring for full methodology and scope
-notes (full-trajectory eval and the live OODDetector pipeline are explicitly out of scope, not
-silently skipped).
+Trained the top three Stage 2 finalists with two seeds each, to early stopping (patience=3) or a
+documented 2-hour-per-run ceiling, then fit calibration per checkpoint (calibration split only)
+and evaluated on validation/development_holdout/both OOD-holdout categories. All 6 runs
+succeeded, zero failures.
 
 | Field | Value |
 |---|---|
-| Run dir | `experiments/jobs/bundle-f-stage3/` |
-| Status file | `experiments/jobs/bundle-f-stage3/status.json` |
-| Log | `experiments/jobs/bundle-f-stage3/job.log` |
+| Run dir | `experiments/jobs/bundle-f-stage3/` (status/log committed at `23024dd`) |
 | Registry | `experiments/registry/bundle-f-stage3.jsonl` |
-| Final report (on completion) | `reports/results/v3/stage3-finalist-training.json` |
-| Started | 2026-08-05T01:13:50Z |
-| Runs | 6 total: {E2, E0, E1} x seeds {20260810, 20260811} |
-| Max epochs / early stopping / per-run ceiling | 16 epochs / patience 3 / 7200s (2h) |
-| Verification before launch | scratch smoke run (1 epoch, 64/32/32/32-example subsets, not committed): training, calibration fitting, and validation/dev-holdout/OOD evaluation all completed cleanly; OOD top-1 (27%) sensibly far below in-distribution top-1 (92%) |
+| Final report | `reports/results/v3/stage3-finalist-training.json` |
+| Selection recommendation | `reports/results/v3/finalist-selection-recommendation.md` |
+| Started / ended | 2026-08-05T01:13:50Z / 2026-08-05T13:16Z (~12.0h) |
+| Runs | 6 total: {E2, E0, E1} x seeds {20260810, 20260811} -- every run hit the 2h ceiling (`stop_reason: runtime_budget`) at 11-13 epochs, none early-stopped |
+| Recommendation | **E1** (prior_mode=feature_only) -- best OOD-unseen-topology generalization (top1 0.530 vs E2's 0.495, calibrated coverage 0.848 vs 0.823), trading <1pp in-distribution accuracy to E2. See the recommendation doc for the full trade-off and its "not yet covered" caveats. |
+
+To re-run from scratch: `python3 scripts/run_stage3_finalist_training.py` (no per-run resume; a
+full restart costs ~12h at the observed pace -- check `job.log` for which finalist/seed
+combinations already logged `OK` before deciding whether a full restart or a smaller manual
+rerun of just the missing combinations is more appropriate).
+
+## Bundle F Stage 4 control training (no-adapter HydroCore-S / HydroMono-S, 2 seeds) -- RUNNING
+
+Trains the one Stage 4 control this repo can meaningfully distinguish, under the identical
+budget as Stage 3's finalists. See `scripts/run_stage4_controls_training.py`'s module docstring
+for why HydroMono-S and no-adapter HydroCore-S are the same control here (verified
+bit-identical), why "current architecture baseline" (E0) and "classical-only baseline" need no
+new training.
+
+| Field | Value |
+|---|---|
+| Run dir | `experiments/jobs/bundle-f-stage4/` |
+| Status file | `experiments/jobs/bundle-f-stage4/status.json` |
+| Log | `experiments/jobs/bundle-f-stage4/job.log` |
+| Registry | `experiments/registry/bundle-f-stage4.jsonl` |
+| Final report (on completion) | `reports/results/v3/stage4-controls-training.json` |
+| Started | 2026-08-05T13:30:19Z |
+| Runs | 2 total: no-adapter-S x seeds {20260810, 20260811} (same seeds as Stage 3) |
+| Max epochs / early stopping / per-run ceiling | 16 epochs / patience 3 / 7200s (2h) -- identical to Stage 3 |
+| Verification before launch | scratch smoke run (1 epoch, 64/32/32/32-example subsets, not committed): completed cleanly, same pattern as Stage 3's pre-launch check |
+| Classical-only baseline (already computed, no training) | val top1 0.625, dev_holdout top1 0.639, OOD-unseen-topology top1 0.236, OOD-severe-missingness top1 0.592 |
 
 **To check status:**
 
 ```bash
 cd /workspace/HydroSwarm
-python3 -c "import json; print(json.load(open('experiments/jobs/bundle-f-stage3/status.json'))['state'])"
-tail -30 experiments/jobs/bundle-f-stage3/job.log
+python3 -c "import json; print(json.load(open('experiments/jobs/bundle-f-stage4/status.json'))['state'])"
+tail -30 experiments/jobs/bundle-f-stage4/job.log
 ```
 
-**To resume/relaunch if the job dies before completing** (no per-run resume across the whole
-script; a restart reruns all 6 finalist/seed combinations from scratch since the report is only
-written once at the end -- at up to 2h/run this could cost up to ~12h worst case, though early
-stopping should make the real total considerably less; check `job.log` for which
-finalist/seed combinations already logged `OK` before deciding whether a full restart or a
-smaller manual rerun of just the missing combinations is more appropriate):
+**To resume/relaunch if the job dies before completing** (no per-run resume; a full restart
+costs up to ~4h worst case at 2 runs x 2h):
 
 ```bash
 cd /workspace/HydroSwarm
@@ -100,8 +118,8 @@ export PYTHONPATH=src
 python3 -c "
 import sys; sys.path.insert(0, 'src')
 from hydroswarm.training import job_runner
-command = [sys.executable, '-u', 'scripts/run_stage3_finalist_training.py']
-handle = job_runner.launch(command, run_dir='experiments/jobs/bundle-f-stage3', workdir='.',
+command = [sys.executable, '-u', 'scripts/run_stage4_controls_training.py']
+handle = job_runner.launch(command, run_dir='experiments/jobs/bundle-f-stage4', workdir='.',
     min_free_disk_gb=5.0, resume_command=command, env={'PYTHONPATH': 'src'})
 print(handle.pid)
 "
@@ -112,19 +130,20 @@ Once `state` is `COMPLETED`, mark it finished and inspect the results:
 ```bash
 python3 -c "
 from hydroswarm.training import job_runner
-job_runner.mark_finished('experiments/jobs/bundle-f-stage3', exit_code=0)
+job_runner.mark_finished('experiments/jobs/bundle-f-stage4', exit_code=0)
 "
 python3 -c "
 import json
-report = json.load(open('reports/results/v3/stage3-finalist-training.json'))
+report = json.load(open('reports/results/v3/stage4-controls-training.json'))
 print(json.dumps(report['failures'], indent=2))
-for finalist, seeds in report['results'].items():
+for control, seeds in report['results'].items():
     for seed, r in seeds.items():
-        print(finalist, seed, r['validation_metrics']['source_top1'], r['development_holdout_metrics']['source_top1'], r['stopped_early'])
+        print(control, seed, r['validation_metrics']['source_top1'], r['development_holdout_metrics']['source_top1'], r['stopped_early'])
 "
 ```
 
-Next steps after this job completes: per the plan's Stage 6 ("Calibration and final
-selection"), compare the six finalist/seed results (validation + development_holdout + OOD
-top-1/ECE/coverage), select the single strongest S architecture, and only then proceed to
-Bundle G (HydroCore-M, explicitly gated on this selection) and the locked-test track.
+Next steps after this job completes: fold the no-adapter control's results into
+`finalist-selection-recommendation.md` alongside E0's Stage 3 numbers and the classical-only
+baseline (all four Stage 4 comparison points then complete), confirm E1 (or revise the
+recommendation if a control surprisingly outperforms it), and proceed to Stage 5 (updated
+HydroCore-M, explicitly gated on this selection) and Bundle G.

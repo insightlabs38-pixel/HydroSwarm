@@ -208,4 +208,15 @@ the existing `experiments/registry/*.lock` pattern). `scripts/run_stage3_finalis
 proven masked-aware prediction pattern rather than the older learning-v1-oriented
 `scripts/evaluate_learning.py`.
 
+## Bundle F Stage 3 completion + Stage 4 launch, commits `23024dd`, `772b114`
+
+`experiments/jobs/bundle-f-stage3/{status.json,job.log}`, `experiments/registry/bundle-f-stage3.jsonl`,
+`reports/results/v3/stage3-finalist-training.json`: completed job provenance and full per-seed
+results for all 6 Stage 3 runs (`23024dd`). `reports/results/v3/finalist-selection-recommendation.md`
+(new): the E1 selection writeup with full trade-off reasoning and explicit scope caveats.
+`scripts/run_stage4_controls_training.py` (new, `772b114`): Stage 4 control training, reusing
+Stage 3's pipeline by direct import; documents the HydroMono/no-adapter architectural-identity
+finding and the classical-only baseline (computed inline, not via this script -- no model
+needed).
+
 This section will be appended to (not rewritten) as later bundles land, grouped by commit.

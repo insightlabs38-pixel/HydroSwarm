@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "2026-08-05T01:20:00Z",
+  "updated_at_utc": "2026-08-05T13:35:00Z",
   "completed": [
     {
       "task": "0.1",
@@ -246,6 +246,18 @@
       "title": "Launch finalist training script (E2/E0/E1, 2 seeds each)",
       "commit": "ddf6fd9",
       "summary": "Wrote and smoke-tested scripts/run_stage3_finalist_training.py: trains the top 3 Stage 2 finalists (selected mechanically from the predeclared score) with 2 seeds each to early stopping or a 2h ceiling, fits calibration per checkpoint on the calibration split only, evaluates on validation/development_holdout/both OOD-holdout categories. Verified via a scratch 1-epoch smoke run before launching the real 6-run background job. Job launched and running at handoff time; see training-jobs.md."
+    },
+    {
+      "task": "Bundle F Stage 3",
+      "title": "Complete finalist training and record selection recommendation",
+      "commit": "23024dd",
+      "summary": "All 6 finalist/seed runs completed successfully, zero failures, ~12.0h wall time. Recommends E1 (prior_mode=feature_only): best out-of-distribution generalization to an unseen topology (top1 0.530 vs E2 winner-on-in-distribution-metrics 0.495, calibrated coverage 0.848 vs 0.823), trading under 1 percentage point of in-distribution accuracy to E2. Recorded as a recommendation for human review in reports/results/v3/finalist-selection-recommendation.md, not an autonomous final selection -- Stage 4 controls, Stage 5, full-trajectory eval, and abstention recording all remain before a true Stage 6 final selection."
+    },
+    {
+      "task": "Bundle F Stage 4",
+      "title": "Compute classical-only baseline; launch no-adapter/HydroMono control training",
+      "commit": "772b114",
+      "summary": "Discovered HydroMono-S and no-adapter HydroCore-S are architecturally identical in this codebase (bit-identical state dicts verified directly from the same seed) -- training both would be duplicate compute, so only one is trained. Current-architecture baseline is E0, already trained in Stage 3. Classical-only baseline computed directly from the corpus precomputed classical_prior feature, no training needed (val top1 0.625, dev_holdout 0.639, OOD-unseen-topology only 0.236 -- more than double worse than any neural finalist under that shift). Launched the one distinguishable control (no-adapter HydroCore-S, 2 seeds, Stage 3-identical budget) as a background job."
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Follow-up / next actions
 
-Updated live throughout the run. As of this update (commit `ddf6fd9`; Stage 3 finalist
+Updated live throughout the run. As of this update (commit `772b114`; Stage 4 control
 training running in the background):
 
 ## Immediate next steps (in dependency order)
@@ -9,26 +9,35 @@ training running in the background):
    succeeded; predeclared-score ranking E2 > E0 > E1 > E3 > E6 > E4 > E8 > E7 > E5. Top four
    scores span only 0.0052 (noise-level at one seed/4 epochs). See `training-jobs.md` and
    `reports/results/v3/stage2-architecture-screening.json`. No longer a follow-up item.
-2. **Bundle F Stage 3 finalist training (E2/E0/E1, 2 seeds each) -- running now, not yet
-   complete.** Per the plan's "select up to three finalist configurations" (Stage 3), the top
-   three Stage 2 scores were carried forward mechanically rather than trusting the single
-   noise-level-margin winner. Each finalist/seed trains to early stopping or a 2h ceiling, fits
-   calibration on the calibration split, and evaluates on validation/development_holdout/both
-   OOD-holdout categories. See `training-jobs.md` for exact monitor/resume commands.
-   **This is the actively blocking item** -- final S-architecture selection depends on it.
-3. **After Stage 3 completes**: per the plan's Stage 6 ("Calibration and final selection"),
-   compare all 6 finalist/seed results (validation + development_holdout + OOD top-1/ECE/
-   coverage/set-size), select the single strongest S architecture, and record the decision.
-   From there: Stage 4 controls (HydroMono-S, no-adapter HydroCore-S, classical-only baseline)
-   and Stage 5 (updated HydroCore-M, gated on this selection) are the plan's next stages: not
-   started, and each is a substantial multi-hour training investment of its own.
-4. **Task 3.2 — complete incident-view API contract.** Done this session (backend endpoint +
+2. **Bundle F Stage 3 finalist training (E2/E0/E1, 2 seeds each) is complete.** All 6 runs
+   succeeded, ~12.0h wall time; every run hit the 2h-per-run ceiling rather than
+   early-stopping. Recommends **E1** (prior_mode=feature_only): best OOD-unseen-topology
+   generalization, trading <1pp in-distribution accuracy to E2. See
+   `reports/results/v3/finalist-selection-recommendation.md` for the full trade-off writeup
+   and explicit caveats on what this recommendation does not yet cover. No longer a follow-up
+   item, though the recommendation itself awaits Stage 4/human review before being final.
+3. **Bundle F Stage 4 control training -- running now, not yet complete.** Trains the one
+   distinguishable control (no-adapter HydroCore-S / HydroMono-S, verified architecturally
+   identical to each other) with 2 seeds under Stage 3's exact budget. The other two required
+   Stage 4 controls need no new training: "current architecture baseline" is E0 (already
+   trained in Stage 3), "classical-only baseline" was computed directly from the corpus's
+   precomputed `classical_prior` feature (val top1 0.625, OOD-unseen-topology only 0.236 --
+   validates the neural component's value, especially under distribution shift). See
+   `training-jobs.md` for exact monitor/resume commands. **This is the actively blocking
+   item** -- Stage 4 must complete (or be judged not to change the recommendation) before
+   treating E1 as settled.
+4. **After Stage 4 completes**: fold the no-adapter control's results into
+   `finalist-selection-recommendation.md`, confirm or revise the E1 recommendation, then
+   proceed to Stage 5 (updated HydroCore-M, gated on this selection) and Bundle G. Stage 6's
+   remaining requirements (full-trajectory eval, abstention/unsafe-non-abstention recording)
+   still need scoping regardless of which S architecture wins.
+5. **Task 3.2 — complete incident-view API contract.** Done this session (backend endpoint +
    schema, frontend wiring, contract tests) -- see `summary.md`'s "Task 3.2" section for full
    detail. No longer a follow-up item.
-5. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
+6. Bundle G (updated HydroCore-M training) is explicitly gated on Bundle F's S-architecture
    selection completing first -- "only after selecting strongest S architecture" per the
    plan -- so it cannot start early no matter how much idle capacity exists.
-6. **Phase 8 (frontend UX, Tasks 8.1/8.3/8.4) is a candidate independent thread not yet
+7. **Phase 8 (frontend UX, Tasks 8.1/8.3/8.4) is a candidate independent thread not yet
    scoped.** Task 8.2 (model-governance view) already exists (`ModelGovernanceTable.tsx`).
    Tasks 8.1 (simplified decision-rail workspace layout), 8.3 (validated-vs-unseen-topology
    comparison view), and 8.4 (a scripted "RUN VERIFIED INCIDENT DEMONSTRATION" guided judge
@@ -50,6 +59,9 @@ python -m pytest -q                        # expect 363 passed (see test-results
 cd frontend && npm ci && npm run test -- --run   # expect 30 passed
 npx playwright install --with-deps chromium && npx playwright test  # expect 10 passed
 ```
+
+To check on or resume the actively-running Stage 4 control-training job, see
+`training-jobs.md`'s exact commands.
 
 To check on or resume the actively-running Stage 3 finalist-training job, see
 `training-jobs.md`'s exact commands.

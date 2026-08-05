@@ -7,14 +7,14 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - Branch: `agent/gcp-multitopology-v3`
 - Starting commit: `5697f912667fa236ece784a98f141c8162ff6bf8` (main, "Complete HydroCore-M
   evaluation and topology transfer study")
-- Ending commit: `ddf6fd9` (Cycle B corpus landed, Task 3.2 complete, a real hard-coded-plan
-  bug found and fixed, Stage 2 architecture screening completed, Stage 3 finalist training
-  running in the background; still running)
-- Commits created: 52 (see `git log --oneline main..agent/gcp-multitopology-v3`)
-- Working tree: clean except the actively-running Stage 3 job's own `experiments/jobs/` and
-  `experiments/registry/bundle-f-stage3.jsonl` (uncommitted until the job finishes -- see
+- Ending commit: `772b114` (Cycle B corpus landed, Task 3.2 complete, a real hard-coded-plan
+  bug found and fixed, Stage 2 and Stage 3 both completed with a documented finalist
+  recommendation, Stage 4 control training running in the background; still running)
+- Commits created: 55 (see `git log --oneline main..agent/gcp-multitopology-v3`)
+- Working tree: clean except the actively-running Stage 4 job's own `experiments/jobs/` and
+  `experiments/registry/bundle-f-stage4.jsonl` (uncommitted until the job finishes -- see
   "Every training job's status" below)
-- Pushed to `origin/agent/gcp-multitopology-v3` on GitHub through commit `ddf6fd9`
+- Pushed to `origin/agent/gcp-multitopology-v3` on GitHub through commit `772b114`
 
 ## Completed tasks
 
@@ -49,8 +49,22 @@ Plan: `overnight-plan.txt` (2026-08-03 v3), multi-topology GCP execution and tra
 - [x] Bundle F, Stage 2 architecture screening (E0-E8): all 9 configurations completed
   successfully. Ranking: E2 > E0 > E1 > E3 > E6 > E4 > E8 > E7 > E5 (see training-jobs.md for
   full scores). Top four scores span only 0.0052 -- noise-level at this budget.
-- [ ] Bundle F, Stage 3 finalist training (E2/E0/E1, 2 seeds each) — **running now** in the
-  background; see "Every training job's status" below for exact resume/monitoring commands.
+- [x] Bundle F, Stage 3 finalist training (E2/E0/E1, 2 seeds each): all 6 runs completed
+  successfully, ~12.0h wall time. Recommends **E1** (prior_mode=feature_only) as the strongest
+  S candidate -- best out-of-distribution generalization to an unseen topology, trading a
+  <1pp in-distribution accuracy edge to E2. See
+  `reports/results/v3/finalist-selection-recommendation.md` for the full trade-off writeup;
+  this is a recommendation for human review, not an autonomous final selection (Stage 6 needs
+  more than this run has done -- see that document's "What this recommendation does not yet
+  cover").
+- [x] Bundle F, Stage 4 controls: classical-only baseline computed directly (no training
+  needed -- val top1 0.625, OOD-unseen-topology only 0.236, validating the neural component's
+  value especially under distribution shift). Discovered HydroMono-S and no-adapter
+  HydroCore-S are architecturally identical in this codebase (bit-identical state dicts
+  verified directly) -- training both would be duplicate compute.
+- [ ] Bundle F, Stage 4 no-adapter/HydroMono control training (2 seeds) — **running now** in
+  the background; see "Every training job's status" below for exact resume/monitoring
+  commands.
 - [ ] M training/evaluation
 - [ ] calibration/OOD evaluation
 - [ ] full-trajectory benchmark
@@ -249,8 +263,8 @@ Commits: `580185e` (backend), `ebd260c` (frontend), `bd944d5` (test-fixture fix 
 
 - None. The one intermittent test failure (`test_information_gain_is_nonnegative_within_tolerance`)
   is pre-existing, unrelated to this session's changes, and explained above under "Tests".
-- Stage 2 architecture screening (E0-E8) is running now in the background and has not finished;
-  see "Every training job's status" below for how to check on or resume it.
+- Stage 4 control training is running now in the background and has not finished; see "Every
+  training job's status" below for how to check on or resume it.
 
 ## Exact commands to continue
 
@@ -263,7 +277,7 @@ cd frontend && npm run test -- --run   # expect 30 passed (up from 25: +5 Counte
 npx playwright test                     # expect 10 passed (retry 1920x1080 visual-regression if it flakes)
 ```
 
-See `follow-up.md` and `training-jobs.md` for the active Stage 3 finalist-training job's exact
+See `follow-up.md` and `training-jobs.md` for the active Stage 4 control-training job's exact
 monitoring/resume commands.
 
 ## Every training job's status
@@ -276,10 +290,16 @@ completed successfully; see `training-jobs.md` and
 configurations, zero failures, ranking E2 > E0 > E1 > E3 > E6 > E4 > E8 > E7 > E5. See
 `training-jobs.md` and `reports/results/v3/stage2-architecture-screening.json`.
 
-**Bundle F Stage 3 finalist training is running now** under `hydroswarm.training.job_runner`,
-training the top three Stage 2 finalists (E2, E0, E1) with two seeds each. Run directory:
-`experiments/jobs/bundle-f-stage3/` (status.json/job.log/job.pid). See `training-jobs.md` for
-the exact monitor/resume commands and current progress at handoff time.
+**Bundle F Stage 3 finalist training completed successfully** -- all 6 runs (E2, E0, E1 x 2
+seeds each), zero failures, ~12.0h wall time. Recommends E1 (prior_mode=feature_only). See
+`training-jobs.md`, `reports/results/v3/stage3-finalist-training.json`, and
+`reports/results/v3/finalist-selection-recommendation.md`.
+
+**Bundle F Stage 4 control training is running now** under `hydroswarm.training.job_runner`,
+training the no-adapter HydroCore-S / HydroMono-S control (architecturally identical, trained
+once) with two seeds. Run directory: `experiments/jobs/bundle-f-stage4/`
+(status.json/job.log/job.pid). See `training-jobs.md` for the exact monitor/resume commands
+and current progress at handoff time.
 
 ## Locked final test
 
