@@ -186,6 +186,27 @@ class WNTRScenarioGenerator:
         self.split_planner = split_planner or SplitPlanner()
 
     def generate(self, network: Any, config: ScenarioGenerationConfig) -> GeneratedScenario:
+        scenario, _randomized_model = self.generate_with_network(network, config)
+        return scenario
+
+    def generate_with_network(
+        self, network: Any, config: ScenarioGenerationConfig
+    ) -> tuple[GeneratedScenario, Any]:
+        """Same as generate(), but also returns the exact randomized WNTR
+        model (demand regime, roughness variation, tank levels, pipe
+        outages -- see _randomize_hydraulics) that this scenario was
+        actually simulated against.
+
+        core-issues.txt repair item 4: a corpus builder must construct each
+        scenario's hydraulic feature context (hydroswarm.training.corpus.
+        build_feature_context) from THIS randomized model, not the pristine
+        network passed in here -- that randomized state was previously
+        discarded the moment generate() returned, forcing every scenario
+        generated from one network object to share a single static context
+        built once, regardless of how much its own hydraulics were
+        randomized.
+        """
+
         rng = np.random.default_rng(config.seed)
         split = config.split or self.split_planner.assign(config.network_family, config.seed)
         if config.network_family in self.split_planner.held_out and split != DatasetSplit.TEST:
@@ -259,7 +280,7 @@ class WNTRScenarioGenerator:
             drift_mask, unit_mismatch_mask,
         )
         ScenarioValidator().validate(result)
-        return result
+        return result, model
 
     @staticmethod
     def _randomize_hydraulics(model: Any, config: ScenarioGenerationConfig, rng: np.random.Generator, demand_regime: float) -> None:

@@ -108,18 +108,18 @@ def _generate_topology_scenarios(
     network_family: str,
     network: Any,
     seed_base: int,
-) -> dict[DatasetSplit, list[GeneratedScenario]]:
+) -> dict[DatasetSplit, list[tuple[GeneratedScenario, Any]]]:
     junctions = tuple(sorted(network.junction_name_list))
     generator = WNTRScenarioGenerator()
-    out: dict[DatasetSplit, list[GeneratedScenario]] = {}
+    out: dict[DatasetSplit, list[tuple[GeneratedScenario, Any]]] = {}
     for split_offset, (split, count) in enumerate(_SPLITS):
-        scenarios: list[GeneratedScenario] = []
+        scenarios: list[tuple[GeneratedScenario, Any]] = []
         split_seed_base = seed_base + split_offset * 1_000_000
         for index in range(count):
             stage = _stage_for_index(index)
             source = junctions[index % len(junctions)]
             event_type = _EVENT_TYPE_CYCLE[index % len(_EVENT_TYPE_CYCLE)]
-            scenario = generator.generate(
+            scenario, randomized_network = generator.generate_with_network(
                 network,
                 ScenarioGenerationConfig(
                     seed=split_seed_base + index * 100,
@@ -134,7 +134,7 @@ def _generate_topology_scenarios(
                     **_degradation_probabilities(stage),
                 ),
             )
-            scenarios.append(scenario)
+            scenarios.append((scenario, randomized_network))
         out[split] = scenarios
     return out
 
@@ -151,7 +151,7 @@ def main() -> int:
     started = time.perf_counter()
     writer = ScenarioDatasetWriter(args.output / "scenarios")
 
-    per_topology: dict[str, dict[DatasetSplit, list[GeneratedScenario]]] = {}
+    per_topology: dict[str, dict[DatasetSplit, list[tuple[GeneratedScenario, Any]]]] = {}
     per_topology_signature_hash: dict[str, str] = {}
     all_examples_by_split: dict[DatasetSplit, list[ScenarioExample]] = {split: [] for split, _ in _SPLITS}
     topology_node_counts: dict[str, int] = {}
@@ -160,17 +160,16 @@ def main() -> int:
         network = loader()
         junctions = tuple(sorted(network.junction_name_list))
         topology_node_counts[network_family] = len(network.node_name_list)
-        feature_context = build_feature_context(network)
         seed_base = args.seed + topology_index * 10_000_000
         by_split = _generate_topology_scenarios(
             network_family=network_family, network=network, seed_base=seed_base
         )
         per_topology[network_family] = by_split
         for scenarios in by_split.values():
-            for scenario in scenarios:
+            for scenario, _randomized_network in scenarios:
                 writer.write(scenario)
 
-        train_scenarios = by_split[DatasetSplit.TRAIN]
+        train_scenarios = [scenario for scenario, _randomized_network in by_split[DatasetSplit.TRAIN]]
         library = fit_signature_library(train_scenarios, junctions)
         per_topology_signature_hash[network_family] = library.manifest_hash
         signature_path = args.output / "signatures" / f"{network_family}.json"
@@ -179,9 +178,17 @@ def main() -> int:
             json.dumps(signature_metadata(library), indent=2, sort_keys=True), encoding="utf-8"
         )
 
+        # core-issues.txt repair item 4: build each scenario's feature
+        # context from its own randomized network, not one shared context
+        # built once from the pristine network (see
+        # generate_cycle_b_corpus.py's identical fix for the full
+        # rationale).
         for split, scenarios in by_split.items():
-            for scenario in scenarios:
-                example = scenario_to_example(scenario, network, library, feature_context=feature_context)
+            for scenario, randomized_network in scenarios:
+                scenario_context = build_feature_context(randomized_network)
+                example = scenario_to_example(
+                    scenario, randomized_network, library, feature_context=scenario_context
+                )
                 all_examples_by_split[split].append(example)
 
     manifest_hashes: dict[str, dict[str, Any]] = {}

@@ -106,10 +106,10 @@ def _degradation_probabilities(stage: CurriculumStage) -> dict[str, float]:
 
 def _generate_topology_scenarios(
     *, network_family: str, network: Any, seed_base: int
-) -> dict[DatasetSplit, list[GeneratedScenario]]:
+) -> dict[DatasetSplit, list[tuple[GeneratedScenario, Any]]]:
     junctions = tuple(sorted(network.junction_name_list))
     generator = WNTRScenarioGenerator()
-    out: dict[DatasetSplit, list[GeneratedScenario]] = {}
+    out: dict[DatasetSplit, list[tuple[GeneratedScenario, Any]]] = {}
     for split_offset, (split, total_count) in enumerate(_SPLITS):
         # Round-robin across the 3 training topologies: this topology's
         # share is total_count // len(TRAIN_TOPOLOGIES), with the
@@ -120,13 +120,13 @@ def _generate_topology_scenarios(
         remainder = total_count % len(TRAIN_TOPOLOGIES)
         count = base_share + (1 if share_index < remainder else 0)
 
-        scenarios: list[GeneratedScenario] = []
+        scenarios: list[tuple[GeneratedScenario, Any]] = []
         split_seed_base = seed_base + split_offset * 1_000_000
         for index in range(count):
             stage = _stage_for_index(index)
             source = junctions[index % len(junctions)]
             event_type = _EVENT_TYPE_CYCLE[index % len(_EVENT_TYPE_CYCLE)]
-            scenario = generator.generate(
+            scenario, randomized_network = generator.generate_with_network(
                 network,
                 ScenarioGenerationConfig(
                     seed=split_seed_base + index * 100,
@@ -141,25 +141,25 @@ def _generate_topology_scenarios(
                     **_degradation_probabilities(stage),
                 ),
             )
-            scenarios.append(scenario)
+            scenarios.append((scenario, randomized_network))
         out[split] = scenarios
     return out
 
 
 def _generate_ood_holdout_for_training_topology(
     *, network_family: str, network: Any, seed_base: int, count: int
-) -> list[GeneratedScenario]:
+) -> list[tuple[GeneratedScenario, Any]]:
     """SEVERE_MISSINGNESS: missing_probability far beyond anything used in
     the main splits (max 0.08 there), on an otherwise ordinary training
     topology -- an in-topology distribution shift."""
 
     junctions = tuple(sorted(network.junction_name_list))
     generator = WNTRScenarioGenerator()
-    scenarios = []
+    scenarios: list[tuple[GeneratedScenario, Any]] = []
     for index in range(count):
         stage = _stage_for_index(index)
         source = junctions[index % len(junctions)]
-        scenario = generator.generate(
+        scenario, randomized_network = generator.generate_with_network(
             network,
             ScenarioGenerationConfig(
                 seed=seed_base + index * 100,
@@ -176,11 +176,13 @@ def _generate_ood_holdout_for_training_topology(
                 communication_outage_probability=0.02,
             ),
         )
-        scenarios.append(scenario)
+        scenarios.append((scenario, randomized_network))
     return scenarios
 
 
-def _generate_unseen_topology_ood_holdout(*, network: Any, count: int) -> tuple[list[GeneratedScenario], Any]:
+def _generate_unseen_topology_ood_holdout(
+    *, network: Any, count: int
+) -> tuple[list[tuple[GeneratedScenario, Any]], Any]:
     """UNSEEN_TOPOLOGY: every scenario comes from coastal-branch, which
     never appears in any train-eligible split. A separate small set of
     TRAIN-labeled scenarios is generated only to fit a signature library
@@ -206,11 +208,11 @@ def _generate_unseen_topology_ood_holdout(*, network: Any, count: int) -> tuple[
     ]
     library = fit_signature_library(signature_scenarios, junctions)
 
-    scenarios = []
+    scenarios: list[tuple[GeneratedScenario, Any]] = []
     for index in range(count):
         stage = _stage_for_index(index)
         source = junctions[index % len(junctions)]
-        scenario = generator.generate(
+        scenario, randomized_network = generator.generate_with_network(
             network,
             ScenarioGenerationConfig(
                 seed=980_000 + index * 100,
@@ -225,7 +227,7 @@ def _generate_unseen_topology_ood_holdout(*, network: Any, count: int) -> tuple[
                 **_degradation_probabilities(stage),
             ),
         )
-        scenarios.append(scenario)
+        scenarios.append((scenario, randomized_network))
     return scenarios, library
 
 
@@ -252,23 +254,31 @@ def main() -> int:
         network = loader()
         junctions = tuple(sorted(network.junction_name_list))
         topology_node_counts[network_family] = len(network.node_name_list)
-        feature_context = build_feature_context(network)
         seed_base = args.seed + topology_index * 10_000_000
         by_split = _generate_topology_scenarios(network_family=network_family, network=network, seed_base=seed_base)
         for scenarios in by_split.values():
-            for scenario in scenarios:
+            for scenario, _randomized_network in scenarios:
                 writer.write(scenario)
 
-        train_scenarios = by_split[DatasetSplit.TRAIN]
+        train_scenarios = [scenario for scenario, _randomized_network in by_split[DatasetSplit.TRAIN]]
         library = fit_signature_library(train_scenarios, junctions)
         per_topology_signature_hash[network_family] = library.manifest_hash
         signature_path = args.output / "signatures" / f"{network_family}.json"
         signature_path.parent.mkdir(parents=True, exist_ok=True)
         signature_path.write_text(json.dumps(signature_metadata(library), indent=2, sort_keys=True), encoding="utf-8")
 
+        # core-issues.txt repair item 4: each scenario's own randomized
+        # network (demand regime, roughness variation, tank levels, pipe
+        # outages -- see WNTRScenarioGenerator._randomize_hydraulics) gets
+        # its own feature context, built fresh per scenario, rather than
+        # one context built once from the pristine (unrandomized) network
+        # and reused for every scenario this topology ever generates.
         for split, scenarios in by_split.items():
-            for scenario in scenarios:
-                example = scenario_to_example(scenario, network, library, feature_context=feature_context)
+            for scenario, randomized_network in scenarios:
+                scenario_context = build_feature_context(randomized_network)
+                example = scenario_to_example(
+                    scenario, randomized_network, library, feature_context=scenario_context
+                )
                 all_examples_by_split[split].append(example)
 
         # SEVERE_MISSINGNESS OOD holdout, split roughly evenly across the
@@ -279,11 +289,14 @@ def main() -> int:
         ood_scenarios = _generate_ood_holdout_for_training_topology(
             network_family=network_family, network=network, seed_base=seed_base + 5_000_000, count=count
         )
-        for scenario in ood_scenarios:
+        for scenario, _randomized_network in ood_scenarios:
             writer.write(scenario)
         ood_examples.setdefault(OODCategory.SEVERE_MISSINGNESS.value, []).extend(
-            scenario_to_example(scenario, network, library, feature_context=feature_context)
-            for scenario in ood_scenarios
+            scenario_to_example(
+                scenario, randomized_network, library,
+                feature_context=build_feature_context(randomized_network),
+            )
+            for scenario, randomized_network in ood_scenarios
         )
 
     # UNSEEN_TOPOLOGY OOD holdout: coastal-branch, held out entirely.
@@ -293,12 +306,14 @@ def main() -> int:
     unseen_scenarios, unseen_library = _generate_unseen_topology_ood_holdout(
         network=dev_ood_network, count=OOD_HOLDOUT_COUNT_PER_CATEGORY
     )
-    for scenario in unseen_scenarios:
+    for scenario, _randomized_network in unseen_scenarios:
         writer.write(scenario)
-    dev_ood_feature_context = build_feature_context(dev_ood_network)
     ood_examples[OODCategory.UNSEEN_TOPOLOGY.value] = [
-        scenario_to_example(scenario, dev_ood_network, unseen_library, feature_context=dev_ood_feature_context)
-        for scenario in unseen_scenarios
+        scenario_to_example(
+            scenario, randomized_network, unseen_library,
+            feature_context=build_feature_context(randomized_network),
+        )
+        for scenario, randomized_network in unseen_scenarios
     ]
     per_topology_signature_hash[f"{dev_ood_family}-signature-only"] = unseen_library.manifest_hash
 
@@ -346,7 +361,16 @@ def main() -> int:
         },
         "cross_split_leakage": audit["cross_split_leakage"],
         "duplicate_scenario_id_estimate": 0,
-        "cache_hit_rate": "not applicable: single generation pass, no cache reuse measured",
+        "cache_hit_rate": (
+            "not applicable: each scenario now builds its own hydraulic feature context from "
+            "its own randomized network (core-issues.txt repair item 4), so "
+            "hydroswarm.simulation.context_cache.HydraulicContextCache was deliberately not "
+            "wired in here -- per-scenario demand/roughness/tank/pipe randomization makes "
+            "every scenario's network_state_hash close to unique, so a cache keyed on it would "
+            "rarely hit, and it would additionally require new FeatureContext (de)serialization "
+            "that does not exist yet. A real, if smaller, correctness fix should not be "
+            "gated on building that infrastructure."
+        ),
         "limitations": [
             "Train/validation/calibration/development_holdout counts are toward the low-to-mid "
             "end of the plan's stated ranges (9,000/1,000/1,000/1,750) rather than the maximum "

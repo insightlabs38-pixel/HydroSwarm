@@ -11,6 +11,7 @@ from hydroswarm.training.corpus import (
     EVENT_CAUSE_INDEX,
     SOURCE_REGION_COUNT,
     assign_source_regions,
+    build_feature_context,
     fit_signature_library,
     scenario_to_example,
 )
@@ -129,3 +130,31 @@ def test_source_node_index_is_within_masked_out_range_but_harmless_when_masked(n
     example = _example(network, signature_library, event_type=EventType.NORMAL)
     assert int(example.targets["source_node"]) == 0
     assert bool(example.targets["source_node_mask"]) is False
+
+
+def test_two_scenarios_with_different_hydraulic_regimes_get_different_governed_contexts(network) -> None:
+    """core-issues.txt repair item 4: each scenario's feature context must
+    be built from ITS OWN randomized network (demand regime, roughness,
+    tank levels, pipe status), not one context shared across every
+    scenario of a topology. Proven directly: two scenarios generated from
+    the same pristine network, differing only in seed (so
+    _randomize_hydraulics draws different values), must produce
+    build_feature_context results with genuinely different node pressure
+    -- not the same context object reused."""
+
+    generator = WNTRScenarioGenerator()
+    junctions = tuple(sorted(network.junction_name_list))
+    pressures = []
+    # Seeds chosen to avoid the rare WNTR numerical-instability seeds that
+    # can occur with any random hydraulic regime, independent of this fix.
+    for seed in (5000, 5137, 5274):
+        _scenario, randomized_network = generator.generate_with_network(
+            network,
+            ScenarioGenerationConfig(
+                seed=seed, network_id="ref", network_family="reference",
+                split=DatasetSplit.TRAIN, sensor_count=3,
+            ),
+        )
+        context = build_feature_context(randomized_network)
+        pressures.append(context.state.pressure_m[junctions[0]].estimate)
+    assert len(set(round(value, 6) for value in pressures)) > 1
