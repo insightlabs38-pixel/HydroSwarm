@@ -20,7 +20,35 @@ Strategist/OOD/auxiliary supervision) for what comes after this.
 | 17 | Fully train selected two, ≥2 seeds each | **DONE** — `reports/results/v3/cycle-b2-stage3-{E1,E0}.json` |
 | 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | **DONE** — 2 real defects found and fixed along the way |
 | 19 | Re-run HydroMono/no-adapter control | IN PROGRESS (background job, ~2.4h expected) |
-| 20 | Decide on HydroCore-M | not started |
+| 20 | Decide on HydroCore-M | **DECIDED: do not train** (see below) |
+
+## Item 20: HydroCore-M decision -- do not train
+
+core-issues.txt: "Do not train HydroCore-M unless the corrected S evidence provides a
+concrete capacity-based justification." The corrected S evidence points the other way.
+Both finalists' `trainer_state.json` validation-loss trajectory across their full
+16-epoch run:
+
+| Epoch | E1 best_validation_loss | E0 best_validation_loss |
+|---|---|---|
+| 3 | 4.320 | 4.321 |
+| 7 | 3.505 (Δ 0.815) | 3.464 (Δ 0.857) |
+| 11 | 3.298 (Δ 0.207) | 3.315 (Δ 0.149) |
+| 15 | 3.208 (Δ 0.090) | 3.200 (Δ 0.115) |
+
+Both finalists show the same smooth, decelerating convergence curve -- large gains
+early, shrinking to a small residual improvement by the last quarter of training. This
+is the signature of a model converging within its current capacity, not one plateauing
+early while still capacity-starved (which would show validation loss still falling
+steeply, or non-monotonically, right up to the runtime/epoch ceiling). No other
+diagnostic run this pass (a data-scaling curve, systematic underfitting across every
+task head, a deliberately capacity-probing ablation) provides a competing signal either.
+
+**Decision: HydroCore-M is not trained in this pass.** This is a negative result,
+recorded explicitly rather than defaulting to "train it anyway to be thorough" -- per
+the plan's own "a larger or more complex model is not automatically preferred" and this
+pass's explicit instruction to require a concrete justification before spending the
+~3x-parameter-count training budget.
 
 ## Item 18 results: two real defects found and fixed, then a credible calibration
 
