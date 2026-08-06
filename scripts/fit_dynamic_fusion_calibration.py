@@ -286,6 +286,11 @@ def fit(
             )
         )
         topology_hashes_used.add(manifest.network_sha256)
+        classical_top1 = max(result.classical_belief, key=result.classical_belief.get)
+        neural_top1 = (
+            max(result.neural_belief, key=result.neural_belief.get) if result.neural_belief else None
+        )
+        fused_top1 = max(result.fused_belief, key=result.fused_belief.get)
         per_scenario_diagnostics.append(
             {
                 "scenario_id": str(manifest.scenario_id),
@@ -297,6 +302,10 @@ def fit(
                 "disagreement_js": (
                     result.fusion_diagnostics.disagreement_js if result.fusion_diagnostics else None
                 ),
+                "true_source": true_source,
+                "classical_top1_correct": classical_top1 == true_source,
+                "neural_top1_correct": (neural_top1 == true_source) if neural_top1 is not None else None,
+                "fused_top1_correct": fused_top1 == true_source,
             }
         )
 
