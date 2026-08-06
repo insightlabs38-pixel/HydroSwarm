@@ -1,0 +1,705 @@
+{
+  "cross_split_leakage": {
+    "examples_missing_topology_metadata": 0,
+    "scenario_id_leaks": [],
+    "seed_family_leaks": [],
+    "topology_hash_conflicts": {},
+    "topology_leak_note": "topology_hash_conflicts lists any network_id that resolved to more than one distinct topology_hash across these splits -- a real leak/labeling bug, not expected reuse. examples_missing_topology_metadata counts examples with no TopologyMetadata at all (e.g. generated before repair item 5), for which this check cannot run at all; a nonzero count here means topology-hash leakage may still be silently undetected for those specific examples."
+  },
+  "decision_splits": [
+    "train",
+    "validation",
+    "calibration"
+  ],
+  "splits": {
+    "calibration": {
+      "count": 1000,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 333,
+        "golden-reference": 334,
+        "loop-grid": 333
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.6544943820224719,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.19101123595505617,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.17272772873194223
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1000,
+        "overall_positive_rate": 1.0,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ],
+          "golden-reference": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null,
+            null
+          ],
+          "loop-grid": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 34,
+          "1": 34,
+          "2": 34,
+          "3": 34,
+          "4": 33,
+          "5": 34,
+          "6": 34
+        },
+        "golden-reference": {
+          "0": 68,
+          "1": 68,
+          "2": 51,
+          "3": 51
+        },
+        "loop-grid": {
+          "0": 34,
+          "1": 34,
+          "2": 26,
+          "3": 26,
+          "4": 34,
+          "5": 33,
+          "6": 25,
+          "7": 25
+        }
+      },
+      "split": "calibration",
+      "target_class_histograms": {
+        "duration": {
+          "0": 235,
+          "1": 248,
+          "2": 229
+        },
+        "relative_strength": {
+          "0": 242,
+          "1": 245,
+          "2": 225
+        },
+        "source_node": {
+          "0": 136,
+          "1": 136,
+          "2": 111,
+          "3": 111,
+          "4": 67,
+          "5": 67,
+          "6": 59,
+          "7": 25
+        },
+        "start_time": {
+          "0": 175,
+          "1": 176,
+          "2": 188,
+          "3": 173
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "development_holdout": {
+      "count": 1750,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 583,
+        "golden-reference": 584,
+        "loop-grid": 583
+      },
+      "sanity_baselines": {
+        "note": "split 'development_holdout' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1750,
+        "overall_positive_rate": 1.0,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ],
+          "golden-reference": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null,
+            null
+          ],
+          "loop-grid": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 59,
+          "1": 59,
+          "2": 58,
+          "3": 58,
+          "4": 58,
+          "5": 58,
+          "6": 59
+        },
+        "golden-reference": {
+          "0": 117,
+          "1": 117,
+          "2": 88,
+          "3": 88
+        },
+        "loop-grid": {
+          "0": 58,
+          "1": 58,
+          "2": 44,
+          "3": 44,
+          "4": 59,
+          "5": 59,
+          "6": 44,
+          "7": 43
+        }
+      },
+      "split": "development_holdout",
+      "target_class_histograms": {
+        "duration": {
+          "0": 405,
+          "1": 384,
+          "2": 439
+        },
+        "relative_strength": {
+          "0": 385,
+          "1": 414,
+          "2": 429
+        },
+        "source_node": {
+          "0": 234,
+          "1": 234,
+          "2": 190,
+          "3": 190,
+          "4": 117,
+          "5": 117,
+          "6": 103,
+          "7": 43
+        },
+        "start_time": {
+          "0": 290,
+          "1": 303,
+          "2": 303,
+          "3": 332
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "ood-SEVERE_MISSINGNESS": {
+      "count": 400,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "sanity_baselines": {
+        "note": "split 'ood-SEVERE_MISSINGNESS' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 400,
+        "overall_positive_rate": 1.0,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ],
+          "golden-reference": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null,
+            null
+          ],
+          "loop-grid": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 13,
+          "1": 14,
+          "2": 14,
+          "3": 14,
+          "4": 14,
+          "5": 14,
+          "6": 14
+        },
+        "golden-reference": {
+          "0": 28,
+          "1": 28,
+          "2": 21,
+          "3": 21
+        },
+        "loop-grid": {
+          "0": 14,
+          "1": 14,
+          "2": 11,
+          "3": 11,
+          "4": 14,
+          "5": 13,
+          "6": 10,
+          "7": 10
+        }
+      },
+      "split": "ood-SEVERE_MISSINGNESS",
+      "target_class_histograms": {
+        "duration": {
+          "0": 94,
+          "1": 95,
+          "2": 103
+        },
+        "relative_strength": {
+          "0": 92,
+          "1": 110,
+          "2": 90
+        },
+        "source_node": {
+          "0": 55,
+          "1": 56,
+          "2": 46,
+          "3": 46,
+          "4": 28,
+          "5": 27,
+          "6": 24,
+          "7": 10
+        },
+        "start_time": {
+          "0": 73,
+          "1": 79,
+          "2": 77,
+          "3": 63
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "ood-UNSEEN_TOPOLOGY": {
+      "count": 400,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "coastal-branch": 400
+      },
+      "sanity_baselines": {
+        "note": "split 'ood-UNSEEN_TOPOLOGY' is not in decision_splits; baseline accuracies are intentionally omitted so this audit can never be used to tune against locked-test performance."
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 400,
+        "overall_positive_rate": 1.0,
+        "per_node_positive_rate_by_network": {
+          "coastal-branch": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null,
+            null
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "coastal-branch": {
+          "0": 47,
+          "1": 47,
+          "2": 47,
+          "3": 47,
+          "4": 46,
+          "5": 46
+        }
+      },
+      "split": "ood-UNSEEN_TOPOLOGY",
+      "target_class_histograms": {
+        "duration": {
+          "0": 90,
+          "1": 94,
+          "2": 96
+        },
+        "relative_strength": {
+          "0": 103,
+          "1": 90,
+          "2": 87
+        },
+        "source_node": {
+          "0": 47,
+          "1": 47,
+          "2": 47,
+          "3": 47,
+          "4": 46,
+          "5": 46
+        },
+        "start_time": {
+          "0": 70,
+          "1": 78,
+          "2": 69,
+          "3": 63
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "train": {
+      "count": 9000,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 3000,
+        "golden-reference": 3000,
+        "loop-grid": 3000
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.6585714285714286,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.19047619047619047,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.17261904761904762
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 9000,
+        "overall_positive_rate": 1.0,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ],
+          "golden-reference": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null,
+            null
+          ],
+          "loop-grid": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 300,
+          "1": 300,
+          "2": 300,
+          "3": 300,
+          "4": 300,
+          "5": 300,
+          "6": 300
+        },
+        "golden-reference": {
+          "0": 600,
+          "1": 600,
+          "2": 450,
+          "3": 450
+        },
+        "loop-grid": {
+          "0": 300,
+          "1": 300,
+          "2": 225,
+          "3": 225,
+          "4": 300,
+          "5": 300,
+          "6": 225,
+          "7": 225
+        }
+      },
+      "split": "train",
+      "target_class_histograms": {
+        "duration": {
+          "0": 2065,
+          "1": 2138,
+          "2": 2097
+        },
+        "relative_strength": {
+          "0": 2149,
+          "1": 2061,
+          "2": 2090
+        },
+        "source_node": {
+          "0": 1200,
+          "1": 1200,
+          "2": 975,
+          "3": 975,
+          "4": 600,
+          "5": 600,
+          "6": 525,
+          "7": 225
+        },
+        "start_time": {
+          "0": 1578,
+          "1": 1597,
+          "2": 1553,
+          "3": 1572
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    },
+    "validation": {
+      "count": 1000,
+      "duplicate_scenario_ids": [],
+      "finite_value_violations": [],
+      "impossible_labels": [],
+      "near_duplicate_groups": [],
+      "network_balance": {
+        "branched-loop": 333,
+        "golden-reference": 334,
+        "loop-grid": 333
+      },
+      "sanity_baselines": {
+        "classical_eig_sample": {
+          "reason": "requires Scout candidate enumeration (Task 2.3); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "classical_signature_prior": 0.625,
+        "deterministic_plan_template_ranking": {
+          "reason": "requires Strategist plan labels and WNTR verification (Task 2.4); not computable from stored Sentinel-only tensors.",
+          "value": null
+        },
+        "majority_source": {
+          "accuracy": 0.19101123595505617,
+          "majority_class": 0
+        },
+        "nearest_positive_sensor": {
+          "reason": "requires per-sensor concentration traces from live/cached signature artifacts, not present in the frozen canonical-tensor rows; add once Task 2.3 Scout label generation exposes sensor-level signatures.",
+          "value": null
+        },
+        "random_source": 0.17272772873194223
+      },
+      "sensor_fault_prevalence": {
+        "examples_with_target": 1000,
+        "overall_positive_rate": 1.0,
+        "per_node_positive_rate_by_network": {
+          "branched-loop": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ],
+          "golden-reference": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null,
+            null
+          ],
+          "loop-grid": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            null
+          ]
+        }
+      },
+      "source_balance_by_network": {
+        "branched-loop": {
+          "0": 34,
+          "1": 34,
+          "2": 34,
+          "3": 34,
+          "4": 33,
+          "5": 34,
+          "6": 34
+        },
+        "golden-reference": {
+          "0": 68,
+          "1": 68,
+          "2": 51,
+          "3": 51
+        },
+        "loop-grid": {
+          "0": 34,
+          "1": 34,
+          "2": 26,
+          "3": 26,
+          "4": 34,
+          "5": 33,
+          "6": 25,
+          "7": 25
+        }
+      },
+      "split": "validation",
+      "target_class_histograms": {
+        "duration": {
+          "0": 227,
+          "1": 267,
+          "2": 218
+        },
+        "relative_strength": {
+          "0": 243,
+          "1": 249,
+          "2": 220
+        },
+        "source_node": {
+          "0": 136,
+          "1": 136,
+          "2": 111,
+          "3": 111,
+          "4": 67,
+          "5": 67,
+          "6": 59,
+          "7": 25
+        },
+        "start_time": {
+          "0": 180,
+          "1": 181,
+          "2": 166,
+          "3": 185
+        }
+      },
+      "target_missingness": {
+        "duration": 0,
+        "relative_strength": 0,
+        "sensor_fault": 0,
+        "source_node": 0,
+        "start_time": 0
+      }
+    }
+  }
+}

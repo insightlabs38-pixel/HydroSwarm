@@ -1,0 +1,129 @@
+{
+  "corpus_dir": "data/learning-v2/cycle-b2",
+  "gates": {
+    "deterministic_replay": {
+      "excluded_split_note": "development_holdout excluded: plain curriculum scenarios and the two OOD-holdout helpers share one manifest file with different degradation-probability formulas that cannot be distinguished from the manifest alone.",
+      "scenarios_replayed": 12,
+      "splits_covered": [
+        "train",
+        "validation",
+        "calibration"
+      ],
+      "status": "passed"
+    },
+    "finite_values": {
+      "splits_checked": [
+        "calibration",
+        "development_holdout",
+        "ood-SEVERE_MISSINGNESS",
+        "ood-UNSEEN_TOPOLOGY",
+        "train",
+        "validation"
+      ],
+      "status": "passed"
+    },
+    "label_audit_present": {
+      "decision_splits": [
+        "calibration",
+        "train",
+        "validation"
+      ],
+      "splits_present": [
+        "calibration",
+        "development_holdout",
+        "ood-SEVERE_MISSINGNESS",
+        "ood-UNSEEN_TOPOLOGY",
+        "train",
+        "validation"
+      ],
+      "status": "passed"
+    },
+    "leakage": {
+      "cross_split_leakage": {
+        "examples_missing_topology_metadata": 0,
+        "scenario_id_leaks": [],
+        "seed_family_leaks": [],
+        "topology_hash_conflicts": {},
+        "topology_leak_note": "topology_hash_conflicts lists any network_id that resolved to more than one distinct topology_hash across these splits -- a real leak/labeling bug, not expected reuse. examples_missing_topology_metadata counts examples with no TopologyMetadata at all (e.g. generated before repair item 5), for which this check cannot run at all; a nonzero count here means topology-hash leakage may still be silently undetected for those specific examples."
+      },
+      "status": "passed"
+    },
+    "mask_round_trip": {
+      "families_checked": [
+        "branched-loop",
+        "golden-reference"
+      ],
+      "regression_suite": "tests/unit/test_variable_collate.py passed",
+      "status": "passed"
+    },
+    "normalization_ownership": {
+      "edge_normalization_sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
+      "node_normalization_sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
+      "status": "passed",
+      "train_examples_used_to_refit": 9000
+    },
+    "shard_checksums": {
+      "checked_splits": [
+        {
+          "example_count": 1000,
+          "split_dir": "calibration"
+        },
+        {
+          "example_count": 1750,
+          "split_dir": "development_holdout"
+        },
+        {
+          "example_count": 400,
+          "split_dir": "ood-SEVERE_MISSINGNESS"
+        },
+        {
+          "example_count": 400,
+          "split_dir": "ood-UNSEEN_TOPOLOGY"
+        },
+        {
+          "example_count": 9000,
+          "split_dir": "train"
+        },
+        {
+          "example_count": 1000,
+          "split_dir": "validation"
+        }
+      ],
+      "status": "passed"
+    },
+    "target_mask_validation": {
+      "splits_checked": [
+        "calibration",
+        "development_holdout",
+        "ood-SEVERE_MISSINGNESS",
+        "ood-UNSEEN_TOPOLOGY",
+        "train",
+        "validation"
+      ],
+      "status": "passed"
+    },
+    "topology_provenance": {
+      "checked": {
+        "branched-loop": {
+          "examples_checked": 6,
+          "mismatches": []
+        },
+        "coastal-branch": {
+          "examples_checked": 6,
+          "mismatches": []
+        },
+        "golden-reference": {
+          "examples_checked": 6,
+          "mismatches": []
+        },
+        "loop-grid": {
+          "examples_checked": 6,
+          "mismatches": []
+        }
+      },
+      "status": "passed"
+    }
+  },
+  "overall_status": "passed",
+  "schema_version": 1
+}

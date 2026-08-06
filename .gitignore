@@ -25,6 +25,7 @@ data/learning-v1/canonical-tensor-report-v2.json
 data/learning-v2/**/scenarios/**/*.npz
 data/learning-v2/**/scenarios/**/*.parquet
 data/learning-v2/**/tensors/**/*.safetensors
+data/learning-v2/**/tensors-normalized/**/*.safetensors
 models/checkpoints/
 experiments/runs/
 experiments/registry/*.lock
