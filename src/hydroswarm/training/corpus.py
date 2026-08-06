@@ -201,24 +201,41 @@ def _event_cause(scenario: GeneratedScenario) -> EventCause:
     return EventCause.NORMAL
 
 
+def sensor_health_summary(
+    series: Sequence[SensorSeries], *, health_threshold: float = 0.75
+) -> tuple[float, int]:
+    """(healthy_fraction, sensors_ever_healthy) over `series` -- the raw
+    sensor-health signal both `_evidence_sufficiency`'s sensor-health-only
+    rule and hydroswarm.training.control_labels' fuller rule are built
+    from, factored out so both compute it identically rather than risking
+    drift between two independent implementations."""
+
+    all_health = [value for item in series for value in item.health]
+    if not all_health:
+        return 0.0, 0
+    healthy_fraction = sum(1 for value in all_health if value >= health_threshold) / len(all_health)
+    sensors_ever_healthy = sum(1 for item in series if any(value >= health_threshold for value in item.health))
+    return healthy_fraction, sensors_ever_healthy
+
+
 def _evidence_sufficiency(series: Sequence[SensorSeries], *, health_threshold: float = 0.75) -> bool:
     """Documented deterministic rule (overnight-plan.txt Task 2.2): evidence
     is sufficient when at least half of all (sensor, timestep) health
     readings clear health_threshold and at least two distinct sensors ever
     clear it. This is the sensor-health-based subset of the plan's full
     rule (which also references calibrated candidate-set size, posterior
-    entropy, disagreement, and OOD state) -- those additional signals only
-    exist once a live controller loop runs over a corpus example (see
-    TrajectoryState, Task 2.6), and are not available at pure corpus-
-    generation time. Extending this rule to the full combination is future
-    work once trajectory-based generation exists.
+    entropy, disagreement, and OOD state). hydroswarm.training.control_labels.
+    classify_evidence_sufficiency now extends this with posterior entropy
+    and OOD-category calibration validity (core-issues2.txt Phase 5) --
+    calibrated candidate-set size specifically still cannot be computed
+    here: it requires a CalibrationArtifact already fitted against a
+    trained Sentinel checkpoint, which does not exist until after Stage 1
+    of Phase 8's staged training sequence. This narrower rule remains the
+    one scenario_to_example calls at pure corpus-generation time, before
+    any model exists to calibrate against.
     """
 
-    all_health = [value for item in series for value in item.health]
-    if not all_health:
-        return False
-    healthy_fraction = sum(1 for value in all_health if value >= health_threshold) / len(all_health)
-    sensors_ever_healthy = sum(1 for item in series if any(value >= health_threshold for value in item.health))
+    healthy_fraction, sensors_ever_healthy = sensor_health_summary(series, health_threshold=health_threshold)
     return healthy_fraction >= 0.5 and sensors_ever_healthy >= 2
 
 

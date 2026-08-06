@@ -3,6 +3,7 @@
 from .artifacts import RunArtifacts
 from .checkpoint import export_model, load_checkpoint, save_checkpoint
 from .config import TrainingConfig
+from .control_labels import classify_evidence_sufficiency, classify_next_step, next_step_target
 from .data import (
     AgentTrajectory,
     CurriculumSchedule,
@@ -119,6 +120,8 @@ __all__ = [
     "by_source_node",
     "check_schema_version",
     "classify_abstention_outcome",
+    "classify_evidence_sufficiency",
+    "classify_next_step",
     "classify_ood_category",
     "collate_scenarios",
     "collate_variable_topology",
@@ -133,6 +136,7 @@ __all__ = [
     "load_scenario_examples_jsonl",
     "manifest_entry",
     "measure_equivariance",
+    "next_step_target",
     "ood_class_target",
     "permute_example",
     "resolve_source_node_id",
