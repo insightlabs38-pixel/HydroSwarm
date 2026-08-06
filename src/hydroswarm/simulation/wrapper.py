@@ -181,6 +181,27 @@ def _digest(payload: object) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+#: The hydraulic snapshot time (seconds into the simulation) that governed
+#: feature construction has always used for computing a representative
+#: static-ish node/edge feature snapshot -- hydroswarm.training.corpus.
+#: build_feature_context (training) and hydroswarm.cli's fixed-inference
+#: verification both call calculate_state(3_600) explicitly. Discovered
+#: via core-issues.txt Phase 3 item 18 (fitting calibration against the
+#: real, exact deployed HybridInferencePipeline): HybridInferencePipeline
+#: .analyze() called calculate_state() with no argument, which defaults to
+#: the network's LAST simulated timestamp -- for a typical 24-hour
+#: simulation (86,400s) that is nowhere near the 3,600s snapshot the model
+#: was actually trained on, and measurably degraded the real trained
+#: model's neural-branch accuracy at live inference (confirmed by an A/B
+#: comparison against a real trained checkpoint: the true source's belief
+#: went from an undifferentiated ~0.30 among candidates to a correctly-
+#: ranked ~0.49 once the snapshot time matched training). Use this
+#: constant at every call site that builds model input features from a
+#: HydraulicSimulator snapshot, so train and serve can never silently
+#: diverge on it again.
+FEATURE_SNAPSHOT_TIME_SECONDS = 3_600
+
+
 class HydraulicSimulator:
     """Load, validate and simulate water networks using WNTR as authority."""
 

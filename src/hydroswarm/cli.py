@@ -39,7 +39,7 @@ def run_self_test() -> dict[str, Any]:
     from hydroswarm.model import HydroCore
     from hydroswarm.runtime import DefaultPipelineFactory
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
-    from hydroswarm.simulation.wrapper import HydraulicSimulator
+    from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
     graph = build_networkx_network()
     hydraulic_model = build_wntr_network()
@@ -90,7 +90,7 @@ def run_self_test() -> dict[str, Any]:
     inference_hash = hashlib.sha256(source_probabilities.numpy().tobytes()).hexdigest()
 
     simulator = HydraulicSimulator(hydraulic_model, timeout_seconds=20.0)
-    state = simulator.calculate_state(3600)
+    state = simulator.calculate_state(FEATURE_SNAPSHOT_TIME_SECONDS)
     if not state.pressure_m or not all(map(lambda value: value == value, state.pressure_m.values())):
         raise RuntimeError("fixed WNTR reference simulation is invalid")
     simulation_hash = simulator.state_hash()

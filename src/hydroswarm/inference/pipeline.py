@@ -38,6 +38,7 @@ from hydroswarm.planning import (
 )
 from hydroswarm.preprocessing import BuiltHydroBatch, HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.sampling import ActiveSamplingResult, SamplingConstraints, rank_sample_locations
+from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS
 from hydroswarm.tasks import RUNTIME_TASKS, validate_tasks
 
 from .ood import OODDetector
@@ -395,7 +396,18 @@ class HybridInferencePipeline:
         # TopologyMetadata.topology_hash, so a CalibrationArtifact fit
         # against real corpus examples can be checked against it here.
         topology_hash = network_sha256(network)
-        raw_state = stage("hydraulic_simulation", self.simulator.calculate_state)
+        # Phase 3 item 18 discovery: calculate_state() with no argument
+        # defaults to the network's LAST simulated timestamp, not the
+        # FEATURE_SNAPSHOT_TIME_SECONDS snapshot every feature-building path
+        # (hydroswarm.training.corpus.build_feature_context, hydroswarm.cli's
+        # fixed-inference verification) actually uses -- for a typical
+        # multi-hour simulation this silently fed the model a hydraulic
+        # snapshot far outside its training distribution. See
+        # FEATURE_SNAPSHOT_TIME_SECONDS's docstring for the full writeup.
+        raw_state = stage(
+            "hydraulic_simulation",
+            lambda: self.simulator.calculate_state(FEATURE_SNAPSHOT_TIME_SECONDS),
+        )
         tank_levels = {name: raw_state.pressure_m.get(name, 0.0) for name in network.tank_name_list}
         estimated = stage(
             "state_estimation",

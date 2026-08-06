@@ -17,7 +17,7 @@ from hydroswarm.classical import HydraulicStateEstimator, OperationalTelemetry
 from hydroswarm.data.scenarios import EventType, GeneratedScenario
 from hydroswarm.preprocessing import HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.preprocessing.schema import NormalizationStats
-from hydroswarm.simulation.wrapper import HydraulicSimulator
+from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
 from .data import CurriculumStage, ScenarioExample, TopologyMetadata
 from .targets_v2 import TARGETS_V2_SCHEMA_VERSION, EventCause
@@ -101,7 +101,7 @@ def assign_source_regions(network: Any, *, num_regions: int = SOURCE_REGION_COUN
 
 def build_feature_context(network: Any) -> FeatureContext:
     simulator = HydraulicSimulator(network)
-    simulated = simulator.calculate_state(3_600)
+    simulated = simulator.calculate_state(FEATURE_SNAPSHOT_TIME_SECONDS)
     state = HydraulicStateEstimator().estimate(simulated, OperationalTelemetry())
     return FeatureContext(state=state, graph=simulator.build_dynamic_graph(simulated))
 

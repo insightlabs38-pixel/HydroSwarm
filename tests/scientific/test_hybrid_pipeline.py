@@ -20,6 +20,7 @@ from hydroswarm.inference import (
 )
 from hydroswarm.preprocessing import DEFAULT_FEATURE_SCHEMA, SensorSeries
 from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
+from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS
 
 
 def _artifact() -> SignatureArtifact:
@@ -118,6 +119,41 @@ def test_hybrid_result_aligns_native_beliefs_and_records_provenance() -> None:
     assert result.runtime_mode == HybridRuntimeMode.FULL_HYBRID
     assert result.provenance_hashes["model"] == pipeline._model_hash
     assert all(len(value) == 64 for value in result.provenance_hashes.values() if value != "none")
+
+
+def test_analyze_snapshots_hydraulic_state_at_the_feature_snapshot_time_not_the_last_step() -> None:
+    # core-issues.txt Phase 3 item 18 discovery: calculate_state() with no
+    # argument defaults to the network's LAST simulated timestamp, not the
+    # FEATURE_SNAPSHOT_TIME_SECONDS snapshot hydroswarm.training.corpus.
+    # build_feature_context (training) and hydroswarm.cli's fixed-inference
+    # verification both use -- silently feeding the model a hydraulic state
+    # far outside its training distribution for any simulation whose
+    # duration differs from FEATURE_SNAPSHOT_TIME_SECONDS. Regression test:
+    # a network whose duration is deliberately NOT
+    # FEATURE_SNAPSHOT_TIME_SECONDS must still be snapshotted at that time.
+    network = build_wntr_network()
+    network.options.time.duration = FEATURE_SNAPSHOT_TIME_SECONDS * 4
+    simulator = HydraulicSimulator(network)
+    calls: list[int | None] = []
+    original = HydraulicSimulator.calculate_state
+
+    def spy(self, at_time=None):
+        calls.append(at_time)
+        return original(self, at_time)
+
+    HydraulicSimulator.calculate_state = spy
+    try:
+        pipeline = HybridInferencePipeline(
+            simulator=simulator,
+            signature_artifact=_artifact(),
+            model=PriorFollowingModel(),
+            maximum_planning_candidates=1,
+        )
+        pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    finally:
+        HydraulicSimulator.calculate_state = original
+
+    assert calls == [FEATURE_SNAPSHOT_TIME_SECONDS]
 
 
 def test_neural_failure_is_explicit_and_falls_back_to_classical_posterior() -> None:
