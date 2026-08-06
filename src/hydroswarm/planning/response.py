@@ -71,9 +71,14 @@ def generate_response_plans(
     neural_validity_deltas: Mapping[str, float] | None = None,
     maximum_plans: int = 8,
 ) -> tuple[PlanProposal, ...]:
-    """Generate six-to-eight diverse plans including a no-action comparator."""
-    if maximum_plans < 3 or maximum_plans > 8:
-        raise ValueError("maximum_plans must be between 3 and 8")
+    """Generate three-to-nine diverse plans including a no-action comparator.
+
+    9 is the canonical bounded template count (hydroswarm.planning.
+    action_templates.ACTION_TEMPLATES) -- core-issues3.txt Phase 3.1/3.5:
+    training-label generation must be able to request the full vocabulary,
+    not be capped one short of it."""
+    if maximum_plans < 3 or maximum_plans > 9:
+        raise ValueError("maximum_plans must be between 3 and 9")
     links = context.isolatable_links
     flushes = context.downstream_flush_nodes
     monitors = context.monitor_nodes or context.probable_source_nodes

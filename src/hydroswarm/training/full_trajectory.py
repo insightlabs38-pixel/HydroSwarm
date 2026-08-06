@@ -80,7 +80,7 @@ def build_incident_trajectory(
     edge_normalization: NormalizationStats | None = None,
     maximum_samples: int = 5,
     maximum_exact_simulations: int = 3,
-    maximum_plans: int = 8,
+    maximum_plans: int = 9,
 ) -> IncidentTrajectory:
     context = feature_context or build_feature_context(network)
     example = scenario_to_example(
@@ -140,6 +140,7 @@ def build_incident_trajectory(
         event_cause=_event_cause(scenario),
     )
 
+    edge_ids = example.topology.edge_ids if example.topology is not None else ()
     scout = build_scout_trajectory(scenario, artifact, node_ids, maximum_samples=maximum_samples)
     strategist = build_strategist_trajectory(
         scenario,
@@ -147,6 +148,7 @@ def build_incident_trajectory(
         context,
         artifact,
         node_ids,
+        edge_ids,
         maximum_exact_simulations=maximum_exact_simulations,
         maximum_plans=maximum_plans,
     )

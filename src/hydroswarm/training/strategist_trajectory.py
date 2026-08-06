@@ -40,38 +40,17 @@ from hydroswarm.classical.signatures import SignatureArtifact, localize_with_sig
 from hydroswarm.data.scenarios import GeneratedScenario
 from hydroswarm.domain import IncidentState
 from hydroswarm.inference.pipeline import HybridInferencePipeline
+from hydroswarm.planning.action_templates import ACTION_TEMPLATE_INDEX, ACTION_TEMPLATES
 
 from .corpus import FeatureContext, build_sensor_series
 from .strategist_labels import StrategistLabel, generate_strategist_labels
 from .trajectory_v2 import FullTrajectory, RemainingBudgets, TrajectoryState
 
-#: The bounded deterministic template set hydroswarm.planning.response.
-#: generate_response_plans() actually produces, in its own append order --
-#: the canonical action_template categorical index. NOTE: this is 9
-#: templates, but hydroswarm.model.core.HydroCore's action_head defaults to
-#: action_vocabulary_size=8 -- a real, previously-undiscovered class-count
-#: mismatch this module's own construction surfaced (targets_v2.py
-#: deliberately excludes action_template from its fixed TARGET_CLASS_COUNTS
-#: for exactly this reason: the head's width is a configurable constructor
-#: argument, not a fixed constant). Any future Strategist-enabled training
-#: run MUST pass action_vocabulary_size=len(ACTION_TEMPLATES) explicitly --
-#: the current bare default is insufficient and would misclassify or error
-#: on the last template. Flagged here rather than changed unilaterally: a
-#: model-architecture default change affects checkpoint-loading
-#: compatibility (core-issues.txt Task 4.0) and is out of this label-
-#: generation module's scope.
-ACTION_TEMPLATES = (
-    "NO_ACTION",
-    "ISOLATE_SOURCE",
-    "FLUSH_DOWNSTREAM",
-    "ISOLATE_AND_FLUSH",
-    "PROTECT_CRITICAL",
-    "INCREASE_MONITORING",
-    "REQUEST_SAMPLE",
-    "WAIT_OBSERVE",
-    "ALTERNATE_VALVE_CUT",
-)
-_ACTION_TEMPLATE_INDEX = {name: index for index, name in enumerate(ACTION_TEMPLATES)}
+#: Re-exported for existing importers; the canonical definition now lives in
+#: hydroswarm.planning.action_templates (core-issues3.txt Phase 3.5) so
+#: model construction, runtime mapping, and checkpoint metadata all share
+#: one source instead of each keeping their own mirror of this tuple.
+__all__ = ["ACTION_TEMPLATES", "StrategistTrajectory", "StrategistTrajectoryStep", "build_strategist_trajectory"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -97,13 +76,59 @@ class StrategistTrajectory:
     steps: tuple[StrategistTrajectoryStep, ...]
 
 
-def _strategist_label_targets(label: StrategistLabel, node_ids: Sequence[str]) -> dict[str, torch.Tensor]:
-    has_target = label.target_node_index is not None
+def _resolve_target_pointer(
+    label: StrategistLabel, node_ids: Sequence[str], edge_ids: Sequence[tuple[str, str]], network: Any
+) -> tuple[int, bool]:
+    """Resolve target_pointer against the CORRECT canonical index space for
+    this label's target type (Phase 3.4 repair): node_ids for a NODE
+    target, edge_ids for a LINK target -- never sorted(network.
+    junction_name_list), which silently disagreed with the canonical node
+    space (junctions + reservoirs + tanks) every other node-indexed target
+    uses, and had no representation for link targets at all. targets_v2's
+    DUAL_INDEX_TARGETS already documents that target_pointer's space is
+    action_template-dependent; primary_target_type is exactly that
+    disambiguator."""
+
+    if label.primary_target_type == "NONE" or label.primary_target_id is None:
+        return -1, False
+    if label.primary_target_type == "NODE":
+        if label.primary_target_id not in node_ids:
+            return -1, False
+        return node_ids.index(label.primary_target_id), True
+    # LINK: edge_ids stores (start_node, end_node) pairs in
+    # sorted(network.link_name_list) order (see hydroswarm.training.corpus.
+    # scenario_to_example) -- reconstruct that same name->index mapping
+    # rather than matching on endpoints, which is not unique for parallel
+    # links.
+    link_names = sorted(network.link_name_list)
+    if label.primary_target_id not in link_names:
+        return -1, False
+    link_index = link_names.index(label.primary_target_id)
+    if link_index >= len(edge_ids):
+        return -1, False
+    return link_index, True
+
+
+def _strategist_label_targets(
+    label: StrategistLabel, node_ids: Sequence[str], edge_ids: Sequence[tuple[str, str]], network: Any
+) -> dict[str, torch.Tensor]:
+    target_pointer, has_target = _resolve_target_pointer(label, node_ids, edge_ids, network)
     has_consequences = label.consequence_vector is not None
+    has_plan_value = label.plan_value is not None
+
+    def _proxy(value: float | None) -> tuple[torch.Tensor, torch.Tensor]:
+        return torch.tensor(value if value is not None else 0.0), torch.tensor(value is not None)
+
+    exposure_proxy, exposure_proxy_mask = _proxy(label.exposure_proxy)
+    pressure_risk_proxy, pressure_risk_proxy_mask = _proxy(label.pressure_risk_proxy)
+    service_loss_proxy, service_loss_proxy_mask = _proxy(label.service_loss_proxy)
+    containment_time_proxy, containment_time_proxy_mask = _proxy(label.containment_time_proxy)
+    plan_regret_proxy, plan_regret_proxy_mask = _proxy(label.plan_regret_proxy)
+
     return {
-        "action_template": torch.tensor(_ACTION_TEMPLATE_INDEX[label.action_template]),
+        "action_template": torch.tensor(ACTION_TEMPLATE_INDEX[label.action_template]),
         "action_template_mask": torch.tensor(True),
-        "target_pointer": torch.tensor(label.target_node_index if has_target else -1),
+        "target_pointer": torch.tensor(target_pointer),
         "target_pointer_mask": torch.tensor(has_target),
         # plan_validity is read only from PlanVerifier's own decision
         # (generate_strategist_labels never assigns it from a template's
@@ -113,13 +138,25 @@ def _strategist_label_targets(label: StrategistLabel, node_ids: Sequence[str]) -
         "plan_validity_mask": torch.tensor(True),
         # targets_v2's plan_value masking_rule: "undefined for invalid plans
         # without a computed consequence vector" -- label.plan_value is
-        # always numerically present (it's the template's own predicted
-        # score), but the governed target is masked out wherever the
-        # schema declares it undefined.
-        "plan_value": torch.tensor(label.plan_value),
-        "plan_value_mask": torch.tensor(has_consequences),
+        # None whenever generate_strategist_labels could not compute it
+        # (invalid plan, or no comparator available), never a heuristic
+        # fallback value (Phase 3.2 repair).
+        "plan_value": torch.tensor(label.plan_value if has_plan_value else 0.0),
+        "plan_value_mask": torch.tensor(has_plan_value),
         "consequence_vector": torch.tensor(label.consequence_vector if has_consequences else (0.0, 0.0, 0.0, 0.0)),
         "consequence_vector_mask": torch.tensor(has_consequences),
+        # Phase 3.3 repair: these five proxy targets were defined in
+        # targets_v2 but never populated by this module.
+        "exposure_proxy": exposure_proxy,
+        "exposure_proxy_mask": exposure_proxy_mask,
+        "pressure_risk_proxy": pressure_risk_proxy,
+        "pressure_risk_proxy_mask": pressure_risk_proxy_mask,
+        "service_loss_proxy": service_loss_proxy,
+        "service_loss_proxy_mask": service_loss_proxy_mask,
+        "containment_time_proxy": containment_time_proxy,
+        "containment_time_proxy_mask": containment_time_proxy_mask,
+        "plan_regret_proxy": plan_regret_proxy,
+        "plan_regret_proxy_mask": plan_regret_proxy_mask,
     }
 
 
@@ -129,10 +166,11 @@ def build_strategist_trajectory(
     feature_context: FeatureContext,
     artifact: SignatureArtifact,
     node_ids: Sequence[str],
+    edge_ids: Sequence[tuple[str, str]] = (),
     *,
     trajectory_id: str | None = None,
     maximum_exact_simulations: int = 3,
-    maximum_plans: int = 8,
+    maximum_plans: int = 9,
 ) -> StrategistTrajectory:
     """Build a single-step trajectory: classify the incident's probable
     source nodes from its own observations (the same classical localizer
@@ -150,7 +188,12 @@ def build_strategist_trajectory(
     own index space -- not sorted(network.junction_name_list). See
     scout_trajectory.build_scout_trajectory's docstring for the full
     rationale; full_trajectory.py's build_incident_trajectory derives
-    node_ids from example.topology for exactly this reason.
+    node_ids from example.topology for exactly this reason. `edge_ids`
+    (defaulting to empty for existing callers that don't yet thread it
+    through) SHOULD be example.topology.edge_ids -- link-target plans
+    (ISOLATE_SOURCE/ISOLATE_AND_FLUSH/ALTERNATE_VALVE_CUT) cannot resolve a
+    target_pointer without it and are masked out (target_pointer_mask=False)
+    when omitted, never silently misresolved against the node space.
     """
 
     scenario_id = str(scenario.manifest.scenario_id)
@@ -169,7 +212,7 @@ def build_strategist_trajectory(
     labels = generate_strategist_labels(
         network, context, maximum_exact_simulations=maximum_exact_simulations, maximum_plans=maximum_plans
     )
-    targets = tuple(_strategist_label_targets(label, node_ids) for label in labels)
+    targets = tuple(_strategist_label_targets(label, node_ids, edge_ids, network) for label in labels)
 
     incident_state = IncidentState(
         incident_id=incident_id,

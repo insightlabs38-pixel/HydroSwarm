@@ -359,6 +359,21 @@ class HydroCore(nn.Module):
         modality_layers: int = 1,
         latent_tokens: int = 96,
         plan_queries: int = 8,
+        # core-issues3.txt Phase 3.5: hydroswarm.planning.action_templates.
+        # ACTION_TEMPLATE_COUNT is the canonical vocabulary size (9), one
+        # more than this default. NOT changed here: the promoted checkpoint
+        # does not pin action_vocabulary_size in its recorded architecture
+        # config, so it relies on this constructor default even though it
+        # never trains the action head -- raising the default to 9 broke
+        # strict reload of that checkpoint (action_head's saved weight shape
+        # is [8, ...]), caught by
+        # tests/integration/test_default_pipeline_factory.py. Any future
+        # Strategist-enabled training run MUST pass
+        # action_vocabulary_size=ACTION_TEMPLATE_COUNT explicitly (as
+        # strategist_trajectory.py's ACTION_TEMPLATES has documented since
+        # before this phase) until Phase 9's architecture-v4 contract makes
+        # this a strictly-validated, always-recorded config field instead of
+        # a silent constructor default.
         action_vocabulary_size: int = 8,
         dropout: float = 0.1,
         normalization: str = "rmsnorm",

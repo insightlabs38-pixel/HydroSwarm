@@ -130,6 +130,117 @@ def test_target_pointer_masked_off_for_no_response_comparator(tmp_path) -> None:
             assert not bool(target["target_pointer_mask"])
 
 
+def test_link_target_pointer_resolves_against_edge_ids_not_node_ids(tmp_path) -> None:
+    """core-issues3.txt Phase 3.4 repair: a LINK-target plan's target_pointer
+    must resolve against edge_ids (in sorted(network.link_name_list) order),
+    never silently reuse the node index space or masked off just because a
+    caller forgot to pass edge_ids -- if edge_ids IS supplied, resolution
+    must actually work."""
+
+    network = build_wntr_network()
+    artifact = _fast_artifact(network, tmp_path / "cache")
+    scenario = _scenario(network, source_node="J2", seed=10)
+    context = build_feature_context(network)
+    node_ids = tuple(sorted(network.node_name_list))
+    link_names = sorted(network.link_name_list)
+    edge_ids = tuple(
+        (network.get_link(name).start_node_name, network.get_link(name).end_node_name) for name in link_names
+    )
+
+    result = build_strategist_trajectory(scenario, network, context, artifact, node_ids, edge_ids)
+    isolate_label = next(
+        (label for label in result.steps[0].labels if label.action_template == "ISOLATE_SOURCE"), None
+    )
+    assert isolate_label is not None
+    assert isolate_label.primary_target_type == "LINK"
+
+    isolate_target = next(
+        target
+        for label, target in zip(result.steps[0].labels, result.steps[0].targets)
+        if label.action_template == "ISOLATE_SOURCE"
+    )
+    assert bool(isolate_target["target_pointer_mask"])
+    resolved_index = int(isolate_target["target_pointer"])
+    assert link_names[resolved_index] == isolate_label.primary_target_id
+    # And it must NOT coincidentally be interpretable as a valid node index
+    # pointing at the same target name (the two spaces are different sizes
+    # and orderings on this network -- this assertion would catch a
+    # regression back to resolving link targets against node_ids).
+    assert node_ids[resolved_index] != isolate_label.primary_target_id or len(node_ids) != len(link_names)
+
+
+def test_node_target_pointer_uses_canonical_space_not_junction_only_order(tmp_path) -> None:
+    """The old bug: target resolution used sorted(network.junction_name_list)
+    (junctions only), which silently disagrees with the canonical node
+    space (junctions + reservoirs + tanks, source_node_logits/sensor_fault's
+    own index space) on any real network with a reservoir or tank."""
+
+    network = build_wntr_network()
+    artifact = _fast_artifact(network, tmp_path / "cache")
+    scenario = _scenario(network, source_node="J2", seed=10)
+    context = build_feature_context(network)
+    node_ids = tuple(sorted(network.node_name_list))
+    junction_only_ids = tuple(sorted(network.junction_name_list))
+    assert node_ids != junction_only_ids  # sanity: this network really does have non-junction nodes
+
+    result = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
+    flush_label, flush_target = next(
+        (label, target)
+        for label, target in zip(result.steps[0].labels, result.steps[0].targets)
+        if label.action_template == "FLUSH_DOWNSTREAM"
+    )
+    assert bool(flush_target["target_pointer_mask"])
+    resolved_index = int(flush_target["target_pointer"])
+    # Self-consistency: the resolved index, read back against the same
+    # canonical node_ids space, must recover the label's own semantic target.
+    assert node_ids[resolved_index] == flush_label.primary_target_id
+    assert junction_only_ids  # sanity: fixture still has junctions to compare against
+
+
+def test_resolve_target_pointer_uses_the_space_the_caller_supplies_not_a_recomputed_one() -> None:
+    """Focused unit test of _resolve_target_pointer, independent of any one
+    real network's incidental alphabetical sort order (the full-pipeline
+    test above can't reliably exercise a case where the canonical and
+    junction-only spaces disagree for a specific target, since that
+    depends on where a network's reservoir/tank names happen to sort).
+    Constructs canonical vs. junction-only spaces that disagree by
+    construction and confirms the function resolves against whichever
+    space it is actually given."""
+
+    from hydroswarm.training.strategist_labels import StrategistLabel
+    from hydroswarm.training.strategist_trajectory import _resolve_target_pointer
+
+    label = StrategistLabel(
+        action_template="FLUSH_DOWNSTREAM",
+        primary_target_id="J4",
+        primary_target_type="NODE",
+        plan_validity=True,
+        plan_value=1.0,
+        regret=0.0,
+        exposure_proxy=0.0,
+        pressure_risk_proxy=0.0,
+        service_loss_proxy=0.0,
+        containment_time_proxy=0.0,
+        plan_regret_proxy=0.0,
+        rejection_codes=(),
+        consequence_vector=(0.0, 0.0, 1.0, 0.0),
+        is_no_response_comparator=False,
+    )
+    canonical_node_ids = ("R1", "J1", "J2", "J3", "J4")  # reservoir sorted first: index 4
+    junction_only_ids = ("J1", "J2", "J3", "J4")  # index 3 -- deliberately different
+
+    class _StubNetwork:
+        link_name_list = ()
+
+    canonical_index, canonical_found = _resolve_target_pointer(label, canonical_node_ids, (), _StubNetwork())
+    junction_only_index, junction_only_found = _resolve_target_pointer(label, junction_only_ids, (), _StubNetwork())
+
+    assert canonical_found and junction_only_found
+    assert canonical_index == 4
+    assert junction_only_index == 3
+    assert canonical_index != junction_only_index
+
+
 def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")

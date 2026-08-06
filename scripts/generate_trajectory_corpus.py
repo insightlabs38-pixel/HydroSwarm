@@ -145,7 +145,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--signature-cache-dir", type=Path, default=Path("experiments/cache/signatures"))
     parser.add_argument("--maximum-samples", type=int, default=5)
     parser.add_argument("--maximum-exact-simulations", type=int, default=3)
-    parser.add_argument("--maximum-plans", type=int, default=8)
+    parser.add_argument("--maximum-plans", type=int, default=9)
     return parser
 
 
