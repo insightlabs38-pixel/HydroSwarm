@@ -18,10 +18,10 @@ checkpoints, and every existing result artifact remain untouched.
 | 1 | Define and validate missing targets_v2 heads | **DONE** (schema/audit scope) — see "Phase 1" below |
 | 2 | HydroScout supervision | **DONE** (label-generation/trajectory library) — see "Phase 2" below |
 | 3 | HydroStrategist supervision | **DONE** (label-generation/trajectory library) — see "Phase 3" below |
-| 4 | Learned OOD supervision | **NOT STARTED** |
-| 5 | Complete control targets (evidence_sufficiency/next_step) | **NOT STARTED** |
-| 6 | Auxiliary objectives | **NOT STARTED** |
-| 7 | Full trajectory corpus | **NOT STARTED** |
+| 4 | Learned OOD supervision | **DONE** (label-generation library) — see "Phase 4" below |
+| 5 | Complete control targets (evidence_sufficiency/next_step) | **DONE** (label-generation library) — see "Phase 5" below |
+| 6 | Auxiliary objectives | **DONE** (label-generation library) — see "Phase 6" below |
+| 7 | Full trajectory corpus | **IN PROGRESS** |
 | 8-10 | Staged training, experiments, promotion gates | **NOT STARTED** |
 
 ## Arm environment fixes (prerequisite, not in core-issues2.txt itself)
@@ -176,18 +176,58 @@ plan`) is not wired in — Strategist supervision here is single-decision-point,
 Phase 3's own spec; corpus-generation script and Strategist benchmark, same reasons
 as Scout above.
 
-## What's next
+## Phase 4: learned OOD supervision (commit `47b94df`)
 
-Phase 4 (learned OOD supervision) is next. The classical/deterministic OOD stack
-(`inference/ood.py`, `training/ood_categories.py`, `calibration/conformal.py`'s
-validity gates) is mature; only a per-example `ood_class` label generator is
-missing. After Phase 4-6 build the remaining label generators as library functions
-(matching Phase 2/3's pattern), Phase 7 will combine all of them (Sentinel + Scout +
-Strategist + OOD + control) into one real corpus-generation script writing a new
-versioned sibling directory (e.g. `data/learning-v2/cycle-b2-trajectories/`) — this
-is deliberately deferred rather than writing a separate throwaway corpus script per
-phase, since Phase 7 explicitly unifies them into one integrated trajectory dataset
-anyway (see "What's next" reasoning recorded when Phase 2 started, carried forward).
+`hydroswarm.training.ood_labels.classify_ood_category()` derives a governed
+`OODCategory` purely from `GeneratedScenario`/`ScenarioManifest` fields already
+recorded at generation time (no config object needs threading through). Reproduces
+6 of 11 categories (NONE, UNSEEN_TOPOLOGY, EXTREME_DEMAND, TANK_STATE_SHIFT,
+ROUGHNESS_MISMATCH, SEVERE_MISSINGNESS, FROZEN_DRIFTING_SENSOR), each thresholded
+with a wide margin above the corpus generator's documented in-distribution ranges.
+The other 4 are explicitly not generated, documented in the module docstring
+(UNSEEN_SENSOR_LAYOUT/VALVE_PUMP_MISMATCH/TIMING_OUTSIDE_TRAINING_RANGE need
+generator capabilities that don't exist yet; UNSUPPORTED_NETWORK_ELEMENT_OR_INVALID_
+CALIBRATION is a calibration-artifact concern, not a scenario property).
+
+**Real defect found and fixed**: Phase 1's `TARGET_CLASS_COUNTS["ood_class"]` was
+wrongly set to 3 (copied from `ood_head`'s width, a distinct 3-way severity concept —
+`OODLevel` — not `ood_class`'s own 11-category definition). Would have silently
+rejected 8 of 11 real categories as "invalid" the moment this phase generated real
+labels. Fixed to `len(OODCategory)`.
+
+## Phase 5: complete control targets (commit `899c7fb`)
+
+`hydroswarm.training.control_labels.classify_evidence_sufficiency()` extends the
+existing sensor-health-only rule with posterior entropy and OOD-category calibration
+validity — the two signals from the governed definition that are actually computable
+without a trained model. **Calibrated candidate-set size and classical-neural
+disagreement remain out of reach**: both need a `CalibrationArtifact` fitted against
+an already-*trained* Sentinel checkpoint, and evidence_sufficiency is itself a
+training target for that same checkpoint — a genuine ordering dependency (resolves
+after Stage 1 of Phase 8), not an oversight.
+
+`classify_next_step()` mirrors `agents/controller.py`'s `EVIDENCE_CHECK` state
+exactly for 3 of 4 `NextStep` values, and adds `INSPECT_SENSOR` (which has no live
+FSM state) derived from `event_cause == SENSOR_FAULT` — flagged as this module's own
+reasoned extension, not a literal port.
+
+## Phase 6: auxiliary objectives (commit `0f48a8b`)
+
+All three (`sensor_reconstruction_target`, `future_concentration_target`,
+`travel_time_target`) reuse existing computed structures rather than adding new
+simulation: sensor reconstruction/future concentration read the scenario's own
+already-simulated `truth_concentration` at a reference/future time; travel time
+reuses `HydraulicSimulator.build_dynamic_graph`'s `"travel_time_seconds"` edge
+weight (the same structural feature already used as a model *input*, reused here as
+ground truth for the *target*).
+
+## What's next: Phase 7 (full trajectory corpus)
+
+Every label generator Phase 2-6 need now exists as a tested library function. Phase 7
+combines them (Sentinel + Scout + Strategist + OOD + control + auxiliary) into one
+real corpus-generation script writing a new versioned sibling directory (e.g.
+`data/learning-v2/cycle-b2-trajectories/`), deliberately deferred until now rather
+than writing a throwaway corpus script per phase.
 
 ## Restrictions honored
 
