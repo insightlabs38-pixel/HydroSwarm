@@ -12,10 +12,17 @@ smarter formula over stored tensors -- it is re-running the real classical/
 estimation pipeline per calibration scenario:
 
 1. Build (once per training topology, cached) a real SignatureArtifact via
-   SignatureBuilder, using the exact bins production actually uses
-   (src/hydroswarm/runtime/defaults.py), not the training corpus's broader
-   generation grid -- matching what will actually run in deployment is the
-   point.
+   SignatureBuilder, using a hypothesis grid wide enough to actually
+   represent this corpus's incident parameters (start/duration/strength
+   ranges matching ScenarioGenerationConfig's own defaults) -- NOT
+   src/hydroswarm/runtime/defaults.py's narrower production grid. That
+   narrower grid was tried first and is a real, separately-flagged finding
+   in its own right (see START_TIME_BINS's docstring below): it cannot
+   represent this corpus's actual incidents and measurably degrades even
+   the classical localizer alone (65% vs. 95% top-1 in a direct 20-scenario
+   A/B), which is a live-inference concern for a human to weigh, not
+   something to silently work around by picking whichever bins happen to
+   produce a better number here.
 2. For each calibration-split scenario, regenerate its exact scenario +
    randomized network deterministically from its recorded seed (same
    mechanism as run_corpus_gates.py's deterministic_replay gate), rebuild
@@ -85,13 +92,30 @@ from hydroswarm.training.corpus import build_feature_context, build_sensor_serie
 # run_corpus_gates.py's deterministic_replay gate, which does the same.
 from generate_cycle_b_corpus import DEV_OOD_TOPOLOGY, TRAIN_TOPOLOGIES, _degradation_probabilities
 
-# Production wiring's exact signature-artifact configuration
-# (src/hydroswarm/runtime/defaults.py) -- deliberately not the training
-# corpus's broader generation grid; matching what will actually run in
-# deployment is the point of this script.
-START_TIME_BINS = (0, 60)
-DURATION_BINS = (30, 60)
-STRENGTH_BINS = (0.5, 1.0)
+# A second real finding from this script (Phase 3 item 18), distinct from
+# the hydraulic-snapshot-time defect fixed in hydroswarm/inference/pipeline.py:
+# src/hydroswarm/runtime/defaults.py's production wiring builds its
+# SignatureArtifact with a narrow hypothesis grid --
+# start_time_bins=(0, 60), duration_bins=(30, 60), strength_bins=(0.5, 1.0)
+# -- that does not span this corpus's actual incident-parameter ranges
+# (ScenarioGenerationConfig's defaults: start up to 240 min, duration up to
+# 120 min, strength up to 2.0). Verified empirically: on 20 real
+# golden-reference calibration scenarios, the classical localizer's own
+# top-1 accuracy was 13/20 (65%) with the narrow production bins and 19/20
+# (95%) with bins spanning the corpus's actual generation grid -- a
+# hypothesis grid that cannot represent the true incident cannot localize
+# it correctly regardless of the model. This is very likely a live
+# accuracy gap in production today, not only a corpus-comparison artifact
+# -- flagged prominently in reports/results/v3/phase3-handoff.md as its own
+# follow-up, deliberately NOT changed in src/hydroswarm/runtime/defaults.py
+# by this script (that is a live-inference latency/config tradeoff decision
+# for a human to make, not a mechanical bug fix). This script uses the
+# wider, corpus-matching grid below so ITS OWN calibration fit reflects the
+# trained model's and real dynamic fusion's genuine quality, not an
+# artifact of a hypothesis grid that structurally cannot answer correctly.
+START_TIME_BINS = (0, 60, 120, 240)
+DURATION_BINS = (30, 60, 120)
+STRENGTH_BINS = (0.5, 1.0, 2.0)
 DEMAND_REGIMES = ("nominal",)
 SAMPLE_TIMES_SECONDS = tuple(range(0, 6 * 3_600 + 1, 3_600))
 
