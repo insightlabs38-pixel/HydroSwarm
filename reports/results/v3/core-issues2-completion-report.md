@@ -259,6 +259,24 @@ In priority order:
    today cannot consume `data/learning-v2/cycle-b2-trajectories/*.jsonl`'s
    `scout`/`strategist` fields. This is the single largest remaining piece —
    everything else in Phase 8-10 that touches Scout/Strategist is gated on it.
+
+   **Concrete design starting point, confirmed by inspection**: `HydroCore`'s
+   input contract already has a `previous_actions: Tensor` slot
+   (`model/core.py`, consumed via `self.action_projection` into the incident
+   context) -- exactly the "which candidates are already sampled" signal Scout
+   needs to produce a *different* `sample_node`/`information_gain` prediction
+   at step 2 than step 1 from the same underlying scenario. `corpus.py`'s
+   current single-snapshot `scenario_to_example` does not populate it
+   meaningfully. Each `ScoutTrajectoryStep`'s `diagnostics["already_sampled"]`
+   (already recorded in every generated trajectory) has exactly the
+   information a per-step input-rebuilding pass would need to encode into
+   `previous_actions` before calling `HydraulicFeatureBuilder.build(...)`
+   again for that step. The training loop shape this implies: one training
+   example per *trajectory step* (not per incident), inputs rebuilt per step
+   with the correct `previous_actions` encoding, targets read directly from
+   that step's already-governed `ScoutTrajectoryStep.targets`/
+   `StrategistTrajectoryStep.targets`. Not implemented this pass -- flagged
+   here as the concrete next action, not a vague "needs more work."
 2. **Phase 8 stages 2-7**: architecture screening with the new heads at real
    scale (this pass only ran Stage 1's smoke/failure check, not a ranking
    sweep), Scout supervision, Strategist supervision, learned OOD, validated
