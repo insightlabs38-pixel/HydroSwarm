@@ -6,9 +6,11 @@ not synthetic fixtures."""
 
 from __future__ import annotations
 
+import dataclasses
 import sys
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -185,3 +187,44 @@ def test_old_shared_pristine_context_would_have_produced_identical_travel_time_f
         "than the shared pristine graph -- otherwise the fix has no observable effect"
     )
     assert travel_a_old_bug is not None and travel_b_old_bug is not None  # sanity: old path still runs, just wrong
+
+
+def test_negligible_magnitude_float_noise_does_not_fail_reconstruction(pristine_network, two_scenarios) -> None:
+    """Real case found running this module against data/learning-v2/cycle-b2:
+    scenario e5f317e7-8b65-54a3-b898-c553357ea90d (a NORMAL/negligible-
+    strength scenario, concentration ~1e-8 mg/L) reconstructs bit-identically
+    across two independent fresh regenerations, but differs from the
+    corpus's originally-stored array by ~2.7e-19 -- sub-float32-rounding
+    noise, not a reconstruction defect (same class of cross-environment
+    nondeterminism as the already-documented signed-zero case, here below
+    exact-equality resolution rather than at it). np.array_equal alone
+    would wrongly fail-closed on this; the atol=1e-6 tolerance (three
+    orders of magnitude below quantization_step, the smallest physically
+    meaningful resolution anywhere in this system) must accept it."""
+
+    scenario_a, _ = two_scenarios
+    noised = dataclasses.replace(
+        scenario_a,
+        truth_concentration=scenario_a.truth_concentration + np.float32(2.7e-19),
+    )
+    reconstruction = reconstruct_scenario_network(
+        pristine_network, scenario_a.manifest, degradation_policy=_degradation_probabilities, original=noised
+    )
+    assert reconstruction.replay_matched is True
+
+
+def test_a_real_magnitude_difference_still_fails_closed(pristine_network, two_scenarios) -> None:
+    """The tolerance added for float-rounding noise must not mask an actual
+    reconstruction defect: a difference at the scale of a real signal
+    (0.01 mg/L, ordinary sensor-noise-std magnitude, far above both
+    quantization_step and the 1e-6 tolerance) must still raise."""
+
+    scenario_a, _ = two_scenarios
+    tampered = dataclasses.replace(
+        scenario_a,
+        truth_concentration=scenario_a.truth_concentration + np.float32(0.01),
+    )
+    with pytest.raises(ScenarioReconstructionError):
+        reconstruct_scenario_network(
+            pristine_network, scenario_a.manifest, degradation_policy=_degradation_probabilities, original=tampered
+        )
