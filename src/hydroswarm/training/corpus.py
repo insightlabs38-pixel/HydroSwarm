@@ -222,19 +222,15 @@ def _evidence_sufficiency(series: Sequence[SensorSeries], *, health_threshold: f
     return healthy_fraction >= 0.5 and sensors_ever_healthy >= 2
 
 
-def scenario_to_example(
-    scenario: GeneratedScenario,
-    network: Any,
-    signature_library: SignatureLibrary,
-    *,
-    feature_context: FeatureContext | None = None,
-    node_normalization: NormalizationStats | None = None,
-    edge_normalization: NormalizationStats | None = None,
-) -> ScenarioExample:
-    junction_ids = tuple(sorted(network.junction_name_list))
-    if junction_ids != signature_library.node_ids:
-        raise ValueError("scenario network nodes do not match the signature library")
-    context = feature_context or build_feature_context(network)
+def build_sensor_series(scenario: GeneratedScenario, context: FeatureContext) -> list[SensorSeries]:
+    """Real per-sensor observation series for ``scenario``, built against
+    ``context``'s hydraulic state -- the same construction
+    ``scenario_to_example`` uses to build its stored features, extracted so
+    a live-pipeline re-analysis of a governed scenario (e.g. fitting
+    calibration against the exact deployed dynamic hybrid predictor rather
+    than a post-hoc approximation -- core-issues.txt Phase 3 item 18) can
+    reuse it exactly instead of re-deriving it and risking drift."""
+
     series: list[SensorSeries] = []
     for source_column, node_id in enumerate(scenario.sensor_nodes):
         valid = scenario.observation_mask[:, source_column]
@@ -260,6 +256,23 @@ def scenario_to_example(
                 delayed=tuple(map(bool, outage)),
             )
         )
+    return series
+
+
+def scenario_to_example(
+    scenario: GeneratedScenario,
+    network: Any,
+    signature_library: SignatureLibrary,
+    *,
+    feature_context: FeatureContext | None = None,
+    node_normalization: NormalizationStats | None = None,
+    edge_normalization: NormalizationStats | None = None,
+) -> ScenarioExample:
+    junction_ids = tuple(sorted(network.junction_name_list))
+    if junction_ids != signature_library.node_ids:
+        raise ValueError("scenario network nodes do not match the signature library")
+    context = feature_context or build_feature_context(network)
+    series = build_sensor_series(scenario, context)
     prior_values = signature_library.posterior(scenario)
     prior = dict(zip(junction_ids, map(float, prior_values), strict=True))
     built = HydraulicFeatureBuilder(
