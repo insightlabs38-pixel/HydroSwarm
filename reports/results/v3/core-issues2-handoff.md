@@ -22,7 +22,7 @@ checkpoints, and every existing result artifact remain untouched.
 | 5 | Complete control targets (evidence_sufficiency/next_step) | **DONE** (label-generation library) — see "Phase 5" below |
 | 6 | Auxiliary objectives | **DONE** (label-generation library) — see "Phase 6" below |
 | 7 | Full trajectory corpus | **IN PROGRESS** |
-| 8-10 | Staged training, experiments, promotion gates | **NOT STARTED** |
+| 8-10 | Staged training, experiments, promotion gates | **IN PROGRESS** — Stage 1 smoke screening passed, see below |
 
 ## Arm environment fixes (prerequisite, not in core-issues2.txt itself)
 
@@ -270,17 +270,85 @@ python scripts/generate_trajectory_corpus.py \
 ```
 (idempotent -- already-processed scenario_ids in `train.jsonl` are skipped automatically).
 
+## Phase 7/8 bridge: merging trajectory targets into tensor shards (commit `3f26e43`)
+
+`build_incident_trajectory`'s Scout/Strategist output is inherently sequential and
+does not fit `ScenarioExample`'s flat per-example `.targets` dict -- that's why
+`generate_trajectory_corpus.py` writes it to a separate JSONL file. But the *other*
+new targets (`ood_class`/`next_step`/`evidence_sufficiency`/`sensor_reconstruction`/
+`future_concentration`/`travel_time`) ARE flat per-example values already sitting in
+that JSONL's `"targets"` field. `scripts/merge_trajectory_targets.py` re-attaches
+exactly those onto the original `ScenarioExample`'s tensors (inputs untouched, joined
+by `scenario_id`) and re-writes sharded storage via the existing `write_shards` --
+immediately loadable by `ShardedScenarioDataset`/`Trainer`, no re-simulation needed.
+Never mutates the source shard directory.
+
+## Phase 8 Stage 1: smoke and failure screening — PASSED (commit `1001ec2`)
+
+`scripts/run_event_control_smoke_screening.py` runs the established Bundle E Stage 1
+pattern (gradient check, 2-epoch train, checkpoint/resume verification, reload-under-
+recorded-architecture-config check) against `event_control_heads=True` +
+`auxiliary_heads=True`, on a merged trajectory-enriched corpus. **Verified end-to-end
+against a real merged mini corpus**: all 8 new targets (`event_presence`,
+`event_cause`, `evidence_sufficiency`, `next_step`, `ood_class`,
+`sensor_reconstruction`, `future_concentration`, `travel_time`) receive nonzero
+gradient, loss stays finite, training resumes correctly, checkpoint reloads
+bit-for-bit finite. This is the first run where these loss terms could genuinely
+fire at all -- the earlier E8 screening (`run_stage2_architecture_screening.py`,
+against plain Cycle B) explicitly could not, no labels existed for any of them.
+
+**Real integration bug found and fixed by this dry run**:
+`collate_variable_topology`'s `NODE_INDEXED_TARGET_KEYS` only listed
+`sensor_fault`/`sensor_fault_mask` -- the three new auxiliary targets are exactly as
+`[node_count]`-shaped, but were never registered. Collating two differently-sized
+real graphs (the entire point of variable-topology training) raised "inconsistent
+shape across the batch" the moment a real multi-topology batch exercised them; every
+prior test/smoke run used single-topology batches where this failure mode is
+invisible (`torch.stack` succeeds trivially when every example already shares one
+node_count). Fixed by registering all three in `NODE_INDEXED_TARGET_KEYS`, with a
+regression test.
+
 ## What's next
 
-Once the train-split trajectory corpus finishes generating: commit it (`data/
-learning-v2/cycle-b2-trajectories/{train.jsonl,train-report.json}` plus the signature
-cache under `experiments/cache/signatures/`), then decide whether to also generate the
-validation/calibration/development_holdout splits before moving to Phase 8-10 (staged
-training against the new heads, bounded experiment matrix, promotion gates). Note that
-Phase 8's own staged sequence starts with "train the corrected Sentinel backbone,"
-which is already done (Phase 3's E0/E1 finalists) -- the next real step is Stage 2,
-"add event and control heads" (`event_control_heads=True`), trained against this new
-corpus's `event_presence`/`event_cause`/`evidence_sufficiency`/`next_step` targets.
+The full 9,000-scenario train-split trajectory generation job is still running in the
+background (`experiments/jobs/cycle-b2-trajectories-train/`), polled every 10 minutes.
+Once it finishes: commit `data/learning-v2/cycle-b2-trajectories/{train.jsonl,
+train-report.json}` plus the signature cache under `experiments/cache/signatures/`,
+generate the validation/calibration/development_holdout splits the same way, merge
+each into enriched tensor shards, and run the real (not mini-corpus) Stage 1 smoke
+screening — already proven to work end-to-end above, just needs the real-scale data.
+From there, Phase 8's remaining stages (add Scout supervision, add Strategist
+supervision -- both need a new sequence-aware training loop this session has not yet
+built, since Scout/Strategist targets are not flat per-example tensors; add learned
+OOD; joint multitask fine-tuning; HydroCore-M only if S shows a capacity-limited case)
+follow the plan's own staged sequence. Phase 8's Stage 1 item ("train the corrected
+Sentinel backbone") is already done from Phase 3 (E0/E1 finalists) -- this session's
+work extends that with the event/control/auxiliary heads, verified structurally sound
+above; Scout/Strategist head training remains the largest genuinely unstarted piece.
+
+Exact commands to resume or extend this work:
+```bash
+export PYTHONPATH=src
+
+# check/resume the in-flight generation job
+cat experiments/jobs/cycle-b2-trajectories-train/status.json
+python scripts/generate_trajectory_corpus.py \
+  --corpus-dir data/learning-v2/cycle-b2 --output data/learning-v2/cycle-b2-trajectories --split train
+
+# once train finishes, do the same for the other splits
+python scripts/generate_trajectory_corpus.py \
+  --corpus-dir data/learning-v2/cycle-b2 --output data/learning-v2/cycle-b2-trajectories --split validation
+
+# merge into trainable tensor shards
+python scripts/merge_trajectory_targets.py \
+  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/train \
+  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories/train.jsonl \
+  --output data/learning-v2/cycle-b2-trajectories/tensors-enriched/train --split train
+
+# real-scale Stage 1 smoke screening (already passed against a mini corpus)
+python scripts/run_event_control_smoke_screening.py \
+  --corpus-root data/learning-v2/cycle-b2-trajectories/tensors-enriched --tensors-dirname ""
+```
 
 ## Restrictions honored
 
