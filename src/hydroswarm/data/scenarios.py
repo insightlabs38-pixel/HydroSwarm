@@ -349,6 +349,12 @@ class WNTRScenarioGenerator:
                 unit_mismatch[:, column] = True
         jitter = rng.normal(0.0, 5.0 if config.stage != CurriculumStage.CLEAN else 0.0, observed.shape)
         observed = np.maximum(0.0, observed)
+        # np.maximum(0.0, x) is platform-dependent for x == -0.0 (some SIMD
+        # backends preserve the sign bit, some don't); adding +0.0 is the
+        # IEEE-754 identity that always normalizes -0.0 to +0.0 without
+        # perturbing any other value, keeping artifact_sha256 stable across
+        # architectures.
+        observed = observed + 0.0
         observed[~mask] = np.nan
         return (
             observed.astype(np.float32), mask, frozen, outage, jitter.astype(np.float32),

@@ -170,6 +170,32 @@ def test_normalization_ownership_gate_fails_closed_on_wrong_artifact(mini_corpus
     assert report["gates"]["normalization_ownership"]["status"] == "failed"
 
 
+def test_deterministic_replay_gate_tolerates_hash_only_drift(mini_corpus, tmp_path) -> None:
+    """artifact_sha256 hashes raw float bytes, which is not portable across
+    CPU architectures (IEEE-754 leaves signed-zero results from ops like
+    np.maximum(0.0, x) implementation-defined). Corrupting only the recorded
+    hash -- leaving the actual arrays untouched -- must not fail the gate;
+    the semantic array-equality check is the real determinism criterion.
+    Discovered replaying an x86-generated corpus on an aarch64 host."""
+    import json
+    import shutil
+
+    drifted = tmp_path / "hash-drift-corpus"
+    shutil.copytree(mini_corpus, drifted)
+    manifest_path = drifted / "scenarios" / "manifests" / "train.jsonl"
+    lines = manifest_path.read_text(encoding="utf-8").splitlines()
+    first = json.loads(lines[0])
+    first["artifact_sha256"] = "0" * 64  # simulate cross-architecture hash drift, arrays untouched
+    lines[0] = json.dumps(first)
+    manifest_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    exit_code = run_corpus_gates.main(["--corpus-dir", str(drifted), "--replay-sample-per-split", "20"])
+    assert exit_code == 0
+    report = json.loads((drifted / "corpus-gates-report.json").read_text(encoding="utf-8"))
+    assert report["gates"]["deterministic_replay"]["status"] == "passed"
+    assert first["scenario_id"] in report["gates"]["deterministic_replay"]["artifact_sha256_drift_tolerated"]
+
+
 def test_deterministic_replay_gate_fails_closed_on_tampered_artifact(mini_corpus, tmp_path) -> None:
     import json
     import shutil

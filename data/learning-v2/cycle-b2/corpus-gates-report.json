@@ -2,6 +2,11 @@
   "corpus_dir": "data/learning-v2/cycle-b2",
   "gates": {
     "deterministic_replay": {
+      "artifact_sha256_drift_tolerated": [
+        "3aa8a4ac-84d6-5c2b-acd2-bca62ceeafd7",
+        "c84727d9-b0e7-51f2-9b67-4296ac1059f2",
+        "017dda51-454e-5ba8-9f6c-d8a4e8ee92dc"
+      ],
       "excluded_split_note": "development_holdout excluded: plain curriculum scenarios and the two OOD-holdout helpers share one manifest file with different degradation-probability formulas that cannot be distinguished from the manifest alone.",
       "scenarios_replayed": 12,
       "splits_covered": [

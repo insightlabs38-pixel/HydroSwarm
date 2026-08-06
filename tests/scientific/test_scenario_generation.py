@@ -226,6 +226,31 @@ def test_sensor_fault_only_does_not_smuggle_finite_values_into_missing_slots() -
     assert not np.any(np.isfinite(observed[~mask]))
 
 
+def test_observed_concentration_never_contains_signed_negative_zero() -> None:
+    """np.maximum(0.0, x) is IEEE-754 implementation-defined for x == -0.0 --
+    some CPU/SIMD backends preserve the sign bit, some don't. A scenario
+    generated on one architecture and replayed on another can therefore hash
+    differently (artifact_sha256) despite every value comparing numerically
+    equal (-0.0 == 0.0), which broke the deterministic_replay corpus gate
+    when replaying an x86-generated corpus on an aarch64 host. Directly feed
+    _degrade a truth array containing a literal -0.0 (with all randomized
+    degradation disabled, so it survives to the clip step untouched) and
+    assert the negative-zero sign bit does not survive."""
+
+    truth = np.array([[-0.0, 1.5, 0.0]], dtype=np.float32)
+    timestamps = np.array([0.0])
+    config = ScenarioGenerationConfig(
+        seed=1, network_id="ref", network_family="reference", stage=CurriculumStage.CLEAN,
+        sensor_noise_std=0.0, drift_per_hour=0.0, frozen_probability=0.0,
+        communication_outage_probability=0.0, quantization_step=0.0, unit_mismatch_probability=0.0,
+        missing_probability=0.0,
+    )
+    rng = np.random.default_rng(1)
+    observed, *_ = WNTRScenarioGenerator._degrade(truth, timestamps, config, rng)
+    zero_with_sign_bit = (observed == 0.0) & np.signbit(observed)
+    assert not zero_with_sign_bit.any(), observed
+
+
 def test_contamination_event_type_is_unaffected_default() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
