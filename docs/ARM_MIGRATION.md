@@ -38,6 +38,12 @@ find . -name "*.safetensors" -size -1k   # expect no output -- a real LFS object
 # wntr wraps EPANET, which ships prebuilt per-platform binaries inside the wheel.
 # Every corpus-gate, calibration, and training script in this repo calls into it.
 uv sync --frozen
+
+# The mask_round_trip corpus gate shells out to `pytest` (it runs
+# tests/unit/test_variable_collate.py as a secondary check) -- `uv sync --frozen`
+# alone does not install the dev dependency group. Add it if running the full gate
+# suite (step 5 below):
+uv sync --frozen --extra dev
 ```
 
 torch on the source VM was `2.13.0+cu130` (a CUDA build, unused -- every run in this
