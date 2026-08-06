@@ -17,10 +17,65 @@ Strategist/OOD/auxiliary supervision) for what comes after this.
 | 15 | Run all corpus gates | **DONE, all 9 passed** — `data/learning-v2/cycle-b2/corpus-gates-report.json` |
 | 15 | Corrected E0/E1/E2 screening | **DONE** — `reports/results/v3/cycle-b2-stage2-screening.json` |
 | 16 | Select strongest two (validation + dev holdout only) | **DONE** — E1, E0 (E2 dropped) |
-| 17 | Fully train selected two, ≥2 seeds each | IN PROGRESS (2 parallel background jobs, ~4h expected) |
-| 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | not started |
+| 17 | Fully train selected two, ≥2 seeds each | **DONE** — `reports/results/v3/cycle-b2-stage3-{E1,E0}.json` |
+| 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | IN PROGRESS (background jobs) |
 | 19 | Re-run HydroMono/no-adapter control | not started |
 | 20 | Decide on HydroCore-M | not started |
+
+## Item 17 results (full finalist training)
+
+Both finalists' both seeds completed all 16 epochs (`stop_reason: maximum_epochs`,
+~4200-4330s each -- well under the 2-hour ceiling this time, unlike every original
+cycle-b run) with real, non-empty `checkpoint` paths:
+
+| Config | Seed | val top1 | dev-holdout top1 | val ECE | val calibrated coverage | UNSEEN_TOPOLOGY top1 | SEVERE_MISSINGNESS top1 |
+|---|---|---|---|---|---|---|---|
+| E1 | 20260810 | 0.7247 | 0.7093 | 0.026 | 0.907 | 0.475 | 0.664 |
+| E1 | 20260811 | 0.7191 | 0.7142 | 0.034 | 0.899 | 0.507 | 0.651 |
+| E0 | 20260810 | 0.7163 | 0.7215 | 0.033 | 0.900 | 0.568 | 0.664 |
+| E0 | 20260811 | 0.7275 | 0.7142 | 0.031 | 0.892 | 0.518 | 0.651 |
+
+E1 and E0 are effectively tied within seed noise (avg val top1 ~0.722 each). Per item
+16's already-made selection (E1 > E0 by the predeclared screening score), **E1 remains
+the primary candidate**, but E0 is not materially worse and both are carried into item
+18 (calibration) and reported side by side -- no single winner is being crowned here;
+that is Stage 6/`final-selection.json` territory, explicitly out of scope for this pass.
+
+Best-validation-top1 seed per finalist selected for calibration fitting:
+`E1-seed20260810` (checkpoint `experiments/runs/cycle-b2-stage3/E1-seed20260810/
+20260806T012354Z-7645b52d/checkpoints/checkpoint-0016/model.safetensors`) and
+`E0-seed20260811` (`experiments/runs/cycle-b2-stage3/E0-seed20260811/
+20260806T023546Z-993cb3e1/checkpoints/checkpoint-0016/model.safetensors`).
+
+## Item 18 in progress: real dynamic-fusion calibration
+
+```bash
+export PYTHONPATH=src OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8
+
+python scripts/fit_dynamic_fusion_calibration.py \
+  --corpus-dir data/learning-v2/cycle-b2 \
+  --checkpoint experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016/model.safetensors \
+  --variant small --overrides-json '{"prior_mode": "feature_only"}' \
+  --node-normalization data/learning-v2/cycle-b2/normalization/node-normalization.json \
+  --edge-normalization data/learning-v2/cycle-b2/normalization/edge-normalization.json \
+  --signature-cache-dir experiments/cache/signatures \
+  --output reports/results/v3/cycle-b2-dynamic-fusion-calibration-E1.json \
+  --calibration-artifact-output experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016/calibration-dynamic-fusion.json
+
+python scripts/fit_dynamic_fusion_calibration.py \
+  --corpus-dir data/learning-v2/cycle-b2 \
+  --checkpoint experiments/runs/cycle-b2-stage3/E0-seed20260811/20260806T023546Z-993cb3e1/checkpoints/checkpoint-0016/model.safetensors \
+  --variant small --overrides-json '{}' \
+  --node-normalization data/learning-v2/cycle-b2/normalization/node-normalization.json \
+  --edge-normalization data/learning-v2/cycle-b2/normalization/edge-normalization.json \
+  --signature-cache-dir experiments/cache/signatures \
+  --output reports/results/v3/cycle-b2-dynamic-fusion-calibration-E0.json \
+  --calibration-artifact-output experiments/runs/cycle-b2-stage3/E0-seed20260811/20260806T023546Z-993cb3e1/checkpoints/checkpoint-0016/calibration-dynamic-fusion.json
+```
+
+Job dirs: `experiments/jobs/cycle-b2-calibration-{E1,E0}/`. Uses the full calibration
+split (no `--sample-per-topology` cap); builds and caches one real `SignatureArtifact`
+per training topology under `experiments/cache/signatures` (reused across both runs).
 
 ## Item 13-15 results (corpus regeneration + gates)
 
