@@ -19,8 +19,29 @@ Strategist/OOD/auxiliary supervision) for what comes after this.
 | 16 | Select strongest two (validation + dev holdout only) | **DONE** — E1, E0 (E2 dropped) |
 | 17 | Fully train selected two, ≥2 seeds each | **DONE** — `reports/results/v3/cycle-b2-stage3-{E1,E0}.json` |
 | 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | **DONE** — 2 real defects found and fixed along the way |
-| 19 | Re-run HydroMono/no-adapter control | IN PROGRESS (background job, ~2.4h expected) |
+| 19 | Re-run HydroMono/no-adapter control | **DONE** — `reports/results/v3/cycle-b2-stage4-controls-training.json` |
 | 20 | Decide on HydroCore-M | **DECIDED: do not train** (see below) |
+
+## Item 19 results (HydroMono / no-adapter control)
+
+Same budget as Stage 3's finalists (same corpus, epochs, early-stopping, runtime
+ceiling, batch size, seeds 20260810/20260811). Both seeds completed all 16 epochs
+(`stop_reason: maximum_epochs`), ~3080-3280s each (faster than the adapter-bearing
+finalists, as expected for a smaller model -- 3,983,863 params vs. E0/E1's adapter-
+bearing parameter count):
+
+| Seed | val top1 | dev-holdout top1 | val ECE | UNSEEN_TOPOLOGY top1 | SEVERE_MISSINGNESS top1 |
+|---|---|---|---|---|---|
+| 20260810 | 0.7177 | 0.7101 | 0.0327 | 0.589 | 0.654 |
+| 20260811 | 0.7177 | 0.7158 | 0.0291 | 0.582 | 0.668 |
+
+**Honest finding:** the no-adapter control performs essentially identically to both
+adapter-bearing finalists (E1/E0's val top1 was 0.7191-0.7275; this control's is
+0.7177/0.7177). On this corrected corpus, the specialist bottleneck adapters do not
+show a measurable benefit over the no-adapter baseline at this budget. Not a reason to
+retune within this pass (per "no retuning after viewing results" and this task's
+explicit scope), but a real data point for whoever next revisits the adapter
+architecture decision.
 
 ## Item 20: HydroCore-M decision -- do not train
 

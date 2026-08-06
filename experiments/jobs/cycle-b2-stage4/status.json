@@ -13,7 +13,8 @@
     "--output",
     "reports/results/v3/cycle-b2-stage4-controls-training.json"
   ],
-  "ended_at": null,
+  "ended_at": "2026-08-06T06:28:48.253708+00:00",
+  "exit_code": 0,
   "log_path": "experiments/jobs/cycle-b2-stage4/job.log",
   "pid": 280748,
   "resume_command": [
@@ -31,6 +32,6 @@
     "reports/results/v3/cycle-b2-stage4-controls-training.json"
   ],
   "started_at": "2026-08-06T04:40:57.228250+00:00",
-  "state": "RUNNING",
+  "state": "COMPLETED",
   "workdir": "/workspace/HydroSwarm"
 }

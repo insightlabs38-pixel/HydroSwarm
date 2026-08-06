@@ -1,0 +1,5 @@
+no-adapter-S-seed20260810: OK (3079.7s, val_top1=0.718, stopped_early=False)
+no-adapter-S-seed20260811: OK (3280.4s, val_top1=0.718, stopped_early=False)
+{
+  "failures": {}
+}
