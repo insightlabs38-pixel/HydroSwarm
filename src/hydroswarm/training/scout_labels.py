@@ -44,7 +44,7 @@ import pandas as pd
 from hydroswarm.classical.prior import bayesian_source_posterior
 from hydroswarm.classical.signatures import SignatureArtifact, SignatureBuilder, SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import GeneratedScenario
-from hydroswarm.sampling.active import SamplingConstraints, rank_sample_locations
+from hydroswarm.sampling.active import SampleCandidate, SamplingConstraints, rank_sample_locations
 from hydroswarm.simulation.wrapper import HydraulicSimulator
 
 from .corpus import aligned_observations
@@ -108,6 +108,12 @@ class ScoutLabel:
     stop_reason: str | None
     posterior_entropy_bits: float
     alternatives: tuple[str, ...]
+    #: Every candidate rank_sample_locations evaluated (accessible or not,
+    #: up to its top_k), exposed so a trajectory builder can record
+    #: core-issues2.txt Phase 2's "per-node expected information gain where
+    #: supported" and accessibility, without recomputing the posterior/
+    #: signature-matching work this module already did.
+    candidates: tuple[SampleCandidate, ...] = ()
 
 
 def generate_scout_label(
@@ -151,6 +157,7 @@ def generate_scout_label(
             stop_reason=result.stop_reason,
             posterior_entropy_bits=result.posterior_entropy_bits,
             alternatives=(),
+            candidates=result.ranked,
         )
     top = result.ranked[0]
     reduction_fraction = float(min(1.0, max(0.0, top.expected_candidate_reduction / total_candidates)))
@@ -163,4 +170,5 @@ def generate_scout_label(
         stop_reason=result.stop_reason,
         posterior_entropy_bits=result.posterior_entropy_bits,
         alternatives=alternatives,
+        candidates=result.ranked,
     )

@@ -32,6 +32,7 @@ from .permutation import EquivarianceReport, measure_equivariance, permute_examp
 from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
 from .scout_labels import ScoutLabel, build_signature_artifact_for_network, generate_scout_label
+from .scout_trajectory import ScoutTrajectory, ScoutTrajectoryStep, build_scout_trajectory
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
 from .strategist_labels import StrategistLabel, generate_strategist_labels
@@ -81,6 +82,8 @@ __all__ = [
     "ScenarioDatasetView",
     "ScenarioExample",
     "ScoutLabel",
+    "ScoutTrajectory",
+    "ScoutTrajectoryStep",
     "StrategistLabel",
     "ShardedScenarioDataset",
     "TargetSchemaError",
@@ -98,6 +101,7 @@ __all__ = [
     "audit_corpus",
     "audit_split",
     "authorize_locked_final_test",
+    "build_scout_trajectory",
     "build_signature_artifact_for_network",
     "by_curriculum_stage",
     "by_network",
