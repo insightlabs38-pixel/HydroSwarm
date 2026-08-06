@@ -36,6 +36,7 @@ import wntr
 
 from generate_cycle_b_corpus import _degradation_probabilities
 
+from hydroswarm.classical.signature_registry import TOPOLOGY_WIDE_REGIME_HASH, SignatureRegistry
 from hydroswarm.classical.signatures import SignatureArtifact, SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import DatasetSplit, GeneratedScenario, load_generated_scenarios
 from hydroswarm.training.corpus import FeatureContext, _hydraulic_state_hash, build_feature_context, fit_signature_library
@@ -182,6 +183,20 @@ def main(argv: list[str] | None = None) -> int:
         artifacts[family] = build_signature_artifact_for_network(network, cache, key=key)
         print(f"  {family}: signature artifact ready in {time.time() - t0:.1f}s (cache_hit={artifacts[family].cache_hit})")
 
+        # core-issues3.txt Phase 2: index the artifact under the governed
+        # registry instead of leaving it a bare, undiscoverable cache entry
+        # -- records the bucketing policy (TOPOLOGY_WIDE_REGIME_HASH) and
+        # enforces fit_split="train" (SignatureRegistry.register raises for
+        # anything else), matching train_scenarios_by_family's own
+        # train-only construction above.
+        SignatureRegistry(cache).register(
+            topology_hash=scenarios[0].manifest.network_sha256,
+            hydraulic_regime_hash=TOPOLOGY_WIDE_REGIME_HASH,
+            key=key,
+            artifact=artifacts[family],
+            fit_split="train",
+        )
+
     print(f"validated topology hashes: {len(validated_topology_hashes)}")
 
     target_scenarios = list(load_generated_scenarios(args.corpus_dir / "scenarios", split))
@@ -258,6 +273,7 @@ def main(argv: list[str] | None = None) -> int:
         # rows and must not be merged into the same shard.
         "schema_version": "cycle-b2-trajectories-v2",
         "reconstruction_policy_hash": RECONSTRUCTION_POLICY_VERSION,
+        "signature_artifact_policy": TOPOLOGY_WIDE_REGIME_HASH,
         "generated_at": datetime.now(UTC).isoformat(),
         "corpus_dir": str(args.corpus_dir),
         "split": split.value,

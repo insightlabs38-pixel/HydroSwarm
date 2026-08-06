@@ -32,6 +32,26 @@ from hydroswarm.classical.signatures import SignatureArtifact, SignatureCache, S
 
 SCHEMA_VERSION = 1
 
+#: core-issues3.txt Phase 2: the governed bucketing policy actually in
+#: force. Every corpus/runtime consumer of signature artifacts today
+#: (hydroswarm.training.scout_labels.build_signature_artifact_for_network,
+#: called once per topology family from generate_cycle_b_corpus.py /
+#: generate_trajectory_corpus.py) fits exactly ONE artifact per topology
+#: from the topology's own full train-split scenario population,
+#: regardless of demand regime, tank state, or any other in-corpus
+#: hydraulic variation -- this is Phase 2's "Option B: explicitly bucketed
+#: hydraulic-regime artifacts" at the coarsest possible bucket boundary
+#: (one bucket per topology, not per regime). SignatureCacheKey's own
+#: hydraulic_state_hash field is fixed to a single reference feature
+#: context (built from the pristine network, before any scenario-specific
+#: randomization) purely to make the cache key deterministic and
+#: reproducible -- it is NOT a claim that the resulting SignatureArtifact
+#: is only valid for that one hydraulic state. Approximation error against
+#: exact per-scenario state-specific artifacts has not been measured
+#: (tracked as remaining work); this constant exists so that fact is
+#: recorded in the registry rather than left implicit.
+TOPOLOGY_WIDE_REGIME_HASH = "topology-wide-v1"
+
 
 class SignatureRegistryError(Exception):
     """Raised for signature-registry governance violations or clear misses."""
