@@ -30,10 +30,25 @@ from .data import ScenarioExample
 
 #: Target keys that are node-indexed (one value per node) rather than a
 #: single scalar per example, and therefore need the same padding as node
-#: inputs rather than a plain stack. sensor_fault_mask pads with False,
+#: inputs rather than a plain stack. Every *_mask here pads with False,
 #: which is correct for a padded position either way: it is not a real
-#: sensored node.
-NODE_INDEXED_TARGET_KEYS = ("sensor_fault", "sensor_fault_mask")
+#: node (sensored or otherwise) in that example's own topology.
+#: sensor_reconstruction/future_concentration/travel_time are Phase 6's
+#: auxiliary targets (hydroswarm.training.auxiliary_labels) -- also
+#: [node_count]-shaped per targets_v2.NODE_ARRAY_TARGETS, and hit the
+#: exact same "inconsistent shape across the batch" failure sensor_fault
+#: would without this registration, the first time a real multi-topology
+#: batch (not all examples sharing one node_count) exercised them.
+NODE_INDEXED_TARGET_KEYS = (
+    "sensor_fault",
+    "sensor_fault_mask",
+    "sensor_reconstruction",
+    "sensor_reconstruction_mask",
+    "future_concentration",
+    "future_concentration_mask",
+    "travel_time",
+    "travel_time_mask",
+)
 
 
 def _example_to_graph_sample(example: ScenarioExample) -> GraphSample:

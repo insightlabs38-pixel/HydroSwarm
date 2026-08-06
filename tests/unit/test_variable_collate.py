@@ -32,6 +32,7 @@ def _example(
     source_local_index: int,
     seed: int,
     missing_at: tuple[int, int] | None = None,
+    extra_targets: dict[str, torch.Tensor] | None = None,
 ) -> ScenarioExample:
     """Builds a ScenarioExample matching what corpus generation actually
     stores in a shard: temporal_features/quality_features already
@@ -80,6 +81,7 @@ def _example(
         targets={
             "source_node": torch.tensor(source_local_index),
             "sensor_fault": torch.zeros(nodes),
+            **(extra_targets or {}),
         },
     )
 
@@ -90,6 +92,42 @@ def _small_example(seed: int = 1) -> ScenarioExample:
 
 def _large_example(seed: int = 2) -> ScenarioExample:
     return _example("large", nodes=6, edges=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)], source_local_index=4, seed=seed)
+
+
+def test_batch_pads_the_phase_6_auxiliary_node_indexed_targets() -> None:
+    # Regression: sensor_reconstruction/future_concentration/travel_time
+    # (core-issues2.txt Phase 6) are [node_count]-shaped exactly like
+    # sensor_fault, but were not originally registered in
+    # NODE_INDEXED_TARGET_KEYS -- collating two real different-sized graphs
+    # (the whole point of this module) raised "inconsistent shape across
+    # the batch" the first time a real multi-topology batch carried them,
+    # caught by scripts/run_event_control_smoke_screening.py's own dry run.
+    def _aux(nodes: int, seed: int) -> dict[str, torch.Tensor]:
+        generator = torch.Generator().manual_seed(seed)
+        return {
+            "sensor_reconstruction": torch.rand(nodes, generator=generator),
+            "sensor_reconstruction_mask": torch.ones(nodes, dtype=torch.bool),
+            "future_concentration": torch.rand(nodes, generator=generator),
+            "future_concentration_mask": torch.ones(nodes, dtype=torch.bool),
+            "travel_time": torch.rand(nodes, generator=generator),
+            "travel_time_mask": torch.ones(nodes, dtype=torch.bool),
+        }
+
+    small = _example(
+        "small", nodes=3, edges=[(0, 1), (1, 2)], source_local_index=1, seed=1,
+        extra_targets=_aux(3, seed=10),
+    )
+    large = _example(
+        "large", nodes=6, edges=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)], source_local_index=4, seed=2,
+        extra_targets=_aux(6, seed=20),
+    )
+    _, targets = collate_variable_topology([small, large])  # must not raise
+    for key in ("sensor_reconstruction", "future_concentration", "travel_time"):
+        assert targets[key].shape == (2, 6)
+        assert targets[f"{key}_mask"].shape == (2, 6)
+        # padded (beyond each example's own node count) positions are False
+        assert targets[f"{key}_mask"][0, 3:].tolist() == [False, False, False]
+        assert targets[f"{key}_mask"][1, :].tolist() == [True] * 6
 
 
 def test_batch_two_graphs_of_different_sizes() -> None:
