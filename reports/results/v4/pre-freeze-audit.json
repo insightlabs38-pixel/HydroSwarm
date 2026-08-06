@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-06T22:15:00Z",
+  "audit_git_sha_per_spec": "237eb707757f193b350295bbe0e26b7d390a3ea0",
+  "actual_head_at_audit_time": "64c6f24682c5e6b3467258db20376e098224cc89",
+  "commits_between_audited_head_and_actual_head": [
+    "a9e4a1c data: land the Cycle B2 trajectory corpus (core-issues2.txt Phase 7)",
+    "fc6f8fb docs: add the core-issues2.txt completion report",
+    "64c6f24 docs: add concrete Scout/Strategist training-loop design starting point"
+  ],
+  "working_tree": "clean",
+  "branch": "agent/gcp-multitopology-v3",
+  "remote_sync": "up to date with origin/agent/gcp-multitopology-v3",
+  "running_jobs": "none -- every experiments/jobs/*/status.json entry is state=COMPLETED, no live python training/generation process found in ps aux",
+  "environment": {
+    "os": "Linux 6.17.0-1021-gcp aarch64 (GCP c4a-standard-16 equivalent, Arm64)",
+    "python": "3.12.13",
+    "torch": "2.13.0+cu130",
+    "numpy": "2.5.1",
+    "wntr": "1.5.0",
+    "cpu_count": 16,
+    "ram_total_gib": 62,
+    "disk_available_gib": 212,
+    "epanet_arm64_patch": "already applied (build_epanet_arm64.sh no-op on this run)"
+  },
+  "baseline_gates_this_session": {
+    "pytest": "513 passed, 0 failed (302s)",
+    "ruff": "all checks passed",
+    "pyright": "0 errors, 0 warnings, 0 informations",
+    "corpus_gates": "9/9 passed (data/learning-v2/cycle-b2)"
+  },
+  "disk_usage": {
+    "data/learning-v2/cycle-b2": "403M",
+    "data/learning-v2/cycle-b2-trajectories": "216M (provisional, see contradictions)",
+    "experiments/runs": "200M",
+    "experiments/cache": "280K"
+  },
+  "completed_requirements": [
+    "Sentinel targets_v2 schema, label generation, validation (core-issues2.txt Phase 1)",
+    "Scout/Strategist/OOD/control/auxiliary label-generation libraries (core-issues2.txt Phase 2-6)",
+    "Full trajectory corpus generated at real scale: 13,150 records, zero generation errors (core-issues2.txt Phase 7)",
+    "Phase 8 Stage 1 smoke/failure screening passed against real merged corpus",
+    "E0/E1 Stage 3 finalist training + calibration complete (bundle-f-stage2/3/4 jobs, all COMPLETED)",
+    "Arm64 environment fully repaired (EPANET build, pyarrow dependency, cross-arch determinism)"
+  ],
+  "partially_completed_requirements": [
+    "Scout/Strategist labels exist as JSONL only -- never merged into a sequence-aware trainable tensor format; no training loop consumes them yet",
+    "OOD taxonomy: only 6/11 governed categories are reproducible; learned ood_class head untrained",
+    "evidence_sufficiency: partial rule (sensor health + posterior entropy + OOD validity); missing calibrated candidate-set size and classical/neural disagreement (needs a trained+calibrated Stage-A checkpoint, per core-issues3.txt Phase 8)"
+  ],
+  "contradictions_between_reports_and_code": [
+    {
+      "claim": "core-issues2-completion-report.md and core-issues2-handoff.md both describe the trajectory corpus as fully generated and usable",
+      "code_reality": "scripts/generate_trajectory_corpus.py builds exactly one pristine WNTR network + one FeatureContext per topology family (networks = {name: loader() for name, loader in loaders.items()}; contexts[family] = build_feature_context(network)) and reuses it for every scenario in that family, discarding each scenario's own randomized demand/roughness/tank-level/pipe-outage state that Cycle B2 itself was generated with. This invalidates travel_time labels, Strategist WNTR verification context, and any state-dependent Scout artifact for every one of the 13,150 records. This is exactly core-issues3.txt Phase 1's problem statement and its explicit non-negotiable restriction #5 (mark such artifacts provisional/invalid).",
+      "resolution": "data/learning-v2/cycle-b2-trajectories/ is marked PROVISIONAL and INVALID for final training per restriction #5. A corrected extension will be generated at data/learning-v2/cycle-b2-trajectories-v2/ per restriction #4, using a new shared hydroswarm.training.scenario_reconstruction.reconstruct_scenario_network() function (Phase 1 of this pass)."
+    },
+    {
+      "claim": "Strategist plan_value is described as governed",
+      "code_reality": "strategist_labels.py derives plan_value from proposal.predicted_value * proposal.predicted_validity (the old heuristic prescreener's own score), not from exact WNTR consequence vectors relative to NO_ACTION, per core-issues3.txt Phase 3.2.",
+      "resolution": "Tracked as Phase 3 of this pass (not yet started at audit time)."
+    },
+    {
+      "claim": "action_template vocabulary is consistently 9 templates",
+      "code_reality": "planning/response's bounded template generator produces 9 action_template values, but HydroCore.action_head defaults to action_vocabulary_size=8 -- already documented as a known, unfixed defect in core-issues2-handoff.md itself.",
+      "resolution": "Tracked as Phase 3.5/9 of this pass."
+    }
+  ],
+  "provisional_artifacts": [
+    "data/learning-v2/cycle-b2-trajectories/{train,validation,calibration,development_holdout}.jsonl and their tensors-enriched/ merge -- built from one pristine network+context per topology family, not scenario-specific reconstructed state. Do not use for final training per restriction #5.",
+    "experiments/runs/event-control-smoke/ -- smoke-only checkpoint, never intended for promotion, gitignored"
+  ],
+  "remediation_plan_this_pass": [
+    "Phase 1: add hydroswarm/training/scenario_reconstruction.py::reconstruct_scenario_network(), refactor scripts/run_corpus_gates.py's gate_deterministic_replay to use it (single implementation), fix generate_trajectory_corpus.py to reconstruct per-scenario network+context, add regression tests, regenerate a corrected trajectory corpus under cycle-b2-trajectories-v2/",
+    "Phase 2: document the governed signature-artifact policy actually in force (Option B: topology-family-bucketed artifacts fit from train-split scenarios only) and add cache-key/no-cross-state-hit tests",
+    "Phase 3+: repair Strategist plan_value/pointer semantics, candidate-conditioned architecture, closed-loop Scout, OOD taxonomy split, auxiliary/regression mask fixes, architecture v4 contract -- in the order specified by core-issues3.txt"
+  ],
+  "estimated_expensive_jobs": [
+    {
+      "job": "cycle-b2-trajectories-v2 generation (4 splits, ~13,150 scenarios total)",
+      "estimate": "~0.5-1s/scenario observed previously => roughly 2-4 hours total across all splits on 16 vCPU, single-process per split",
+      "resumable": true,
+      "resume_command": "python scripts/generate_trajectory_corpus.py --corpus-dir data/learning-v2/cycle-b2 --output data/learning-v2/cycle-b2-trajectories-v2 --split <split> (idempotent, skips already-processed scenario_ids)"
+    }
+  ],
+  "locked_test_status": "not opened, not referenced, final-selection.json does not exist"
+}
