@@ -221,13 +221,66 @@ reuses `HydraulicSimulator.build_dynamic_graph`'s `"travel_time_seconds"` edge
 weight (the same structural feature already used as a model *input*, reused here as
 ground truth for the *target*).
 
-## What's next: Phase 7 (full trajectory corpus)
+## Phase 7: full trajectory corpus (commits `5fdb9ac`, `e012bea`)
 
-Every label generator Phase 2-6 need now exists as a tested library function. Phase 7
-combines them (Sentinel + Scout + Strategist + OOD + control + auxiliary) into one
-real corpus-generation script writing a new versioned sibling directory (e.g.
-`data/learning-v2/cycle-b2-trajectories/`), deliberately deferred until now rather
-than writing a throwaway corpus script per phase.
+`hydroswarm.training.full_trajectory.build_incident_trajectory()` combines every
+label generator Phase 1-6 built (Sentinel via `scenario_to_example`, OOD category,
+evidence_sufficiency/next_step, Scout sampling sub-trajectory, Strategist planning
+sub-trajectory, all three auxiliary targets) into one governed `IncidentTrajectory`
+per scenario. Deliberately not flattened into one `FullTrajectory` hash chain — Scout's
+and Strategist's own `TrajectoryState` sequences already validate their own internal
+integrity independently; `IncidentTrajectory` is a container over the three pieces.
+
+**Real, previously-undiscovered bug found and fixed while wiring this together**:
+Phase 2/3/6's Scout/Strategist/auxiliary label generators were tested (in isolation)
+against `sorted(network.junction_name_list)` as their node index space, but the
+canonical space every other node-indexed target actually uses (`source_node`,
+`sensor_fault`, `TopologyMetadata.node_ids`) is `canonical_node_order(network.
+node_name_list)` — ALL nodes (junctions + reservoirs + tanks). The two only coincide
+when a network has zero reservoirs/tanks, never true for a real network. Left
+uncorrected, `sample_node`/`target_pointer`/`travel_time` indices would have silently
+pointed at the wrong node once compared against `source_node_logits`'s shared index
+space. Caught by `validate_targets_v2`'s `NODE_ARRAY_TARGETS` disagreement check
+(Phase 1's own hardening) the moment Phase 7 combined everything against one real
+topology. Fixed by having `build_incident_trajectory` derive `node_ids` from
+`example.topology.node_ids` rather than accepting it as a parameter — removes the
+possibility of a caller passing the wrong space, not just documents the requirement.
+
+`scripts/generate_trajectory_corpus.py` is the corpus-generation driver: reuses an
+existing Cycle B2-style corpus's own already-generated scenarios (never resimulates,
+never writes under `--corpus-dir`), fits one `SignatureLibrary`/`SignatureArtifact`
+per training topology from the target corpus's own train-split scenarios, and calls
+`build_incident_trajectory` once per scenario, appending JSON-serialized results to a
+per-split JSONL shard. Resumable (tracks processed `scenario_id`s, skips them on
+restart) at the scale this targets. Smoke-tested against the real
+`data/learning-v2/cycle-b2` corpus (10 scenarios, zero errors, ~0.5s/scenario
+including topology-hash/OOD-category/Scout/Strategist/auxiliary computation).
+
+**Real-scale generation launched** as a background job (`experiments/jobs/
+cycle-b2-trajectories-train/`, PID recorded in that directory's `status.json`) over
+the full 9,000-scenario train split, writing to `data/learning-v2/cycle-b2-trajectories/
+train.jsonl` — at ~0.5s/scenario this is projected to take roughly 75 minutes. Being
+polled every 10 minutes. Exact resume command if it needs restarting:
+```bash
+export PYTHONPATH=src
+python scripts/generate_trajectory_corpus.py \
+  --corpus-dir data/learning-v2/cycle-b2 \
+  --output data/learning-v2/cycle-b2-trajectories \
+  --split train
+```
+(idempotent -- already-processed scenario_ids in `train.jsonl` are skipped automatically).
+
+## What's next
+
+Once the train-split trajectory corpus finishes generating: commit it (`data/
+learning-v2/cycle-b2-trajectories/{train.jsonl,train-report.json}` plus the signature
+cache under `experiments/cache/signatures/`), then decide whether to also generate the
+validation/calibration/development_holdout splits before moving to Phase 8-10 (staged
+training against the new heads, bounded experiment matrix, promotion gates). Note that
+Phase 8's own staged sequence starts with "train the corrected Sentinel backbone,"
+which is already done (Phase 3's E0/E1 finalists) -- the next real step is Stage 2,
+"add event and control heads" (`event_control_heads=True`), trained against this new
+corpus's `event_presence`/`event_cause`/`evidence_sufficiency`/`next_step` targets.
 
 ## Restrictions honored
 
