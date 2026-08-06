@@ -1,5 +1,9 @@
 # core-issues2.txt (Scout/Strategist/OOD/control/auxiliary expansion) — live handoff report
 
+**See `reports/results/v3/core-issues2-completion-report.md` for the structured
+completion record (target definitions, counts, safety-gate results, exact resume
+commands, remaining work) this document's narrative log summarizes.**
+
 Branch: `agent/gcp-multitopology-v3`. This is a **living document**, updated as each
 milestone completes. Continues from `core-issues-repair-report.md` (Phase 1+2 repair,
 done) and `phase3-completion-report.md`/`phase3-handoff.md` (Phase 3 rebuild/retrain,
