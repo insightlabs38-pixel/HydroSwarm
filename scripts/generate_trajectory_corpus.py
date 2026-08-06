@@ -34,10 +34,16 @@ from typing import Any
 
 import wntr
 
+from generate_cycle_b_corpus import _degradation_probabilities
+
 from hydroswarm.classical.signatures import SignatureArtifact, SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import DatasetSplit, GeneratedScenario, load_generated_scenarios
 from hydroswarm.training.corpus import FeatureContext, _hydraulic_state_hash, build_feature_context, fit_signature_library
 from hydroswarm.training.full_trajectory import IncidentTrajectory, build_incident_trajectory
+from hydroswarm.training.scenario_reconstruction import (
+    RECONSTRUCTION_POLICY_VERSION,
+    reconstruct_scenario_network,
+)
 from hydroswarm.training.scout_labels import build_signature_artifact_for_network
 
 
@@ -60,7 +66,9 @@ def _tensor_to_jsonable(value: Any) -> Any:
     return value
 
 
-def _incident_trajectory_to_json(result: IncidentTrajectory) -> dict[str, Any]:
+def _incident_trajectory_to_json(
+    result: IncidentTrajectory, reconstruction: Any
+) -> dict[str, Any]:
     example = result.example
     return {
         "scenario_id": example.scenario_id,
@@ -72,6 +80,17 @@ def _incident_trajectory_to_json(result: IncidentTrajectory) -> dict[str, Any]:
         "targets": {key: _tensor_to_jsonable(value) for key, value in example.targets.items()},
         "topology_hash": example.topology.topology_hash if example.topology else None,
         "network_hash": example.topology.network_hash if example.topology else None,
+        # core-issues3.txt Phase 1 item 8: version the reconstruction policy
+        # and record it per trajectory, not just as a script-level constant --
+        # this is the scenario-specific randomized network/context identity,
+        # not the pristine topology's.
+        "reconstruction": {
+            "policy_hash": reconstruction.reconstruction_policy_hash,
+            "network_state_hash": reconstruction.network_state_hash,
+            "hydraulic_state_hash": reconstruction.hydraulic_state_hash,
+            "replay_matched": reconstruction.replay_matched,
+            "artifact_hash_drifted": reconstruction.artifact_hash_drifted,
+        },
         "scout": {
             "trajectory": result.scout.trajectory.to_json(),
             "steps": [
@@ -183,23 +202,35 @@ def main(argv: list[str] | None = None) -> int:
             if family not in networks:
                 continue
             try:
-                result = build_incident_trajectory(
-                    scenario,
+                # core-issues3.txt Phase 1: reconstruct THIS scenario's own
+                # randomized hydraulic state (demand regime, roughness,
+                # tank levels, pipe status) rather than reusing one pristine
+                # network/context shared by every scenario in this topology
+                # family. Fails closed (raises) if the reconstruction does
+                # not semantically match this scenario's own stored arrays.
+                reconstruction = reconstruct_scenario_network(
                     networks[family],
+                    scenario.manifest,
+                    degradation_policy=_degradation_probabilities,
+                    original=scenario,
+                )
+                result = build_incident_trajectory(
+                    reconstruction.scenario,
+                    reconstruction.network,
                     libraries[family],
                     artifacts[family],
                     topology_hash=scenario.manifest.network_sha256,
                     validated_topology_hashes=validated_topology_hashes,
-                    feature_context=contexts[family],
+                    feature_context=reconstruction.feature_context,
                     maximum_samples=args.maximum_samples,
                     maximum_exact_simulations=args.maximum_exact_simulations,
                     maximum_plans=args.maximum_plans,
                 )
-            except Exception as error:  # noqa: BLE001 -- record and continue, never silently drop the corpus
+            except Exception as error:  # noqa: BLE001 -- record and continue (incl. ScenarioReconstructionError), never silently drop the corpus
                 error_count += 1
                 print(f"ERROR scenario {scenario_id}: {error!r}")
                 continue
-            stream.write(json.dumps(_incident_trajectory_to_json(result)) + "\n")
+            stream.write(json.dumps(_incident_trajectory_to_json(result, reconstruction)) + "\n")
             stream.flush()
             ood_counts[result.ood_category.value] += 1
             processed_count += 1
@@ -209,7 +240,13 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  {processed_count}/{len(target_scenarios) - len(already_processed)} done, {rate:.2f}/s")
 
     report = {
-        "schema_version": "cycle-b2-trajectories-v1",
+        # v2: every row's network/feature-context is now the scenario's own
+        # reconstruct_scenario_network() output, not one pristine
+        # network/context shared across the whole topology family
+        # (core-issues3.txt Phase 1). v1 rows are NOT compatible with v2
+        # rows and must not be merged into the same shard.
+        "schema_version": "cycle-b2-trajectories-v2",
+        "reconstruction_policy_hash": RECONSTRUCTION_POLICY_VERSION,
         "generated_at": datetime.now(UTC).isoformat(),
         "corpus_dir": str(args.corpus_dir),
         "split": split.value,

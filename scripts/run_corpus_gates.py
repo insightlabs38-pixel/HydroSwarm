@@ -77,15 +77,15 @@ from generate_cycle_b_corpus import DEV_OOD_TOPOLOGY, TRAIN_TOPOLOGIES, _degrada
 from hydroswarm.data.scenarios import (
     CurriculumStage,
     DatasetSplit,
-    EventType,
+    GeneratedScenario,
     IncidentTruth,
     ScenarioManifest,
-    WNTRScenarioGenerator,
 )
-from hydroswarm.data.scenarios import ScenarioGenerationConfig, network_sha256
+from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA, NormalizationStats
 from hydroswarm.training import ShardedScenarioDataset, collate_variable_topology
 from hydroswarm.training.data import ScenarioExample
+from hydroswarm.training.scenario_reconstruction import ScenarioReconstructionError, reconstruct_scenario_network
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -336,6 +336,28 @@ def gate_mask_round_trip(corpus_dir: Path, report: dict[str, Any]) -> None:
     report["regression_suite"] = "tests/unit/test_variable_collate.py passed"
 
 
+def _npz_to_generated_scenario(manifest: ScenarioManifest, arrays: Any) -> GeneratedScenario:
+    """Reconstructs the GeneratedScenario shape reconstruct_scenario_network's
+    `original` parameter expects from a corpus's already-written .npz
+    artifact + its already-parsed manifest -- no resimulation, just a
+    reshape of stored arrays."""
+
+    return GeneratedScenario(
+        manifest=manifest,
+        timestamps_seconds=arrays["timestamps_seconds"],
+        truth_concentration=arrays["truth_concentration"],
+        observed_concentration=arrays["observed_concentration"],
+        observation_mask=arrays["observation_mask"],
+        frozen_mask=arrays["frozen_mask"],
+        communication_outage_mask=arrays["communication_outage_mask"],
+        timestamp_jitter_seconds=arrays["timestamp_jitter_seconds"],
+        sensor_nodes=manifest.sensor_nodes,
+        flow_reversal_mask=arrays["flow_reversal_mask"],
+        drift_mask=arrays["drift_mask"],
+        unit_mismatch_mask=arrays["unit_mismatch_mask"],
+    )
+
+
 def _record_to_manifest(record: dict[str, Any]) -> ScenarioManifest:
     incident_record = dict(record["incident"])
     incident_record["source_nodes"] = tuple(incident_record["source_nodes"])
@@ -361,10 +383,15 @@ def _record_to_manifest(record: dict[str, Any]) -> ScenarioManifest:
 
 
 def gate_deterministic_replay(corpus_dir: Path, report: dict[str, Any], *, sample_per_split: int) -> None:
+    """Delegates the actual reconstruction to
+    hydroswarm.training.scenario_reconstruction.reconstruct_scenario_network
+    -- core-issues3.txt Phase 1 item 3 requires the corpus gate and the
+    trajectory generator to share exactly one replay implementation rather
+    than maintaining two."""
+
     scenarios_root = corpus_dir / "scenarios"
     loaders = _topology_loaders()
     pristine_cache: dict[str, Any] = {}
-    generator = WNTRScenarioGenerator()
     rng = random.Random(20260805)
 
     checked = []
@@ -384,43 +411,20 @@ def gate_deterministic_replay(corpus_dir: Path, report: dict[str, Any], *, sampl
                 pristine_cache[family] = loaders[family]()
             artifact_path = scenarios_root / split.value / f"{manifest.scenario_id}.npz"
             with np.load(artifact_path) as arrays:
-                original = {key: arrays[key] for key in arrays.files}
+                original = _npz_to_generated_scenario(manifest, arrays)
 
-            config = ScenarioGenerationConfig(
-                seed=manifest.seed,
-                network_id=manifest.network_id,
-                network_family=family,
-                split=manifest.split,
-                stage=manifest.stage,
-                event_type=EventType(manifest.event_type),
-                source_node=manifest.incident.source_nodes[0],
-                sensor_count=len(manifest.sensor_nodes),
-                pipe_outage_probability=0.0,
-                **_degradation_probabilities(manifest.stage),
-            )
-            regenerated = generator.generate(pristine_cache[family], config)
             checked.append(str(manifest.scenario_id))
-            if regenerated.manifest.replay_sha256 != manifest.replay_sha256:
-                mismatches.append({"scenario_id": str(manifest.scenario_id), "reason": "replay_sha256 differs"})
+            try:
+                reconstructed = reconstruct_scenario_network(
+                    pristine_cache[family],
+                    manifest,
+                    degradation_policy=_degradation_probabilities,
+                    original=original,
+                )
+            except ScenarioReconstructionError as error:
+                mismatches.append({"scenario_id": str(manifest.scenario_id), "reason": str(error)})
                 continue
-            # artifact_sha256 hashes raw float bytes, which is not portable
-            # across CPU architectures: IEEE-754 leaves signed-zero results
-            # from ops like np.maximum(0.0, x) implementation-defined, so a
-            # scenario generated on one architecture and replayed on another
-            # can produce a differing hash with bit-identical *values* (-0.0
-            # vs. 0.0, which compare equal and are physically the same
-            # concentration). Treat a hash-only mismatch as inconclusive and
-            # fall through to the semantic array checks below, which are the
-            # actual determinism criterion; only fail if those disagree too.
-            hash_drifted = regenerated.manifest.artifact_sha256 != manifest.artifact_sha256
-            array_mismatch = False
-            for key in ("observed_concentration", "observation_mask", "truth_concentration"):
-                if not np.array_equal(getattr(regenerated, key), original[key], equal_nan=True):
-                    array_mismatch = True
-                    mismatches.append(
-                        {"scenario_id": str(manifest.scenario_id), "reason": f"{key} array differs on replay"}
-                    )
-            if hash_drifted and not array_mismatch:
+            if reconstructed.artifact_hash_drifted:
                 hash_only_drift.append(str(manifest.scenario_id))
     if not checked:
         raise GateFailure("no train/validation/calibration scenarios available to replay")

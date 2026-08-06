@@ -1,0 +1,179 @@
+"""Canonical scenario-specific hydraulic-state reconstruction.
+
+core-issues3.txt Phase 1: ``scripts/generate_trajectory_corpus.py`` built one
+pristine WNTR network and one ``FeatureContext`` per topology family and
+reused both for every scenario in that family, discarding each scenario's
+own randomized demand regime, roughness perturbation, tank-level variation,
+and pipe-outage state that the scenario was actually simulated against.
+That silently invalidates travel-time labels, the Strategist's WNTR
+verification context, and any state-dependent Scout artifact.
+
+This module factors out the *one* canonical function that replays a stored
+``ScenarioManifest`` against its pristine topology and returns the exact
+randomized WNTR model plus its derived ``FeatureContext`` -- the same
+replay logic ``scripts/run_corpus_gates.py``'s ``deterministic_replay`` gate
+already implements for a different purpose (a determinism check, not a
+reconstruction API). Per Phase 1 item 3 ("do not maintain two independent
+implementations of replay reconstruction"), both the corpus gate and the
+trajectory generator now call this one function.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Callable, Mapping
+
+import numpy as np
+
+from hydroswarm.data.scenarios import (
+    CurriculumStage,
+    EventType,
+    GeneratedScenario,
+    ScenarioGenerationConfig,
+    ScenarioManifest,
+    WNTRScenarioGenerator,
+    network_sha256,
+)
+from hydroswarm.simulation.wrapper import HydraulicSimulator
+
+from .corpus import FeatureContext, _hydraulic_state_hash, build_feature_context
+
+#: A corpus generator's own degradation-probability policy, e.g.
+#: scripts/generate_cycle_b_corpus.py's ``_degradation_probabilities``.
+#: Deliberately not imported from any one script here -- every corpus
+#: generator owns its own policy and must pass it in explicitly, so this
+#: module carries no hidden dependency on one generator's defaults.
+DegradationPolicy = Callable[[CurriculumStage], Mapping[str, float]]
+
+#: Bumped whenever reconstruct_scenario_network's own replay contract
+#: changes (which config fields it derives from a manifest, or how). Not
+#: the same as generator_version (hydroswarm.data.scenarios), which
+#: versions scenario *generation* itself.
+RECONSTRUCTION_POLICY_VERSION = "scenario-reconstruction-v1"
+
+
+class ScenarioReconstructionError(RuntimeError):
+    """Raised when a reconstructed scenario does not semantically match its
+    stored manifest -- fail closed rather than silently handing a caller a
+    hydraulic context that does not correspond to the scenario it claims
+    to represent."""
+
+
+@dataclass(frozen=True, slots=True)
+class ReconstructedScenarioContext:
+    """The exact per-scenario replay of a stored ``ScenarioManifest``
+    against its pristine topology: the randomized WNTR model actually
+    simulated, its derived ``FeatureContext``, and the identity hashes
+    every downstream consumer (trajectory generation, Strategist
+    planning/verification, travel-time targets, Scout sample truth) must
+    use instead of a topology-family-shared pristine context."""
+
+    scenario: GeneratedScenario
+    network: Any
+    feature_context: FeatureContext
+    #: Stable across every scenario sharing this topology family --
+    #: hashes the pristine network, not this scenario's randomized state.
+    topology_hash: str
+    #: This scenario's own exact randomized network configuration --
+    #: demand pattern, roughness, tank levels, pipe status.
+    network_state_hash: str
+    hydraulic_state_hash: str
+    replay_matched: bool
+    #: True only when ``original`` was supplied, its artifact_sha256 differed
+    #: from the reconstruction's own, but the semantic array-equality
+    #: fallback still matched (the cross-architecture signed-zero case).
+    artifact_hash_drifted: bool
+    reconstruction_policy_hash: str
+
+
+def reconstruct_scenario_network(
+    pristine_network: Any,
+    manifest: ScenarioManifest,
+    *,
+    degradation_policy: DegradationPolicy,
+    original: GeneratedScenario | None = None,
+    generator: WNTRScenarioGenerator | None = None,
+) -> ReconstructedScenarioContext:
+    """Exactly regenerate ``manifest``'s scenario against
+    ``pristine_network``, returning the randomized WNTR model actually
+    simulated (demand regime, roughness variation, tank levels, pipe
+    outages) and its derived ``FeatureContext`` -- never the pristine
+    network alone.
+
+    Uses the manifest's own recorded seed, source, event type, and stage;
+    the degradation-probability policy must be supplied by the caller
+    (Phase 1 item 2: "use the same seed, event type, source, start,
+    duration, demand regime, degradation probabilities, and topology
+    loader as the original generator").
+
+    Fails closed (raises ``ScenarioReconstructionError``) if the replay
+    does not match the stored manifest. When ``original`` (the scenario's
+    own previously-generated ``GeneratedScenario``) is supplied, mismatch
+    detection falls through to a semantic array-equality check on
+    ``observed_concentration``/``observation_mask``/``truth_concentration``
+    before failing -- the same cross-architecture-tolerant check
+    ``run_corpus_gates.py`` already uses, since IEEE-754 leaves signed-zero
+    results implementation-defined across CPU/SIMD backends, so a
+    hash-only mismatch alone is inconclusive.
+    """
+
+    generator = generator or WNTRScenarioGenerator()
+    config = ScenarioGenerationConfig(
+        seed=manifest.seed,
+        network_id=manifest.network_id,
+        network_family=manifest.network_family,
+        split=manifest.split,
+        stage=manifest.stage,
+        event_type=EventType(manifest.event_type),
+        source_node=manifest.incident.source_nodes[0],
+        sensor_count=len(manifest.sensor_nodes),
+        # Matches every corpus generator's own convention (generate_cycle_b_corpus.py,
+        # run_corpus_gates.py): pipe outages are never enabled for this corpus
+        # family. rng.random() is still drawn unconditionally inside
+        # _randomize_hydraulics regardless of this value, so the rng stream
+        # position is identical either way -- only the branch outcome differs.
+        pipe_outage_probability=0.0,
+        **degradation_policy(manifest.stage),
+    )
+    scenario, randomized_network = generator.generate_with_network(pristine_network, config)
+    replay_matched, artifact_hash_drifted = _verify_replay(scenario, manifest, original)
+    feature_context = build_feature_context(randomized_network)
+    return ReconstructedScenarioContext(
+        scenario=scenario,
+        network=randomized_network,
+        feature_context=feature_context,
+        topology_hash=network_sha256(pristine_network),
+        network_state_hash=HydraulicSimulator(randomized_network).state_hash(),
+        hydraulic_state_hash=_hydraulic_state_hash(feature_context.state),
+        replay_matched=replay_matched,
+        artifact_hash_drifted=artifact_hash_drifted,
+        reconstruction_policy_hash=RECONSTRUCTION_POLICY_VERSION,
+    )
+
+
+def _verify_replay(
+    regenerated: GeneratedScenario,
+    manifest: ScenarioManifest,
+    original: GeneratedScenario | None,
+) -> tuple[bool, bool]:
+    if regenerated.manifest.replay_sha256 != manifest.replay_sha256:
+        raise ScenarioReconstructionError(
+            f"replay_sha256 differs for scenario {manifest.scenario_id}: "
+            f"reconstruction does not match the stored manifest's own generation parameters"
+        )
+    if original is None:
+        return True, False
+    # artifact_sha256 alone must never gate whether the array-level check
+    # runs: a tampered .npz whose containing manifest record was left
+    # untouched has a *matching* recorded artifact_sha256 (the old,
+    # untampered value) even though the actual arrays differ. The hash is
+    # only informational bookkeeping (hash_only_drift, for the documented
+    # cross-architecture signed-zero case); the array comparison below is
+    # the actual, unconditional determinism criterion.
+    hash_drifted = regenerated.manifest.artifact_sha256 != original.manifest.artifact_sha256
+    for key in ("observed_concentration", "observation_mask", "truth_concentration"):
+        if not np.array_equal(getattr(regenerated, key), getattr(original, key), equal_nan=True):
+            raise ScenarioReconstructionError(
+                f"{key} array differs on reconstruction for scenario {manifest.scenario_id}"
+            )
+    return True, hash_drifted
