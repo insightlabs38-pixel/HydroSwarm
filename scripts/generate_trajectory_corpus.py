@@ -43,6 +43,7 @@ from hydroswarm.training.corpus import FeatureContext, _hydraulic_state_hash, bu
 from hydroswarm.training.full_trajectory import IncidentTrajectory, build_incident_trajectory
 from hydroswarm.training.scenario_reconstruction import (
     RECONSTRUCTION_POLICY_VERSION,
+    ScenarioReconstructionError,
     reconstruct_scenario_network,
 )
 from hydroswarm.training.scout_labels import build_signature_artifact_for_network
@@ -68,7 +69,7 @@ def _tensor_to_jsonable(value: Any) -> Any:
 
 
 def _incident_trajectory_to_json(
-    result: IncidentTrajectory, reconstruction: Any
+    result: IncidentTrajectory, reconstruction: Any, weak_verification: bool = False
 ) -> dict[str, Any]:
     example = result.example
     return {
@@ -91,6 +92,14 @@ def _incident_trajectory_to_json(
             "hydraulic_state_hash": reconstruction.hydraulic_state_hash,
             "replay_matched": reconstruction.replay_matched,
             "artifact_hash_drifted": reconstruction.artifact_hash_drifted,
+            # True only for development_holdout scenarios whose semantic
+            # array-level check was skipped because the corpus's own
+            # degradation-formula ambiguity for that split (see the retry
+            # comment above) made a spurious failure indistinguishable from
+            # a real one. The scenario/network identity (replay_sha256) is
+            # still verified either way -- only the degraded-observation
+            # outcome check is skipped when this is True.
+            "weak_verification": weak_verification,
         },
         "scout": {
             "trajectory": result.scout.trajectory.to_json(),
@@ -234,14 +243,48 @@ def main(argv: list[str] | None = None) -> int:
                 # network/context shared by every scenario in this topology
                 # family. Fails closed (raises) if the reconstruction does
                 # not semantically match this scenario's own stored arrays.
-                reconstruction = reconstruct_scenario_network(
-                    networks[family],
-                    scenario.manifest,
-                    degradation_policy=_degradation_probabilities,
-                    original=scenario,
-                )
+                #
+                # development_holdout mixes plain-curriculum scenarios
+                # (_degradation_probabilities(stage), verifiable) with two
+                # OOD-holdout helpers generate_cycle_b_corpus.py's own
+                # _generate_ood_holdout_for_training_topology fits with a
+                # DIFFERENT, hardcoded degradation formula
+                # (missing_probability=0.45 etc.) -- run_corpus_gates.py's
+                # deterministic_replay gate already documents this exact
+                # split as excluded because "which formula was used ...
+                # cannot be distinguished from the manifest alone." Retry
+                # without the array-level check (replay_sha256's seed/
+                # source/network/stage/split identity match still holds --
+                # only the degradation-outcome verification is skipped) for
+                # this split only, rather than spuriously failing ~1/4 of it.
+                weak_verification = False
+                try:
+                    reconstruction = reconstruct_scenario_network(
+                        networks[family],
+                        scenario.manifest,
+                        degradation_policy=_degradation_probabilities,
+                        original=scenario,
+                    )
+                except ScenarioReconstructionError:
+                    if split is not DatasetSplit.DEVELOPMENT_HOLDOUT:
+                        raise
+                    reconstruction = reconstruct_scenario_network(
+                        networks[family],
+                        scenario.manifest,
+                        degradation_policy=_degradation_probabilities,
+                        original=None,
+                    )
+                    weak_verification = True
+                # Always build the trajectory from the corpus's own stored,
+                # already-ground-truth scenario -- never from
+                # reconstruction.scenario, which is a regenerated copy
+                # useful only for the verification check above. This also
+                # sidesteps the development_holdout degradation-formula
+                # ambiguity entirely for the actual targets: only the
+                # verification step (irrelevant to what data is used) is
+                # affected by it, never the data itself.
                 result = build_incident_trajectory(
-                    reconstruction.scenario,
+                    scenario,
                     reconstruction.network,
                     libraries[family],
                     artifacts[family],
@@ -256,7 +299,7 @@ def main(argv: list[str] | None = None) -> int:
                 error_count += 1
                 print(f"ERROR scenario {scenario_id}: {error!r}")
                 continue
-            stream.write(json.dumps(_incident_trajectory_to_json(result, reconstruction)) + "\n")
+            stream.write(json.dumps(_incident_trajectory_to_json(result, reconstruction, weak_verification)) + "\n")
             stream.flush()
             ood_counts[result.ood_category.value] += 1
             processed_count += 1
