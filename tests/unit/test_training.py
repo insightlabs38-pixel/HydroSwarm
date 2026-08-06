@@ -78,6 +78,8 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
     outputs = {
         "source_node_logits": torch.tensor([[3.0, 0.0]], requires_grad=True),
         "sample_node_logits": torch.tensor([[0.0, 3.0]], requires_grad=True),
+        "action_logits": torch.tensor([[3.0, 0.0]], requires_grad=True),
+        "action_pointer_logits": torch.tensor([[0.0, 3.0]], requires_grad=True),
         "plan_value": torch.tensor([[0.2, 0.4]], requires_grad=True),
         "plan_validity_logits": torch.tensor([[[3.0, 0.0], [0.0, 3.0]]], requires_grad=True),
         "ood_logits": torch.tensor([[3.0, 0.0, 0.0]], requires_grad=True),
@@ -85,33 +87,69 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "duration_logits": torch.zeros(1, 8, requires_grad=True),
         "relative_strength_logits": torch.zeros(1, 4, requires_grad=True),
         "sensor_fault_logits": torch.zeros(1, 2, requires_grad=True),
-        "residual_prediction": torch.zeros(1, 2, requires_grad=True),
         "sensor_reconstruction_prediction": torch.ones(1, 2, requires_grad=True),
         "evidence_sufficiency": torch.tensor([0.7], requires_grad=True),
     }
     targets = {
         "source_node": torch.tensor([0]),
         "sample_node": torch.tensor([1]),
+        # action_template/target_pointer/ood_class are targets_v2's governed
+        # names, not the model's own action_logits/action_pointer_logits/
+        # ood_logits output names -- compute_multitask_loss looks each task
+        # up by its governed name (see the classifications dict comment).
+        "action_template": torch.tensor([0]),
+        "target_pointer": torch.tensor([1]),
         "plan_value": torch.tensor([[0.0, 0.5]]),
         "plan_validity": torch.tensor([[0, 1]]),
-        "ood": torch.tensor([0]),
+        "ood_class": torch.tensor([0]),
         "start_time": torch.tensor([3]),
         "duration": torch.tensor([2]),
         "relative_strength": torch.tensor([1]),
         "sensor_fault": torch.zeros(1, 2),
-        "residual": torch.ones(1, 2),
         "sensor_reconstruction": torch.zeros(1, 2),
         "evidence_sufficiency": torch.tensor([1.0]),
     }
     result = compute_multitask_loss(
         outputs,
         targets,
-        task_weights={"residual": 2.0},
+        task_weights={"sensor_reconstruction": 2.0},
         profile_ordinal_weight=0.4,
     )
     assert set(result.tasks) == set(targets)
     assert torch.isfinite(result.total)
     result.total.backward()
+
+
+def test_loss_task_keys_match_targets_v2_governed_names_not_output_names() -> None:
+    """compute_multitask_loss's classifications dict previously keyed
+    action_logits/action_pointer_logits/ood_logits by their own output
+    names ("action"/"action_pointer"/"ood") instead of targets_v2's
+    governed target names ("action_template"/"target_pointer"/"ood_class").
+    A correctly generated governed target therefore silently never matched
+    and silently never trained those heads -- confirm the fix by using
+    ONLY the governed names in targets and asserting each produces a loss
+    entry keyed by that governed name."""
+
+    from hydroswarm.training.targets_v2 import TARGETS_V2
+
+    governed_names = set(TARGETS_V2)
+    assert {"action_template", "target_pointer", "ood_class"} <= governed_names
+    assert "action" not in governed_names
+    assert "action_pointer" not in governed_names
+    assert "ood" not in governed_names
+
+    outputs = {
+        "action_logits": torch.tensor([[3.0, 0.0]], requires_grad=True),
+        "action_pointer_logits": torch.tensor([[0.0, 3.0]], requires_grad=True),
+        "ood_logits": torch.tensor([[3.0, 0.0, 0.0]], requires_grad=True),
+    }
+    targets = {
+        "action_template": torch.tensor([0]),
+        "target_pointer": torch.tensor([1]),
+        "ood_class": torch.tensor([0]),
+    }
+    result = compute_multitask_loss(outputs, targets)
+    assert set(result.tasks) == {"action_template", "target_pointer", "ood_class"}
 
 
 def test_evidence_sufficiency_head_output_shape_matches_its_scalar_per_example_target() -> None:

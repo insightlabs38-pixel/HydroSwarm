@@ -113,14 +113,22 @@ def compute_multitask_loss(
 
     weights = task_weights or {}
     losses: dict[str, Tensor] = {}
+    # Task keys here are hydroswarm.training.targets_v2's governed target
+    # names -- not the model's own output-attribute names (the dict values)
+    # -- because compute_multitask_loss looks up each task's label by this
+    # key in `targets`. Three of these previously used the *output* name
+    # for both (action/action_pointer/ood) instead of the governed target
+    # name (action_template/target_pointer/ood_class), so a correctly
+    # generated governed target would never have matched any key here and
+    # would have silently trained nothing (core-issues2.txt Phase 1 audit).
     classifications = {
         "source_node": "source_node_logits",
         "source_region": "source_region_logits",
         "sample_node": "sample_node_logits",
-        "action": "action_logits",
-        "action_pointer": "action_pointer_logits",
+        "action_template": "action_logits",
+        "target_pointer": "action_pointer_logits",
         "plan_validity": "plan_validity_logits",
-        "ood": "ood_logits",
+        "ood_class": "ood_logits",
         # overnight-plan.txt Task 4.4: only present in outputs when the
         # model was built with event_control_heads=True, so these are
         # silently skipped (like every other entry here) for models built
@@ -131,11 +139,8 @@ def compute_multitask_loss(
     regressions = {
         "plan_value": "plan_value",
         "information_gain": "expected_information_gain",
-        "residual": "residual_prediction",
         "sensor_reconstruction": "sensor_reconstruction_prediction",
         "future_concentration": "future_concentration_prediction",
-        "pressure": "pressure_prediction",
-        "flow": "flow_prediction",
         "travel_time": "travel_time_prediction",
         # overnight-plan.txt Task 4.6: only present in outputs when the
         # model was built with consequence_prescreening_heads=True.

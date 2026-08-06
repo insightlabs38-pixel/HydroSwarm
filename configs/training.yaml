@@ -25,13 +25,12 @@ training:
     duration: 0.5
     relative_strength: 0.5
     sample_node: 1.0
-    action: 1.0
-    action_pointer: 1.0
+    action_template: 1.0
+    target_pointer: 1.0
     plan_validity: 1.0
     plan_value: 0.5
     information_gain: 0.5
-    residual: 0.5
-    ood: 1.0
+    ood_class: 1.0
     sensor_fault: 1.0
-    reconstruction: 0.25
+    sensor_reconstruction: 0.25
 
