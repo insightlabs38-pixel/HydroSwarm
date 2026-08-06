@@ -6,10 +6,19 @@ early stopping or a documented maximum runtime; run at least two seeds when time
 validation, development holdout, and OOD development sets; run full-trajectory evaluation
 where supported."
 
-Finalists are the top three configurations from Stage 2's predeclared score (see
-`reports/results/v3/stage2-architecture-screening.json`'s `ranking`), taken mechanically
--- E2 > E0 > E1 (E2's 0.7794 margin over E0's 0.7783 and E1's 0.7768 is small enough that
-all three are carried forward rather than trusting a single-seed screening pick).
+Finalists are the top configurations from Stage 2's predeclared score (see
+`reports/results/v3/stage2-architecture-screening.json`'s `ranking`), taken mechanically.
+
+Original (pre-repair) cycle-b run: top three carried forward -- E2 (0.7794) > E0
+(0.7783) > E1 (0.7768), margin small enough that all three went to Stage 3 rather than
+trusting a single-seed screening pick.
+
+core-issues.txt Phase 3 items 15-16 (corrected cycle-b2 run, corrected masks/hydraulic
+context/topology metadata/normalization in effect): a targeted E0/E1/E2-only re-screen
+per `reports/results/v3/cycle-b2-stage2-screening.json` ranks E1 (0.7473) > E0 (0.7463)
+> E2 (0.7426) -- also a small margin, but the task instructions for this pass explicitly
+call for selecting exactly the strongest two, not carrying all three forward again.
+FINALISTS below reflects that: E1, E0.
 
 Each finalist is trained with two seeds ("at least two ... when time permits"; three-seed
 "final candidate" training is deferred to Stage 6 once one architecture is actually
@@ -74,12 +83,13 @@ CALIBRATION_FUSION_NEURAL_WEIGHT = 0.6
 #: a usable per-epoch trend at a fraction of the CPU cost.
 GRADNORM_LOG_EVERY_N_BATCHES = 25
 
-#: Top three from Stage 2's predeclared score, taken mechanically (no retuning after
-#: viewing results): E2 (0.7794) > E0 (0.7783) > E1 (0.7768).
+#: Top two from the corrected cycle-b2 Stage 2 re-screen's predeclared score, taken
+#: mechanically (no retuning after viewing results): E1 (0.7473) > E0 (0.7463) > E2
+#: (0.7426) -- see reports/results/v3/cycle-b2-stage2-screening.json. E2 dropped per
+#: core-issues.txt Phase 3 item 16's explicit "select the strongest two" instruction.
 FINALISTS: dict[str, dict[str, Any]] = {
-    "E2": {"prior_mode": "logit_only"},
-    "E0": {},
     "E1": {"prior_mode": "feature_only"},
+    "E0": {},
 }
 SEEDS: tuple[int, ...] = (20260810, 20260811)
 
@@ -395,7 +405,18 @@ def main() -> int:
         help="subdirectory of --corpus-root holding sharded tensors (default: tensors; use "
         "tensors-normalized for a corpus with governed normalization applied)",
     )
+    parser.add_argument(
+        "--finalists",
+        nargs="+",
+        default=list(FINALISTS),
+        choices=list(FINALISTS),
+        help="subset of FINALISTS to run in this invocation (default: all). Lets separate "
+        "finalists be launched as independent parallel processes -- each finalist's own "
+        "seeds still run sequentially within one process, but two finalists no longer "
+        "have to wait on each other. Merge each invocation's --output afterward.",
+    )
     args = parser.parse_args()
+    finalists = {name: FINALISTS[name] for name in args.finalists}
 
     train = _load_dataset("train", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
     validation = _load_dataset("validation", corpus_root=args.corpus_root, tensors_dirname=args.tensors_dirname)
@@ -416,7 +437,7 @@ def main() -> int:
     started = time.perf_counter()
     results: dict[str, dict[str, Any]] = {}
     failures: dict[str, str] = {}
-    for name, overrides in FINALISTS.items():
+    for name, overrides in finalists.items():
         results[name] = {}
         for seed in SEEDS:
             key = f"{name}-seed{seed}"
@@ -438,7 +459,7 @@ def main() -> int:
         "schema_version": 1,
         "stage": "Bundle F Stage 3 -- finalist training",
         "corpus": str(args.corpus_root / args.tensors_dirname),
-        "finalists": FINALISTS,
+        "finalists": finalists,
         "seeds": list(SEEDS),
         "max_epochs": MAX_EPOCHS,
         "early_stopping_patience": EARLY_STOPPING_PATIENCE,
