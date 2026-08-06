@@ -26,6 +26,8 @@ from enum import Enum
 import torch
 from torch import Tensor
 
+from .data import TopologyMetadata
+
 TARGETS_V2_SCHEMA_VERSION = "targets_v2"
 
 
@@ -377,6 +379,48 @@ TARGETS_BY_CATEGORY: dict[str, tuple[str, ...]] = {
 }
 
 
+#: Fixed-cardinality categorical targets. Mirrors the corresponding
+#: RoleHead output sizes in hydroswarm.model.core (source_region_head=3,
+#: ood_head=3, plan_validity_head=2, EVENT_CAUSE_CLASS_COUNT,
+#: NEXT_STEP_CLASS_COUNT) and losses.py's PROFILE_CLASS_COUNTS -- kept as
+#: separately-documented constants here rather than importing model.core,
+#: matching this module's existing zero-coupling convention (EventCause/
+#: NextStep are likewise defined locally, not imported). action_template's
+#: cardinality is a configurable model constructor argument
+#: (action_vocabulary_size), not a fixed constant, so it is deliberately
+#: excluded here rather than risk a false-positive range rejection.
+TARGET_CLASS_COUNTS: dict[str, int] = {
+    "source_region": 3,
+    "start_time": 4,
+    "duration": 3,
+    "relative_strength": 3,
+    "event_cause": len(EventCause),
+    "next_step": len(NextStep),
+    "ood_class": 3,
+    "plan_validity": 2,
+}
+
+#: Scalar graph-local node indices: must satisfy 0 <= value < topology.node_count.
+NODE_INDEX_TARGETS = frozenset({"source_node", "sample_node"})
+
+#: target_pointer may index either a node or a link (action_template-dependent,
+#: see its TargetSpec.definition), so it gets a looser bound than a pure node
+#: index: 0 <= value < max(node_count, edge_count).
+DUAL_INDEX_TARGETS = frozenset({"target_pointer"})
+
+#: Per-node arrays whose trailing dimension must equal topology.node_count.
+NODE_ARRAY_TARGETS = frozenset({"sensor_fault", "sensor_reconstruction", "future_concentration", "travel_time"})
+
+#: Strategist targets that describe one entry per generated plan candidate;
+#: whichever of these are present in the same example must agree on their
+#: leading ("number of plans") dimension.
+PLAN_DIMENSION_TARGETS = frozenset({
+    "action_template", "target_pointer", "plan_validity", "plan_value", "consequence_vector",
+    "exposure_proxy", "pressure_risk_proxy", "service_loss_proxy", "containment_time_proxy",
+    "plan_regret_proxy",
+})
+
+
 def check_schema_version(version: str) -> None:
     """Fail clearly when loading targets written under an incompatible
     schema, per the plan's explicit requirement -- never silently reinterpret
@@ -389,11 +433,30 @@ def check_schema_version(version: str) -> None:
         )
 
 
-def validate_targets_v2(targets: Mapping[str, Tensor]) -> None:
-    """Raise TargetSchemaError if `targets` violates the contract:
-    unknown target keys, an unmaskable target missing its required value
-    combined with a present mask claiming otherwise, or a mask key without
-    a corresponding value key.
+def validate_targets_v2(targets: Mapping[str, Tensor], *, topology: TopologyMetadata | None = None) -> None:
+    """Raise TargetSchemaError if `targets` violates the contract (core-issues2.txt
+    Phase 1 item 3 -- fail closed, do not silently accept a malformed row):
+
+    - unknown target keys;
+    - a mask key without a corresponding value key, or on a non-maskable target;
+    - a maskable target present without its required mask (the reverse of the
+      previous check -- every present maskable target must state its validity,
+      not just every present mask must be well-formed);
+    - a non-boolean mask;
+    - a fixed-cardinality categorical target (TARGET_CLASS_COUNTS) whose
+      value at a valid (mask=True or unmaskable) position falls outside
+      [0, class_count);
+    - a graph-local index target (NODE_INDEX_TARGETS/DUAL_INDEX_TARGETS)
+      whose value at a valid position falls outside the topology's node (or
+      node-or-edge) index range -- only checked when `topology` is given;
+    - a per-node array target (NODE_ARRAY_TARGETS) whose trailing dimension
+      disagrees with `topology.node_count` -- only checked when `topology`
+      is given (this is the "disagreement between target metadata and
+      topology metadata" check);
+    - two or more present PLAN_DIMENSION_TARGETS whose leading dimension
+      ("number of plan candidates") disagree with each other;
+    - a non-finite (NaN/Inf) value at a valid position in any floating-point
+      target.
     """
 
     mask_suffix = "_mask"
@@ -417,3 +480,76 @@ def validate_targets_v2(targets: Mapping[str, Tensor]) -> None:
             )
         if targets[mask_key].dtype != torch.bool:
             raise TargetSchemaError(f"mask key {mask_key!r} must be boolean")
+
+    for name in value_keys:
+        if TARGETS_V2[name].maskable and f"{name}_mask" not in targets:
+            raise TargetSchemaError(
+                f"target {name!r} is maskable and present but its required mask "
+                f"{name}_mask is missing"
+            )
+
+    def _valid_positions(name: str) -> Tensor:
+        mask = targets.get(f"{name}_mask")
+        value = targets[name]
+        return mask.bool() if mask is not None else torch.ones_like(value, dtype=torch.bool)
+
+    for name, class_count in TARGET_CLASS_COUNTS.items():
+        if name not in targets:
+            continue
+        value = targets[name]
+        valid = _valid_positions(name)
+        checked = value[valid] if valid.shape == value.shape else value
+        if checked.numel() and ((checked < 0) | (checked >= class_count)).any():
+            raise TargetSchemaError(
+                f"target {name!r} has a value outside its valid class range [0, {class_count})"
+            )
+
+    if topology is not None:
+        for name in NODE_INDEX_TARGETS:
+            if name not in targets:
+                continue
+            value = targets[name]
+            valid = _valid_positions(name)
+            checked = value[valid] if valid.shape == value.shape else value
+            if checked.numel() and ((checked < 0) | (checked >= topology.node_count)).any():
+                raise TargetSchemaError(
+                    f"target {name!r} has a graph-local index outside [0, {topology.node_count}) "
+                    "for this example's topology"
+                )
+        upper_bound = max(topology.node_count, len(topology.edge_ids))
+        for name in DUAL_INDEX_TARGETS:
+            if name not in targets:
+                continue
+            value = targets[name]
+            valid = _valid_positions(name)
+            checked = value[valid] if valid.shape == value.shape else value
+            if checked.numel() and ((checked < 0) | (checked >= upper_bound)).any():
+                raise TargetSchemaError(
+                    f"target {name!r} has a graph-local index outside [0, {upper_bound}) "
+                    "for this example's topology (node-or-edge bound)"
+                )
+        for name in NODE_ARRAY_TARGETS:
+            if name not in targets:
+                continue
+            value = targets[name]
+            if value.dim() >= 1 and value.shape[-1] != topology.node_count:
+                raise TargetSchemaError(
+                    f"target {name!r} has trailing dimension {value.shape[-1]}, disagreeing with "
+                    f"this example's topology node_count {topology.node_count}"
+                )
+
+    plan_dims: dict[str, int] = {}
+    for name in PLAN_DIMENSION_TARGETS:
+        if name in targets and targets[name].dim() >= 1:
+            plan_dims[name] = targets[name].shape[0]
+    if len(set(plan_dims.values())) > 1:
+        raise TargetSchemaError(f"strategist plan-dimension targets disagree on plan count: {plan_dims}")
+
+    for name in value_keys:
+        value = targets[name]
+        if not torch.is_floating_point(value):
+            continue
+        valid = _valid_positions(name)
+        checked = value[valid] if valid.shape == value.shape else value
+        if checked.numel() and not torch.isfinite(checked).all():
+            raise TargetSchemaError(f"target {name!r} has a non-finite value at a valid position")

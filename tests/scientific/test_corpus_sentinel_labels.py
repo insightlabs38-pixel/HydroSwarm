@@ -62,7 +62,7 @@ def test_assign_source_regions_is_deterministic_and_bounded(network) -> None:
 
 def test_contamination_example_has_event_presence_true_and_valid_masks(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.CONTAMINATION)
-    validate_targets_v2(example.targets)
+    validate_targets_v2(example.targets, topology=example.topology)
     assert bool(example.targets["event_presence"]) is True
     assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.CONTAMINATION]
     assert bool(example.targets["source_node_mask"]) is True
@@ -74,7 +74,7 @@ def test_contamination_example_has_event_presence_true_and_valid_masks(network, 
 
 def test_normal_example_has_event_presence_false_and_masked_targets(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.NORMAL)
-    validate_targets_v2(example.targets)
+    validate_targets_v2(example.targets, topology=example.topology)
     assert bool(example.targets["event_presence"]) is False
     assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.NORMAL]
     assert bool(example.targets["source_node_mask"]) is False
@@ -98,7 +98,7 @@ def test_normal_example_has_event_presence_false_and_masked_targets(network, sig
 
 def test_sensor_fault_only_example_has_correct_cause_and_shows_the_fault(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.SENSOR_FAULT_ONLY)
-    validate_targets_v2(example.targets)
+    validate_targets_v2(example.targets, topology=example.topology)
     assert bool(example.targets["event_presence"]) is False
     assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.SENSOR_FAULT]
     assert bool(example.targets["sensor_fault"].any())  # the forced fault is visible
