@@ -144,6 +144,13 @@ def build_strategist_trajectory(
     fitting is deterministic" carries over from generate_strategist_labels'
     own determinism) -- trajectory_id/incident_id are uuid5-derived from
     the scenario id, not randomly generated.
+
+    `node_ids` MUST be the canonical full topology node space (junctions +
+    reservoirs + tanks), matching source_node_logits/sensor_fault_logits'
+    own index space -- not sorted(network.junction_name_list). See
+    scout_trajectory.build_scout_trajectory's docstring for the full
+    rationale; full_trajectory.py's build_incident_trajectory derives
+    node_ids from example.topology for exactly this reason.
     """
 
     scenario_id = str(scenario.manifest.scenario_id)

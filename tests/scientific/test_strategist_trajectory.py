@@ -41,7 +41,7 @@ def test_trajectory_is_well_formed_with_a_no_response_comparator(tmp_path) -> No
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=10)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
 
@@ -56,7 +56,7 @@ def test_every_label_targets_pass_validate_targets_v2(tmp_path) -> None:
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J3", seed=11)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
     for target in result.steps[0].targets:
@@ -68,7 +68,7 @@ def test_action_template_index_matches_the_canonical_vocabulary(tmp_path) -> Non
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=10)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
     for label, target in zip(result.steps[0].labels, result.steps[0].targets):
@@ -87,7 +87,7 @@ def test_plan_validity_is_read_from_wntr_not_the_predicted_score(tmp_path) -> No
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=10)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
     step = result.steps[0]
@@ -122,7 +122,7 @@ def test_target_pointer_masked_off_for_no_response_comparator(tmp_path) -> None:
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=10)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
     for label, target in zip(result.steps[0].labels, result.steps[0].targets):
@@ -135,7 +135,7 @@ def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J4", seed=12)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     first = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
     second = build_strategist_trajectory(scenario, network, context, artifact, node_ids)
@@ -149,7 +149,7 @@ def test_different_scenarios_get_different_trajectory_and_incident_ids(tmp_path)
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     a = build_strategist_trajectory(_scenario(network, source_node="J2", seed=10), network, context, artifact, node_ids)
     b = build_strategist_trajectory(_scenario(network, source_node="J3", seed=11), network, context, artifact, node_ids)

@@ -148,6 +148,18 @@ def build_scout_trajectory(
     randomness here is scenario.manifest.seed-derived upstream, and
     trajectory_id/incident_id are uuid5-derived from the scenario id rather
     than randomly generated.
+
+    `node_ids` MUST be the canonical full topology node space (junctions +
+    reservoirs + tanks -- e.g. hydroswarm.training.data.TopologyMetadata.
+    node_ids, or equivalently HydraulicFeatureBuilder's own
+    canonical_node_order(network.node_name_list)), not
+    sorted(network.junction_name_list). sample_node's graph-local index is
+    only meaningful if it shares the exact same index space
+    source_node_logits/sensor_fault_logits are indexed against; a
+    junction-only ordering silently disagrees with that space whenever the
+    network has any reservoir or tank (full_trajectory.py's
+    build_incident_trajectory derives node_ids from example.topology for
+    exactly this reason -- do the same in any other caller).
     """
 
     if maximum_samples < 1:

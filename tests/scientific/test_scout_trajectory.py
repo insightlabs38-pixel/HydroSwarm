@@ -42,7 +42,7 @@ def test_trajectory_is_well_formed_and_hash_chained(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=10)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_scout_trajectory(scenario, artifact, node_ids)
 
@@ -60,7 +60,7 @@ def test_every_step_targets_pass_validate_targets_v2(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J3", seed=11)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_scout_trajectory(scenario, artifact, node_ids)
     for step in result.steps:
@@ -71,7 +71,7 @@ def test_sample_node_target_is_a_valid_graph_local_index(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=10)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     result = build_scout_trajectory(scenario, artifact, node_ids)
     for step in result.steps:
@@ -93,7 +93,7 @@ def test_already_sampled_grows_monotonically_and_is_never_repeated(tmp_path) -> 
     scenario = _scenario(network, source_node="J2", seed=10, sensor_count=len(network.junction_name_list))
 
     result = build_scout_trajectory(
-        scenario, artifact, tuple(sorted(network.junction_name_list)), noise_scale_mg_l=50.0
+        scenario, artifact, tuple(sorted(network.node_name_list)), noise_scale_mg_l=50.0
     )
     seen: set[str] = set()
     for step in result.steps:
@@ -110,7 +110,7 @@ def test_trajectory_terminates_at_maximum_samples(tmp_path) -> None:
     scenario = _scenario(network, source_node="J2", seed=10, sensor_count=len(network.junction_name_list))
 
     result = build_scout_trajectory(
-        scenario, artifact, tuple(sorted(network.junction_name_list)),
+        scenario, artifact, tuple(sorted(network.node_name_list)),
         maximum_samples=1, noise_scale_mg_l=50.0,
     )
     assert len(result.steps) == 1
@@ -129,7 +129,7 @@ def test_maximum_samples_above_the_domain_bound_is_rejected(tmp_path) -> None:
 
     with pytest.raises(ValueError, match="exceeds"):
         build_scout_trajectory(
-            scenario, artifact, tuple(sorted(network.junction_name_list)),
+            scenario, artifact, tuple(sorted(network.node_name_list)),
             maximum_samples=MAXIMUM_SAMPLES_BOUND + 1,
         )
 
@@ -140,14 +140,14 @@ def test_zero_or_negative_maximum_samples_is_rejected(tmp_path) -> None:
     scenario = _scenario(network, source_node="J2", seed=10)
 
     with pytest.raises(ValueError, match="at least 1"):
-        build_scout_trajectory(scenario, artifact, tuple(sorted(network.junction_name_list)), maximum_samples=0)
+        build_scout_trajectory(scenario, artifact, tuple(sorted(network.node_name_list)), maximum_samples=0)
 
 
 def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J4", seed=12)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     first = build_scout_trajectory(scenario, artifact, node_ids)
     second = build_scout_trajectory(scenario, artifact, node_ids)
@@ -158,7 +158,7 @@ def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
 def test_different_scenarios_get_different_trajectory_and_incident_ids(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
     a = build_scout_trajectory(_scenario(network, source_node="J2", seed=10), artifact, node_ids)
     b = build_scout_trajectory(_scenario(network, source_node="J3", seed=11), artifact, node_ids)
 
@@ -171,7 +171,7 @@ def test_stops_immediately_when_no_candidate_is_accessible(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
     scenario = _scenario(network, source_node="J2", seed=13)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     inaccessible = {node: False for node in artifact.sensor_nodes}
     result = build_scout_trajectory(scenario, artifact, node_ids, constraints=SamplingConstraints(accessible=inaccessible))

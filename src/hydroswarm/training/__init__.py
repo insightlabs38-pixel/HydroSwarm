@@ -5,6 +5,7 @@ from .auxiliary_labels import future_concentration_target, sensor_reconstruction
 from .checkpoint import export_model, load_checkpoint, save_checkpoint
 from .config import TrainingConfig
 from .control_labels import classify_evidence_sufficiency, classify_next_step, next_step_target
+from .full_trajectory import IncidentTrajectory, build_incident_trajectory
 from .data import (
     AgentTrajectory,
     CurriculumSchedule,
@@ -82,6 +83,7 @@ __all__ = [
     "ExperimentRegistry",
     "FullTrajectory",
     "GovernedScenarioDataset",
+    "IncidentTrajectory",
     "MultiTaskLoss",
     "NextStep",
     "OODCategory",
@@ -113,6 +115,7 @@ __all__ = [
     "audit_corpus",
     "audit_split",
     "authorize_locked_final_test",
+    "build_incident_trajectory",
     "build_scout_trajectory",
     "build_signature_artifact_for_network",
     "build_strategist_trajectory",

@@ -29,7 +29,7 @@ def _scenario(network, *, event_type=EventType.CONTAMINATION, source_node="J2", 
 def test_sensor_reconstruction_masks_exactly_the_sensor_nodes() -> None:
     network = build_wntr_network()
     scenario = _scenario(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = sensor_reconstruction_target(scenario, node_ids)
     validate_targets_v2(target)
@@ -42,7 +42,7 @@ def test_sensor_reconstruction_masks_exactly_the_sensor_nodes() -> None:
 def test_sensor_reconstruction_value_matches_truth_at_reference_time() -> None:
     network = build_wntr_network()
     scenario = _scenario(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = sensor_reconstruction_target(scenario, node_ids, reference_time_seconds=3600)
     time_index = int(np.argmin(np.abs(np.asarray(scenario.timestamps_seconds, dtype=float) - 3600)))
@@ -56,7 +56,7 @@ def test_sensor_reconstruction_value_matches_truth_at_reference_time() -> None:
 def test_future_concentration_is_unmasked_when_the_horizon_is_within_simulated_duration() -> None:
     network = build_wntr_network()
     scenario = _scenario(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = future_concentration_target(scenario, node_ids, horizon_seconds=3600)
     validate_targets_v2(target)
@@ -68,7 +68,7 @@ def test_future_concentration_is_unmasked_when_the_horizon_is_within_simulated_d
 def test_future_concentration_is_fully_masked_when_the_horizon_exceeds_simulated_duration() -> None:
     network = build_wntr_network()
     scenario = _scenario(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = future_concentration_target(scenario, node_ids, horizon_seconds=10_000_000)
     validate_targets_v2(target)
@@ -79,7 +79,7 @@ def test_travel_time_is_masked_out_entirely_for_non_contamination_events() -> No
     network = build_wntr_network()
     scenario = _scenario(network, event_type=EventType.NORMAL)
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = travel_time_target(scenario, context.graph, node_ids)
     validate_targets_v2(target)
@@ -90,7 +90,7 @@ def test_travel_time_from_a_real_source_covers_reachable_nodes_with_finite_value
     network = build_wntr_network()
     scenario = _scenario(network, event_type=EventType.CONTAMINATION, source_node="J2")
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = travel_time_target(scenario, context.graph, node_ids)
     validate_targets_v2(target)
@@ -108,7 +108,7 @@ def test_travel_time_at_the_source_itself_is_zero() -> None:
     network = build_wntr_network()
     scenario = _scenario(network, event_type=EventType.CONTAMINATION, source_node="J2")
     context = build_feature_context(network)
-    node_ids = tuple(sorted(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
 
     target = travel_time_target(scenario, context.graph, node_ids)
     source_index = node_ids.index("J2")

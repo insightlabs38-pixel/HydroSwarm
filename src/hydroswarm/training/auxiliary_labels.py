@@ -5,6 +5,13 @@ targets_v2.TargetSpec text ("never an authoritative product output") and
 share the [node_count] shape/masking convention corpus.py's sensor_fault
 target already established -- a full topology-length array, masked to
 whatever subset of nodes actually has ground truth.
+
+Every `node_ids` parameter below MUST be the canonical full topology node
+space (junctions + reservoirs + tanks), matching source_node_logits/
+sensor_fault_logits' own index space -- not sorted(network.junction_name_
+list). See scout_trajectory.build_scout_trajectory's docstring for the
+full rationale; full_trajectory.py's build_incident_trajectory derives
+node_ids from example.topology for exactly this reason.
 """
 
 from __future__ import annotations
