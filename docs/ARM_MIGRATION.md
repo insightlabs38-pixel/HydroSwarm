@@ -51,6 +51,31 @@ repository's history is CPU-only; see `source-environment.json`). Installing a C
 or Arm-native `torch>=2.5` build is correct and expected to differ from the source
 version string; it does not need to match exactly.
 
+**wntr's bundled EPANET binary does not support linux-arm64 -- this is a real upstream
+gap, discovered during this migration, not a repo defect.** `wntr/epanet/toolkit.py`
+ships prebuilt EPANET toolkit binaries for windows-x64, darwin-x64, darwin-arm, and
+linux-x64 only; the Linux branch is a bare `else` with no architecture check (unlike the
+darwin branch, which does check for `arm`). Every WNTR/EPANET call -- corpus generation,
+the `deterministic_replay`/`mask_round_trip` corpus gates, Strategist verification, live
+inference -- fails on an aarch64 host with `OSError: .../libepanet22.so: cannot open
+shared object file` (a wrong-ELF-class load failure; the x86-64 binary is physically
+present, `ctypes`/`dlopen` just cannot execute it on this architecture). Fix, applied
+automatically and idempotently:
+
+```bash
+./scripts/build_epanet_arm64.sh
+```
+
+This clones `OpenWaterAnalytics/EPANET` at tag `v2.2` (the actual 2.2.0 release --
+`USEPA/EPANET`, the newer official mirror, only tags `v2.3.0-beta`), builds the
+`epanet2` CMake target for the host architecture, and copies the resulting `.so` over
+`wntr`'s hardcoded `libepanet/linux-x64/libepanet22.so` path (the path is a string
+literal wntr uses regardless of actual host arch, so this works without touching wntr or
+any Python code in this repo). No-op on non-arm64 hosts. **Re-run this after every `uv
+sync`** -- a fresh sync reinstalls wntr's wheel, which reverts the patch back to the
+x86-64 binary. Verified against a real network in this repo
+(`data/topologies/loop-grid.inp`) as its last step.
+
 ## 3. Extract the raw scenario archives (optional -- only if you need raw scenario
    replay, not just the tensor corpus)
 
@@ -116,6 +141,7 @@ normalization artifact hashes the checkpoint was trained against.
 
 ```bash
 export PYTHONPATH=src
+./scripts/build_epanet_arm64.sh   # required on arm64 hosts before any WNTR-calling step below
 python scripts/verify_migration_artifacts.py --corpus-dir data/learning-v2/cycle-b2
 ```
 
