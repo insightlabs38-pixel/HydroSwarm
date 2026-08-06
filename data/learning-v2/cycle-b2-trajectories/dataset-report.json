@@ -1,0 +1,68 @@
+{
+  "schema_version": "cycle-b2-trajectories-v1",
+  "generator": "scripts/generate_trajectory_corpus.py + scripts/merge_trajectory_targets.py",
+  "source_corpus": "data/learning-v2/cycle-b2",
+  "description": "core-issues2.txt Phase 7 full-incident-trajectory extension of Cycle B2: for every scenario, a governed OOD category, evidence_sufficiency/next_step control targets, three auxiliary targets (sensor_reconstruction/future_concentration/travel_time), a Scout sampling sub-trajectory, and a Strategist planning sub-trajectory (exactly WNTR-verified). Never mutates data/learning-v2/cycle-b2.",
+  "counts_by_split": {
+    "train": 9000,
+    "validation": 1000,
+    "calibration": 1000,
+    "development_holdout": 2150
+  },
+  "errors_by_split": {
+    "train": 0,
+    "validation": 0,
+    "calibration": 0,
+    "development_holdout": 0
+  },
+  "ood_category_counts_by_split": {
+    "train": {"NONE": 8831, "FROZEN_DRIFTING_SENSOR": 17, "SEVERE_MISSINGNESS": 152},
+    "validation": {"NONE": 978, "FROZEN_DRIFTING_SENSOR": 3, "SEVERE_MISSINGNESS": 19},
+    "calibration": {"NONE": 983, "SEVERE_MISSINGNESS": 16, "FROZEN_DRIFTING_SENSOR": 1},
+    "development_holdout": {"NONE": 1799, "FROZEN_DRIFTING_SENSOR": 5, "SEVERE_MISSINGNESS": 346}
+  },
+  "ood_category_totals": {"NONE": 12591, "FROZEN_DRIFTING_SENSOR": 26, "SEVERE_MISSINGNESS": 533},
+  "ood_categories_not_yet_generated": [
+    "UNSEEN_SENSOR_LAYOUT", "EXTREME_DEMAND", "TANK_STATE_SHIFT", "ROUGHNESS_MISMATCH",
+    "VALVE_PUMP_MISMATCH", "TIMING_OUTSIDE_TRAINING_RANGE",
+    "UNSUPPORTED_NETWORK_ELEMENT_OR_INVALID_CALIBRATION"
+  ],
+  "ood_category_note": "EXTREME_DEMAND/TANK_STATE_SHIFT/ROUGHNESS_MISMATCH are all classifiable by hydroswarm.training.ood_labels.classify_ood_category but this corpus's source scenarios (data/learning-v2/cycle-b2) never generated examples with those specific knobs pushed out of range -- the classifier is ready, the underlying scenario generation for those specific shift types was out of Phase 4's scope (see ood_labels.py's own docstring for the full per-category reproducibility note). UNSEEN_TOPOLOGY (coastal-branch) scenarios exist in development_holdout's manifest but were not processed by this pass -- coastal-branch is not one of this script's three loaded training topologies (see generate_trajectory_corpus.py's _train_topology_loaders); a coastal-branch-aware follow-up run would need that network loaded too.",
+  "scout_steps_histogram_by_split": {
+    "train": {"1": 4191, "2": 1001, "3": 1129, "4": 1094, "5": 1585},
+    "validation": {"1": 461, "2": 115, "3": 130, "4": 123, "5": 171},
+    "calibration": {"1": 470, "2": 115, "3": 117, "4": 124, "5": 174},
+    "development_holdout": {"1": 940, "2": 217, "3": 257, "4": 268, "5": 468}
+  },
+  "scout_steps_note": "Adaptive, not maxed out uniformly: ~47% of incidents resolve after Scout's first recommendation (should_continue_sampling becomes false or no further candidate exists), the remainder continue up to the 5-sample budget bound -- evidence this reflects real per-scenario evidence sufficiency rather than a fixed sampling count.",
+  "strategist_labels_histogram_by_split": {
+    "train": {"4": 9000}, "validation": {"4": 1000}, "calibration": {"4": 1000}, "development_holdout": {"4": 2150}
+  },
+  "strategist_labels_note": "Every incident in this corpus produced exactly 4 plan labels (the maximum_exact_simulations=3 prescreened bound plus the always-guaranteed NO_ACTION comparator) -- every scenario's network had enough candidate templates (isolatable links, downstream flush nodes, monitor nodes) to fill the bound; this is consistent with prescreen_top_plans' documented cap, not an anomaly, and was directly observed (not merely inferred) across all 13,150 records with zero exceptions.",
+  "hard_negatives": "None deliberately curated in this pass (core-issues2.txt Phase 2/3's explicit hard-case list -- misleading sensors, near-tied plans, exposure-vs-pressure tradeoffs, etc. -- requires deliberate scenario-pair construction not attempted here, consistent with data/learning-v2/cycle-b2/dataset-report.json's own equivalent limitation for Cycle B2 itself). Every Strategist label set does include the required rejected/invalid-plan hard negatives organically, since plan_validity is read from real WNTR verification and not every candidate template is accepted for every network state.",
+  "trajectory_length_note": "Scout sub-trajectories: 1-5 steps (bounded by MAXIMUM_SAMPLES_BOUND=5). Strategist sub-trajectories: exactly 1 step (single decision point per incident state, per Phase 3's own spec -- no multi-round plan revision in this pass).",
+  "generation_time_seconds": {"train": 4198.2, "validation": 425.5, "calibration": 425.6, "development_holdout": 921.6},
+  "validated_topology_hashes": [
+    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+  ],
+  "tensor_shard_merge": {
+    "description": "scripts/merge_trajectory_targets.py re-attached ood_class/next_step/evidence_sufficiency/sensor_reconstruction/future_concentration/travel_time (flat per-example targets) onto data/learning-v2/cycle-b2/tensors-normalized/{split} shards, producing data/learning-v2/cycle-b2-trajectories/tensors-enriched/{split}. Scout/Strategist sequential data is NOT merged into these shards (does not fit ScenarioExample's flat .targets dict) -- remains in the JSONL files only.",
+    "match_rate": {
+      "train": "9000/9000", "validation": "1000/1000", "calibration": "1000/1000",
+      "development_holdout": "1750/1750 (regular) + 400/400 (ood-SEVERE_MISSINGNESS, separate shard dir)"
+    }
+  },
+  "stage1_smoke_screening": {
+    "script": "scripts/run_event_control_smoke_screening.py",
+    "configuration": {"event_control_heads": true, "auxiliary_heads": true},
+    "result": "PASSED at real scale (200 train / 50 validation examples from tensors-enriched/{train,validation})",
+    "new_tasks_with_gradient": [
+      "event_presence", "event_cause", "evidence_sufficiency", "next_step", "ood_class",
+      "sensor_reconstruction", "future_concentration", "travel_time"
+    ],
+    "checks": {"no_nans": true, "labels_receive_gradients": true, "new_tasks_all_receive_gradients": true, "reproducible": true}
+  },
+  "locked_test_discipline": "The locked final test was not opened, listed, hashed, or referenced by any command run to generate this corpus. final-selection.json does not exist."
+}

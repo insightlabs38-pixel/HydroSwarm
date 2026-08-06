@@ -16,3 +16,11 @@ models/cycle-b2-candidates/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 models/cycle-b2-candidates/**/*.pt filter=lfs diff=lfs merge=lfs -text
 models/cycle-b2-controls/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 artifacts/migration/**/*.tar.zst filter=lfs diff=lfs merge=lfs -text
+
+# core-issues2.txt Phase 7: trajectory-target-enriched tensor shards (merged
+# from data/learning-v2/cycle-b2-trajectories/*.jsonl via
+# scripts/merge_trajectory_targets.py) go through Git LFS, matching the
+# existing cycle-b2 tensors{,-normalized} convention. The trajectory JSONL
+# files themselves stay regular git text, matching how scenario manifests
+# elsewhere in this repo are not LFS-tracked.
+data/learning-v2/cycle-b2-trajectories/tensors-enriched/**/*.safetensors filter=lfs diff=lfs merge=lfs -text

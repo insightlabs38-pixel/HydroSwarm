@@ -1,0 +1,58 @@
+{
+  "corpus": "data/learning-v2/cycle-b2-trajectories/tensors-enriched",
+  "failure": null,
+  "result": {
+    "checkpoint_reload_ok": true,
+    "first_pass_best_validation_loss": 12992573.142857144,
+    "first_pass_epochs": 2,
+    "gradient_norms": {
+      "duration": 10.712964595715045,
+      "event_cause": 29.794940278554524,
+      "event_presence": 10.677030146066016,
+      "evidence_sufficiency": 10.162593175057523,
+      "future_concentration": 14071.058543790714,
+      "next_step": 25.93828213724006,
+      "ood_class": 25.379811464371635,
+      "relative_strength": 6.270436050056874,
+      "sensor_fault": 13.830517620841722,
+      "sensor_reconstruction": 318.4081552573491,
+      "source_node": 3.2607407514752866,
+      "source_region": 17.035592119825793,
+      "start_time": 12.79127429682653,
+      "travel_time": 278730.6302330991
+    },
+    "new_tasks_with_gradient": [
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "future_concentration",
+      "next_step",
+      "ood_class",
+      "sensor_reconstruction",
+      "travel_time"
+    ],
+    "overrides": {
+      "auxiliary_heads": true,
+      "event_control_heads": true
+    },
+    "resume_ok": true,
+    "resumed_best_validation_loss": 12992018.714285715,
+    "resumed_epochs": 3,
+    "resumed_global_steps": 30,
+    "run_id": "20260806T213703Z-3467f00d",
+    "wall_seconds": 38.57131561800088
+  },
+  "schema_version": 1,
+  "seed": 20260806,
+  "stage": "core-issues2.txt Phase 8 Stage 1 -- event/control/auxiliary smoke screening",
+  "stop_gate": {
+    "labels_receive_gradients": true,
+    "new_tasks_all_receive_gradients": true,
+    "no_nans": true,
+    "passed": true,
+    "reproducible": true
+  },
+  "train_subset": 200,
+  "validation_subset": 50,
+  "wall_seconds": 38.57580455800053
+}

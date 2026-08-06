@@ -1,0 +1,48 @@
+loading train-split scenarios per topology to fit signature libraries...
+  golden-reference: signature artifact ready in 0.0s (cache_hit=True)
+  branched-loop: signature artifact ready in 0.0s (cache_hit=True)
+  loop-grid: signature artifact ready in 11.8s (cache_hit=False)
+validated topology hashes: 3
+processing 1000 scenarios from split=calibration (0 already done)
+  25/1000 done, 2.11/s
+  50/1000 done, 2.10/s
+  75/1000 done, 2.10/s
+  100/1000 done, 2.09/s
+  125/1000 done, 2.09/s
+  150/1000 done, 2.08/s
+  175/1000 done, 2.03/s
+  200/1000 done, 2.04/s
+  225/1000 done, 2.04/s
+  250/1000 done, 2.04/s
+  275/1000 done, 2.04/s
+  300/1000 done, 2.05/s
+  325/1000 done, 2.05/s
+  350/1000 done, 2.05/s
+  375/1000 done, 2.09/s
+  400/1000 done, 2.12/s
+  425/1000 done, 2.15/s
+  450/1000 done, 2.16/s
+  475/1000 done, 2.19/s
+  500/1000 done, 2.21/s
+  525/1000 done, 2.23/s
+  550/1000 done, 2.25/s
+  575/1000 done, 2.27/s
+  600/1000 done, 2.27/s
+  625/1000 done, 2.29/s
+  650/1000 done, 2.30/s
+  675/1000 done, 2.31/s
+  700/1000 done, 2.32/s
+  725/1000 done, 2.31/s
+  750/1000 done, 2.31/s
+  775/1000 done, 2.32/s
+  800/1000 done, 2.32/s
+  825/1000 done, 2.32/s
+  850/1000 done, 2.32/s
+  875/1000 done, 2.33/s
+  900/1000 done, 2.34/s
+  925/1000 done, 2.34/s
+  950/1000 done, 2.35/s
+  975/1000 done, 2.35/s
+  1000/1000 done, 2.36/s
+wrote 1000 new records (0 errors) to data/learning-v2/cycle-b2-trajectories/calibration.jsonl
+report: data/learning-v2/cycle-b2-trajectories/calibration-report.json
