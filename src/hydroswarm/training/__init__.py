@@ -1,6 +1,7 @@
 """Governed CPU training, checkpoints, and scientific multitask objectives."""
 
 from .artifacts import RunArtifacts
+from .auxiliary_labels import future_concentration_target, sensor_reconstruction_target, travel_time_target
 from .checkpoint import export_model, load_checkpoint, save_checkpoint
 from .config import TrainingConfig
 from .control_labels import classify_evidence_sufficiency, classify_next_step, next_step_target
@@ -129,6 +130,7 @@ __all__ = [
     "compute_multitask_loss",
     "cross_split_leakage",
     "export_model",
+    "future_concentration_target",
     "generate_scout_label",
     "generate_strategist_labels",
     "load_checkpoint",
@@ -141,9 +143,11 @@ __all__ = [
     "permute_example",
     "resolve_source_node_id",
     "save_checkpoint",
+    "sensor_reconstruction_target",
     "set_deterministic_seed",
     "task_gradient_norms",
     "topology_calibration_is_valid",
+    "travel_time_target",
     "validate_split_isolation",
     "validate_targets_v2",
     "write_shards",
