@@ -16,8 +16,8 @@ checkpoints, and every existing result artifact remain untouched.
 |---|---|---|
 | 0 | Arm VM environment repair (EPANET build, pyarrow dependency, cross-arch FP determinism) | **DONE** — see "Arm environment fixes" below |
 | 1 | Define and validate missing targets_v2 heads | **DONE** (schema/audit scope) — see "Phase 1" below |
-| 2 | HydroScout supervision | **NOT STARTED** |
-| 3 | HydroStrategist supervision | **NOT STARTED** |
+| 2 | HydroScout supervision | **DONE** (label-generation/trajectory library) — see "Phase 2" below |
+| 3 | HydroStrategist supervision | **DONE** (label-generation/trajectory library) — see "Phase 3" below |
 | 4 | Learned OOD supervision | **NOT STARTED** |
 | 5 | Complete control targets (evidence_sufficiency/next_step) | **NOT STARTED** |
 | 6 | Auxiliary objectives | **NOT STARTED** |
@@ -125,16 +125,69 @@ phase; the existing label generators found in the audit already satisfy this (Sc
 from EIG ranking, Strategist from WNTR verification, OOD categories from governed
 distribution-shift generation).
 
+## Phase 2: HydroScout supervision (label-generation library, commit `8e59a71`)
+
+`hydroswarm.training.scout_trajectory.build_scout_trajectory()` repeatedly calls
+`generate_scout_label()` with a growing `already_sampled` set, packaging each step
+into a hash-chained `FullTrajectory` plus a `ScoutTrajectoryStep` carrying a strictly
+targets_v2-governed `targets` dict (passes `validate_targets_v2()` as-is) and a
+separate `diagnostics` dict for the non-governed extras Phase 2 item 3 also asks for
+(per-node information gain, per-candidate accessibility). `scout_labels.ScoutLabel`
+gained a `candidates` field (every candidate `rank_sample_locations` evaluated,
+previously discarded) to support this without recomputing posterior/signature work.
+10 tests, including one that caught a real off-by-one in the `maximum_samples`
+termination check before it shipped.
+
+Known, documented simplification: `generate_scout_label` always evaluates the *same*
+base observations at every step (`already_sampled` changes which candidates are
+excluded, not what evidence is revealed) — the fuller "simulate a genuinely new
+observation after each sample" notion belongs to Phase 7, which doesn't exist yet
+either. Phase 2's own literal spec is satisfied as written.
+
+**Not yet done** (deferred to Phase 7, see below): an actual corpus-generation script
+that runs this over real scenarios and writes a versioned dataset; the Scout benchmark
+comparison against random/fixed/classical-EIG baselines (needs a trained Scout head,
+which needs Phase 7's corpus + Phase 8 training).
+
+## Phase 3: HydroStrategist supervision (label-generation library, commit `f517294`)
+
+`hydroswarm.training.strategist_trajectory.build_strategist_trajectory()` classifies
+an incident's probable source nodes via the same classical localizer the live
+pipeline uses (`HybridInferencePipeline._signature_observations`/`localize_with_
+signatures`/`_credible_nodes`/`_planning_context`, reused directly rather than
+re-derived — deliberately avoiding the same train/serve-skew defect class the repair
+pass found in commit `a99cdbc`), generates and exactly WNTR-verifies a bounded plan
+set via the already-existing `generate_strategist_labels()`, and packages the result
+as a single-step `TrajectoryState` plus one governed target dict per plan label. 7
+tests, including independent re-verification that `plan_validity` is read only from
+WNTR, never a template's predicted score.
+
+**Real defect found and documented, not fixed** (out of this module's scope):
+`hydroswarm.planning.response`'s bounded template generator produces 9 distinct
+`action_template` values, but `HydroCore.action_head` defaults to
+`action_vocabulary_size=8`. Any future Strategist-enabled training run must pass
+`action_vocabulary_size=9` explicitly — the bare default is insufficient and would
+misclassify or error on the last template. Not changed unilaterally: a model-
+architecture default change affects checkpoint-loading compatibility
+(core-issues.txt Task 4.0), and no promoted checkpoint currently trains this head.
+
+**Not yet done** (deferred to Phase 7): multi-round plan revision (`revise_rejected_
+plan`) is not wired in — Strategist supervision here is single-decision-point, per
+Phase 3's own spec; corpus-generation script and Strategist benchmark, same reasons
+as Scout above.
+
 ## What's next
 
-Phase 2 (HydroScout supervision) is next: build a trajectory-driver loop that calls
-`scout_labels.generate_scout_label()` repeatedly per incident with a growing
-`already_sampled` set, packaging each step into a `TrajectoryState` and the sequence
-into a `FullTrajectory`, then a corpus-level script to run this over a set of
-scenarios (reusing the existing Cycle B2 scenario archives per Phase 2's data spec,
-writing output to a new versioned sibling directory rather than mutating
-`data/learning-v2/cycle-b2` in place — following the exact precedent
-`cycle-b2` itself set relative to `cycle-b`).
+Phase 4 (learned OOD supervision) is next. The classical/deterministic OOD stack
+(`inference/ood.py`, `training/ood_categories.py`, `calibration/conformal.py`'s
+validity gates) is mature; only a per-example `ood_class` label generator is
+missing. After Phase 4-6 build the remaining label generators as library functions
+(matching Phase 2/3's pattern), Phase 7 will combine all of them (Sentinel + Scout +
+Strategist + OOD + control) into one real corpus-generation script writing a new
+versioned sibling directory (e.g. `data/learning-v2/cycle-b2-trajectories/`) — this
+is deliberately deferred rather than writing a separate throwaway corpus script per
+phase, since Phase 7 explicitly unifies them into one integrated trajectory dataset
+anyway (see "What's next" reasoning recorded when Phase 2 started, carried forward).
 
 ## Restrictions honored
 
