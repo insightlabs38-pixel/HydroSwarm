@@ -1,0 +1,184 @@
+{
+  "calibration_alpha": 0.1,
+  "corpus": "data/learning-v2/cycle-b2/tensors-normalized",
+  "early_stopping_patience": 3,
+  "failures": {},
+  "finalists": {
+    "E0": {}
+  },
+  "max_epochs": 16,
+  "maximum_runtime_seconds_per_run": 7200.0,
+  "results": {
+    "E0": {
+      "20260810": {
+        "best_validation_loss": 3.2456475458447893,
+        "calibration_artifact_hash": "8de6b49430f0757a55b37e928407aad59d5162991764ed9097f61e02e321aeff",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.04474726580686503,
+          "mean_set_size": 2.3637640449438204
+        },
+        "checkpoint": "experiments/runs/cycle-b2-stage3/E0-seed20260810/20260806T012353Z-a8f77fde/checkpoints/checkpoint-0016",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.30700325732899,
+          "measured_coverage": 0.9071661237785016
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8770358306188925,
+          "ece": 0.020763043799598375,
+          "examples": 1228,
+          "mean_latency_seconds": 0.005175200552588033,
+          "mrr": 0.8134994958895612,
+          "source_top1": 0.7214983713355049,
+          "source_top3": 0.8770358306188925
+        },
+        "epochs_completed": 16,
+        "finalist": "E0",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.363013698630137,
+              "measured_coverage": 0.8698630136986302
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8732876712328768,
+              "ece": 0.05777698025515633,
+              "examples": 292,
+              "mean_latency_seconds": 0.005115065661089356,
+              "mrr": 0.7823548597521202,
+              "source_top1": 0.6643835616438356,
+              "source_top3": 0.8732876712328768
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.392857142857143,
+              "measured_coverage": 0.7714285714285715
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8,
+              "ece": 0.1326625897948231,
+              "examples": 280,
+              "mean_latency_seconds": 0.004793059102978857,
+              "mrr": 0.7145238095238096,
+              "source_top1": 0.5678571428571428,
+              "source_top3": 0.8
+            }
+          }
+        },
+        "overrides": {},
+        "parameter_count": 4041031,
+        "run_id": "20260806T012353Z-ea69ed45",
+        "seed": 20260810,
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.2865168539325844,
+          "measured_coverage": 0.9002808988764045
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8721910112359551,
+          "ece": 0.03330458631592522,
+          "examples": 712,
+          "mean_latency_seconds": 0.005409783668531755,
+          "mrr": 0.8103581460674156,
+          "source_top1": 0.7162921348314607,
+          "source_top3": 0.8721910112359551
+        },
+        "wall_seconds": 4310.4364166469895
+      },
+      "20260811": {
+        "best_validation_loss": 3.2002046865130227,
+        "calibration_artifact_hash": "b68c2247a14132368eb886049c7b4c40becff9f9380dbedfa2b36401a09a8c6c",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.02641240053770041,
+          "mean_set_size": 2.3286516853932584
+        },
+        "checkpoint": "experiments/runs/cycle-b2-stage3/E0-seed20260811/20260806T023546Z-993cb3e1/checkpoints/checkpoint-0016",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.2866449511400653,
+          "measured_coverage": 0.8982084690553745
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8713355048859935,
+          "ece": 0.02637701231610117,
+          "examples": 1228,
+          "mean_latency_seconds": 0.005440469353912402,
+          "mrr": 0.8087627966496044,
+          "source_top1": 0.7141693811074918,
+          "source_top3": 0.8713355048859935
+        },
+        "epochs_completed": 16,
+        "finalist": "E0",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.2945205479452055,
+              "measured_coverage": 0.8664383561643836
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8732876712328768,
+              "ece": 0.06568365426708575,
+              "examples": 292,
+              "mean_latency_seconds": 0.005473867604400953,
+              "mrr": 0.7746004566210046,
+              "source_top1": 0.6506849315068494,
+              "source_top3": 0.8732876712328768
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.1035714285714286,
+              "measured_coverage": 0.7714285714285715
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8428571428571429,
+              "ece": 0.24421566873788836,
+              "examples": 280,
+              "mean_latency_seconds": 0.005112262118317241,
+              "mrr": 0.6967857142857142,
+              "source_top1": 0.5178571428571429,
+              "source_top3": 0.8428571428571429
+            }
+          }
+        },
+        "overrides": {},
+        "parameter_count": 4041031,
+        "run_id": "20260806T023546Z-f72874d9",
+        "seed": 20260811,
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.247191011235955,
+          "measured_coverage": 0.8918539325842697
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8792134831460674,
+          "ece": 0.03142917547584252,
+          "examples": 712,
+          "mean_latency_seconds": 0.005624452169020392,
+          "mrr": 0.8164944489031568,
+          "source_top1": 0.7275280898876404,
+          "source_top3": 0.8792134831460674
+        },
+        "wall_seconds": 4211.820726348989
+      }
+    }
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260810,
+    20260811
+  ],
+  "stage": "Bundle F Stage 3 -- finalist training",
+  "wall_seconds": 8522.41782948401
+}

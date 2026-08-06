@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python",
+    "scripts/generate_cycle_b_corpus.py",
+    "--output",
+    "data/learning-v2/cycle-b2",
+    "--seed",
+    "71000"
+  ],
+  "ended_at": "2026-08-06T00:53:48.593150+00:00",
+  "exit_code": 0,
+  "log_path": "experiments/jobs/cycle-b2-generation/job.log",
+  "pid": 142635,
+  "resume_command": [
+    "python",
+    "scripts/generate_cycle_b_corpus.py",
+    "--output",
+    "data/learning-v2/cycle-b2",
+    "--seed",
+    "71000"
+  ],
+  "started_at": "2026-08-05T22:56:54.644017+00:00",
+  "state": "COMPLETED",
+  "workdir": "/workspace/HydroSwarm"
+}

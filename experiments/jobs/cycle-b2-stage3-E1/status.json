@@ -1,0 +1,41 @@
+{
+  "command": [
+    "python",
+    "scripts/run_stage3_finalist_training.py",
+    "--corpus-root",
+    "data/learning-v2/cycle-b2",
+    "--tensors-dirname",
+    "tensors-normalized",
+    "--finalists",
+    "E1",
+    "--run-root",
+    "experiments/runs/cycle-b2-stage3",
+    "--registry",
+    "experiments/registry/cycle-b2-stage3-E1.jsonl",
+    "--output",
+    "reports/results/v3/cycle-b2-stage3-E1.json"
+  ],
+  "ended_at": "2026-08-06T03:48:37.202713+00:00",
+  "exit_code": 0,
+  "log_path": "experiments/jobs/cycle-b2-stage3-E1/job.log",
+  "pid": 226154,
+  "resume_command": [
+    "python",
+    "scripts/run_stage3_finalist_training.py",
+    "--corpus-root",
+    "data/learning-v2/cycle-b2",
+    "--tensors-dirname",
+    "tensors-normalized",
+    "--finalists",
+    "E1",
+    "--run-root",
+    "experiments/runs/cycle-b2-stage3",
+    "--registry",
+    "experiments/registry/cycle-b2-stage3-E1.jsonl",
+    "--output",
+    "reports/results/v3/cycle-b2-stage3-E1.json"
+  ],
+  "started_at": "2026-08-06T01:23:41.927072+00:00",
+  "state": "COMPLETED",
+  "workdir": "/workspace/HydroSwarm"
+}

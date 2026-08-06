@@ -1,0 +1,5 @@
+E1-seed20260810: OK (4329.2s, val_top1=0.725, stopped_early=False)
+E1-seed20260811: OK (4235.1s, val_top1=0.719, stopped_early=False)
+{
+  "failures": {}
+}

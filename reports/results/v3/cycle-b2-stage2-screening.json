@@ -1,0 +1,114 @@
+{
+  "batch_size": 16,
+  "corpus": "data/learning-v2/cycle-b2/tensors-normalized",
+  "epochs": 4,
+  "experiments_run": [
+    "E0",
+    "E1",
+    "E2"
+  ],
+  "failures": {},
+  "ranking": [
+    "E1",
+    "E0",
+    "E2"
+  ],
+  "results": {
+    "E0": {
+      "best_validation_loss": 4.070913545669071,
+      "checkpoint": "experiments/runs/cycle-b2-stage2/20260806T005747Z-6ac98758/model-export.safetensors",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8664495114006515,
+        "ece": 0.025295400755413186,
+        "mean_latency_seconds": 0.0038003797921632985,
+        "mrr": 0.7969666123778502,
+        "sensor_fault_accuracy": 0.5059497248252268,
+        "source_top1": 0.6938110749185668,
+        "source_top3": 0.8664495114006515
+      },
+      "experiment": "E0",
+      "overrides": {},
+      "parameter_count": 4041031,
+      "run_id": "20260806T005747Z-9d118959",
+      "score": 0.7463420087902496,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8721910112359551,
+        "ece": 0.03520780351808229,
+        "mean_latency_seconds": 0.0038741842876449466,
+        "mrr": 0.7997191011235957,
+        "sensor_fault_accuracy": 0.5046728971962616,
+        "source_top1": 0.6966292134831461,
+        "source_top3": 0.8721910112359551
+      },
+      "wall_seconds": 447.84033496901975
+    },
+    "E1": {
+      "best_validation_loss": 4.13600428520687,
+      "checkpoint": "experiments/runs/cycle-b2-stage2/20260806T010516Z-09475db7/model-export.safetensors",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8697068403908795,
+        "ece": 0.024544685763528373,
+        "mean_latency_seconds": 0.0037817635325678345,
+        "mrr": 0.8035307119590507,
+        "sensor_fault_accuracy": 0.5059497248252268,
+        "source_top1": 0.7052117263843648,
+        "source_top3": 0.8697068403908795
+      },
+      "experiment": "E1",
+      "overrides": {
+        "prior_mode": "feature_only"
+      },
+      "parameter_count": 4041031,
+      "run_id": "20260806T010515Z-30f50195",
+      "score": 0.7472928995820344,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8764044943820225,
+        "ece": 0.028800698248355572,
+        "mean_latency_seconds": 0.0037871804036960443,
+        "mrr": 0.7959487025147138,
+        "sensor_fault_accuracy": 0.5046728971962616,
+        "source_top1": 0.6867977528089888,
+        "source_top3": 0.8764044943820225
+      },
+      "wall_seconds": 443.8827571599977
+    },
+    "E2": {
+      "best_validation_loss": 4.102315285849193,
+      "checkpoint": "experiments/runs/cycle-b2-stage2/20260806T011239Z-180b0aa8/model-export.safetensors",
+      "development_holdout_metrics": {
+        "candidate_coverage_at_3": 0.8729641693811075,
+        "ece": 0.02721135314638916,
+        "mean_latency_seconds": 0.0037562643666784754,
+        "mrr": 0.7941028773072747,
+        "sensor_fault_accuracy": 0.5057266101442808,
+        "source_top1": 0.6881107491856677,
+        "source_top3": 0.8729641693811075
+      },
+      "experiment": "E2",
+      "overrides": {
+        "prior_mode": "logit_only"
+      },
+      "parameter_count": 4041031,
+      "run_id": "20260806T011239Z-3b8e3a06",
+      "score": 0.7426414495842981,
+      "task_weights": {},
+      "validation_metrics": {
+        "candidate_coverage_at_3": 0.8707865168539326,
+        "ece": 0.04009651105976506,
+        "mean_latency_seconds": 0.0037951284347010577,
+        "mrr": 0.7945308319957197,
+        "sensor_fault_accuracy": 0.5042834890965732,
+        "source_top1": 0.6882022471910112,
+        "source_top3": 0.8707865168539326
+      },
+      "wall_seconds": 441.16094096400775
+    }
+  },
+  "schema_version": 1,
+  "score_formula": "0.30*source_top1(val) + 0.15*source_top3(val) + 0.10*mrr(val) + 0.15*(1-ece(val)) + 0.10*candidate_coverage_at_3(val) + 0.10*source_top1(dev_holdout) + 0.05*sensor_fault_accuracy(val) + 0.05*normalized_inverse_latency",
+  "seed": 20260805,
+  "stage": "Bundle F Stage 2 -- architecture screening (E0-E8)",
+  "wall_seconds": 1332.8967079930007
+}

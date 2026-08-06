@@ -1,0 +1,13 @@
+{
+  "alpha": 0.1,
+  "calibration_artifact": "experiments/runs/cycle-b2-stage3/E0-seed20260811/20260806T023546Z-993cb3e1/checkpoints/checkpoint-0016/calibration-dynamic-fusion.json",
+  "calibration_artifact_hash": "548009981c74a1d1c66c28936c1e66d65eca670638329c737101dad3d22a922f",
+  "checkpoint": "experiments/runs/cycle-b2-stage3/E0-seed20260811/20260806T023546Z-993cb3e1/checkpoints/checkpoint-0016/model.safetensors",
+  "coverage": 0.9143258426966292,
+  "examples_skipped": 288,
+  "examples_used": 712,
+  "expected_calibration_error": 0.08088244761664962,
+  "fusion_config": "fuse_source_probabilities-v1",
+  "mean_set_size": 2.5842696629213484,
+  "schema_version": 1
+}

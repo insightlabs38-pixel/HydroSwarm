@@ -1,0 +1,190 @@
+{
+  "calibration_alpha": 0.1,
+  "corpus": "data/learning-v2/cycle-b2/tensors-normalized",
+  "early_stopping_patience": 3,
+  "failures": {},
+  "finalists": {
+    "E1": {
+      "prior_mode": "feature_only"
+    }
+  },
+  "max_epochs": 16,
+  "maximum_runtime_seconds_per_run": 7200.0,
+  "results": {
+    "E1": {
+      "20260810": {
+        "best_validation_loss": 3.208445214089893,
+        "calibration_artifact_hash": "b24b55c8ff2f52ba40bf3f7a83b12726f177c9a226c4501db7b756098602999e",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.02985982582173834,
+          "mean_set_size": 2.3974719101123596
+        },
+        "checkpoint": "experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.3640065146579805,
+          "measured_coverage": 0.9006514657980456
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8786644951140065,
+          "ece": 0.03364152041436791,
+          "examples": 1228,
+          "mean_latency_seconds": 0.005372828652590816,
+          "mrr": 0.807832131223825,
+          "source_top1": 0.7092833876221498,
+          "source_top3": 0.8786644951140065
+        },
+        "epochs_completed": 16,
+        "finalist": "E1",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.458904109589041,
+              "measured_coverage": 0.886986301369863
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8595890410958904,
+              "ece": 0.04398470739387482,
+              "examples": 292,
+              "mean_latency_seconds": 0.00544410413868556,
+              "mrr": 0.781099151989563,
+              "source_top1": 0.6643835616438356,
+              "source_top3": 0.8595890410958904
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.3892857142857142,
+              "measured_coverage": 0.7285714285714285
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8,
+              "ece": 0.2319045604339668,
+              "examples": 280,
+              "mean_latency_seconds": 0.005125198097617353,
+              "mrr": 0.6592857142857143,
+              "source_top1": 0.475,
+              "source_top3": 0.8
+            }
+          }
+        },
+        "overrides": {
+          "prior_mode": "feature_only"
+        },
+        "parameter_count": 4041031,
+        "run_id": "20260806T012354Z-a8cd1f66",
+        "seed": 20260810,
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.348314606741573,
+          "measured_coverage": 0.9073033707865169
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.875,
+          "ece": 0.0260002979108791,
+          "examples": 712,
+          "mean_latency_seconds": 0.005416287929844831,
+          "mrr": 0.8143977394328517,
+          "source_top1": 0.7247191011235955,
+          "source_top3": 0.875
+        },
+        "wall_seconds": 4329.193061129015
+      },
+      "20260811": {
+        "best_validation_loss": 3.184784317773486,
+        "calibration_artifact_hash": "78b0f4cdbdbbe02def200075b23e6440c7ef4919c9c717cd77fc744c39a4b7d5",
+        "calibration_report": {
+          "coverage": 0.9073033707865169,
+          "expected_calibration_error": 0.026248960036580067,
+          "mean_set_size": 2.3497191011235956
+        },
+        "checkpoint": "experiments/runs/cycle-b2-stage3/E1-seed20260811/20260806T023604Z-282c8c2f/checkpoints/checkpoint-0016",
+        "development_holdout_calibrated": {
+          "examples": 1228,
+          "mean_set_size": 2.3387622149837135,
+          "measured_coverage": 0.9006514657980456
+        },
+        "development_holdout_metrics": {
+          "candidate_coverage_at_3": 0.8754071661237784,
+          "ece": 0.02173026000735037,
+          "examples": 1228,
+          "mean_latency_seconds": 0.004164382551657922,
+          "mrr": 0.8092523654412905,
+          "source_top1": 0.7141693811074918,
+          "source_top3": 0.8754071661237784
+        },
+        "epochs_completed": 16,
+        "finalist": "E1",
+        "ood_development": {
+          "SEVERE_MISSINGNESS": {
+            "calibrated": {
+              "examples": 292,
+              "mean_set_size": 2.4006849315068495,
+              "measured_coverage": 0.8698630136986302
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8732876712328768,
+              "ece": 0.06069247286817796,
+              "examples": 292,
+              "mean_latency_seconds": 0.0041928211975797765,
+              "mrr": 0.776186399217221,
+              "source_top1": 0.6506849315068494,
+              "source_top3": 0.8732876712328768
+            }
+          },
+          "UNSEEN_TOPOLOGY": {
+            "calibrated": {
+              "examples": 280,
+              "mean_set_size": 2.0964285714285715,
+              "measured_coverage": 0.7678571428571429
+            },
+            "localization": {
+              "candidate_coverage_at_3": 0.8535714285714285,
+              "ece": 0.24521237292460032,
+              "examples": 280,
+              "mean_latency_seconds": 0.003862399789146106,
+              "mrr": 0.6926785714285714,
+              "source_top1": 0.5071428571428571,
+              "source_top3": 0.8535714285714285
+            }
+          }
+        },
+        "overrides": {
+          "prior_mode": "feature_only"
+        },
+        "parameter_count": 4041031,
+        "run_id": "20260806T023604Z-8b535efd",
+        "seed": 20260811,
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false,
+        "validation_calibrated": {
+          "examples": 712,
+          "mean_set_size": 2.294943820224719,
+          "measured_coverage": 0.898876404494382
+        },
+        "validation_metrics": {
+          "candidate_coverage_at_3": 0.8693820224719101,
+          "ece": 0.03363791733896468,
+          "examples": 712,
+          "mean_latency_seconds": 0.004318036987309354,
+          "mrr": 0.8120251471375066,
+          "source_top1": 0.7191011235955056,
+          "source_top3": 0.8693820224719101
+        },
+        "wall_seconds": 4235.094319630996
+      }
+    }
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260810,
+    20260811
+  ],
+  "stage": "Bundle F Stage 3 -- finalist training",
+  "wall_seconds": 8564.447540127992
+}

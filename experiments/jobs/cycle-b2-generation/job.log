@@ -1,0 +1,99 @@
+{
+  "cache_hit_rate": "not applicable: each scenario now builds its own hydraulic feature context from its own randomized network (core-issues.txt repair item 4), so hydroswarm.simulation.context_cache.HydraulicContextCache was deliberately not wired in here -- per-scenario demand/roughness/tank/pipe randomization makes every scenario's network_state_hash close to unique, so a cache keyed on it would rarely hit, and it would additionally require new FeatureContext (de)serialization that does not exist yet. A real, if smaller, correctness fix should not be gated on building that infrastructure.",
+  "counts_by_topology": {
+    "branched-loop": 4249,
+    "golden-reference": 4252,
+    "loop-grid": 4249
+  },
+  "cross_split_leakage": {
+    "examples_missing_topology_metadata": 0,
+    "scenario_id_leaks": [],
+    "seed_family_leaks": [],
+    "topology_hash_conflicts": {},
+    "topology_leak_note": "topology_hash_conflicts lists any network_id that resolved to more than one distinct topology_hash across these splits -- a real leak/labeling bug, not expected reuse. examples_missing_topology_metadata counts examples with no TopologyMetadata at all (e.g. generated before repair item 5), for which this check cannot run at all; a nonzero count here means topology-hash leakage may still be silently undetected for those specific examples."
+  },
+  "curriculum_stage_counts": {
+    "ADVERSARIAL": 2544,
+    "CLEAN": 2553,
+    "DEGRADED": 2553,
+    "OPERATIONAL": 2553,
+    "SHIFT": 2547
+  },
+  "cycle": "B",
+  "development_ood_topology": "coastal-branch",
+  "duplicate_scenario_id_estimate": 0,
+  "event_cause_counts": {
+    "0": 8952,
+    "1": 1899,
+    "2": 633,
+    "4": 1266
+  },
+  "generated_at": "2026-08-06T00:52:41.877448+00:00",
+  "generation_seconds": 6943.027719464997,
+  "limitations": [
+    "Train/validation/calibration/development_holdout counts are toward the low-to-mid end of the plan's stated ranges (9,000/1,000/1,000/1,750) rather than the maximum (12,000/1,000/1,000/2,000), to keep a single generation pass tractable within one session; still within every stated range.",
+    "OOD holdout covers 2 of the plan's ~10 governed OODCategory values (UNSEEN_TOPOLOGY, SEVERE_MISSINGNESS) at 400 examples each, not the full category list at 300-500 each. EXTREME_DEMAND, TANK_STATE_SHIFT, VALVE_PUMP_MISMATCH, ROUGHNESS_MISMATCH, FROZEN_DRIFTING_SENSOR, TIMING_OUTSIDE_TRAINING_RANGE, and UNSUPPORTED_NETWORK_ELEMENT_OR_INVALID_CALIBRATION were not generated this pass.",
+    "The generated OOD-holdout examples are not labeled with an ood_class target -- hydroswarm.training.corpus.scenario_to_example does not currently emit one at all (a pre-existing gap: ood_class is a governed targets_v2 target with no generator, same category of gap Bundle E found and partly closed for other targets). Category membership for these examples is recorded only in this report's ood_holdout_counts and the per-split key names under tensors/, not as a per-example model target.",
+    "The plan's required hard-negative list (hydraulically similar sources, graph symmetries, misleading positive/negative sensors, contamination vs. sensor drift, incorrect valve state, wrong-but-high-confidence classical prior, similar-EIG sample candidates, plans that reduce exposure but violate pressure, plans that preserve pressure but provide little benefit) requires deliberate scenario-pair construction this generator does not attempt; none of it was generated this pass.",
+    "The two topologies Cycle A already used (golden-reference, branched-loop) are reused here as 2 of Cycle B's 3 training topologies; loop-grid is the only topology newly introduced for training in this cycle."
+  ],
+  "ood_holdout_counts": {
+    "SEVERE_MISSINGNESS": 400,
+    "UNSEEN_TOPOLOGY": 400
+  },
+  "quarantined_scenarios": 0,
+  "replay_validation_rate": 1.0,
+  "scenario_count": 12750,
+  "schema_version": 1,
+  "signature_library_sha256_by_topology": {
+    "branched-loop": "a4ac3f8bf03f7e00cabcf23e212794ffd6c4f17103010b2d733c01ba49314c3e",
+    "coastal-branch-signature-only": "bc74b361ef9a45cfd35132a41d5bc3a423226ad16bac299b2dd40cdedfc3db39",
+    "golden-reference": "41d5b6674fb4d5beb699fe79eb930a3008f2c9562a444ab29151ac438b6be22d",
+    "loop-grid": "e355bb99060c015f9b62547adbad513ab4d1247bd6f4c17388af9e609bc33a8d"
+  },
+  "split_counts": {
+    "calibration": 1000,
+    "development_holdout": 1750,
+    "train": 9000,
+    "validation": 1000
+  },
+  "storage_bytes": 223299085,
+  "tensor_shard_manifests": {
+    "calibration": {
+      "shards": 4,
+      "total_examples": 1000
+    },
+    "development_holdout": {
+      "shards": 7,
+      "total_examples": 1750
+    },
+    "ood-SEVERE_MISSINGNESS": {
+      "shards": 2,
+      "total_examples": 400
+    },
+    "ood-UNSEEN_TOPOLOGY": {
+      "shards": 2,
+      "total_examples": 400
+    },
+    "train": {
+      "shards": 36,
+      "total_examples": 9000
+    },
+    "validation": {
+      "shards": 4,
+      "total_examples": 1000
+    }
+  },
+  "topology_families": 4,
+  "topology_node_counts": {
+    "branched-loop": 8,
+    "coastal-branch": 8,
+    "golden-reference": 6,
+    "loop-grid": 9
+  },
+  "training_topologies": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ]
+}

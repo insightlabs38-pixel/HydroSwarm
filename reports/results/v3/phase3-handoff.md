@@ -18,9 +18,101 @@ Strategist/OOD/auxiliary supervision) for what comes after this.
 | 15 | Corrected E0/E1/E2 screening | **DONE** — `reports/results/v3/cycle-b2-stage2-screening.json` |
 | 16 | Select strongest two (validation + dev holdout only) | **DONE** — E1, E0 (E2 dropped) |
 | 17 | Fully train selected two, ≥2 seeds each | **DONE** — `reports/results/v3/cycle-b2-stage3-{E1,E0}.json` |
-| 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | IN PROGRESS (background jobs) |
-| 19 | Re-run HydroMono/no-adapter control | not started |
+| 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | **DONE** — 2 real defects found and fixed along the way |
+| 19 | Re-run HydroMono/no-adapter control | IN PROGRESS (background job, ~2.4h expected) |
 | 20 | Decide on HydroCore-M | not started |
+
+## Item 18 results: two real defects found and fixed, then a credible calibration
+
+Fitting calibration against the *actual* `HybridInferencePipeline.analyze()` (not the
+`fixed_weight_fusion` approximation) immediately produced a nonsensical result --
+`coverage=1.0`, `mean_set_size≈7.66` (essentially "every node"), `ECE≈0.35` -- versus
+Stage 3's own internal fixed-weight calibration on the same checkpoints
+(`ECE≈0.03`, `mean_set_size≈2.3`). Rather than accept a bad number, this was run down to
+two real, distinct, previously-undiscovered defects:
+
+**Defect 1 (fixed, `a99cdbc`): live inference snapshotted hydraulic state at the wrong
+time.** `HybridInferencePipeline.analyze()` called `self.simulator.calculate_state()`
+with no argument, which defaults to the network's *last* simulated timestep. Every
+feature-building path that trains or verifies the model
+(`hydroswarm.training.corpus.build_feature_context`, `hydroswarm.cli`'s fixed-inference
+verification) has always explicitly snapshotted at 3,600s instead. For the golden-
+reference/Cycle B networks (86,400s simulations) that is a massive, silent train/serve
+skew. Confirmed empirically against a real trained checkpoint: the true source's neural
+belief went from an undifferentiated ~0.30 among candidates to a correctly-ranked ~0.49
+once the snapshot matched training. Fixed by introducing a single named constant,
+`FEATURE_SNAPSHOT_TIME_SECONDS`, used by all three call sites (`build_feature_context`,
+`hydroswarm.cli`, and now `HybridInferencePipeline.analyze()`) instead of a literal
+present in two of them and silently absent from the third. Regression test added
+(`tests/scientific/test_hybrid_pipeline.py`); full suite (436 tests) unaffected.
+
+**Defect 2 (fixed in `fit_dynamic_fusion_calibration.py` only, `2e46d92`): the
+calibration script's own signature-artifact hypothesis grid was too narrow.** The
+script initially copied `src/hydroswarm/runtime/defaults.py`'s production
+`SignatureBuilder` configuration (`start_time_bins=(0,60)`, `duration_bins=(30,60)`,
+`strength_bins=(0.5,1.0)`) on the reasoning that matching deployment was the point.
+That grid cannot represent this corpus's actual incidents (`ScenarioGenerationConfig`'s
+defaults go up to 240min start, 120min duration, 2.0 strength) -- confirmed with a
+direct 20-scenario A/B on real golden-reference calibration data: the classical
+localizer's own top-1 accuracy was 13/20 (65%) with the narrow production bins and
+19/20 (95%) with bins spanning the corpus's real generation grid. A hypothesis grid that
+cannot represent the true incident cannot localize it correctly regardless of model
+quality. Fixed in the calibration script (now uses the wider, corpus-matching grid).
+**Not fixed in `src/hydroswarm/runtime/defaults.py`** -- this is very likely a real,
+live accuracy gap in production today (any real incident whose duration/strength/
+start-time falls outside that narrow grid), but changing it trades live-inference
+latency (more hypotheses to simulate/search per incident) against coverage of
+realistic incidents, which is a product decision for a human to make, not a mechanical
+bug fix to apply unilaterally inside an autonomous run.
+
+**Final result, both finalists, full calibration split (712 CONTAMINATION-only
+examples out of 1000; NORMAL/SENSOR_FAULT_ONLY correctly excluded -- see the script's
+own guard):**
+
+| Checkpoint | Coverage (target 0.90) | Mean set size | ECE | Classical top1 | Neural top1 | Fused top1 |
+|---|---|---|---|---|---|---|
+| E1-seed20260810 | 0.9143 | 2.636 | 0.0791 | 0.7177 | 0.6994 | 0.7093 |
+| E0-seed20260811 | 0.9143 | 2.584 | 0.0809 | 0.7177 | 0.7008 | 0.7121 |
+
+Classical top-1 is identical across E1/E0 (expected -- same classical localizer,
+independent of the neural model). Real dynamic fusion is close to but a bit less sharp
+than Stage 3's `fixed_weight_fusion` approximation (ECE 0.08 vs 0.03, mean set size 2.6
+vs 2.3) -- a believable, order-of-magnitude-consistent difference between the two
+fusion formulas on the same checkpoints, not a red flag. Both calibration artifacts
+record `fusion_config_hash=DYNAMIC_TRUST_FUSION_CONFIG` (not
+`fixed_weight_fusion_config(...)`) and validated `checkpoint`/`normalization`/
+`topology`/`feature_schema` identity hashes.
+
+Artifacts: `reports/results/v3/cycle-b2-dynamic-fusion-calibration-{E1,E0}.json`
+(full per-scenario diagnostics), calibration artifacts alongside each checkpoint at
+`.../checkpoint-0016/calibration-dynamic-fusion.json`.
+
+Resume commands (now using the corrected script):
+
+```bash
+export PYTHONPATH=src OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8
+
+python scripts/fit_dynamic_fusion_calibration.py \
+  --corpus-dir data/learning-v2/cycle-b2 \
+  --checkpoint experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016/model.safetensors \
+  --variant small --overrides-json '{"prior_mode": "feature_only"}' \
+  --node-normalization data/learning-v2/cycle-b2/normalization/node-normalization.json \
+  --edge-normalization data/learning-v2/cycle-b2/normalization/edge-normalization.json \
+  --signature-cache-dir experiments/cache/signatures \
+  --output reports/results/v3/cycle-b2-dynamic-fusion-calibration-E1.json \
+  --calibration-artifact-output experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016/calibration-dynamic-fusion.json
+```
+(swap the E1 paths/overrides for E0's to reproduce that one.)
+
+## Follow-up recommendation (not applied): widen production's signature-artifact grid
+
+`src/hydroswarm/runtime/defaults.py`'s `DefaultPipelineFactory` builds its
+`SignatureArtifact` with `start_time_bins=(0, 60)`, `duration_bins=(30, 60)`,
+`strength_bins=(0.5, 1.0)`. Per Defect 2 above, this measurably caps classical
+localization accuracy for any real incident outside that grid. Recommend widening it
+to match `ScenarioGenerationConfig`'s defaults (or a deliberately chosen operational
+range) after weighing the added hypothesis-grid search cost against coverage of
+realistic incidents -- a product/latency decision, not included in this pass's scope.
 
 ## Item 17 results (full finalist training)
 
