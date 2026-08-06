@@ -1,0 +1,50 @@
+{
+  "archives": [
+    {
+      "archive": "artifacts/migration/cycle-b2-scenarios-train.tar.zst",
+      "archive_bytes": 3722296,
+      "archive_sha256": "5b6235440c55ac0f521ac84251c97327b34453f896ed7a86426bfd349992540d",
+      "expected_destination": "data/learning-v2/cycle-b2/scenarios/train/",
+      "extraction_command": "tar --use-compress-program=unzstd -xf artifacts/migration/cycle-b2-scenarios-train.tar.zst -C data/learning-v2/cycle-b2/scenarios",
+      "file_count": 18000,
+      "includes_ood_scenarios": false,
+      "split": "train",
+      "uncompressed_bytes": 59979149
+    },
+    {
+      "archive": "artifacts/migration/cycle-b2-scenarios-validation.tar.zst",
+      "archive_bytes": 425656,
+      "archive_sha256": "cff90995be2af7f12522f414abfbf60d72cb69131afa6d0861b278c1eebd5233",
+      "expected_destination": "data/learning-v2/cycle-b2/scenarios/validation/",
+      "extraction_command": "tar --use-compress-program=unzstd -xf artifacts/migration/cycle-b2-scenarios-validation.tar.zst -C data/learning-v2/cycle-b2/scenarios",
+      "file_count": 2000,
+      "includes_ood_scenarios": false,
+      "split": "validation",
+      "uncompressed_bytes": 6664284
+    },
+    {
+      "archive": "artifacts/migration/cycle-b2-scenarios-calibration.tar.zst",
+      "archive_bytes": 426604,
+      "archive_sha256": "e1ad6c9be7f68ec91f4dde0176ec7de35d0fb9acdc74b966f26aea2011a7c77b",
+      "expected_destination": "data/learning-v2/cycle-b2/scenarios/calibration/",
+      "extraction_command": "tar --use-compress-program=unzstd -xf artifacts/migration/cycle-b2-scenarios-calibration.tar.zst -C data/learning-v2/cycle-b2/scenarios",
+      "file_count": 2000,
+      "includes_ood_scenarios": false,
+      "split": "calibration",
+      "uncompressed_bytes": 6664416
+    },
+    {
+      "archive": "artifacts/migration/cycle-b2-scenarios-development-holdout.tar.zst",
+      "archive_bytes": 1020031,
+      "archive_sha256": "5df0f96554cade64497d0c87553af58fc5912d39bc1c2423b669e4c8b4339c98",
+      "expected_destination": "data/learning-v2/cycle-b2/scenarios/development_holdout/",
+      "extraction_command": "tar --use-compress-program=unzstd -xf artifacts/migration/cycle-b2-scenarios-development-holdout.tar.zst -C data/learning-v2/cycle-b2/scenarios",
+      "file_count": 5100,
+      "includes_ood_scenarios": true,
+      "split": "development_holdout",
+      "uncompressed_bytes": 16942484
+    }
+  ],
+  "schema_version": 1,
+  "source_git_sha": "6fea9f220f1a63bbf10c85fa241e7716d52477df"
+}

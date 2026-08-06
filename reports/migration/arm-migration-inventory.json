@@ -1,0 +1,1825 @@
+{
+  "entries": [
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/calibration/index.jsonl",
+      "sha256": "a2c5a5ad1691a627ae9a4aca2bf7bb0c5deb3921396a6a657b3d29154c561a75",
+      "size_bytes": 1543515,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/calibration/manifest.json",
+      "sha256": "dc248d37e6a99e87001b0fd1a3b39a1c77aa5cd77cc86c7f809c42a4d8eb2848",
+      "size_bytes": 868,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/calibration/shard-00000.safetensors",
+      "sha256": "81e57a24ae9c361e9c0612de7908015d02abd7d7e6819cedf6f6f59789951d2e",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/calibration/shard-00001.safetensors",
+      "sha256": "3852a485781d251095db971bcbfe7626542ac84ef7080ad801a2bb53a00bae6a",
+      "size_bytes": 1808870,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/calibration/shard-00002.safetensors",
+      "sha256": "0f9be8a1303067917fa0c69f78bc63d0d52d03db5f934c67e672d3a961033f47",
+      "size_bytes": 1507884,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/calibration/shard-00003.safetensors",
+      "sha256": "10345ef6e5ef9cb6be9b39a3157ece2c6700a1dacad2b47fa07ddd04dba6bbd6",
+      "size_bytes": 1439248,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/index.jsonl",
+      "sha256": "1c21df5f0e39ea4659ab31fda61e60c157c7703c64cdde8c8a114efba42c4bcd",
+      "size_bytes": 2715185,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/manifest.json",
+      "sha256": "bda74b28151f006f99848d9149a796404abca0715af72b75188897a5330babb8",
+      "size_bytes": 1363,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00000.safetensors",
+      "sha256": "95a0f912fce4e20e3e29bb2612c5e8b9f1061422f5f90b0de415e5c924d19d45",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00001.safetensors",
+      "sha256": "d4d07bbee50a26a439c8612b613a1c3d1f8c3b44882ec65a77e76bf20f517b31",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00002.safetensors",
+      "sha256": "03d63bdd60af09381ca36e3cdab47b63a125051abb0e3eb49a9746f07f3462b2",
+      "size_bytes": 1782144,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00003.safetensors",
+      "sha256": "994072289e2c1ccef6236369f191492fc6736c849aec63fac1c7acb2a5700fe6",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00004.safetensors",
+      "sha256": "5dd2509e29bf864daba406701a5421099fcc94ceffb508fe18a43b4fc291878e",
+      "size_bytes": 1514132,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00005.safetensors",
+      "sha256": "bdff4af1a5bc0e0a3739d4dda1689b70a4ba27bce0403a8a0f04fc13ef12f420",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/development_holdout/shard-00006.safetensors",
+      "sha256": "73001841a679dc12a56213740f5e9d1079b3777daef25d798c4eef0710305189",
+      "size_bytes": 1327226,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-SEVERE_MISSINGNESS/index.jsonl",
+      "sha256": "cd952c083d89b6a64595b99b091b6ce86de8bd4f34d9f31a826ee6cd301a4bc5",
+      "size_bytes": 620535,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-SEVERE_MISSINGNESS/manifest.json",
+      "sha256": "ef7ba0a5464adb8b19e54f36826e4835cf83752d2f0bf84755c06fd4d5c1c955",
+      "size_bytes": 537,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-SEVERE_MISSINGNESS/shard-00000.safetensors",
+      "sha256": "46666ddd46afefb0ddc35e9c781eee21ab15010266da8fc684377bc33a01f324",
+      "size_bytes": 2057862,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-SEVERE_MISSINGNESS/shard-00001.safetensors",
+      "sha256": "43933762c747a164bcbe1976731dd24fabf86def96294bafc89ba8334edf71ae",
+      "size_bytes": 885844,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-UNSEEN_TOPOLOGY/index.jsonl",
+      "sha256": "cb0228e96353d3352179eb6a2d8dbafaa24a7eea917f80eee63031046ede788f",
+      "size_bytes": 627380,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-UNSEEN_TOPOLOGY/manifest.json",
+      "sha256": "82614d5e9a52e1a297b1631a2f4193a501895d3b8348e8d1992f1a3ebd3b4461",
+      "size_bytes": 537,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-UNSEEN_TOPOLOGY/shard-00000.safetensors",
+      "sha256": "2866d2eda5d277a1b9c2507b6cdc03989b495f4414895294461d2370214d6e39",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/ood-UNSEEN_TOPOLOGY/shard-00001.safetensors",
+      "sha256": "310cc9f728acdc0cb01f1cb4304a5aa25b9092fec593dfd2290f3afded390474",
+      "size_bytes": 816552,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/index.jsonl",
+      "sha256": "a4e05a19cab4c999d6c2f98f5c2b4bd26e1349ddd85ed80ef69f9292fd63ada9",
+      "size_bytes": 13831520,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/manifest.json",
+      "sha256": "6fdc60b30bf13bb4897853535f0d8511c531d1a52e3acf6a07646a06dbef00e0",
+      "size_bytes": 6147,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00000.safetensors",
+      "sha256": "3bc8f4d905979f708cc17f4dc37213dd7dbe6b02dec81689d7cf5cba4c286ed2",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00001.safetensors",
+      "sha256": "cd42fad9e0ab9adeae6f196445f8ca7fdf4c03d16a16541c1ce024295ed94be2",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00002.safetensors",
+      "sha256": "234c1206210d91d2e1ac1b38ce24142fcc4ccece1ae615c037a8cea54849e441",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00003.safetensors",
+      "sha256": "5776496182f3fce92a700f93133939bce8d88a305b81ddf263b12710df9acca7",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00004.safetensors",
+      "sha256": "1a79157b6894407a006ac94679367ed9923318a96b8aaab12b7060eb5518020c",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00005.safetensors",
+      "sha256": "d859458298b82f8bb98443e6fc3a797c7c34b5612c600191f6b79d6c61721c16",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00006.safetensors",
+      "sha256": "3f7a6f245fd67332023cfe035680ec7c643df51982d221f8fbe7c0c628b3712b",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00007.safetensors",
+      "sha256": "a4bbc977d3faf1e64fd9571708722f59aa247f4cad25ce710daebdfd4fbedcb2",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00008.safetensors",
+      "sha256": "cc24493effd97956a7fac64ea00d088c54b666e7e60b0108e2fc35f89fc0c067",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00009.safetensors",
+      "sha256": "cf0921ab4d4a73ce0b456bd40ec75ce617b32ce6268258936f0162b8101ef7fa",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00010.safetensors",
+      "sha256": "8d3655ab56156919ab6c240c9b7bae55d250fdebccdffaa5666dfd82478729ce",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00011.safetensors",
+      "sha256": "3e3e95da098751f6192baeff82dfe056fa7914c5226cbebbd886c7fc97ed48b3",
+      "size_bytes": 2280336,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00012.safetensors",
+      "sha256": "6499997dd798eb07b473c259ef205d5bf46092bbc44c03ffb3aa8b19bc5a0d86",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00013.safetensors",
+      "sha256": "b1b731e721a54fe733ef7eef70ce0cc02985205066e15b3a0a00d0765217b8cf",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00014.safetensors",
+      "sha256": "c250a9271557491bc33a9897db808d98701073c83fc9ab8738be124f498ac1e2",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00015.safetensors",
+      "sha256": "b65578e2416d35d8f1a65c29e6cec5ad07b2b616b4ed23e424c843a988d5ddd0",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00016.safetensors",
+      "sha256": "a05ac8dfead10d4fdcd439e7ac0192844454b392d2f4327b401412cbdcd4aab6",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00017.safetensors",
+      "sha256": "060cc55a2c580455721cb3dbdba31e14e76775439a6a25bab97cc67bece59815",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00018.safetensors",
+      "sha256": "b0297ca97a1d6df17fd0a1663d45771b57c9d174c12669bf540b542728903423",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00019.safetensors",
+      "sha256": "25e8efc2b3a78e9a05e56ef39111320e71efcc18855cc59e86a17821760ba472",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00020.safetensors",
+      "sha256": "7e585c0bbb5de544ceb1a0dea607aad9a71f405ebc343efa0550b2e29e3bdea1",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00021.safetensors",
+      "sha256": "5b33c3b22d55c68ee84aecf3a98389a6fc1838daa797e80737ba7b0f82ca9088",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00022.safetensors",
+      "sha256": "eda1060ac29e45ea28121249aacc610930b71fbb518bec4a55bb51de5004daee",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00023.safetensors",
+      "sha256": "23b04bc4bbad739c19434d827c259242c85282b88b9c414fbeb8ce90f5c475c4",
+      "size_bytes": 1530336,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00024.safetensors",
+      "sha256": "33e28f5406b602b25d11fb8baf6bd03c82ce2bd089b95937c89c420ed96a8612",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00025.safetensors",
+      "sha256": "8868056aec85f98b1fa534f3582f8e5b2d52145dc95be33fbde731253c86dca4",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00026.safetensors",
+      "sha256": "7fc1fda1d9e04b1b8df605a74eda13ef351ef3fcfcc54234096b6eeb8b939f21",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00027.safetensors",
+      "sha256": "5fcfde2ca28237c66bb295787ade6385906fa182e452c0563cfabe6ffeae0d4c",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00028.safetensors",
+      "sha256": "c5366571d0a49d20e4bbe0395ea05254aabefd26391c2b05e3bc38035d8e04d2",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00029.safetensors",
+      "sha256": "9b1924d1b092e2b33e36cf39e5f988a1f3e5288226400fe245b6cc6358853c8c",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00030.safetensors",
+      "sha256": "8177497cdee545b3f997d9c7f7733bf9db6aa88a637d8504ddf2334d8aeb333e",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00031.safetensors",
+      "sha256": "e69239143e9e5172e8c55ba71812557168090b542f72ec6f1cabb59fd3bd3a13",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00032.safetensors",
+      "sha256": "f17e3806e78fa9f56d4e10110d0adef943907aff3ee8df0e667526edf46eee98",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00033.safetensors",
+      "sha256": "4a7bd72392aeb03cfd0a61e42a9a7558c24ad1b9c0d0e05744e84ea3acc795a7",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00034.safetensors",
+      "sha256": "81f530cd27207c003ca812bb9585619b7cb199feffe52f7da7a8970969f7727e",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/train/shard-00035.safetensors",
+      "sha256": "0b7eb1dc2a88859321502c32dc5baf35450fa76c15e2ae429214e40eb9eee709",
+      "size_bytes": 246216,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/validation/index.jsonl",
+      "sha256": "2f629c9c1020e2fa125be7c87a33e79f5dba655899b4dd06240c8befa8556b16",
+      "size_bytes": 1542515,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/validation/manifest.json",
+      "sha256": "d54b1dc58f745db45e1e6cf3f380aca9c9124087e314c31d1417ae86fe833f23",
+      "size_bytes": 868,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/validation/shard-00000.safetensors",
+      "sha256": "72ea93b0b6b359abdee68f54948bcd21f07a962fd47f07697c6c862082dc1a76",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/validation/shard-00001.safetensors",
+      "sha256": "5b8cbdbba4c42d5a0fa6a8893efb24c7bf404bd4a3a4a11bd94469118222e076",
+      "size_bytes": 1808870,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/validation/shard-00002.safetensors",
+      "sha256": "7239356e8c26f08f05e1c98f7118c6fdb6e98cba7e26de363d688503689029de",
+      "size_bytes": 1507884,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors/validation/shard-00003.safetensors",
+      "sha256": "62ccc88d1f8600ea4048f18aa24cd18163d3310fc6f16efe0dd3f5c997ea384c",
+      "size_bytes": 1439248,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration/index.jsonl",
+      "sha256": "a2c5a5ad1691a627ae9a4aca2bf7bb0c5deb3921396a6a657b3d29154c561a75",
+      "size_bytes": 1543515,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration/manifest.json",
+      "sha256": "4930e6c9a7bd1f65c5af8144f0b9bf4dc080c9c9fe02ce0848506af85f4b9cc1",
+      "size_bytes": 868,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration/shard-00000.safetensors",
+      "sha256": "fd41bd8ce22d52eee7400e192e7b89dd4d1825ff371297d1b8383317e7420ffd",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration/shard-00001.safetensors",
+      "sha256": "ef0111127dafa795a1ad0d406dc184ac968778ff216191eaf40476b27449c0fa",
+      "size_bytes": 1808870,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration/shard-00002.safetensors",
+      "sha256": "cc5aacec870c47dbedf1dbad07254a055a636135c556f4a130ae8ba8ec83ec64",
+      "size_bytes": 1507884,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration/shard-00003.safetensors",
+      "sha256": "530b78418ec304a98277eac2c47443b09b41b6e10d409e68f951d162670601b6",
+      "size_bytes": 1439248,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/index.jsonl",
+      "sha256": "1c21df5f0e39ea4659ab31fda61e60c157c7703c64cdde8c8a114efba42c4bcd",
+      "size_bytes": 2715185,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/manifest.json",
+      "sha256": "1ef5711cb1bf16f7d80d3fb23959ee484708d240861eca37d7fa5019f1e28cba",
+      "size_bytes": 1363,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00000.safetensors",
+      "sha256": "33d56f703b29e7ebd30e362676507262c498ddf031eebd4cbc9af404e4ea70e3",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00001.safetensors",
+      "sha256": "691f6d330d0f6512a37d9ca9677939cab3059a1e0e2c32b4cf2e1cfb669f938a",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00002.safetensors",
+      "sha256": "6e032ebcf5022041e5bd15c90559bcf0627d48b07f5664fb2f0ec57cc19034d8",
+      "size_bytes": 1782144,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00003.safetensors",
+      "sha256": "2a3b0b110e952854cbe0774d28cc768c97a82411751d9a1ede228beb1363b34e",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00004.safetensors",
+      "sha256": "026a256062f72548aa70d58d98b441d4cb7a6e988036c1cbdbebb481a73ab200",
+      "size_bytes": 1514132,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00005.safetensors",
+      "sha256": "e6c8db37fbd8901a07ad78b128217569203d47457ccdfdcaf6a8c2ae1d1ced35",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout/shard-00006.safetensors",
+      "sha256": "81a387494870b4ab1a736e124c7d06035a4e4995b72b15504363869bb97eee53",
+      "size_bytes": 1327226,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-SEVERE_MISSINGNESS/index.jsonl",
+      "sha256": "cd952c083d89b6a64595b99b091b6ce86de8bd4f34d9f31a826ee6cd301a4bc5",
+      "size_bytes": 620535,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-SEVERE_MISSINGNESS/manifest.json",
+      "sha256": "1ca1bc191b2fa987bb97efa57e94dfd799b2fc8cae8376abab42ff322cdb060d",
+      "size_bytes": 537,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-SEVERE_MISSINGNESS/shard-00000.safetensors",
+      "sha256": "875497eacd355adfca41f9e62f941ce6b4267eb9b5437160f8998585d0c79ccb",
+      "size_bytes": 2057862,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-SEVERE_MISSINGNESS/shard-00001.safetensors",
+      "sha256": "2e789a7e866106e335414dd7ffab9f818434775bc4622a151db59456fbc72b92",
+      "size_bytes": 885844,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-UNSEEN_TOPOLOGY/index.jsonl",
+      "sha256": "cb0228e96353d3352179eb6a2d8dbafaa24a7eea917f80eee63031046ede788f",
+      "size_bytes": 627380,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-UNSEEN_TOPOLOGY/manifest.json",
+      "sha256": "09dd619b60c48d6dcd881e8a43ee3ce400c5d50b8433d4f49b6791396dd76c73",
+      "size_bytes": 537,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-UNSEEN_TOPOLOGY/shard-00000.safetensors",
+      "sha256": "485ce1a64651b2d7e650f443019dc4c630bf552376ac256bad0eb575608c6db7",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/ood-UNSEEN_TOPOLOGY/shard-00001.safetensors",
+      "sha256": "65d4f4000a2e2876b125fc09548d47aa4d29a166f2826468ec7fc18ceeff0e49",
+      "size_bytes": 816552,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/index.jsonl",
+      "sha256": "a4e05a19cab4c999d6c2f98f5c2b4bd26e1349ddd85ed80ef69f9292fd63ada9",
+      "size_bytes": 13831520,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/manifest.json",
+      "sha256": "d35297a2e6c6278a89c5ba5f2a060b4fda93e6b964e1dbb43f293722426fc013",
+      "size_bytes": 6147,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00000.safetensors",
+      "sha256": "fa858681610b33f161ecc47021a897debb72dcc5d39e61bd6e401e8ac6411224",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00001.safetensors",
+      "sha256": "72bb03a34b163d1e50f02b47715b363e226dd1e83ef85d364538f90f19096996",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00002.safetensors",
+      "sha256": "8c55381dc98a8508701a8d1ce2670f3286e23cc5b4231aced094883768419970",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00003.safetensors",
+      "sha256": "563ff9933338ed1ee3155269198ce4b5125da43f738616cd88d1ad7dad20595f",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00004.safetensors",
+      "sha256": "b0807d3f3dfe478194459d29a67c77ea1caa104a34c1ad43a67c75cd67f4eee8",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00005.safetensors",
+      "sha256": "beb32d94e6e1de859645507f679e676ae64e1382aad1f428cf7e879608772662",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00006.safetensors",
+      "sha256": "38bae063a1c2b54e2eac84935bc7271f4896c867f89714cafa54ef4d02c3a398",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00007.safetensors",
+      "sha256": "11837e01f329cb09aad92b1182250c35339a5e9403d142069b5b155ed8ff1bf7",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00008.safetensors",
+      "sha256": "23904d628ae0f45cbeb14bd17ecb707fd6c95ac1dcb5289ed5d0bdd54c7f3f4e",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00009.safetensors",
+      "sha256": "db270ac5172a381478e72e4a89f8379fa713c41574c9cbb0275af156dcb504b5",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00010.safetensors",
+      "sha256": "e0b573c28dde62deaf73c0645a1e99331e28c154c5f5e1b6783804e9a38daf10",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00011.safetensors",
+      "sha256": "989ecea732eccf5f6ef0eba6248ae4a01d41db85d302581afd1e4f486b321356",
+      "size_bytes": 2280336,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00012.safetensors",
+      "sha256": "c3fcbec74d814142bffa3214b8a6c7168aac84d637171a13ba05ff95c4e29798",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00013.safetensors",
+      "sha256": "20a4453d9e52a39b74bdb4ee85a39bdc4e8c861d4341eeaa997111b691fbd64d",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00014.safetensors",
+      "sha256": "55af345233aaa5a11fd7e53b6e03d5a52445b583ec46892e28ea70c72fa14fe4",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00015.safetensors",
+      "sha256": "f73b5ab415821a0f7518674706dd294e53fd478fba401ed90dbaac370fd44304",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00016.safetensors",
+      "sha256": "78e2d0366a9e3d5e582264baff960385ae43c8decd78e21134a0131a3ed8fc5e",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00017.safetensors",
+      "sha256": "2e29a1185b0e30a66cd117a287724778682f897dbc5d891527f2ac6db6b0ec22",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00018.safetensors",
+      "sha256": "f8a89d821aeb24d41b5d4516e1827b262d130585fac757e0fe855d4155ee8f96",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00019.safetensors",
+      "sha256": "3578b0bceadbc617565cebc58d701a3fb045fe08b469dad51e57b595ac277494",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00020.safetensors",
+      "sha256": "0e1319a8a35ae15f4dd9bca675f305d9ad86e6a62c7780ffb72a677f489c6b02",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00021.safetensors",
+      "sha256": "a26681facebc326285176cd4b31f89084ddccd48f3cd3d850b790ad90fd26277",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00022.safetensors",
+      "sha256": "6b8403ed886a4bd8035da476daccfda7554b22a7014ca1f2d251b701c0c3afb4",
+      "size_bytes": 1455432,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00023.safetensors",
+      "sha256": "df1ee0380b2280bf87e1c38c8629da5e73f1e93ace8a491a490b26d870ff19d7",
+      "size_bytes": 1530336,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00024.safetensors",
+      "sha256": "4bd43e2f80cf0441cbc3111d3d9e0666104b514597d56613d405c51af6b4842c",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00025.safetensors",
+      "sha256": "296e1a262c1e1c6780a7d85f2c12f63cca99cb06492467721c9eaef72672c2cc",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00026.safetensors",
+      "sha256": "2335c67d85b90b9f7034c310d5e08e971ccbbf77fc2ddffc34bbf1acefedecdb",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00027.safetensors",
+      "sha256": "4746d131f35381c3c5c1be4018ed02f2768924a0a2e893d63c8046c951a7bbfb",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00028.safetensors",
+      "sha256": "eadf0e148b4f79eacedcbe2436f7d1b7c844dba2fefb0cba69030b68eeaaa57a",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00029.safetensors",
+      "sha256": "80039727726f422275820504dbd4a76651b33a47cdfa1bffe09b7074613d5947",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00030.safetensors",
+      "sha256": "f59be6453397c430e1ed9c5d61c87932df2c5736e91b63d4e7391eb2671e0be4",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00031.safetensors",
+      "sha256": "92f34cbea51b7f8be92dc40feb642a27e8157d31c3d0c14a2b05a1c728caa910",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00032.safetensors",
+      "sha256": "8daad0b9c279dee632a207716340985642f0ccf9b02cf12bdef2a533209c49fc",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00033.safetensors",
+      "sha256": "689c5d0885e34e55ff274fa1445f50d6eab58d1f95b06e9538f74d44a1fcdeb2",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00034.safetensors",
+      "sha256": "862e8084afb13d454678eb5a8925b95b153c0cc8d9c335603b2e2d1fb09f62e7",
+      "size_bytes": 1588600,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train/shard-00035.safetensors",
+      "sha256": "d64646b273b42435c96417deb04b00cca3dd1a527a197d7a76954d0c718995aa",
+      "size_bytes": 246216,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation/index.jsonl",
+      "sha256": "2f629c9c1020e2fa125be7c87a33e79f5dba655899b4dd06240c8befa8556b16",
+      "size_bytes": 1542515,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation/manifest.json",
+      "sha256": "6816522ab2d886b1d732497d8c4da2f98ab9d6b7f4069d83b353c2c268a2166b",
+      "size_bytes": 868,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation/shard-00000.safetensors",
+      "sha256": "b5d5f195468c0ae46ce845f0247d98fb532cdc662896ed60699d0cc72dfc3d88",
+      "size_bytes": 2600728,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation/shard-00001.safetensors",
+      "sha256": "ce194c6525d9d0fee4177f07e0ed3dd5605f7d644b56ef1a2ce8bebb8f8c5aff",
+      "size_bytes": 1808870,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation/shard-00002.safetensors",
+      "sha256": "b0de4e8a61d43bdd166b3d67501a973a85cbb2170477ee75369be4406ce6caca",
+      "size_bytes": 1507884,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation/shard-00003.safetensors",
+      "sha256": "f45ad4893c6a710fc12e6d54485fa70af2bec59579e38cff6af56756ace3354e",
+      "size_bytes": 1439248,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000) + fit_normalization.py + rebuild_normalized_shards.py",
+      "source_seed": 71000,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/architecture_config.json",
+      "sha256": "3b4fe64f17993f339ed572ce212844d95d4dd13bf3e330db85aae1c939d28f51",
+      "size_bytes": 1818,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/calibration-dynamic-fusion.json",
+      "sha256": "5c066eb2925d6dc3d26b97ebdc021284d7c12a3da495d2a65bb32ed8fa2e71fd",
+      "size_bytes": 34733,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/calibration-dynamic-fusion.json.sha256",
+      "sha256": "fcb67a380ed90df00dc63e350be6cc4b2dfb5f038e6b6f2b2fe6c0afcc1e1ded",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/config.json",
+      "sha256": "0a46156c62876b860fe5f283098646b73fe74b5a0c86c4144bdb8c9866c1821f",
+      "size_bytes": 605,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/metadata.json",
+      "sha256": "702e6c414cfac5157d6aea4e96d019022cbddda8ce3e0ec04af98d9538040732",
+      "size_bytes": 358,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/model.safetensors",
+      "sha256": "051cfd94dec4a7ec61e559a1268b66acaada2d6248bda8c976846f9064ef3a23",
+      "size_bytes": 16187924,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/optimizer_state.pt",
+      "sha256": "1d347fa478c53a64aea997d6e462045e3f094ff8d7973cebda4b238f87d81966",
+      "size_bytes": 31698191,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/stage3-fixed-weight-calibration.json",
+      "sha256": "ccce538bbbd7fac2227b239389c76f43e0216c4c4855ec3d73d4f175e7b45920",
+      "size_bytes": 58569,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/stage3-fixed-weight-calibration.json.sha256",
+      "sha256": "5beb79427f2947b38a9ae5cf9c6935060fe10d9597b5c7e83b51af99c1f25ec6",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/summary.json",
+      "sha256": "a0fc62282af5e9ebdd8f588f7f78a59b1f0e6a0bde5cd7e5fe7839b2a7db6078",
+      "size_bytes": 747,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260810/trainer_state.json",
+      "sha256": "733cd9b84022f775d04029381027b904c1eb42fff96bec7055ad65e1d9d717f2",
+      "size_bytes": 85,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/architecture_config.json",
+      "sha256": "d75d54ba659eb120dc19f1bdead373d2b389cfa5353df69c36970a2edc286cba",
+      "size_bytes": 1818,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/config.json",
+      "sha256": "c316d2572c713091772cb4327ec9053cccb673e1f837d69cdf1f72caa90dc5b2",
+      "size_bytes": 605,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/metadata.json",
+      "sha256": "98c77c26f2168b0ec90b5de7e5d0a5f662b247ce2152c351069fc557e6b5a8ac",
+      "size_bytes": 358,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/model.safetensors",
+      "sha256": "4ae71f3b31c3e7d4e10667126aad5343d64dad513aa48c626c4e3fa42a5dd63a",
+      "size_bytes": 16187924,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/optimizer_state.pt",
+      "sha256": "49bbf448216f6e35546333340da6843b590bb71c5c48e9e87f58461a8f35c728",
+      "size_bytes": 31698191,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/stage3-fixed-weight-calibration.json",
+      "sha256": "b8e9f3e66da4e1fe54dbd344784e3174deb5b846b3bba40bcb8970ee86f1be8b",
+      "size_bytes": 58490,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/stage3-fixed-weight-calibration.json.sha256",
+      "sha256": "4db3d1c1148d873a2ab8054a50e20fd5349b9845cb390f6ac4b6905b94819dcd",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/summary.json",
+      "sha256": "412838a5281fcc8751ce07a5b93d477bd6fad4192287a47ae7801df24767c6cd",
+      "size_bytes": 747,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E1-seed20260811/trainer_state.json",
+      "sha256": "fee8b3dfa011c3b14d454a62830ed1027c22e681f9028aa011306a0d1ab96f1f",
+      "size_bytes": 85,
+      "source_run": "cycle-b2-stage3-E1",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/architecture_config.json",
+      "sha256": "ce15598264139ac5ab9706ecff0163ad57cf7640cb332370233992f8e8aa41f2",
+      "size_bytes": 1782,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/config.json",
+      "sha256": "0a46156c62876b860fe5f283098646b73fe74b5a0c86c4144bdb8c9866c1821f",
+      "size_bytes": 605,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/metadata.json",
+      "sha256": "77d69c5388fc694926e0be1515396f76c156aae3cb9dc7d9ed1b9c403bf8104f",
+      "size_bytes": 358,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/model.safetensors",
+      "sha256": "04ada898f994c8cd54e12d65a7997256d80e5d6fb4c96a003f56e3492ad43580",
+      "size_bytes": 16187924,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/optimizer_state.pt",
+      "sha256": "69158fcccc1e89a8f35c43fabdcfa1807a9bd124fadd62b023d5e27656eef09b",
+      "size_bytes": 31698977,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/stage3-fixed-weight-calibration.json",
+      "sha256": "f1a897ecd7ce90c116574a624730b09b92e83c1ab505a6995c5efb6744be1eb6",
+      "size_bytes": 58612,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/stage3-fixed-weight-calibration.json.sha256",
+      "sha256": "f4da29ed42320a780fb7951035c9059844a161db2451a3f9ee2edb73a21dcb41",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/summary.json",
+      "sha256": "a3f34fec03a7a54fbd3dde199989574a0eda50b431bb62053cd2a9a9d225edab",
+      "size_bytes": 748,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260810/trainer_state.json",
+      "sha256": "4f2ec893add1b822bf4aa0b4dc7613ce6caa5622d567df47d34f56ed5096669d",
+      "size_bytes": 86,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/architecture_config.json",
+      "sha256": "0859819ca871c64aa51af48ec7305f6652637b0ab53f0f699e25fca64798735b",
+      "size_bytes": 1782,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/calibration-dynamic-fusion.json",
+      "sha256": "f9cf03926cc1df42b320eae1c0f4d4afb8d33953d4fba8d77e4bcdda61193656",
+      "size_bytes": 34682,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/calibration-dynamic-fusion.json.sha256",
+      "sha256": "c1a94b607dc8082a81caee24ec38c761341ad5e9a45f22433ca55a8b714a1a93",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/config.json",
+      "sha256": "c316d2572c713091772cb4327ec9053cccb673e1f837d69cdf1f72caa90dc5b2",
+      "size_bytes": 605,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/metadata.json",
+      "sha256": "659396366c947ef98946df452f294cd977917946b59e2e68c46670cbb94a26c8",
+      "size_bytes": 358,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/model.safetensors",
+      "sha256": "c8f6a5e62a09264f653eec90854ca4934581348e05aa3c86cefc65cb5eee65df",
+      "size_bytes": 16187924,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/optimizer_state.pt",
+      "sha256": "77c1e10e86058ed3d2e015c80820416f6498d43bb9c3a487daf08b432303932b",
+      "size_bytes": 31698977,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/stage3-fixed-weight-calibration.json",
+      "sha256": "c26e0c6def4850836ed459ba2844e9628bd7d89fa5abaa3f024c89d939bb9e6d",
+      "size_bytes": 58497,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/stage3-fixed-weight-calibration.json.sha256",
+      "sha256": "45a898b0b28b04f9b7f26d7804a57cec8057fc6d61e076b5a199879982104365",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/summary.json",
+      "sha256": "1b5959e3e71b5b79e9b60d046863fc2a08a7aa1f091249aa2deb68db01009d47",
+      "size_bytes": 748,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-candidates/E0-seed20260811/trainer_state.json",
+      "sha256": "a4ec11c906449adb73d6db8cccc3115a31d212397e6066928918fb7b66c1223a",
+      "size_bytes": 86,
+      "source_run": "cycle-b2-stage3-E0",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/architecture_config.json",
+      "sha256": "d383fcd2ee4f62254caf8f97e2008b5f13e795186c23ecfe707feda209cc34f4",
+      "size_bytes": 1843,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/config.json",
+      "sha256": "0a46156c62876b860fe5f283098646b73fe74b5a0c86c4144bdb8c9866c1821f",
+      "size_bytes": 605,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/metadata.json",
+      "sha256": "220525f40a37fac763b3f0c1966646306319dfc6bbd20f7ed7de2a21fe0b8691",
+      "size_bytes": 358,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/model.safetensors",
+      "sha256": "fe2bd18b6849d680beae3c4274481797d873f752388ca412ee0a9965b4bb0e3b",
+      "size_bytes": 15957724,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/stage4-fixed-weight-calibration.json",
+      "sha256": "ba7275e4da46a7c0d3881cb224e7cbd817b9d10455c8881699dc8ca57b0e885b",
+      "size_bytes": 58265,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/stage4-fixed-weight-calibration.json.sha256",
+      "sha256": "95aebe80e2fc6517f0eafd90961c068c055da9b643d8a36a4a9035215bf407db",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260810/summary.json",
+      "sha256": "8b4534b97c131c45732bbc0ab69072234a353e3d198f7987b646f5e42fb3a933",
+      "size_bytes": 788,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260810,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/architecture_config.json",
+      "sha256": "40d3c62d1653a0d8d6beaac24735af35209f4444898accb141ad8508a1b5ebad",
+      "size_bytes": 1843,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/config.json",
+      "sha256": "c316d2572c713091772cb4327ec9053cccb673e1f837d69cdf1f72caa90dc5b2",
+      "size_bytes": 605,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/metadata.json",
+      "sha256": "bc05394e7d81f49ea0d8bf39ecbf76f4c307a91e8b51b7de0282df0c4307b2b1",
+      "size_bytes": 358,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/model.safetensors",
+      "sha256": "f9fa30883cfe33c7ac1f272daaed62d9e263f743760fc7717e00e354703f5d2e",
+      "size_bytes": 15957724,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/stage4-fixed-weight-calibration.json",
+      "sha256": "678a1ee0faa9611817c5f3262bbffc6f1fdafc764feb68b34d7f03e1de057571",
+      "size_bytes": 58401,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/stage4-fixed-weight-calibration.json.sha256",
+      "sha256": "1f0a2c202d3143aea3a1e035e69ce659aa001f628139e40d9ced8fb2d08296fc",
+      "size_bytes": 64,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "models/cycle-b2-controls/no-adapter-seed20260811/summary.json",
+      "sha256": "9875d2be1fc7e4f3c8d8b56a0f4ac116ea63316e9ce7f8ec11f5f19006c5f3ee",
+      "size_bytes": 788,
+      "source_run": "cycle-b2-stage4",
+      "source_seed": 20260811,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/normalization/node-normalization.json",
+      "sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
+      "size_bytes": 1397,
+      "source_run": "fit_normalization.py",
+      "source_seed": null,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/normalization/node-normalization.json.sha256",
+      "sha256": "c095b8b894de3d4775984aefce7e3c72cdee92391da8cfbeabca9ce83f74d922",
+      "size_bytes": 65,
+      "source_run": "fit_normalization.py",
+      "source_seed": null,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/normalization/edge-normalization.json",
+      "sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
+      "size_bytes": 892,
+      "source_run": "fit_normalization.py",
+      "source_seed": null,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "data/learning-v2/cycle-b2/normalization/edge-normalization.json.sha256",
+      "sha256": "dee6b49172ee5fcd7e1a08a5fe43a21c72a4cd1137acc34c6625503e218c03f0",
+      "size_bytes": 65,
+      "source_run": "fit_normalization.py",
+      "source_seed": null,
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "artifacts/migration/cycle-b2-scenarios-calibration.tar.zst",
+      "sha256": "e1ad6c9be7f68ec91f4dde0176ec7de35d0fb9acdc74b966f26aea2011a7c77b",
+      "size_bytes": 426604,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000)",
+      "source_seed": 71000,
+      "status": "recommended",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "artifacts/migration/cycle-b2-scenarios-development-holdout.tar.zst",
+      "sha256": "5df0f96554cade64497d0c87553af58fc5912d39bc1c2423b669e4c8b4339c98",
+      "size_bytes": 1020031,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000)",
+      "source_seed": 71000,
+      "status": "recommended",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "artifacts/migration/cycle-b2-scenarios-manifest.json",
+      "sha256": "ef5aca002d18a9c7af6b15744dbcd85fe0f8a1c52a50995932c1f85326212015",
+      "size_bytes": 2498,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000)",
+      "source_seed": 71000,
+      "status": "recommended",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "artifacts/migration/cycle-b2-scenarios-train.tar.zst",
+      "sha256": "5b6235440c55ac0f521ac84251c97327b34453f896ed7a86426bfd349992540d",
+      "size_bytes": 3722296,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000)",
+      "source_seed": 71000,
+      "status": "recommended",
+      "tracking": "git-lfs"
+    },
+    {
+      "path": "artifacts/migration/cycle-b2-scenarios-validation.tar.zst",
+      "sha256": "cff90995be2af7f12522f414abfbf60d72cb69131afa6d0861b278c1eebd5233",
+      "size_bytes": 425656,
+      "source_run": "generate_cycle_b_corpus.py (seed 71000)",
+      "source_seed": 71000,
+      "status": "recommended",
+      "tracking": "git-lfs"
+    }
+  ],
+  "omitted": [
+    {
+      "path": "experiments/runs/cycle-b2-stage2/*",
+      "reason": "Stage 2 screening checkpoints -- diagnostic only, superseded by Stage 3 finalist training",
+      "status": "omitted"
+    },
+    {
+      "path": "experiments/runs/cycle-b2-stage3/*/*/checkpoints/checkpoint-{0004,0008,0012}",
+      "reason": "periodic (non-final) checkpoints; only checkpoint-0016 (final) is preserved per finalist/seed",
+      "status": "omitted"
+    },
+    {
+      "path": "experiments/runs/cycle-b2-stage3/*/*/{best-model,model-export}.safetensors",
+      "reason": "duplicate exports of checkpoint-0016's own model.safetensors under a different save path; the migration task's provided hashes match checkpoint-0016/model.safetensors specifically",
+      "status": "omitted"
+    },
+    {
+      "path": "experiments/runs/cycle-b2-stage4/*/*/checkpoints/*",
+      "reason": "periodic control checkpoints and their optimizer state; only the final model-export.safetensors is preserved per instruction 5 ('do not copy all periodic control checkpoints')",
+      "status": "omitted"
+    },
+    {
+      "path": "experiments/cache/signatures/*",
+      "reason": "regenerable SignatureArtifact cache (fit_dynamic_fusion_calibration.py); already .gitignored",
+      "status": "omitted"
+    },
+    {
+      "path": "data/learning-v2/cycle-b (old) and cycle-a",
+      "reason": "preserved historical corpora, out of scope for this migration (Cycle B2 only)",
+      "status": "omitted"
+    },
+    {
+      "path": "the locked final test",
+      "reason": "never opened, inspected, copied, or archived at any point during this migration, per explicit instruction",
+      "status": "omitted"
+    }
+  ],
+  "schema_version": 1,
+  "source_branch": "agent/gcp-multitopology-v3",
+  "source_git_sha": "6fea9f220f1a63bbf10c85fa241e7716d52477df",
+  "summary": {
+    "git_lfs_bytes": 426950843,
+    "git_lfs_entries": 124,
+    "standard_git_bytes": 42229190,
+    "standard_git_entries": 73,
+    "total_bytes": 469180033,
+    "total_entries": 197
+  }
+}

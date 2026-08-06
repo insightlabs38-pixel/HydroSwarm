@@ -1,0 +1,13 @@
+{
+  "best_epoch": 15,
+  "best_validation_loss": 3.208445214089893,
+  "epochs_completed": 16,
+  "export_path": "experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/model-export.safetensors",
+  "export_sha256": "1800b160a16bb6783f7ff9c87e2515d92f4509c4e7127c39f4c9e75f5516dc27",
+  "final_checkpoint": "experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016",
+  "global_steps": 7882,
+  "last_resumable_checkpoint": "experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d/checkpoints/checkpoint-0016",
+  "run_directory": "experiments/runs/cycle-b2-stage3/E1-seed20260810/20260806T012354Z-7645b52d",
+  "stop_reason": "maximum_epochs",
+  "stopped_early": false
+}

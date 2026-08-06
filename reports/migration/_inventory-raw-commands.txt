@@ -1,0 +1,15 @@
+=== git rev-parse HEAD ===
+6fea9f220f1a63bbf10c85fa241e7716d52477df
+=== git status --short ===
+?? reports/migration/
+=== git status --ignored --short (count) ===
+251
+=== du -sh cycle-b2 dirs ===
+403M	data/learning-v2/cycle-b2
+115M	data/learning-v2/cycle-b2/tensors
+115M	data/learning-v2/cycle-b2/tensors-normalized
+174M	data/learning-v2/cycle-b2/scenarios
+=== du -sh experiments/runs/cycle-b2-* ===
+232M	experiments/runs/cycle-b2-stage2
+870M	experiments/runs/cycle-b2-stage3
+432M	experiments/runs/cycle-b2-stage4

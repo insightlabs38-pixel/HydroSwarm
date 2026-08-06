@@ -1,0 +1,29 @@
+{
+  "edge_normalization_sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
+  "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "finalist": "E0",
+  "label": "E0-seed20260810",
+  "manifest_hashes": {
+    "calibration": "900f55add24de88837eb9886962fa1bf93284e7a38d140d1511da59adf9693fd",
+    "development_holdout": "8365b350c17d803fa5f1c48bf1297a3d76a74a2882a7772691ce980e2d5cece0",
+    "train": "a0cbc8603d0fcfe948a91b90d84628495a5cb7143ef2e0dd7a128f7e20724c26",
+    "validation": "6e9ca16f8070a7fec8c4c4576418d9c2be04581a1cc388fc7d11815f7e9021f3"
+  },
+  "model_sha256": "04ada898f994c8cd54e12d65a7997256d80e5d6fb4c96a003f56e3492ad43580",
+  "node_normalization_sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
+  "normalization_dir": "data/learning-v2/cycle-b2/normalization",
+  "notes": "architecture_config synthesized during Arm migration from the experiment registry's 'opened' record plus checkpoint-0016's own model.safetensors -- these training runs predate promote_checkpoint.py's architecture_config sidecar convention, so no such file existed at training time.",
+  "overrides": {},
+  "schema_version": 1,
+  "seed": 20260810,
+  "source_checkpoint_path": "experiments/runs/cycle-b2-stage3/E0-seed20260810/20260806T012353Z-a8f77fde/checkpoints/checkpoint-0016",
+  "source_git_commit": "1fbd878b1be20911a7ce1be8b3726b83189954fb",
+  "source_run_id": "20260806T012353Z-ea69ed45",
+  "target_schema_hash": "targets_v2",
+  "topology_hashes": [
+    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+  ],
+  "variant": "small"
+}

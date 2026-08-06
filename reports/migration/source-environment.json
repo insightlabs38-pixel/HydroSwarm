@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "purpose": "Source environment snapshot for the x86 E2 VM -> Arm VM migration of agent/gcp-multitopology-v3",
+  "source_git_sha": "6fea9f220f1a63bbf10c85fa241e7716d52477df",
+  "source_branch": "agent/gcp-multitopology-v3",
+  "os": {
+    "platform": "Linux-7.0.0-1008-gcp-x86_64-with-glibc2.41",
+    "kernel": "7.0.0-1008-gcp #8-Ubuntu SMP PREEMPT Thu Jul 2 19:07:22 UTC 2026",
+    "distribution": "Ubuntu (glibc 2.41)"
+  },
+  "cpu": {
+    "architecture": "x86_64",
+    "model": "AMD EPYC 7B12",
+    "logical_cores": 16
+  },
+  "memory_bytes_total": 66754375680,
+  "python_version": "3.12.13",
+  "packages": {
+    "torch": "2.13.0+cu130",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "safetensors": "0.8.0",
+    "wntr": "1.5.0",
+    "uv": "0.12.1"
+  },
+  "torch_build_note": "torch reports a CUDA (+cu130) build even though every training/inference run in this repository's history has run CPU-only (device='cpu' in every TrainingConfig; see experiments/runs/cycle-b2-stage3/*/config.json). No CUDA device was used to produce any artifact in this migration. On the new Arm VM, install a CPU-only or Arm-appropriate torch build -- there is no requirement to match the exact +cu130 local version, only the torch >=2.5 constraint in pyproject.toml and, ideally, the same major.minor line (2.13) for closest numerical parity.",
+  "thread_environment_variables": {
+    "OMP_NUM_THREADS": "8-12 (varied per job; set explicitly per training/calibration invocation, never left at the interpreter default -- see docs/ARM_MIGRATION.md for the exact values used per job)",
+    "MKL_NUM_THREADS": "matched OMP_NUM_THREADS per invocation",
+    "OPENBLAS_NUM_THREADS": "matched OMP_NUM_THREADS per invocation"
+  },
+  "package_installation_command": "uv sync --frozen",
+  "environment_recreation_command": "uv sync --frozen (uses the committed uv.lock / pyproject.toml; add --extra console only if the Streamlit console is needed)",
+  "git_lfs": {
+    "version": "git-lfs/3.6.1",
+    "install_command": "git lfs install"
+  },
+  "notes": [
+    "requires-python = '>=3.12' in pyproject.toml; no architecture-specific pins exist in the dependency list itself.",
+    "wntr wraps EPANET, which ships prebuilt binaries per-platform inside the wntr wheel -- confirm an Arm-compatible wntr wheel is available for the target Python/OS combination before relying on any code path that calls WNTR simulation (corpus gates' deterministic_replay gate, signature-artifact building, and all training/calibration scripts do).",
+    "safetensors and torch are both pure/near-pure runtime libraries with official Arm wheels; no known additional risk there beyond normal version-matching."
+  ]
+}

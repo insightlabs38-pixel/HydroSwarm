@@ -26,6 +26,14 @@ data/learning-v2/**/scenarios/**/*.npz
 data/learning-v2/**/scenarios/**/*.parquet
 data/learning-v2/**/tensors/**/*.safetensors
 data/learning-v2/**/tensors-normalized/**/*.safetensors
+# Arm migration (agent/gcp-multitopology-v3): narrow exceptions so the
+# corrected Cycle B2 corpus can be committed through Git LFS without
+# exposing cycle-a/cycle-b (old) or any future cycle's shards. Raw scenario
+# .npz arrays stay ignored everywhere, including cycle-b2 -- those are
+# preserved as compressed archives under artifacts/migration/ instead (see
+# .gitattributes and docs/ARM_MIGRATION.md).
+!data/learning-v2/cycle-b2/tensors/**/*.safetensors
+!data/learning-v2/cycle-b2/tensors-normalized/**/*.safetensors
 models/checkpoints/
 experiments/cache/
 experiments/runs/

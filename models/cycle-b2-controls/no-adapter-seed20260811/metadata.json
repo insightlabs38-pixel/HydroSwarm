@@ -1,0 +1,10 @@
+{
+  "cpu_count": 16,
+  "dataset_manifest_hash": "a0cbc8603d0fcfe948a91b90d84628495a5cb7143ef2e0dd7a128f7e20724c26",
+  "git_commit": "712596a2670e28bbede27d521ab5dfeff329fa44",
+  "platform": "Linux-7.0.0-1008-gcp-x86_64-with-glibc2.41",
+  "processor": "",
+  "python": "3.12.13",
+  "ram_bytes": 67415699456,
+  "started_at": "2026-08-06T05:32:30.393280+00:00"
+}

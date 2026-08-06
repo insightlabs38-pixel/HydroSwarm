@@ -5,3 +5,14 @@ dist/ export-ignore
 *.pdf binary
 *.safetensors binary
 *.zip binary
+
+# Arm migration (agent/gcp-multitopology-v3): Cycle B2 tensor corpus, preserved
+# finalist/control checkpoints, and scenario archives go through Git LFS.
+# Listed narrowly by directory -- this must not silently pick up unrelated
+# future .safetensors/.pt files elsewhere in the repo.
+data/learning-v2/cycle-b2/tensors/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+data/learning-v2/cycle-b2/tensors-normalized/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+models/cycle-b2-candidates/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+models/cycle-b2-candidates/**/*.pt filter=lfs diff=lfs merge=lfs -text
+models/cycle-b2-controls/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+artifacts/migration/**/*.tar.zst filter=lfs diff=lfs merge=lfs -text
