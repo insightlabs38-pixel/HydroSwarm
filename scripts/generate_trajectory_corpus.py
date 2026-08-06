@@ -192,6 +192,7 @@ def main(argv: list[str] | None = None) -> int:
     ood_counts: Counter[str] = Counter()
     error_count = 0
     processed_count = 0
+    skipped_unsupported_topology: Counter[str] = Counter()
     started_at = time.time()
     with shard_path.open("a", encoding="utf-8") as stream:
         for index, scenario in enumerate(target_scenarios):
@@ -200,6 +201,16 @@ def main(argv: list[str] | None = None) -> int:
                 continue
             family = scenario.manifest.network_family
             if family not in networks:
+                # core-issues3.txt Phase 1 item J: a governed corpus must
+                # report and resolve every omission, not silently continue.
+                # This branch is currently reached by development_holdout's
+                # coastal-branch (unseen-topology) scenarios: this script
+                # only loads the three TRAIN_TOPOLOGIES networks, and
+                # Phase 2 item 5 / item R forbid fitting a topology-specific
+                # signature library from development-holdout incidents, so
+                # there is no governed artifact to build a trajectory with
+                # for that topology yet. Recorded below, not hidden.
+                skipped_unsupported_topology[family] += 1
                 continue
             try:
                 # core-issues3.txt Phase 1: reconstruct THIS scenario's own
@@ -255,6 +266,16 @@ def main(argv: list[str] | None = None) -> int:
         "total_in_shard": len(already_processed) + processed_count,
         "ood_category_counts_this_run": dict(ood_counts),
         "validated_topology_hashes": sorted(validated_topology_hashes),
+        # core-issues3.txt Phase 1 item J: report every omission explicitly.
+        # Nonzero here means this split contains topology families this
+        # script has no governed signature artifact for (currently
+        # development_holdout's coastal-branch/unseen-topology scenarios --
+        # see Phase 2/5's "do not fit a topology-specific artifact from
+        # development-holdout incidents" restriction). Not resolved by this
+        # script; resolving it requires the governed unseen-topology
+        # Scout/Strategist-unavailable fallback path Phase 2 item 5
+        # describes, tracked separately.
+        "skipped_unsupported_topology_this_run": dict(skipped_unsupported_topology),
         "elapsed_seconds": time.time() - started_at,
     }
     report_path = args.output / f"{split.value}-report.json"
@@ -262,6 +283,8 @@ def main(argv: list[str] | None = None) -> int:
     report["previous_run"] = existing_report
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
     print(f"wrote {processed_count} new records ({error_count} errors) to {shard_path}")
+    if skipped_unsupported_topology:
+        print(f"WARNING: skipped unsupported-topology scenarios: {dict(skipped_unsupported_topology)}")
     print(f"report: {report_path}")
     return 0 if error_count == 0 else 1
 
