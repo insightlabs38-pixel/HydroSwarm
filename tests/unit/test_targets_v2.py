@@ -9,11 +9,13 @@ from hydroswarm.training import (
     TARGETS_V2_SCHEMA_VERSION,
     EventCause,
     NextStep,
+    OODCategory,
     TargetSchemaError,
     TopologyMetadata,
     check_schema_version,
     validate_targets_v2,
 )
+from hydroswarm.training.targets_v2 import TARGET_CLASS_COUNTS
 
 
 def _topology(*, node_count: int = 4, edge_count: int = 2) -> TopologyMetadata:
@@ -139,9 +141,25 @@ def test_validate_rejects_a_maskable_target_present_without_its_mask() -> None:
         validate_targets_v2({"source_node": torch.tensor(2)})
 
 
+def test_ood_class_range_is_the_full_governed_category_taxonomy_not_the_head_width() -> None:
+    # Regression: TARGET_CLASS_COUNTS["ood_class"] previously mirrored
+    # hydroswarm.model.core's ood_head width (3, a distinct concept --
+    # OODLevel severity), not ood_class's own governed definition (the
+    # full OODCategory taxonomy). That would have silently rejected any
+    # real category index >= 3 as "invalid" -- 8 of the 11 governed
+    # categories, including UNSEEN_TOPOLOGY-adjacent ones with high
+    # ordinal position.
+    assert TARGET_CLASS_COUNTS["ood_class"] == len(OODCategory) == 11
+    highest_index = len(OODCategory) - 1
+    validate_targets_v2({"ood_class": torch.tensor(highest_index)})  # must not raise
+    with pytest.raises(TargetSchemaError, match="valid class range"):
+        validate_targets_v2({"ood_class": torch.tensor(len(OODCategory))})
+
+
 def test_validate_rejects_a_categorical_value_outside_its_class_range() -> None:
     with pytest.raises(TargetSchemaError, match="valid class range"):
-        validate_targets_v2({"ood_class": torch.tensor(3)})  # ood_class has exactly 3 classes: 0,1,2
+        # plan_validity has exactly 2 classes: 0,1
+        validate_targets_v2({"plan_validity": torch.tensor(2), "plan_validity_mask": torch.tensor(True)})
 
 
 def test_validate_ignores_categorical_value_outside_range_at_a_masked_out_position() -> None:

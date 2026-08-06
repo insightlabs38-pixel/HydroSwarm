@@ -27,6 +27,7 @@ import torch
 from torch import Tensor
 
 from .data import TopologyMetadata
+from .ood_categories import OODCategory
 
 TARGETS_V2_SCHEMA_VERSION = "targets_v2"
 
@@ -381,14 +382,31 @@ TARGETS_BY_CATEGORY: dict[str, tuple[str, ...]] = {
 
 #: Fixed-cardinality categorical targets. Mirrors the corresponding
 #: RoleHead output sizes in hydroswarm.model.core (source_region_head=3,
-#: ood_head=3, plan_validity_head=2, EVENT_CAUSE_CLASS_COUNT,
-#: NEXT_STEP_CLASS_COUNT) and losses.py's PROFILE_CLASS_COUNTS -- kept as
-#: separately-documented constants here rather than importing model.core,
-#: matching this module's existing zero-coupling convention (EventCause/
-#: NextStep are likewise defined locally, not imported). action_template's
-#: cardinality is a configurable model constructor argument
-#: (action_vocabulary_size), not a fixed constant, so it is deliberately
-#: excluded here rather than risk a false-positive range rejection.
+#: plan_validity_head=2, EVENT_CAUSE_CLASS_COUNT, NEXT_STEP_CLASS_COUNT) and
+#: losses.py's PROFILE_CLASS_COUNTS -- kept as separately-documented
+#: constants here rather than importing model.core, matching this module's
+#: existing zero-coupling convention (EventCause/NextStep are likewise
+#: defined locally, not imported). action_template's cardinality is a
+#: configurable model constructor argument (action_vocabulary_size), not a
+#: fixed constant, so it is deliberately excluded here rather than risk a
+#: false-positive range rejection -- see strategist_trajectory.py's
+#: ACTION_TEMPLATES for the real 9-vs-8 mismatch this exclusion protects
+#: against.
+#:
+#: ood_class is intentionally NOT hydroswarm.model.core's ood_head width
+#: (3): this target's own governed definition (see its TargetSpec above)
+#: is the full OODCategory taxonomy, not a 3-way severity level (that's a
+#: distinct concept -- hydroswarm.inference.ood.OODLevel, which the
+#: ood_class TargetSpec text does not reference). An earlier version of
+#: this table wrongly used 3 here (matching the head's current width
+#: instead of the target's actual definition), which would have silently
+#: accepted only 3 of the 11 governed categories and rejected the rest as
+#: "invalid" -- exactly backwards. The target's own cardinality is the
+#: correct value to validate against regardless of whether the current
+#: model architecture has enough head capacity to learn all of it (that is
+#: a model-architecture gap to size correctly when the ood_head is
+#: eventually trained, not a reason to under-specify the label's own valid
+#: range now).
 TARGET_CLASS_COUNTS: dict[str, int] = {
     "source_region": 3,
     "start_time": 4,
@@ -396,7 +414,7 @@ TARGET_CLASS_COUNTS: dict[str, int] = {
     "relative_strength": 3,
     "event_cause": len(EventCause),
     "next_step": len(NextStep),
-    "ood_class": 3,
+    "ood_class": len(OODCategory),
     "plan_validity": 2,
 }
 
