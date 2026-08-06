@@ -15,9 +15,9 @@ Strategist/OOD/auxiliary supervision) for what comes after this.
 | 13 | Regenerate corrected Cycle B → `data/learning-v2/cycle-b2` | **DONE** — 12,750 scenarios, identical structure to old cycle-b, seed 71000 |
 | 14 | Fit train-only normalization; rebuild normalized shards | **DONE** — `data/learning-v2/cycle-b2/normalization/`, applied to `tensors-normalized/` |
 | 15 | Run all corpus gates | **DONE, all 9 passed** — `data/learning-v2/cycle-b2/corpus-gates-report.json` |
-| 15 | Corrected E0/E1/E2 screening | IN PROGRESS (background job `experiments/jobs/cycle-b2-stage2`) |
-| 16 | Select strongest two (validation + dev holdout only) | not started |
-| 17 | Fully train selected two, ≥2 seeds each | not started |
+| 15 | Corrected E0/E1/E2 screening | **DONE** — `reports/results/v3/cycle-b2-stage2-screening.json` |
+| 16 | Select strongest two (validation + dev holdout only) | **DONE** — E1, E0 (E2 dropped) |
+| 17 | Fully train selected two, ≥2 seeds each | IN PROGRESS (2 parallel background jobs, ~4h expected) |
 | 18 | Fit calibration on exact dynamic hybrid predictor + evaluate | not started |
 | 19 | Re-run HydroMono/no-adapter control | not started |
 | 20 | Decide on HydroCore-M | not started |
@@ -41,6 +41,68 @@ Normalization: fit from all 9,000 raw train examples
 applied to rebuild every split (`tensors-normalized/`) in 33s; the
 `normalization_ownership` gate independently refit from `tensors/train` alone and
 confirmed a byte-exact fingerprint match.
+
+## Item 15-16 results (corrected E0/E1/E2 screening + selection)
+
+`reports/results/v3/cycle-b2-stage2-screening.json`, identical seed/epochs/batch-size to
+the original screen (`SEED=20260805`, `EPOCHS=4`, `BATCH_SIZE=16`), run against
+`tensors-normalized`:
+
+| Config | Score | val top1 | dev-holdout top1 | val ECE |
+|---|---|---|---|---|
+| E1 (prior_mode=feature_only) | **0.7473** | 0.6868 | 0.7052 | 0.0288 |
+| E0 (baseline) | 0.7463 | 0.6966 | 0.6938 | 0.0352 |
+| E2 (prior_mode=logit_only) | 0.7426 | 0.6882 | 0.6881 | 0.0401 |
+
+Ranking: E1 > E0 > E2, same relative order as the original (pre-repair) cycle-b screen
+(E2 > E0 > E1 there, but that was fit on a corpus with unpopulated topology metadata,
+the source-region head bug, and no sensor-fault mask -- not a like-for-like comparison).
+**Honest finding, not hidden:** absolute val top1 here (~69%) is noticeably lower than
+what the original screen and later stage3/stage4 reports implied for this architecture
+family. This is consistent with the corrected pipeline no longer crediting the model for
+correct predictions on padded/invalid positions and no longer letting an unpopulated
+topology silently simplify the task -- i.e., the corrected numbers are the trustworthy
+ones; the old ones were optimistic. Full re-evaluation against a trained, calibrated
+finalist (item 17-18) is needed before drawing a firm conclusion either way.
+
+Per item 16 ("select the strongest two using validation and disposable development
+holdout only"), **E1 and E0 go to Stage 3**; E2 is dropped (this differs from the
+original cycle-b run, which carried all three forward -- item 16 here explicitly asks
+for exactly two). See `scripts/run_stage3_finalist_training.py`'s updated `FINALISTS`.
+
+## Item 17 in progress: full finalist training
+
+Every original Stage 3 run (cycle-b, pre-repair) hit its 2-hour-per-seed ceiling
+(7200s) without early-stopping. Two finalists x two seeds sequentially in one process
+would be a ~8h critical path; running each finalist as an independent parallel process
+(`--finalists E1` / `--finalists E0`, each with its own `--registry`/`--output`, thread
+budget capped to `OMP_NUM_THREADS=MKL_NUM_THREADS=OPENBLAS_NUM_THREADS=8` each -- 16
+vCPUs total, no oversubscription) halves that to ~4h. Launched:
+
+```bash
+export PYTHONPATH=src OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 OPENBLAS_NUM_THREADS=8
+
+python scripts/run_stage3_finalist_training.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --finalists E1 \
+  --run-root experiments/runs/cycle-b2-stage3 \
+  --registry experiments/registry/cycle-b2-stage3-E1.jsonl \
+  --output reports/results/v3/cycle-b2-stage3-E1.json
+
+python scripts/run_stage3_finalist_training.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --finalists E0 \
+  --run-root experiments/runs/cycle-b2-stage3 \
+  --registry experiments/registry/cycle-b2-stage3-E0.jsonl \
+  --output reports/results/v3/cycle-b2-stage3-E0.json
+```
+
+Job runner dirs: `experiments/jobs/cycle-b2-stage3-E1/`, `experiments/jobs/cycle-b2-stage3-E0/`
+(each has `status.json`/`job.log`/`job.pid`; the commands above are each job's own
+`resume_command`). Both use the calibration-split `fixed_weight_fusion` approximation
+for their own internal per-seed calibration report (unchanged from the original script,
+adequate for finalist comparison); item 18's real dynamic-fusion calibration is fit
+separately afterward against the winning checkpoint(s), not here.
 
 ## Prerequisite code changes (all committed, tested, pushed)
 
