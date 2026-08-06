@@ -15,9 +15,9 @@ remain untouched.
 | Phase | Task | Status |
 |---|---|---|
 | 0 | Audit current HEAD | **DONE** |
-| 1 | Reconstruct exact scenario hydraulic state | **DONE** (code + tests); regeneration running |
+| 1 | Reconstruct exact scenario hydraulic state | **DONE** (code + tests) |
 | 2 | Governed signature-artifact policy | **DONE** (documented + wired; approximation error unmeasured, flagged) |
-| 3 | Repair Strategist label semantics | not started |
+| 3 | Repair Strategist label semantics | **DONE** (code + tests); corpus regeneration running |
 | 4 | Candidate-conditioned Strategist | not started |
 | 5 | Closed-loop Scout states | not started |
 | 6 | OOD taxonomy / event-cause | not started |
@@ -33,6 +33,8 @@ remain untouched.
 4. `5372075` fix(data): tolerate sub-float32-rounding noise on negligible-strength scenarios
 5. `bb7698e` feat(classical): wire the signature registry into trajectory generation
 6. `93d5bc3` fix(data): use stored scenario data for trajectories, not regenerated arrays
+7. `668092b` docs(handoff): publish pre-freeze implementation handoff after Phase 1-2
+8. `bfaf676` fix(strategist): derive exact consequence values and semantic targets
 
 All pushed to `origin/agent/gcp-multitopology-v3`.
 
@@ -154,14 +156,83 @@ policy for equality (grepped `src/hydroswarm/runtime/defaults.py` and
 wire the registry into yet, so "runtime/training policy equality" (Phase 2
 item 7's last bullet) has no runtime half to test against.
 
+## Phase 3: repair Strategist label semantics — DONE
+
+Three real defects fixed in `strategist_labels.py` (full detail in commit
+`bfaf676`'s message):
+
+1. **Selection bias (3.1)**: training-label generation only verified plans
+   the old heuristic prescreener selected (`prescreen_top_plans`,
+   `predicted_validity >= 0.5`, top-3-by-predicted-score) plus `NO_ACTION` —
+   using a heuristic to decide which candidates receive labels would have
+   made it structurally impossible for a learned prescreener to ever beat
+   it. `generate_strategist_labels` now exactly WNTR-verifies the FULL
+   bounded candidate set (up to the canonical 9 templates).
+2. **Ungoverned plan_value (3.2/3.3)**: was
+   `proposal.predicted_value * proposal.predicted_validity` — the old
+   heuristic's own unverified score. New
+   `hydroswarm.planning.plan_value_policy` module (versioned,
+   `PLAN_VALUE_POLICY_VERSION`) derives `plan_value`/`regret` and all five
+   previously-defined-but-never-populated consequence-proxy targets
+   (`exposure_proxy`, `pressure_risk_proxy`, `service_loss_proxy`,
+   `containment_time_proxy`, `plan_regret_proxy`) from exact WNTR
+   `ConsequenceMetrics` only. 6 monotonicity tests pass (lower exposure/
+   fewer pressure violations/greater service availability/shorter
+   containment time cannot reduce `plan_value`; best plan in a pool has
+   zero regret; `NO_ACTION` is scored identically to every other
+   candidate, never given an automatic free pass).
+3. **Broken target-pointer semantics (3.4)**: `target_pointer` was computed
+   via `sorted(network.junction_name_list)` at label-generation time — the
+   same node-space bug class already found and fixed for Scout/Sentinel
+   (junction-only order silently disagrees with the canonical node space
+   every other node-indexed target uses), and link targets were silently
+   dropped entirely (`positions.get()` returned `None` for link names,
+   since `positions` only ever contained junction names).
+   `StrategistLabel` now carries semantic identity
+   (`primary_target_id`/`primary_target_type: NONE|NODE|LINK`); index
+   resolution against the scenario's own canonical `node_ids`/`edge_ids`
+   now happens only at tensor-building time
+   (`strategist_trajectory._resolve_target_pointer`).
+
+Also (3.5): centralized the canonical 9-template vocabulary into
+`hydroswarm.planning.action_templates`; raised `generate_response_plans`'
+`maximum_plans` cap from 8 to 9 (it structurally excluded the 9th template —
+`ALTERNATE_VALVE_CUT` — whenever the other 8 were eligible, a second,
+independent instance of the known 8-vs-9 mismatch).
+
+**Attempted and reverted**: raising `HydroCore.action_vocabulary_size`'s
+default from 8 to 9 to match. The promoted checkpoint does not pin this in
+its recorded architecture config, so it silently relies on the constructor
+default despite never training the action head — raising it broke strict
+reload of that checkpoint (`action_head`'s saved weight shape is `[8, ...]`),
+caught immediately by the full test suite
+(`test_default_pipeline_factory.py`). Reverted with a comment explaining
+why; deferred to Phase 9's architecture-v4 contract, where config
+completeness is meant to be strictly validated rather than left to a
+constructor default. **This is a real, generalizable lesson for the rest of
+this pass**: any shared model-constructor default change needs a full test
+run before being treated as safe, even when the head in question appears
+untrained everywhere the audit checked.
+
+15 new/rewritten tests. 536 tests passing (was 513 at session start),
+ruff/pyright clean.
+
 ## Trajectory corpus regeneration (data/learning-v2/cycle-b2-trajectories-v2/)
 
 Running as 4 resumable background jobs (`experiments/jobs/
 cycle-b2-trajectories-v2-{train,validation,calibration,development_holdout}`),
 launched via `hydroswarm.training.job_runner`, polled at a 10-minute interval.
-`validation` and `calibration` completed with **0 errors**. `train` and
-`development_holdout` are in progress (relaunched against commit `93d5bc3`
-after the fixes above; idempotent resume from prior partial progress).
+
+**Regenerated from scratch after Phase 3** (second restart): the first
+complete run (Phase 1+2 fixes only, `validation`/`calibration` reached 0
+errors, `development_holdout` reached 0 errors with 327/2150 rows using the
+documented `weak_verification` fallback, `train` was ~18% through) predated
+the Phase 3 Strategist fix — every row written under that run had the old,
+buggy `plan_value`/target-pointer semantics. Rather than ship a corpus with
+inconsistent Strategist-label semantics across rows, all four splits' output
+was deleted (confirmed via `git status` that nothing had been committed yet)
+and regeneration restarted clean against commit `bfaf676`. In progress as of
+this report.
 
 The old `data/learning-v2/cycle-b2-trajectories/` (built with the pristine-
 context bug) is left untouched and remains marked provisional/invalid per
@@ -195,18 +266,22 @@ pushed to `origin/agent/gcp-multitopology-v3`.
 
 ## Next steps
 
-1. Let `train`/`development_holdout` regeneration finish (~1-2 hours from
-   relaunch at the observed ~1.3-1.5 scenarios/s), then commit the new
-   corpus's manifests/reports (large tensor shards, if any are produced by a
-   later merge step, go via Git LFS per Phase 18 — this stage only produces
-   JSONL, not tensor shards).
-2. Phase 3: repair Strategist label semantics — verify the full bounded
-   candidate set (not just the old heuristic-prescreened subset) during
-   training-label generation; derive `plan_value` from exact WNTR
-   consequences via a versioned `PlanValuePolicy`, not
-   `predicted_value * predicted_validity`; generate the consequence-proxy
-   targets the architecture already defines heads for but nothing
-   populates; fix `strategist_labels.py`'s graph-local pointer semantics
-   (currently a bare sorted-junctions index, not a semantic
-   node/link-typed pointer); resolve the canonical action-template count
-   (planner produces 9, `HydroCore.action_head` defaults to 8).
+1. Let the (restarted, post-Phase-3) 4-split regeneration finish (~2 hours
+   from relaunch at the observed ~1.3-1.5 scenarios/s), verify each split's
+   `report.json` shows `errors_this_run: 0`, then commit the new corpus's
+   JSONL/manifests/reports (this stage only produces JSONL, not tensor
+   shards — no Git LFS needed for this artifact).
+2. Phase 4: candidate-conditioned Strategist architecture —
+   `CandidatePlanEncoder`, per-candidate plan features/masks, removing the
+   fixed anonymous plan-query positions (`plan_queries=8`) as candidate
+   identity. This is a genuinely large model-architecture change; given
+   this pass just found that even a same-cardinality default change
+   (`action_vocabulary_size`) broke promoted-checkpoint reload, budget real
+   time for full-suite verification before/after, not just the new
+   architecture's own unit tests.
+3. Phase 5: real closed-loop Scout states (reveal evidence incrementally,
+   enforce observation cutoffs, arbitrary-node sampling).
+4. Phase 6: split OOD category (11-class) from deterministic severity
+   (3-class) — currently conflated.
+5. Phase 7: masked-regression helper honoring target masks (currently the
+   generic MSE path ignores mask companions for several targets).
