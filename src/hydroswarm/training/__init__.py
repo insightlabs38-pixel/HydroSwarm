@@ -36,6 +36,12 @@ from .scout_trajectory import ScoutTrajectory, ScoutTrajectoryStep, build_scout_
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
 from .strategist_labels import StrategistLabel, generate_strategist_labels
+from .strategist_trajectory import (
+    ACTION_TEMPLATES,
+    StrategistTrajectory,
+    StrategistTrajectoryStep,
+    build_strategist_trajectory,
+)
 from .targets_v2 import (
     TARGETS_BY_CATEGORY,
     TARGETS_V2,
@@ -58,6 +64,7 @@ from .trajectory_v2 import (
 from .variable_collate import collate_variable_topology
 
 __all__ = [
+    "ACTION_TEMPLATES",
     "OOD_CATEGORY_BEHAVIOR",
     "TARGETS_BY_CATEGORY",
     "TARGETS_V2",
@@ -85,6 +92,8 @@ __all__ = [
     "ScoutTrajectory",
     "ScoutTrajectoryStep",
     "StrategistLabel",
+    "StrategistTrajectory",
+    "StrategistTrajectoryStep",
     "ShardedScenarioDataset",
     "TargetSchemaError",
     "TargetSpec",
@@ -103,6 +112,7 @@ __all__ = [
     "authorize_locked_final_test",
     "build_scout_trajectory",
     "build_signature_artifact_for_network",
+    "build_strategist_trajectory",
     "by_curriculum_stage",
     "by_network",
     "by_source_node",
