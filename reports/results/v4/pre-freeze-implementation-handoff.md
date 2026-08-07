@@ -18,13 +18,13 @@ remain untouched.
 | 1 | Reconstruct exact scenario hydraulic state | **DONE** (code + tests) |
 | 2 | Governed signature-artifact policy | **DONE** (documented + wired; approximation error unmeasured, flagged) |
 | 3 | Repair Strategist label semantics | **DONE** (code + tests) |
-| 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
-| 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
-| 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
+| 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; now also wired to real training data and proven end-to-end with real nonzero gradients -- Phase 10.3, see below) |
+| 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started; step-0 supervision now wired to real training data and proven end-to-end -- Phase 10.2, see below) |
+| 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3's balanced corpus for the 4 remaining reproducible categories now generated for real -- Phase 10.4, see below) |
 | 7 | Auxiliary objectives / regression losses | **DONE** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
 | 8 | Second-pass calibrated control targets | **DONE** (all steps 1-9 complete, including step 6b -- corpus merge + real control-head training -- see "core-issues4.txt continuation pass, part 2" below) |
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
-| 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **IN PROGRESS** -- see below |
+| 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **10.1 IN PROGRESS (train split still generating), 10.2-10.5 DONE** -- see "Phase 10" section below |
 | 11-20 | Loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
@@ -1419,56 +1419,336 @@ output_width` round-trips every new field through a real constructor call.
   it before the rest of the v4 contract exists would only create
   compatibility friction without the payoff Phase 9 is meant to deliver.
 
+## Phase 10 (core-issues4.txt Section I / core-issues3.txt Phase 10)
+
+Started immediately after Phase 9 completed, in the exact priority order
+Section I specifies. Five commits, all pushed to
+`origin/agent/gcp-multitopology-v3`:
+
+1. `dc2741f` feat(training): build real Scout-state and Strategist-candidate datasets (Phase 10.2/10.3)
+2. `b140b0c` feat(data): generate balanced supported-category OOD extension corpus (Phase 10.4)
+3. `54ae4e9` test(v4): real multi-topology gradient smoke test for every retained output (Phase 10.5)
+
+(Phase 10.1's trajectory-corpus-regeneration commits are still pending as
+of this handoff update -- the `train` split is still generating in the
+background; `validation`/`calibration`/`development_holdout` are complete
+and already committed as part of the Phase 10.2/10.3 commit above, since
+those datasets were built from them.)
+
+### Phase 10.1 -- regenerate the final non-provisional trajectory corpus (IN PROGRESS)
+
+`data/learning-v2/cycle-b2-trajectories-v2` (committed in the prior pass)
+was explicitly provisional: it predated Phase 6.4's `HYDRAULIC_MISMATCH`
+mislabel fix, Phase 7.2's Scout per-node target shape, Phase 7.3's
+sensor-reconstruction masking, Phase 7.4's `future_concentration` disable,
+and Phase 7.5's travel-time transform. Re-running
+`scripts/generate_trajectory_corpus.py` against the current HEAD (which
+already contains all of those fixes in the underlying label-generation
+code -- confirmed by inspection: `build_incident_trajectory` already
+threads `reconstruction` into `build_scout_trajectory`, Phase 5's
+incremental-revelation mechanism) produces a genuinely corrected corpus
+with no additional code changes needed for the regeneration itself.
+
+Launched as 4 independent resumable background jobs (`hydroswarm.training.
+job_runner`, `experiments/jobs/cycle-b2-trajectories-v3-{split}`), polled
+at the requested 10-minute interval:
+
+| split | status | scenarios | errors |
+|---|---|---:|---:|
+| validation | **COMPLETE**, committed | 1000/1000 | 0 |
+| calibration | **COMPLETE**, committed | 1000/1000 | 0 |
+| development_holdout | **COMPLETE**, committed | 2150/2150 (400 coastal-branch skipped, unsupported topology -- same documented behavior as the prior pass) | 0 |
+| train | **RUNNING** as of this update | ~2800+/9000 (~0.68 scenarios/s, ETA roughly 2-2.5h more from this update's timestamp) | 0 so far |
+
+Exact resume command (idempotent -- skips already-processed scenario_ids,
+confirmed by `hydroswarm.training.job_runner`'s own PID-liveness-over-
+`status.json` convention, same caveat as the prior pass: `status.json`'s
+`state` field is only updated by an explicit `mark_finished()` call, so
+check `kill -0 <pid>` for ground truth while a job is actually running):
+
+```bash
+export PYTHONPATH=src
+python scripts/generate_trajectory_corpus.py \
+  --corpus-dir data/learning-v2/cycle-b2 \
+  --output data/learning-v2/cycle-b2-trajectories-v3 \
+  --split train
+# Check status:
+cat experiments/jobs/cycle-b2-trajectories-v3-train/status.json
+tail -f experiments/jobs/cycle-b2-trajectories-v3-train/job.log
+```
+
+**Once `train` finishes**: commit `train.jsonl`/`train-report.json` (likely
+needs a Git LFS exception by exact filename, matching
+`cycle-b2-trajectories-v2/train.jsonl`'s own >100MB precedent -- check size
+first), then re-run `scripts/build_scout_state_dataset.py` and
+`scripts/build_strategist_candidate_dataset.py` against the `train` split
+(exact commands in their own sections below), producing the full-scale
+Scout/Strategist training corpora this pass only built for `validation`.
+
+### Phase 10.2 -- sharded Scout-state datasets and collators (DONE for `validation`)
+
+`scripts/build_scout_state_dataset.py`: merges each trajectory's Scout
+step 0 (the initial, unconditioned decision) onto `cycle-b2`'s base
+tensors. **Deliberate scoping decision, not an oversight**: `HydroCore`
+has no `already_sampled`-equivalent input anywhere in `HydroBatch` to
+condition later Scout steps on, so training against Phase 5's full
+multi-step trajectory would hand the model contradictory targets for an
+identical input representation across steps of the same scenario -- the
+same class of gap `future_concentration_target`'s Phase 7.4 disable
+already established a precedent for. Examples with zero Scout steps
+(Phase 2 item 4: "no useful candidate exists") are masked, not dropped,
+preserving 1:1 correspondence with the base corpus.
+
+No new collator was needed for Scout specifically -- but building this
+surfaced two real, previously-undiscovered defects in the *existing*
+collator (`variable_collate.py`) and its `permutation.py` counterpart,
+both instances of the same "two independently-maintained lists silently
+drift apart" defect class this project has now hit three times (after the
+8-vs-9 action-template count and the `ood_head`-vs-`ood_category_head`
+loss mapping):
+
+1. `variable_collate.NODE_INDEXED_TARGET_KEYS` (a hand-maintained tuple)
+   was missing `information_gain`/`candidate_reduction` entirely (Phase
+   7.2's per-node conversion) -- collating a real batch with these targets
+   raised. Now derived from `targets_v2.NODE_ARRAY_TARGETS` programmatically.
+2. `permutation.py` had its own separate, even narrower copy
+   (`("sensor_fault",)` only) for equivariance-testing node permutation,
+   plus an incomplete `NODE_INDEX_TARGET_KEYS` (missing `sample_node`).
+   Both now derived from `targets_v2` directly.
+
+Verified for real against `cycle-b2-trajectories-v3/validation.jsonl`
+(1000/1000 examples matched, genuine per-node shapes confirmed) with a
+real forward+backward pass across all 3 topology families: every Scout
+head (`sample_node_head`, `information_gain_head`,
+`candidate_reduction_head`, `should_continue_sampling_head`) receives a
+real nonzero gradient. `tests/integration/test_scout_state_dataset.py`
+(self-contained, hand-built fixtures, does not depend on the background
+job's output).
+
+Resume command (once `train` finishes, per Phase 10.1 above):
+
+```bash
+export PYTHONPATH=src
+python scripts/build_scout_state_dataset.py \
+  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/train \
+  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/train.jsonl \
+  --output data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/train \
+  --split train
+```
+
+### Phase 10.3 -- sharded Strategist-candidate datasets and collators (DONE for `validation`)
+
+`scripts/build_strategist_candidate_dataset.py`: `build_strategist_trajectory`
+is single-step by design (no Scout-style multi-step ambiguity), so every
+scenario's one real Strategist step is used directly. Builds BOTH the
+candidate-conditioned architecture's real INPUT contract
+(`plan_template_ids`/`plan_target_type`/`plan_target_node_index`/
+`plan_target_link_index`/`plan_features`/`plan_mask`, from each candidate
+label's semantic identity plus its already-resolved `target_pointer`) and
+its governed TARGETS (`plan_validity`/`plan_value`/all 5 consequence
+proxies, copied directly from the exact-WNTR-derived per-candidate
+targets).
+
+`plan_features` scoping decision, documented in the script's own
+docstring: `CandidatePlanEncoder` describes richer pre-verification
+proposal features (the old heuristic score, cost estimate, action count,
+source-region overlap, etc.) that are not present anywhere in the
+persisted trajectory JSONL today -- computing them for real requires the
+original network/incident context at *generation* time, not something
+derivable from the already-serialized labels. Rather than fabricate
+plausible-looking numbers (forbidden by this project's own labeling
+restrictions), `plan_features` uses only genuinely available, leakage-free,
+purely structural facts (6 dims, matching `HydroCore.PLAN_FEATURE_DIM`'s
+default width). The richer feature set is real, scoped follow-up work.
+
+This *is* a genuinely new collator: `variable_collate.py` gained
+candidate-dimension (P) padding for both the `plan_*` INPUT keys (a new
+`_pad_plan_indexed_inputs` helper) and the governed per-plan TARGET keys
+(reusing `targets_v2.PLAN_DIMENSION_TARGETS` rather than a fifth
+hand-maintained list). Verified with a genuinely variable candidate count
+per example (not just the real corpus's always-9), not merely the
+fixed-P case.
+
+Verified for real against `cycle-b2-trajectories-v3/validation.jsonl`
+(1000/1000 examples matched, canonical 9 candidates/example) with a real
+forward+backward pass across all 3 topology families: `CandidatePlanEncoder`,
+`plan_value_head`, `plan_validity_head`, and all 5 consequence-proxy heads
+receive real nonzero gradients -- **the first time the candidate-conditioned
+Strategist architecture has trained on real data in this project's
+history** (previously "architecture + tests; not yet wired to real
+training data" per the prior handoff). `tests/integration/
+test_strategist_candidate_dataset.py` (self-contained fixtures).
+
+Resume command (once `train` finishes):
+
+```bash
+export PYTHONPATH=src
+python scripts/build_strategist_candidate_dataset.py \
+  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/train \
+  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/train.jsonl \
+  --output data/learning-v2/cycle-b2-trajectories-v3/strategist-tensors-normalized/train \
+  --split train
+```
+
+### Phase 10.4 -- balanced supported-category OOD extension corpus (DONE)
+
+`cycle-b2` already had real generated data for 2 of the 6 non-NONE
+supported OOD categories (`SEVERE_MISSINGNESS`, `UNSEEN_TOPOLOGY`).
+`scripts/generate_ood_extension_corpus.py` fills the remaining 4
+(`EXTREME_DEMAND`, `TANK_STATE_SHIFT`, `ROUGHNESS_MISMATCH`,
+`FROZEN_DRIFTING_SENSOR`), using the already-tested
+`OOD_TRIGGERING_CONFIG_OVERRIDES` recipe at real scale (400/category,
+matching the existing `SEVERE_MISSINGNESS` holdout's own count) -- written
+to a new `data/learning-v2/cycle-b2-ood-extension/`, never touching
+`cycle-b2` itself. Each topology's signature library is refit from that
+topology's real `cycle-b2` TRAIN scenarios and hash-verified against
+`cycle-b2`'s own recorded artifact before use (never fit from holdout
+data, never a silently-drifted copy).
+
+Every one of the 1600 generated scenarios is verified for real via
+`classify_ood_category()` before being kept -- the script fails closed if
+any scenario's override does not actually trigger its intended category.
+All 1600 passed.
+
+**Two real defects found running this at real scale, not by inspection**:
+
+1. `WNTRScenarioGenerator.generate_with_network` unconditionally zeroes
+   `missing_probability` whenever `stage == CurriculumStage.CLEAN`,
+   silently discarding whatever the caller's config actually requested. A
+   real small-scale dry run caught 3/6 `SEVERE_MISSINGNESS` scenarios
+   silently classifying as `NONE` because of exactly this (the *existing*,
+   protected `cycle-b2` `SEVERE_MISSINGNESS` holdout likely carries the
+   same latent ~1/5 gap, since `generate_cycle_b_corpus.py`'s own
+   `_stage_for_index` cycles through every stage including `CLEAN` -- not
+   touched here, flagged for awareness). Fixed by never selecting `CLEAN`
+   for any OOD-extension scenario.
+2. `generate_category` verified each scenario's category but never
+   actually attached `ood_class_target(...)` to the resulting example --
+   the entire point of this corpus would have been silently missing. The
+   first (buggy) full-scale run, already complete, was killed and its
+   untracked, never-committed output discarded before this fix; the corpus
+   actually committed is the corrected regeneration.
+
+`tests/scientific/test_generate_ood_extension_corpus.py` runs the real
+recipe for all 5 governed categories at small real scale against the
+actual `cycle-b2` corpus, asserting `ood_class` is both present and
+correct (the regression test for defect 2) and that `CLEAN` is never
+selected (defect 1). Both raw and `tensors-normalized/` variants
+committed (the latter via direct reuse of `rebuild_normalized_shards.py`'s
+`rebuild_split` function, since that script's `main()` hard-requires a
+`train` split this corpus deliberately does not have).
+
+### Phase 10.5 -- real multi-topology gradient smoke tests for every retained v4 output (DONE)
+
+`tests/integration/test_full_output_gradient_smoke.py`, two tests:
+
+1. Merges `cycle-b2-trajectories-v3`'s completed `validation` split onto
+   `cycle-b2`'s base tensors (`scripts/merge_trajectory_targets.py`) and
+   runs one real forward+backward with `event_control_heads` +
+   `auxiliary_heads` + `ood_category_head` + `scout_control_heads` all
+   enabled *together* (a genuine joint-multitask configuration, not one
+   flag at a time) across all 3 real topologies: every governed
+   Sentinel/control/auxiliary/OOD head receives a real nonzero gradient.
+2. Uses `cycle-b2-ood-extension`'s real data (Phase 10.4) to exercise
+   `ood_category_head` against 4 genuinely distinct real non-NONE classes
+   -- `cycle-b2`'s own data is almost entirely `NONE`-class, so a batch
+   drawn only from it would not meaningfully exercise the head's non-NONE
+   logits.
+
+Scout and Strategist are covered by their own Phase 10.2/10.3 tests, not
+duplicated here. Together with Phase 10.2/10.3's own tests, every retained
+v4 output (per `checkpoint_identity.py`'s Section D decisions) now has at
+least one real, committed, passing test proving it receives a nonzero
+gradient from real multi-topology data.
+
 ## Restrictions honored
 
 No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
 promoted checkpoints, and every existing v3 result artifact are untouched.
-Locked test not opened; `final-selection.json` does not exist. No destructive
-git/filesystem commands used. No sudo, no credential exposure. All commits
-pushed to `origin/agent/gcp-multitopology-v3`.
+`data/learning-v2/cycle-b2-control-v2`, `cycle-b2-trajectories-v3`, and
+`cycle-b2-ood-extension` are all new, separately-versioned artifacts:
+nothing was overwritten in place. Locked test not opened;
+`final-selection.json` does not exist. No destructive git/filesystem
+commands used (the one deletion performed -- Phase 10.4's discarded buggy
+first run -- was this same session's own untracked, never-committed
+scratch output). No sudo, no credential exposure. All commits pushed to
+`origin/agent/gcp-multitopology-v3`.
 
-## Next steps (current, as of the core-issues4.txt continuation pass, part 2)
+## Next steps (current, as of the Phase 10 pass)
 
-**Phase 9 (core-issues4.txt Sections A-I) is now fully DONE** -- see "core-
-issues4.txt continuation pass, part 2" above for the Section H stop-gate
-checklist, all 16 items verified true. Phase 8 is now fully DONE (all 9
-steps). Work has moved into core-issues4.txt Section I / core-issues3.txt
-Phase 10, in the exact priority order Section I specifies:
+**Phase 9 (core-issues4.txt Sections A-I) and Phase 8 are fully DONE** --
+see "core-issues4.txt continuation pass, part 2" above for the Section H
+stop-gate checklist, all 16 items verified true. **Phase 10 (core-issues4.txt
+Section I / core-issues3.txt Phase 10) is DONE for items 2-5; item 1 is
+in progress**:
 
-1. Regenerate the final non-provisional trajectory corpus incorporating
-   all Phase 1-9 corrections.
-2. Build sharded Scout-state datasets and collators.
-3. Build sharded Strategist-candidate datasets and collators.
-4. Generate the balanced supported-category OOD extension.
+1. Regenerate the final non-provisional trajectory corpus -- **IN
+   PROGRESS**: `validation`/`calibration`/`development_holdout` complete
+   and committed (0 errors each); `train` still generating in the
+   background as of this update (~2800+/9000, ETA ~2-2.5h from this
+   update's timestamp). Exact resume/status commands in the Phase 10.1
+   section above.
+2. Build sharded Scout-state datasets and collators -- **DONE for
+   `validation`** (real end-to-end gradient proof); re-run against `train`
+   once item 1 finishes (exact command in the Phase 10.2 section above).
+   Found and fixed a real 3-instance-deep "hand-maintained list drifts
+   from its source of truth" defect in `variable_collate.py`/`permutation.py`.
+3. Build sharded Strategist-candidate datasets and collators -- **DONE for
+   `validation`** (real end-to-end gradient proof, the candidate-conditioned
+   architecture's first real training data in this project's history);
+   re-run against `train` once item 1 finishes.
+4. Generate the balanced supported-category OOD extension -- **DONE**,
+   full scale (1600 real, individually-verified scenarios across the 4
+   remaining reproducible categories). Found and fixed two real defects
+   (a `CurriculumStage.CLEAN` config-override-zeroing gap, and a missing
+   `ood_class_target` attachment) by actually running the generator, not
+   by inspection.
 5. Run real multi-topology gradient/training smoke tests for every
-   retained v4 output.
+   retained v4 output -- **DONE**. Every retained v4 output (per
+   `checkpoint_identity.py`'s Section D decisions) now has at least one
+   real, committed, passing test proving a nonzero gradient from real
+   multi-topology data.
 
-Not yet started as of this handoff update; tracked as the active work.
-Also still open, correctly sequenced after the above (no promoted v4
-checkpoint exists yet to wire a runtime path to):
+Still open, correctly sequenced after Phase 10 (no promoted v4 checkpoint
+exists yet to wire a runtime path to, and Phase 10.1's `train` split feeds
+directly into any future architecture-selection decision):
 
+- **Once `train` finishes**: commit it, re-run Scout/Strategist dataset
+  building against it, and consider whether a full joint-multitask
+  training run (Phase 9 of core-issues2.txt's own staged-training plan) is
+  now warranted -- explicitly NOT started this pass; this remains a real,
+  substantial next step, not a formality.
 - **Wire `output_governance`/checkpoint-identity into a live v4 runtime
   path**: `runtime/defaults.py`/`inference/pipeline.py` still only
   understand the v3 `trained_tasks` role-level gating.
 - **Section F's optional low-LR joint fine-tune** for the control heads,
   only if a future evaluation pass materially improves
   `unsafe_non_abstention_count`/`INSPECT_FAULTY_SENSOR` recall enough to
-  justify it -- not attempted now, see the honest-limitation note above.
+  justify it -- not attempted this pass, see the honest-limitation note
+  above.
 - Phases 11-20 (loss-system config, staged training/ablations, required
   metrics, promotion gates, CI, artifact governance, architecture
   selection, locked-test boundary) not started.
 
-A recurring pattern worth carrying forward, extended again this part:
+A recurring pattern worth carrying forward, extended again this pass:
 every phase touched so far has surfaced at least one real,
 previously-unobserved defect only visible once exercised at real scale or
-with a genuinely adversarial test case, not by inspection alone -- this
-part's own two new instances are the raw-vs-normalized tensor-variant
-mismatch caught by actually running `gate_normalization_ownership` (not
-assuming the merge script was correct because it "looked done"), and the
-`CheckpointIdentity.fingerprint` bound-method-comparison bug in the new
-integration test's own first draft, caught by an independent
-`dataclasses.asdict` comparison before concluding it was a real defect
-rather than a test bug. Continue prioritizing real-scale/real-data testing
-over unit tests with synthetic arrays, and independently verifying a
-failing assertion's root cause before either dismissing it as a test bug
-or reporting it as a real regression.
+with a genuinely adversarial test case, not by inspection alone. This
+pass's own instances: the raw-vs-normalized tensor-variant mismatch caught
+by actually running `gate_normalization_ownership`; the
+`CheckpointIdentity.fingerprint` bound-method-comparison bug in a new
+test's own first draft, caught by an independent `dataclasses.asdict`
+comparison before concluding it was a real defect rather than a test bug;
+the third instance of the "hand-maintained list drifts from its source of
+truth" defect class, in two DIFFERENT modules (`variable_collate.py` and
+`permutation.py`), found only once a real per-node/per-plan target was
+actually collated or permuted; the `CurriculumStage.CLEAN`
+`missing_probability`-zeroing gap and the missing `ood_class_target`
+attachment, both found only by actually running the OOD-extension
+generator at real scale and writing a real test for its output, not by
+reading the code. Continue prioritizing real-scale/real-data testing over
+unit tests with synthetic arrays, independently verifying a failing
+assertion's root cause before either dismissing it as a test bug or
+reporting it as a real regression, and treating every "two things that
+must agree" relationship in this codebase as a candidate for exactly this
+drift class until it is derived from one shared source.
