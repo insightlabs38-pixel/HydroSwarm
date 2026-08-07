@@ -66,6 +66,28 @@ def test_scout_label_is_well_formed(tmp_path) -> None:
     assert 0.0 <= label.candidate_reduction_fraction <= 1.0
 
 
+def test_reindex_to_signature_grid_is_usable_directly_with_localize_with_signatures(tmp_path) -> None:
+    # core-issues3.txt Phase 12 Stage D: an operational Scout-policy
+    # comparison needs per-node marginal source probabilities (a different
+    # question from "which node to sample next"), which
+    # hydroswarm.classical.signatures.localize_with_signatures already
+    # computes from the exact same reindexed observations this module
+    # feeds bayesian_source_posterior -- reindex_to_signature_grid is
+    # public specifically so a second caller does not have to duplicate
+    # the reindexing logic.
+    from hydroswarm.classical.signatures import localize_with_signatures
+    from hydroswarm.training.scout_labels import reindex_to_signature_grid
+
+    network = build_wntr_network()
+    artifact = _fast_artifact(network, tmp_path / "cache")
+    scenario = _scenario(network, source_node="J2", seed=10)
+
+    observed, valid = reindex_to_signature_grid(scenario, artifact.sensor_nodes, artifact.sample_times_seconds)
+    result = localize_with_signatures(observed, artifact, observation_mask=valid, noise_scale=0.5)
+    assert set(result.source_probabilities) == {hypothesis.source_node for hypothesis in artifact.hypotheses}
+    assert abs(sum(result.source_probabilities.values()) - 1.0) < 1e-6
+
+
 def test_scout_label_recommends_a_sample_when_evidence_is_genuinely_ambiguous(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")

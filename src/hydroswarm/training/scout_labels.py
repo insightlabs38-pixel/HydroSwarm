@@ -84,12 +84,22 @@ def build_signature_artifact_for_network(
     )
 
 
-def _reindex_to_signature_grid(
+def reindex_to_signature_grid(
     scenario: GeneratedScenario, node_ids: Sequence[str], sample_times_seconds: Sequence[int]
 ) -> tuple[np.ndarray, np.ndarray]:
     """Align a scenario's own (sensor-aligned) observations onto the
     signature artifact's fixed time grid, matching the nearest-neighbor
-    reindexing SignatureBuilder itself uses when fitting signatures."""
+    reindexing SignatureBuilder itself uses when fitting signatures.
+
+    Public (not a module-private leading-underscore helper) because a
+    second real caller needs it: core-issues3.txt Phase 12 Stage D's
+    Scout-policy comparison calls
+    hydroswarm.classical.signatures.localize_with_signatures directly (for
+    per-node marginal source probabilities and a candidate set -- a
+    different question from generate_scout_label's own "which node to
+    sample next"), which needs these exact reindexed observation arrays as
+    input. Reused here rather than duplicated so both callers stay
+    provably consistent with the same reindexing convention."""
 
     observed, valid = aligned_observations(scenario, node_ids)
     frame = pd.DataFrame(observed, index=scenario.timestamps_seconds, columns=node_ids)
@@ -144,7 +154,7 @@ def generate_scout_label(
     fixed original observations only) -- this is what made every prior
     Scout "trajectory" re-rank the same fixed evidence at every step."""
 
-    observed, valid = _reindex_to_signature_grid(scenario, artifact.sensor_nodes, artifact.sample_times_seconds)
+    observed, valid = reindex_to_signature_grid(scenario, artifact.sensor_nodes, artifact.sample_times_seconds)
     if revealed_samples:
         # pandas' reindex().to_numpy() can return a read-only view sharing
         # memory with its source frame -- copy before mutating regardless
