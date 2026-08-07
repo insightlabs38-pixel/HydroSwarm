@@ -53,14 +53,14 @@ AUXILIARY_TASKS = frozenset({"sensor_reconstruction", "future_concentration", "t
 AUXILIARY_TASK_DEFAULT_WEIGHT = 0.1
 
 
-def _cross_entropy(logits: Tensor, target: Tensor) -> tuple[Tensor, int]:
+def _cross_entropy(logits: Tensor, target: Tensor, *, weight: Tensor | None = None) -> tuple[Tensor, int]:
     flattened_target = target.long().reshape(-1)
     valid = flattened_target != -100
     count = int(valid.sum())
     if not valid.any():
         return logits.sum() * 0.0, count
     flattened_logits = logits.reshape(-1, logits.shape[-1])
-    return F.cross_entropy(flattened_logits[valid], flattened_target[valid]), count
+    return F.cross_entropy(flattened_logits[valid], flattened_target[valid], weight=weight), count
 
 
 def _ordinal_classification_loss(
@@ -178,10 +178,28 @@ def compute_multitask_loss(
     *,
     task_weights: Mapping[str, float] | None = None,
     profile_ordinal_weight: float = 0.0,
+    class_weights: Mapping[str, Tensor] | None = None,
 ) -> MultiTaskLoss:
-    """Compute every task for which both a semantic prediction and target exist."""
+    """Compute every task for which both a semantic prediction and target exist.
+
+    `class_weights` (core-issues3.txt Phase 11.2, distinct from
+    `task_weights`): an optional ``{task_name: per-class weight tensor}``
+    mapping -- e.g. from hydroswarm.training.class_balance.
+    train_owned_class_weights/class_weights_tensor, fit from TRAIN-split
+    prevalence only -- passed through to `torch.nn.functional.
+    cross_entropy`'s own `weight=` argument for the named classification
+    task(s). `task_weights` scales a whole task's contribution to `total`;
+    `class_weights` reweights WITHIN one task's classification loss by
+    class. Only applies to the multi-class `classifications` tasks below
+    (event_cause, ood_class, next_step, plan_validity, and similar) -- the
+    binary/BCE-based tasks (event_presence, sensor_fault,
+    should_continue_sampling, evidence_sufficiency) would need a
+    `pos_weight`, not a per-class weight vector; not wired here, since none
+    of them has a documented imbalance problem this pass identified.
+    """
 
     weights = task_weights or {}
+    class_weight_map = class_weights or {}
     losses: dict[str, Tensor] = {}
     # Task keys here are hydroswarm.training.targets_v2's governed target
     # names -- not the model's own output-attribute names (the dict values)
@@ -239,7 +257,9 @@ def compute_multitask_loss(
     for task, output_name in classifications.items():
         if task in targets and output_name in outputs:
             losses[task], counts[task] = _cross_entropy(
-                outputs[output_name], _apply_target_mask(task, targets[task], targets)
+                outputs[output_name],
+                _apply_target_mask(task, targets[task], targets),
+                weight=class_weight_map.get(task),
             )
     for task, class_count in PROFILE_CLASS_COUNTS.items():
         output_name = f"{task}_logits"

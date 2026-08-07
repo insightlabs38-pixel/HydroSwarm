@@ -3,6 +3,13 @@
 from .artifacts import RunArtifacts
 from .auxiliary_labels import future_concentration_target, sensor_reconstruction_target, travel_time_target
 from .checkpoint import export_model, load_checkpoint, save_checkpoint
+from .class_balance import (
+    CLASS_WEIGHT_POLICY_VERSION,
+    class_prevalence,
+    class_weights_tensor,
+    merge_prevalence,
+    train_owned_class_weights,
+)
 from .config import TrainingConfig
 from .control_labels import classify_evidence_sufficiency, classify_next_step, next_step_target
 from .full_trajectory import IncidentTrajectory, build_incident_trajectory
@@ -123,6 +130,11 @@ __all__ = [
     "TopologyMetadata",
     "Trainer",
     "TrainingConfig",
+    "CLASS_WEIGHT_POLICY_VERSION",
+    "class_prevalence",
+    "class_weights_tensor",
+    "merge_prevalence",
+    "train_owned_class_weights",
     "TrainingSummary",
     "TrajectoryIntegrityError",
     "TrajectoryState",
