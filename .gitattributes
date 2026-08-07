@@ -42,6 +42,9 @@ data/learning-v2/cycle-b2-trajectories/tensors-enriched/**/*.safetensors filter=
 # future smaller split file in this same directory is not silently pulled
 # into LFS too.
 data/learning-v2/cycle-b2-trajectories-v2/train.jsonl filter=lfs diff=lfs merge=lfs -text
+# Same size-driven exception, cycle-b2-trajectories-v3's own train.jsonl
+# (9000 scenarios, 126 MB).
+data/learning-v2/cycle-b2-trajectories-v3/train.jsonl filter=lfs diff=lfs merge=lfs -text
 
 # core-issues3.txt Phase 10.2/10.3: cycle-b2-trajectories-v3's derived
 # Scout-state and Strategist-candidate tensor shards (merged onto
