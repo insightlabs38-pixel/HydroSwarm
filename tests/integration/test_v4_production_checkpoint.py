@@ -142,6 +142,8 @@ def test_real_multi_topology_v4_training_save_resume_and_production_reload(tmp_p
         identity=identity,
         resolved_training_config=resumed_config.as_dict(),
         dataset_manifest_hashes={"train": train.manifest_hash, "validation": validation.manifest_hash},
+        task_weights=resumed_config.task_weights,
+        workdir=".",
     )
     assert (v4_dir / "checkpoint_identity.json").exists()
     assert (v4_dir / "artifact_manifest.json").exists()

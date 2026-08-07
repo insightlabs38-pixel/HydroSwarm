@@ -129,8 +129,10 @@ from dataclasses import dataclass, field
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+import random
+from typing import Any, Mapping
 
+import numpy as np
 import torch
 from safetensors.torch import load_file, save_file
 
@@ -163,6 +165,7 @@ from hydroswarm.training.output_governance import (
     OutputGovernanceError,
     validate_output_governance,
 )
+from hydroswarm.training.artifacts import git_commit_hash
 from hydroswarm.training.scenario_reconstruction import RECONSTRUCTION_POLICY_VERSION
 from hydroswarm.training.targets_v2 import TARGETS_V2, TARGETS_V2_SCHEMA_VERSION, EventCause, NextStep
 
@@ -178,6 +181,16 @@ TRAINER_STATE_FILENAME = "trainer_state.json"
 IDENTITY_FILENAME = "checkpoint_identity.json"
 RESOLVED_CONFIG_FILENAME = "resolved_training_config.json"
 ARTIFACT_MANIFEST_FILENAME = "artifact_manifest.json"
+#: core-issues3.txt Phase 11.5: "Every checkpoint must preserve... RNG."
+#: Python/NumPy/torch global RNG state at the moment of save -- without
+#: this, resuming from a v4 checkpoint reproduces the exact per-epoch data
+#: order (Trainer's DataLoader generator is deterministically re-derived
+#: from config.seed + epoch, independent of any accumulated global RNG
+#: state) but NOT dropout's own randomness, which draws from the global
+#: torch RNG and would otherwise silently restart from whatever state
+#: Trainer.__init__'s set_deterministic_seed(config.seed) leaves it in,
+#: not from wherever the pre-resume run had actually advanced it to.
+RNG_STATE_FILENAME = "rng_state.pt"
 
 
 def _ordered_hash(values: tuple[str, ...]) -> str:
@@ -661,6 +674,20 @@ def _write_json(path: Path, value: Any) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True, default=str), encoding="utf-8")
 
 
+def _capture_rng_state() -> dict[str, Any]:
+    return {
+        "python_random": random.getstate(),
+        "numpy_random": np.random.get_state(),
+        "torch_random": torch.get_rng_state(),
+    }
+
+
+def _restore_rng_state(state: dict[str, Any]) -> None:
+    random.setstate(state["python_random"])
+    np.random.set_state(state["numpy_random"])
+    torch.set_rng_state(state["torch_random"])
+
+
 def save_v4_checkpoint(
     directory: str | Path,
     *,
@@ -673,12 +700,26 @@ def save_v4_checkpoint(
     identity: CheckpointIdentity,
     resolved_training_config: dict[str, Any],
     dataset_manifest_hashes: dict[str, str],
+    task_weights: Mapping[str, float],
     transform_hashes: dict[str, str] | None = None,
     calibration_hash: str | None = None,
+    workdir: str | Path = ".",
 ) -> Path:
     """Write a complete v4 checkpoint directory (Section B). Verifies the
     live model matches `identity` BEFORE writing anything, so a mismatched
-    save is never silently produced."""
+    save is never silently produced.
+
+    core-issues3.txt Phase 11.5 ("every checkpoint must preserve... task
+    weights... source Git SHA... RNG"): `task_weights` is recorded exactly
+    as given (this function does not itself require it be complete against
+    hydroswarm.training.losses.ALL_TASK_NAMES -- that is a training-entry-
+    point-time concern, hydroswarm.training.config.TrainingConfig.from_yaml's
+    own require_complete_task_weights flag; a checkpoint must preserve
+    whatever weights a run actually used, even an intentionally partial
+    ablation), `workdir`'s current git commit is recorded as
+    `source_git_sha`, and the Python/NumPy/torch global RNG state at the
+    moment of this call is captured to RNG_STATE_FILENAME.
+    """
 
     verify_model_matches_identity(model, identity)
     path = Path(directory)
@@ -692,9 +733,16 @@ def save_v4_checkpoint(
         {"optimizer": optimizer.state_dict(), "scheduler": scheduler.state_dict()},
         path / OPTIMIZER_STATE_FILENAME,
     )
+    torch.save(_capture_rng_state(), path / RNG_STATE_FILENAME)
     _write_json(
         path / TRAINER_STATE_FILENAME,
-        {"epoch": epoch, "global_step": global_step, "best_validation_loss": best_validation_loss},
+        {
+            "epoch": epoch,
+            "global_step": global_step,
+            "best_validation_loss": best_validation_loss,
+            "task_weights": dict(task_weights),
+            "source_git_sha": git_commit_hash(Path(workdir)),
+        },
     )
     _write_json(path / IDENTITY_FILENAME, identity.to_canonical_dict())
     _write_json(path / RESOLVED_CONFIG_FILENAME, resolved_training_config)
@@ -722,6 +770,7 @@ def load_v4_checkpoint(
     model: HydroCore | None = None,
     optimizer: torch.optim.Optimizer | None = None,
     scheduler: torch.optim.lr_scheduler.LRScheduler | None = None,
+    restore_rng: bool = False,
 ) -> tuple[HydroCore, CheckpointIdentity, dict[str, Any]]:
     """Load and validate a v4 checkpoint (Section B's exact required
     order):
@@ -738,6 +787,14 @@ def load_v4_checkpoint(
        1, via validate_output_governance inside validate_checkpoint_identity).
     6. Load optimizer/scheduler state only after the model identity passes.
     7. Fail closed on missing or mismatched v4 metadata.
+
+    `restore_rng` (core-issues3.txt Phase 11.5): when True, also restores
+    the Python/NumPy/torch global RNG state captured at save time --
+    default False because most callers load a v4 checkpoint for inference/
+    inspection (dropout is inert under model.eval() regardless of RNG
+    state), where mutating process-global RNG state as a side effect of a
+    load would be a surprising, action-at-a-distance side effect. A
+    training RESUME path is the one caller that should pass True.
     """
 
     path = Path(directory)
@@ -788,6 +845,14 @@ def load_v4_checkpoint(
             optimizer.load_state_dict(resume["optimizer"])
         if scheduler is not None:
             scheduler.load_state_dict(resume["scheduler"])
+    if restore_rng:
+        rng_path = path / RNG_STATE_FILENAME
+        if not rng_path.exists():
+            raise CheckpointIdentityError(
+                f"{path} has no {RNG_STATE_FILENAME} -- cannot restore_rng=True from a "
+                "checkpoint saved before core-issues3.txt Phase 11.5's RNG-capture change"
+            )
+        _restore_rng_state(torch.load(rng_path, map_location="cpu", weights_only=False))
     return model, identity, trainer_state
 
 

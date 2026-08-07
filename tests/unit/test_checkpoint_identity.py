@@ -207,6 +207,7 @@ def test_v4_save_load_round_trip(tmp_path) -> None:
         identity=identity,
         resolved_training_config={"lr": 1e-3},
         dataset_manifest_hashes={"train": "abc123"},
+        task_weights={"source_node": 1.0},
     )
     for name in (
         ci.MODEL_WEIGHTS_FILENAME,
@@ -215,12 +216,22 @@ def test_v4_save_load_round_trip(tmp_path) -> None:
         ci.IDENTITY_FILENAME,
         ci.RESOLVED_CONFIG_FILENAME,
         ci.ARTIFACT_MANIFEST_FILENAME,
+        # core-issues3.txt Phase 11.5: RNG state is a required checkpoint
+        # artifact even though it predates (and is additive to) Section B's
+        # original six-file list.
+        ci.RNG_STATE_FILENAME,
     ):
         assert (directory / name).exists(), name
 
     loaded_model, loaded_identity, trainer_state = ci.load_v4_checkpoint(directory)
     assert loaded_identity.fingerprint() == identity.fingerprint()
-    assert trainer_state == {"epoch": 3, "global_step": 42, "best_validation_loss": 0.75}
+    assert trainer_state["epoch"] == 3
+    assert trainer_state["global_step"] == 42
+    assert trainer_state["best_validation_loss"] == 0.75
+    # Phase 11.5: task weights and source Git SHA are preserved directly in
+    # the checkpoint, not only in the caller's own run directory.
+    assert trainer_state["task_weights"] == {"source_node": 1.0}
+    assert trainer_state["source_git_sha"]  # non-empty; "unavailable" outside a git checkout
     # weights actually match (not just the identity)
     for key, value in model.state_dict().items():
         assert torch.equal(value, loaded_model.state_dict()[key])
@@ -247,6 +258,7 @@ def test_altered_identity_fingerprint_fails(tmp_path) -> None:
         directory, model=model, optimizer=optimizer, scheduler=scheduler,
         epoch=1, global_step=1, best_validation_loss=1.0, identity=identity,
         resolved_training_config={}, dataset_manifest_hashes={"train": "abc123"},
+        task_weights={"source_node": 1.0},
     )
     identity_path = directory / ci.IDENTITY_FILENAME
     payload = json.loads(identity_path.read_text(encoding="utf-8"))
@@ -290,6 +302,7 @@ def test_v4_checkpoint_cannot_load_through_the_legacy_path(tmp_path) -> None:
         directory, model=model, optimizer=optimizer, scheduler=scheduler,
         epoch=1, global_step=1, best_validation_loss=1.0, identity=identity,
         resolved_training_config={}, dataset_manifest_hashes={"train": "abc123"},
+        task_weights={"source_node": 1.0},
     )
     with pytest.raises(LegacyLoaderRejectedV4CheckpointError):
         load_checkpoint(directory, model=_tiny_model())
@@ -301,3 +314,91 @@ def test_from_checkpoint_identity_is_attached_to_hydrocore() -> None:
     assert isinstance(model, HydroCore)
     assert model.variant_name == identity.variant
     ci.verify_model_matches_identity(model, identity)
+
+
+# --- Phase 11.5: checkpoint completeness (RNG, source Git SHA) ------------
+
+
+def _save_v4(directory, model, **overrides) -> None:
+    identity = _identity_for(model)
+    optimizer, scheduler = _optimizer_scheduler(model)
+    kwargs = dict(
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        epoch=1,
+        global_step=1,
+        best_validation_loss=1.0,
+        identity=identity,
+        resolved_training_config={},
+        dataset_manifest_hashes={"train": "abc123"},
+        task_weights={"source_node": 1.0},
+    )
+    kwargs.update(overrides)
+    ci.save_v4_checkpoint(directory, **kwargs)
+
+
+def test_save_v4_checkpoint_records_source_git_sha(tmp_path) -> None:
+    import subprocess
+
+    directory = tmp_path / "checkpoint"
+    _save_v4(directory, _tiny_model(), workdir=".")
+    trainer_state = json.loads((directory / ci.TRAINER_STATE_FILENAME).read_text(encoding="utf-8"))
+    expected = subprocess.run(
+        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True
+    ).stdout.strip()
+    assert trainer_state["source_git_sha"] == expected
+
+
+def test_save_v4_checkpoint_records_source_git_sha_unavailable_outside_a_repo(tmp_path) -> None:
+    directory = tmp_path / "checkpoint"
+    _save_v4(directory, _tiny_model(), workdir=str(tmp_path))
+    trainer_state = json.loads((directory / ci.TRAINER_STATE_FILENAME).read_text(encoding="utf-8"))
+    assert trainer_state["source_git_sha"] == "unavailable"
+
+
+def test_load_v4_checkpoint_does_not_touch_rng_state_by_default(tmp_path) -> None:
+    import random
+
+    directory = tmp_path / "checkpoint"
+    _save_v4(directory, _tiny_model())
+    random.seed(999)
+    before = random.getstate()
+    ci.load_v4_checkpoint(directory)
+    assert random.getstate() == before
+
+
+def test_load_v4_checkpoint_restore_rng_reproduces_the_exact_state_at_save_time(tmp_path) -> None:
+    import random
+
+    import numpy as np
+
+    directory = tmp_path / "checkpoint"
+    random.seed(123)
+    np.random.seed(123)
+    torch.manual_seed(123)
+    _save_v4(directory, _tiny_model())
+
+    # Control draw immediately after save -- save_v4_checkpoint's own
+    # implementation must not itself consume any RNG.
+    control = (random.random(), float(np.random.rand()), float(torch.rand(1)))
+
+    # Advance every RNG stream, simulating further work after the save.
+    for _ in range(10):
+        random.random()
+        np.random.rand()
+        torch.rand(1)
+    advanced = (random.random(), float(np.random.rand()), float(torch.rand(1)))
+    assert advanced != control
+
+    ci.load_v4_checkpoint(directory, restore_rng=True)
+    restored = (random.random(), float(np.random.rand()), float(torch.rand(1)))
+    assert restored == control
+
+
+def test_load_v4_checkpoint_restore_rng_fails_closed_on_a_pre_phase_11_5_checkpoint(tmp_path) -> None:
+    directory = tmp_path / "checkpoint"
+    _save_v4(directory, _tiny_model())
+    (directory / ci.RNG_STATE_FILENAME).unlink()
+    with pytest.raises(ci.CheckpointIdentityError, match=ci.RNG_STATE_FILENAME):
+        ci.load_v4_checkpoint(directory, restore_rng=True)

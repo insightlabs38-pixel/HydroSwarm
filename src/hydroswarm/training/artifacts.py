@@ -16,7 +16,15 @@ from uuid import uuid4
 import psutil
 
 
-def _git_commit(workdir: Path) -> str:
+def git_commit_hash(workdir: Path) -> str:
+    """Current HEAD commit SHA for `workdir`'s repository, or "unavailable"
+    if `workdir` is not a git checkout / git is not installed. Public (not
+    a leading-underscore RunArtifacts-private helper) so other modules that
+    need to record a source Git SHA -- e.g.
+    hydroswarm.training.checkpoint_identity's v4 checkpoint save path,
+    core-issues3.txt Phase 11.5 -- reuse this exact implementation rather
+    than a second, independently-drifting copy."""
+
     try:
         result = subprocess.run(
             ["git", "rev-parse", "HEAD"],
@@ -29,6 +37,11 @@ def _git_commit(workdir: Path) -> str:
         return result.stdout.strip()
     except (OSError, subprocess.SubprocessError):
         return "unavailable"
+
+
+#: Backward-compatible private alias for any in-module caller still using
+#: the old name.
+_git_commit = git_commit_hash
 
 
 def atomic_json(path: Path, value: Mapping[str, Any]) -> None:
