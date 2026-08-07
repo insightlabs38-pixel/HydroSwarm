@@ -1932,7 +1932,7 @@ checkpoint from Phase 8; Stage B is the first genuinely new real training
 work in this phase). Two commits, both pushed to
 `origin/agent/gcp-multitopology-v3`:
 
-1. `PHASE12_STAGE_B_SCRIPT_COMMIT` feat(training): Stage B control/OOD/auxiliary ablation script and real run (core-issues3.txt Phase 12 Stage B)
+1. `8ebb682` feat(training): Stage B control/OOD/auxiliary ablation script and real run (core-issues3.txt Phase 12 Stage B)
 
 No work on `main`. Every protected artifact untouched. `data/learning-v2/
 cycle-b2` and `cycle-b2-trajectories-v3` were only READ (via
