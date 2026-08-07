@@ -22,7 +22,7 @@ remain untouched.
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
 | 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
 | 7 | Auxiliary objectives / regression losses | **IN PROGRESS** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
-| 8 | Second-pass calibrated control targets | not started |
+| 8 | Second-pass calibrated control targets | **IN PROGRESS** (code + unit tests done; Stage-A checkpoint training running as a background job; second-pass generation not yet run against the real checkpoint) |
 | 9-20 | Architecture v4, training, gates, selection | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
@@ -559,6 +559,117 @@ contract, not as an in-place Phase 7 edit.
 still have no model head (Phase 9 Scout-head-configuration territory);
 sensor_reconstruction/future_concentration mg/L-scale normalization
 (future_concentration is disabled anyway).
+
+## Phase 8: second-pass calibrated control targets — IN PROGRESS
+
+**Stage-A checkpoint training (steps 1-3) — running as a background job.**
+Reuses the already-tested `scripts/run_stage3_finalist_training.py`
+(train → select via validation → fit conformal calibration on the fused
+hybrid predictor, exactly Phase 8 steps 1-3) against `data/learning-v2/
+cycle-b2/tensors-normalized` with the previously-best config (`E1`,
+`prior_mode=feature_only`), 2 seeds. No prior checkpoint files survived on
+this environment to reuse (only their result JSON metadata did — see
+`reports/results/v3/cycle-b2-stage3-E1.json`), so this is a genuine fresh
+training run, not a re-analysis of stale artifacts.
+
+Launched via `hydroswarm.training.job_runner.launch()`:
+
+```
+run dir: experiments/jobs/v4-stage-a-sentinel
+command: python -u scripts/run_stage3_finalist_training.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --finalists E1 \
+  --run-root experiments/runs/v4-stage-a-sentinel \
+  --registry experiments/registry/v4-stage-a-sentinel.jsonl \
+  --output reports/results/v4/stage-a-sentinel-training.json
+env: OMP_NUM_THREADS=10 MKL_NUM_THREADS=10 OPENBLAS_NUM_THREADS=10
+```
+
+Resume command is identical (this script has no `--resume-from`; a
+re-invocation starts a fresh timestamped run directory, not a checkpoint
+resume — noted honestly, not claimed as true interrupt/resume support).
+Per-epoch progress: `experiments/runs/v4-stage-a-sentinel/E1-seed<seed>/
+<timestamp>/metrics.jsonl`. Expected wall time ~70-75 min/seed (matching
+the historical `cycle-b2-stage3-E1` run's 4235-4329s), ~2.5h total for both
+seeds + calibration/eval. Polled at 10-minute intervals via a persistent
+Monitor.
+
+**Known data-quality caveat, carried into this checkpoint**: `data/
+learning-v2/cycle-b2` predates this session's Phase 6.4 fix and contains
+633/12750 (~5%) examples with the `HYDRAULIC_MISMATCH` mislabeling bug
+(see Phase 6 section above) in their `event_cause` target. `cycle-b2` is a
+protected, immutable artifact per this spec's restriction #3 and must not
+be regenerated to fix this. The resulting Stage-A checkpoint's
+`event_cause` head will have learned from ~5% mislabeled examples for that
+one class -- a real, bounded, now-documented limitation, not a blocker for
+Phase 8's purpose (the checkpoint's `source_node`/`source_region`/profile
+heads, which second-pass control labels actually depend on, are unaffected
+by this specific label class).
+
+**Second-pass label generation (steps 4, 5, 7) — code + unit tests done,
+not yet run against the real checkpoint.**
+New module `hydroswarm.training.second_pass_control_labels`:
+
+- `classify_evidence_sufficiency_second_pass()`: extends `control_labels.
+  classify_evidence_sufficiency`'s sensor-health/entropy/OOD-validity rule
+  with the two signals that need a trained checkpoint + calibration
+  artifact -- a narrow, non-empty calibrated candidate set (bounded by
+  `DEFAULT_MAXIMUM_CANDIDATE_SET_SIZE=3`, matching `inference.pipeline`'s
+  own `maximum_planning_candidates` default) and low classical-neural
+  disagreement (Jensen-Shannon divergence, reusing `inference.fusion.
+  jensen_shannon_divergence` and `DEFAULT_DISAGREEMENT_THRESHOLD=0.5`,
+  matching `uncertainty_control`'s own threshold). Pure function, 7 unit
+  tests, no model required.
+- `generate_second_pass_control_labels()`: batched, lazy (one batch
+  materialized at a time, matching `_predict_rows`'s established
+  discipline), runs a **frozen** model forward (raises `ValueError` if
+  `model.training` is `True` -- the most detectable version of item 7's
+  circular-self-label-leakage concern), fuses with the classical prior via
+  the same `fixed_weight_fusion` weighting Stage 3's calibration fitting
+  uses, queries the calibrator's real `candidate_set()`, and yields one
+  `SecondPassControlLabel` per example carrying `teacher_checkpoint_hash`.
+  4 tests against a real "small"-variant `HydroCore` and real
+  `ScenarioExample`s (not synthetic-shape fixtures) -- including a test
+  that an unvalidated topology forces `calibration_valid=False`,
+  `calibrated_candidate_set_size=0`, and `next_step=ABSTAIN`.
+
+**Deliberate design choice, documented in the module docstring**: unlike
+`inference.pipeline`'s live `evidence_sufficient` decision (`calibrated and
+0 < len(conformal_nodes) <= maximum_planning_candidates and
+model_evidence`), the second-pass label does NOT fold the model's own
+`evidence_sufficiency` head output into itself -- doing so would be
+exactly the circularity item 7 warns against (a checkpoint's own current
+prediction feeding its own next training label for the same target). The
+live pipeline can safely use it because that is an operational decision,
+not something fed back into further training.
+
+**Item 8 (INSPECT_SENSOR) — resolved, with a real correction made mid-pass**:
+initially concluded "no live INSPECT_SENSOR-equivalent exists anywhere,"
+based only on `agents.controller`'s FSM (`FSMState` has no matching state
+-- true). Before committing, re-checked more broadly and found this was
+wrong: `hydroswarm.inference.fusion.uncertainty_control()` (called live
+from `inference/pipeline.py`) already has an authoritative
+`ControlAction.INSPECT_SENSORS`, triggered by `disagreement_js >= 0.5` --
+a genuinely different signal than `targets_v2.NextStep.INSPECT_SENSOR`'s
+`event_cause == SENSOR_FAULT` derivation. Corrected the docstring/tests
+before this was committed anywhere, rather than shipping the overclaim:
+`control_labels.NEXT_STEP_RUNTIME_ENABLED` excludes `INSPECT_SENSOR`
+specifically because the *agent-FSM controller* has no matching state,
+not because no inspect-sensor concept exists in the codebase at all. Two
+independently-triggered "inspect the sensor" signals now exist,
+agreeing only in name -- flagged as real design work for Phase 9's
+architecture-v4 contract to reconcile (or deliberately keep separate),
+not resolved unilaterally here. 3 tests, including one that exercises the
+real `uncertainty_control()` call and asserts it returns
+`ControlAction.INSPECT_SENSORS` for a high-disagreement input.
+
+**Not done in this pass (steps 6, 9 — blocked on the Stage-A checkpoint,
+not skipped)**: actually running `generate_second_pass_control_labels`
+against the real trained checkpoint + fitted calibrator; training control
+heads from the resulting labels (freeze-backbone-first, then optional
+low-LR joint fine-tune); policy-agreement/unsafe-action tests against real
+second-pass labels (as opposed to the synthetic-model unit tests already
+written). Will run once the background Stage-A job completes.
 
 ## Restrictions honored
 

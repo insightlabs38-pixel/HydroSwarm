@@ -76,6 +76,34 @@ import torch
 from .ood_categories import OODCategory, OOD_CATEGORY_BEHAVIOR
 from .targets_v2 import EventCause, NextStep
 
+#: core-issues3.txt Phase 8 item 8: hydroswarm.agents.controller's FSMState
+#: has no INSPECT_SENSOR-equivalent state at all (confirmed by inspection
+#: of agents/schemas.py's FSMState and controller.py's ALLOWED_TRANSITIONS
+#: -- EVIDENCE_CHECK only ever transitions to SAMPLE_SELECTION,
+#: PLAN_GENERATION, or COMPLETE), so NextStep.INSPECT_SENSOR has no
+#: matching branch in the specific controller (the agent FSM) this target
+#: is meant to advise.
+#:
+#: This is NOT the same as "no live inspect-sensor concept exists
+#: anywhere" -- hydroswarm.inference.pipeline already computes a DIFFERENT,
+#: already-authoritative ControlAction.INSPECT_SENSORS via
+#: inference.fusion.uncertainty_control(), triggered by
+#: disagreement_js >= 0.5 (classical/neural disagreement), not by
+#: event_cause == SENSOR_FAULT the way classify_next_step below derives
+#: this target. Two independently-triggered "inspect the sensor" signals
+#: exist in this codebase today, in different subsystems, agreeing only in
+#: name -- reconciling them (or deciding they are genuinely different
+#: questions that both deserve to exist) is real design work belonging to
+#: Phase 9's granular output-gating/architecture-v4 contract, not
+#: something to resolve unilaterally in a label-generation pass. Until
+#: that reconciliation happens, NextStep.INSPECT_SENSOR remains a valid,
+#: reproducible TRAINING label (classify_next_step's event_cause ==
+#: SENSOR_FAULT derivation is a real governed target, not an invented
+#: label) but is NOT runtime-enabled for the agent-FSM controller
+#: specifically -- that controller has no state to fulfill it, regardless
+#: of what the separately-authoritative inference-pipeline policy does.
+NEXT_STEP_RUNTIME_ENABLED: frozenset[NextStep] = frozenset(NextStep) - frozenset({NextStep.INSPECT_SENSOR})
+
 #: Posterior entropy (bits) at or below which the classical localizer's
 #: belief is concentrated enough to count toward "sufficient" -- one
 #: component of the governed rule; sensor health and OOD-category validity
