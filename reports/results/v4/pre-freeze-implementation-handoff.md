@@ -21,19 +21,30 @@ remain untouched.
 | 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
 | 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
-| 7 | Auxiliary objectives / regression losses | **IN PROGRESS** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
+| 7 | Auxiliary objectives / regression losses | **DONE** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
 | 8 | Second-pass calibrated control targets | **DONE** (steps 1-5, 7, 8, 9 complete + run against a real checkpoint; step 6 -- training control heads from these labels -- scoped as a documented, immediately-resumable follow-up, see below) |
 | 9 | Architecture v4 contract | **BOUNDED FIRST STEP DONE** (9.1 partial: `architecture_config()` now records every dimension/layer-count/output-width fact; rest of 9.1/9.2/9.3/9.4 deliberately deferred, see below) |
 | 10-20 | Datasets/collation, loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
-Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
-`validation`/`calibration`/`development_holdout` complete with 0 errors,
-`train` in progress (~3875/9000 as of this update, ~1.8h remaining at
-observed rate) — see its own section below. Note: `train`'s in-progress
-run predates Phase 5's Scout improvement (not restarted a third time for
-it — see Phase 5's own section).
+Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
+**complete and committed** — all 4 splits finished with 0 errors (see its
+own section below). It is provisional (predates Phase 6.4/7 fixes landed
+later in this same pass); a full regeneration covering Phases 1-7 together
+is deferred to Phase 10.
 
-## Commits this pass (newest last)
+## Session summary (this continuation pass)
+
+Starting point: Phases 0-5 done, Phase 6 partial (crash-bug fixed, items
+6.2-6.6 not started), corpus regeneration in progress. This pass completed
+Phase 6's remainder, all of Phase 7, all of Phase 8 (modulo one explicitly
+deferred step), and a bounded first step of Phase 9 — six commits, all
+pushed, working tree clean, 588 tests passing (up from 565 at the start of
+this pass).
+
+## Commits this pass (oldest to newest)
+
+Phase 0-5 (prior continuation within this same branch, retained for
+context):
 
 1. `5f459e7` audit(pre-freeze): record current architecture and artifact gaps
 2. `76ec631` fix(data): reconstruct exact scenario hydraulic contexts
@@ -51,12 +62,45 @@ it — see Phase 5's own section).
 14. `1c1ae02` fix(test): stop seeding a scout test from Python's randomized string hash()
 15. `3470bab` docs(handoff): update after Phase 5 completion
 16. `13f4b09` fix(ood): separate category supervision from severity control
-14. `1c1ae02` fix(test): stop seeding a scout test from Python's randomized string hash()
+17. `3e38868` docs(handoff): update after Phase 6 partial completion, restructure report
 
-All pushed to `origin/agent/gcp-multitopology-v3`. Working tree clean apart
-from the in-progress `data/learning-v2/cycle-b2-trajectories-v2/` and its
-`experiments/jobs/cycle-b2-trajectories-v2-*/` job directories (uncommitted
-until generation finishes with 0 errors on every split).
+This continuation pass (Phase 6 remainder → Phase 9 bounded first step):
+
+18. `4e4946a` fix(training): honor governed regression masks and transforms (Phase 7)
+19. `62e3bd8` fix(ood): complete Phase 6 remainder — mismatch mislabeling, category registries
+20. `60b3a6f` feat(control): add second-pass calibrated control-label generation (Phase 8)
+21. `4e7734e` data: land cycle-b2-trajectories-v2 corpus (Phase 1+2+3 fixes), provisional
+22. `e0844bb` feat(control): run second-pass control labels against real Stage-A checkpoint (Phase 8)
+23. `0a4fcdb` chore(model): record every dimension/output-width in architecture_config (Phase 9.1)
+
+All pushed to `origin/agent/gcp-multitopology-v3`. Working tree clean.
+
+Real defects found and fixed this continuation pass (by exercising code at
+real scale or re-checking a claim broadly, not by inspection alone):
+
+1. **Phase 7.1**: the generic regression-loss path ignored every target's
+   `_mask` companion, training the model directly against masked
+   placeholder zeros.
+2. **Phase 7.2**: Scout's `information_gain`/`candidate_reduction` targets
+   were scalars that would silently shape-mismatch against HydroCore's
+   real per-node output the moment training exercised that path.
+3. **Phase 7.3**: `sensor_reconstruction` supervised mostly trivial
+   identity copying (the input already showed the true value at every
+   healthy sensor position).
+4. **Phase 7.4**: `future_concentration` genuinely leaked its own target
+   timestamp into the model's own visible input window — proven with a
+   real `ScenarioExample` and a passing regression test, not argued from
+   inspection alone.
+5. **Phase 6.4**: `corpus._event_cause` was actively mislabeling every
+   NORMAL-event SHIFT/ADVERSARIAL-stage scenario as `HYDRAULIC_MISMATCH`
+   with no real simulated perturbation behind the label — an active bug
+   the in-progress corpus regeneration was generating at the time it was
+   found.
+6. **Phase 8 item 8**: an initial "no live INSPECT_SENSOR-equivalent
+   exists" conclusion, checked against only one subsystem
+   (`agents.controller`'s FSM), was wrong — `inference.pipeline` already
+   has a separate, live `ControlAction.INSPECT_SENSORS`. Caught and
+   corrected by re-checking more broadly before committing, not after.
 
 ## Phase 1: reconstruct exact scenario hydraulic state — DONE
 
