@@ -90,7 +90,7 @@ def test_event_cause_has_exactly_the_specified_classes() -> None:
 def test_next_step_has_exactly_the_specified_classes() -> None:
     assert {member.value for member in NextStep} == {
         "COLLECT_SAMPLE",
-        "INSPECT_SENSOR",
+        "INSPECT_FAULTY_SENSOR",
         "GENERATE_PLANS",
         "ABSTAIN",
     }

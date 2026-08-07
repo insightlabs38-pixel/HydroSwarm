@@ -58,7 +58,7 @@ deterministic policy) already encodes 3 of NextStep's 4 values:
 
 classify_next_step below mirrors this exactly (same branch order, same
 budget bound) and adds the one case the live FSM has no distinct state
-for: INSPECT_SENSOR. There is no dormant/partial implementation of this
+for: INSPECT_FAULTY_SENSOR. There is no dormant/partial implementation of this
 branch anywhere in the repo (confirmed by inspection of controller.py) --
 it is derived here from event_cause == SENSOR_FAULT (an already-governed,
 already-trained target that exists specifically to distinguish "this
@@ -76,13 +76,13 @@ import torch
 from .ood_categories import OODCategory, OOD_CATEGORY_BEHAVIOR
 from .targets_v2 import EventCause, NextStep
 
-#: core-issues3.txt Phase 8 item 8: hydroswarm.agents.controller's FSMState
-#: has no INSPECT_SENSOR-equivalent state at all (confirmed by inspection
-#: of agents/schemas.py's FSMState and controller.py's ALLOWED_TRANSITIONS
-#: -- EVIDENCE_CHECK only ever transitions to SAMPLE_SELECTION,
-#: PLAN_GENERATION, or COMPLETE), so NextStep.INSPECT_SENSOR has no
-#: matching branch in the specific controller (the agent FSM) this target
-#: is meant to advise.
+#: core-issues3.txt Phase 8 item 8 / core-issues4.txt Section G:
+#: hydroswarm.agents.controller's FSMState has no INSPECT_FAULTY_SENSOR-
+#: equivalent state at all (confirmed by inspection of agents/schemas.py's
+#: FSMState and controller.py's ALLOWED_TRANSITIONS -- EVIDENCE_CHECK only
+#: ever transitions to SAMPLE_SELECTION, PLAN_GENERATION, or COMPLETE), so
+#: NextStep.INSPECT_FAULTY_SENSOR has no matching branch in the specific
+#: controller (the agent FSM) this target is meant to advise.
 #:
 #: This is NOT the same as "no live inspect-sensor concept exists
 #: anywhere" -- hydroswarm.inference.pipeline already computes a DIFFERENT,
@@ -90,19 +90,33 @@ from .targets_v2 import EventCause, NextStep
 #: inference.fusion.uncertainty_control(), triggered by
 #: disagreement_js >= 0.5 (classical/neural disagreement), not by
 #: event_cause == SENSOR_FAULT the way classify_next_step below derives
-#: this target. Two independently-triggered "inspect the sensor" signals
-#: exist in this codebase today, in different subsystems, agreeing only in
-#: name -- reconciling them (or deciding they are genuinely different
-#: questions that both deserve to exist) is real design work belonging to
-#: Phase 9's granular output-gating/architecture-v4 contract, not
-#: something to resolve unilaterally in a label-generation pass. Until
-#: that reconciliation happens, NextStep.INSPECT_SENSOR remains a valid,
-#: reproducible TRAINING label (classify_next_step's event_cause ==
+#: this target.
+#:
+#: Section G resolution (two independently-triggered "inspect the sensor"
+#: signals, in different subsystems, previously agreeing only in name):
+#: keep them as separate, distinctly-named actions rather than merge them
+#: into one action with reason codes. NextStep.INSPECT_FAULTY_SENSOR (this
+#: module) is a Sentinel/control-head TRAINING label derived from
+#: event_cause == SENSOR_FAULT -- "the evidence pattern itself looks like a
+#: faulty sensor, not real contamination." ControlAction.INSPECT_SENSORS
+#: (inference.fusion) is a live OPERATIONAL trigger derived from
+#: classical/neural disagreement -- "the two independent predictors
+#: disagree enough that a human should check instrumentation before
+#: trusting either." These are genuinely different questions (a label
+#: about the incident's likely cause vs. a live signal about predictor
+#: agreement) that can both independently be true or false for the same
+#: incident, so collapsing them into one shared action with reason codes
+#: would lose that distinction. The rename from INSPECT_SENSOR to
+#: INSPECT_FAULTY_SENSOR makes this distinction visible in the type itself,
+#: not only in documentation. NextStep.INSPECT_FAULTY_SENSOR remains a
+#: valid, reproducible TRAINING label (classify_next_step's event_cause ==
 #: SENSOR_FAULT derivation is a real governed target, not an invented
-#: label) but is NOT runtime-enabled for the agent-FSM controller
+#: label) but stays NOT runtime-enabled for the agent-FSM controller
 #: specifically -- that controller has no state to fulfill it, regardless
 #: of what the separately-authoritative inference-pipeline policy does.
-NEXT_STEP_RUNTIME_ENABLED: frozenset[NextStep] = frozenset(NextStep) - frozenset({NextStep.INSPECT_SENSOR})
+NEXT_STEP_RUNTIME_ENABLED: frozenset[NextStep] = frozenset(NextStep) - frozenset(
+    {NextStep.INSPECT_FAULTY_SENSOR}
+)
 
 #: Posterior entropy (bits) at or below which the classical localizer's
 #: belief is concentrated enough to count toward "sufficient" -- one
@@ -152,7 +166,7 @@ def classify_next_step(
     maximum_sampling_rounds: int = MAXIMUM_SAMPLING_ROUNDS,
 ) -> NextStep:
     """Mirrors hydroswarm.agents.controller's EVIDENCE_CHECK branch order
-    exactly, extended with INSPECT_SENSOR (see module docstring)."""
+    exactly, extended with INSPECT_FAULTY_SENSOR (see module docstring)."""
 
     if ood_level_outside_validated_range:
         return NextStep.ABSTAIN
@@ -161,7 +175,7 @@ def classify_next_step(
     if sample_count >= maximum_sampling_rounds:
         return NextStep.ABSTAIN
     if event_cause == EventCause.SENSOR_FAULT:
-        return NextStep.INSPECT_SENSOR
+        return NextStep.INSPECT_FAULTY_SENSOR
     return NextStep.COLLECT_SAMPLE
 
 

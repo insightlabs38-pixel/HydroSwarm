@@ -187,4 +187,4 @@ def test_unvalidated_topology_invalidates_calibration_and_forces_zero_candidate_
 def test_next_step_runtime_enabled_excludes_inspect_sensor_but_labels_can_still_produce_it() -> None:
     # Sanity cross-check linking this module's next_step output back to
     # control_labels' runtime-gating registry (Phase 8 item 8).
-    assert NextStep.INSPECT_SENSOR not in NEXT_STEP_RUNTIME_ENABLED
+    assert NextStep.INSPECT_FAULTY_SENSOR not in NEXT_STEP_RUNTIME_ENABLED

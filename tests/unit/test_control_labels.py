@@ -73,7 +73,7 @@ def test_next_step_inspects_sensor_when_cause_is_a_sensor_fault() -> None:
         ood_level_outside_validated_range=False, evidence_sufficient=False,
         sample_count=0, event_cause=EventCause.SENSOR_FAULT,
     )
-    assert step == NextStep.INSPECT_SENSOR
+    assert step == NextStep.INSPECT_FAULTY_SENSOR
 
 
 def test_next_step_collects_sample_as_the_default_case() -> None:
@@ -101,7 +101,7 @@ def test_next_step_target_is_governed_and_covers_every_class() -> None:
 
 
 def test_inspect_sensor_is_a_trainable_label_but_not_fsm_runtime_enabled() -> None:
-    """core-issues3.txt Phase 8 item 8: INSPECT_SENSOR remains a valid
+    """core-issues3.txt Phase 8 item 8: INSPECT_FAULTY_SENSOR remains a valid
     training label (classify_next_step still derives it deterministically
     from event_cause == SENSOR_FAULT), but must not be authorized by the
     agent FSM controller at runtime -- no matching FSMState exists to
@@ -113,8 +113,8 @@ def test_inspect_sensor_is_a_trainable_label_but_not_fsm_runtime_enabled() -> No
     test_fsm_has_no_inspect_sensor_state_but_the_inference_pipeline_
     already_does below."""
 
-    assert NextStep.INSPECT_SENSOR not in NEXT_STEP_RUNTIME_ENABLED
-    assert NEXT_STEP_RUNTIME_ENABLED == frozenset(NextStep) - {NextStep.INSPECT_SENSOR}
+    assert NextStep.INSPECT_FAULTY_SENSOR not in NEXT_STEP_RUNTIME_ENABLED
+    assert NEXT_STEP_RUNTIME_ENABLED == frozenset(NextStep) - {NextStep.INSPECT_FAULTY_SENSOR}
 
 
 def test_fsm_has_no_inspect_sensor_state_but_the_inference_pipeline_already_does() -> None:
@@ -126,7 +126,7 @@ def test_fsm_has_no_inspect_sensor_state_but_the_inference_pipeline_already_does
     hydroswarm.inference.fusion.uncertainty_control already has a live
     ControlAction.INSPECT_SENSORS -- a genuinely different, already-
     authoritative signal (disagreement_js-driven) from this module's
-    event_cause-driven NextStep.INSPECT_SENSOR, not the same mechanism
+    event_cause-driven NextStep.INSPECT_FAULTY_SENSOR, not the same mechanism
     under two names."""
 
     from hydroswarm.agents.schemas import FSMState

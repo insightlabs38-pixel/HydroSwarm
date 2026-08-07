@@ -122,7 +122,7 @@ OOD_CATEGORY_BEHAVIOR: dict[OODCategory, ExpectedBehavior] = {
         planning_permitted=False,
         calibration_valid=False,
         description="A faulty sensor can masquerade as contamination evidence; planning "
-        "must wait for sensor-fault triage (INSPECT_SENSOR), not proceed on tainted evidence.",
+        "must wait for sensor-fault triage (INSPECT_FAULTY_SENSOR), not proceed on tainted evidence.",
     ),
     OODCategory.TIMING_OUTSIDE_TRAINING_RANGE: ExpectedBehavior(
         category=OODCategory.TIMING_OUTSIDE_TRAINING_RANGE,

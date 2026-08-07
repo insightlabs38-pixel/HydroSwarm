@@ -46,7 +46,16 @@ class EventCause(str, Enum):
 
 class NextStep(str, Enum):
     COLLECT_SAMPLE = "COLLECT_SAMPLE"
-    INSPECT_SENSOR = "INSPECT_SENSOR"
+    # core-issues4.txt Section G: renamed from INSPECT_SENSOR (was
+    # ambiguous with inference.fusion.ControlAction.INSPECT_SENSORS, a
+    # differently-triggered signal in a different subsystem -- see
+    # control_labels.py's module docstring for the full reconciliation).
+    # This member is derived from event_cause == SENSOR_FAULT and is a
+    # Sentinel-side control-head training label; ControlAction.
+    # INSPECT_SENSORS is derived from classical/neural disagreement and is
+    # the live inference.pipeline runtime action. Renaming makes the two
+    # concepts textually distinct rather than merely documented-distinct.
+    INSPECT_FAULTY_SENSOR = "INSPECT_FAULTY_SENSOR"
     GENERATE_PLANS = "GENERATE_PLANS"
     ABSTAIN = "ABSTAIN"
 
@@ -332,8 +341,9 @@ TARGETS_V2: dict[str, TargetSpec] = {
         _spec(
             category="control",
             name="next_step",
-            definition="One of COLLECT_SAMPLE, INSPECT_SENSOR, GENERATE_PLANS, ABSTAIN -- see "
-            "hydroswarm.training.targets_v2.NextStep.",
+            definition="One of COLLECT_SAMPLE, INSPECT_FAULTY_SENSOR, GENERATE_PLANS, ABSTAIN -- "
+            "see hydroswarm.training.targets_v2.NextStep. INSPECT_FAULTY_SENSOR is distinct from "
+            "inference.fusion.ControlAction.INSPECT_SENSORS (core-issues4.txt Section G).",
             unit="categorical (4 classes)",
             masking_rule="Never masked; always defined by the deterministic controller policy "
             "for this state.",

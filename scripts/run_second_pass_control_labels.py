@@ -140,11 +140,11 @@ def main() -> int:
         "first_pass_sensor_health_only_agreement_rate": agreement / len(labels) if labels else 0.0,
         "unsafe_non_abstention_count": len(unsafe_non_abstention),
         "unsafe_non_abstention_scenario_ids": unsafe_non_abstention[:20],
-        # Phase 8 item 8: INSPECT_SENSOR is a valid training label but not
+        # Phase 8 item 8: INSPECT_FAULTY_SENSOR is a valid training label but not
         # runtime-enabled for the agent-FSM controller -- surfaced here so
         # its prevalence is visible, not just theoretically excluded.
         "inspect_sensor_non_runtime_enabled_count": sum(
-            1 for label in labels if label.next_step == NextStep.INSPECT_SENSOR
+            1 for label in labels if label.next_step == NextStep.INSPECT_FAULTY_SENSOR
         ),
         "next_step_runtime_enabled": sorted(step.value for step in NEXT_STEP_RUNTIME_ENABLED),
     }
