@@ -130,6 +130,44 @@ def test_batch_pads_the_phase_6_auxiliary_node_indexed_targets() -> None:
         assert targets[f"{key}_mask"][1, :].tolist() == [True] * 6
 
 
+def test_batch_pads_scout_per_node_targets() -> None:
+    # Regression (core-issues3.txt Phase 10.2): information_gain/
+    # candidate_reduction were converted from a scalar (the single selected
+    # sample_node's value) to a full [node_count]-shaped array by Phase 7.2
+    # -- targets_v2.NODE_ARRAY_TARGETS was updated at the time, but this
+    # module's own separately hand-maintained NODE_INDEXED_TARGET_KEYS
+    # tuple was not, so collating two real different-sized graphs (the
+    # whole point of this module) raised "inconsistent shape across the
+    # batch" the first time a real Phase-10.2 Scout dataset actually
+    # exercised this path -- not caught by any prior test, since nothing
+    # before Phase 10.2 merged real per-node Scout targets into a batch.
+    # NODE_INDEXED_TARGET_KEYS is now derived from NODE_ARRAY_TARGETS
+    # directly, closing this specific gap and every future one like it.
+    def _scout(nodes: int, seed: int) -> dict[str, torch.Tensor]:
+        generator = torch.Generator().manual_seed(seed)
+        return {
+            "information_gain": torch.rand(nodes, generator=generator),
+            "information_gain_mask": torch.ones(nodes, dtype=torch.bool),
+            "candidate_reduction": torch.rand(nodes, generator=generator),
+            "candidate_reduction_mask": torch.ones(nodes, dtype=torch.bool),
+        }
+
+    small = _example(
+        "small", nodes=3, edges=[(0, 1), (1, 2)], source_local_index=1, seed=1,
+        extra_targets=_scout(3, seed=10),
+    )
+    large = _example(
+        "large", nodes=6, edges=[(0, 1), (1, 2), (2, 3), (3, 4), (4, 5)], source_local_index=4, seed=2,
+        extra_targets=_scout(6, seed=20),
+    )
+    _, targets = collate_variable_topology([small, large])  # must not raise
+    for key in ("information_gain", "candidate_reduction"):
+        assert targets[key].shape == (2, 6)
+        assert targets[f"{key}_mask"].shape == (2, 6)
+        assert targets[f"{key}_mask"][0, 3:].tolist() == [False, False, False]
+        assert targets[f"{key}_mask"][1, :].tolist() == [True] * 6
+
+
 def test_batch_two_graphs_of_different_sizes() -> None:
     inputs, targets = collate_variable_topology([_small_example(), _large_example()])
     assert inputs["node_features"].shape == (2, 6, 3)  # padded to max_nodes=6

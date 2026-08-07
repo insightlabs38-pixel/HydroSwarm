@@ -21,6 +21,7 @@ from torch import Tensor
 from torch.nn import Module
 
 from .data import ScenarioExample, TopologyMetadata
+from .targets_v2 import NODE_ARRAY_TARGETS, NODE_INDEX_TARGETS
 
 CollateFn = Callable[[Sequence[ScenarioExample]], tuple[dict[str, Tensor], dict[str, Tensor]]]
 
@@ -36,10 +37,22 @@ NODE_INDEXED_INPUT_KEYS = (
 )
 #: Inputs indexed [time, nodes, ...] -- permuted along dim 1.
 TIME_NODE_INDEXED_INPUT_KEYS = ("temporal_features", "quality_features")
-#: Targets indexed [nodes] -- permuted along dim 0.
-NODE_INDEXED_TARGET_KEYS = ("sensor_fault",)
+#: Targets indexed [nodes] -- permuted along dim 0. Derived from
+#: targets_v2.NODE_ARRAY_TARGETS (never listed separately by hand) --
+#: core-issues3.txt Phase 10.2: this module's own hand-maintained tuple
+#: (previously only `("sensor_fault",)`) had silently fallen out of sync
+#: with NODE_ARRAY_TARGETS, missing sensor_reconstruction/
+#: future_concentration/travel_time/information_gain/candidate_reduction
+#: entirely -- an unpermuted node-array target compared against a permuted
+#: model output would report a FALSE equivariance violation (or mask a
+#: real one), not merely a missing feature. Found while fixing the exact
+#: same drift pattern in variable_collate.py's own NODE_INDEXED_TARGET_KEYS
+#: (also derived from NODE_ARRAY_TARGETS now, for the same reason).
+NODE_INDEXED_TARGET_KEYS = tuple(NODE_ARRAY_TARGETS)
 #: Targets that are themselves a single local node index needing remapping.
-NODE_INDEX_TARGET_KEYS = ("source_node",)
+#: Derived from targets_v2.NODE_INDEX_TARGETS -- was missing `sample_node`
+#: (only had `source_node`) for the same reason as above.
+NODE_INDEX_TARGET_KEYS = tuple(NODE_INDEX_TARGETS)
 
 
 def _validate_permutation(permutation: Sequence[int], node_count: int) -> list[int]:

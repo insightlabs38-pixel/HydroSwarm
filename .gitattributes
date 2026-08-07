@@ -39,3 +39,12 @@ data/learning-v2/cycle-b2-trajectories/tensors-enriched/**/*.safetensors filter=
 # future smaller split file in this same directory is not silently pulled
 # into LFS too.
 data/learning-v2/cycle-b2-trajectories-v2/train.jsonl filter=lfs diff=lfs merge=lfs -text
+
+# core-issues3.txt Phase 10.2/10.3: cycle-b2-trajectories-v3's derived
+# Scout-state and Strategist-candidate tensor shards (merged onto
+# cycle-b2's own base tensors-normalized inputs by scripts/
+# build_scout_state_dataset.py / build_strategist_candidate_dataset.py) --
+# same sharded-safetensors-through-LFS convention as every other tensor
+# corpus above.
+data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+data/learning-v2/cycle-b2-trajectories-v3/strategist-tensors-normalized/**/*.safetensors filter=lfs diff=lfs merge=lfs -text

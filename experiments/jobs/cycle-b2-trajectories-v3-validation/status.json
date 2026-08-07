@@ -1,0 +1,31 @@
+{
+  "command": [
+    "python",
+    "-u",
+    "scripts/generate_trajectory_corpus.py",
+    "--corpus-dir",
+    "data/learning-v2/cycle-b2",
+    "--output",
+    "data/learning-v2/cycle-b2-trajectories-v3",
+    "--split",
+    "validation"
+  ],
+  "ended_at": "2026-08-07T06:07:36.757344+00:00",
+  "exit_code": 0,
+  "log_path": "experiments/jobs/cycle-b2-trajectories-v3-validation/job.log",
+  "pid": 1500945,
+  "resume_command": [
+    "python",
+    "-u",
+    "scripts/generate_trajectory_corpus.py",
+    "--corpus-dir",
+    "data/learning-v2/cycle-b2",
+    "--output",
+    "data/learning-v2/cycle-b2-trajectories-v3",
+    "--split",
+    "validation"
+  ],
+  "started_at": "2026-08-07T05:41:24.193928+00:00",
+  "state": "COMPLETED",
+  "workdir": "/workspace/HydroSwarm"
+}
