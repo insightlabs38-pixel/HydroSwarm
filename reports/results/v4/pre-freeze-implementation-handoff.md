@@ -236,9 +236,46 @@ untrained everywhere the audit checked.
 15 new/rewritten tests. 536 tests passing (was 513 at session start),
 ruff/pyright clean.
 
-## Trajectory corpus regeneration (data/learning-v2/cycle-b2-trajectories-v2/)
+## Trajectory corpus regeneration (data/learning-v2/cycle-b2-trajectories-v2/) — COMPLETE, PROVISIONAL
 
-Running as 4 resumable background jobs (`experiments/jobs/
+All 4 splits finished with 0 errors and are now committed:
+
+| split | scenarios | errors | notes |
+|---|---|---|---|
+| train | 9000/9000 | 0 | |
+| validation | 1000/1000 | 0 | |
+| calibration | 1000/1000 | 0 | |
+| development_holdout | 2150/2150 | 0 | 400 `coastal-branch` (unseen-topology) scenarios skipped -- reported, per Phase 1 item 6/J, not silently dropped |
+
+Total 181 MB, committed as regular Git text (not LFS) -- matches the
+established convention for `data/learning-v2/cycle-b2-trajectories/`'s own
+JSONL (`.gitattributes`'s comment: "The trajectory JSONL files themselves
+stay regular git text"). Only derived tensor shards would need LFS, and
+none have been built from this corpus yet (`scripts/merge_trajectory_
+targets.py` / a tensors-enriched build was not run this pass).
+
+**This corpus predates three fixes landed during this same pass and is
+therefore PROVISIONAL, not ready for real training**, per the established
+"don't restart an already-90%-complete run for an enhancement" precedent
+from Phase 5:
+
+1. Phase 6.4's `HYDRAULIC_MISMATCH` mislabeling fix (`corpus._event_cause`)
+   -- every NORMAL-event SHIFT/ADVERSARIAL-stage scenario in this corpus
+   still carries the old, incorrect label.
+2. Phase 7.2's Scout `information_gain`/`candidate_reduction` per-node
+   target shape (this corpus still has the old scalar shape).
+3. Phase 7.3's sensor_reconstruction denoising-only mask, Phase 7.4's
+   future_concentration disable, and Phase 7.5's travel_time log1p
+   transform (all still reflect pre-fix semantics in this corpus).
+
+A full regeneration incorporating everything from Phases 1-7 together is
+needed before this corpus can be used for real Scout/Strategist/auxiliary
+training -- deliberately deferred to Phase 10's dataset-versioning work
+(which needs its own regeneration anyway, for the sharded Scout/
+Strategist/OOD dataset layout Phase 10 specifies) rather than a fourth
+partial restart of this JSONL-only artifact.
+
+Was run as 4 resumable background jobs (`experiments/jobs/
 cycle-b2-trajectories-v2-{train,validation,calibration,development_holdout}`),
 launched via `hydroswarm.training.job_runner`, polled at a 10-minute interval.
 

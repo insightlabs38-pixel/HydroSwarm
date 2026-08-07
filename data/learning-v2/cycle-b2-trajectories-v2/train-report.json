@@ -1,0 +1,24 @@
+{
+  "corpus_dir": "data/learning-v2/cycle-b2",
+  "elapsed_seconds": 10720.299713850021,
+  "errors_this_run": 0,
+  "generated_at": "2026-08-07T02:50:27.229404+00:00",
+  "ood_category_counts_this_run": {
+    "FROZEN_DRIFTING_SENSOR": 17,
+    "NONE": 8831,
+    "SEVERE_MISSINGNESS": 152
+  },
+  "previous_run": null,
+  "reconstruction_policy_hash": "scenario-reconstruction-v1",
+  "scenarios_processed_this_run": 9000,
+  "schema_version": "cycle-b2-trajectories-v2",
+  "signature_artifact_policy": "topology-wide-v1",
+  "skipped_unsupported_topology_this_run": {},
+  "split": "train",
+  "total_in_shard": 9000,
+  "validated_topology_hashes": [
+    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+  ]
+}
