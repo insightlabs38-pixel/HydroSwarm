@@ -1,0 +1,7 @@
+{
+  "examples_missing_topology_metadata": 0,
+  "scenario_id_leaks": [],
+  "seed_family_leaks": [],
+  "topology_hash_conflicts": {},
+  "topology_leak_note": "topology_hash_conflicts lists any network_id that resolved to more than one distinct topology_hash across these splits -- a real leak/labeling bug, not expected reuse. examples_missing_topology_metadata counts examples with no TopologyMetadata at all (e.g. generated before repair item 5), for which this check cannot run at all; a nonzero count here means topology-hash leakage may still be silently undetected for those specific examples."
+}

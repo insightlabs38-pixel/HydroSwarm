@@ -34,6 +34,11 @@ data/learning-v2/**/tensors-normalized/**/*.safetensors
 # .gitattributes and docs/ARM_MIGRATION.md).
 !data/learning-v2/cycle-b2/tensors/**/*.safetensors
 !data/learning-v2/cycle-b2/tensors-normalized/**/*.safetensors
+# core-issues4.txt Section F step 6b: cycle-b2-control-v2's own merged
+# tensor shards (same convention as cycle-b2 above -- targets differ,
+# inputs/topology are the same real, non-regenerated data).
+!data/learning-v2/cycle-b2-control-v2/tensors/**/*.safetensors
+!data/learning-v2/cycle-b2-control-v2/tensors-normalized/**/*.safetensors
 models/checkpoints/
 experiments/cache/
 experiments/runs/

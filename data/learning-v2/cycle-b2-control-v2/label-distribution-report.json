@@ -1,0 +1,38 @@
+{
+  "train": {
+    "count": 9000,
+    "event_cause": {
+      "AMBIGUOUS": 0,
+      "CONTAMINATION": 6300,
+      "HYDRAULIC_MISMATCH": 0,
+      "NORMAL": 1350,
+      "SENSOR_FAULT": 1350
+    },
+    "evidence_sufficiency_false": 4919,
+    "evidence_sufficiency_true": 4081,
+    "next_step": {
+      "ABSTAIN": 0,
+      "COLLECT_SAMPLE": 3609,
+      "GENERATE_PLANS": 4081,
+      "INSPECT_FAULTY_SENSOR": 1310
+    }
+  },
+  "validation": {
+    "count": 1000,
+    "event_cause": {
+      "AMBIGUOUS": 0,
+      "CONTAMINATION": 712,
+      "HYDRAULIC_MISMATCH": 0,
+      "NORMAL": 144,
+      "SENSOR_FAULT": 144
+    },
+    "evidence_sufficiency_false": 541,
+    "evidence_sufficiency_true": 459,
+    "next_step": {
+      "ABSTAIN": 0,
+      "COLLECT_SAMPLE": 402,
+      "GENERATE_PLANS": 459,
+      "INSPECT_FAULTY_SENSOR": 139
+    }
+  }
+}

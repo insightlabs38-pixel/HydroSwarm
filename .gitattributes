@@ -12,6 +12,11 @@ dist/ export-ignore
 # future .safetensors/.pt files elsewhere in the repo.
 data/learning-v2/cycle-b2/tensors/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 data/learning-v2/cycle-b2/tensors-normalized/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+# core-issues4.txt Section F step 6b: cycle-b2-control-v2's merged tensor
+# shards (targets differ from cycle-b2's own; inputs/topology identical) --
+# same sharded-safetensors convention as cycle-b2 itself, above.
+data/learning-v2/cycle-b2-control-v2/tensors/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+data/learning-v2/cycle-b2-control-v2/tensors-normalized/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 models/cycle-b2-candidates/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
 models/cycle-b2-candidates/**/*.pt filter=lfs diff=lfs merge=lfs -text
 models/cycle-b2-controls/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
