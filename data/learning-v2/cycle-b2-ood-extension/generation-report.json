@@ -1,0 +1,140 @@
+{
+  "categories": {
+    "EXTREME_DEMAND": {
+      "category": "EXTREME_DEMAND",
+      "config_overrides": {
+        "demand_regimes": [
+          2.5
+        ]
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    },
+    "FROZEN_DRIFTING_SENSOR": {
+      "category": "FROZEN_DRIFTING_SENSOR",
+      "config_overrides": {
+        "frozen_probability": 1.0,
+        "sensor_count": 6
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    },
+    "ROUGHNESS_MISMATCH": {
+      "category": "ROUGHNESS_MISMATCH",
+      "config_overrides": {
+        "roughness_variation_fraction": 0.4
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    },
+    "TANK_STATE_SHIFT": {
+      "category": "TANK_STATE_SHIFT",
+      "config_overrides": {
+        "tank_level_variation_fraction": 0.6
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    }
+  },
+  "cycle_b2_root": "data/learning-v2/cycle-b2",
+  "generation_seconds": 330.0045712229985,
+  "manifest_hashes": {
+    "ood-EXTREME_DEMAND": {
+      "index_file": "index.jsonl",
+      "index_sha256": "84b3cbb3ac79ed489806bc53cda7fb39a061af4fe60746f70710eeece84dfdcc",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "afecc408a93a945271100b0b7b4948f1b3dae556fd35dd712f08a0fa9b33922d"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "695c987195f94737bec4a24274ce51ebc5449531c2320768cba250e77229cb6a"
+        }
+      ],
+      "total_examples": 400
+    },
+    "ood-FROZEN_DRIFTING_SENSOR": {
+      "index_file": "index.jsonl",
+      "index_sha256": "2475bf496e2a93f36bbcf4bdd057454a463bbbaa6918d104149b6f04f8dc757d",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "43fc6a20e228597b659331c696928aa09ba68ef5e8f48a8de0df6f258fd833cf"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "98b2bbc6e538f23d48236c08eb079fea57e605ae2b8fb975834bdd8ad884390f"
+        }
+      ],
+      "total_examples": 400
+    },
+    "ood-ROUGHNESS_MISMATCH": {
+      "index_file": "index.jsonl",
+      "index_sha256": "6bc784f1aefb504d0ca4a67969ebf65be2c8efff7f3b219cff4daebfee1d05e7",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "e3161c6f8a858da40e16eb3ddbd432317d424b896b04945ecb6ede29fe006bc1"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "d0bd406703673c0d5c0854e31dd061e73d8bbc3d8d5f18d0c7b25e7995539643"
+        }
+      ],
+      "total_examples": 400
+    },
+    "ood-TANK_STATE_SHIFT": {
+      "index_file": "index.jsonl",
+      "index_sha256": "fca39de1418120c07655cb1af00127f4cc6e66ddabc8bd39009ae3507cc4eee1",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "8a3e30ce96f7417bbe44f94a8269d3f179914afe2bdc9deca71216e9ec0f765a"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "c98ea30d3bbf776302a0092db7a0067d4c773d4d7a865e9ca0d4d36c4cb41ff2"
+        }
+      ],
+      "total_examples": 400
+    }
+  },
+  "schema_version": 1
+}

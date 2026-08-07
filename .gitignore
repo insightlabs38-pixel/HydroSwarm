@@ -39,6 +39,13 @@ data/learning-v2/**/tensors-normalized/**/*.safetensors
 # inputs/topology are the same real, non-regenerated data).
 !data/learning-v2/cycle-b2-control-v2/tensors/**/*.safetensors
 !data/learning-v2/cycle-b2-control-v2/tensors-normalized/**/*.safetensors
+# core-issues3.txt Phase 10.4: the balanced supported-category OOD
+# extension corpus (real, independently-generated development_holdout-only
+# scenarios for EXTREME_DEMAND/TANK_STATE_SHIFT/ROUGHNESS_MISMATCH/
+# FROZEN_DRIFTING_SENSOR). Raw scenario .npz arrays stay ignored, same as
+# every other corpus above -- only the tensor shards are committed.
+!data/learning-v2/cycle-b2-ood-extension/tensors/**/*.safetensors
+!data/learning-v2/cycle-b2-ood-extension/tensors-normalized/**/*.safetensors
 models/checkpoints/
 experiments/cache/
 experiments/runs/

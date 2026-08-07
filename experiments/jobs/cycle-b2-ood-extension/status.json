@@ -1,0 +1,37 @@
+{
+  "command": [
+    "python",
+    "-u",
+    "scripts/generate_ood_extension_corpus.py",
+    "--output",
+    "data/learning-v2/cycle-b2-ood-extension",
+    "--count-per-category",
+    "400",
+    "--categories",
+    "EXTREME_DEMAND",
+    "TANK_STATE_SHIFT",
+    "ROUGHNESS_MISMATCH",
+    "FROZEN_DRIFTING_SENSOR"
+  ],
+  "ended_at": "2026-08-07T06:35:43.573962+00:00",
+  "exit_code": 0,
+  "log_path": "experiments/jobs/cycle-b2-ood-extension/job.log",
+  "pid": 1803305,
+  "resume_command": [
+    "python",
+    "-u",
+    "scripts/generate_ood_extension_corpus.py",
+    "--output",
+    "data/learning-v2/cycle-b2-ood-extension",
+    "--count-per-category",
+    "400",
+    "--categories",
+    "EXTREME_DEMAND",
+    "TANK_STATE_SHIFT",
+    "ROUGHNESS_MISMATCH",
+    "FROZEN_DRIFTING_SENSOR"
+  ],
+  "started_at": "2026-08-07T06:26:27.539982+00:00",
+  "state": "COMPLETED",
+  "workdir": "/workspace/HydroSwarm"
+}
