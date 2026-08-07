@@ -69,6 +69,56 @@ TANK_STATE_SHIFT_THRESHOLD = 0.25
 ROUGHNESS_MISMATCH_THRESHOLD = 0.15
 FROZEN_DRIFTING_SENSOR_THRESHOLD = 0.5
 
+#: core-issues3.txt Phase 6.2: queryable (not just documented-in-prose)
+#: record of which OODCategory members classify_ood_category can actually
+#: return -- checkpoint/runtime metadata must never trust a category the
+#: generator never produced (an untrained class), and the module docstring
+#: above already enumerates exactly this split; these two constants make
+#: that enumeration a fact code can assert against (see
+#: test_ood_labels.py::test_classify_ood_category_only_ever_returns_a_
+#: supported_category) rather than only a comment that could silently
+#: drift from actual behavior.
+SUPPORTED_OOD_CATEGORIES: frozenset[OODCategory] = frozenset({
+    OODCategory.NONE,
+    OODCategory.UNSEEN_TOPOLOGY,
+    OODCategory.EXTREME_DEMAND,
+    OODCategory.TANK_STATE_SHIFT,
+    OODCategory.ROUGHNESS_MISMATCH,
+    OODCategory.SEVERE_MISSINGNESS,
+    OODCategory.FROZEN_DRIFTING_SENSOR,
+})
+UNSUPPORTED_OOD_CATEGORIES: frozenset[OODCategory] = frozenset(OODCategory) - SUPPORTED_OOD_CATEGORIES
+
+#: core-issues3.txt Phase 6.3: a governed, versioned recipe of
+#: ScenarioGenerationConfig overrides known to reliably trigger each
+#: reproducible non-NONE category (verified against classify_ood_category
+#: itself, not asserted from the threshold table alone -- see
+#: test_ood_labels.py::test_every_recipe_override_reliably_triggers_its_
+#: category). UNSEEN_TOPOLOGY is deliberately absent: it is not a
+#: generation-config property at all (any config yields it once given an
+#: unvalidated topology_hash at classification time), so it has no
+#: generation-time override to record here.
+#:
+#: This is the reusable "which knobs to push" building block a real
+#: balanced-OOD corpus-generation pass needs (Phase 6.3's "Generate a
+#: separate, versioned, balanced OOD training extension"). Turning it into
+#: an actual standalone corpus at Cycle-B2 scale -- real production
+#: topologies, thousands of scenarios, plus the trained-model-dependent
+#: metrics Phase 6.3 also requires (false-normal rate, macro F1,
+#: calibration by category, unsafe non-abstention -- none of which can be
+#: computed without a trained checkpoint, see control_labels.py's
+#: identical structural dependency) -- is deferred: it needs dedicated
+#: compute time this pass's CPU budget does not have free while the
+#: cycle-b2-trajectories-v2 regeneration is still running, and most of its
+#: required metrics are blocked on Phase 8's Stage-A checkpoint regardless.
+OOD_TRIGGERING_CONFIG_OVERRIDES: dict[OODCategory, dict[str, object]] = {
+    OODCategory.EXTREME_DEMAND: {"demand_regimes": (2.5,)},
+    OODCategory.TANK_STATE_SHIFT: {"tank_level_variation_fraction": 0.6},
+    OODCategory.ROUGHNESS_MISMATCH: {"roughness_variation_fraction": 0.4},
+    OODCategory.SEVERE_MISSINGNESS: {"missing_probability": 0.6},
+    OODCategory.FROZEN_DRIFTING_SENSOR: {"frozen_probability": 1.0, "sensor_count": 6},
+}
+
 #: Enum declaration order, matching targets_v2.TARGET_CLASS_COUNTS["ood_class"].
 _OOD_CLASS_INDEX = {category: index for index, category in enumerate(OODCategory)}
 

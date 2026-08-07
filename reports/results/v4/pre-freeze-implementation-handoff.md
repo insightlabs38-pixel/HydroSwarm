@@ -20,7 +20,7 @@ remain untouched.
 | 3 | Repair Strategist label semantics | **DONE** (code + tests) |
 | 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
-| 6 | OOD taxonomy / event-cause | **PARTIAL** (6.1/item F crash-bug fixed + tested; 6.2-6.6 not started) |
+| 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
 | 7 | Auxiliary objectives / regression losses | **IN PROGRESS** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
 | 8 | Second-pass calibrated control targets | not started |
 | 9-20 | Architecture v4, training, gates, selection | not started |
@@ -372,17 +372,94 @@ from `"ood_class": "ood_logits"` to `"ood_class": "ood_category_logits"`.
 constructed a synthetic `ood_logits` output intentionally exercising the
 old, now-fixed mapping).
 
-**Not done in this pass** (items 6.2-6.6, explicitly deferred): supported-
-category metadata (`trained_ood_categories`/`validated_ood_categories`/
-`unsupported_ood_categories`); a balanced OOD training extension for the
-6/11 currently-reproducible categories; implementing or removing the
-`VALVE_PUMP_MISMATCH`/`HYDRAULIC_MISMATCH` categories (currently labels
-without a real simulated perturbation, per the Phase 0 audit); handling
-`AMBIGUOUS` event cause (currently never generated); the
-`category != NONE -> OUTSIDE_VALIDATED_RANGE` collapse check. The crash-
-preventing architecture fix was prioritized as the highest-value, most
-urgent item — the remaining items are corpus/labeling work, not the kind
-of silent-failure risk the architecture fix closes.
+**6.2 — supported-category metadata (DONE, in a follow-up sub-pass)**:
+added `ood_labels.SUPPORTED_OOD_CATEGORIES`/`UNSUPPORTED_OOD_CATEGORIES`
+(7 supported: NONE + UNSEEN_TOPOLOGY/EXTREME_DEMAND/TANK_STATE_SHIFT/
+ROUGHNESS_MISMATCH/SEVERE_MISSINGNESS/FROZEN_DRIFTING_SENSOR; 4
+unsupported: UNSEEN_SENSOR_LAYOUT/VALVE_PUMP_MISMATCH/
+TIMING_OUTSIDE_TRAINING_RANGE/UNSUPPORTED_NETWORK_ELEMENT_OR_INVALID_
+CALIBRATION) and `corpus.SUPPORTED_EVENT_CAUSES`/`UNSUPPORTED_EVENT_
+CAUSES` (HYDRAULIC_MISMATCH + AMBIGUOUS unsupported). These turn what was
+previously only module-docstring prose into queryable constants, each
+backed by a real regression test that exercises the actual classifier
+across every documented threshold/config combination (not merely asserted
+to match the docstring) — the exact metadata Phase 9's checkpoint contract
+(`trained_ood_categories`/`validated_ood_categories`) will consume.
+
+**6.3 — balanced OOD extension (PARTIAL, scoped deliberately)**: most of
+this item's required measurements (false-normal rate, macro F1,
+calibration by category, unsafe non-abstention) are evaluation metrics
+against a *trained* classifier — structurally blocked on Phase 8's Stage-A
+checkpoint, the same dependency `control_labels.py`'s own docstring
+already documents for evidence_sufficiency's remaining signals. What IS
+achievable now: `ood_labels.OOD_TRIGGERING_CONFIG_OVERRIDES`, a governed,
+versioned recipe of `ScenarioGenerationConfig` overrides that reliably
+triggers each of the 5 non-topology reproducible categories — verified
+(not merely asserted) against `classify_ood_category` across 3 seeds each
+in `test_every_recipe_override_reliably_triggers_its_category`. This is
+the reusable building block a real balanced-corpus generation script
+needs; turning it into an actual Cycle-B2-scale corpus is deferred —
+running one now would compete for CPU with the still-in-progress
+`cycle-b2-trajectories-v2` train regeneration, and most of the item's
+required metrics can't be computed without Phase 8's checkpoint regardless.
+
+**6.4 — VALVE_PUMP_MISMATCH / HYDRAULIC_MISMATCH (DONE — "remove" branch
+taken)**: found a real, *active* defect while implementing this, not by
+design review: `corpus._event_cause` was unconditionally labeling every
+NORMAL-event scenario generated at `CurriculumStage.SHIFT`/`ADVERSARIAL`
+as `EventCause.HYDRAULIC_MISMATCH` — but `scenarios.py`'s
+`model_mismatch["valve_telemetry_incorrect"]` is purely
+`stage in {SHIFT, ADVERSARIAL}`, a curriculum-stage *label* with **no
+corresponding simulated valve/pump/topology perturbation behind it**
+(confirmed by inspection of `_randomize_hydraulics` and
+`generate_with_network`: the flag is written into the manifest and never
+otherwise consulted). Every such scenario was a genuinely quiet,
+internally-consistent network mislabeled as a hydraulic mismatch — the
+currently-running `cycle-b2-trajectories-v2` train regeneration has been
+generating these bad labels throughout its run (see corpus-regeneration
+note below). Fixed by removing `HYDRAULIC_MISMATCH` from `_event_cause`'s
+derivation entirely (the "remove" branch of Phase 6.4's explicit
+implement-or-remove choice) rather than fabricate a real perturbation
+under time pressure. `OODCategory.VALVE_PUMP_MISMATCH` was already
+unreachable (never generated) prior to this pass — now formally recorded
+in `UNSUPPORTED_OOD_CATEGORIES`.
+
+**6.5 — AMBIGUOUS event cause (DONE, resolved as "mark unsupported")**:
+already never generated (unchanged); now formally recorded in
+`UNSUPPORTED_EVENT_CAUSES` and covered by
+`test_event_cause_never_assigns_an_unsupported_class`, which exercises
+`_event_cause` across every event_type × curriculum_stage combination and
+asserts the result is always in `SUPPORTED_EVENT_CAUSES`.
+
+**6.6 — `category != NONE -> OUTSIDE_VALIDATED_RANGE` collapse (DONE —
+verified, no code change needed)**: `full_trajectory.py`'s
+`classify_next_step(ood_level_outside_validated_range=category !=
+OODCategory.NONE, ...)` looked like the exact anti-pattern this item
+warns against, but is actually *consistent* with the governed
+`OOD_CATEGORY_BEHAVIOR` table: every currently-defined non-NONE category
+already has `planning_permitted=False, calibration_valid=False` (no
+CAUTION-only/partial-severity category exists yet). Added
+`test_every_non_none_category_currently_suppresses_planning_and_
+invalidates_calibration` to make this invariant an explicit, checked fact
+rather than an implicit one — if a future category is added with
+`planning_permitted=True`, this test fails and flags every
+`category != NONE` shortcut in caller code for review, rather than one
+silently becoming wrong.
+
+**Consequence for the in-progress corpus regeneration**: the 6.4 fix
+changes `event_cause` label semantics for NORMAL-event SHIFT/ADVERSARIAL-
+stage scenarios. `cycle-b2-trajectories-v2`'s `train` split (still running
+as of this update) was generated entirely under the pre-fix code and
+therefore contains the HYDRAULIC_MISMATCH mislabeling bug throughout —
+consistent with the established precedent (Phase 5's Scout-reveal
+improvement was likewise not restarted a third time into an
+already-90%-complete run). This corpus remains useful for validating the
+Phase 1-3/5 pipeline mechanics themselves, but is now also provisional
+with respect to Phase 6.4's fix, on top of Phase 7's auxiliary-target
+fixes — a full regeneration incorporating everything from Phases 1-7
+together is needed before this corpus can be used for real training, and
+belongs with Phase 10's dataset-versioning work rather than a fourth
+partial restart.
 
 ## Phase 7: auxiliary objectives / regression losses — IN PROGRESS
 

@@ -5,11 +5,18 @@ from __future__ import annotations
 
 import pytest
 
-from hydroswarm.data.scenarios import DatasetSplit, EventType, ScenarioGenerationConfig, WNTRScenarioGenerator
+from hydroswarm.data.scenarios import (
+    CurriculumStage,
+    DatasetSplit,
+    EventType,
+    ScenarioGenerationConfig,
+    WNTRScenarioGenerator,
+)
 from hydroswarm.simulation.network import build_wntr_network
 from hydroswarm.training.corpus import (
     EVENT_CAUSE_INDEX,
     SOURCE_REGION_COUNT,
+    SUPPORTED_EVENT_CAUSES,
     assign_source_regions,
     build_feature_context,
     fit_signature_library,
@@ -114,6 +121,53 @@ def test_fault_only_scenario_has_correct_event_cause(network, signature_library)
     # Direct plan requirement (Task 2.2 test list).
     example = _example(network, signature_library, event_type=EventType.SENSOR_FAULT_ONLY)
     assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.SENSOR_FAULT]
+
+
+def test_normal_scenario_at_shift_and_adversarial_stage_is_not_labeled_hydraulic_mismatch(
+    network, signature_library
+) -> None:
+    """core-issues3.txt Phase 6.4 / item K: hydroswarm.data.scenarios sets
+    model_mismatch['valve_telemetry_incorrect'] purely from
+    `stage in {SHIFT, ADVERSARIAL}` with NO corresponding simulated
+    valve/pump perturbation behind it -- a genuinely quiet, internally-
+    consistent network must not be mislabeled HYDRAULIC_MISMATCH just
+    because of its curriculum stage. Only EventCause.NORMAL is a
+    supported label for a normal-event scenario until a real, reproducible
+    mismatch perturbation exists."""
+
+    generator = WNTRScenarioGenerator()
+    for stage in (CurriculumStage.SHIFT, CurriculumStage.ADVERSARIAL):
+        scenario = generator.generate(
+            network,
+            ScenarioGenerationConfig(
+                seed=2500, network_id="ref", network_family="reference", split=DatasetSplit.TRAIN,
+                event_type=EventType.NORMAL, sensor_count=3, stage=stage,
+            ),
+        )
+        assert scenario.manifest.model_mismatch.get("valve_telemetry_incorrect") is True
+        example = scenario_to_example(scenario, network, signature_library)
+        assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.NORMAL]
+
+
+def test_event_cause_never_assigns_an_unsupported_class(network, signature_library) -> None:
+    """corpus._event_cause must only ever return a SUPPORTED_EVENT_CAUSES
+    member (HYDRAULIC_MISMATCH and AMBIGUOUS are governed taxonomy members
+    with no reproducible generator behind them yet)."""
+
+    index_to_cause = {index: cause for cause, index in EVENT_CAUSE_INDEX.items()}
+    generator = WNTRScenarioGenerator()
+    for event_type in (EventType.CONTAMINATION, EventType.SENSOR_FAULT_ONLY, EventType.NORMAL):
+        for stage in (CurriculumStage.OPERATIONAL, CurriculumStage.SHIFT, CurriculumStage.ADVERSARIAL):
+            scenario = generator.generate(
+                network,
+                ScenarioGenerationConfig(
+                    seed=2600, network_id="ref", network_family="reference", split=DatasetSplit.TRAIN,
+                    event_type=event_type, sensor_count=3, stage=stage,
+                ),
+            )
+            example = scenario_to_example(scenario, network, signature_library)
+            cause = index_to_cause[int(example.targets["event_cause"])]
+            assert cause in SUPPORTED_EVENT_CAUSES
 
 
 def test_evidence_sufficiency_agrees_with_clean_high_health_scenario(network, signature_library) -> None:

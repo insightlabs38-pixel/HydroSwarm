@@ -179,25 +179,47 @@ def fit_signature_library(
 EVENT_CAUSE_INDEX: dict[EventCause, int] = {cause: index for index, cause in enumerate(EventCause)}
 
 
+#: core-issues3.txt Phase 6.4 / item K: EventCause.HYDRAULIC_MISMATCH and
+#: AMBIGUOUS are defined in the governed taxonomy but have no reproducible
+#: generator behind them yet -- see _event_cause's docstring. Runtime/
+#: promotion code must treat these as unsupported (never assume the
+#: event_cause head was actually trained to distinguish them) until one is
+#: implemented and this set is updated to match.
+UNSUPPORTED_EVENT_CAUSES: frozenset[EventCause] = frozenset({EventCause.HYDRAULIC_MISMATCH, EventCause.AMBIGUOUS})
+SUPPORTED_EVENT_CAUSES: frozenset[EventCause] = frozenset(EventCause) - UNSUPPORTED_EVENT_CAUSES
+
+
 def _event_cause(scenario: GeneratedScenario) -> EventCause:
     """Deterministic event_cause derivation from the generator's event_type
-    and model_mismatch flags -- never a hand label. AMBIGUOUS is not yet
-    produced by the generator (it needs a scenario that genuinely combines
-    multiple confounders); this is a documented limitation, not an
-    oversight."""
+    -- never a hand label. Only ever returns a SUPPORTED_EVENT_CAUSES
+    member.
+
+    core-issues3.txt Phase 6.4 / item K: previously returned
+    HYDRAULIC_MISMATCH whenever model_mismatch['valve_telemetry_incorrect']
+    or ['missing_topology_element'] was set -- but
+    hydroswarm.data.scenarios sets 'valve_telemetry_incorrect' purely from
+    `config.stage in {SHIFT, ADVERSARIAL}` (a curriculum-stage *label*)
+    with NO corresponding simulated valve/pump/topology perturbation
+    behind it (confirmed by inspection of WNTRScenarioGenerator.
+    generate_with_network: the flag is set in the `mismatch` dict handed
+    to ScenarioManifest, never fed into `_randomize_hydraulics` or any
+    other function that would make the actual simulated network disagree
+    with its own telemetry). Every such "normal" scenario was therefore a
+    genuinely quiet, internally-consistent network mislabeled as
+    HYDRAULIC_MISMATCH -- training the event_cause head to associate that
+    class with curriculum-stage-correlated spurious features rather than
+    any real hydraulic/telemetry discrepancy present in the input. Fixed
+    by removing the flag from label derivation entirely: a normal-event
+    scenario is always NORMAL until a real, reproducible mismatch
+    perturbation exists (Phase 6.4's "implement...or remove" choice --
+    remove was taken here). AMBIGUOUS was already, separately, never
+    produced (unchanged)."""
 
     event_type = scenario.manifest.event_type
     if event_type == EventType.CONTAMINATION.value:
         return EventCause.CONTAMINATION
     if event_type == EventType.SENSOR_FAULT_ONLY.value:
         return EventCause.SENSOR_FAULT
-    # event_type == "normal": distinguish a genuinely quiet network from one
-    # where the hydraulic model itself disagrees with the (still
-    # contamination-free) telemetry.
-    if scenario.manifest.model_mismatch.get("valve_telemetry_incorrect") or scenario.manifest.model_mismatch.get(
-        "missing_topology_element"
-    ):
-        return EventCause.HYDRAULIC_MISMATCH
     return EventCause.NORMAL
 
 

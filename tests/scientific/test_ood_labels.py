@@ -6,8 +6,14 @@ import torch
 
 from hydroswarm.data.scenarios import CurriculumStage, DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
 from hydroswarm.simulation.network import build_wntr_network
-from hydroswarm.training.ood_categories import OODCategory
-from hydroswarm.training.ood_labels import classify_ood_category, ood_class_target
+from hydroswarm.training.ood_categories import OOD_CATEGORY_BEHAVIOR, OODCategory
+from hydroswarm.training.ood_labels import (
+    OOD_TRIGGERING_CONFIG_OVERRIDES,
+    SUPPORTED_OOD_CATEGORIES,
+    UNSUPPORTED_OOD_CATEGORIES,
+    classify_ood_category,
+    ood_class_target,
+)
 from hydroswarm.training.targets_v2 import validate_targets_v2
 
 _VALIDATED = frozenset({"reference-topology-hash"})
@@ -126,3 +132,69 @@ def test_ood_class_target_is_governed_and_matches_the_classified_category() -> N
 def test_every_category_maps_to_a_distinct_index() -> None:
     indices = {int(ood_class_target(category)["ood_class"]) for category in OODCategory}
     assert len(indices) == len(list(OODCategory))
+
+
+def test_supported_and_unsupported_ood_categories_partition_the_full_taxonomy() -> None:
+    assert SUPPORTED_OOD_CATEGORIES | UNSUPPORTED_OOD_CATEGORIES == frozenset(OODCategory)
+    assert SUPPORTED_OOD_CATEGORIES & UNSUPPORTED_OOD_CATEGORIES == frozenset()
+
+
+def test_classify_ood_category_never_returns_an_unsupported_category(tmp_path) -> None:
+    """core-issues3.txt Phase 6.2: the SUPPORTED_OOD_CATEGORIES registry
+    must match classify_ood_category's real behavior, not silently drift
+    from it -- exercised across every configuration knob combination this
+    module's own threshold table names, not just the individually-flagged
+    cases each already have their own test."""
+
+    network = build_wntr_network()
+    configurations = [
+        {},
+        {"stage": CurriculumStage.ADVERSARIAL, "missing_probability": 0.08, "frozen_probability": 0.06,
+         "communication_outage_probability": 0.06, "unit_mismatch_probability": 0.02},
+        *OOD_TRIGGERING_CONFIG_OVERRIDES.values(),
+    ]
+    for overrides in configurations:
+        for topology_hash, validated in (
+            ("reference-topology-hash", _VALIDATED),
+            ("some-other-hash", _VALIDATED),
+        ):
+            scenario = _generate(network, **overrides)
+            category = classify_ood_category(
+                scenario, topology_hash=topology_hash, validated_topology_hashes=validated
+            )
+            assert category in SUPPORTED_OOD_CATEGORIES
+
+
+def test_every_recipe_override_reliably_triggers_its_category(tmp_path) -> None:
+    """core-issues3.txt Phase 6.3: OOD_TRIGGERING_CONFIG_OVERRIDES is the
+    reusable recipe a future balanced-OOD corpus-generation pass would use
+    -- verified against classify_ood_category's real behavior across
+    several seeds each, not asserted from the threshold table alone."""
+
+    network = build_wntr_network()
+    for category, overrides in OOD_TRIGGERING_CONFIG_OVERRIDES.items():
+        for seed in (100, 200, 300):
+            scenario = _generate(network, seed=seed, **overrides)
+            classified = classify_ood_category(
+                scenario, topology_hash="reference-topology-hash", validated_topology_hashes=_VALIDATED
+            )
+            assert classified == category, f"{category} recipe {overrides} gave {classified} at seed {seed}"
+
+
+def test_every_non_none_category_currently_suppresses_planning_and_invalidates_calibration() -> None:
+    """core-issues3.txt Phase 6.6: guards against silently collapsing every
+    non-NONE category to OUTSIDE_VALIDATED_RANGE severity in caller code
+    (e.g. full_trajectory.py's `category != OODCategory.NONE` check) UNLESS
+    the governed OOD_CATEGORY_BEHAVIOR table itself says so for every such
+    category. Currently true for the entire taxonomy (no CAUTION-only
+    category is defined yet) -- if a future category is added with
+    planning_permitted=True (a partial-degradation CAUTION case), any
+    `category != NONE` shortcut elsewhere must be revisited alongside it,
+    which this test would then catch by failing."""
+
+    for category in OODCategory:
+        if category == OODCategory.NONE:
+            continue
+        behavior = OOD_CATEGORY_BEHAVIOR[category]
+        assert behavior.planning_permitted is False
+        assert behavior.calibration_valid is False
