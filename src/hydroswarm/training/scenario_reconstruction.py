@@ -24,8 +24,10 @@ from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
 import numpy as np
+import pandas as pd
 
 from hydroswarm.data.scenarios import (
+    NEGLIGIBLE_STRENGTH_MG_MIN,
     CurriculumStage,
     EventType,
     GeneratedScenario,
@@ -195,3 +197,50 @@ def _verify_replay(
                 f"{key} array differs on reconstruction for scenario {manifest.scenario_id}"
             )
     return True, hash_drifted
+
+
+def simulate_all_node_truth(
+    reconstruction: ReconstructedScenarioContext,
+    *,
+    base_strength_mg_min: float = 10.0,
+) -> pd.DataFrame:
+    """Re-run the incident simulation against the reconstructed scenario's
+    exact randomized network, returning concentration at EVERY node --
+    not just the scenario's own originally-chosen sensor subset.
+
+    core-issues3.txt Phase 5 (item Q: "All-node Scout sample truth must
+    come from the exact randomized scenario, not a pristine topology or a
+    generic signature prediction"). WNTRScenarioGenerator.generate_with_
+    network already computes exactly this full-node frame internally
+    (HydraulicSimulator.simulate_incident's own return value) but only
+    keeps the sensor-subset columns before discarding it
+    (`frame = simulation.concentration_mg_l.loc[:, list(sensors)]`) --
+    this function reruns that same simulate_incident call against the
+    SAME already-reconstructed network and the manifest's own recorded
+    incident parameters (source/start/duration/strength), so no fresh RNG
+    draws are needed and the result is deterministic. Callers that need to
+    verify this reproduces the original scenario's own stored sensor
+    columns should compare against `reconstruction.scenario.
+    truth_concentration` at `reconstruction.scenario.manifest.
+    sensor_nodes` (see the regression test for this function).
+
+    `base_strength_mg_min` must match the value the corpus's own generator
+    used (ScenarioGenerationConfig.base_strength_mg_min, default 10.0 --
+    no corpus generator in this repository overrides it; reconstruct_
+    scenario_network's own config construction likewise never does).
+    """
+
+    manifest = reconstruction.scenario.manifest
+    incident = manifest.incident
+    is_contamination = manifest.event_type == EventType.CONTAMINATION.value
+    injection_strength = (
+        incident.relative_strength if is_contamination else NEGLIGIBLE_STRENGTH_MG_MIN / base_strength_mg_min
+    )
+    simulator = HydraulicSimulator(reconstruction.network)
+    simulation = simulator.simulate_incident(
+        incident.source_nodes[0],
+        strength_mg_min=base_strength_mg_min * injection_strength,
+        start_minute=incident.start_minute,
+        duration_minutes=incident.duration_minutes,
+    )
+    return simulation.concentration_mg_l

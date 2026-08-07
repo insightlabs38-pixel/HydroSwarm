@@ -30,6 +30,7 @@ from hydroswarm.training.corpus import build_feature_context  # noqa: E402
 from hydroswarm.training.scenario_reconstruction import (  # noqa: E402
     ScenarioReconstructionError,
     reconstruct_scenario_network,
+    simulate_all_node_truth,
 )
 
 _FAMILY, _LOADER = TRAIN_TOPOLOGIES[0]  # golden-reference: cheap, real
@@ -228,3 +229,60 @@ def test_a_real_magnitude_difference_still_fails_closed(pristine_network, two_sc
         reconstruct_scenario_network(
             pristine_network, scenario_a.manifest, degradation_policy=_degradation_probabilities, original=tampered
         )
+
+
+def test_simulate_all_node_truth_reproduces_the_scenarios_own_stored_sensor_columns(
+    pristine_network, two_scenarios
+) -> None:
+    """core-issues3.txt Phase 5 item Q: all-node Scout sample truth must
+    come from the exact randomized scenario. The strongest possible proof
+    that simulate_all_node_truth's independent simulate_incident call
+    reproduces the SAME physical simulation the corpus generator's own
+    (RNG-driven) call already ran: its values at the scenario's own
+    original sensor nodes must match the scenario's own stored
+    truth_concentration array exactly (both are float32, same computation,
+    no noise/degradation applied to either -- this is comparing two exact
+    simulator outputs, not tolerating any float noise)."""
+
+    scenario_a, _ = two_scenarios
+    reconstruction = reconstruct_scenario_network(
+        pristine_network, scenario_a.manifest, degradation_policy=_degradation_probabilities, original=scenario_a
+    )
+    all_node_truth = simulate_all_node_truth(reconstruction)
+
+    sensor_nodes = scenario_a.manifest.sensor_nodes
+    timestamps = scenario_a.timestamps_seconds
+    reproduced = (
+        all_node_truth.loc[:, list(sensor_nodes)]
+        .reindex(index=list(timestamps), method="nearest")
+        .to_numpy(dtype=np.float32)
+    )
+    assert np.allclose(reproduced, scenario_a.truth_concentration, atol=1e-6, rtol=0.0)
+
+
+def test_simulate_all_node_truth_reaches_nodes_outside_the_original_sensor_set(
+    pristine_network, two_scenarios
+) -> None:
+    scenario_a, _ = two_scenarios
+    reconstruction = reconstruct_scenario_network(
+        pristine_network, scenario_a.manifest, degradation_policy=_degradation_probabilities, original=scenario_a
+    )
+    all_node_truth = simulate_all_node_truth(reconstruction)
+
+    non_sensor_nodes = [
+        node for node in pristine_network.junction_name_list if node not in scenario_a.manifest.sensor_nodes
+    ]
+    assert non_sensor_nodes, "fixture network must have at least one non-sensor junction to test with"
+    target = non_sensor_nodes[0]
+    assert target in all_node_truth.columns
+    assert np.isfinite(all_node_truth[target].to_numpy(dtype=np.float64)).all()
+
+
+def test_simulate_all_node_truth_is_deterministic(pristine_network, two_scenarios) -> None:
+    scenario_a, _ = two_scenarios
+    reconstruction = reconstruct_scenario_network(
+        pristine_network, scenario_a.manifest, degradation_policy=_degradation_probabilities, original=scenario_a
+    )
+    first = simulate_all_node_truth(reconstruction)
+    second = simulate_all_node_truth(reconstruction)
+    assert np.array_equal(first.to_numpy(), second.to_numpy(), equal_nan=True)
