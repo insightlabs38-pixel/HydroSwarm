@@ -22,9 +22,10 @@ remain untouched.
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
 | 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
 | 7 | Auxiliary objectives / regression losses | **DONE** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
-| 8 | Second-pass calibrated control targets | **step 6 PARTIAL** (steps 1-5, 7, 8, 9 done; step 6a -- per-scenario label persistence -- DONE and run against real data this pass; step 6b -- merge into a governed corpus + train control heads -- scoped as a documented, immediately-resumable follow-up, see "core-issues4.txt continuation pass" below) |
-| 9 | Architecture v4 contract | **DONE for Sections A-E** (executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract -- see "core-issues4.txt continuation pass" below; Section F step-6b/G training run/H full adversarial sweep remain, see Next steps) |
-| 10-20 | Datasets/collation, loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
+| 8 | Second-pass calibrated control targets | **DONE** (all steps 1-9 complete, including step 6b -- corpus merge + real control-head training -- see "core-issues4.txt continuation pass, part 2" below) |
+| 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
+| 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **IN PROGRESS** -- see below |
+| 11-20 | Loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
 **complete and committed** — all 4 splits finished with 0 errors (see its
@@ -307,6 +308,223 @@ done
 #    teacher_checkpoint_hash, and the new manifest files' calibration_hash/
 #    control_policy_hash).
 ```
+
+## core-issues4.txt continuation pass, part 2 (Phase 8 step 6b + Section H)
+
+Continuation of the same branch, starting from HEAD `27d023e` (the prior
+part's final handoff commit). Two commits, both pushed to
+`origin/agent/gcp-multitopology-v3`, working tree clean:
+
+1. `75161ff` feat(data): merge second-pass control labels into cycle-b2-control-v2 corpus
+2. `5ab9165` feat(training): train v4 event_control_heads from cycle-b2-control-v2 (frozen backbone)
+
+Full suite: 645 -> 650 passed over this part (1 new integration test file,
+plus 4 tests added to the existing `test_output_governance.py`), ruff and
+pyright clean throughout, 9/9 corpus gates passing against BOTH
+`data/learning-v2/cycle-b2` (untouched, re-verified) and the new
+`data/learning-v2/cycle-b2-control-v2`. No work on `main`. Locked test not
+opened; `final-selection.json` does not exist.
+
+### Section F step 6b -- corpus merge (DONE)
+
+`scripts/merge_second_pass_control_labels.py` joins the persisted
+second-pass labels (`data/learning-v2/cycle-b2-control-v2/second-pass-labels/
+{train,validation}.jsonl`, Section F step 6a) with corrected `event_cause`
+(recomputed via `hydroswarm.training.corpus._event_cause` against real
+`GeneratedScenario` objects loaded through `load_generated_scenarios` --
+never `cycle-b2`'s own stored `event_cause` tensor, which is a protected
+artifact carrying the documented ~5% pre-Phase-6.4 `HYDRAULIC_MISMATCH`
+mislabel) onto `cycle-b2`'s own tensor inputs, for `train`/`validation`
+only (`calibration` stays calibration-owned, per Section F's explicit
+rule).
+
+**Real structural finding, not anticipated going in**: `cycle-b2` carries
+two parallel tensor variants -- `tensors/` (raw, pre-normalization
+features, which `run_corpus_gates.py`'s `gate_normalization_ownership`
+refits `NormalizationStats` from and compares byte-for-byte against
+`normalization/*.json`) and `tensors-normalized/` (post-transform features,
+what Stage-A was actually trained/calibrated against). An initial version
+of the merge script only merged `tensors-normalized` but named its output
+`tensors`, which made `gate_normalization_ownership` try to refit
+normalization from already-normalized data and fail against the
+raw-fit artifact -- an apples-to-oranges mismatch, not a real
+normalization-ownership violation, caught immediately by actually running
+the gate rather than assuming the merge was correct because it "looked
+done." Fixed by merging BOTH variants into correspondingly-named output
+directories, matching `cycle-b2`'s own convention exactly.
+
+`scenarios/` and `normalization/` are read-only relative symlinks into
+`cycle-b2` (byte-identical inputs -- only targets changed), so
+`run_corpus_gates.py`'s topology-provenance/deterministic-replay/
+normalization-ownership gates re-verify real, unmodified `cycle-b2`
+provenance rather than trusting a second, separately-trusted copy.
+`label-audit.json` is built by reusing `hydroswarm.training.label_audit.
+audit_corpus` (the exact function `cycle-b2`'s own audit was built from)
+against the merged examples, plus an explicit supplementary range/finite
+check on the three new/changed targets (`event_cause`, `evidence_sufficiency`,
+`next_step`) that `audit_corpus`'s own `_impossible_labels` does not know
+about.
+
+**Result, run for real**: 9000/9000 train and 1000/1000 validation examples
+matched (0 unmatched); 450+48=498 `event_cause` labels changed by the
+Phase 6.4 fix (498/10000 = 4.98%, matching the previously-documented ~5%
+`HYDRAULIC_MISMATCH` mislabel rate almost exactly -- direct, independent
+confirmation the fix is being applied correctly, not just a repeated
+claim). All 9/9 corpus gates pass against
+`data/learning-v2/cycle-b2-control-v2`. `cycle-b2` itself untouched
+(re-verified 9/9 after this change). Committed through Git LFS following
+the exact same `.gitattributes`/`.gitignore` narrow-exception convention
+`cycle-b2`'s own tensors use (extended, not duplicated).
+
+### Section F step 6b -- control-head training (DONE)
+
+`scripts/train_control_heads.py`:
+
+1. Builds `HydroCore.from_variant("small", prior_mode="feature_only",
+   event_control_heads=True)`.
+2. Loads the Stage-A teacher checkpoint's state dict with `strict=False`,
+   then asserts the ONLY missing keys are the new
+   `event_presence_head`/`event_cause_head`/`next_step_head` parameters
+   Stage-A never had (fails closed on anything else -- no silent partial
+   load).
+3. Freezes every parameter except `evidence_head.*`/`next_step_head.*`.
+   `task_weights` also zeroes every task loss except `evidence_sufficiency`/
+   `next_step`, as a second, independent guarantee alongside freezing (not
+   merely relying on frozen parameters to make other losses inert).
+4. Trains (12 epochs, `experiments/runs/v4-control-heads`, launched via
+   `hydroswarm.training.job_runner.launch()`, polled at the requested
+   10-minute interval, wall time 823s).
+5. Evaluates on validation with real, computed (not asserted) metrics.
+
+Real, honest results (`reports/results/v4/control-heads-training.json`,
+teacher hash `ca31dd665908fd6e7c2797c22ffc708bfd436162ca0367dba3ddc670df5ad9de`):
+
+| metric | value |
+|---|---|
+| `evidence_sufficiency` accuracy / F1 | 0.950 / 0.946 |
+| `evidence_sufficiency` ECE | 0.0085 (well calibrated) |
+| `next_step` accuracy / macro F1 | 0.820 / 0.658 |
+| `next_step` per-class F1 (support) | GENERATE_PLANS 0.948 (459), COLLECT_SAMPLE 0.803 (402), INSPECT_FAULTY_SENSOR 0.222 (139), ABSTAIN n/a (0) |
+| `policy_agreement` | 0.787 |
+| **`unsafe_non_abstention_count`** | **10 / 1000** |
+| `generate_plans_with_empty_candidate_set_count` | 10 |
+
+`policy_agreement` re-derives `classify_next_step(...)` from THIS model's
+own predicted `evidence_sufficiency` (not the label) and checks it against
+this model's own predicted `next_step` class -- a genuine internal
+consistency check between two architecturally-independent heads, not a
+restatement of `next_step` accuracy.
+
+**Honest limitation, reported rather than hidden**:
+`unsafe_non_abstention_count` is nonzero (10/1000 = 1%) and
+`INSPECT_FAULTY_SENSOR` recall is weak (0.14, the minority class at 13.9%
+support, easily confused with `COLLECT_SAMPLE` since both stem from the
+same "evidence insufficient" branch). This is a real, trained ablation
+baseline exactly as Section F step 6 specifies -- it is deliberately NOT
+marked validated or runtime-enabled anywhere (`output_governance`'s
+`trained_outputs != validated_outputs != runtime_enabled_outputs`
+invariant exists precisely for this case: trained, evaluated, and
+currently rejected at the safety gate). Section F step 6's OPTIONAL
+low-LR joint fine-tune was considered and deliberately NOT attempted:
+its own text gates the fine-tune on "validation and safety metrics
+justify it," and a nonzero unsafe-non-abstention count does not meet that
+bar. Left as a documented, resumable follow-up rather than attempted
+speculatively under continued time pressure -- consistent with this
+project's own established lesson about not rushing multi-step training
+changes (the Phase 3/4 `action_vocabulary_size` regression).
+
+Resume/reproduce:
+
+```bash
+export PYTHONPATH=src
+python scripts/train_control_heads.py \
+  --corpus-root data/learning-v2/cycle-b2-control-v2 --tensors-dirname tensors-normalized \
+  --teacher-checkpoint experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors \
+  --teacher-checkpoint-hash ca31dd665908fd6e7c2797c22ffc708bfd436162ca0367dba3ddc670df5ad9de \
+  --second-pass-dir data/learning-v2/cycle-b2-control-v2/second-pass-labels \
+  --run-root experiments/runs/v4-control-heads \
+  --registry experiments/registry/v4-control-heads.jsonl \
+  --output reports/results/v4/control-heads-training.json
+```
+
+### Section H -- real tests and stop gates (DONE)
+
+Ran the actual checklist, not merely re-asserted it. One real gap found
+and closed, everything else verified already covered by the prior part's
+23 `test_checkpoint_identity.py` tests, 8 `test_output_governance.py`
+tests, 11 `test_scout_control_heads.py` tests, and 13
+`test_candidate_plan_batch_validation.py` tests:
+
+- **Gap found**: no test (and no live check at all) covered "untrained
+  output requested by runtime" -- `output_governance.
+  validate_output_governance` only validates a governance-set CHOICE at
+  checkpoint-build time; nothing enforced the invariant at actual
+  output-consumption time. Added `output_governance.
+  require_runtime_enabled(runtime_enabled_outputs, name)` -- fails closed
+  for any name not in the allowlist, known or unknown -- plus 4 tests.
+- **Added** `tests/integration/test_v4_production_checkpoint.py`: real
+  (not synthetic-shape) multi-topology training against genuine
+  `cycle-b2-control-v2` examples (stride-sampled across the full split so
+  a small subset genuinely spans multiple real topology families, not
+  just the first N contiguous, same-topology rows), a Trainer-level
+  save/resume/reload check, and a full `build_checkpoint_identity`/
+  `save_v4_checkpoint`/`load_v4_checkpoint` round trip against the
+  actually-trained model -- closes "one real multi-topology v4 training
+  smoke run" / "checkpoint save/resume/reload test" / "production-factory
+  construction test using a real v4 artifact" together, deliberately
+  self-contained (does not hardcode any background job's ephemeral
+  `experiments/runs/` path, which is gitignored and not guaranteed to
+  survive cleanup).
+- **Real bug caught while writing this test, not by inspection**:
+  `CheckpointIdentity.fingerprint` is a method, not a property --
+  `identity.fingerprint == other.fingerprint` silently compares two bound
+  method objects (always unequal) instead of the actual fingerprint
+  strings. First draft of the new test had exactly this bug and failed
+  for the wrong reason; fixed to `identity.fingerprint() ==
+  other.fingerprint()` (confirmed via a byte-for-byte
+  `dataclasses.asdict` field comparison that the underlying identity data
+  really was unchanged before concluding it was a test bug, not a real
+  round-trip defect).
+- Every other Section H adversarial case (missing identity, stale/altered
+  identity, wrong action-template/OOD-category ordering, wrong output
+  sets, wrong normalization, unsupported OOD category, padded plan
+  candidates, zero candidates, link-target candidates, both directions of
+  v3/v4 accidental cross-load) reused already-existing, already-passing
+  tests -- reviewed by name and content against the checklist, not assumed
+  covered.
+
+**core-issues4.txt Section H stop-gate checklist -- every item verified
+true, not just checked off**:
+
+- [x] `ARCHITECTURE_VERSION_V4` = `hydrocore-v4` for new models (legacy
+      `ARCHITECTURE_VERSION` untouched)
+- [x] legacy v3 remains loadable through a separate explicit path
+- [x] v4 identity reconstructs every behavior-critical field
+- [x] v4 checkpoints persist and verify all schema/policy/artifact hashes
+- [x] trained/validated/runtime output sets are implemented
+      (`output_governance`, now including the runtime-consumption-time
+      `require_runtime_enabled` guard) -- still NOT wired into the live
+      `runtime/defaults.py`/`inference/pipeline.py` path (no promoted v4
+      checkpoint exists to gate; tracked as Phase 10+ remaining work)
+- [x] action vocabulary is canonical and nine-class where relevant
+- [x] candidate-conditioned Strategist no longer depends on anonymous
+      position
+- [x] missing Scout heads exist and receive losses
+- [x] orphaned outputs are removed or explicitly demoted
+- [x] second-pass control labels are persisted per scenario
+- [x] the corrected control corpus passes gates (9/9,
+      `data/learning-v2/cycle-b2-control-v2`)
+- [x] control-head training completes on real data (12 epochs, real
+      metrics reported above, including the honest unsafe-non-abstention
+      finding)
+- [x] full tests (655 passed), Ruff and Pyright pass
+- [x] working tree is clean and commits are pushed
+- [x] locked test remains unopened
+- [x] `final-selection.json` does not exist
+
+**Phase 9 is now complete in full** (Sections A through I of
+core-issues4.txt). Proceeding into Phase 10 per core-issues4.txt Section I
+/ core-issues3.txt Phase 10, in the specified priority order.
 
 ## Session summary (prior continuation pass)
 
@@ -1209,82 +1427,48 @@ Locked test not opened; `final-selection.json` does not exist. No destructive
 git/filesystem commands used. No sudo, no credential exposure. All commits
 pushed to `origin/agent/gcp-multitopology-v3`.
 
-## Next steps (current, as of the core-issues4.txt continuation pass)
+## Next steps (current, as of the core-issues4.txt continuation pass, part 2)
 
-Phase 9 Sections A-E are DONE (see that section above). Phase 8 is DONE
-through step 6a (per-scenario label persistence); step 6b (merge + train)
-remains, exact resume commands in that section above. core-issues4.txt's
-own stop-gate checklist (section H) status:
+**Phase 9 (core-issues4.txt Sections A-I) is now fully DONE** -- see "core-
+issues4.txt continuation pass, part 2" above for the Section H stop-gate
+checklist, all 16 items verified true. Phase 8 is now fully DONE (all 9
+steps). Work has moved into core-issues4.txt Section I / core-issues3.txt
+Phase 10, in the exact priority order Section I specifies:
 
-- [x] `ARCHITECTURE_VERSION_V4` defined for new v4 models (legacy
-      `ARCHITECTURE_VERSION` untouched)
-- [x] legacy v3 remains loadable through a separate explicit path
-- [x] v4 identity reconstructs every behavior-critical field
-- [x] v4 checkpoints persist and verify all schema/policy/artifact hashes
-- [x] trained/validated/runtime output sets are implemented
-      (`output_governance`) -- NOT yet wired into a live runtime path
-      (no promoted v4 checkpoint exists to wire it to)
-- [x] action vocabulary is canonical and nine-class where relevant
-- [x] candidate-conditioned Strategist no longer depends on anonymous
-      position (was already true from the prior pass; Section E hardened
-      its input validation)
-- [x] missing Scout heads exist and receive losses
-- [x] orphaned outputs are removed or explicitly demoted (by vocabulary
-      omission, documented in checkpoint_identity.py's Section D writeup)
-- [x] second-pass control labels are persisted per scenario
-- [ ] the corrected control corpus passes gates -- NOT DONE (merge script
-      not yet written, Section F's remaining half)
-- [ ] control-head training completes on real data -- NOT DONE (blocked
-      on the merge above)
-- [x] full tests, Ruff and Pyright pass (639 passed, both clean)
-- [x] working tree is clean and commits are pushed
-- [x] locked test remains unopened
-- [x] `final-selection.json` does not exist
+1. Regenerate the final non-provisional trajectory corpus incorporating
+   all Phase 1-9 corrections.
+2. Build sharded Scout-state datasets and collators.
+3. Build sharded Strategist-candidate datasets and collators.
+4. Generate the balanced supported-category OOD extension.
+5. Run real multi-topology gradient/training smoke tests for every
+   retained v4 output.
 
-**Honest assessment**: Phase 9 is complete through Section E; the
-continuation's own instructions frame Section F step 6b (train + persist
-per-scenario, corpus merge, control-head training) and the full adversarial
-test sweep in Section H as one continuous requirement before Phase 9 can be
-called fully done. Step 6a is real, tested, and run against real data;
-6b (the corpus merge + actual training run) is scoped and NOT attempted,
-for the same reason this exact deferral happened once already in the prior
-pass -- see Phase 8's section above for why, and for the exact commands to
-resume it.
+Not yet started as of this handoff update; tracked as the active work.
+Also still open, correctly sequenced after the above (no promoted v4
+checkpoint exists yet to wire a runtime path to):
 
-Remaining work, roughly in priority order:
+- **Wire `output_governance`/checkpoint-identity into a live v4 runtime
+  path**: `runtime/defaults.py`/`inference/pipeline.py` still only
+  understand the v3 `trained_tasks` role-level gating.
+- **Section F's optional low-LR joint fine-tune** for the control heads,
+  only if a future evaluation pass materially improves
+  `unsafe_non_abstention_count`/`INSPECT_FAULTY_SENSOR` recall enough to
+  justify it -- not attempted now, see the honest-limitation note above.
+- Phases 11-20 (loss-system config, staged training/ablations, required
+  metrics, promotion gates, CI, artifact governance, architecture
+  selection, locked-test boundary) not started.
 
-1. **Phase 8 step 6b / Section F remainder** (deferred, not skipped, exact
-   resume commands in that section above): write
-   `scripts/merge_second_pass_control_labels.py`, run corpus gates on the
-   result, train `event_control_heads=True` control heads (frozen backbone
-   first), record real evidence-sufficiency/next-step/policy-agreement/
-   unsafe-non-abstention metrics.
-2. **core-issues4.txt Section I / core-issues3.txt Phase 10**: regenerate
-   the final non-provisional trajectory corpus incorporating all Phase 1-9
-   corrections; build sharded Scout-state and Strategist-candidate
-   datasets/collators (the `scout_control_heads`/candidate-conditioned
-   architecture landed this pass now has real heads to train, but still no
-   dataset/collator wiring real data into them); generate the balanced
-   supported-category OOD extension (Phase 6.3's still-open follow-up);
-   run real multi-topology gradient/training smoke tests for every
-   retained v4 output. Not started.
-3. **Wire `output_governance`/checkpoint-identity into a live v4 runtime
-   path**: `runtime/defaults.py`/`inference/pipeline.py` still only
-   understand the v3 `trained_tasks` role-level gating. This has no
-   promoted v4 checkpoint to point at yet (Phase 9's own training/
-   selection work is not done), so building the v4 runtime path is
-   naturally sequenced after step 1-2 above, not before.
-4. Phases 11-20 (loss-system config, staged training/ablations, required
-   metrics, promotion gates, CI, artifact governance, architecture
-   selection, locked-test boundary) not started.
-5. A recurring pattern worth carrying forward, extended this pass: every
-   phase touched so far has surfaced at least one real,
-   previously-unobserved defect only visible once exercised at real scale
-   or with a genuinely adversarial test case, not by inspection alone --
-   this pass's own new instance is Section E's padded-plan
-   `CandidatePlanEncoder` crash (`IndexError: index out of range in
-   self`), caught by a test that was expected to pass on first write and
-   didn't. Continue prioritizing real-scale/real-data testing over unit
-   tests with synthetic arrays, and re-checking a "no X exists" claim
-   against the WHOLE codebase before committing it, not just the one
-   module that prompted the question.
+A recurring pattern worth carrying forward, extended again this part:
+every phase touched so far has surfaced at least one real,
+previously-unobserved defect only visible once exercised at real scale or
+with a genuinely adversarial test case, not by inspection alone -- this
+part's own two new instances are the raw-vs-normalized tensor-variant
+mismatch caught by actually running `gate_normalization_ownership` (not
+assuming the merge script was correct because it "looked done"), and the
+`CheckpointIdentity.fingerprint` bound-method-comparison bug in the new
+integration test's own first draft, caught by an independent
+`dataclasses.asdict` comparison before concluding it was a real defect
+rather than a test bug. Continue prioritizing real-scale/real-data testing
+over unit tests with synthetic arrays, and independently verifying a
+failing assertion's root cause before either dismissing it as a test bug
+or reporting it as a real regression.
