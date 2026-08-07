@@ -25,7 +25,8 @@ remain untouched.
 | 8 | Second-pass calibrated control targets | **DONE** (all steps 1-9 complete, including step 6b -- corpus merge + real control-head training -- see "core-issues4.txt continuation pass, part 2" below) |
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
 | 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **DONE (all of 10.1-10.5)** -- see "Phase 10" section below |
-| 11-20 | Loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
+| 11 | Loss system and training configuration | **DONE (11.1-11.5)** -- see "Phase 11" section below |
+| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
 **complete and committed** — all 4 splits finished with 0 errors (see its
@@ -1670,6 +1671,257 @@ v4 output (per `checkpoint_identity.py`'s Section D decisions) now has at
 least one real, committed, passing test proving it receives a nonzero
 gradient from real multi-topology data.
 
+## Phase 11 (core-issues3.txt "PHASE 11 -- LOSS SYSTEM AND TRAINING CONFIGURATION") -- ALL 5 ITEMS DONE
+
+Overnight autonomous continuation, started from clean HEAD `a187add` (the
+prior pass's final Phase 10 handoff commit, verified against the expected
+commit before any edits). Read `overnight-plan.txt`,
+`core-issues.txt`/`core-issues2.txt`/`core-issues4.txt` (context) and
+`/workspace/core-issues3.txt` (task spec) in full before starting. Nothing
+was left mid-task from the prior pass -- Phase 10 was fully complete, so
+this pass began Phase 11 fresh, in order (11.1 -> 11.4 -> 11.5 -> 11.3 ->
+11.2; 11.3/11.2 were reordered after 11.1 to land the checkpoint/gradient
+plumbing first, since 11.2's class-weights wiring is a small addition to
+the same `compute_multitask_loss` signature 11.1 already touched). Five
+commits, all pushed to `origin/agent/gcp-multitopology-v3`, working tree
+clean after each:
+
+1. `33eb229` feat(training): explicit task weights and per-task loss diagnostics (11.1)
+2. `d647348` feat(training): gradient-conflict diagnostics and per-task validation history (11.4)
+3. `d498376` feat(training): v4 checkpoints preserve RNG state, source Git SHA, task weights (11.5)
+4. `a24564f` feat(training): reusable scale-safety preflight check (11.3)
+5. `344ec21` feat(training): class-imbalance reporting and train-owned class weights (11.2)
+
+No work on `main`. `data/learning-v2/cycle-b2` and every other protected
+corpus/checkpoint/v3 result artifact untouched (this pass only READ real
+corpus data, for 11.2's real class-prevalence report -- no corpus write).
+Locked test not opened; `final-selection.json` does not exist.
+
+### 11.1 -- explicit task weights for every retained target (DONE)
+
+`configs/training.yaml`'s `task_weights` previously covered 13 of the ~27
+tasks `compute_multitask_loss` can produce, silently relying on its hidden
+per-call default (1.0, or 0.1 for `AUXILIARY_TASKS`) for the rest --
+exactly what core-issues3.txt Phase 11.1 says not to do for "the final
+experiments." New `hydroswarm.training.losses.ALL_TASK_NAMES` (the union of
+every task key `compute_multitask_loss` can produce, kept next to the
+function itself so a future new task is a one-place addition, not a fourth
+instance of this project's "two lists drift apart" defect class) plus
+`validate_task_weights_complete()`/`IncompleteTaskWeightsError` fail closed
+on a `task_weights` mapping missing an explicit entry.
+`configs/training.yaml` now declares all ~27 explicit weights, grouped and
+commented by role/reasoning; a new test
+(`test_configs_training_yaml_declares_every_retained_task_weight_explicitly`)
+proves the actual production config -- not just a synthetic fixture --
+passes. `TrainingConfig.from_yaml` gained an opt-in
+`require_complete_task_weights` flag for a training entry point to enforce
+this at config-load time.
+
+`MultiTaskLoss` now also carries, per task: `valid_counts` (post-mask/
+finite target count), `weights` (the value actually applied, post-override/
+default), and `weighted` (`weight * mean unweighted loss`) -- Trainer's
+per-batch `metrics.jsonl` entries log all three alongside the existing
+`task_losses`/`task_gradient_norms`. 8 new tests,
+`tests/unit/test_losses.py`.
+
+**Deliberately NOT retroactively touched**: the historical Stage 2/3/4
+screening scripts (`scripts/run_stage2_architecture_screening.py`,
+`run_stage3_finalist_training.py`, `run_stage4_controls_training.py`)
+construct `TrainingConfig(...)` directly with their own inline kwargs
+(mostly relying on the same hidden default this item fixes) rather than
+loading `configs/training.yaml` -- these already produced preserved,
+provisional Stage 3/4 results per this project's own restriction #1, and
+retroactively changing their task-weight behavior would change what a
+future re-run of them produces without being asked to. The
+completeness-validated `configs/training.yaml` is the intended input for
+Phase 12's still-unstarted staged training, not a rewrite of already-run
+historical scripts.
+
+### 11.4 -- gradient-interference diagnostics (DONE)
+
+New `hydroswarm.training.losses.task_gradient_conflict`: pairwise cosine
+similarity between each `PRIMARY_TASKS` member's gradient and every other
+present task's gradient (primary-vs-all, not all-vs-all -- a full T x T
+sweep over ~27 possible tasks would cost O(T^2) extra
+`torch.autograd.grad` calls on top of the T calls `task_gradient_norms`
+already costs, for pairs nobody is making a promotion decision about).
+Wired into `Trainer` behind a new opt-in `gradient_conflict_logging` flag
+(default `False`, same sparse `gradnorm_log_every_n_batches` interval as
+`task_gradient_norms`) -- a guard test
+(`test_pcgrad_and_gradient_conflict_logging_default_off`) locks both this
+flag and `pcgrad_enabled` to their required-off-by-default state,
+per-core-issues3.txt Phase 11.4's explicit "Do not enable PCGrad or a
+complex automatic weighting scheme by default."
+
+`Trainer._validate` previously discarded every per-task validation loss,
+keeping only the scalar mean -- exactly the information needed to see
+*which* task's validation performance moved (a "primary-task regression")
+across epochs or configs. Now returns and persists the per-task breakdown
+to a new accumulating `validation_history.jsonl` (one entry per epoch;
+`epoch_summary.json` only ever keeps the latest epoch, since `atomic_json`
+overwrites the same path every call). `RunArtifacts` gained a generic
+`append_jsonl`, with `append_metric` now a thin wrapper over it (identical
+`metrics.jsonl` behavior, unchanged, confirmed by the existing
+`test_gradnorm_logging_only_runs_on_the_configured_batch_interval` test
+still passing unmodified). 10 new tests across
+`tests/unit/test_losses.py` and `tests/scientific/test_training_smoke.py`.
+
+### 11.5 -- checkpoint completeness: RNG, source Git SHA, task weights (DONE)
+
+Audited `save_v4_checkpoint`/`load_v4_checkpoint`
+(`hydroswarm.training.checkpoint_identity`) against core-issues3.txt Phase
+11.5's exact required-preservation list. Architecture config, data
+manifests, transform hashes, and trained/validated/runtime output metadata
+were already covered by the existing `identity`/`resolved_training_config`/
+`dataset_manifest_hashes` parameters; RNG state, source Git SHA, and task
+weights were not.
+
+**Real, concrete gap, not a paperwork gap**: `Trainer`'s DataLoader
+generator is deterministically re-derived from `config.seed + epoch`
+(independent of any accumulated global RNG state), so resuming already
+reproduces the exact per-epoch data order correctly -- but `nn.Dropout`
+draws from the global torch RNG, which was only ever reset to
+`config.seed` once at `Trainer.__init__`. Resuming from a checkpoint would
+silently restart dropout's randomness from the fresh-run state rather than
+continuing from wherever the pre-resume run had actually advanced it to --
+a real (if narrow) resume-determinism defect for any model with nonzero
+dropout, not merely a missing "nice to have" field.
+
+`save_v4_checkpoint` now captures Python/NumPy/torch RNG state to a new
+`rng_state.pt`; `load_v4_checkpoint` gained an opt-in `restore_rng` flag
+(default `False` -- an inference/inspection load should not silently
+mutate process-global RNG state as a side effect; a training-resume caller
+passes `True`), verified by a real round-trip test proving three
+independent RNG streams' subsequent draws match a pre-advance control
+exactly after restore. Also now requires an explicit `task_weights`
+mapping (recorded in `trainer_state.json` exactly as given -- a checkpoint
+preserves whatever weights a run actually used, complete or not; full
+completeness against `ALL_TASK_NAMES` stays a training-entry-point-time
+concern per 11.1, not re-enforced a second time here) and a `workdir`
+parameter used to record `source_git_sha`
+(`hydroswarm.training.artifacts.git_commit_hash`, newly made public and
+reused here rather than a second independently-drifting copy of the same
+subprocess call). 9 new/updated tests,
+`tests/unit/test_checkpoint_identity.py`; the real trained-model
+integration test (`test_v4_production_checkpoint.py`) updated to pass
+`task_weights`/`workdir` through its actual `save_v4_checkpoint` call and
+still passes end to end.
+
+**Deliberately NOT done**: rewiring `Trainer`'s default (v3) checkpoint
+path to use `save_v4_checkpoint`. No promoted v4 checkpoint exists yet to
+make that switch meaningful (Phase 15's "wire `output_governance`/
+checkpoint-identity into a live v4 runtime path" is still open, as already
+flagged in the prior pass's handoff), and `hydroswarm.training.checkpoint`
+'s legacy `save_checkpoint`/`load_checkpoint` explicitly "stays exactly
+as-is for existing v3 checkpoints" per its own docstring and
+core-issues4.txt's PRIMARY DESIGN RULE -- left untouched.
+
+### 11.3 -- scale-safety preflight check (DONE)
+
+New `hydroswarm.training.scale_safety.run_scale_safety_check`: one real
+forward pass, asserting every governed property in one place -- every
+present task reaches `compute_multitask_loss`, every caller-declared
+`required_tasks` has positive `valid_counts`, every task with positive
+`valid_counts` gets a real finite nonzero gradient, every task with zero
+`valid_counts` gets *exactly* zero gradient (the concrete "padded/masked
+positions contribute zero" check -- proves `masked_regression`'s
+`prediction.sum() * 0.0` fallback is still gradient-inert, not merely
+loss-value-inert), and no NaN/Inf anywhere. "No accidental broadcasting" is
+already enforced structurally by `masked_regression`'s own shape check.
+
+`required_tasks` is deliberately scoped per call rather than "every task
+`compute_multitask_loss` knows about" -- a structurally-disabled target
+like `future_concentration` (Phase 7.4: always all-masked) would make an
+unscoped version of this check impossible to ever pass on a real
+full-multitask batch.
+
+Generalizes the ad-hoc version of this same check already duplicated in
+`scripts/run_event_control_smoke_screening.py`'s `_gradient_check` and
+`scripts/run_architecture_smoke_jobs.py` -- existing scripts deliberately
+left untouched (same historical-preservation reasoning as 11.1's Stage
+2-4 scripts note above); this is the one place a new training entry point
+(Phase 12) should call instead of writing a fourth copy.
+
+**Real bug caught while testing, not by inspection**: an earlier draft
+called `result.total.backward()` before `task_gradient_norms`'s own
+per-task `torch.autograd.grad(retain_graph=True)` calls --
+`backward()` without `retain_graph=True` frees the graph, so the second
+task's gradient computation raised "Trying to backward through the graph a
+second time." Fixed by relying entirely on `task_gradient_norms`'s own
+graph-preserving calls (no separate `.backward()` needed for a preflight
+check that does not itself take an optimizer step). 5 new tests,
+`tests/unit/test_scale_safety.py`.
+
+### 11.2 -- class-imbalance reporting and train-owned class weights (DONE)
+
+New `hydroswarm.training.class_balance` module: `class_prevalence()`
+counts label occurrences (mask/`ignore_index`-aware, uniform over a
+scalar-per-example class index or a per-position array like
+`plan_validity`), `merge_prevalence()` combines shard-level counts, and
+`train_owned_class_weights()` derives deterministic, versioned
+(`CLASS_WEIGHT_POLICY_VERSION`), capped inverse-frequency weights from
+TRAIN-split prevalence only -- the same train-only-fitting discipline this
+project already applies to normalization/signature artifacts, never
+validation/calibration/development-holdout.
+
+`compute_multitask_loss` gained an optional `class_weights` argument
+(distinct from `task_weights`: reweights *within* one classification
+task's loss by class, not the task's overall contribution), threaded to
+`F.cross_entropy`'s own `weight=`. Applying it changes a task's loss value
+but never its `valid_counts` -- "evaluate unweighted real-distribution
+metrics separately" is therefore a property callers get for free by
+construction, confirmed by a dedicated test
+(`test_class_weights_change_the_loss_but_not_the_valid_count`).
+
+**Real report, run against real committed corpora** (not merely a
+demonstration of the mechanism): `scripts/report_class_prevalence.py`,
+output committed at `reports/results/v4/class-prevalence.json`:
+
+| task | corpus | split coverage |
+|---|---|---|
+| `event_cause` | `data/learning-v2/cycle-b2` | train/validation/calibration/development_holdout |
+| `next_step` | `data/learning-v2/cycle-b2-control-v2` | train/validation |
+| `plan_validity` | `data/learning-v2/cycle-b2-trajectories-v3/strategist-tensors-normalized` | train/validation |
+
+Real train-split prevalence: `event_cause` {NONE=6300, class1=1350,
+class2=450, class4=900} out of 9000 (class 3 never appears in ANY split --
+consistent with, and independent confirmation of, the already-documented
+Phase 6.4 `HYDRAULIC_MISMATCH`-removal / Phase 6.5 `AMBIGUOUS`-unsupported
+decisions); `next_step` {COLLECT_SAMPLE=3609, GENERATE_PLANS=4081,
+INSPECT_FAULTY_SENSOR=1310} out of 9000, zero `ABSTAIN` examples --
+independently matches `control-heads-training.json`'s already-reported
+"ABSTAIN n/a (0)" finding via a completely different code path (direct
+corpus counting here vs. a trained model's predictions there);
+`plan_validity` {valid=59522, invalid=21478} out of 81000 (9000
+examples x 9 candidate plans each). Train-owned weights derived from
+each of these (e.g. `event_cause` class 2's rarity -> weight 2.1x vs.
+class 0's 0.15x) are recorded in the same JSON, ready for a future Phase
+12 training run to opt into via `class_weights=` -- not applied to any
+training run in this pass (11.2's own text: "use... when justified"; no
+staged-training run exists yet to judge that against).
+
+**Deliberately not covered this pass**: `ood_class`'s real non-NONE
+prevalence (`data/learning-v2/cycle-b2-ood-extension`) -- that corpus's
+per-category shard directories (`ood-EXTREME_DEMAND` etc.) carry an
+internal split-consistency check in `ShardedScenarioDataset` that this
+script's straightforward "one conventional split name per corpus" loading
+pattern doesn't satisfy; real, scoped follow-up work, not silently
+skipped (flagged in the script's own module docstring). 12 new tests,
+`tests/unit/test_class_balance.py`.
+
+### Full suite, Ruff, Pyright
+
+`ruff check src/ scripts/ tests/` and `pyright src/` both clean
+(0 errors/warnings) after every commit in this pass, re-verified against
+the final HEAD. Full `pytest` suite: **697 passed, 0 failed** (533s), up
+from **661 passed** on the unmodified pre-Phase-11 code (a real baseline
+run captured at the start of this pass, before any edits, not merely
+quoted from the prior handoff). A second, targeted run of
+`tests/unit/`+`tests/scientific/`+the three v4/Scout/Strategist
+integration files independently reported 663 passed, 0 failed -- both
+runs agree (a full-suite run necessarily includes more files than the
+targeted subset, hence the different totals; neither reported a failure).
+
 ## Restrictions honored
 
 No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
@@ -1683,13 +1935,15 @@ first run -- was this same session's own untracked, never-committed
 scratch output). No sudo, no credential exposure. All commits pushed to
 `origin/agent/gcp-multitopology-v3`.
 
-## Next steps (current, as of the completed Phase 10 pass)
+## Next steps (current, as of the completed Phase 11 pass)
 
-**Phase 8, Phase 9 (core-issues4.txt Sections A-I), and Phase 10
-(core-issues4.txt Section I / core-issues3.txt Phase 10, all 5 items) are
-all fully DONE.** See "core-issues4.txt continuation pass, part 2" above
-for the Section H stop-gate checklist (all 16 items verified true) and the
-"Phase 10" section above for the full item-by-item detail. Summary:
+**Phase 8, Phase 9 (core-issues4.txt Sections A-I), Phase 10
+(core-issues4.txt Section I / core-issues3.txt Phase 10, all 5 items), and
+Phase 11 (all 5 items) are all fully DONE.** See "core-issues4.txt
+continuation pass, part 2" above for the Section H stop-gate checklist (all
+16 items verified true), the "Phase 10" section for its full item-by-item
+detail, and the "Phase 11" section immediately above this one for 11.1-11.5.
+Phase 10 summary (unchanged from the prior pass):
 
 1. Regenerate the final non-provisional trajectory corpus -- **DONE**, all
    4 splits, 13150/13150 real scenarios processed (400 coastal-branch
@@ -1733,8 +1987,17 @@ decision):
   `unsafe_non_abstention_count`/`INSPECT_FAULTY_SENSOR` recall enough to
   justify it -- not attempted this pass, see the honest-limitation note
   above.
-- Phases 11-20 (loss-system config, staged training/ablations, required
-  metrics, promotion gates, CI, artifact governance, architecture
+- **`class_weights` (Phase 11.2) exist but are not yet applied to any real
+  training run** -- 11.2's own text ("use... when justified") gates that on
+  a real evaluation showing it's warranted, which needs the Phase 12
+  staged-training run that hasn't started yet.
+- Phase 12 (staged training and ablations, Stage A-G) is the natural next
+  step: it is the first phase that actually consumes Phase 10's full-scale
+  Scout/Strategist/OOD-extension datasets and Phase 11's now-complete loss/
+  checkpoint infrastructure at real training scale (a genuine joint-
+  multitask run, not merely stride-sampled smoke batches).
+- Phases 13-20 (required metrics/baselines, promotion gates, runtime
+  integration, corpus gates, CI, artifact governance, architecture
   selection, locked-test boundary) not started.
 
 A recurring pattern worth carrying forward, extended again this pass:
