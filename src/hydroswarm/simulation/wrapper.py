@@ -8,7 +8,7 @@ import json
 import multiprocessing
 import queue
 import tempfile
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -176,9 +176,236 @@ class HydraulicEvaluation:
     cache_hit: bool = False
 
 
+@dataclass(frozen=True, slots=True)
+class WeightedSourceHypothesis:
+    """One bounded credible source hypothesis with its posterior
+    probability -- used for runtime plan-consequence evaluation when no
+    ground-truth source profile is available (important-issues.txt
+    requirement 7). Not presented as ground truth: `probability` reflects
+    calibrated localization evidence, never a certainty."""
+
+    profile: IncidentSourceProfile
+    probability: float
+
+    def __post_init__(self) -> None:
+        if not (0.0 < self.probability <= 1.0):
+            raise ValueError("hypothesis probability must be in (0, 1]")
+
+
+#: important-issues.txt requirement 7: "Prefer a maximum of 3 credible
+#: SourceHypothesis values."
+MAXIMUM_EVALUATION_HYPOTHESES = 3
+
+
+@dataclass(frozen=True, slots=True)
+class PlanEvaluationContext:
+    """Explicit incident-evaluation assumptions for exposure-aware plan
+    verification (important-issues.txt requirement 5) -- carried
+    alongside the plan rather than hidden inside evaluate_plan()'s own
+    defaults.
+
+    Exactly one of `source_profile` (training: the scenario's exact
+    ground-truth source, per requirement 6) or `hypotheses` (runtime: a
+    bounded credible set built from calibrated localization evidence, per
+    requirement 7) must be supplied.
+    """
+
+    contamination_threshold_mg_l: float
+    source_profile: IncidentSourceProfile | None = None
+    hypotheses: tuple[WeightedSourceHypothesis, ...] = ()
+    population_by_node: Mapping[str, float] | None = None
+    #: "posterior_weighted" (default; the expected-consequence headline
+    #: number) or "worst_case" (the conservative headline number) -- either
+    #: way, both are always computed and reported when hypotheses are used
+    #: (requirement 7: "report both"). Ignored in single-profile mode.
+    aggregation_policy: str = "posterior_weighted"
+    #: Bumped whenever calculate_exposure_consequences' formula changes.
+    consequence_policy_version: str = "exposure-consequences-v1"
+
+    def __post_init__(self) -> None:
+        if self.contamination_threshold_mg_l < 0:
+            raise ValueError("contamination threshold cannot be negative")
+        has_profile = self.source_profile is not None
+        has_hypotheses = bool(self.hypotheses)
+        if has_profile == has_hypotheses:
+            raise ValueError(
+                "PlanEvaluationContext requires exactly one of source_profile "
+                "(training/known ground truth) or hypotheses (runtime/bounded credible set)"
+            )
+        if len(self.hypotheses) > MAXIMUM_EVALUATION_HYPOTHESES:
+            raise ValueError(
+                f"bounded hypothesis evaluation supports at most {MAXIMUM_EVALUATION_HYPOTHESES} "
+                "credible source hypotheses"
+            )
+        if self.aggregation_policy not in ("posterior_weighted", "worst_case"):
+            raise ValueError(f"unknown aggregation_policy: {self.aggregation_policy!r}")
+
+    @property
+    def profiles(self) -> tuple[tuple[IncidentSourceProfile, float], ...]:
+        """Every (profile, probability) pair to evaluate; probability is
+        1.0 (a certainty) only in ground-truth single-profile mode."""
+
+        if self.source_profile is not None:
+            return ((self.source_profile, 1.0),)
+        return tuple((h.profile, h.probability) for h in self.hypotheses)
+
+    @property
+    def population_map_identity(self) -> str:
+        if not self.population_by_node:
+            return "none"
+        return _digest({str(k): float(v) for k, v in sorted(self.population_by_node.items())})
+
+    @property
+    def hypothesis_identity(self) -> dict[str, Any]:
+        """Deterministic identity payload for cache keys and provenance
+        (requirement 9: "source profile/hypothesis-set identity")."""
+
+        if self.source_profile is not None:
+            return {"mode": "single", "profile": self.source_profile.as_dict()}
+        return {
+            "mode": "hypotheses",
+            "hypotheses": [
+                {"profile": h.profile.as_dict(), "probability": h.probability} for h in self.hypotheses
+            ],
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class HypothesisConsequence:
+    """One evaluated hypothesis' exact plan-modified consequence."""
+
+    profile: IncidentSourceProfile
+    probability: float
+    consequences: ConsequenceMetrics
+    rejection_codes: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class PlanExposureEvaluation:
+    """Exposure-aware plan verification result (important-issues.txt
+    requirements 3/4/7): the canonical output of `evaluate_plan_consequences`.
+
+    `consequences` is the headline ConsequenceMetrics per
+    `evaluation_context.aggregation_policy` -- the exact result in
+    single-profile (training) mode, or the requested aggregate (posterior-
+    weighted expected or worst-case) across the bounded hypothesis set in
+    runtime mode. `worst_case_consequences` is always populated alongside
+    it in hypothesis mode (never presented as the only number, per
+    requirement 7's "report both"). `rejection_codes` is the safety-
+    conservative UNION of PRESSURE_BELOW_MINIMUM/SERVICE_BELOW_MINIMUM
+    across every evaluated hypothesis (requirement 4: hydraulic safety
+    authority must not be averaged away by a benign hypothesis).
+    """
+
+    consequences: ConsequenceMetrics
+    worst_case_consequences: ConsequenceMetrics | None
+    rejection_codes: tuple[str, ...]
+    state_hash: str
+    per_hypothesis: tuple[HypothesisConsequence, ...]
+    #: Real number of new EPANET simulations this evaluation call itself
+    #: consumed (0 when every underlying simulate_incident_plan call hit
+    #: cache) -- requirement 10: "must not silently count as one simulator
+    #: call."
+    exact_simulation_count: int
+    pump_energy_kwh: float | None = None
+    pump_cost: float | None = None
+    cache_hit: bool = False
+
+
 def _digest(payload: object) -> str:
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+#: Sentinel used only when weighting a "never contained within the
+#: simulation window" hypothesis (containment_time_minutes=None) against
+#: hypotheses that WERE contained, for the posterior-weighted headline
+#: aggregate -- not a claim about actual containment time. Matches
+#: hydroswarm.planning.plan_value_policy's own DEFAULT_CONTAINMENT_SCALE_
+#: MINUTES treatment of "not contained" as maximally-bad-but-bounded rather
+#: than unboundedly bad; kept as an independent local constant rather than
+#: importing planning/plan_value_policy here to avoid inverting this
+#: module's (simulation/) lower architectural layering under planning/.
+_UNCONTAINED_AGGREGATION_SENTINEL_MINUTES = 240.0
+
+
+def _aggregate_hypothesis_consequences(
+    items: Sequence["HypothesisConsequence"],
+    *,
+    operation_count: int,
+    mode: str,
+) -> ConsequenceMetrics:
+    """Combine per-hypothesis exact ConsequenceMetrics into one headline
+    metric (important-issues.txt requirement 7: "report both
+    posterior-weighted expected consequence and worst-case consequence").
+
+    mode="posterior_weighted": probability-weighted expectation, weights
+    renormalized over the evaluated hypotheses (a bounded credible set need
+    not itself sum to exactly 1). mode="worst_case": the maximally-adverse
+    value per field independently (minimum_pressure_m takes the minimum,
+    every other field takes the maximum) -- a conservative composite used
+    for safety authority, not necessarily any single hypothesis' own
+    outcome.
+    """
+
+    if not items:
+        raise ValueError("cannot aggregate zero hypothesis consequences")
+    if len(items) == 1:
+        return items[0].consequences.model_copy(update={"operation_count": operation_count})
+
+    if mode == "worst_case":
+        containment_values = [item.consequences.containment_time_minutes for item in items]
+        return ConsequenceMetrics(
+            population_impacted=max(item.consequences.population_impacted for item in items),
+            contaminant_mass_consumed_mg=max(item.consequences.contaminant_mass_consumed_mg for item in items),
+            volume_above_threshold_l=max(item.consequences.volume_above_threshold_l for item in items),
+            contaminated_pipe_extent_m=max(item.consequences.contaminated_pipe_extent_m for item in items),
+            minimum_pressure_m=min(item.consequences.minimum_pressure_m for item in items),
+            pressure_violation_minutes=max(item.consequences.pressure_violation_minutes for item in items),
+            unserved_demand_l=max(item.consequences.unserved_demand_l for item in items),
+            service_availability=min(item.consequences.service_availability for item in items),
+            operation_count=operation_count,
+            containment_time_minutes=(
+                None
+                if all(value is None for value in containment_values)
+                else max(
+                    value if value is not None else _UNCONTAINED_AGGREGATION_SENTINEL_MINUTES
+                    for value in containment_values
+                )
+            ),
+            exposure_evaluated=True,
+        )
+    if mode != "posterior_weighted":
+        raise ValueError(f"unknown aggregation mode: {mode!r}")
+
+    total_probability = sum(item.probability for item in items) or 1.0
+    weights = [item.probability / total_probability for item in items]
+
+    def _weighted(getter: Callable[[ConsequenceMetrics], float]) -> float:
+        return sum(w * getter(item.consequences) for w, item in zip(weights, items, strict=True))
+
+    containment_values = [item.consequences.containment_time_minutes for item in items]
+    containment_weighted = (
+        None
+        if all(value is None for value in containment_values)
+        else sum(
+            w * (value if value is not None else _UNCONTAINED_AGGREGATION_SENTINEL_MINUTES)
+            for w, value in zip(weights, containment_values, strict=True)
+        )
+    )
+    return ConsequenceMetrics(
+        population_impacted=_weighted(lambda c: c.population_impacted),
+        contaminant_mass_consumed_mg=_weighted(lambda c: c.contaminant_mass_consumed_mg),
+        volume_above_threshold_l=_weighted(lambda c: c.volume_above_threshold_l),
+        contaminated_pipe_extent_m=_weighted(lambda c: c.contaminated_pipe_extent_m),
+        minimum_pressure_m=_weighted(lambda c: c.minimum_pressure_m),
+        pressure_violation_minutes=_weighted(lambda c: c.pressure_violation_minutes),
+        unserved_demand_l=_weighted(lambda c: c.unserved_demand_l),
+        service_availability=_weighted(lambda c: c.service_availability),
+        operation_count=operation_count,
+        containment_time_minutes=containment_weighted,
+        exposure_evaluated=True,
+    )
 
 
 #: The hydraulic snapshot time (seconds into the simulation) that governed
@@ -491,6 +718,88 @@ class HydraulicSimulator:
         )
         return self.simulate_hypothesis(profile, include_diagnostics=False)
 
+    @staticmethod
+    def _inject_incident_sources(model: Any, profile: IncidentSourceProfile) -> None:
+        """Add the profile's mass-source patterns to `model` in place.
+
+        Shared by `simulate_hypothesis` (pristine network) and
+        `simulate_incident_plan` (plan-modified network) so both source-
+        injection paths stay byte-for-byte identical
+        (important-issues.txt requirement 2: "Refactor simulate_hypothesis()
+        and/or the new path to share the source-injection/EPANET
+        implementation rather than duplicating it").
+        """
+
+        model.options.quality.parameter = "CHEMICAL"
+        model.options.quality.inpfile_units = "mg/L"
+        timestep = int(model.options.time.pattern_timestep)
+        periods = max(1, int(model.options.time.duration // timestep) + 1)
+        for index, source in enumerate(profile.sources):
+            start = int(source.start_minute * 60 // timestep)
+            stop = max(
+                start + 1,
+                int((source.start_minute + source.duration_minutes) * 60 / timestep + 0.999),
+            )
+            pattern_name = f"hydroswarm_incident_pattern_{index}"
+            source_name = f"hydroswarm_incident_source_{index}"
+            model.add_pattern(
+                pattern_name,
+                [1.0 if start <= period < stop else 0.0 for period in range(periods)],
+            )
+            model.add_source(
+                source_name,
+                source.node_id,
+                "MASS",
+                float(source.strength_mg_min),
+                pattern_name,
+            )
+
+    def _build_incident_simulation(
+        self,
+        model: Any,
+        results: Any,
+        profile: IncidentSourceProfile,
+        *,
+        include_diagnostics: bool,
+        extra_state_payload: Mapping[str, Any] | None = None,
+    ) -> IncidentSimulation:
+        """Shared EPANET-result -> IncidentSimulation assembly for both
+        `simulate_hypothesis` and `simulate_incident_plan`."""
+
+        quality = results.node["quality"].copy()
+        demand = results.node["demand"].copy()
+        pressure = results.node["pressure"].copy()
+        water_age = self._quality_diagnostic("AGE") if include_diagnostics else None
+        tracer = (
+            self._quality_diagnostic("TRACE", trace_node=profile.source_node_id)
+            if include_diagnostics
+            else None
+        )
+        energy, cost = self._pump_energy(results, model)
+        state_payload: dict[str, Any] = {
+            "network": self._network_fingerprint(),
+            "profile": profile.as_dict(),
+            "quality": quality.round(9).to_dict(),
+        }
+        if extra_state_payload:
+            state_payload.update(extra_state_payload)
+        state_hash = _digest(state_payload)
+        return IncidentSimulation(
+            concentration_mg_l=quality,
+            source_node_id=profile.source_node_id,
+            state_hash=state_hash,
+            simulator="EpanetSimulator via WNTR",
+            simulator_version=self.simulator_version,
+            source_node_ids=tuple(source.node_id for source in profile.sources),
+            profile=profile,
+            demand_m3s=demand,
+            pressure_m=pressure,
+            water_age_hours=water_age,
+            tracer_percent=tracer,
+            pump_energy_kwh=energy,
+            pump_cost=cost,
+        )
+
     def simulate_hypothesis(
         self,
         profile: IncidentSourceProfile,
@@ -515,61 +824,64 @@ class HydraulicSimulator:
                 self.cache.invalidate(cache_key)
         self._consume_budget("hypothesis")
         model = copy.deepcopy(self.network)
-        model.options.quality.parameter = "CHEMICAL"
-        model.options.quality.inpfile_units = "mg/L"
-        timestep = int(model.options.time.pattern_timestep)
-        periods = max(1, int(model.options.time.duration // timestep) + 1)
-        for index, source in enumerate(profile.sources):
-            start = int(source.start_minute * 60 // timestep)
-            stop = max(
-                start + 1,
-                int((source.start_minute + source.duration_minutes) * 60 / timestep + 0.999),
-            )
-            pattern_name = f"hydroswarm_incident_pattern_{index}"
-            source_name = f"hydroswarm_incident_source_{index}"
-            model.add_pattern(
-                pattern_name,
-                [1.0 if start <= period < stop else 0.0 for period in range(periods)],
-            )
-            model.add_source(
-                source_name,
-                source.node_id,
-                "MASS",
-                float(source.strength_mg_min),
-                pattern_name,
-            )
+        self._inject_incident_sources(model, profile)
         results = self._run_epanet(model, "incident")
-        quality = results.node["quality"].copy()
-        demand = results.node["demand"].copy()
-        pressure = results.node["pressure"].copy()
-        water_age = self._quality_diagnostic("AGE") if include_diagnostics else None
-        tracer = (
-            self._quality_diagnostic("TRACE", trace_node=profile.source_node_id)
-            if include_diagnostics
-            else None
+        simulation = self._build_incident_simulation(
+            model, results, profile, include_diagnostics=include_diagnostics
         )
-        energy, cost = self._pump_energy(results, model)
-        state_hash = _digest(
-            {
-                "network": self._network_fingerprint(),
-                "profile": profile.as_dict(),
-                "quality": quality.round(9).to_dict(),
-            }
+        if self.cache:
+            self.cache.put(cache_key, self._incident_payload(simulation))
+        return simulation
+
+    def simulate_incident_plan(
+        self,
+        plan: OperationalPlan,
+        incident_profile: IncidentSourceProfile,
+        *,
+        include_diagnostics: bool = False,
+    ) -> IncidentSimulation:
+        """Canonical plan-aware incident simulation path
+        (important-issues.txt requirement 2).
+
+        Copies the exact scenario/runtime network state, applies the
+        `OperationalPlan`'s actions (pipe closures, flushing, etc.), injects
+        the incident source profile into that SAME modified network, then
+        runs ONE EPANET chemical-transport pass -- returning concentration,
+        pressure, demand, flow and energy together (requirement 8: never a
+        separate, unrelated hydraulic-only pass followed by an independent
+        chemical pass). Shares `_inject_incident_sources`/
+        `_build_incident_simulation` with `simulate_hypothesis` so the two
+        paths cannot silently diverge (requirement 2).
+        """
+
+        unknown = sorted(
+            {source.node_id for source in incident_profile.sources} - set(self.network.node_name_list)
         )
-        simulation = IncidentSimulation(
-            concentration_mg_l=quality,
-            source_node_id=profile.source_node_id,
-            state_hash=state_hash,
-            simulator="EpanetSimulator via WNTR",
-            simulator_version=self.simulator_version,
-            source_node_ids=tuple(source.node_id for source in profile.sources),
-            profile=profile,
-            demand_m3s=demand,
-            pressure_m=pressure,
-            water_age_hours=water_age,
-            tracer_percent=tracer,
-            pump_energy_kwh=energy,
-            pump_cost=cost,
+        if unknown:
+            raise ValueError(f"unknown incident source nodes: {', '.join(unknown)}")
+        plan_payload = plan.model_dump(mode="json", exclude={"created_at"})
+        cache_key = self._cache_key(
+            profile=incident_profile.as_dict(),
+            plan=plan_payload,
+            operation=f"incident-plan-diagnostics-{include_diagnostics}",
+        )
+        cached = self.cache.get(cache_key) if self.cache else None
+        if cached is not None:
+            try:
+                return self._incident_from_payload(cached, incident_profile, cache_hit=True)
+            except (KeyError, TypeError, ValueError, SimulationIncompleteError):
+                self.cache.invalidate(cache_key)
+        self._consume_budget("incident-plan")
+        model = self._prepared_network()
+        self._apply_actions(model, plan)
+        self._inject_incident_sources(model, incident_profile)
+        results = self._run_epanet(model, "incident-plan")
+        simulation = self._build_incident_simulation(
+            model,
+            results,
+            incident_profile,
+            include_diagnostics=include_diagnostics,
+            extra_state_payload={"plan": plan_payload},
         )
         if self.cache:
             self.cache.put(cache_key, self._incident_payload(simulation))
@@ -656,6 +968,7 @@ class HydraulicSimulator:
         threshold_mg_l: float,
         population_by_node: Mapping[str, float] | None = None,
         operation_count: int = 0,
+        requested_demand_m3s: pd.DataFrame | None = None,
     ) -> ConsequenceMetrics:
         if not simulation.complete or simulation.unstable:
             raise SimulationIncompleteError("cannot calculate consequences from incomplete results")
@@ -669,14 +982,47 @@ class HydraulicSimulator:
             )
             for name in self.network.pipe_name_list
         }
+        #: Reservoirs/tanks are boundary nodes, not real service points --
+        #: WNTR/EPANET report a reservoir's "pressure" as its fixed head
+        #: relative to elevation, which is frequently ~0 m by construction
+        #: and NOT a real low-pressure violation. evaluate_plan()'s legacy
+        #: hydraulic-only path has always filtered to junction_name_list
+        #: before computing minimum_pressure_m; evaluation/golden.py's
+        #: hand-merged exposure workaround independently discovered and
+        #: applied the same filter. Apply it here too, once, centrally, so
+        #: every canonical-evaluator caller (training labels, golden
+        #: fixture, live API) agrees -- found by this pass's own real
+        #: execution: an unfiltered reservoir pressure of ~0 m falsely
+        #: triggered PRESSURE_BELOW_MINIMUM for every plan, including
+        #: NO_ACTION, on the very first real run of this new code path.
+        junctions = [name for name in self.network.junction_name_list if name in simulation.pressure_m.columns]
+        concentration = simulation.concentration_mg_l[
+            [name for name in junctions if name in simulation.concentration_mg_l.columns]
+        ]
+        demand = simulation.demand_m3s[[name for name in junctions if name in simulation.demand_m3s.columns]]
+        pressure = simulation.pressure_m[junctions]
+        requested = (
+            requested_demand_m3s[[name for name in junctions if name in requested_demand_m3s.columns]]
+            if requested_demand_m3s is not None
+            else None
+        )
         return calculate_exposure_consequences(
-            simulation.concentration_mg_l,
-            simulation.demand_m3s,
+            concentration,
+            demand,
             threshold_mg_l=threshold_mg_l,
             population_by_node=population_by_node,
             pipe_endpoints=pipe_endpoints,
-            pressure_m=simulation.pressure_m,
+            pressure_m=pressure,
             minimum_pressure_m=self.minimum_pressure_m,
+            #: important-issues.txt requirement 3/8: pass the plan-free
+            #: baseline demand so service_availability/unserved_demand_l
+            #: reflect real delivery shortfall relative to what the network
+            #: would have demanded with NO plan applied, not relative to
+            #: the plan's own (possibly reduced) demand -- without this, a
+            #: plan that closes a pipe and thereby suppresses demand at the
+            #: nodes behind it would otherwise show no unserved-demand
+            #: penalty at all.
+            requested_demand_m3s=requested,
             operation_count=operation_count,
         )
 
@@ -743,22 +1089,32 @@ class HydraulicSimulator:
             cache_hit=cache_hit,
         )
 
-    def _cache_key(self, *, profile: Any, plan: Any, operation: str) -> str:
+    def _cache_key(
+        self,
+        *,
+        profile: Any,
+        plan: Any,
+        operation: str,
+        extra_config: Mapping[str, Any] | None = None,
+    ) -> str:
         if self.cache is None:
             return ""
+        config: dict[str, Any] = {
+            "operation": operation,
+            "minimum_pressure_m": self.minimum_pressure_m,
+            "minimum_service_availability": self.minimum_service_availability,
+            "pressure_required_m": self.pressure_required_m,
+            "energy_price_per_kwh": self.energy_price_per_kwh,
+        }
+        if extra_config:
+            config.update(extra_config)
         return self.cache.key(
             network=self._network_fingerprint(),
             state=self.state_hash(),
             profile=profile,
             plan=plan,
             simulator={"name": self.simulator_name, "version": self.simulator_version},
-            config={
-                "operation": operation,
-                "minimum_pressure_m": self.minimum_pressure_m,
-                "minimum_service_availability": self.minimum_service_availability,
-                "pressure_required_m": self.pressure_required_m,
-                "energy_price_per_kwh": self.energy_price_per_kwh,
-            },
+            config=config,
         )
 
     def _pump_energy(self, results: Any, model: Any) -> tuple[float | None, float | None]:
@@ -790,7 +1146,20 @@ class HydraulicSimulator:
         return energy_kwh, energy_kwh * self.energy_price_per_kwh
 
     def evaluate_plan(self, plan: OperationalPlan) -> HydraulicEvaluation:
-        """Apply a prescreened plan to a copy and evaluate exact hydraulic thresholds."""
+        """Apply a prescreened plan to a copy and evaluate exact hydraulic
+        thresholds ONLY.
+
+        Legacy hydraulic-only path (important-issues.txt requirement 12):
+        the returned ConsequenceMetrics has `exposure_evaluated=False` and
+        its contamination-exposure fields (`contaminant_mass_consumed_mg`,
+        `volume_above_threshold_l`, `population_impacted`,
+        `contaminated_pipe_extent_m`, `containment_time_minutes`) are
+        Pydantic defaults, NOT measured. Callers must not present them as
+        real exposure. Use `evaluate_plan_consequences` with an explicit
+        `PlanEvaluationContext` whenever incident evidence is available and
+        a real contamination-exposure consequence is required -- this
+        method remains only for plans with no associated incident/source
+        context at all (e.g. generic pre-incident network safety checks)."""
 
         plan_payload = plan.model_dump(mode="json", exclude={"created_at"})
         cache_key = self._cache_key(profile=None, plan=plan_payload, operation="plan-evaluation")
@@ -860,6 +1229,177 @@ class HydraulicSimulator:
                     "state_hash": evaluation.state_hash,
                     "pump_energy_kwh": energy,
                     "pump_cost": cost,
+                },
+            )
+        return evaluation
+
+    def _baseline_requested_demand(self) -> pd.DataFrame:
+        """No-plan, no-incident baseline demand -- cached independently of
+        plan/profile since it depends only on network state
+        (important-issues.txt requirement 8: "a separately cached
+        no-action/baseline demand state is acceptable")."""
+
+        cache_key = self._cache_key(profile=None, plan=None, operation="baseline-demand")
+        cached = self.cache.get(cache_key) if self.cache else None
+        if cached is not None:
+            frame = self._frame_from_payload(cached.get("demand"))
+            if frame is not None:
+                return frame
+            if self.cache:
+                self.cache.invalidate(cache_key)
+        self._consume_budget("baseline-demand")
+        results = self._run_hydraulics(self._prepared_network())
+        demand = results.node["demand"].copy()
+        if self.cache:
+            self.cache.put(cache_key, {"demand": self._frame_payload(demand)})
+        return demand
+
+    def evaluate_plan_consequences(
+        self,
+        plan: OperationalPlan,
+        evaluation_context: PlanEvaluationContext,
+    ) -> PlanExposureEvaluation:
+        """Canonical exposure-aware plan verification path
+        (important-issues.txt requirements 3/4/7/8/9/10).
+
+        For every hypothesis in `evaluation_context` (a single ground-truth
+        profile in training, or a bounded credible set at runtime), applies
+        the plan and injects that source into the SAME modified network via
+        `simulate_incident_plan`, then builds the complete ConsequenceMetrics
+        (contamination exposure AND hydraulic pressure/service, together,
+        from the SAME EPANET chemical-transport run -- never an independent
+        hydraulic-only pass followed by an unrelated chemical pass) via
+        `calculate_consequences`. PRESSURE_BELOW_MINIMUM/
+        SERVICE_BELOW_MINIMUM are derived per-hypothesis from exact
+        simulator results and UNIONED across hypotheses, so hydraulic
+        safety authority can never be averaged away by a benign hypothesis
+        (requirement 4).
+        """
+
+        profiles = evaluation_context.profiles
+        threshold = evaluation_context.contamination_threshold_mg_l
+        population = evaluation_context.population_by_node
+        operation_count = sum(action.action_type != ActionType.END_PLAN for action in plan.actions)
+        plan_payload = plan.model_dump(mode="json", exclude={"created_at"})
+
+        cache_key = self._cache_key(
+            profile=evaluation_context.hypothesis_identity,
+            plan=plan_payload,
+            operation="plan-exposure-evaluation",
+            extra_config={
+                "contamination_threshold_mg_l": threshold,
+                "population_map_identity": evaluation_context.population_map_identity,
+                "consequence_policy_version": evaluation_context.consequence_policy_version,
+                "aggregation_policy": evaluation_context.aggregation_policy,
+            },
+        )
+        cached = self.cache.get(cache_key) if self.cache else None
+        if cached is not None:
+            try:
+                return PlanExposureEvaluation(
+                    consequences=ConsequenceMetrics.model_validate(cached["consequences"]),
+                    worst_case_consequences=(
+                        ConsequenceMetrics.model_validate(cached["worst_case_consequences"])
+                        if cached.get("worst_case_consequences") is not None
+                        else None
+                    ),
+                    rejection_codes=tuple(cached["rejection_codes"]),
+                    state_hash=cached["state_hash"],
+                    per_hypothesis=(),
+                    exact_simulation_count=0,
+                    pump_energy_kwh=cached.get("pump_energy_kwh"),
+                    pump_cost=cached.get("pump_cost"),
+                    cache_hit=True,
+                )
+            except (KeyError, TypeError, ValueError):
+                self.cache.invalidate(cache_key)
+
+        baseline_demand = self._baseline_requested_demand()
+        runs_before = self.exact_runs
+        per_hypothesis: list[HypothesisConsequence] = []
+        energy_total = 0.0
+        cost_total = 0.0
+        energy_known = True
+        for profile, probability in profiles:
+            simulation = self.simulate_incident_plan(plan, profile, include_diagnostics=False)
+            metrics = self.calculate_consequences(
+                simulation,
+                threshold_mg_l=threshold,
+                population_by_node=population,
+                operation_count=operation_count,
+                requested_demand_m3s=baseline_demand,
+            )
+            codes: list[str] = []
+            if metrics.minimum_pressure_m < self.minimum_pressure_m:
+                codes.append("PRESSURE_BELOW_MINIMUM")
+            if metrics.service_availability < self.minimum_service_availability:
+                codes.append("SERVICE_BELOW_MINIMUM")
+            per_hypothesis.append(
+                HypothesisConsequence(
+                    profile=profile,
+                    probability=probability,
+                    consequences=metrics,
+                    rejection_codes=tuple(codes),
+                )
+            )
+            if simulation.pump_energy_kwh is None:
+                energy_known = False
+            else:
+                energy_total += simulation.pump_energy_kwh
+                cost_total += simulation.pump_cost or 0.0
+
+        #: requirement 10: the real number of NEW exact EPANET runs this one
+        #: verification consumed -- may exceed 1 for a multi-hypothesis
+        #: evaluation, and is 0 when every simulate_incident_plan call hit
+        #: cache. Never silently collapsed to "one simulator call."
+        exact_simulation_count = self.exact_runs - runs_before
+
+        rejection_codes = tuple(sorted({code for item in per_hypothesis for code in item.rejection_codes}))
+        aggregated = _aggregate_hypothesis_consequences(
+            per_hypothesis, operation_count=operation_count, mode="posterior_weighted"
+        )
+        worst_case = (
+            _aggregate_hypothesis_consequences(per_hypothesis, operation_count=operation_count, mode="worst_case")
+            if len(per_hypothesis) > 1
+            else None
+        )
+        consequences = (
+            worst_case
+            if evaluation_context.aggregation_policy == "worst_case" and worst_case is not None
+            else aggregated
+        )
+
+        state_hash = _digest(
+            {
+                "network": self._network_fingerprint(),
+                "plan": plan_payload,
+                "hypotheses": evaluation_context.hypothesis_identity,
+                "threshold": threshold,
+                "population_map_identity": evaluation_context.population_map_identity,
+            }
+        )
+        evaluation = PlanExposureEvaluation(
+            consequences=consequences,
+            worst_case_consequences=worst_case,
+            rejection_codes=rejection_codes,
+            state_hash=state_hash,
+            per_hypothesis=tuple(per_hypothesis),
+            exact_simulation_count=exact_simulation_count,
+            pump_energy_kwh=energy_total if energy_known else None,
+            pump_cost=cost_total if energy_known else None,
+        )
+        if self.cache:
+            self.cache.put(
+                cache_key,
+                {
+                    "consequences": consequences.model_dump(mode="json"),
+                    "worst_case_consequences": (
+                        worst_case.model_dump(mode="json") if worst_case is not None else None
+                    ),
+                    "rejection_codes": list(rejection_codes),
+                    "state_hash": state_hash,
+                    "pump_energy_kwh": evaluation.pump_energy_kwh,
+                    "pump_cost": evaluation.pump_cost,
                 },
             )
         return evaluation
@@ -974,6 +1514,7 @@ def calculate_consequences(
     threshold_mg_l: float,
     population_by_node: Mapping[str, float] | None = None,
     operation_count: int = 0,
+    requested_demand_m3s: pd.DataFrame | None = None,
 ) -> ConsequenceMetrics:
     """Public integration helper for exact simulation consequence calculation."""
 
@@ -982,4 +1523,5 @@ def calculate_consequences(
         threshold_mg_l=threshold_mg_l,
         population_by_node=population_by_node,
         operation_count=operation_count,
+        requested_demand_m3s=requested_demand_m3s,
     )

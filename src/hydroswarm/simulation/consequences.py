@@ -102,6 +102,7 @@ def calculate_exposure_consequences(
         service_availability=max(0.0, min(1.0, availability)),
         operation_count=operation_count,
         containment_time_minutes=containment_time,
+        exposure_evaluated=True,
     )
 
 

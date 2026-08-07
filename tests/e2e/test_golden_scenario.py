@@ -18,6 +18,13 @@ def test_golden_scenario_executes_complete_human_gated_workflow(tmp_path) -> Non
     assert result["plans"]["safe"]["verification"]["decision"] == "VERIFIED"
     assert result["consequences"]["no_response"]["contaminant_mass_consumed_mg"] > 0
     assert result["consequences"]["exposure_reduction_mg"] > 0
+    #: important-issues.txt requirement 11: golden/demo evaluation must use
+    #: the SAME canonical plan consequence evaluator as training/PlanVerifier/
+    #: the live /verify API -- confirmed by checking the evaluator's own
+    #: exposure_evaluated marker survives into the fixture's serialized
+    #: verification payloads, not a separately hand-merged workaround value.
+    assert result["plans"]["no_response"]["verification"]["consequences"]["exposure_evaluated"] is True
+    assert result["plans"]["safe"]["verification"]["consequences"]["exposure_evaluated"] is True
 
     assert result["workflow"]["sampling_pause_state"] == "SAMPLE_SELECTION"
     assert result["workflow"]["approval_pause_state"] == "HUMAN_APPROVAL"

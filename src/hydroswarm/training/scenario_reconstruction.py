@@ -31,12 +31,13 @@ from hydroswarm.data.scenarios import (
     CurriculumStage,
     EventType,
     GeneratedScenario,
+    IncidentTruth,
     ScenarioGenerationConfig,
     ScenarioManifest,
     WNTRScenarioGenerator,
     network_sha256,
 )
-from hydroswarm.simulation.wrapper import HydraulicSimulator
+from hydroswarm.simulation.wrapper import HydraulicSimulator, IncidentSourceProfile
 
 from .corpus import FeatureContext, _hydraulic_state_hash, build_feature_context
 
@@ -199,6 +200,32 @@ def _verify_replay(
     return True, hash_drifted
 
 
+def incident_truth_to_source_profile(
+    incident: IncidentTruth,
+    *,
+    is_contamination: bool,
+    base_strength_mg_min: float = 10.0,
+) -> IncidentSourceProfile:
+    """Canonical IncidentTruth -> IncidentSourceProfile conversion
+    (important-issues.txt requirement 6: "generate Strategist consequences
+    from the scenario's exact ground-truth IncidentTruth converted to
+    IncidentSourceProfile"). This is the exact mapping
+    `simulate_all_node_truth` below already used inline; factored out here
+    so a second implementation of this conversion cannot drift from it (the
+    recurring "hand-maintained value drifts from its source of truth"
+    defect class this codebase has hit repeatedly elsewhere)."""
+
+    injection_strength = (
+        incident.relative_strength if is_contamination else NEGLIGIBLE_STRENGTH_MG_MIN / base_strength_mg_min
+    )
+    return IncidentSourceProfile(
+        source_node_id=incident.source_nodes[0],
+        strength_mg_min=base_strength_mg_min * injection_strength,
+        start_minute=incident.start_minute,
+        duration_minutes=incident.duration_minutes,
+    )
+
+
 def simulate_all_node_truth(
     reconstruction: ReconstructedScenarioContext,
     *,
@@ -233,14 +260,14 @@ def simulate_all_node_truth(
     manifest = reconstruction.scenario.manifest
     incident = manifest.incident
     is_contamination = manifest.event_type == EventType.CONTAMINATION.value
-    injection_strength = (
-        incident.relative_strength if is_contamination else NEGLIGIBLE_STRENGTH_MG_MIN / base_strength_mg_min
+    profile = incident_truth_to_source_profile(
+        incident, is_contamination=is_contamination, base_strength_mg_min=base_strength_mg_min
     )
     simulator = HydraulicSimulator(reconstruction.network)
     simulation = simulator.simulate_incident(
-        incident.source_nodes[0],
-        strength_mg_min=base_strength_mg_min * injection_strength,
-        start_minute=incident.start_minute,
-        duration_minutes=incident.duration_minutes,
+        profile.source_node_id,
+        strength_mg_min=profile.strength_mg_min,
+        start_minute=profile.start_minute,
+        duration_minutes=profile.duration_minutes,
     )
     return simulation.concentration_mg_l

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import copy
 import hashlib
 import json
 import math
@@ -18,8 +17,13 @@ import numpy as np
 from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController, SwarmLimits
 from hydroswarm.domain import ActionType, IncidentState, OperationalAction, OperationalPlan, SensorObservation
 from hydroswarm.explanation import EvidenceBundle, ExplanationIntent, deterministic_operational_summary, explain
-from hydroswarm.simulation import HydraulicSimulator, IncidentSourceProfile, PlanVerifier, build_wntr_network
-from hydroswarm.simulation.consequences import calculate_exposure_consequences
+from hydroswarm.simulation import (
+    HydraulicSimulator,
+    IncidentSourceProfile,
+    PlanEvaluationContext,
+    PlanVerifier,
+    build_wntr_network,
+)
 from hydroswarm.storage import SimulationResultCache
 
 
@@ -216,42 +220,33 @@ class GoldenScenarioRunner:
         )
         no_response_plan = _plan("No response", (OperationalAction(action_type=ActionType.END_PLAN),))
         verifier = PlanVerifier(simulator)
+        #: important-issues.txt requirement 11: golden/demo evaluation calls
+        #: the SAME canonical plan consequence evaluator as training
+        #: Strategist label generation, PlanVerifier, and the live /verify
+        #: API -- no separate hand-merged calculate_exposure_consequences
+        #: workaround. The true source is known here (this is a fixture with
+        #: a fixed ground-truth incident), so this uses the single-profile
+        #: (training-equivalent) evaluation context, matching
+        #: important-issues.txt requirement 6's rule for known ground truth.
+        evaluation_context = PlanEvaluationContext(
+            contamination_threshold_mg_l=scenario["contamination_threshold_mg_l"],
+            source_profile=IncidentSourceProfile(source_node_id=TRUE_SOURCE, **profile_kwargs),
+        )
         verifications = {
-            "unsafe": verifier.verify(unsafe_plan).model_copy(update={"verified_at": TIMESTAMP}),
-            "safe": verifier.verify(safe_plan).model_copy(update={"verified_at": TIMESTAMP}),
-            "no_response": verifier.verify(no_response_plan).model_copy(update={"verified_at": TIMESTAMP}),
+            "unsafe": verifier.verify(unsafe_plan, evaluation_context).model_copy(
+                update={"verified_at": TIMESTAMP}
+            ),
+            "safe": verifier.verify(safe_plan, evaluation_context).model_copy(
+                update={"verified_at": TIMESTAMP}
+            ),
+            "no_response": verifier.verify(no_response_plan, evaluation_context).model_copy(
+                update={"verified_at": TIMESTAMP}
+            ),
         }
 
-        no_response = simulations[TRUE_SOURCE]
-        safe_network = copy.deepcopy(network)
-        safe_simulator = HydraulicSimulator(safe_network, cache=cache)
-        safe_simulator._apply_actions(safe_simulator.network, safe_plan)
-        safe_response = safe_simulator.simulate_hypothesis(
-            IncidentSourceProfile(source_node_id=TRUE_SOURCE, **profile_kwargs),
-            include_diagnostics=False,
-        )
-        junctions = list(network.junction_name_list)
-
-        def exposure(simulation, operations: int):
-            endpoints = {
-                name: (
-                    network.get_link(name).start_node_name,
-                    network.get_link(name).end_node_name,
-                    float(network.get_link(name).length),
-                )
-                for name in network.pipe_name_list
-            }
-            return calculate_exposure_consequences(
-                simulation.concentration_mg_l[junctions],
-                simulation.demand_m3s[junctions],
-                threshold_mg_l=scenario["contamination_threshold_mg_l"],
-                pipe_endpoints=endpoints,
-                pressure_m=simulation.pressure_m[junctions],
-                operation_count=operations,
-            )
-
-        no_response_metrics = exposure(no_response, 0)
-        safe_metrics = exposure(safe_response, 1)
+        no_response_metrics = verifications["no_response"].consequences
+        safe_metrics = verifications["safe"].consequences
+        assert no_response_metrics is not None and safe_metrics is not None
         exposure_reduction = (
             no_response_metrics.contaminant_mass_consumed_mg
             - safe_metrics.contaminant_mass_consumed_mg

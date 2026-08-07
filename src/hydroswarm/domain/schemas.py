@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -141,6 +141,15 @@ class ConsequenceMetrics(FrozenModel):
     service_availability: Probability = 1.0
     operation_count: int = Field(ge=0)
     containment_time_minutes: NonNegative | None = None
+    #: important-issues.txt requirement 12: False whenever the
+    #: contamination-exposure fields above (population_impacted,
+    #: contaminant_mass_consumed_mg, volume_above_threshold_l,
+    #: contaminated_pipe_extent_m, containment_time_minutes) are Pydantic
+    #: defaults rather than measured from a real chemical-transport
+    #: simulation -- e.g. the legacy hydraulic-only evaluate_plan() path
+    #: used when no incident evaluation context is available. Callers must
+    #: never present these fields as measured exposure when this is False.
+    exposure_evaluated: bool = False
 
 
 class PlanVerification(FrozenModel):
@@ -150,6 +159,21 @@ class PlanVerification(FrozenModel):
     simulator_version: str
     state_hash: str = Field(pattern=r"^[a-f0-9]{64}$")
     consequences: ConsequenceMetrics | None = None
+    #: important-issues.txt requirement 7: populated only when this plan was
+    #: evaluated against a bounded multi-hypothesis source set (runtime,
+    #: no ground truth). `consequences` above is the posterior-weighted
+    #: expected outcome in that case; this is the worst-case outcome across
+    #: the same evaluated hypotheses. None in single-profile (training) or
+    #: hydraulic-only (legacy) evaluation.
+    worst_case_consequences: ConsequenceMetrics | None = None
+    #: important-issues.txt requirements 5/9/10: explicit evaluation
+    #: assumptions and provenance -- aggregation policy, evaluated
+    #: hypotheses/profile identity, contamination threshold,
+    #: population-map identity, consequence-policy version, and the actual
+    #: number of exact EPANET simulations this one verification consumed
+    #: (which may exceed 1 for a multi-hypothesis evaluation and must not
+    #: be silently collapsed to "one simulator call").
+    evaluation_provenance: dict[str, Any] | None = None
     rejection_codes: tuple[str, ...] = ()
     abstention_reason: AbstentionReason | None = None
     verified_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

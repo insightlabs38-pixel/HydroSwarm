@@ -41,16 +41,25 @@ that canonical space is actually available.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Any, Literal, Mapping
 
-from hydroswarm.domain import ConsequenceMetrics, PlanDecision
+from hydroswarm.data.scenarios import IncidentTruth
+from hydroswarm.domain import ConsequenceMetrics, IncidentCreate, PlanDecision
 from hydroswarm.planning.action_templates import LINK_TARGET_TEMPLATES
 from hydroswarm.planning.plan_value_policy import evaluate_plan_value
 from hydroswarm.planning.response import PlanGenerationContext, generate_response_plans
 from hydroswarm.simulation.verifier import PlanVerifier
-from hydroswarm.simulation.wrapper import HydraulicSimulator
+from hydroswarm.simulation.wrapper import HydraulicSimulator, PlanEvaluationContext
+from hydroswarm.training.scenario_reconstruction import incident_truth_to_source_profile
 
 TargetType = Literal["NONE", "NODE", "LINK"]
+
+#: important-issues.txt requirement 6: training-label exposure evaluation
+#: needs a contamination threshold. Reuse the live API's own governed
+#: default (IncidentCreate.contamination_threshold_mg_l) rather than a
+#: second hand-copied literal, so training and the operator-facing default
+#: cannot silently drift apart.
+DEFAULT_CONTAMINATION_THRESHOLD_MG_L: float = IncidentCreate.model_fields["contamination_threshold_mg_l"].default
 
 
 @dataclass(frozen=True, slots=True)
@@ -100,6 +109,10 @@ def generate_strategist_labels(
     *,
     maximum_exact_simulations: int = 3,
     maximum_plans: int = 9,
+    incident_truth: IncidentTruth | None = None,
+    is_contamination: bool = True,
+    contamination_threshold_mg_l: float = DEFAULT_CONTAMINATION_THRESHOLD_MG_L,
+    population_by_node: Mapping[str, float] | None = None,
 ) -> tuple[StrategistLabel, ...]:
     """Generate and exactly verify the FULL bounded candidate set for one
     incident context (Phase 3.1), always including the no-response
@@ -115,6 +128,19 @@ def generate_strategist_labels(
     returns is exactly verified. Use response.prescreen_top_plans directly
     at runtime, where the expensive-simulation budget is a real operational
     constraint the training corpus does not need to reproduce.
+
+    important-issues.txt requirement 6: when `incident_truth` is supplied
+    (the scenario's own exact ground-truth incident, converted to an
+    `IncidentSourceProfile` via `incident_truth_to_source_profile` --
+    never an inferred/predicted source), every candidate is verified
+    through the canonical exposure-aware `PlanEvaluationContext` path, so
+    `consequences.exposure_evaluated` is real and `plan_value`/proxy
+    targets below carry genuine contamination-exposure signal instead of
+    being mechanically tied at a hydraulic-only 1.0 for every valid plan.
+    When omitted (e.g. a structural/validity-only caller with no incident
+    at all), verification falls back to the legacy hydraulic-only path and
+    `consequence_vector`/proxy targets reflect only pressure/service, not
+    exposure -- callers must not treat that case as exposure-aware.
     """
 
     del maximum_exact_simulations  # training-label generation verifies every proposal; see docstring
@@ -122,7 +148,17 @@ def generate_strategist_labels(
 
     simulator = HydraulicSimulator(network)
     verifier = PlanVerifier(simulator)
-    verifications = {proposal.template: verifier.verify(proposal.plan) for proposal in proposals}
+    evaluation_context: PlanEvaluationContext | None = None
+    if incident_truth is not None:
+        profile = incident_truth_to_source_profile(incident_truth, is_contamination=is_contamination)
+        evaluation_context = PlanEvaluationContext(
+            contamination_threshold_mg_l=contamination_threshold_mg_l,
+            source_profile=profile,
+            population_by_node=population_by_node,
+        )
+    verifications = {
+        proposal.template: verifier.verify(proposal.plan, evaluation_context) for proposal in proposals
+    }
 
     no_action_verification = verifications.get("NO_ACTION")
     no_action_metrics = (

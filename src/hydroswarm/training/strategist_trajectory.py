@@ -37,7 +37,7 @@ from uuid import NAMESPACE_URL, uuid5
 import torch
 
 from hydroswarm.classical.signatures import SignatureArtifact, localize_with_signatures
-from hydroswarm.data.scenarios import GeneratedScenario
+from hydroswarm.data.scenarios import EventType, GeneratedScenario
 from hydroswarm.domain import IncidentState
 from hydroswarm.inference.pipeline import HybridInferencePipeline
 from hydroswarm.planning.action_templates import ACTION_TEMPLATE_INDEX, ACTION_TEMPLATES
@@ -209,8 +209,19 @@ def build_strategist_trajectory(
     context = HybridInferencePipeline._planning_context(
         incident_id, network, feature_context.graph, probable_nodes, frozenset()
     )
+    #: important-issues.txt requirement 6: training-label exposure
+    #: evaluation must come from the scenario's own exact ground-truth
+    #: IncidentTruth, never from the classical localizer's inferred
+    #: `probable_nodes` above (those exist only to build the deterministic
+    #: plan-generation context -- which links/nodes are eligible action
+    #: targets -- not to supply the source used for exposure consequences).
     labels = generate_strategist_labels(
-        network, context, maximum_exact_simulations=maximum_exact_simulations, maximum_plans=maximum_plans
+        network,
+        context,
+        maximum_exact_simulations=maximum_exact_simulations,
+        maximum_plans=maximum_plans,
+        incident_truth=scenario.manifest.incident,
+        is_contamination=scenario.manifest.event_type == EventType.CONTAMINATION.value,
     )
     targets = tuple(_strategist_label_targets(label, node_ids, edge_ids, network) for label in labels)
 

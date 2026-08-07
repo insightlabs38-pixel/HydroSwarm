@@ -40,8 +40,14 @@ from hydroswarm.inference import MODEL_VERSION, IncidentAnalysisResult
 from hydroswarm.preprocessing import SensorSeries
 from hydroswarm.storage import AuditEvent
 from hydroswarm.networks import MAX_INP_BYTES, NetworkImportError, NetworkImporter
-from hydroswarm.simulation import HydraulicSimulator, PlanVerifier
-from hydroswarm.simulation.wrapper import wntr
+from hydroswarm.simulation import (
+    MAXIMUM_EVALUATION_HYPOTHESES,
+    HydraulicSimulator,
+    PlanEvaluationContext,
+    PlanVerifier,
+    WeightedSourceHypothesis,
+)
+from hydroswarm.simulation.wrapper import IncidentSourceProfile, wntr
 from hydroswarm.runtime import DefaultPipelineFactory
 
 from .state import (
@@ -604,6 +610,49 @@ def create_app(
         runtime().persist(record)
         return plans
 
+    def _runtime_evaluation_context(record: IncidentRuntime) -> PlanEvaluationContext | None:
+        """important-issues.txt requirement 7: at runtime there is no true
+        source profile. Build a bounded (<= MAXIMUM_EVALUATION_HYPOTHESES)
+        credible-hypothesis evaluation context from the incident's own
+        CALIBRATED localization evidence -- never an inferred point
+        estimate presented as ground truth, and never built at all when
+        calibration is not yet valid (requirement 12: abstain / mark
+        unavailable rather than fabricate a zero/None exposure value --
+        `PlanVerifier.verify` falls back to the hydraulic-only path, whose
+        `ConsequenceMetrics.exposure_evaluated=False`, whenever this
+        returns None).
+
+        Each hypothesis uses `IncidentSourceProfile`'s own governed default
+        timing/strength (start_minute=0, duration_minutes=60,
+        strength_mg_min=10.0 -- the same baseline profile shape
+        evaluation/golden.py's fixture uses) at the candidate node: this
+        codebase does not yet surface a validated per-node start-time/
+        duration/relative-strength prediction to the API layer
+        (core-issues4.txt's output-governance work has not promoted those
+        Sentinel heads into `runtime_enabled_outputs`), so only node
+        identity and its calibrated probability -- real, calibrated
+        evidence -- vary between hypotheses. Record and probability are
+        never presented as certain: `evaluation_provenance` on the
+        resulting `PlanVerification` carries every evaluated hypothesis and
+        the aggregation mode used.
+        """
+
+        candidates = record.state.candidates
+        if candidates is None or not candidates.calibrated or not candidates.node_probabilities:
+            return None
+        ranked = sorted(candidates.node_probabilities.items(), key=lambda item: (-item[1], item[0]))
+        hypotheses = tuple(
+            WeightedSourceHypothesis(profile=IncidentSourceProfile(source_node_id=node), probability=probability)
+            for node, probability in ranked[:MAXIMUM_EVALUATION_HYPOTHESES]
+            if probability > 0.0
+        )
+        if not hypotheses:
+            return None
+        return PlanEvaluationContext(
+            contamination_threshold_mg_l=record.create.contamination_threshold_mg_l,
+            hypotheses=hypotheses,
+        )
+
     @app.post(
         "/api/incidents/{incident_id}/plans/{plan_id}/verify",
         response_model=PlanVerification,
@@ -636,7 +685,13 @@ def create_app(
                 )
             simulator = HydraulicSimulator(network_path, exact_simulation_budget=remaining_budget)
             try:
-                verification = PlanVerifier(simulator).verify(plan)
+                # important-issues.txt requirement 12: return actual
+                # contamination consequences when sufficient calibrated
+                # incident evidence exists (_runtime_evaluation_context
+                # returns None, falling back to the hydraulic-only legacy
+                # path, otherwise).
+                evaluation_context = _runtime_evaluation_context(record)
+                verification = PlanVerifier(simulator).verify(plan, evaluation_context)
             finally:
                 exact_runs_consumed = simulator.exact_runs
         if verification.plan_id != plan_id:
@@ -745,6 +800,34 @@ def create_app(
         )
         consequence = verification.consequences if verification else None
         before_after = record.analysis.before_after if isinstance(record.analysis, IncidentAnalysisResult) else None
+        # important-issues.txt requirement 13: populate exposure_reduction_mg
+        # from the exact verified plan versus the exact NO_ACTION comparator
+        # -- structural NO_ACTION identity (a plan whose only action is
+        # END_PLAN), matching planning/response.py's own NO_ACTION template,
+        # not a name-string convention. Only populated when BOTH the
+        # selected plan's and NO_ACTION's consequences are
+        # exposure_evaluated=True (requirement 12: never present a
+        # hydraulic-only Pydantic default as a measured exposure reduction).
+        no_action_verification = next(
+            (
+                item
+                for plan_id, item in record.verifications.items()
+                if plan_id in record.plans
+                and all(action.action_type == ActionType.END_PLAN for action in record.plans[plan_id].actions)
+            ),
+            None,
+        )
+        no_action_consequence = no_action_verification.consequences if no_action_verification else None
+        exposure_reduction_mg = None
+        if (
+            consequence is not None
+            and consequence.exposure_evaluated
+            and no_action_consequence is not None
+            and no_action_consequence.exposure_evaluated
+        ):
+            exposure_reduction_mg = (
+                no_action_consequence.contaminant_mass_consumed_mg - consequence.contaminant_mass_consumed_mg
+            )
         return EvidenceBundle(
             source_node=leading,
             source_probability=analysis.fused_belief.get(leading) if leading else None,
@@ -761,7 +844,7 @@ def create_app(
             selected_plan=str(verification.plan_id) if verification else None,
             rejected_plan=str(rejected.plan_id) if rejected else None,
             rejection_codes=rejected.rejection_codes if rejected else (),
-            exposure_reduction_mg=None,
+            exposure_reduction_mg=exposure_reduction_mg,
             pressure_violation_minutes=consequence.pressure_violation_minutes if consequence else None,
             service_availability=consequence.service_availability if consequence else None,
             disagreement_js=analysis.disagreement_js,
