@@ -42,6 +42,8 @@ model's own evidence_sufficiency prediction.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
+import json
 from typing import Iterator
 
 import torch
@@ -79,6 +81,38 @@ DEFAULT_MAXIMUM_CANDIDATE_SET_SIZE = 3
 #: disagreement (there, triggering ControlAction.INSPECT_SENSORS).
 DEFAULT_DISAGREEMENT_THRESHOLD = 0.5
 
+#: core-issues4.txt Section F: a versioned identity for the exact second-
+#: pass control-label policy (which thresholds/weights produced a given
+#: row), so a persisted label row can be traced back to the policy that
+#: generated it the same way every other governed artifact in this repo
+#: is (ACTION_TEMPLATE_SCHEMA_HASH, PLAN_VALUE_POLICY_VERSION, etc.).
+SECOND_PASS_CONTROL_POLICY_VERSION = "second-pass-control-v1"
+
+
+def second_pass_control_policy_hash(
+    *,
+    fusion_neural_weight: float = SECOND_PASS_FUSION_NEURAL_WEIGHT,
+    maximum_candidate_set_size: int = DEFAULT_MAXIMUM_CANDIDATE_SET_SIZE,
+    disagreement_threshold: float = DEFAULT_DISAGREEMENT_THRESHOLD,
+    entropy_threshold_bits: float = DEFAULT_ENTROPY_THRESHOLD_BITS,
+    maximum_sampling_rounds: int = MAXIMUM_SAMPLING_ROUNDS,
+) -> str:
+    """Fingerprint over the actual policy VALUES (not just the version
+    string), so a future threshold change is a hash change even if nobody
+    remembers to bump SECOND_PASS_CONTROL_POLICY_VERSION by hand -- same
+    convention as hydroswarm.planning.action_templates.
+    ACTION_TEMPLATE_SCHEMA_HASH."""
+
+    payload = {
+        "policy_version": SECOND_PASS_CONTROL_POLICY_VERSION,
+        "fusion_neural_weight": fusion_neural_weight,
+        "maximum_candidate_set_size": maximum_candidate_set_size,
+        "disagreement_threshold": disagreement_threshold,
+        "entropy_threshold_bits": entropy_threshold_bits,
+        "maximum_sampling_rounds": maximum_sampling_rounds,
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
 
 @dataclass(frozen=True, slots=True)
 class SecondPassControlLabel:
@@ -93,6 +127,14 @@ class SecondPassControlLabel:
     evidence_sufficiency: bool
     next_step: NextStep
     teacher_checkpoint_hash: str
+    #: core-issues4.txt Section F: topology/network identity, needed so a
+    #: persisted row can be joined/audited without re-loading the source
+    #: scenario. Empty string when the example carries no TopologyMetadata
+    #: (never expected for a real corpus row, but kept a plain str rather
+    #: than str | None so downstream JSONL/tensor consumers don't need a
+    #: null-handling branch).
+    network_id: str
+    topology_hash: str
 
 
 def classify_evidence_sufficiency_second_pass(
@@ -222,6 +264,8 @@ def generate_second_pass_control_labels(
                     evidence_sufficiency=sufficiency,
                     next_step=step,
                     teacher_checkpoint_hash=teacher_checkpoint_hash,
+                    network_id=example.network_id,
+                    topology_hash=topology_hash,
                 )
 
 

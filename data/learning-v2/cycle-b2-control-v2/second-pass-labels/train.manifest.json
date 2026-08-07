@@ -1,0 +1,20 @@
+{
+  "calibration": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/calibration.json",
+  "calibration_hash": "b979c0f71002bd2d2dfcfd3cf1d7010a0d696158cfd9d4692cb1fe8f380a9d8b",
+  "checkpoint": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors",
+  "control_policy_hash": "7e414a1725f54aa501ce8e6b0bd610c1744160c23e737e33007f8630451e7695",
+  "control_policy_version": "second-pass-control-v1",
+  "corpus_root": "data/learning-v2/cycle-b2",
+  "jsonl_path": "data/learning-v2/cycle-b2-control-v2/second-pass-labels/train.jsonl",
+  "jsonl_sha256": "82f27c238ed8c99887ce48eaeacd5145c46dbcc34d05fa75ad8d4b4fb8f8f7a6",
+  "next_step_distribution": {
+    "COLLECT_SAMPLE": 3609,
+    "GENERATE_PLANS": 4081,
+    "INSPECT_FAULTY_SENSOR": 1310
+  },
+  "row_count": 9000,
+  "schema_version": 1,
+  "split": "train",
+  "teacher_checkpoint_hash": "ca31dd665908fd6e7c2797c22ffc708bfd436162ca0367dba3ddc670df5ad9de",
+  "tensors_dirname": "tensors-normalized"
+}
