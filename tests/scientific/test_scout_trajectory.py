@@ -281,7 +281,7 @@ def test_incremental_revelation_produces_a_genuinely_different_posterior_than_be
 
     from hydroswarm.training.scenario_reconstruction import simulate_all_node_truth
     from hydroswarm.training.scout_labels import generate_scout_label
-    from hydroswarm.training.scout_trajectory import _reveal_sample_measurement
+    from hydroswarm.training.scout_trajectory import reveal_sample_measurement
 
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
@@ -297,7 +297,7 @@ def test_incremental_revelation_produces_a_genuinely_different_posterior_than_be
     assert without_reveal.sample_node_id is not None
     assert without_reveal.posterior_entropy_bits > 0.0, "fixture must have real baseline ambiguity to resolve"
 
-    measurement = _reveal_sample_measurement(
+    measurement = reveal_sample_measurement(
         reconstruction, all_node_truth, without_reveal.sample_node_id, 0, noise_scale_mg_l=0.5
     )
     with_reveal = generate_scout_label(
@@ -308,22 +308,22 @@ def test_incremental_revelation_produces_a_genuinely_different_posterior_than_be
 
 def test_reveal_sample_measurement_is_deterministic_and_matches_true_value_within_noise(tmp_path) -> None:
     from hydroswarm.training.scenario_reconstruction import simulate_all_node_truth
-    from hydroswarm.training.scout_trajectory import _reveal_sample_measurement
+    from hydroswarm.training.scout_trajectory import reveal_sample_measurement
 
     network = build_wntr_network()
     reconstruction = _reconstruction_for(network, source_node="J2", seed=10)
     all_node_truth = simulate_all_node_truth(reconstruction)
     target_node = "J4"
 
-    first = _reveal_sample_measurement(reconstruction, all_node_truth, target_node, 0, noise_scale_mg_l=0.5)
-    second = _reveal_sample_measurement(reconstruction, all_node_truth, target_node, 0, noise_scale_mg_l=0.5)
+    first = reveal_sample_measurement(reconstruction, all_node_truth, target_node, 0, noise_scale_mg_l=0.5)
+    second = reveal_sample_measurement(reconstruction, all_node_truth, target_node, 0, noise_scale_mg_l=0.5)
     assert first == second
 
     # A different step_index must (with overwhelming probability) draw a
     # different noise realization -- proves the seed genuinely includes
     # step_index, not just node_id (Phase 5 item 5.2's "deterministic
     # measurement seed derived from scenario_id + step_index + node_id").
-    different_step = _reveal_sample_measurement(reconstruction, all_node_truth, target_node, 1, noise_scale_mg_l=0.5)
+    different_step = reveal_sample_measurement(reconstruction, all_node_truth, target_node, 1, noise_scale_mg_l=0.5)
     assert different_step != first
 
     true_value = float(

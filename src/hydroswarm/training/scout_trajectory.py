@@ -145,7 +145,7 @@ def _scout_step_diagnostics(label: ScoutLabel, already_sampled: Sequence[str]) -
     }
 
 
-def _reveal_sample_measurement(
+def reveal_sample_measurement(
     reconstruction: ReconstructedScenarioContext,
     all_node_truth: pd.DataFrame,
     node_id: str,
@@ -159,6 +159,15 @@ def _reveal_sample_measurement(
     build_scout_trajectory's ordering: this is called only after
     generate_scout_label returns, using its result, and only feeds the
     NEXT step's revealed_samples).
+
+    Public (not module-private) because a second real caller needs it:
+    core-issues3.txt Phase 12 Stage D's Scout-policy comparison runs its
+    own pluggable multi-step trajectory loop (this module's own
+    build_scout_trajectory always uses generate_scout_label's classical-
+    EIG choice for which node to reveal next, which Stage D needs to
+    override per policy) but still needs the exact same reveal semantics
+    -- reused here rather than duplicated so both trajectory loops stay
+    provably consistent about what a "revealed sample" means.
 
     Deterministic measurement seed = scenario_id + step_index + node_id
     (Phase 5 item 5.2), independent of any other RNG stream in this
@@ -328,7 +337,7 @@ def build_scout_trajectory(
             # Reveal happens strictly AFTER this step's own decision was
             # already made above -- the assertion at the top of the next
             # iteration checks this ordering held.
-            revealed_samples[label.sample_node_id] = _reveal_sample_measurement(
+            revealed_samples[label.sample_node_id] = reveal_sample_measurement(
                 reconstruction,
                 all_node_truth,
                 label.sample_node_id,
