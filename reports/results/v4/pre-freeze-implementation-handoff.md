@@ -24,7 +24,7 @@ remain untouched.
 | 7 | Auxiliary objectives / regression losses | **DONE** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
 | 8 | Second-pass calibrated control targets | **DONE** (all steps 1-9 complete, including step 6b -- corpus merge + real control-head training -- see "core-issues4.txt continuation pass, part 2" below) |
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
-| 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **10.1 IN PROGRESS (train split still generating), 10.2-10.5 DONE** -- see "Phase 10" section below |
+| 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **DONE (all of 10.1-10.5)** -- see "Phase 10" section below |
 | 11-20 | Loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
@@ -1419,23 +1419,18 @@ output_width` round-trips every new field through a real constructor call.
   it before the rest of the v4 contract exists would only create
   compatibility friction without the payoff Phase 9 is meant to deliver.
 
-## Phase 10 (core-issues4.txt Section I / core-issues3.txt Phase 10)
+## Phase 10 (core-issues4.txt Section I / core-issues3.txt Phase 10) -- ALL 5 ITEMS DONE
 
 Started immediately after Phase 9 completed, in the exact priority order
-Section I specifies. Five commits, all pushed to
+Section I specifies. Six commits, all pushed to
 `origin/agent/gcp-multitopology-v3`:
 
-1. `dc2741f` feat(training): build real Scout-state and Strategist-candidate datasets (Phase 10.2/10.3)
+1. `dc2741f` feat(training): build real Scout-state and Strategist-candidate datasets (Phase 10.2/10.3, `validation` split)
 2. `b140b0c` feat(data): generate balanced supported-category OOD extension corpus (Phase 10.4)
 3. `54ae4e9` test(v4): real multi-topology gradient smoke test for every retained output (Phase 10.5)
+4. `7f8a11f` feat(data): complete Phase 10.1 trajectory corpus regeneration (`train` split, plus re-running Phase 10.2/10.3 datasets against it)
 
-(Phase 10.1's trajectory-corpus-regeneration commits are still pending as
-of this handoff update -- the `train` split is still generating in the
-background; `validation`/`calibration`/`development_holdout` are complete
-and already committed as part of the Phase 10.2/10.3 commit above, since
-those datasets were built from them.)
-
-### Phase 10.1 -- regenerate the final non-provisional trajectory corpus (IN PROGRESS)
+### Phase 10.1 -- regenerate the final non-provisional trajectory corpus (DONE)
 
 `data/learning-v2/cycle-b2-trajectories-v2` (committed in the prior pass)
 was explicitly provisional: it predated Phase 6.4's `HYDRAULIC_MISMATCH`
@@ -1446,46 +1441,42 @@ and Phase 7.5's travel-time transform. Re-running
 already contains all of those fixes in the underlying label-generation
 code -- confirmed by inspection: `build_incident_trajectory` already
 threads `reconstruction` into `build_scout_trajectory`, Phase 5's
-incremental-revelation mechanism) produces a genuinely corrected corpus
+incremental-revelation mechanism) produced a genuinely corrected corpus
 with no additional code changes needed for the regeneration itself.
 
 Launched as 4 independent resumable background jobs (`hydroswarm.training.
 job_runner`, `experiments/jobs/cycle-b2-trajectories-v3-{split}`), polled
-at the requested 10-minute interval:
+at the requested 10-minute interval. **All 4 splits now complete and
+committed, 0 errors throughout**:
 
-| split | status | scenarios | errors |
-|---|---|---:|---:|
-| validation | **COMPLETE**, committed | 1000/1000 | 0 |
-| calibration | **COMPLETE**, committed | 1000/1000 | 0 |
-| development_holdout | **COMPLETE**, committed | 2150/2150 (400 coastal-branch skipped, unsupported topology -- same documented behavior as the prior pass) | 0 |
-| train | **RUNNING** as of this update | ~2800+/9000 (~0.68 scenarios/s, ETA roughly 2-2.5h more from this update's timestamp) | 0 so far |
+| split | scenarios | errors | wall time |
+|---|---:|---:|---:|
+| validation | 1000/1000 | 0 | ~19 min |
+| calibration | 1000/1000 | 0 | ~19 min |
+| development_holdout | 2150/2150 (400 coastal-branch skipped, unsupported topology -- same documented behavior as the prior pass) | 0 | ~44 min |
+| train | 9000/9000 | 0 | ~3h16m |
 
-Exact resume command (idempotent -- skips already-processed scenario_ids,
-confirmed by `hydroswarm.training.job_runner`'s own PID-liveness-over-
-`status.json` convention, same caveat as the prior pass: `status.json`'s
-`state` field is only updated by an explicit `mark_finished()` call, so
-check `kill -0 <pid>` for ground truth while a job is actually running):
+`train.jsonl` (126 MB) needed the same >100MB Git LFS filename exception
+`cycle-b2-trajectories-v2/train.jsonl` already established (added by exact
+filename, not a directory-wide glob, matching that precedent exactly).
+
+`cycle-b2-trajectories-v3` fully supersedes the provisional `-v2` corpus
+as the governed trajectory corpus going forward. `-v2` is left untouched
+(not deleted), consistent with this project's "preserve for audit" policy.
+
+Reproduce (idempotent -- skips already-processed scenario_ids):
 
 ```bash
 export PYTHONPATH=src
-python scripts/generate_trajectory_corpus.py \
-  --corpus-dir data/learning-v2/cycle-b2 \
-  --output data/learning-v2/cycle-b2-trajectories-v3 \
-  --split train
-# Check status:
-cat experiments/jobs/cycle-b2-trajectories-v3-train/status.json
-tail -f experiments/jobs/cycle-b2-trajectories-v3-train/job.log
+for split in validation calibration development_holdout train; do
+  python scripts/generate_trajectory_corpus.py \
+    --corpus-dir data/learning-v2/cycle-b2 \
+    --output data/learning-v2/cycle-b2-trajectories-v3 \
+    --split "$split"
+done
 ```
 
-**Once `train` finishes**: commit `train.jsonl`/`train-report.json` (likely
-needs a Git LFS exception by exact filename, matching
-`cycle-b2-trajectories-v2/train.jsonl`'s own >100MB precedent -- check size
-first), then re-run `scripts/build_scout_state_dataset.py` and
-`scripts/build_strategist_candidate_dataset.py` against the `train` split
-(exact commands in their own sections below), producing the full-scale
-Scout/Strategist training corpora this pass only built for `validation`.
-
-### Phase 10.2 -- sharded Scout-state datasets and collators (DONE for `validation`)
+### Phase 10.2 -- sharded Scout-state datasets and collators (DONE, full `train`+`validation` scale)
 
 `scripts/build_scout_state_dataset.py`: merges each trajectory's Scout
 step 0 (the initial, unconditioned decision) onto `cycle-b2`'s base
@@ -1525,18 +1516,27 @@ real nonzero gradient. `tests/integration/test_scout_state_dataset.py`
 (self-contained, hand-built fixtures, does not depend on the background
 job's output).
 
-Resume command (once `train` finishes, per Phase 10.1 above):
+**Re-run against the completed `train` split** once Phase 10.1 finished:
+9000/9000 matched, 0 masked-placeholder fallbacks. A real forward+backward
+smoke pass across a stride-sampled, all-3-topology subset of the full
+train-scale dataset confirmed it remains finite and trainable at full
+scale (`data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/
+{train,validation}`, both committed).
+
+Reproduce:
 
 ```bash
 export PYTHONPATH=src
-python scripts/build_scout_state_dataset.py \
-  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/train \
-  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/train.jsonl \
-  --output data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/train \
-  --split train
+for split in train validation; do
+  python scripts/build_scout_state_dataset.py \
+    --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/"$split" \
+    --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/"$split".jsonl \
+    --output data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/"$split" \
+    --split "$split"
+done
 ```
 
-### Phase 10.3 -- sharded Strategist-candidate datasets and collators (DONE for `validation`)
+### Phase 10.3 -- sharded Strategist-candidate datasets and collators (DONE, full `train`+`validation` scale)
 
 `scripts/build_strategist_candidate_dataset.py`: `build_strategist_trajectory`
 is single-step by design (no Scout-style multi-step ambiguity), so every
@@ -1579,15 +1579,24 @@ history** (previously "architecture + tests; not yet wired to real
 training data" per the prior handoff). `tests/integration/
 test_strategist_candidate_dataset.py` (self-contained fixtures).
 
-Resume command (once `train` finishes):
+**Re-run against the completed `train` split** once Phase 10.1 finished:
+9000/9000 matched, canonical 9 candidates/example throughout. A real
+forward+backward smoke pass across a stride-sampled, all-3-topology subset
+confirmed the full train-scale dataset remains finite and trainable
+(`data/learning-v2/cycle-b2-trajectories-v3/strategist-tensors-normalized/
+{train,validation}`, both committed).
+
+Reproduce:
 
 ```bash
 export PYTHONPATH=src
-python scripts/build_strategist_candidate_dataset.py \
-  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/train \
-  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/train.jsonl \
-  --output data/learning-v2/cycle-b2-trajectories-v3/strategist-tensors-normalized/train \
-  --split train
+for split in train validation; do
+  python scripts/build_strategist_candidate_dataset.py \
+    --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/"$split" \
+    --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/"$split".jsonl \
+    --output data/learning-v2/cycle-b2-trajectories-v3/strategist-tensors-normalized/"$split" \
+    --split "$split"
+done
 ```
 
 ### Phase 10.4 -- balanced supported-category OOD extension corpus (DONE)
@@ -1674,29 +1683,25 @@ first run -- was this same session's own untracked, never-committed
 scratch output). No sudo, no credential exposure. All commits pushed to
 `origin/agent/gcp-multitopology-v3`.
 
-## Next steps (current, as of the Phase 10 pass)
+## Next steps (current, as of the completed Phase 10 pass)
 
-**Phase 9 (core-issues4.txt Sections A-I) and Phase 8 are fully DONE** --
-see "core-issues4.txt continuation pass, part 2" above for the Section H
-stop-gate checklist, all 16 items verified true. **Phase 10 (core-issues4.txt
-Section I / core-issues3.txt Phase 10) is DONE for items 2-5; item 1 is
-in progress**:
+**Phase 8, Phase 9 (core-issues4.txt Sections A-I), and Phase 10
+(core-issues4.txt Section I / core-issues3.txt Phase 10, all 5 items) are
+all fully DONE.** See "core-issues4.txt continuation pass, part 2" above
+for the Section H stop-gate checklist (all 16 items verified true) and the
+"Phase 10" section above for the full item-by-item detail. Summary:
 
-1. Regenerate the final non-provisional trajectory corpus -- **IN
-   PROGRESS**: `validation`/`calibration`/`development_holdout` complete
-   and committed (0 errors each); `train` still generating in the
-   background as of this update (~2800+/9000, ETA ~2-2.5h from this
-   update's timestamp). Exact resume/status commands in the Phase 10.1
-   section above.
-2. Build sharded Scout-state datasets and collators -- **DONE for
-   `validation`** (real end-to-end gradient proof); re-run against `train`
-   once item 1 finishes (exact command in the Phase 10.2 section above).
-   Found and fixed a real 3-instance-deep "hand-maintained list drifts
-   from its source of truth" defect in `variable_collate.py`/`permutation.py`.
-3. Build sharded Strategist-candidate datasets and collators -- **DONE for
-   `validation`** (real end-to-end gradient proof, the candidate-conditioned
-   architecture's first real training data in this project's history);
-   re-run against `train` once item 1 finishes.
+1. Regenerate the final non-provisional trajectory corpus -- **DONE**, all
+   4 splits, 13150/13150 real scenarios processed (400 coastal-branch
+   correctly skipped as unsupported topology), 0 errors throughout.
+2. Build sharded Scout-state datasets and collators -- **DONE**, full
+   `train`+`validation` scale, real end-to-end gradient proof. Found and
+   fixed a real 3-instance-deep "hand-maintained list drifts from its
+   source of truth" defect in `variable_collate.py`/`permutation.py`.
+3. Build sharded Strategist-candidate datasets and collators -- **DONE**,
+   full `train`+`validation` scale, real end-to-end gradient proof -- the
+   candidate-conditioned architecture's first real training data in this
+   project's history.
 4. Generate the balanced supported-category OOD extension -- **DONE**,
    full scale (1600 real, individually-verified scenarios across the 4
    remaining reproducible categories). Found and fixed two real defects
@@ -1710,14 +1715,16 @@ in progress**:
    multi-topology data.
 
 Still open, correctly sequenced after Phase 10 (no promoted v4 checkpoint
-exists yet to wire a runtime path to, and Phase 10.1's `train` split feeds
-directly into any future architecture-selection decision):
+exists yet to wire a runtime path to, and Phase 10's full-scale Scout/
+Strategist datasets feed directly into any future architecture-selection
+decision):
 
-- **Once `train` finishes**: commit it, re-run Scout/Strategist dataset
-  building against it, and consider whether a full joint-multitask
-  training run (Phase 9 of core-issues2.txt's own staged-training plan) is
-  now warranted -- explicitly NOT started this pass; this remains a real,
-  substantial next step, not a formality.
+- **A full joint-multitask training run** (core-issues2.txt Phase 9's own
+  staged-training plan) using the now-complete, full-scale Scout/
+  Strategist/OOD-extension datasets -- explicitly NOT started this pass;
+  this remains a real, substantial next step, not a formality. The
+  datasets exist and are proven trainable; nothing has actually been
+  trained on them at scale yet (only stride-sampled smoke batches).
 - **Wire `output_governance`/checkpoint-identity into a live v4 runtime
   path**: `runtime/defaults.py`/`inference/pipeline.py` still only
   understand the v3 `trained_tasks` role-level gating.
