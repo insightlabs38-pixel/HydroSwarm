@@ -1,0 +1,113 @@
+{
+  "failure": null,
+  "result": {
+    "scenarios_evaluated": 300,
+    "scenarios_requested": 300,
+    "skipped_no_matching_example": 0,
+    "skipped_reconstruction_error": 0,
+    "step0_comparison": {
+      "policies": {
+        "classical_eig": {
+          "agreement_with_classical_eig_rate": 1.0,
+          "mean_entropy_reduction_bits": -0.2096245647753191,
+          "no_recommendation_count": 0,
+          "recommendation_count": 300
+        },
+        "classical_plus_residual": {
+          "agreement_with_classical_eig_rate": 0.83,
+          "mean_entropy_reduction_bits": -0.2422398331436272,
+          "no_recommendation_count": 0,
+          "recommendation_count": 300
+        },
+        "fixed_order": {
+          "agreement_with_classical_eig_rate": 0.12333333333333334,
+          "mean_entropy_reduction_bits": 0.014700131907434431,
+          "no_recommendation_count": 0,
+          "recommendation_count": 300
+        },
+        "learned_scout": {
+          "agreement_with_classical_eig_rate": 0.5666666666666667,
+          "mean_entropy_reduction_bits": -0.21852563335540642,
+          "no_recommendation_count": 0,
+          "recommendation_count": 300
+        },
+        "random": {
+          "agreement_with_classical_eig_rate": 0.18,
+          "mean_entropy_reduction_bits": 0.007194550400467179,
+          "no_recommendation_count": 0,
+          "recommendation_count": 300
+        }
+      },
+      "scenarios": 300
+    },
+    "trajectory_comparison": {
+      "exclusion_reason": "no already_sampled/revealed-evidence conditioning in HydroCore's Scout input (core-issues3.txt Phase 10.2's documented scoping decision) -- see module docstring",
+      "maximum_samples": 3,
+      "policies": {
+        "classical_eig": {
+          "mean_candidate_set_size_by_step": {
+            "0": 3.296666666666667,
+            "1": 3.77,
+            "2": 4.01,
+            "3": 4.13
+          },
+          "median_samples_to_resolution": 0.0,
+          "never_resolved_count": 91,
+          "resolved_within_k_samples": {
+            "1": 0.6366666666666667,
+            "2": 0.6833333333333333,
+            "3": 0.6966666666666667
+          },
+          "trajectories": 300
+        },
+        "fixed_order": {
+          "mean_candidate_set_size_by_step": {
+            "0": 3.296666666666667,
+            "1": 3.28,
+            "2": 3.4,
+            "3": 3.3966666666666665
+          },
+          "median_samples_to_resolution": 0.0,
+          "never_resolved_count": 117,
+          "resolved_within_k_samples": {
+            "1": 0.58,
+            "2": 0.6033333333333334,
+            "3": 0.61
+          },
+          "trajectories": 300
+        },
+        "random": {
+          "mean_candidate_set_size_by_step": {
+            "0": 3.296666666666667,
+            "1": 3.3033333333333332,
+            "2": 3.3333333333333335,
+            "3": 3.4766666666666666
+          },
+          "median_samples_to_resolution": 0.0,
+          "never_resolved_count": 117,
+          "resolved_within_k_samples": {
+            "1": 0.58,
+            "2": 0.5933333333333334,
+            "3": 0.61
+          },
+          "trajectories": 300
+        }
+      },
+      "policies_evaluated": [
+        "random",
+        "fixed_order",
+        "classical_eig"
+      ],
+      "policies_excluded": [
+        "learned_scout",
+        "classical_plus_residual"
+      ]
+    },
+    "wall_seconds": 217.86385451999377
+  },
+  "schema_version": 1,
+  "scout_checkpoint": "experiments/runs/v4-scout-heads/20260807T164149Z-adf93d12/checkpoints/checkpoint-0010/model.safetensors",
+  "seed": 20260807,
+  "stage": "core-issues3.txt Phase 12 Stage D: Scout-policy comparison",
+  "wall_seconds": 217.91880424600095
+}
