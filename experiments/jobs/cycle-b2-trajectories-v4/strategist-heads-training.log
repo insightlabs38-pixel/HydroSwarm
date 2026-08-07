@@ -1,0 +1,20 @@
+OK (669.8s); metrics: {
+  "examples_evaluated": 1000,
+  "plan_validity_accuracy": 0.9958888888888889,
+  "plan_validity_precision": 0.9944494449444945,
+  "plan_validity_recall": 1.0,
+  "plan_validity_f1": 0.9972169988717563,
+  "plan_validity_valid_count": 9000,
+  "plan_value_mse": 0.005367005284078198,
+  "plan_value_valid_count": 6629,
+  "exposure_proxy_mse": 0.1080663971078038,
+  "exposure_proxy_valid_count": 6629,
+  "pressure_risk_proxy_mse": 1.496814225691735e-05,
+  "pressure_risk_proxy_valid_count": 6629,
+  "service_loss_proxy_mse": 1.4638457463657758e-05,
+  "service_loss_proxy_valid_count": 6629,
+  "containment_time_proxy_mse": 0.08085687983393904,
+  "containment_time_proxy_valid_count": 6629,
+  "plan_regret_proxy_mse": 0.014998469444974944,
+  "plan_regret_proxy_valid_count": 6629
+}

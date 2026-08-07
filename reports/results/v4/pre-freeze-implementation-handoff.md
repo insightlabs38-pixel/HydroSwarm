@@ -26,7 +26,7 @@ remain untouched.
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
 | 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **DONE (all of 10.1-10.5)** -- see "Phase 10" section below |
 | 11 | Loss system and training configuration | **DONE (11.1-11.5)** -- see "Phase 11" section below |
-| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started; **Stage F/12+ blocked** on `important-issues.txt`'s emergency exposure-blind-verification fix (see dedicated section below) — code fix **DONE**, corpus regeneration **IN PROGRESS** |
+| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started; `important-issues.txt`'s emergency exposure-blind-verification fix that was blocking Stage F is now **fully resolved** (code fix, corpus regen, gates, retrain, and Stage E rerun all DONE — see dedicated section below); Stage F itself not yet started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
 **complete and committed** — all 4 splits finished with 0 errors (see its
@@ -3038,3 +3038,132 @@ python scripts/run_stage_e_strategist_comparison.py \
 
 This report will be updated again once the regeneration completes and
 steps 1-4 above have actually been run (not merely planned).
+
+### UPDATE — regeneration, retrain, and Stage E rerun all completed for real
+
+All four background jobs above ran to completion (commit `9a0c364`, pushed):
+`data/learning-v2/cycle-b2-trajectories-v4` — **13,150/13,150 scenarios, 0
+errors** across all 4 splits (`train` 9000, `validation` 1000, `calibration`
+1000, `development_holdout` 2150 real + 400 `coastal-branch` correctly
+skipped as unsupported topology, matching v3's own known count exactly).
+`data/learning-v2/cycle-b2-trajectories-v3` left completely untouched.
+
+**Structural gates (requirement 15) — 5/5 PASS at full scale**
+(`reports/results/v4/strategist-corpus-gates-v4.json`), across all 13,150
+scenarios together:
+
+```
+scenarios_with_cost_variation: 4726 / 13150   (was 0 in v3)
+plan_value_variance:            0.0057        (was 2.79e-25 in v3)
+exposure_variance:               1.24e15       (was exactly 0.0 in v3)
+no_action_always_identical:     False
+any_valid_plan_beats_no_action: True
+```
+
+**Strategist heads retrained from the clean Stage-A Sentinel/v4 foundation**
+(requirement 16 — `scripts/train_strategist_heads.py`, unchanged code, just
+pointed at the v4 corpus): checkpoint
+`experiments/runs/v4-strategist-heads-v4corpus/20260807T212734Z-8be491eb/checkpoints/checkpoint-0010`
+(10 epochs, 669.8s, teacher =
+`experiments/runs/v4-stage-a-sentinel/E1-seed20260810/.../checkpoint-0016`).
+`load_report` confirms `CandidatePlanEncoder` and all 5
+`consequence_proxy_heads` were genuinely **missing** from the teacher
+checkpoint (freshly initialized, not resumed from Stage E's degenerate-value
+checkpoint) and `action_head.*` was correctly **dropped**, never loaded.
+Real validation metrics
+(`reports/results/v4/strategist-heads-training-v4corpus.json`), 1000
+scenarios:
+
+| metric | v3 (degenerate) | v4 (corrected) |
+|---|---|---|
+| `plan_validity_f1` | 0.997 | 0.997 (unchanged — this was always real signal) |
+| `plan_value_mse` | ~3e-6 (trivial: constant target) | **0.00537** (real target variance) |
+| `exposure_proxy_mse` | ~3e-6 (trivial) | **0.108** |
+| `containment_time_proxy_mse` | ~3e-5 (trivial) | **0.0809** |
+| `plan_regret_proxy_mse` | ~3e-6 (trivial) | **0.0150** |
+
+**Stage E rerun** (requirement 17 —
+`reports/results/v4/stage-e-strategist-comparison-v4corpus.json`, 1000
+validation scenarios, 4.5s):
+
+| policy | mean simulator calls | selected-valid rate | found non-NO_ACTION rate | mean regret vs. oracle | matched oracle-best rate |
+|---|---|---|---|---|---|
+| `exact_all` (oracle) | 9.0 | 1.000 | 0.275 | 0.0 (reference) | 1.000 |
+| `deterministic_heuristic` | 3.0 | 1.000 | 0.996 | **0.00596** | 0.966 |
+| `learned_prescreen` | 3.0 | 1.000 | 0.914 | **0.00697** | 0.829 |
+| `learned_ordering` | 1.0 | 1.000 | 0.926 | **0.01266** | 0.785 |
+
+**This is now a real, meaningful comparison, unlike Stage E's original
+pass**: `mean_regret_vs_oracle` is nonzero and genuinely discriminates
+policy quality (was mechanically `0.0` for every policy under the old
+degenerate corpus — a metric with zero discriminating power). `exact_all`'s
+`found_non_no_action_plan_rate` is now a real number (0.275 — the oracle
+genuinely prefers `NO_ACTION` roughly 72.5% of the time once plan_value
+carries real signal, not the old tie-break artifact that mechanically
+produced exactly `0.000`). Every policy still achieves `selected_valid_rate
+== 1.000` (hydraulic/service safety is never compromised by ranking
+quality). `learned_ordering` remains the cheapest (1 simulator call vs. 3
+for the other learned/heuristic policies) but now visibly trades off real
+quality for that cost reduction (0.785 matched-oracle-best rate vs. 0.966
+for the deterministic heuristic) — a genuine, now-measurable efficiency/
+quality tradeoff, exactly what Phase 12 Stage E originally set out to
+compare and previously could not, because every candidate's `plan_value`
+was tied at 1.0.
+
+Reproduce:
+
+```bash
+export PYTHONPATH=src
+python scripts/run_strategist_corpus_gates.py \
+  --trajectory-dir data/learning-v2/cycle-b2-trajectories-v4 \
+  --splits train validation calibration development_holdout \
+  --report reports/results/v4/strategist-corpus-gates-v4.json
+
+python scripts/train_strategist_heads.py \
+  --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized \
+  --run-root experiments/runs/v4-strategist-heads-v4corpus \
+  --registry experiments/registry/v4-strategist-heads-v4corpus.jsonl \
+  --output reports/results/v4/strategist-heads-training-v4corpus.json
+
+python scripts/run_stage_e_strategist_comparison.py \
+  --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized \
+  --split validation \
+  --strategist-checkpoint experiments/runs/v4-strategist-heads-v4corpus/20260807T212734Z-8be491eb/checkpoints/checkpoint-0010/model.safetensors \
+  --limit 1000 \
+  --output reports/results/v4/stage-e-strategist-comparison-v4corpus.json
+```
+
+### important-issues.txt STOP GATE (requirement 20) — status
+
+- [x] canonical exposure-aware verification passes (code fix + 14 tests, 712/712 suite green, Ruff/Pyright clean)
+- [x] corrected Strategist corpus passes non-degeneracy gates (5/5, full 13,150-scenario scale)
+- [x] corrected Strategist heads are retrained (10 epochs, real target variance, real metrics)
+- [x] Stage E has been rerun with meaningful plan-value variance (nonzero, discriminating regret across all 3 non-oracle policies)
+
+**All four requirement-20 conditions are now satisfied.** Stage F /
+`core-issues3.txt` continuation is therefore no longer blocked by this
+defect. This pass still did not itself start Stage F, architecture
+selection, or open the locked test — that is the correctly-sequenced next
+step for a future continuation, not something to fold into an already-large
+emergency-fix pass. `final-selection.json` does not exist.
+
+### Old Stage E results — explicitly marked INVALID/PROVISIONAL
+
+`reports/results/v4/stage-e-strategist-comparison.json` (the ORIGINAL Stage
+E run, against `cycle-b2-trajectories-v3`) is **superseded and invalid** for
+every `plan_value`/regret/consequence-proxy-dependent finding: every valid
+candidate's `plan_value` was mechanically tied at exactly 1.0 (root cause:
+`HydraulicSimulator.evaluate_plan()` never computed contamination
+consequences), so `mean_regret_vs_oracle == 0.0` and `exact_all`'s
+`found_non_no_action_plan_rate == 0.000` in that file are tie-break
+artifacts, not real findings — do not cite them. Preserved unmodified as a
+historical/provisional artifact per important-issues.txt restriction #1
+("existing Stage E results as explicitly provisional evidence"), not
+deleted or silently overwritten; `reports/results/v4/stage-e-strategist-comparison-v4corpus.json`
+above is the valid replacement.
+
+The one finding from the original Stage E pass that **remains valid and is
+reconfirmed above**: `plan_validity` (0.996-0.997 accuracy/F1 in both the
+old and new runs) was always derived from WNTR's real pressure/service
+verification, never from the broken exposure path, and is unaffected by
+this defect.
