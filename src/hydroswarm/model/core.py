@@ -9,7 +9,7 @@ import torch
 from torch import Tensor, nn
 
 from .adapters import BottleneckAdapter, RoleHead
-from .candidate_plan_encoder import TARGET_TYPE_INDEX, CandidatePlanEncoder
+from .candidate_plan_encoder import TARGET_TYPE_CLASSES, TARGET_TYPE_INDEX, CandidatePlanEncoder
 from .encoders import (
     GraphStructuralEncoder,
     QualityEncoder,
@@ -41,6 +41,28 @@ class HydroBatch(TypedDict, total=False):
     residual_features: Tensor
     classical_prior: Tensor
     source_candidate_mask: Tensor
+    # core-issues4.txt Section E: candidate-conditioned Strategist forward
+    # (strategist_mode="candidate_conditioned") reads these directly via
+    # batch[...]/batch.get(...) but they were never declared on HydroBatch
+    # itself -- a real schema gap for anything (a collator, a type
+    # checker, a caller) that only has the TypedDict to go by. All left
+    # optional here (not Required) because HydroBatch has no way to
+    # express "required only in strategist_mode=candidate_conditioned";
+    # forward()'s own explicit KeyError-on-missing behavior when that mode
+    # is active, exercised by test_candidate_plan_batch_validation.py,
+    # remains the actual enforcement.
+    plan_template_ids: Tensor
+    plan_target_type: Tensor
+    plan_target_node_index: Tensor
+    plan_target_link_index: Tensor
+    plan_features: Tensor
+    plan_mask: Tensor
+    # Reserved for Phase 10's Strategist collator (remaining exact-
+    # simulation budget / prior verifier-history features per candidate) --
+    # not read by forward() yet, declared so the eventual collator has a
+    # stable field name to target rather than inventing one ad hoc.
+    plan_remaining_budget: Tensor
+    plan_verifier_history: Tensor
 
 
 class HydroOutput(TypedDict, total=False):
@@ -59,6 +81,8 @@ class HydroOutput(TypedDict, total=False):
     sensor_fault_logits: Tensor
     sample_node_logits: Tensor
     expected_information_gain: Tensor
+    candidate_reduction_prediction: Tensor
+    should_continue_sampling_logits: Tensor
     action_logits: Tensor
     action_pointer_logits: Tensor
     plan_value: Tensor
@@ -173,7 +197,7 @@ STRATEGIST_MODES: tuple[StrategistMode, ...] = get_args(StrategistMode)
 #: event/next-step control heads must exactly match
 #: hydroswarm.training.targets_v2.EventCause / NextStep's enum member
 #: order (CONTAMINATION, SENSOR_FAULT, HYDRAULIC_MISMATCH, AMBIGUOUS,
-#: NORMAL / COLLECT_SAMPLE, INSPECT_SENSOR, GENERATE_PLANS, ABSTAIN). Not
+#: NORMAL / COLLECT_SAMPLE, INSPECT_FAULTY_SENSOR, GENERATE_PLANS, ABSTAIN). Not
 #: imported directly to avoid a model<->training import cycle. For
 #: event_cause, hydroswarm.training.corpus.EVENT_CAUSE_INDEX (built via
 #: enumerate(EventCause)) is the actual label encoder and this count is
@@ -257,6 +281,19 @@ CONSEQUENCE_PROXY_NAMES: tuple[str, ...] = (
 #: independently testable.
 STRATEGIST_MODE_DEFAULT: StrategistMode = "anonymous_queries"
 PLAN_FEATURE_DIM = 6
+
+#: core-issues4.txt Section D item 3: two governed Scout targets
+#: (hydroswarm.training.targets_v2's "candidate_reduction" -- per-node,
+#: masked like information_gain -- and "should_continue_sampling" --
+#: incident-level, never masked) already exist and are already generated
+#: by hydroswarm.training.scout_trajectory, but had no model head to
+#: receive a gradient at all (a real gap: a governed target with no
+#: corresponding output can never be trained, unlike an untrained output
+#: with no target, which Phase 9.2's output governance already handles).
+#: Same net-new-parameters compatibility concern as every other Phase-4.x/
+#: 6.x/Section-D flag above, so gated the same way -- disabled by default,
+#: absent (not randomly initialized and silently unused) when disabled.
+SCOUT_CONTROL_HEADS_DEFAULT = False
 
 
 class ArchitectureCompatibilityError(Exception):
@@ -352,6 +389,14 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             f"checkpoint was trained with ood_category_head={recorded_ood_category_head!r} but this "
             f"model instance is configured with ood_category_head={model.ood_category_head_enabled!r}; "
             "enabling it adds an 11-class ood_category_head that the old 3-logit ood_head does not have"
+        )
+    recorded_scout_control_heads = metadata.get("scout_control_heads")
+    if recorded_scout_control_heads is not None and recorded_scout_control_heads != model.scout_control_heads:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with scout_control_heads={recorded_scout_control_heads!r} but this "
+            f"model instance is configured with scout_control_heads={model.scout_control_heads!r}; "
+            "enabling it adds candidate_reduction_head/should_continue_sampling_head parameters that a "
+            "checkpoint trained without them does not have"
         )
 
 
@@ -452,6 +497,7 @@ class HydroCore(nn.Module):
         strategist_mode: StrategistMode = STRATEGIST_MODE_DEFAULT,
         plan_feature_dim: int = PLAN_FEATURE_DIM,
         ood_category_head: bool = OOD_CATEGORY_HEAD_DEFAULT,
+        scout_control_heads: bool = SCOUT_CONTROL_HEADS_DEFAULT,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -485,6 +531,29 @@ class HydroCore(nn.Module):
         # though it is a real architecture-identity fact a checkpoint
         # loader needs to reconstruct the model from. Pure additive
         # attribute recording; changes no forward()-visible behavior.
+        #
+        # core-issues4.txt Section A: the input feature-width constructor
+        # arguments (node/edge/temporal/quality/role/action/verifier/
+        # residual_feature_dim) were never recorded even here -- used only
+        # to build the input encoders/projections, then forgotten, the same
+        # gap the comment above already fixed for every other dimension.
+        # training.checkpoint_identity (the v4 identity module) needs these
+        # to reconstruct a model from a checkpoint's identity alone.
+        # Recorded with the same pure-additive, forward()-unaffected
+        # convention; `dropout_value` likewise (dropout is "behavior-
+        # critical" per Section A's field list, since a mismatched dropout
+        # would silently compute a different train-time forward pass, but
+        # was previously visible only inside the submodules it was passed
+        # to, not on the model itself).
+        self.node_feature_dim = node_feature_dim
+        self.edge_feature_dim = edge_feature_dim
+        self.temporal_feature_dim = temporal_feature_dim
+        self.quality_feature_dim = quality_feature_dim
+        self.role_feature_dim = role_feature_dim
+        self.action_feature_dim = action_feature_dim
+        self.verifier_feature_dim = verifier_feature_dim
+        self.residual_feature_dim = residual_feature_dim
+        self.dropout_value = dropout
         self.nhead = nhead
         self.dim_feedforward = dim_feedforward
         self.modality_layers = modality_layers
@@ -506,6 +575,7 @@ class HydroCore(nn.Module):
         self.strategist_mode = strategist_mode
         self.plan_feature_dim = plan_feature_dim
         self.ood_category_head_enabled = ood_category_head
+        self.scout_control_heads = scout_control_heads
         # core-issues.txt repair item 9: set by from_variant() so a
         # checkpoint's own architecture_config() records which named
         # variant it was built from; a model constructed directly (e.g. the
@@ -597,6 +667,18 @@ class HydroCore(nn.Module):
         self.sensor_fault_head = RoleHead(d_model, 1)
         self.sample_node_head = RoleHead(d_model, 1)
         self.information_gain_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Softplus())
+        # core-issues4.txt Section D item 3: candidate_reduction is a
+        # per-node fraction in [0, 1] (targets_v2's own documented unit),
+        # so Sigmoid -- not Softplus, which is unbounded above like
+        # information_gain_head's bits-valued target -- matches the
+        # target's actual range. should_continue_sampling is an
+        # incident-level raw logit (RoleHead), trained with
+        # BCEWithLogitsLoss like event_presence/sensor_fault.
+        if self.scout_control_heads:
+            self.candidate_reduction_head = nn.Sequential(
+                make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Sigmoid()
+            )
+            self.should_continue_sampling_head = RoleHead(d_model, 1)
         self.profile_heads = nn.ModuleDict(
             {
                 "start_time": RoleHead(d_model, 12),
@@ -723,6 +805,7 @@ class HydroCore(nn.Module):
             "consequence_prescreening_heads": self.consequence_prescreening_heads,
             "strategist_mode": self.strategist_mode,
             "ood_category_head": self.ood_category_head_enabled,
+            "scout_control_heads": self.scout_control_heads,
             "d_model": self.d_model,
             "nhead": self.nhead,
             "dim_feedforward": self.dim_feedforward,
@@ -738,6 +821,17 @@ class HydroCore(nn.Module):
             "plan_feature_dim": self.plan_feature_dim,
             "normalization": self.normalization_kind,
             "activation": self.activation_kind,
+            # core-issues4.txt Section A: input feature widths, now recorded
+            # as instance attributes above.
+            "node_feature_dim": self.node_feature_dim,
+            "edge_feature_dim": self.edge_feature_dim,
+            "temporal_feature_dim": self.temporal_feature_dim,
+            "quality_feature_dim": self.quality_feature_dim,
+            "role_feature_dim": self.role_feature_dim,
+            "action_feature_dim": self.action_feature_dim,
+            "verifier_feature_dim": self.verifier_feature_dim,
+            "residual_feature_dim": self.residual_feature_dim,
+            "dropout": self.dropout_value,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -855,16 +949,97 @@ class HydroCore(nn.Module):
             # anonymous_queries path (reordering blocks containing dropout
             # would change RNG consumption order and silently change that
             # path's own numerical output).
-            plan_template_ids = batch["plan_template_ids"]
-            plan_target_type = batch["plan_target_type"]
-            plan_mask_tensor = batch["plan_mask"].bool()
-            plan_features = batch["plan_features"].float()
+            # .get()-then-raise (not batch["..."]) because these fields are
+            # NOT Required on HydroBatch (Section E's schema addition below
+            # deliberately left them optional -- HydroBatch cannot express
+            # "required only when strategist_mode=candidate_conditioned");
+            # matches the codebase's own established convention for every
+            # other optional-but-sometimes-mandatory field (e.g. edge_index
+            # in the candidate_conditioned link-target branch below).
+            plan_template_ids = batch.get("plan_template_ids")
+            plan_target_type = batch.get("plan_target_type")
+            plan_mask_optional = batch.get("plan_mask")
+            plan_features_optional = batch.get("plan_features")
+            if (
+                plan_template_ids is None
+                or plan_target_type is None
+                or plan_mask_optional is None
+                or plan_features_optional is None
+            ):
+                missing_plan_fields = [
+                    name
+                    for name, value in (
+                        ("plan_template_ids", plan_template_ids),
+                        ("plan_target_type", plan_target_type),
+                        ("plan_mask", plan_mask_optional),
+                        ("plan_features", plan_features_optional),
+                    )
+                    if value is None
+                ]
+                raise KeyError(
+                    "missing HydroBatch fields required by strategist_mode=candidate_conditioned: "
+                    f"{', '.join(missing_plan_fields)}"
+                )
+            plan_mask_tensor = plan_mask_optional.bool()
+            plan_features = plan_features_optional.float()
             plans = plan_template_ids.shape[1]
+            # core-issues4.txt Section E: validate dimensions/value ranges
+            # BEFORE any embedding/gather -- an out-of-range template id or
+            # target index previously reached torch.gather/nn.Embedding
+            # directly, which either raises an opaque low-level error or
+            # (for a gather index within the tensor's storage bounds but
+            # semantically wrong) silently reads a real, unrelated node's
+            # embedding instead of failing closed.
+            if plan_template_ids.shape != (batch_size, plans):
+                raise ValueError("plan_template_ids must have shape [batch, plans]")
+            if plan_target_type.shape != (batch_size, plans):
+                raise ValueError("plan_target_type must have shape [batch, plans]")
+            if plan_mask_tensor.shape != (batch_size, plans):
+                raise ValueError("plan_mask must have shape [batch, plans]")
+            if plan_features.shape != (batch_size, plans, self.plan_feature_dim):
+                raise ValueError(
+                    f"plan_features must have shape [batch, plans, {self.plan_feature_dim}]"
+                )
+            # Padded plans (plan_mask False) may legitimately carry a
+            # sentinel/garbage template id -- CandidatePlanEncoder's own
+            # plan_mask handling already zeroes their contribution to
+            # plan_hidden -- so range-check only positions the caller
+            # marked real.
+            if plan_mask_tensor.any():
+                real_template_ids = plan_template_ids[plan_mask_tensor]
+                if bool(((real_template_ids < 0) | (real_template_ids >= self.action_vocabulary_size)).any()):
+                    raise ValueError(
+                        f"plan_template_ids contains a value outside [0, {self.action_vocabulary_size}) "
+                        "at a non-padded (plan_mask=True) position"
+                    )
+                real_target_type = plan_target_type[plan_mask_tensor]
+                if bool(((real_target_type < 0) | (real_target_type >= len(TARGET_TYPE_CLASSES))).any()):
+                    raise ValueError(
+                        f"plan_target_type contains a value outside [0, {len(TARGET_TYPE_CLASSES)}) "
+                        "at a non-padded (plan_mask=True) position"
+                    )
             target_embedding = hidden.new_zeros(batch_size, plans, self.d_model)
             node_target_index = batch.get("plan_target_node_index")
             if node_target_index is not None:
-                is_node_target = plan_target_type == TARGET_TYPE_INDEX["NODE"]
-                safe_node_index = node_target_index.clamp(min=0)
+                is_node_target = (plan_target_type == TARGET_TYPE_INDEX["NODE"]) & plan_mask_tensor
+                if bool(is_node_target.any()):
+                    real_node_targets = node_target_index[is_node_target]
+                    if bool(((real_node_targets < 0) | (real_node_targets >= nodes)).any()):
+                        raise ValueError(
+                            f"plan_target_node_index contains a value outside [0, {nodes}) at a "
+                            "real (plan_mask=True, target_type=NODE) position"
+                        )
+                # core-issues4.txt Section E: clamp BOTH bounds, not just
+                # min=0 -- an unclamped upper bound previously let an
+                # out-of-range index reach torch.gather directly (an
+                # opaque runtime error at best). Clamping is safe here
+                # specifically because it only affects positions the
+                # `torch.where` below discards (is_node_target is False
+                # wherever the index is not a real, validated node
+                # target) -- padded/NONE-type positions never contribute
+                # their gathered value to target_embedding regardless of
+                # what clamp(...) resolves their index to.
+                safe_node_index = node_target_index.clamp(min=0, max=nodes - 1)
                 gathered_node = torch.gather(
                     role_hidden["strategist"], 1,
                     safe_node_index.unsqueeze(-1).expand(-1, -1, self.d_model),
@@ -875,8 +1050,18 @@ class HydroCore(nn.Module):
             if link_target_index is not None and edge_index_for_targets is not None:
                 if edge_index_for_targets.ndim == 2:
                     edge_index_for_targets = edge_index_for_targets.unsqueeze(0).expand(batch_size, -1, -1)
-                is_link_target = plan_target_type == TARGET_TYPE_INDEX["LINK"]
-                safe_link_index = link_target_index.clamp(min=0)
+                edge_count = edge_index_for_targets.shape[-1]
+                is_link_target = (plan_target_type == TARGET_TYPE_INDEX["LINK"]) & plan_mask_tensor
+                if bool(is_link_target.any()):
+                    real_link_targets = link_target_index[is_link_target]
+                    if bool(((real_link_targets < 0) | (real_link_targets >= edge_count)).any()):
+                        raise ValueError(
+                            f"plan_target_link_index contains a value outside [0, {edge_count}) at "
+                            "a real (plan_mask=True, target_type=LINK) position"
+                        )
+                # Same both-bounds-clamped, where-discarded-if-invalid
+                # reasoning as safe_node_index above.
+                safe_link_index = link_target_index.clamp(min=0, max=max(edge_count - 1, 0))
                 edge_src, edge_dst = edge_index_for_targets[:, 0, :], edge_index_for_targets[:, 1, :]
                 src_node_idx = torch.gather(edge_src, 1, safe_link_index)
                 dst_node_idx = torch.gather(edge_dst, 1, safe_link_index)
@@ -966,6 +1151,13 @@ class HydroCore(nn.Module):
         )
         if self.ood_category_head_enabled:
             output["ood_category_logits"] = self.ood_category_head(incident_context)
+        if self.scout_control_heads:
+            output["candidate_reduction_prediction"] = (
+                self.candidate_reduction_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, 0.0)
+            )
+            output["should_continue_sampling_logits"] = self.should_continue_sampling_head(
+                incident_context
+            ).squeeze(-1)
         if self.event_control_heads:
             output["event_presence_logits"] = self.event_presence_head(incident_context).squeeze(-1)
             output["event_cause_logits"] = self.event_cause_head(incident_context)
@@ -1028,6 +1220,8 @@ class HydroCore(nn.Module):
                 self.pointer_query,
             )
         )
+        if self.scout_control_heads:
+            heads += count(self.candidate_reduction_head) + count(self.should_continue_sampling_head)
         if self.event_control_heads:
             heads += count(self.event_presence_head) + count(self.event_cause_head) + count(self.next_step_head)
         if self.auxiliary_heads:

@@ -189,6 +189,10 @@ def compute_multitask_loss(
     regressions = {
         "plan_value": "plan_value",
         "information_gain": "expected_information_gain",
+        # core-issues4.txt Section D item 3: per-node, same masking
+        # convention as information_gain (targets_v2's own documented
+        # "Same as information_gain" masking rule).
+        "candidate_reduction": "candidate_reduction_prediction",
         "sensor_reconstruction": "sensor_reconstruction_prediction",
         "future_concentration": "future_concentration_prediction",
         "travel_time": "travel_time_prediction",
@@ -243,6 +247,22 @@ def compute_multitask_loss(
     if "evidence_sufficiency" in targets and "evidence_sufficiency" in outputs:
         losses["evidence_sufficiency"] = F.binary_cross_entropy(
             outputs["evidence_sufficiency"].float(), targets["evidence_sufficiency"].float()
+        )
+    if "should_continue_sampling" in targets and "should_continue_sampling_logits" in outputs:
+        # core-issues4.txt Section D item 3: targets_v2 declares this
+        # target "Never masked; always defined by the budget policy", so
+        # no f"{task}_mask" companion exists -- same
+        # isfinite-and-non-negative validity check as event_presence
+        # above (this repo's convention for a boolean target with no
+        # separate mask field).
+        continue_target = targets["should_continue_sampling"].float()
+        valid = torch.isfinite(continue_target) & (continue_target >= 0)
+        losses["should_continue_sampling"] = (
+            F.binary_cross_entropy_with_logits(
+                outputs["should_continue_sampling_logits"].float()[valid], continue_target[valid]
+            )
+            if valid.any()
+            else outputs["should_continue_sampling_logits"].sum() * 0.0
         )
     if not losses:
         raise ValueError("no compatible model outputs and training targets")

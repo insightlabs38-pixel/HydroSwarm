@@ -102,9 +102,26 @@ class CandidatePlanEncoder(nn.Module):
         if plan_mask.shape != (batch, plans):
             raise ValueError("plan_mask must have shape [batch, plans]")
 
+        # core-issues4.txt Section E: a padded plan's template_ids/
+        # target_type value is discarded by the masked_fill(0.0) at the
+        # bottom of this method regardless of what it is -- but
+        # nn.Embedding itself has no such tolerance: an out-of-vocabulary
+        # index at ANY position (including a padded one) raises
+        # IndexError before that masking ever runs. Real collators pad
+        # target-index fields with -1 elsewhere in this exact codebase
+        # (HydroCore's plan_target_node_index/plan_target_link_index), so
+        # a caller padding template_ids/target_type the same natural way
+        # must not crash the model. Substitute a fixed, always-valid index
+        # (0 -- NONE for target_type, template 0 for template_ids) at
+        # padded positions only; real (plan_mask=True) positions are
+        # passed through unchanged and still range-checked by the caller
+        # (HydroCore.forward), so an out-of-range value at a REAL position
+        # still fails closed here via the ordinary IndexError.
+        safe_template_ids = template_ids.masked_fill(~plan_mask, 0)
+        safe_target_type = target_type.masked_fill(~plan_mask, TARGET_TYPE_INDEX["NONE"])
         hidden = (
-            self.template_embedding(template_ids)
-            + self.target_type_embedding(target_type)
+            self.template_embedding(safe_template_ids)
+            + self.target_type_embedding(safe_target_type)
             + target_embedding
             + self.feature_projection(plan_features)
             + self.incident_projection(incident_context)[:, None, :]
