@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+import torch
 
 from hydroswarm.classical.signatures import SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
@@ -159,7 +160,15 @@ def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
     first = build_scout_trajectory(scenario, artifact, node_ids)
     second = build_scout_trajectory(scenario, artifact, node_ids)
     assert first.trajectory == second.trajectory
-    assert [step.targets for step in first.steps] == [step.targets for step in second.steps]
+    # Plain dict `==` on tensor values raises "ambiguous truth value" the
+    # moment a value is a multi-element tensor (information_gain/
+    # candidate_reduction, since core-issues3.txt Phase 7.2) rather than a
+    # 0-d scalar -- compare structurally instead.
+    assert len(first.steps) == len(second.steps)
+    for left, right in zip(first.steps, second.steps):
+        assert left.targets.keys() == right.targets.keys()
+        for key in left.targets:
+            assert torch.equal(left.targets[key], right.targets[key]), key
 
 
 def test_different_scenarios_get_different_trajectory_and_incident_ids(tmp_path) -> None:
@@ -172,6 +181,55 @@ def test_different_scenarios_get_different_trajectory_and_incident_ids(tmp_path)
     assert a.trajectory.trajectory_id != b.trajectory.trajectory_id
     assert a.trajectory.scenario_id != b.trajectory.scenario_id
     assert a.steps[0].state.incident_state.incident_id != b.steps[0].state.incident_state.incident_id
+
+
+def test_information_gain_and_candidate_reduction_are_per_node_arrays(tmp_path) -> None:
+    """core-issues3.txt Phase 7.2: these targets must be shaped
+    [len(node_ids)], matching HydroCore's per-node expected_information_gain
+    output, not a scalar broadcast against it -- and only genuinely-ranked,
+    accessible candidates may be unmasked."""
+
+    network = build_wntr_network()
+    artifact = _fast_artifact(network, tmp_path / "cache")
+    scenario = _scenario(network, source_node="J2", seed=10, sensor_count=len(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
+
+    result = build_scout_trajectory(scenario, artifact, node_ids, noise_scale_mg_l=50.0)
+    for step in result.steps:
+        for key in ("information_gain", "information_gain_mask", "candidate_reduction", "candidate_reduction_mask"):
+            assert step.targets[key].shape == (len(node_ids),)
+        if step.label.sample_node_id is not None:
+            # The recommended node was necessarily ranked (it is the top
+            # ranked candidate), so it must be unmasked with a nonnegative
+            # information-gain value.
+            index = node_ids.index(step.label.sample_node_id)
+            assert bool(step.targets["information_gain_mask"][index])
+            assert float(step.targets["information_gain"][index]) >= 0.0
+        # A node that was never scored as a candidate at all (not one of
+        # this scenario's sensor_nodes) must stay masked with a zero
+        # placeholder, not an invented value.
+        never_a_candidate = next(node for node in node_ids if node not in artifact.sensor_nodes)
+        never_index = node_ids.index(never_a_candidate)
+        assert not bool(step.targets["information_gain_mask"][never_index])
+        assert float(step.targets["information_gain"][never_index]) == 0.0
+
+
+def test_information_gain_target_is_compatible_with_masked_regression(tmp_path) -> None:
+    """Proves the shape fix actually unblocks losses.masked_regression
+    against HydroCore's real per-node expected_information_gain output
+    shape, not just an isolated shape assertion on the target alone."""
+
+    from hydroswarm.training.losses import masked_regression
+
+    network = build_wntr_network()
+    artifact = _fast_artifact(network, tmp_path / "cache")
+    scenario = _scenario(network, source_node="J2", seed=10, sensor_count=len(network.junction_name_list))
+    node_ids = tuple(sorted(network.node_name_list))
+
+    result = build_scout_trajectory(scenario, artifact, node_ids, noise_scale_mg_l=50.0)
+    step = result.steps[0]
+    fake_prediction = torch.zeros(len(node_ids))
+    masked_regression(fake_prediction, step.targets["information_gain"], step.targets["information_gain_mask"])
 
 
 def test_stops_immediately_when_no_candidate_is_accessible(tmp_path) -> None:

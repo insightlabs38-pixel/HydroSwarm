@@ -43,11 +43,23 @@ def sensor_reconstruction_target(
     reference_time_seconds: float = FEATURE_SNAPSHOT_TIME_SECONDS,
 ) -> dict[str, torch.Tensor]:
     """The scenario's own unmasked truth_concentration at reference_time,
-    for every sensor node -- ground truth for a denoising/reconstruction
-    objective over whatever the input's own (possibly degraded) reading
-    looked like at that node. Masked out for every non-sensor node: it was
-    never simulated as an observation point at all, so there is no ground
-    truth to reconstruct against there."""
+    for every sensor node whose OWN input reading was actually degraded
+    (missing, frozen, in communication outage) at that instant -- a
+    denoising objective over whatever the input's own corrupted reading
+    looked like there.
+
+    core-issues3.txt Phase 7.3 / item I: masking every sensor node
+    regardless of whether its reading was degraded (the pre-fix behavior)
+    supervises mostly trivial identity copying -- corpus.py's
+    build_sensor_series feeds the model scenario.observed_concentration
+    directly, which equals truth_concentration exactly at every
+    healthy (non-degraded) sensor position. A model "reconstructing" a
+    value it was already given verbatim as input learns nothing; only a
+    position where the input itself was actually corrupted poses a real
+    denoising problem. Masked out for every non-sensor node (never
+    simulated as an observation point, so there is no ground truth) and
+    for every healthy sensor position (nothing to denoise -- the input
+    already shows the true value)."""
 
     value = np.zeros(len(node_ids), dtype=np.float32)
     mask = np.zeros(len(node_ids), dtype=bool)
@@ -56,6 +68,13 @@ def sensor_reconstruction_target(
     for sensor_index, node_id in enumerate(scenario.sensor_nodes):
         position = positions.get(node_id)
         if position is None:
+            continue
+        degraded = (
+            not scenario.observation_mask[time_index, sensor_index]
+            or scenario.frozen_mask[time_index, sensor_index]
+            or scenario.communication_outage_mask[time_index, sensor_index]
+        )
+        if not degraded:
             continue
         value[position] = scenario.truth_concentration[time_index, sensor_index]
         mask[position] = True
@@ -72,33 +91,54 @@ def future_concentration_target(
     reference_time_seconds: float = FEATURE_SNAPSHOT_TIME_SECONDS,
     horizon_seconds: float = DEFAULT_FUTURE_HORIZON_SECONDS,
 ) -> dict[str, torch.Tensor]:
-    """truth_concentration at reference_time_seconds + horizon_seconds, for
-    every sensor node. Masked out entirely (no future truth available) for
-    any scenario whose simulated duration does not reach that far, and
-    always masked out for non-sensor nodes (no concentration truth exists
-    for them at any time)."""
+    """DISABLED (core-issues3.txt Phase 7.4 / item H): always returns an
+    all-masked-out placeholder. Do not re-enable by simply removing this
+    early return without first giving the base ScenarioExample a genuine
+    observation cutoff -- see the leakage explanation below.
+
+    Why this is disabled, not fixed in place: the target this function is
+    meant to supervise is truth_concentration at
+    reference_time_seconds + horizon_seconds (2h into the scenario by
+    default). But hydroswarm.training.corpus.scenario_to_example builds its
+    temporal/quality input tensors via HydraulicFeatureBuilder.build(...,
+    window_steps=len(scenario.timestamps_seconds)) -- EVERY timestamp the
+    scenario simulated (typically a 24h window, per
+    hydroswarm.simulation.network's options.time.duration), not a bounded
+    lookback from some "current" instant. The specific target timestamp
+    this function would supervise is therefore already directly present as
+    a raw temporal input feature the model can read off verbatim -- not an
+    approximate leak, an exact one. A model "forecasting" a value it was
+    already handed as input learns nothing and would report a
+    misleadingly perfect validation score.
+
+    A real fix requires a genuinely cutoff-aware feature representation
+    (a ScenarioExample variant whose temporal/quality tensors are built
+    from only scenario.timestamps_seconds <= reference_time_seconds,
+    per core-issues3.txt Phase 5's "explicit observation cutoff" applied
+    to the base Sentinel example, not only Scout) -- a materially larger,
+    cross-cutting change belonging with Phase 9/10's dataset-and-collator
+    work, not a self-contained Phase 7 loss/masking fix. Disabling this
+    target here (rather than shipping it broken, or attempting an
+    under-tested partial fix) is the fail-closed choice: masked-out
+    positions contribute nothing to the loss (losses.masked_regression),
+    so downstream training is unaffected either way -- this just prevents
+    a real (if low-weighted) leakage channel from silently existing."""
 
     value = np.zeros(len(node_ids), dtype=np.float32)
     mask = np.zeros(len(node_ids), dtype=bool)
-    target_time = reference_time_seconds + horizon_seconds
-    max_time = float(np.max(scenario.timestamps_seconds)) if len(scenario.timestamps_seconds) else -math.inf
-    if target_time > max_time:
-        return {
-            "future_concentration": torch.from_numpy(value),
-            "future_concentration_mask": torch.from_numpy(mask),
-        }
-    time_index = _nearest_time_index(scenario.timestamps_seconds, target_time)
-    positions = {node_id: index for index, node_id in enumerate(node_ids)}
-    for sensor_index, node_id in enumerate(scenario.sensor_nodes):
-        position = positions.get(node_id)
-        if position is None:
-            continue
-        value[position] = scenario.truth_concentration[time_index, sensor_index]
-        mask[position] = True
     return {
         "future_concentration": torch.from_numpy(value),
         "future_concentration_mask": torch.from_numpy(mask),
     }
+
+
+#: core-issues3.txt Phase 7.5: raw travel-time seconds range from 0 to tens
+#: of thousands and can dominate a multitask MSE next to bounded [0, 1]-ish
+#: regression targets. log1p is a fixed, train-owned, documented transform
+#: (not fit from data), applied identically to every split; invert with
+#: expm1 to recover physical-unit seconds for reporting. Bumped only if the
+#: transform itself changes (never for target/weighting tuning).
+TRAVEL_TIME_TRANSFORM = "log1p"
 
 
 def travel_time_target(
@@ -112,7 +152,11 @@ def travel_time_target(
     Masked out for every node unreachable from the source (no directed
     path, or every path traverses a zero-flow/infinite-travel-time edge),
     and for every node on a NORMAL/SENSOR_FAULT_ONLY scenario where no real
-    contamination source exists."""
+    contamination source exists.
+
+    The value is TRAVEL_TIME_TRANSFORM-transformed (log1p(seconds)), not raw
+    seconds -- see that constant's docstring. Invert with
+    torch.expm1/np.expm1 before reporting a physical-unit metric."""
 
     value = np.zeros(len(node_ids), dtype=np.float32)
     mask = np.zeros(len(node_ids), dtype=bool)
@@ -126,6 +170,6 @@ def travel_time_target(
         except (nx.NetworkXNoPath, nx.NodeNotFound):
             continue
         if math.isfinite(travel_time):
-            value[index] = travel_time
+            value[index] = math.log1p(max(0.0, travel_time))
             mask[index] = True
     return {"travel_time": torch.from_numpy(value), "travel_time_mask": torch.from_numpy(mask)}

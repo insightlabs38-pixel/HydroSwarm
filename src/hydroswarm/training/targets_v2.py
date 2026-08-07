@@ -185,18 +185,25 @@ TARGETS_V2: dict[str, TargetSpec] = {
         _spec(
             category="scout",
             name="information_gain",
-            definition="Expected posterior-entropy reduction (bits) from sampling sample_node.",
-            unit="bits",
-            masking_rule="Same as sample_node.",
+            definition="Per-node expected posterior-entropy reduction (bits) from sampling "
+            "that node -- shape [node_count], matching HydroCore's expected_information_gain "
+            "output (core-issues3.txt Phase 7.2: previously a scalar for only the single "
+            "selected sample_node, which silently broadcast against the model's per-node "
+            "prediction instead of aligning to it).",
+            unit="bits, per node, shape [node_count]",
+            masking_rule="Masked (information_gain_mask=False) for every node that was not "
+            "an accessible, unsampled candidate this step actually scored -- an unranked node "
+            "has no computed expected-gain estimate, not a true value of zero.",
             source_of_truth="Computed from training-only simulation/signature assets (Task 2.3).",
         ),
         _spec(
             category="scout",
             name="candidate_reduction",
-            definition="Expected fractional reduction in the calibrated candidate set size "
-            "after sampling sample_node.",
-            unit="fraction in [0, 1]",
-            masking_rule="Same as sample_node.",
+            definition="Per-node expected fractional reduction in the calibrated candidate "
+            "set size after sampling that node -- shape [node_count], same masking convention "
+            "as information_gain (core-issues3.txt Phase 7.2).",
+            unit="fraction in [0, 1], per node, shape [node_count]",
+            masking_rule="Same as information_gain.",
             source_of_truth="Computed from training-only simulation/signature assets (Task 2.3).",
         ),
         _spec(
@@ -341,8 +348,12 @@ TARGETS_V2: dict[str, TargetSpec] = {
             "self-supervised denoising objective (Task 4.5), never an authoritative product "
             "output.",
             unit="mg/L, per node, shape [node_count]",
-            masking_rule="Masked (no ground truth) for any node that was never actually "
-            "observed by the corpus generator at any point in the scenario.",
+            masking_rule="Masked for any node that was never actually observed by the corpus "
+            "generator, AND for any sensor node whose own reading was NOT degraded at the "
+            "reference instant (core-issues3.txt Phase 7.3: a healthy sensor's input already "
+            "equals its own truth value, so 'reconstructing' it is a trivial identity mapping, "
+            "not a real denoising objective) -- only genuinely missing/frozen/communication-"
+            "outage positions are unmasked.",
             source_of_truth="The corpus generator's own unmasked simulation output, used only "
             "as training supervision -- never available at inference/production time.",
         ),
@@ -353,9 +364,14 @@ TARGETS_V2: dict[str, TargetSpec] = {
             "window, per node -- an auxiliary forecasting objective (Task 4.5), never an "
             "authoritative product output.",
             unit="mg/L, per node, shape [node_count]",
-            masking_rule="Masked for scenarios/nodes where the corpus generator's simulation "
-            "horizon does not extend far enough past the observation window to supply ground "
-            "truth.",
+            masking_rule="core-issues3.txt Phase 7.4 / item H: ALWAYS masked (disabled) as of "
+            "this schema version. The base ScenarioExample's temporal input features are built "
+            "from the scenario's entire simulated window, not a bounded lookback from a "
+            "defined 'now' -- so the target instant this auxiliary was meant to supervise is "
+            "already directly visible as a raw input feature (exact leakage, not "
+            "approximate). Re-enabling requires a genuinely cutoff-aware feature "
+            "representation first; see auxiliary_labels.future_concentration_target's "
+            "docstring.",
             source_of_truth="Exact WNTR/EPANET simulation continued past the observation "
             "window (training-only future truth).",
         ),
@@ -365,7 +381,10 @@ TARGETS_V2: dict[str, TargetSpec] = {
             definition="Hydraulic travel time from the true contamination source to each "
             "node -- an auxiliary structural-awareness objective (Task 4.5), never an "
             "authoritative product output.",
-            unit="seconds, per node, shape [node_count]",
+            unit="log1p(seconds), per node, shape [node_count] (core-issues3.txt Phase 7.5: "
+            "auxiliary_labels.TRAVEL_TIME_TRANSFORM -- invert with expm1 for a physical-unit "
+            "metric; raw seconds would otherwise dominate a multitask MSE next to "
+            "[0, 1]-ish regression targets).",
             masking_rule="Masked for nodes hydraulically unreachable from the source, and for "
             "every node on NORMAL/SENSOR_FAULT_ONLY (non-contamination) scenarios where no "
             "source exists.",
@@ -427,7 +446,12 @@ NODE_INDEX_TARGETS = frozenset({"source_node", "sample_node"})
 DUAL_INDEX_TARGETS = frozenset({"target_pointer"})
 
 #: Per-node arrays whose trailing dimension must equal topology.node_count.
-NODE_ARRAY_TARGETS = frozenset({"sensor_fault", "sensor_reconstruction", "future_concentration", "travel_time"})
+NODE_ARRAY_TARGETS = frozenset({
+    "sensor_fault", "sensor_reconstruction", "future_concentration", "travel_time",
+    # core-issues3.txt Phase 7.2: converted from a scalar (the single
+    # selected sample_node's value) to a full per-node array.
+    "information_gain", "candidate_reduction",
+})
 
 #: Strategist targets that describe one entry per generated plan candidate;
 #: whichever of these are present in the same example must agree on their

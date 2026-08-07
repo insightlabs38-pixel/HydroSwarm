@@ -114,6 +114,12 @@ class ScoutLabel:
     #: supported" and accessibility, without recomputing the posterior/
     #: signature-matching work this module already did.
     candidates: tuple[SampleCandidate, ...] = ()
+    #: The same denominator candidate_reduction_fraction was normalized
+    #: against (distinct source nodes in the signature artifact's
+    #: hypothesis space), exposed so a caller building per-node reduction
+    #: targets for every candidate (core-issues3.txt Phase 7.2) can apply
+    #: the identical normalization instead of recomputing/duplicating it.
+    total_candidate_count: int = 1
 
 
 def generate_scout_label(
@@ -186,6 +192,7 @@ def generate_scout_label(
             posterior_entropy_bits=result.posterior_entropy_bits,
             alternatives=(),
             candidates=result.ranked,
+            total_candidate_count=total_candidates,
         )
     top = result.ranked[0]
     reduction_fraction = float(min(1.0, max(0.0, top.expected_candidate_reduction / total_candidates)))
@@ -199,4 +206,5 @@ def generate_scout_label(
         posterior_entropy_bits=result.posterior_entropy_bits,
         alternatives=alternatives,
         candidates=result.ranked,
+        total_candidate_count=total_candidates,
     )

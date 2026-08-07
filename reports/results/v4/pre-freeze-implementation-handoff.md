@@ -21,7 +21,7 @@ remain untouched.
 | 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
 | 6 | OOD taxonomy / event-cause | **PARTIAL** (6.1/item F crash-bug fixed + tested; 6.2-6.6 not started) |
-| 7 | Auxiliary objectives / regression losses | not started |
+| 7 | Auxiliary objectives / regression losses | **IN PROGRESS** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
 | 8 | Second-pass calibrated control targets | not started |
 | 9-20 | Architecture v4, training, gates, selection | not started |
 
@@ -383,6 +383,105 @@ without a real simulated perturbation, per the Phase 0 audit); handling
 preventing architecture fix was prioritized as the highest-value, most
 urgent item — the remaining items are corpus/labeling work, not the kind
 of silent-failure risk the architecture fix closes.
+
+## Phase 7: auxiliary objectives / regression losses — IN PROGRESS
+
+**7.1 — `masked_regression()` helper (DONE)**: `losses.py`'s old
+`_masked_mse` checked only `torch.isfinite(target)`, silently ignoring
+every regression target's `f"{task}_mask"` companion. Since every masked
+regression target's generator (plan_value, the five consequence proxies,
+sensor_reconstruction, future_concentration, travel_time) writes an
+explicit `0.0` *finite* placeholder at masked positions specifically so
+absence is recorded in the mask rather than the value, this trained the
+model directly against those placeholders — confirmed by inspection, not
+guesswork (Phase 7.1's exact description). New `masked_regression()`
+combines the mask with the finite check and additionally raises on a
+prediction/target shape mismatch instead of silently broadcasting
+(directly closes 7.2 below). Wired into every entry in
+`compute_multitask_loss`'s `regressions` dict.
+
+**7.2 — Scout EIG per-node alignment (DONE)**: `information_gain`/
+`candidate_reduction` were previously scalars (only the selected
+sample_node's value), which would have silently broadcast-mismatched
+against HydroCore's real per-node `expected_information_gain` output
+(`[B, N]`) the moment `masked_regression`'s new shape check ran — not yet
+triggered in production only because no caller currently merges Scout
+targets into a real training batch (Phase 10's Scout collator doesn't
+exist yet). Converted to per-node arrays (`shape [node_count]`), populated
+at every candidate `rank_sample_locations` actually scored (accessible,
+ranked), masked elsewhere. Added `ScoutLabel.total_candidate_count` so the
+per-node reduction-fraction normalization isn't duplicated logic.
+`targets_v2.NODE_ARRAY_TARGETS` now includes both. 2 new tests, incl. one
+that runs the real per-node target through `masked_regression` against a
+same-shaped fake prediction (not just an isolated shape assertion).
+
+**7.3 — Sensor reconstruction denoising-only (DONE)**: the target
+previously unmasked *every* sensor node's truth value, regardless of
+whether that position's own input reading was degraded. Since
+`corpus.build_sensor_series` feeds the model
+`scenario.observed_concentration` directly (which equals
+`truth_concentration` exactly at every healthy position), this mostly
+supervised trivial identity copying (item I). Now masked to only
+genuinely missing/frozen/communication-outage positions at the reference
+instant. Rewrote the two existing tests (which asserted "every sensor is
+unmasked", now false) into a healthy-scenario test (nothing masked in) and
+a forced-degradation test (everything masked in, correct truth value).
+
+**7.4 — Future-concentration leakage (DONE — disabled, not silently
+shipped)**: confirmed by inspection **and a passing regression test**
+that `corpus.scenario_to_example` builds temporal/quality input tensors
+via `HydraulicFeatureBuilder.build(..., window_steps=len(scenario.
+timestamps_seconds))` — i.e. the model's own visible input already spans
+the *entire* simulated window (~24h per `simulation/network.py`'s
+`options.time.duration`), not a bounded lookback from a "current" instant.
+`future_concentration_target`'s target instant (2h in, by default) is
+therefore already directly present as a raw input feature — exact
+leakage, not approximate (item H). A real fix needs a genuinely
+cutoff-aware `ScenarioExample` variant (Phase 5's "explicit observation
+cutoff" applied to the base Sentinel example, not only Scout) — materially
+larger than a Phase 7 loss-masking fix, so out of scope here. Rather than
+ship it broken or half-fix it under-tested, `future_concentration_target`
+now always returns an all-masked placeholder (fail-closed — masked
+positions contribute nothing to the loss either way), with a test
+(`test_future_concentration_disable_is_justified_by_real_input_window_
+leakage`) that builds a real `ScenarioExample` and proves the target
+timestamp is literally present in `example.inputs["timestamps"]`, so the
+justification for disabling it is checked, not just asserted in a
+docstring.
+
+**7.5 — Travel-time log1p transform (DONE)**: raw seconds (0 to tens of
+thousands) would dominate a multitask MSE next to the mostly-[0,1]-scaled
+other regression targets. Added `auxiliary_labels.TRAVEL_TIME_TRANSFORM =
+"log1p"`, applied at generation time; inverse (`expm1`) documented for
+physical-unit reporting once an evaluation script exists. New test
+verifies the stored value against an independently recomputed
+`np.log1p(raw_seconds)`.
+
+**7.6 — Normalize heterogeneous regression targets (mostly already true,
+confirmed not re-derived)**: the five Strategist consequence-proxy targets
+were already train-owned-scale-normalized by Phase 3's
+`plan_value_policy.py` (each component divided by a fixed, documented,
+train-owned scale — not fit from data). Travel-time is now covered by 7.5.
+Not further touched: sensor_reconstruction/future_concentration's mg/L
+scale (future_concentration is disabled per 7.4 regardless).
+
+**7.7 — Binary logits (deferred to Phase 9, not done)**: `evidence_head`
+ends in `nn.Sigmoid()` (trained with `F.binary_cross_entropy` against a
+probability, correctly, just not the v4-preferred logits+
+`BCEWithLogitsLoss` convention); `event_presence_head` is already a raw
+`RoleHead` (logits + `BCEWithLogitsLoss`, already correct);
+`should_continue_sampling` has no model head/output at all yet (no loss
+entry either — Phase 5.5/Phase 9 Scout-head work, not a Phase 7 bug).
+Changing `evidence_head`'s activation in place would silently break strict
+reload of the promoted checkpoint (established lesson from Phase 3/4's
+`action_vocabulary_size` regression) — a new logits-based head belongs
+behind a checkpoint-compatibility flag with Phase 9's architecture-v4
+contract, not as an in-place Phase 7 edit.
+
+**Not done in this pass**: `should_continue_sampling`/`candidate_reduction`
+still have no model head (Phase 9 Scout-head-configuration territory);
+sensor_reconstruction/future_concentration mg/L-scale normalization
+(future_concentration is disabled anyway).
 
 ## Restrictions honored
 

@@ -89,16 +89,48 @@ class ScoutTrajectory:
 
 
 def _scout_step_targets(label: ScoutLabel, node_ids: Sequence[str]) -> dict[str, torch.Tensor]:
-    # torch.Tensor-valued, matching hydroswarm.training.corpus.scenario_to_example's
-    # convention and validate_targets_v2's Mapping[str, Tensor] contract.
+    """torch.Tensor-valued, matching hydroswarm.training.corpus.scenario_to_example's
+    convention and validate_targets_v2's Mapping[str, Tensor] contract.
+
+    core-issues3.txt Phase 7.2: information_gain/candidate_reduction are
+    per-node arrays (shape [len(node_ids)]), matching HydroCore's own
+    expected_information_gain output shape, NOT the single selected
+    candidate's scalar value broadcast against every node's prediction --
+    the exact shape-mismatch class losses.masked_regression's new strict
+    shape check now catches. Populated at every candidate
+    rank_sample_locations actually scored (accessible, unsampled, within
+    top_k -- see ScoutLabel.candidates), masked elsewhere: an unranked
+    node has no computed expected-gain estimate, not a true value of zero.
+    candidate_reduction uses the exact same total_candidate_count
+    denominator ScoutLabel.candidate_reduction_fraction was normalized
+    against, not a duplicated computation.
+    """
+
     has_recommendation = label.sample_node_id is not None
+    positions = {node_id: index for index, node_id in enumerate(node_ids)}
+    information_gain = torch.zeros(len(node_ids), dtype=torch.float32)
+    information_gain_mask = torch.zeros(len(node_ids), dtype=torch.bool)
+    candidate_reduction = torch.zeros(len(node_ids), dtype=torch.float32)
+    candidate_reduction_mask = torch.zeros(len(node_ids), dtype=torch.bool)
+    for candidate in label.candidates:
+        if not candidate.accessible:
+            continue
+        position = positions.get(candidate.node_id)
+        if position is None:
+            continue
+        information_gain[position] = candidate.expected_information_gain_bits
+        information_gain_mask[position] = True
+        candidate_reduction[position] = min(
+            1.0, max(0.0, candidate.expected_candidate_reduction / label.total_candidate_count)
+        )
+        candidate_reduction_mask[position] = True
     return {
         "sample_node": torch.tensor(node_ids.index(label.sample_node_id) if has_recommendation else -1),
         "sample_node_mask": torch.tensor(has_recommendation),
-        "information_gain": torch.tensor(label.information_gain_bits),
-        "information_gain_mask": torch.tensor(has_recommendation),
-        "candidate_reduction": torch.tensor(label.candidate_reduction_fraction),
-        "candidate_reduction_mask": torch.tensor(has_recommendation),
+        "information_gain": information_gain,
+        "information_gain_mask": information_gain_mask,
+        "candidate_reduction": candidate_reduction,
+        "candidate_reduction_mask": candidate_reduction_mask,
         "should_continue_sampling": torch.tensor(label.should_continue_sampling),
     }
 

@@ -93,11 +93,52 @@ def _apply_target_mask(task: str, target: Tensor, targets: Mapping[str, Tensor])
     return target.masked_fill(~mask.bool(), -100)
 
 
-def _masked_mse(prediction: Tensor, target: Tensor) -> Tensor:
-    target = target.float()
+def masked_regression(prediction: Tensor, target: Tensor, mask: Tensor | None = None) -> Tensor:
+    """Single governed masked-regression helper (core-issues3.txt Phase 7.1).
+
+    The previous per-call regression path (``_masked_mse``) checked only
+    ``torch.isfinite(target)``, silently ignoring the ``f"{task}_mask"``
+    companion targets_v2 defines for every maskable regression target
+    (plan_value, the consequence proxies, sensor_reconstruction,
+    future_concentration, travel_time). Those targets' generators write an
+    explicit ``0.0`` placeholder at masked positions -- a *finite* value --
+    precisely so the true absence of a label is recorded in the mask, not
+    smuggled into the value itself (see targets_v2.py's module docstring).
+    Checking only finiteness therefore trained the model directly against
+    those placeholder zeros, exactly as _apply_target_mask already existed
+    to prevent for classification targets.
+
+    Also enforces `prediction.shape == target.shape` rather than relying on
+    torch's broadcasting rules: a per-node prediction ([B, N]) regressed
+    against a scalar-per-example target ([B]) broadcasts silently into a
+    meaningless loss instead of raising -- the exact shape-mismatch class
+    Phase 7.2 describes for Scout's expected_information_gain head. Gather
+    or reduce the prediction to the target's shape (or vice versa) before
+    calling this rather than depending on broadcasting to paper over a
+    shape disagreement.
+    """
+
     prediction = prediction.float()
+    target = target.float()
+    if prediction.shape != target.shape:
+        raise ValueError(
+            f"masked_regression: prediction shape {tuple(prediction.shape)} disagrees with "
+            f"target shape {tuple(target.shape)} -- reduce/gather to a matching shape rather "
+            "than relying on broadcasting"
+        )
     valid = torch.isfinite(target)
+    if mask is not None:
+        mask = mask.bool()
+        if mask.shape != target.shape:
+            raise ValueError(
+                f"masked_regression: mask shape {tuple(mask.shape)} disagrees with target "
+                f"shape {tuple(target.shape)}"
+            )
+        valid = valid & mask
     if not valid.any():
+        # A graph-connected zero (not a detached Python float) so backward()
+        # still runs cleanly through this term in a batch where every
+        # example happens to mask this particular task.
         return prediction.sum() * 0.0
     return F.mse_loss(prediction[valid], target[valid])
 
@@ -175,7 +216,7 @@ def compute_multitask_loss(
             )
     for task, output_name in regressions.items():
         if task in targets and output_name in outputs:
-            losses[task] = _masked_mse(outputs[output_name], targets[task])
+            losses[task] = masked_regression(outputs[output_name], targets[task], targets.get(f"{task}_mask"))
     if "sensor_fault" in targets and "sensor_fault_logits" in outputs:
         fault_target = targets["sensor_fault"].float()
         valid = torch.isfinite(fault_target) & (fault_target >= 0)
