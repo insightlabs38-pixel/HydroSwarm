@@ -3167,3 +3167,31 @@ reconfirmed above**: `plan_validity` (0.996-0.997 accuracy/F1 in both the
 old and new runs) was always derived from WNTR's real pressure/service
 verification, never from the broken exposure path, and is unaffected by
 this defect.
+
+### Real next-step scoping for Stage F (not started this pass — recorded, not guessed)
+
+With the important-issues.txt stop gate satisfied, `core-issues3.txt` Phase
+12 Stage F ("joint fine-tuning ... only after role-specific tasks work
+individually") is the correctly-sequenced next step. Checked directly
+rather than assumed: **Stage F is not simply "point the existing trainer at
+the v4 corpus and go."** `configs/training.yaml` already has explicit
+per-task weights for every retained target (Phase 11.1, already done), and
+`scripts/train.py` is a real governed trainer -- but it loads one flat
+JSONL manifest per example with ALL of that example's inputs/targets
+together in one dict. The three real datasets that exist today are three
+SEPARATE derived corpora, each independently overlaying only its own
+component onto the `cycle-b2`/`cycle-b2-control-v2` base:
+`cycle-b2-trajectories-v3/scout-tensors-normalized` (Scout, Phase 10.2) and
+`cycle-b2-trajectories-v4/strategist-tensors-normalized` (Strategist, this
+pass). None of the three carry every other role's targets simultaneously.
+A genuine joint-multitask run needs either (a) a new merge step producing
+one dataset with base Sentinel/control/OOD + Scout + Strategist targets
+all present per scenario_id, or (b) a training loop that joins multiple
+aligned shard sources at batch-construction time. This is real, scoped
+engineering work, not a formality -- consistent with the prior pass's own
+assessment ("explicitly NOT started ... this remains a real, substantial
+next step, not a formality"), now independently reconfirmed by inspection
+of the actual dataset/trainer code before attempting it. Not designed or
+attempted in this pass, which was scoped to the important-issues.txt
+emergency fix; recorded here rather than either guessed at with an unverified
+command or silently left implicit.
