@@ -116,8 +116,15 @@ def test_scout_label_respects_accessibility_constraints(tmp_path) -> None:
 def test_information_gain_is_nonnegative_within_tolerance(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
-    for source in sorted(network.junction_name_list):
-        scenario = _scenario(network, source_node=source, seed=hash(source) % 1000 + 20)
+    # Fixed per-source seeds, not hash(source): Python's built-in hash() on
+    # a str is randomized per-process (PYTHONHASHSEED) by default, so this
+    # test's own seed silently varied run-to-run -- occasionally landing on
+    # a seed whose randomized hydraulics produced a numerically unstable
+    # EPANET simulation (SimulationUnstableError), unrelated to the actual
+    # thing under test (information-gain nonnegativity). Confirmed flaky by
+    # repeated runs before this fix.
+    for index, source in enumerate(sorted(network.junction_name_list)):
+        scenario = _scenario(network, source_node=source, seed=20 + index)
         label = generate_scout_label(scenario, artifact)
         assert label.information_gain_bits >= -1e-9
 
