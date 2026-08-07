@@ -22,8 +22,8 @@ remain untouched.
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
 | 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
 | 7 | Auxiliary objectives / regression losses | **DONE** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
-| 8 | Second-pass calibrated control targets | **DONE** (steps 1-5, 7, 8, 9 complete + run against a real checkpoint; step 6 -- training control heads from these labels -- scoped as a documented, immediately-resumable follow-up, see below) |
-| 9 | Architecture v4 contract | **BOUNDED FIRST STEP DONE** (9.1 partial: `architecture_config()` now records every dimension/layer-count/output-width fact; rest of 9.1/9.2/9.3/9.4 deliberately deferred, see below) |
+| 8 | Second-pass calibrated control targets | **step 6 PARTIAL** (steps 1-5, 7, 8, 9 done; step 6a -- per-scenario label persistence -- DONE and run against real data this pass; step 6b -- merge into a governed corpus + train control heads -- scoped as a documented, immediately-resumable follow-up, see "core-issues4.txt continuation pass" below) |
+| 9 | Architecture v4 contract | **DONE for Sections A-E** (executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract -- see "core-issues4.txt continuation pass" below; Section F step-6b/G training run/H full adversarial sweep remain, see Next steps) |
 | 10-20 | Datasets/collation, loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
@@ -32,7 +32,283 @@ own section below). It is provisional (predates Phase 6.4/7 fixes landed
 later in this same pass); a full regeneration covering Phases 1-7 together
 is deferred to Phase 10.
 
-## Session summary (this continuation pass)
+## core-issues4.txt continuation pass (Phase 9 A-E + Phase 8 step 6a)
+
+Started from clean HEAD `948231e` (verified against the expected commit
+before any edits). Read `/workspace/core-issues3.txt` and
+`/workspace/core-issues4.txt` in full before starting. Three commits, all
+pushed to `origin/agent/gcp-multitopology-v3`, working tree clean:
+
+1. `55f0e6f` fix(control): reconcile INSPECT_SENSOR naming collision (Section G)
+2. `3223b3d` feat(model,training): HydroCore-v4 checkpoint identity, output governance, Scout control heads, candidate-plan validation (Phase 9 / Section E)
+3. `69f25ab` feat(control): persist second-pass control labels per scenario (Phase 8 step 6, part 1)
+
+Full suite: 588 -> 639 passed over the pass (51 new tests across six new
+test files), ruff and pyright clean throughout, 9/9 corpus gates still
+passing against `data/learning-v2/cycle-b2` (untouched, re-verified after
+this pass's changes). No work on `main`. Locked test not opened;
+`final-selection.json` does not exist.
+
+### Section G -- INSPECT_SENSOR reconciliation (DONE)
+
+Chose "keep separate, distinctly-named actions" over "one shared action
+with reason codes": `targets_v2.NextStep.INSPECT_SENSOR` (a Sentinel
+control-head training label derived from `event_cause == SENSOR_FAULT`)
+and `inference.fusion.ControlAction.INSPECT_SENSORS` (a live,
+already-authoritative action derived from classical/neural disagreement)
+answer genuinely different questions and can independently be true or
+false for the same incident -- merging them into one action with reason
+codes would lose that distinction. Renamed the training-label enum member
+to `NextStep.INSPECT_FAULTY_SENSOR` so the distinction is visible in the
+type itself. `ControlAction.INSPECT_SENSORS` untouched. Done before Phase
+8 step 6 persisted any real data under the old name, so no committed
+artifact ever carried the ambiguous name.
+
+### Section A/B -- executable v4 checkpoint identity (DONE)
+
+New `hydroswarm.training.checkpoint_identity` module: a frozen
+`CheckpointIdentity` dataclass assembling model construction, semantic
+schema hashes (action-template/OOD-category/event-cause/next-step
+ordering + hash, `targets_v2`'s structural schema hash, feature schema
+hash), scientific-policy versions (`PlanValuePolicy`, signature-artifact
+bucketing policy, scenario-reconstruction policy, travel-time transform,
+calibration schema), and output-governance sets into one deterministic
+fingerprint. `build_checkpoint_identity`/`validate_checkpoint_identity`/
+`verify_model_matches_identity`/`save_v4_checkpoint`/`load_v4_checkpoint`
+implement Section B's exact required load order.
+
+`HydroCore.from_checkpoint_identity` is attached to the class from this
+module (not defined inside `model/core.py`) specifically so `core.py`
+keeps its existing zero-external-`hydroswarm`-import leaf-module invariant
+-- the reasoning is documented in the module's own docstring, since it's
+the kind of design decision a future reader would otherwise have to
+rediscover.
+
+**PRIMARY DESIGN RULE honored**: `ARCHITECTURE_VERSION_V4 =
+"hydrocore-v4"` is a new constant this module owns; nothing about the
+existing v3 `ARCHITECTURE_VERSION` (`"hydrocore-v3"`),
+`verify_architecture_compatibility`, or `load_state_dict_with_v2_migration`
+changed. `hydroswarm.training.checkpoint`'s legacy `load_checkpoint`
+(unchanged otherwise) now explicitly refuses any directory containing
+`checkpoint_identity.json` (`LegacyLoaderRejectedV4CheckpointError`); the
+v4 loader requires that same file (`NotAV4CheckpointError` otherwise). Both
+directions verified by dedicated tests
+(`test_v3_checkpoint_still_loads_through_the_legacy_loader`,
+`test_v3_checkpoint_cannot_load_through_the_v4_loader`,
+`test_v4_checkpoint_cannot_load_through_the_legacy_path`).
+`load_v4_checkpoint` also cross-checks the identity's recomputed
+fingerprint against `artifact_manifest.json`'s recorded one, so either
+file being hand-edited independently of the other is caught
+(`test_altered_identity_fingerprint_fails`).
+
+All of Section B's required adversarial tests exist and pass: v4 save/load
+round trip, every architecture field reconstructs exactly, changed
+activation/normalization/action-template-ordering/OOD-category-ordering/
+PlanValuePolicy/signature-policy all fail closed, missing identity fails,
+altered fingerprint fails, and all three v3/v4 cross-load directions fail
+closed. 23 tests, `tests/unit/test_checkpoint_identity.py`.
+
+Also landed alongside this (same additive convention as the prior Phase
+9.1 commit): `HydroCore` now records the input feature-width constructor
+arguments (`node_feature_dim`/`edge_feature_dim`/`temporal_feature_dim`/
+`quality_feature_dim`/`role_feature_dim`/`action_feature_dim`/
+`verifier_feature_dim`/`residual_feature_dim`/`dropout`) as instance
+attributes and `architecture_config()` fields -- the same gap the prior
+commit fixed for every other dimension, now closed for these too. Pure
+additive, `forward()`-unaffected, confirmed by the full suite both before
+and after.
+
+### Section C -- granular output governance (DONE)
+
+New `hydroswarm.training.output_governance` module names every individual
+learned output HydroCore can produce (not just role), replacing the
+role-only `hydroswarm.tasks.RUNTIME_TASKS` granularity that let one
+validated head (e.g. `source_node`) silently authorize every other head
+sharing its role (e.g. `source_region`, `sensor_fault`) even when that
+other head never received a real gradient. Enforces the required
+invariant `runtime_enabled_outputs <= validated_outputs <= trained_outputs`
+plus "no unknown output name" -- fail-closed
+(`OutputGovernanceError`), 8 tests
+(`tests/unit/test_output_governance.py`). This module is deliberately NOT
+wired into the live `runtime/defaults.py`/`inference/pipeline.py` yet --
+there is no promoted v4 checkpoint for it to gate, and
+`DefaultPipelineFactory`'s existing v3 path (hardcoded to the real
+promoted `models/hydrocore-s-learning-v1.safetensors`) was intentionally
+left completely untouched per the restriction against overwriting current
+checkpoints. Wiring it into a live v4 runtime path is real remaining work,
+tracked below.
+
+### Section D -- retain/demote/remove decisions for every head (DONE)
+
+Full reasoning lives in `checkpoint_identity.py`'s own "Section D"
+docstring section (kept next to the mechanism it constrains, not only
+here). Summary:
+
+- **By vocabulary omission** (the old 3-logit `ood_head`,
+  `uncertainty`, `action_logits`/`action_pointer_logits`, and the
+  anonymous per-role `RoleHead` outputs are simply absent from
+  `CANONICAL_OUTPUT_NAMES`): `output_governance.validate_output_governance`
+  structurally refuses to ever let these be
+  trained/validated/runtime-enabled under v4, regardless of what a caller
+  passes. `action_logits`/`action_pointer_logits` remain physically
+  constructed in `HydroCore` (no gating flag exists for them; removing
+  them would be a breaking v3-incompatible change to shared parameters,
+  not a pure-additive one) but can never be v4-governed.
+- **`future_concentration`**: kept IN the vocabulary (a real concept a
+  correct future implementation could fill in) but
+  `build_checkpoint_identity` unconditionally rejects it from
+  `trained_outputs` with a clear error -- its target generator
+  (Phase 7.4) always returns an all-masked placeholder today, so no
+  checkpoint has ever actually trained it.
+- **Item 3, the only real code addition**: two previously-missing Scout
+  heads, `candidate_reduction_prediction` (per-node, Sigmoid-bounded
+  fraction in [0,1]) and `should_continue_sampling_logits`
+  (incident-level raw logit) -- both governed targets
+  (`targets_v2.candidate_reduction`/`should_continue_sampling`) already
+  existed with no model head to receive a gradient at all. Gated behind a
+  new `scout_control_heads` flag (default `False`, same net-new-parameters
+  compatibility convention as every other Phase-4.x/6.x flag), wired into
+  `architecture_config()`/`verify_architecture_compatibility()`/
+  `parameter_report()` and into `compute_multitask_loss` (masked per-node
+  regression / `BCEWithLogitsLoss` matching the `event_presence`
+  convention). A real backward pass through the actual multitask-loss path
+  proves both heads receive nonzero gradients
+  (`test_both_heads_receive_a_real_nonzero_gradient_through_compute_multitask_loss`).
+  11 tests, `tests/unit/test_scout_control_heads.py`.
+- Everything already correctly retained needed no change: every governed
+  Sentinel head, `sample_node`/`information_gain`, candidate-conditioned
+  Strategist as the v4 Strategist mode, and the 11-class `ood_category`
+  head as advisory-only alongside (never overriding) deterministic
+  severity.
+
+### Section E -- candidate/vocabulary contract (DONE)
+
+`HydroBatch`'s `TypedDict` now declares every candidate-plan field
+candidate-conditioned `forward()` reads
+(`plan_template_ids`/`plan_target_type`/`plan_target_node_index`/
+`plan_target_link_index`/`plan_features`/`plan_mask`, plus two
+Phase-10-reserved budget/verifier-history fields) -- previously undeclared
+entirely, a real schema gap for any caller/collator/type-checker relying
+only on the TypedDict. Added real dimension/value-range validation before
+any embedding/gather: an out-of-range template id, target type, or
+node/link target index at a REAL (`plan_mask=True`) position now fails
+closed with a clear `ValueError` instead of reaching `torch.gather`/
+`nn.Embedding` directly. The prior code only clamped the lower bound
+(`clamp(min=0)`) on target indices -- an out-of-range upper value would
+have reached `torch.gather` directly (opaque low-level error at best).
+
+**Real defect found while adding this validation, not by inspection**:
+`CandidatePlanEncoder.template_ids`/`target_type` embeddings ran on the
+FULL tensor, including padded (`plan_mask=False`) positions, before any
+masking -- a padded plan carrying an out-of-vocabulary sentinel (a natural
+padding convention; `plan_target_node_index`/`plan_target_link_index`
+already use `-1` this exact way elsewhere in this same module) crashed
+the model outright with `IndexError: index out of range in self`, caught
+by `test_out_of_range_template_id_at_padded_position_is_tolerated`
+actually failing on its first real run (not merely anticipated). Fixed in
+`candidate_plan_encoder.py` by substituting a fixed, always-valid index at
+padded positions only (discarded by the encoder's own trailing
+`masked_fill` regardless); real positions are unaffected and still
+range-checked by the caller. 13 tests,
+`tests/unit/test_candidate_plan_batch_validation.py`.
+
+### Section F -- second-pass control-label persistence, part 1 of 2 (DONE)
+
+The existing `scripts/run_second_pass_control_labels.py` only ever wrote
+aggregate reports (materializing the full label `list(...)` in memory to
+compute summary statistics) -- it never persisted individual rows, so its
+output could not be used as training data. New
+`scripts/persist_second_pass_control_labels.py` streams ONE JSONL row at a
+time directly from `generate_second_pass_control_labels`'s generator (no
+`list(...)` of the whole split), writing a checksummed manifest alongside
+it: row count, `jsonl_sha256`, `teacher_checkpoint_hash`,
+`calibration_hash` (via `CalibrationArtifact.artifact_hash`), and a new
+`control_policy_hash` (`second_pass_control_policy_hash()`) covering the
+actual second-pass threshold VALUES, not just a version string, so a
+future threshold change is a hash change even without a manual version
+bump.
+
+`SecondPassControlLabel` gained `network_id`/`topology_hash` fields
+(trivially available at generation time; the single existing construction
+site updated, no other call sites exist).
+
+**Run for real** against the actual trained Stage-A checkpoint
+(`experiments/runs/v4-stage-a-sentinel/E1-seed20260810`'s selected
+checkpoint + calibration, the same one Phase 8 steps 1-9 already
+validated): 9000 train rows, 1000 validation rows, committed as regular
+git text under `data/learning-v2/cycle-b2-control-v2/second-pass-labels/`
+(4.8 MB + 540 KB). Both runs' `next_step_distribution` matches the
+previously-reported aggregate numbers EXACTLY (train
+`COLLECT_SAMPLE/GENERATE_PLANS/INSPECT_FAULTY_SENSOR` =
+3609/4081/1310, validation = 402/459/139) -- direct confirmation the
+streaming path computes identical labels to the already-verified
+list-based path, not just that it runs without error. 9 tests,
+`tests/scientific/test_persist_second_pass_control_labels.py`.
+
+**NOT done this pass** (Section F's remaining half, scoped as an
+immediately-resumable follow-up below, for the same reason Phase 8 step 6
+was scoped-and-deferred once already in the prior pass -- rushing a
+corpus-merge-plus-training-run under time pressure is exactly what this
+project's own retrospective repeatedly warns against, e.g. the
+Phase 3/4 `action_vocabulary_size` regression): joining these persisted
+labels by `scenario_id` into a new, versioned corpus
+(`data/learning-v2/cycle-b2-control-v2/` per the suggested location) that
+ALSO contains corrected `event_cause` labels (recomputed via the
+now-fixed `hydroswarm.training.corpus._event_cause` against each
+scenario's real `GeneratedScenario` -- loadable via
+`hydroswarm.data.scenarios.load_generated_scenarios(cycle-b2-root, split)`
+-- rather than reusing `cycle-b2`'s own stored `event_cause` tensor, which
+still carries the ~5% pre-Phase-6.4 `HYDRAULIC_MISMATCH` mislabel per its
+own documented, protected-artifact caveat); running corpus gates on the
+result; and training `event_control_heads=True` control heads from it
+(frozen-backbone first, per Section F's own explicit staging).
+
+Exact resume commands:
+
+```bash
+export PYTHONPATH=src
+
+# Step 6a (DONE, already committed -- re-run only to regenerate/verify):
+for split in train validation; do
+  python scripts/persist_second_pass_control_labels.py \
+    --checkpoint experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors \
+    --calibration experiments/runs/v4-stage-a-sentinel/E1-seed20260810/calibration.json \
+    --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+    --split "$split" --prior-mode feature_only \
+    --output-dir data/learning-v2/cycle-b2-control-v2/second-pass-labels
+done
+
+# Step 6b (NOT YET WRITTEN -- the next piece of work):
+# 1. Write scripts/merge_second_pass_control_labels.py:
+#    - load_generated_scenarios(Path("data/learning-v2/cycle-b2"), DatasetSplit.TRAIN/.VALIDATION)
+#      to get real GeneratedScenario objects, keyed by scenario_id
+#    - recompute event_cause = hydroswarm.training.corpus._event_cause(scenario) per scenario
+#      (the corrected, post-Phase-6.4 classifier -- do NOT reuse cycle-b2's own stored
+#      event_cause tensor, which is a protected artifact with a known, documented ~5%
+#      HYDRAULIC_MISMATCH mislabel)
+#    - stream-join data/learning-v2/cycle-b2-control-v2/second-pass-labels/{split}.jsonl
+#      by scenario_id against the corrected event_cause map
+#    - write evidence_sufficiency/next_step/event_cause target tensors (following
+#      scripts/merge_trajectory_targets.py's existing tensor-writing convention) into a new
+#      tensors-normalized-v2-control variant under data/learning-v2/cycle-b2-control-v2/
+#    - write manifest/index/checksums/teacher-checkpoint-identity/calibration-identity/
+#      control-policy-identity/leakage-report/label-distribution-report (Section F's
+#      explicit list)
+# 2. python scripts/run_corpus_gates.py --corpus-dir data/learning-v2/cycle-b2-control-v2
+# 3. Train: v4 model, event_control_heads=True, initialize compatible Sentinel weights from
+#    the Stage-A checkpoint above, freeze backbone first, train evidence_sufficiency/
+#    next_step heads, evaluate on validation, retain the frozen-backbone result as an
+#    ablation baseline before considering an optional low-LR joint fine-tune.
+# 4. Required real metrics: evidence-sufficiency accuracy/F1, next-step macro F1 and
+#    per-class recall, policy agreement, unsafe non-abstention count, GENERATE_PLANS-with-
+#    empty-candidate-set count, output calibration where applicable. Record the teacher
+#    checkpoint hash in the resulting student checkpoint (already available:
+#    reports/results/v4/second-pass-control-labels-{train,validation}.json's
+#    teacher_checkpoint_hash, and the new manifest files' calibration_hash/
+#    control_policy_hash).
+```
+
+## Session summary (prior continuation pass)
 
 Starting point: Phases 0-5 done, Phase 6 partial (crash-bug fixed, items
 6.2-6.6 not started), corpus regeneration in progress. This pass completed
@@ -933,58 +1209,82 @@ Locked test not opened; `final-selection.json` does not exist. No destructive
 git/filesystem commands used. No sudo, no credential exposure. All commits
 pushed to `origin/agent/gcp-multitopology-v3`.
 
-## Next steps
+## Next steps (current, as of the core-issues4.txt continuation pass)
 
-Phases 1-8 are now DONE (Phase 8 modulo step 6, scoped as an immediately-
-resumable follow-up above). Remaining work:
+Phase 9 Sections A-E are DONE (see that section above). Phase 8 is DONE
+through step 6a (per-scenario label persistence); step 6b (merge + train)
+remains, exact resume commands in that section above. core-issues4.txt's
+own stop-gate checklist (section H) status:
 
-1. **Phase 8 step 6** (deferred, not skipped): write a `merge_trajectory_
-   targets.py`-analogous script folding `SecondPassControlLabel` output
-   into a governed corpus variant, then train with
-   `event_control_heads=True` from it. Exact resume commands are in
-   Phase 8's section above.
-2. **Phase 6.3 follow-up** (deferred, not skipped): turn
-   `ood_labels.OOD_TRIGGERING_CONFIG_OVERRIDES` into an actual Cycle-B2-
-   scale balanced OOD corpus, and measure the item's trained-model-
-   dependent metrics (false-normal rate, macro F1, calibration by
-   category) now that a real checkpoint exists to evaluate against.
-3. **A future full corpus regeneration** (Phase 10 territory) covering
-   Phases 1-7 together for `cycle-b2-trajectories-v2` (currently
-   provisional -- predates Phase 6.4's `HYDRAULIC_MISMATCH` fix and
-   Phase 7's Scout/auxiliary-target fixes).
-4. **Phase 9**: architecture-v4 contract. `strategist_mode`,
-   `ood_category_head`, and every other Phase-4.x/6.x flag this pass
-   added are already individually recorded in `architecture_config()`,
-   but Phase 9 wants a single strictly-validated contract (trained/
-   validated/runtime-enabled output sets, not role-level gating) plus
-   action-template/OOD-category/plan-feature schema hashes,
-   normalization/transform hashes, and the `PlanValuePolicy`/signature-
-   artifact-policy hashes this pass's new modules already expose
-   individually (`PLAN_VALUE_POLICY_VERSION`, `TRAVEL_TIME_TRANSFORM`,
-   `signature-reconstruction-v1`, etc.) but have not yet been assembled
-   into one contract. Not started this pass -- deliberately: it is a
-   large, cross-cutting change touching `model/core.py`'s live
-   `architecture_config()`/checkpoint-compatibility path, and this
-   session's own established lesson (the Phase 3/4 `action_
-   vocabulary_size` regression) is that changes there need a full test
-   run before being treated as safe, which needs a dedicated block of
-   session time this pass did not have left after completing Phases
-   6-8 thoroughly.
-5. Phases 10-20 (dataset/collator work, loss-system config, staged
-   training/ablations, required metrics, promotion gates, runtime
-   integration, corpus gates, CI, artifact governance, architecture
+- [x] `ARCHITECTURE_VERSION_V4` defined for new v4 models (legacy
+      `ARCHITECTURE_VERSION` untouched)
+- [x] legacy v3 remains loadable through a separate explicit path
+- [x] v4 identity reconstructs every behavior-critical field
+- [x] v4 checkpoints persist and verify all schema/policy/artifact hashes
+- [x] trained/validated/runtime output sets are implemented
+      (`output_governance`) -- NOT yet wired into a live runtime path
+      (no promoted v4 checkpoint exists to wire it to)
+- [x] action vocabulary is canonical and nine-class where relevant
+- [x] candidate-conditioned Strategist no longer depends on anonymous
+      position (was already true from the prior pass; Section E hardened
+      its input validation)
+- [x] missing Scout heads exist and receive losses
+- [x] orphaned outputs are removed or explicitly demoted (by vocabulary
+      omission, documented in checkpoint_identity.py's Section D writeup)
+- [x] second-pass control labels are persisted per scenario
+- [ ] the corrected control corpus passes gates -- NOT DONE (merge script
+      not yet written, Section F's remaining half)
+- [ ] control-head training completes on real data -- NOT DONE (blocked
+      on the merge above)
+- [x] full tests, Ruff and Pyright pass (639 passed, both clean)
+- [x] working tree is clean and commits are pushed
+- [x] locked test remains unopened
+- [x] `final-selection.json` does not exist
+
+**Honest assessment**: Phase 9 is complete through Section E; the
+continuation's own instructions frame Section F step 6b (train + persist
+per-scenario, corpus merge, control-head training) and the full adversarial
+test sweep in Section H as one continuous requirement before Phase 9 can be
+called fully done. Step 6a is real, tested, and run against real data;
+6b (the corpus merge + actual training run) is scoped and NOT attempted,
+for the same reason this exact deferral happened once already in the prior
+pass -- see Phase 8's section above for why, and for the exact commands to
+resume it.
+
+Remaining work, roughly in priority order:
+
+1. **Phase 8 step 6b / Section F remainder** (deferred, not skipped, exact
+   resume commands in that section above): write
+   `scripts/merge_second_pass_control_labels.py`, run corpus gates on the
+   result, train `event_control_heads=True` control heads (frozen backbone
+   first), record real evidence-sufficiency/next-step/policy-agreement/
+   unsafe-non-abstention metrics.
+2. **core-issues4.txt Section I / core-issues3.txt Phase 10**: regenerate
+   the final non-provisional trajectory corpus incorporating all Phase 1-9
+   corrections; build sharded Scout-state and Strategist-candidate
+   datasets/collators (the `scout_control_heads`/candidate-conditioned
+   architecture landed this pass now has real heads to train, but still no
+   dataset/collator wiring real data into them); generate the balanced
+   supported-category OOD extension (Phase 6.3's still-open follow-up);
+   run real multi-topology gradient/training smoke tests for every
+   retained v4 output. Not started.
+3. **Wire `output_governance`/checkpoint-identity into a live v4 runtime
+   path**: `runtime/defaults.py`/`inference/pipeline.py` still only
+   understand the v3 `trained_tasks` role-level gating. This has no
+   promoted v4 checkpoint to point at yet (Phase 9's own training/
+   selection work is not done), so building the v4 runtime path is
+   naturally sequenced after step 1-2 above, not before.
+4. Phases 11-20 (loss-system config, staged training/ablations, required
+   metrics, promotion gates, CI, artifact governance, architecture
    selection, locked-test boundary) not started.
-6. A recurring pattern worth carrying forward: every phase this pass
-   touched surfaced at least one real, previously-unobserved defect only
-   visible once exercised at real scale or with a genuinely adversarial
-   test case (not by code inspection alone) — Phase 1's three sub-bugs,
-   Phase 3's checkpoint-compatibility regression, Phase 5's read-only-array
-   bug, Phase 6.1's latent crash, Phase 6.4's active `HYDRAULIC_MISMATCH`
-   mislabeling bug, Phase 7.4's real future-concentration leakage (proven
-   with a test, not just argued), and Phase 8's INSPECT_SENSOR
-   overclaim (caught and corrected before committing by checking more
-   broadly than the first, narrower answer). Continue prioritizing
-   real-scale/real-data testing over unit tests with synthetic arrays,
-   and re-checking a "no X exists" claim against the WHOLE codebase
-   before committing it, not just the one module that prompted the
-   question.
+5. A recurring pattern worth carrying forward, extended this pass: every
+   phase touched so far has surfaced at least one real,
+   previously-unobserved defect only visible once exercised at real scale
+   or with a genuinely adversarial test case, not by inspection alone --
+   this pass's own new instance is Section E's padded-plan
+   `CandidatePlanEncoder` crash (`IndexError: index out of range in
+   self`), caught by a test that was expected to pass on first write and
+   didn't. Continue prioritizing real-scale/real-data testing over unit
+   tests with synthetic arrays, and re-checking a "no X exists" claim
+   against the WHOLE codebase before committing it, not just the one
+   module that prompted the question.
