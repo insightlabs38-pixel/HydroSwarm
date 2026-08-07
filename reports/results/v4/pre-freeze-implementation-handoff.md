@@ -2352,6 +2352,229 @@ from the post-Phase-12-Stage-B baseline (697), matching the one new test
 this pass added (`test_reindex_to_signature_grid_is_usable_directly_with_
 localize_with_signatures`).
 
+## Phase 12 Stage E (core-issues3.txt "PHASE 12", Stage E: Strategist) -- DONE, with a significant real defect surfaced
+
+Continuation within the same overnight autonomous run, immediately after
+the Phase 12 Stage D work above -- picked up per this session's own
+instruction ("begin work on phase 12 section E unless something was
+deferred"; nothing was deferred, and Stage D's own "Next steps" already
+named Stage E as the natural next real training step). Two commits, both
+pushed to `origin/agent/gcp-multitopology-v3`:
+
+1. `73699f7` feat(training): train Strategist heads for real (Stage E prep)
+2. `daa947e` feat(training): Stage E Strategist-policy comparison script and real run
+
+No work on `main`. Every protected artifact untouched. Locked test not
+opened; `final-selection.json` does not exist.
+
+### Prerequisite: train the candidate-conditioned Strategist heads for the first time (real run)
+
+Same situation Stage D found for Scout: `plan_value_head`/`plan_validity_head`
+are unconditional base heads already present in the Stage-A Sentinel
+checkpoint, but Stage-A trained with the default `strategist_mode=
+"anonymous_queries"` and the stale `action_vocabulary_size=8` default (the
+exact 8-vs-9 mismatch `checkpoint_identity.py`'s own Section D documents),
+so those heads never saw a real candidate-plan representation --
+`candidate_plan_encoder`/`consequence_proxy_heads` did not exist in that
+checkpoint at all. New `scripts/train_strategist_heads.py` (frozen
+backbone, matching `train_scout_heads.py`'s established pattern) trains
+all 4 Strategist heads on Phase 10.3's real `cycle-b2-trajectories-v3/
+strategist-tensors-normalized` dataset (9000 train / 1000 validation
+candidates -- every real validation scenario carries all 9 canonical
+candidates, all exactly WNTR-verified per Phase 3.1's own repair). The
+teacher checkpoint's `action_head` weights are deliberately dropped before
+loading (`load_state_dict(strict=False)` after popping those keys) --
+vocab-size-incompatible (8 vs 9) AND excluded from the v4 output vocabulary
+regardless (`checkpoint_identity.py` Section D item 6: deterministic
+candidate plans own action-template/target identity; the learned model
+only ranks/validates/prescreens).
+
+**Real result** (727.2s, `experiments/runs/v4-strategist-heads/
+20260807T173109Z-bf941ddc/checkpoints/checkpoint-0010`, 10 epochs):
+
+| metric | value |
+|---|---|
+| `plan_validity` accuracy | **0.996** |
+| `plan_validity` precision / recall / F1 | 0.994 / 1.000 / 0.997 |
+| `plan_value` MSE | 3.4e-5 |
+| `exposure_proxy` / `pressure_risk_proxy` / `service_loss_proxy` / `containment_time_proxy` / `plan_regret_proxy` MSE | all ~3e-6 to 3e-5 |
+
+`plan_validity` is real signal (WNTR genuinely rejects ~26% of the 9000
+training candidates on pressure/service grounds, and this head learns that
+boundary well). The near-zero regression MSEs are **not** evidence of a
+well-learned value function -- see the next section.
+
+### A significant real defect this stage surfaced (not fixed in this pass)
+
+While building the Stage E policy comparison, the near-perfect regression
+MSEs above looked suspicious enough to check directly rather than accept
+at face value (this project's own established discipline: "independently
+verifying a failing assertion's root cause before either dismissing it as
+a test bug or reporting it as a real regression" -- carried forward here
+to a suspiciously GOOD number instead of a failing one). Checked directly
+against the full validation split, not by inspection:
+
+```
+total_valid 6629
+exposure_nonzero 0        (0.0% of valid candidates)
+pressure_nonzero 0
+service_nonzero 0
+containment_lt1 0          (containment_time_proxy is 1.0 -- "never contained" -- always)
+scenarios_with_cost_variation 0 / 1000
+```
+
+**Every one of the 6629 valid candidates across all 1000 validation
+scenarios has an IDENTICAL cost, hence an IDENTICAL `plan_value` of exactly
+1.0.** `plan_value_policy.evaluate_plan_value`'s formula
+(`plan_value = 1/(1+regret)`, `regret = cost - min(pool costs)`) is correct
+and well-tested (`tests/scientific/test_plan_value_policy.py`'s own
+monotonicity tests pass) -- the defect is upstream, in what `cost` is
+computed FROM.
+
+**Root cause** (traced to source, not guessed): `HydraulicSimulator.
+evaluate_plan()` (`src/hydroswarm/simulation/wrapper.py:792-865`) --
+the function `PlanVerifier.verify()` calls, which `generate_strategist_
+labels` (`src/hydroswarm/training/strategist_labels.py`) uses for
+Strategist training-label generation, AND which the live
+`POST /api/incidents/{id}/plans/{id}/verify` endpoint
+(`src/hydroswarm/api/app.py:639`) uses for real-time plan verification --
+only runs `self._run_hydraulics(model)`, a **pure hydraulic** simulation
+(pressure, demand, flow). It builds its returned `ConsequenceMetrics` from
+only `minimum_pressure_m`/`pressure_violation_minutes`/`unserved_demand_l`/
+`service_availability`/`operation_count`. It never calls
+`calculate_exposure_consequences()`/`HydraulicSimulator.
+calculate_consequences()` (`src/hydroswarm/simulation/consequences.py`,
+`wrapper.py:652-681`) -- the water-quality-aware function this SAME module
+already implements, tests (`tests/scientific/test_consequences.py`), and
+uses elsewhere. `ConsequenceMetrics`' `contaminant_mass_consumed_mg`
+(default `0.0`) and `containment_time_minutes` (default `None`) are simply
+never set by `evaluate_plan()`, so every plan -- regardless of what it
+actually does -- silently gets the Pydantic field defaults.
+
+**This is not a training-corpus-only gap.** `hydroswarm.evaluation.golden.
+py` (the demo/golden-fixture builder, line ~244) already works around this
+exact same incompleteness by computing `calculate_exposure_consequences`
+SEPARATELY and merging it in by hand -- informal evidence someone already
+recognized `PlanVerifier.verify()` alone is insufficient, but the fix was
+only ever applied in one demo-fixture builder, never in
+`HydraulicSimulator.evaluate_plan()`/`PlanVerifier` itself. Both
+`strategist_labels.py` (training) and `api/app.py`'s `/verify` endpoint and
+`evidence_bundle()` (`app.py:746`, surfaced directly to operators via
+`EvidenceBundle.consequence`) trust `verification.consequences` as-is, with
+no such enrichment step. **The live, deployed system's operator-facing
+plan "consequence" therefore never reflects real contamination-exposure
+reduction -- only hydraulic pressure/service impact** -- for a product
+whose entire mission is contamination-incident response. This is
+independent of, and larger in scope than, Stage E's own narrow task.
+
+**Why this was not fixed in this same pass**: this is a large,
+cross-cutting, safety-adjacent change (touches the live plan-verification
+path, not just training-label generation), requires a real design decision
+(how does injecting a contamination-transport simulation into plan
+verification interact with the plan's own hydraulic actions -- run both a
+hydraulic-only pass, per current behavior, AND a chemical-transport pass
+per candidate? at what cost in simulator time, given `PlanVerifier.verify`
+already runs once per bounded candidate?), and would require regenerating
+the ENTIRE `cycle-b2-trajectories-v3` Strategist corpus (Phase 3.1's
+labels) once fixed -- well beyond "Phase 12 Stage E" scope and in tension
+with "prefer bounded, reviewable changes over broad rewrites." Recorded
+here as a concrete, high-priority follow-up instead
+(see "Next steps" below), not silently smoothed over or hidden behind the
+good-looking MSE numbers.
+
+### Stage E policy comparison, honestly interpreted given the defect above
+
+`scripts/run_stage_e_strategist_comparison.py` compares the 4 required
+policies using `cycle-b2-trajectories-v3/strategist-tensors-normalized`'s
+already-exact WNTR-verified candidate targets directly -- no re-simulation
+needed, since Phase 3.1 already verifies the FULL bounded candidate set
+unconditionally for every training-label scenario (see the script's module
+docstring, "What 'simulator calls' means here", for the full, deliberate
+scoping rationale). WNTR remains authoritative in every policy: every
+final selection is always the ground-truth `plan_validity`/`plan_value` of
+whichever candidate(s) that policy chose to "check," never a raw predicted
+score.
+
+**Real result** (1000 validation scenarios, 4.3s):
+
+| policy | mean simulator calls | selected-valid rate | found non-`NO_ACTION` plan rate | mean regret vs. oracle |
+|---|---|---|---|---|
+| `exact_all` (oracle) | 9.0 | 1.000 | 0.000 | 0.0 (reference) |
+| `deterministic_heuristic` | 3.0 | 1.000 | 0.996 | 0.0 |
+| `learned_prescreen` | 3.0 | 1.000 | 0.944 | 0.0 |
+| `learned_ordering` | **1.0** | 1.000 | 0.960 | 0.0 |
+
+**What is and is not a real finding here, given the plan_value defect
+above**:
+
+- **`mean_regret_vs_oracle == 0.0` for every policy is NOT a real finding.**
+  With every valid candidate's `plan_value` tied at exactly 1.0, regret is
+  mechanically 0 for any policy that selects any valid candidate -- this
+  metric currently has zero discriminating power and must not be read as
+  "every policy finds the truly best plan." It will only become meaningful
+  once the root-cause defect above is fixed and `plan_value` genuinely
+  varies by candidate.
+- **`exact_all`'s `found_non_no_action_plan_rate == 0.000` is a tie-break
+  artifact, not evidence NO_ACTION is usually best.** `policy_exact_all`
+  ranks all-tied-at-1.0 candidates by a stable sort over `generate_response_
+  plans`' own original candidate order (`NO_ACTION` always first), and
+  `_select_from_shortlist`'s strict `>` comparison never displaces a
+  first-seen tied value -- so the oracle, as currently defined, always
+  "prefers" `NO_ACTION` among ties. `deterministic_heuristic`/
+  `learned_prescreen`/`learned_ordering` check candidates in THEIR OWN
+  ranked order instead (the heuristic's own tie-break explicitly sorts
+  `NO_ACTION` LAST, matching `prescreen_top_plans`' real production
+  behavior), so they almost always find a non-`NO_ACTION` valid candidate
+  first and keep it (nothing later in a strict-`>` scan can displace an
+  already-tied-for-best pick). This is a real property of each policy's
+  own ranking order, but says nothing about which plan is actually BEST
+  until `plan_value` carries real signal.
+- **What IS a real, meaningful finding: `first_checked_was_valid_rate` ≈
+  0.996 for every policy, and `selected_valid_rate == 1.000` for every
+  policy.** WNTR's pressure/service-availability constraints (the part of
+  plan verification that DOES vary meaningfully -- `plan_validity`'s own
+  0.996 accuracy/0.997 F1 above) are rarely binding for this corpus's
+  candidate plans -- almost any bounded candidate already satisfies them.
+  Combined with the fallback-to-`NO_ACTION` structure every policy shares,
+  every policy here achieves perfect operational safety (never proposes an
+  invalid plan) by construction, not because of ranking quality.
+- **What IS a real, promising efficiency signal: `learned_ordering`
+  achieves the same 100% valid-selection outcome as every other policy
+  while checking only 1 candidate (vs. 3 for both `deterministic_heuristic`
+  and `learned_prescreen`, 9 for the oracle) -- a genuine 3x-9x reduction
+  in "exact simulations checked" for the CURRENTLY-measurable dimension
+  (validity), consistent with core-issues3.txt Phase 13's own "reduce the
+  number of exact simulations needed" Strategist goal.** This result is
+  real and worth carrying forward, but its practical value is currently
+  bounded by the same defect: it demonstrates the learned ranker can find
+  A hydraulically-valid plan efficiently, not yet that it can find the
+  MOST EXPOSURE-REDUCING valid plan efficiently -- that claim requires the
+  root-cause fix above before it can be tested at all.
+
+Reproduce:
+
+```bash
+export PYTHONPATH=src
+# 1. Train Strategist's heads (~12 min):
+python scripts/train_strategist_heads.py
+
+# 2. Run the real 4-policy comparison (~5s for the full 1000-scenario validation split):
+python scripts/run_stage_e_strategist_comparison.py --limit 1000
+# (--strategist-checkpoint to override the auto-detected checkpoint from step 1;
+# --limit 0 for the entire split; smaller --limit for a fast smoke test)
+```
+
+### Full suite, Ruff, Pyright
+
+`ruff check src scripts tests` and `pyright src scripts tests` both clean.
+Full `pytest` suite re-run after this pass: **698 passed, 0 failed**
+(583.9s) -- unchanged from the post-Phase-12-Stage-D baseline (this pass
+added no new pytest test files; Stage D's own scripts had none either --
+these Stage training/comparison entry-point scripts are validated by real
+execution + a smoke run, matching that established convention, not by
+dedicated unit tests of the underlying model/dataset code, which already
+has its own coverage).
+
 ## Restrictions honored
 
 No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
@@ -2365,23 +2588,58 @@ first run -- was this same session's own untracked, never-committed
 scratch output). No sudo, no credential exposure. All commits pushed to
 `origin/agent/gcp-multitopology-v3`.
 
-## Next steps (current, as of the completed Phase 12 Stage D pass)
+## Next steps (current, as of the completed Phase 12 Stage E pass)
+
+**Most important open item, found this pass (see "Phase 12 Stage E"
+above for the full root-cause writeup): `HydraulicSimulator.evaluate_plan()`
+(`src/hydroswarm/simulation/wrapper.py:792-865`) never computes
+contamination-exposure consequences -- only hydraulic pressure/service
+impact.** `contaminant_mass_consumed_mg`/`containment_time_minutes` are
+Pydantic-default (`0.0`/`None`) for every plan, verified directly across
+all 1000 validation scenarios / 6629 valid Strategist candidates (zero
+cost variation, anywhere). This affects BOTH the Strategist training
+corpus's `plan_value`/consequence-proxy labels (Phase 3.2/3.3's own
+targets, believed correctly populated since their introduction, are
+provably degenerate) AND the live `/api/incidents/{id}/plans/{id}/verify`
+endpoint's operator-facing consequence (`EvidenceBundle.consequence`,
+`app.py:746`) -- the deployed system currently cannot report or rank
+plans by real contamination-exposure reduction, only by pressure/service
+safety. Recommended fix direction: wire
+`calculate_exposure_consequences()`/`HydraulicSimulator.
+calculate_consequences()` (already implemented, tested, and used by
+`evaluation/golden.py`'s own demo-fixture builder as a hand-merged
+workaround) into `evaluate_plan()` itself, which requires deciding how a
+per-plan chemical-transport simulation is incorporated into plan
+verification (today `evaluate_plan` runs one pure-hydraulic pass per
+candidate; a contamination-aware version needs the incident's source
+profile threaded through `PlanVerifier`/`HydraulicSimulator` construction
+and a second, more expensive water-quality pass), then regenerating the
+entire `cycle-b2-trajectories-v3` Strategist corpus once fixed. Not
+attempted this pass -- large, cross-cutting, safety-adjacent, and well
+beyond "Phase 12 Stage E" scope; flagged here as the highest-priority
+concrete follow-up rather than fixed hastily or left implicit in a good-
+looking MSE number.
 
 **Phase 8, Phase 9 (core-issues4.txt Sections A-I), Phase 10
 (core-issues4.txt Section I / core-issues3.txt Phase 10, all 5 items),
-Phase 11 (all 5 items), and Phase 12 Stages B/C/D are all fully DONE.** See
-"core-issues4.txt continuation pass, part 2" above for the Section H
+Phase 11 (all 5 items), and Phase 12 Stages B/C/D/E are all fully DONE.**
+See "core-issues4.txt continuation pass, part 2" above for the Section H
 stop-gate checklist (all 16 items verified true), the "Phase 10" section
 for its full item-by-item detail, "Phase 11" for 11.1-11.5, "Phase 12 Stage
 B" for the real ablation results (`travel_time` is a clean win;
 `sensor_reconstruction` needs a scale fix before it is a reliable
-promotion candidate), and "Phase 12 Stage D" immediately above this one for
-the real Scout-policy comparison (`learned_scout` shows real, positive,
-operationally-grounded competence -- 56.7% agreement with classical EIG, up
-from 6.7% untrained -- but is not yet promotable pending a real
-architecture change to support multi-step evaluation; classical EIG
-clearly beats random/fixed-order on the operational resolved-within-3-
-samples metric, 69.7% vs 61.0%). Phase 10 summary (unchanged from the
+promotion candidate), "Phase 12 Stage D" for the real Scout-policy
+comparison (`learned_scout` shows real, positive, operationally-grounded
+competence -- 56.7% agreement with classical EIG, up from 6.7% untrained --
+but is not yet promotable pending a real architecture change to support
+multi-step evaluation; classical EIG clearly beats random/fixed-order on
+the operational resolved-within-3-samples metric, 69.7% vs 61.0%), and
+"Phase 12 Stage E" immediately above this one for the real Strategist-
+policy comparison and the exposure-blind-consequence defect it surfaced
+(`learned_ordering` finds a hydraulically-valid plan with 1 simulator call
+vs. 3-9 for the other policies -- real and promising on the currently-
+measurable validity dimension, but regret/value comparisons are not yet
+meaningful pending the fix above). Phase 10 summary (unchanged from the
 prior pass):
 
 1. Regenerate the final non-provisional trajectory corpus -- **DONE**, all
@@ -2446,15 +2704,13 @@ decision):
   (only 18% of picks, in a real spot-check). Root cause still open; the
   multi-step operational metrics (which DO clearly favor classical EIG)
   are the more decisive signal in the meantime.
-- **Phase 12 Stages E-G** (E: Strategist ablation comparisons against
-  deterministic/exact-WNTR-only ordering; F: joint fine-tuning across
-  roles; G: HydroCore-M, conditional on a measured capacity-limited case)
-  -- Stage E (Strategist) is the natural next real training step:
-  Phase 10.3 already built and proved the Strategist-candidate dataset
-  trainable (the candidate-conditioned architecture's first real training
-  data in this project's history), but nothing has yet trained it for
-  real or compared its ranking against the required deterministic/exact-
-  WNTR baselines.
+- **Phase 12 Stages F-G** (F: joint fine-tuning across roles; G:
+  HydroCore-M, conditional on a measured capacity-limited case) -- Stage E
+  (Strategist) is now DONE, see above. Stage F is the natural next step,
+  but its value is currently bounded by the same plan-value defect: a
+  joint fine-tune that includes the Strategist's plan_value/proxy losses
+  would be tuning against a target with zero real variance until the
+  root-cause fix lands.
 - Phases 13-20 (required metrics/baselines, promotion gates, runtime
   integration, corpus gates, CI, artifact governance, architecture
   selection, locked-test boundary) not started.
