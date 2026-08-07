@@ -44,6 +44,7 @@ from .ood_labels import classify_ood_category, ood_class_target
 from .permutation import EquivarianceReport, measure_equivariance, permute_example
 from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
+from .scale_safety import ScaleSafetyError, ScaleSafetyReport, run_scale_safety_check
 from .scout_labels import ScoutLabel, build_signature_artifact_for_network, generate_scout_label
 from .scout_trajectory import ScoutTrajectory, ScoutTrajectoryStep, build_scout_trajectory
 from .sharded_data import ShardedScenarioDataset, write_shards
@@ -105,6 +106,9 @@ __all__ = [
     "RemainingBudgets",
     "RunArtifacts",
     "RunHandle",
+    "ScaleSafetyError",
+    "ScaleSafetyReport",
+    "run_scale_safety_check",
     "ScenarioDatasetView",
     "ScenarioExample",
     "ScoutLabel",
