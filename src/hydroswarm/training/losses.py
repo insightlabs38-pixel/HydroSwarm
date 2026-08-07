@@ -128,7 +128,16 @@ def compute_multitask_loss(
         "action_template": "action_logits",
         "target_pointer": "action_pointer_logits",
         "plan_validity": "plan_validity_logits",
-        "ood_class": "ood_logits",
+        # core-issues3.txt Phase 6: was "ood_logits" -- a pre-existing
+        # 3-logit head for a different, deterministic-severity-adjacent
+        # concept (OODLevel), not the governed 11-category ood_class
+        # taxonomy (hydroswarm.training.ood_categories.OODCategory).
+        # Training this task against the old 3-logit head would raise the
+        # moment a real label index >= 3 appeared (SEVERE_MISSINGNESS=7,
+        # FROZEN_DRIFTING_SENSOR=8) -- only present in outputs when the
+        # model was built with ood_category_head=True, so silently skipped
+        # (like every other entry here) for models built without it.
+        "ood_class": "ood_category_logits",
         # overnight-plan.txt Task 4.4: only present in outputs when the
         # model was built with event_control_heads=True, so these are
         # silently skipped (like every other entry here) for models built

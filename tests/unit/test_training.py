@@ -82,7 +82,10 @@ def test_multitask_loss_covers_semantic_heads_and_weights() -> None:
         "action_pointer_logits": torch.tensor([[0.0, 3.0]], requires_grad=True),
         "plan_value": torch.tensor([[0.2, 0.4]], requires_grad=True),
         "plan_validity_logits": torch.tensor([[[3.0, 0.0], [0.0, 3.0]]], requires_grad=True),
-        "ood_logits": torch.tensor([[3.0, 0.0, 0.0]], requires_grad=True),
+        # core-issues3.txt Phase 6: ood_class maps to ood_category_logits
+        # (the correctly-sized 11-class head), not the old 3-logit ood_logits
+        # (a different, deterministic-severity-adjacent concept).
+        "ood_category_logits": torch.zeros(1, 11, requires_grad=True),
         "start_time_logits": torch.zeros(1, 12, requires_grad=True),
         "duration_logits": torch.zeros(1, 8, requires_grad=True),
         "relative_strength_logits": torch.zeros(1, 4, requires_grad=True),
@@ -141,7 +144,10 @@ def test_loss_task_keys_match_targets_v2_governed_names_not_output_names() -> No
     outputs = {
         "action_logits": torch.tensor([[3.0, 0.0]], requires_grad=True),
         "action_pointer_logits": torch.tensor([[0.0, 3.0]], requires_grad=True),
-        "ood_logits": torch.tensor([[3.0, 0.0, 0.0]], requires_grad=True),
+        # core-issues3.txt Phase 6: ood_class maps to ood_category_logits
+        # (the correctly-sized 11-class head), not the old 3-logit ood_logits
+        # (a different, deterministic-severity-adjacent concept).
+        "ood_category_logits": torch.zeros(1, 11, requires_grad=True),
     }
     targets = {
         "action_template": torch.tensor([0]),

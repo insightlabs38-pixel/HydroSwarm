@@ -76,6 +76,7 @@ class HydroOutput(TypedDict, total=False):
     service_loss_proxy: Tensor
     containment_time_proxy: Tensor
     plan_regret_proxy: Tensor
+    ood_category_logits: Tensor
 
 
 @dataclass(frozen=True)
@@ -182,6 +183,25 @@ STRATEGIST_MODES: tuple[StrategistMode, ...] = get_args(StrategistMode)
 #: here, matching len(NextStep).
 EVENT_CAUSE_CLASS_COUNT = 5
 NEXT_STEP_CLASS_COUNT = 4
+
+#: core-issues3.txt Phase 6 item F / additional gap F: the governed
+#: ood_class target (hydroswarm.training.targets_v2's TARGET_CLASS_COUNTS)
+#: is hydroswarm.training.ood_categories.OODCategory's full 11-category
+#: taxonomy, but the pre-existing `ood_head` below is a 3-logit head built
+#: for an entirely different, deterministic-only concept (OODLevel's
+#: NORMAL/CAUTION/OUTSIDE_VALIDATED_RANGE severity, computed by
+#: hydroswarm.inference.ood.OODDetector -- which remains authoritative and
+#: is not changed by this flag). Training compute_multitask_loss's
+#: "ood_class" task against the old 3-logit head would raise the moment a
+#: real label index >= 3 appeared (SEVERE_MISSINGNESS=7, FROZEN_DRIFTING_
+#: SENSOR=8 in OODCategory's declared order) -- not yet observed in any
+#: promoted run only because no training run has yet sampled enough
+#: non-NONE examples to trigger it (559/13,150 ~= 4.2% of the real
+#: trajectory corpus). This adds the correctly-sized head as a separate,
+#: net-new, opt-in output rather than resizing ood_head in place, for the
+#: same checkpoint-compatibility reason as every other Phase 4.x/6.x flag.
+OOD_CATEGORY_COUNT = 11
+OOD_CATEGORY_HEAD_DEFAULT = False
 
 #: overnight-plan.txt Task 4.0's explicit compatibility requirement: "The
 #: updated architecture must not silently load incompatible weights with
@@ -326,6 +346,13 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             "candidate_conditioned adds CandidatePlanEncoder parameters that anonymous_queries "
             "does not have"
         )
+    recorded_ood_category_head = metadata.get("ood_category_head")
+    if recorded_ood_category_head is not None and recorded_ood_category_head != model.ood_category_head_enabled:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with ood_category_head={recorded_ood_category_head!r} but this "
+            f"model instance is configured with ood_category_head={model.ood_category_head_enabled!r}; "
+            "enabling it adds an 11-class ood_category_head that the old 3-logit ood_head does not have"
+        )
 
 
 def load_state_dict_with_v2_migration(
@@ -424,6 +451,7 @@ class HydroCore(nn.Module):
         consequence_prescreening_heads: bool = CONSEQUENCE_PRESCREENING_HEADS_DEFAULT,
         strategist_mode: StrategistMode = STRATEGIST_MODE_DEFAULT,
         plan_feature_dim: int = PLAN_FEATURE_DIM,
+        ood_category_head: bool = OOD_CATEGORY_HEAD_DEFAULT,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -458,6 +486,7 @@ class HydroCore(nn.Module):
         self.consequence_prescreening_heads = consequence_prescreening_heads
         self.strategist_mode = strategist_mode
         self.plan_feature_dim = plan_feature_dim
+        self.ood_category_head_enabled = ood_category_head
         # core-issues.txt repair item 9: set by from_variant() so a
         # checkpoint's own architecture_config() records which named
         # variant it was built from; a model constructed directly (e.g. the
@@ -559,6 +588,13 @@ class HydroCore(nn.Module):
         self.evidence_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Sigmoid())
         self.uncertainty_head = nn.Sequential(make_norm(normalization, d_model), nn.Linear(d_model, 1), nn.Softplus())
         self.ood_head = RoleHead(d_model, 3)
+        # core-issues3.txt Phase 6: the correctly-sized (11-class) governed
+        # ood_class head, separate from the pre-existing 3-logit ood_head
+        # above (a different, deterministic-severity-adjacent concept --
+        # see OOD_CATEGORY_HEAD_DEFAULT's docstring). Only constructed when
+        # ood_category_head is enabled.
+        if self.ood_category_head_enabled:
+            self.ood_category_head = RoleHead(d_model, OOD_CATEGORY_COUNT)
         # overnight-plan.txt Task 4.4: incident-level control heads for the
         # targets_v2 event_presence/event_cause/next_step contract. Only
         # constructed when event_control_heads is enabled -- see
@@ -647,6 +683,7 @@ class HydroCore(nn.Module):
             "auxiliary_heads": self.auxiliary_heads,
             "consequence_prescreening_heads": self.consequence_prescreening_heads,
             "strategist_mode": self.strategist_mode,
+            "ood_category_head": self.ood_category_head_enabled,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -873,6 +910,8 @@ class HydroCore(nn.Module):
             uncertainty=self.uncertainty_head(incident_context),
             ood_logits=self.ood_head(incident_context),
         )
+        if self.ood_category_head_enabled:
+            output["ood_category_logits"] = self.ood_category_head(incident_context)
         if self.event_control_heads:
             output["event_presence_logits"] = self.event_presence_head(incident_context).squeeze(-1)
             output["event_cause_logits"] = self.event_cause_head(incident_context)
@@ -947,6 +986,8 @@ class HydroCore(nn.Module):
             heads += count(self.consequence_proxy_heads)
         if self.strategist_mode == "candidate_conditioned":
             heads += count(self.candidate_plan_encoder)
+        if self.ood_category_head_enabled:
+            heads += count(self.ood_category_head)
         return ParameterReport(
             total=self.parameter_count(),
             trainable=self.parameter_count(trainable_only=True),
