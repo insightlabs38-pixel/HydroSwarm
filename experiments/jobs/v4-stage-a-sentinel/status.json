@@ -1,0 +1,42 @@
+{
+  "command": [
+    "python",
+    "-u",
+    "scripts/run_stage3_finalist_training.py",
+    "--corpus-root",
+    "data/learning-v2/cycle-b2",
+    "--tensors-dirname",
+    "tensors-normalized",
+    "--finalists",
+    "E1",
+    "--run-root",
+    "experiments/runs/v4-stage-a-sentinel",
+    "--registry",
+    "experiments/registry/v4-stage-a-sentinel.jsonl",
+    "--output",
+    "reports/results/v4/stage-a-sentinel-training.json"
+  ],
+  "ended_at": null,
+  "log_path": "experiments/jobs/v4-stage-a-sentinel/job.log",
+  "pid": 1242037,
+  "resume_command": [
+    "python",
+    "-u",
+    "scripts/run_stage3_finalist_training.py",
+    "--corpus-root",
+    "data/learning-v2/cycle-b2",
+    "--tensors-dirname",
+    "tensors-normalized",
+    "--finalists",
+    "E1",
+    "--run-root",
+    "experiments/runs/v4-stage-a-sentinel",
+    "--registry",
+    "experiments/registry/v4-stage-a-sentinel.jsonl",
+    "--output",
+    "reports/results/v4/stage-a-sentinel-training.json"
+  ],
+  "started_at": "2026-08-07T02:07:06.578689+00:00",
+  "state": "RUNNING",
+  "workdir": "/workspace/HydroSwarm"
+}

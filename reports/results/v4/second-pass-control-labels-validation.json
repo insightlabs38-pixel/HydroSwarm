@@ -1,0 +1,29 @@
+{
+  "calibration": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/calibration.json",
+  "calibration_valid_rate": 1.0,
+  "candidate_coverage": 0.9073033707865169,
+  "checkpoint": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors",
+  "corpus": "data/learning-v2/cycle-b2/tensors-normalized",
+  "evidence_sufficiency_rate": 0.459,
+  "examples": 1000,
+  "first_pass_sensor_health_only_agreement_rate": 0.564,
+  "inspect_sensor_non_runtime_enabled_count": 139,
+  "mean_calibrated_candidate_set_size": 2.672,
+  "mean_disagreement_js": 0.16267338045077148,
+  "mean_posterior_entropy_bits": 1.2991883359367635,
+  "next_step_distribution": {
+    "COLLECT_SAMPLE": 402,
+    "GENERATE_PLANS": 459,
+    "INSPECT_SENSOR": 139
+  },
+  "next_step_runtime_enabled": [
+    "ABSTAIN",
+    "COLLECT_SAMPLE",
+    "GENERATE_PLANS"
+  ],
+  "schema_version": 1,
+  "split": "validation",
+  "teacher_checkpoint_hash": "ca31dd665908fd6e7c2797c22ffc708bfd436162ca0367dba3ddc670df5ad9de",
+  "unsafe_non_abstention_count": 0,
+  "unsafe_non_abstention_scenario_ids": []
+}

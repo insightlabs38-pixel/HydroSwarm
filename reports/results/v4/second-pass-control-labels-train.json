@@ -1,0 +1,29 @@
+{
+  "calibration": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/calibration.json",
+  "calibration_valid_rate": 1.0,
+  "candidate_coverage": 0.915079365079365,
+  "checkpoint": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors",
+  "corpus": "data/learning-v2/cycle-b2/tensors-normalized",
+  "evidence_sufficiency_rate": 0.45344444444444443,
+  "examples": 9000,
+  "first_pass_sensor_health_only_agreement_rate": 0.5607777777777778,
+  "inspect_sensor_non_runtime_enabled_count": 1310,
+  "mean_calibrated_candidate_set_size": 2.6897777777777776,
+  "mean_disagreement_js": 0.15755930658181927,
+  "mean_posterior_entropy_bits": 1.3176841006472007,
+  "next_step_distribution": {
+    "COLLECT_SAMPLE": 3609,
+    "GENERATE_PLANS": 4081,
+    "INSPECT_SENSOR": 1310
+  },
+  "next_step_runtime_enabled": [
+    "ABSTAIN",
+    "COLLECT_SAMPLE",
+    "GENERATE_PLANS"
+  ],
+  "schema_version": 1,
+  "split": "train",
+  "teacher_checkpoint_hash": "ca31dd665908fd6e7c2797c22ffc708bfd436162ca0367dba3ddc670df5ad9de",
+  "unsafe_non_abstention_count": 0,
+  "unsafe_non_abstention_scenario_ids": []
+}
