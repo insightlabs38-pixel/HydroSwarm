@@ -20,16 +20,17 @@ remain untouched.
 | 3 | Repair Strategist label semantics | **DONE** (code + tests) |
 | 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
 | 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
-| 6 | OOD taxonomy / event-cause | not started |
+| 6 | OOD taxonomy / event-cause | **PARTIAL** (6.1/item F crash-bug fixed + tested; 6.2-6.6 not started) |
 | 7 | Auxiliary objectives / regression losses | not started |
 | 8 | Second-pass calibrated control targets | not started |
 | 9-20 | Architecture v4, training, gates, selection | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
 `validation`/`calibration`/`development_holdout` complete with 0 errors,
-`train` in progress (~2725/9000 as of this update) — see its own section
-below. Note: `train`'s in-progress run predates Phase 5's Scout
-improvement (not restarted a third time for it — see Phase 5's own section).
+`train` in progress (~3875/9000 as of this update, ~1.8h remaining at
+observed rate) — see its own section below. Note: `train`'s in-progress
+run predates Phase 5's Scout improvement (not restarted a third time for
+it — see Phase 5's own section).
 
 ## Commits this pass (newest last)
 
@@ -46,6 +47,9 @@ improvement (not restarted a third time for it — see Phase 5's own section).
 11. `3db51d5` docs(handoff): update after Phase 4 completion, scope Phase 5
 12. `aa3589d` feat(sampling): add arbitrary-node scenario truth extraction
 13. `d56f976` feat(sampling): reveal genuinely new evidence in closed-loop Scout states
+14. `1c1ae02` fix(test): stop seeding a scout test from Python's randomized string hash()
+15. `3470bab` docs(handoff): update after Phase 5 completion
+16. `13f4b09` fix(ood): separate category supervision from severity control
 14. `1c1ae02` fix(test): stop seeding a scout test from Python's randomized string hash()
 
 All pushed to `origin/agent/gcp-multitopology-v3`. Working tree clean apart
@@ -297,14 +301,6 @@ exists yet) and the runtime top-K-exact-verification integration Phase 15
 describes. This commit delivers and tests the architecture component and
 its `HydroCore` integration; nothing trains through it yet.
 
-## Restrictions honored
-
-No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
-promoted checkpoints, and every existing v3 result artifact are untouched.
-Locked test not opened; `final-selection.json` does not exist. No destructive
-git/filesystem commands used. No sudo, no credential exposure. All commits
-pushed to `origin/agent/gcp-multitopology-v3`.
-
 ## Phase 5: closed-loop Scout states — DONE (core mechanism)
 
 **Root capability delivered**: `hydroswarm.training.scenario_reconstruction.
@@ -352,6 +348,42 @@ themselves is a smaller, separable follow-up. Also not done: wiring
 enhancement, not a correctness fix — deferred to the next full
 regeneration).
 
+## Phase 6: OOD taxonomy — PARTIAL (core crash-bug fixed)
+
+**Real, previously-unobserved defect found and fixed** (commit `13f4b09`):
+`compute_multitask_loss` mapped the governed `ood_class` target (11
+categories) to `HydroCore`'s pre-existing `ood_head` — a 3-logit head for
+an entirely different concept (`OODLevel`'s deterministic severity,
+computed by `OODDetector`, which remains authoritative and untouched).
+Training `ood_class` with a real label index >= 3 (`SEVERE_MISSINGNESS=7`,
+`FROZEN_DRIFTING_SENSOR=8`) would raise — not yet observed in any promoted
+run only because the prior Stage-1 smoke screening's 200-example
+mini-corpus subset apparently never happened to sample one of the
+559/13,150 (~4.2%) non-NONE examples in the real corpus.
+
+Added a correctly-sized, separately-gated `ood_category_head` (11 logits)
+as a net-new opt-in output, following the same checkpoint-compatibility
+convention as every other Phase 4.x/6.x flag this pass established
+(gated construction, `architecture_config()` entry,
+`verify_architecture_compatibility()` check, parameter-report accounting).
+The old 3-logit `ood_head` is completely untouched. Fixed the loss mapping
+from `"ood_class": "ood_logits"` to `"ood_class": "ood_category_logits"`.
+11 new tests, plus 2 pre-existing `test_training.py` tests updated (they
+constructed a synthetic `ood_logits` output intentionally exercising the
+old, now-fixed mapping).
+
+**Not done in this pass** (items 6.2-6.6, explicitly deferred): supported-
+category metadata (`trained_ood_categories`/`validated_ood_categories`/
+`unsupported_ood_categories`); a balanced OOD training extension for the
+6/11 currently-reproducible categories; implementing or removing the
+`VALVE_PUMP_MISMATCH`/`HYDRAULIC_MISMATCH` categories (currently labels
+without a real simulated perturbation, per the Phase 0 audit); handling
+`AMBIGUOUS` event cause (currently never generated); the
+`category != NONE -> OUTSIDE_VALIDATED_RANGE` collapse check. The crash-
+preventing architecture fix was prioritized as the highest-value, most
+urgent item — the remaining items are corpus/labeling work, not the kind
+of silent-failure risk the architecture fix closes.
+
 ## Restrictions honored
 
 No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
@@ -362,19 +394,31 @@ pushed to `origin/agent/gcp-multitopology-v3`.
 
 ## Next steps
 
-1. Let `train`'s regeneration finish (~2725/9000 as of this update,
-   ~0.74 scenarios/s), verify `errors_this_run: 0`, then commit the new
-   corpus's JSONL/manifests/reports (JSONL only — no Git LFS needed for
-   this artifact).
-2. Phase 5 follow-up (optional, smaller): accessibility/hard-case
+1. Let `train`'s regeneration finish (~3875/9000 as of this update,
+   ~0.78 scenarios/s, ~1.8h remaining), verify `errors_this_run: 0`, then
+   commit the new corpus's JSONL/manifests/reports (JSONL only — no Git
+   LFS needed for this artifact).
+2. Phase 6 follow-up (items 6.2-6.6): supported-category metadata,
+   balanced OOD training extension, `VALVE_PUMP_MISMATCH`/
+   `HYDRAULIC_MISMATCH` real-perturbation implementation (or removal from
+   supervision), `AMBIGUOUS` event-cause generation.
+3. Phase 5 follow-up (optional, smaller): accessibility/hard-case
    generation now that incremental revelation works; consider a future
    regeneration pass with `reconstruction` wired into Scout for `train`.
-3. Phase 6: split OOD category (11-class) from deterministic severity
-   (3-class) — currently conflated.
 4. Phase 7: masked-regression helper honoring target masks (currently the
-   generic MSE path ignores mask companions for several targets).
-5. Phase 9: architecture-v4 contract — `strategist_mode` and every other
-   Phase-4.x flag this pass and prior passes added are already individually
-   recorded in `architecture_config()`, but Phase 9 wants a single strictly-
-   validated contract (trained/validated/runtime-enabled output sets, not
-   role-level gating) rather than the current per-flag compatibility checks.
+   generic MSE path ignores mask companions for several targets); Scout
+   EIG per-node alignment; denoising-only sensor reconstruction; future-
+   concentration cutoff; travel-time transform.
+5. Phase 9: architecture-v4 contract — `strategist_mode`, `ood_category_head`,
+   and every other Phase-4.x/6.x flag this pass added are already
+   individually recorded in `architecture_config()`, but Phase 9 wants a
+   single strictly-validated contract (trained/validated/runtime-enabled
+   output sets, not role-level gating) rather than the current per-flag
+   compatibility checks.
+6. A recurring pattern worth carrying forward: every phase this pass
+   touched surfaced at least one real, previously-unobserved defect only
+   visible once exercised at real scale or with a genuinely adversarial
+   test case (not by code inspection alone) — Phase 1's three sub-bugs,
+   Phase 3's checkpoint-compatibility regression, Phase 5's read-only-array
+   bug, Phase 6's latent crash. Continue prioritizing real-scale/real-data
+   testing over unit tests with synthetic arrays wherever practical.
