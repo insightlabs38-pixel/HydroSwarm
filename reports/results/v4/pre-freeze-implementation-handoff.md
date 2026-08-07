@@ -26,7 +26,7 @@ remain untouched.
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
 | 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **DONE (all of 10.1-10.5)** -- see "Phase 10" section below |
 | 11 | Loss system and training configuration | **DONE (11.1-11.5)** -- see "Phase 11" section below |
-| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
+| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started; **Stage F/12+ blocked** on `important-issues.txt`'s emergency exposure-blind-verification fix (see dedicated section below) — code fix **DONE**, corpus regeneration **IN PROGRESS** |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
 **complete and committed** — all 4 splits finished with 0 errors (see its
@@ -2737,3 +2737,304 @@ assertion's root cause before either dismissing it as a test bug or
 reporting it as a real regression, and treating every "two things that
 must agree" relationship in this codebase as a candidate for exactly this
 drift class until it is derived from one shared source.
+
+## important-issues.txt emergency fix pass — exposure-blind plan-verification defect
+
+Stop-gate context: this pass was launched specifically to fix the defect
+flagged as the highest-priority pre-freeze blocker at the end of the "Phase
+12 Stage E" section above, per `important-issues.txt`'s explicit instruction
+to complete it **before** resuming `core-issues3.txt` Stage F / joint
+multitask training / architecture selection. Stage F has **not** been
+started. Locked test not opened; `final-selection.json` does not exist.
+
+### What was fixed (code — done, tested, committed, pushed)
+
+Commit `96d945f` on `agent/gcp-multitopology-v3` (pushed to
+`origin/agent/gcp-multitopology-v3`). Root cause, exactly as diagnosed at
+the end of Stage E: `HydraulicSimulator.evaluate_plan()`
+(`src/hydroswarm/simulation/wrapper.py`) ran a pure-hydraulic pass only —
+`contaminant_mass_consumed_mg`/`containment_time_minutes` were Pydantic
+defaults for every plan, so `plan_value` was mechanically tied at 1.0 for
+every valid candidate across the entire Strategist corpus, and the live
+`/verify` endpoint's `EvidenceBundle.consequence` never reflected real
+contamination exposure.
+
+Fix, matching `important-issues.txt` requirements 1-13:
+
+- `HydraulicSimulator.simulate_incident_plan(plan, incident_profile, ...)`
+  (requirement 2): copies the network, applies the plan's actions, injects
+  the incident source into that SAME modified network, runs ONE EPANET
+  chemical-transport pass. Shares `_inject_incident_sources`/
+  `_build_incident_simulation` with `simulate_hypothesis` (requirement 2's
+  "share the source-injection/EPANET implementation rather than
+  duplicating it") and never runs an independent hydraulic-only pass
+  followed by an unrelated chemical pass (requirement 8).
+- `PlanEvaluationContext`/`WeightedSourceHypothesis` (requirement 5):
+  explicit evaluation assumptions — a single ground-truth `source_profile`
+  (training) or a bounded (`MAXIMUM_EVALUATION_HYPOTHESES = 3`, requirement
+  7) `hypotheses` credible set (runtime), contamination threshold,
+  population map, aggregation policy, consequence-policy version — carried
+  alongside the plan rather than hidden inside `evaluate_plan()`'s own
+  defaults.
+- `evaluate_plan_consequences()`/`PlanExposureEvaluation` (requirements 3,
+  4, 7): builds the complete `ConsequenceMetrics` (exposure AND
+  pressure/service, from the SAME EPANET run) via the existing
+  `calculate_consequences()`/`calculate_exposure_consequences()`.
+  `PRESSURE_BELOW_MINIMUM`/`SERVICE_BELOW_MINIMUM` are derived per-
+  hypothesis from exact simulator results and **unioned** across every
+  evaluated hypothesis (requirement 4: a benign hypothesis can never
+  average away real hydraulic safety authority). Reports both
+  `posterior_weighted` and `worst_case` aggregates when hypotheses are used
+  (requirement 7), never presenting either as ground truth.
+- `ConsequenceMetrics.exposure_evaluated` (requirement 12): `False` on the
+  preserved legacy hydraulic-only `evaluate_plan()` path so its Pydantic-
+  default exposure fields (still used when no incident context exists at
+  all) can never be read as measured; `True` whenever
+  `calculate_exposure_consequences()` actually ran.
+- **A real bug this pass's own first real run surfaced, not designed
+  around in advance**: passing the full node set into
+  `calculate_exposure_consequences` included reservoir/tank nodes, whose
+  WNTR/EPANET "pressure" is their fixed head (~0 m by construction, not a
+  real violation) — this silently rejected every plan, including
+  `NO_ACTION`, the moment real execution was tried. Fixed once, centrally,
+  in `HydraulicSimulator.calculate_consequences` (filter to
+  `junction_name_list`, matching `evaluate_plan()`'s pre-existing pressure
+  filter and `evaluation/golden.py`'s independently-discovered same fix,
+  now unified into one place).
+- Plan-evaluation cache key now includes profile/hypothesis-set identity,
+  contamination threshold, population-map identity, and consequence-policy
+  version (requirement 9) — was `profile=None` unconditionally.
+- `evaluation_provenance["exact_simulation_count"]` records the real number
+  of NEW EPANET runs one `verify()` call consumed (requirement 10) — up to
+  4 for a 3-hypothesis runtime verification (1 cached baseline-demand run +
+  up to 3 hypothesis runs), never silently 1. **Operational consequence
+  worth flagging explicitly**: `ApiSettings.exact_plan_simulation_limit` is
+  schema-capped at 3 (`le=3`) and is spent per-incident, not per-verify-call
+  — a single 3-hypothesis runtime verification can now exhaust an
+  incident's entire lifetime exact-simulation budget in one `/verify` call.
+  This is the honest, correct behavior per requirement 10 (not a bug), but
+  the operational budget policy (is 3 still the right per-incident limit
+  now that one verification can cost up to 3-4 real simulations instead of
+  1?) was not re-tuned this pass — flagged as a concrete follow-up, not
+  silently absorbed.
+- Training (`generate_strategist_labels`/`build_strategist_trajectory`,
+  requirement 6): uses the scenario's exact ground-truth `IncidentTruth`
+  converted to `IncidentSourceProfile` via the new
+  `incident_truth_to_source_profile()` (factored out of, and now shared
+  with, `simulate_all_node_truth`'s identical inline conversion — one
+  source of truth, not two that could drift), using the exact reconstructed
+  randomized scenario network. Never derives exposure labels from inferred
+  source probabilities.
+- `evaluation/golden.py`'s hand-merged `calculate_exposure_consequences`
+  workaround (informal prior evidence, per Stage E's write-up, that someone
+  already knew `PlanVerifier.verify()` alone was insufficient) is removed;
+  the golden fixture now calls the same canonical evaluator as everything
+  else (requirement 11).
+- Live `/verify` (`api/app.py`, requirement 12): `_runtime_evaluation_context`
+  builds a bounded hypothesis set from the incident's own **calibrated**
+  `CandidateSet` (top 3 by probability; returns `None` — hydraulic-only
+  fallback, `exposure_evaluated=False` — when candidates are absent or not
+  yet calibrated, never a fabricated zero). Each hypothesis uses
+  `IncidentSourceProfile`'s own governed default timing/strength
+  (start=0min, duration=60min, strength=10 mg/min — the same baseline
+  `evaluation/golden.py`'s fixture uses) at the candidate node: this
+  codebase does not yet surface a validated per-node start-time/duration/
+  relative-strength prediction to the API layer (core-issues4.txt's output-
+  governance work has not promoted those Sentinel heads into
+  `runtime_enabled_outputs`), so only node identity and calibrated
+  probability vary between hypotheses — real, calibrated evidence, never
+  presented as certain.
+- `EvidenceBundle.exposure_reduction_mg` (requirement 13): computed for
+  real from the exact verified plan vs. the exact `NO_ACTION` comparator
+  (structural identity — a plan whose only action is `END_PLAN`, matching
+  `planning/response.py`'s own template, not a name-string convention) —
+  only when both sides have `exposure_evaluated=True`.
+
+### Tests (requirement 18)
+
+`tests/scientific/test_exposure_aware_plan_evaluation.py` (12 tests):
+NO_ACTION canonical evaluator matches standalone `simulate_hypothesis` +
+`calculate_consequences` (rel=1e-3: `simulate_incident_plan` runs on
+`_prepared_network()`'s PDD demand mode, `simulate_hypothesis` on a plain
+deepcopy — both deliver full demand on this fully-supplied fixture network,
+so results agree to float32 solver precision, not bit-for-bit); a known
+flush plan changes exposure relative to `NO_ACTION`; the same plan under
+different source profiles has distinct exposure; profile-specific and
+threshold-specific cache isolation; pressure/service rejection still
+derives from the exact simulator; simulation failure abstains;
+posterior-weighted vs. worst-case hypothesis aggregation; the legacy
+hydraulic-only path marks `exposure_evaluated=False` rather than a measured
+zero; `PlanEvaluationContext`'s own invariants (max 3 hypotheses, exactly
+one of profile/hypotheses).
+
+`tests/integration/test_live_exposure_verification.py` (2 tests): the
+real (non-injected-verifier) `/api/incidents/{id}/plans/{id}/verify`
+endpoint returns real, nonzero exposure with a real `evaluation_provenance`
+when candidates are calibrated, and falls back to
+`exposure_evaluated=False`/no fabricated worst-case/no provenance when they
+are not.
+
+`tests/e2e/test_golden_scenario.py`: strengthened to assert
+`exposure_evaluated=True` on both the golden fixture's `no_response` and
+`safe` verifications, proving the fixture uses the canonical evaluator, not
+just that its old hand-computed numbers still happen to match.
+
+Full suite **712 passed, 0 failed** (up from the pre-pass 698 baseline: +14
+new tests, 0 regressions). `ruff check src scripts tests` and `pyright src
+scripts tests` both clean.
+
+### `scripts/run_strategist_corpus_gates.py` (requirement 15)
+
+New structural non-degeneracy gates over a `cycle-b2-trajectories-vN`-style
+corpus directory: `plan_value_variance`, `exposure_variance`,
+`per_scenario_cost_variation`, `no_action_not_universally_identical`,
+`some_valid_plan_improves_exposure` — plus plan_value/exposure distribution
+reporting by action_template and by split (not pass/fail, required
+reporting). **Verified against real data in both directions, not just by
+inspection**: run against the existing (defective)
+`data/learning-v2/cycle-b2-trajectories-v3/validation.jsonl`, it correctly
+**fails 4/5 gates** and reproduces Stage E's own numbers exactly
+(`plan_value_variance=2.79e-25`, `exposure_variance=0.0`, `6629` valid
+candidates, `0/1000` scenarios with cost variation) — proof the gates
+detect the real defect, not a synthetic one. Run against a freshly
+regenerated 8-scenario smoke sample built through the corrected pipeline
+(see below), it **passes 5/5** with real nonzero variance
+(`plan_value_variance=8.3e-4`, `exposure_variance=3.69e15`,
+`any_valid_plan_beats_no_action=True`).
+
+```bash
+export PYTHONPATH=src
+python scripts/run_strategist_corpus_gates.py \
+  --trajectory-dir data/learning-v2/cycle-b2-trajectories-v4 \
+  --splits train validation calibration development_holdout \
+  --report reports/results/v4/strategist-corpus-gates-v4.json
+```
+
+### Corpus regeneration — IN PROGRESS, resumable background jobs
+
+`data/learning-v2/cycle-b2-trajectories-v3` is left completely untouched
+(important-issues.txt restriction: "existing v3/v4 result artifacts
+immutable"). The corrected corpus is being written to the new,
+separately-versioned `data/learning-v2/cycle-b2-trajectories-v4/`
+(requirement 14: "Create a new versioned Strategist artifact ... unless the
+current artifact layout genuinely requires a full trajectory-version
+bump" — no schema/field changes, only corrected VALUES, so the existing
+`generate_trajectory_corpus.py`/`build_strategist_trajectory` pipeline
+needed no changes beyond this pass's library fix already threading
+`incident_truth` through).
+
+**Real measured cost**: an 8-scenario smoke run (`--limit 8`) took ~2.25
+s/scenario of real processing time (excluding one-time signature-artifact
+fitting), noticeably slower than the ~0.5-1 s/scenario the Phase 0 audit
+measured for the OLD (hydraulic-only) path — expected, since every
+candidate plan now runs a full EPANET chemical-transport pass instead of a
+quick WNTRSimulator hydraulics-only pass. At that rate, full regeneration
+(13,150 scenarios across 4 splits) is projected at roughly **8 hours** of
+real compute.
+
+Launched as 4 parallel resumable background jobs (one per split, on this
+16-vCPU host) rather than one 8-hour sequential job:
+
+```bash
+export PYTHONPATH=src
+for split in validation calibration development_holdout train; do
+  python scripts/generate_trajectory_corpus.py \
+    --corpus-dir data/learning-v2/cycle-b2 \
+    --output data/learning-v2/cycle-b2-trajectories-v4 \
+    --split "$split" \
+    > "experiments/jobs/cycle-b2-trajectories-v4/${split}.log" 2>&1 &
+done
+wait
+```
+
+Status/logs: `experiments/jobs/cycle-b2-trajectories-v4/{split}.log`.
+**Resumable**: `generate_trajectory_corpus.py` skips any `scenario_id`
+already present in `{split}.jsonl` on restart — if interrupted, re-running
+the exact command above for the affected split(s) continues from where it
+left off, no `--limit`/flags needed to resume. Being polled at the
+requested 10-minute interval while other independent work continues.
+
+### Not yet done (blocked on the regeneration above, or scoped after it)
+
+Per important-issues.txt's own numbering:
+
+- **14 (corpus regen)**: in progress, see above.
+- **15 (structural gates)**: gate script done and validated in both
+  directions (above); has not yet been run against the FULL regenerated
+  v4 corpus (only the 8-scenario smoke sample) because the full
+  regeneration is still running.
+- **16 (retrain Strategist from clean Stage-A foundation)**: not started —
+  correctly sequenced after 14/15 pass on the real full corpus, per
+  important-issues.txt's own STOP GATE (requirement 20). `scripts/
+  train_strategist_heads.py` exists from Stage E prep and is the right
+  entry point; it will need pointing at
+  `cycle-b2-trajectories-v4/strategist-tensors-normalized` once `scripts/
+  build_strategist_candidate_dataset.py` has been re-run against the new
+  corpus (that script itself needed no changes — it only reads
+  `labels`/`targets` already produced upstream by the now-fixed
+  `build_strategist_trajectory`).
+- **17 (rerun Stage E)**: not started, same dependency.
+- Requirement 20's STOP GATE is therefore **not yet satisfied** — Stage F
+  / joint multitask training must not resume until 14-17 complete. This
+  pass has not touched Stage F, architecture selection, the locked test, or
+  `final-selection.json`.
+
+### Exact continuation commands
+
+If the background jobs above are no longer running (session restart, host
+reboot, etc.), first check for partial progress and resume in place (no
+data is lost or needs to be discarded — the script's own resume-by-
+scenario-id logic handles this):
+
+```bash
+export PYTHONPATH=src
+wc -l data/learning-v2/cycle-b2-trajectories-v4/*.jsonl  # progress so far
+# Re-run the exact 4-job loop above; each job resumes its own split.
+```
+
+Once all 4 `{split}.jsonl` files reach their target counts (train=9000,
+validation=1000, calibration=1000, development_holdout=2550 minus
+unsupported-topology skips, matching v3's own real counts):
+
+```bash
+export PYTHONPATH=src
+# 1. Structural non-degeneracy gates (requirement 15) -- must pass before training:
+python scripts/run_strategist_corpus_gates.py \
+  --trajectory-dir data/learning-v2/cycle-b2-trajectories-v4 \
+  --splits train validation calibration development_holdout \
+  --report reports/results/v4/strategist-corpus-gates-v4.json
+
+# 2. Build the sharded candidate-conditioned tensors (needs the base
+#    ShardedScenarioDataset tensors -- reuse cycle-b2-trajectories-v3's own
+#    scout-tensors-normalized/strategist-tensors-normalized generation
+#    command, pointed at the v4 trajectory JSONL and a NEW v4 tensor
+#    output dir):
+python scripts/build_strategist_candidate_dataset.py \
+  --tensor-shard-dir data/learning-v2/cycle-b2/tensors/train \
+  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v4/train.jsonl \
+  --output data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized/train \
+  --split train
+# (repeat --split validation/calibration/development_holdout against their
+# own tensor-shard-dir/trajectory-jsonl pair)
+
+# 3. Retrain Strategist heads from the clean Stage-A Sentinel/v4 foundation
+#    (requirement 16 -- NOT the current degenerate-value Stage E checkpoint).
+#    --teacher-checkpoint's own default already points at the Stage-A
+#    Sentinel/v4 checkpoint (experiments/runs/v4-stage-a-sentinel/...), and
+#    a fresh --run-root/--registry below means CandidatePlanEncoder and the
+#    value/proxy heads are reinitialized, not resumed from Stage E's
+#    degenerate-value checkpoint:
+python scripts/train_strategist_heads.py \
+  --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized \
+  --run-root experiments/runs/v4-strategist-heads-v4corpus \
+  --registry experiments/registry/v4-strategist-heads-v4corpus.jsonl \
+  --output reports/results/v4/strategist-heads-training-v4corpus.json
+
+# 4. Rerun the Stage E 4-policy comparison (requirement 17) against the
+#    corrected checkpoint and corpus:
+python scripts/run_stage_e_strategist_comparison.py \
+  --strategist-checkpoint <path from step 3> --limit 0
+```
+
+This report will be updated again once the regeneration completes and
+steps 1-4 above have actually been run (not merely planned).
