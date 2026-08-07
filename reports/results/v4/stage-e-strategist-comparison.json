@@ -1,0 +1,96 @@
+{
+  "failure": null,
+  "result": {
+    "eligibility_threshold": 0.5,
+    "heuristic_template_scores": {
+      "ALTERNATE_VALVE_CUT": [
+        0.55,
+        0.75
+      ],
+      "FLUSH_DOWNSTREAM": [
+        0.55,
+        0.85
+      ],
+      "INCREASE_MONITORING": [
+        0.25,
+        1.0
+      ],
+      "ISOLATE_AND_FLUSH": [
+        0.8,
+        0.55
+      ],
+      "ISOLATE_SOURCE": [
+        0.65,
+        0.65
+      ],
+      "NO_ACTION": [
+        0.0,
+        1.0
+      ],
+      "PROTECT_CRITICAL": [
+        0.5,
+        0.95
+      ],
+      "REQUEST_SAMPLE": [
+        0.3,
+        1.0
+      ],
+      "WAIT_OBSERVE": [
+        0.1,
+        1.0
+      ]
+    },
+    "policies": {
+      "deterministic_heuristic": {
+        "fell_back_to_no_action_rate": 0.004,
+        "first_checked_was_valid_rate": 0.996,
+        "found_non_no_action_plan_rate": 0.996,
+        "matched_oracle_best_rate": 1.0,
+        "mean_regret_vs_oracle": 0.0,
+        "mean_simulator_calls": 3.0,
+        "scenarios": 1000,
+        "selected_valid_rate": 1.0
+      },
+      "exact_all": {
+        "fell_back_to_no_action_rate": 0.004,
+        "first_checked_was_valid_rate": 0.996,
+        "found_non_no_action_plan_rate": 0.0,
+        "matched_oracle_best_rate": 1.0,
+        "mean_regret_vs_oracle": 0.0,
+        "mean_simulator_calls": 9.0,
+        "scenarios": 1000,
+        "selected_valid_rate": 1.0
+      },
+      "learned_ordering": {
+        "fell_back_to_no_action_rate": 0.004,
+        "first_checked_was_valid_rate": 0.996,
+        "found_non_no_action_plan_rate": 0.96,
+        "matched_oracle_best_rate": 1.0,
+        "mean_regret_vs_oracle": 0.0,
+        "mean_simulator_calls": 1.0,
+        "scenarios": 1000,
+        "selected_valid_rate": 1.0
+      },
+      "learned_prescreen": {
+        "fell_back_to_no_action_rate": 0.004,
+        "first_checked_was_valid_rate": 0.996,
+        "found_non_no_action_plan_rate": 0.944,
+        "matched_oracle_best_rate": 1.0,
+        "mean_regret_vs_oracle": 0.0,
+        "mean_simulator_calls": 3.0,
+        "scenarios": 1000,
+        "selected_valid_rate": 1.0
+      }
+    },
+    "scenarios_evaluated": 1000,
+    "scenarios_requested": 1000,
+    "shortlist_k": 3,
+    "skipped_no_real_candidates": 0,
+    "wall_seconds": 4.3049909330002265
+  },
+  "schema_version": 1,
+  "seed": 20260807,
+  "stage": "core-issues3.txt Phase 12 Stage E: Strategist-policy comparison",
+  "strategist_checkpoint": "experiments/runs/v4-strategist-heads/20260807T173109Z-bf941ddc/checkpoints/checkpoint-0010/model.safetensors",
+  "wall_seconds": 4.310884820995852
+}
