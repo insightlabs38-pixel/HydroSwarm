@@ -9,6 +9,7 @@ import torch
 from torch import Tensor, nn
 
 from .adapters import BottleneckAdapter, RoleHead
+from .candidate_plan_encoder import TARGET_TYPE_INDEX, CandidatePlanEncoder
 from .encoders import (
     GraphStructuralEncoder,
     QualityEncoder,
@@ -154,6 +155,19 @@ INCIDENT_POOLING_MODES: tuple[IncidentPooling, ...] = get_args(IncidentPooling)
 MessageDirection = Literal["forward_only", "dual_gated"]
 MESSAGE_DIRECTIONS: tuple[MessageDirection, ...] = get_args(MessageDirection)
 
+#: core-issues3.txt Phase 4. "anonymous_queries" (default) matches the
+#: original per-plan representation: a fixed-size learned parameter
+#: (plan_query_tokens) independent of any incident, plus pooled incident
+#: context -- a model built this way can only learn "what's usually good
+#: at query position q", never "is THIS specific candidate plan good."
+#: "candidate_conditioned" replaces it with CandidatePlanEncoder's output,
+#: built from the actual deterministic candidate plan's own template/
+#: target/features -- every downstream head (action_head, plan_value_head,
+#: plan_validity_head, consequence_proxy_heads, pointer_query) is
+#: unchanged either way; only how plan_hidden itself is built differs.
+StrategistMode = Literal["anonymous_queries", "candidate_conditioned"]
+STRATEGIST_MODES: tuple[StrategistMode, ...] = get_args(StrategistMode)
+
 #: overnight-plan.txt Task 4.4. Class counts and index order for the
 #: event/next-step control heads must exactly match
 #: hydroswarm.training.targets_v2.EventCause / NextStep's enum member
@@ -212,6 +226,17 @@ CONSEQUENCE_PROXY_NAMES: tuple[str, ...] = (
     "containment_time_proxy",
     "plan_regret_proxy",
 )
+
+#: core-issues3.txt Phase 4. Width of the deterministic pre-verification
+#: plan_features vector CandidatePlanEncoder consumes -- the old
+#: heuristic's own predicted_value/predicted_validity, action count, and
+#: three bounded action-parameter scalars (start time, duration, magnitude)
+#: normalized by the caller (hydroswarm.training's future Strategist
+#: collator, per Phase 10). Fixed here (not derived from a training
+#: example) so the encoder's own input contract is self-documenting and
+#: independently testable.
+STRATEGIST_MODE_DEFAULT: StrategistMode = "anonymous_queries"
+PLAN_FEATURE_DIM = 6
 
 
 class ArchitectureCompatibilityError(Exception):
@@ -292,6 +317,14 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             f"with consequence_prescreening_heads={model.consequence_prescreening_heads!r}; "
             "enabling it adds five plan consequence-proxy head parameters that a checkpoint "
             "trained without them does not have"
+        )
+    recorded_strategist_mode = metadata.get("strategist_mode")
+    if recorded_strategist_mode is not None and recorded_strategist_mode != model.strategist_mode:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with strategist_mode={recorded_strategist_mode!r} but this "
+            f"model instance is configured with strategist_mode={model.strategist_mode!r}; "
+            "candidate_conditioned adds CandidatePlanEncoder parameters that anonymous_queries "
+            "does not have"
         )
 
 
@@ -389,6 +422,8 @@ class HydroCore(nn.Module):
         event_control_heads: bool = EVENT_CONTROL_HEADS_DEFAULT,
         auxiliary_heads: bool = AUXILIARY_HEADS_DEFAULT,
         consequence_prescreening_heads: bool = CONSEQUENCE_PRESCREENING_HEADS_DEFAULT,
+        strategist_mode: StrategistMode = STRATEGIST_MODE_DEFAULT,
+        plan_feature_dim: int = PLAN_FEATURE_DIM,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -409,6 +444,8 @@ class HydroCore(nn.Module):
             raise ValueError(
                 f"message_direction must be one of {MESSAGE_DIRECTIONS}, got {message_direction!r}"
             )
+        if strategist_mode not in STRATEGIST_MODES:
+            raise ValueError(f"strategist_mode must be one of {STRATEGIST_MODES}, got {strategist_mode!r}")
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
@@ -419,6 +456,8 @@ class HydroCore(nn.Module):
         self.event_control_heads = event_control_heads
         self.auxiliary_heads = auxiliary_heads
         self.consequence_prescreening_heads = consequence_prescreening_heads
+        self.strategist_mode = strategist_mode
+        self.plan_feature_dim = plan_feature_dim
         # core-issues.txt repair item 9: set by from_variant() so a
         # checkpoint's own architecture_config() records which named
         # variant it was built from; a model constructed directly (e.g. the
@@ -546,6 +585,20 @@ class HydroCore(nn.Module):
             self.consequence_proxy_heads = nn.ModuleDict(
                 {name: RoleHead(d_model, 1) for name in CONSEQUENCE_PROXY_NAMES}
             )
+        # core-issues3.txt Phase 4: only constructed in candidate_conditioned
+        # mode -- net-new parameters, same compatibility convention as every
+        # other Phase-4.x flag above (default anonymous_queries mode has
+        # zero new parameters and is byte-identical to the pre-Phase-4
+        # module graph).
+        if self.strategist_mode == "candidate_conditioned":
+            self.candidate_plan_encoder = CandidatePlanEncoder(
+                d_model,
+                action_vocabulary_size=action_vocabulary_size,
+                plan_feature_dim=plan_feature_dim,
+                dropout=dropout,
+                normalization=normalization,
+                activation=activation,
+            )
         self.action_head = RoleHead(d_model, action_vocabulary_size)
         self.plan_value_head = RoleHead(d_model, 1)
         self.plan_validity_head = RoleHead(d_model, 2)
@@ -593,6 +646,7 @@ class HydroCore(nn.Module):
             "event_control_heads": self.event_control_heads,
             "auxiliary_heads": self.auxiliary_heads,
             "consequence_prescreening_heads": self.consequence_prescreening_heads,
+            "strategist_mode": self.strategist_mode,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -699,7 +753,60 @@ class HydroCore(nn.Module):
         }
         sentinel_nodes = role_hidden["sentinel"]
         scout_nodes = role_hidden["scout"]
-        plan_hidden = self.plan_query_tokens.unsqueeze(0) + pooled[:, None, :]
+        if self.strategist_mode == "candidate_conditioned":
+            # core-issues3.txt Phase 4: build plan_hidden from the actual
+            # candidate plans (batch-provided), not anonymous learned query
+            # positions. Uses `pooled` (not the fuller incident_context
+            # computed further below, which itself depends on source_logits)
+            # deliberately -- pooled is already available here without
+            # reordering any of the surrounding forward-pass computation,
+            # which must stay byte-identical for the default
+            # anonymous_queries path (reordering blocks containing dropout
+            # would change RNG consumption order and silently change that
+            # path's own numerical output).
+            plan_template_ids = batch["plan_template_ids"]
+            plan_target_type = batch["plan_target_type"]
+            plan_mask_tensor = batch["plan_mask"].bool()
+            plan_features = batch["plan_features"].float()
+            plans = plan_template_ids.shape[1]
+            target_embedding = hidden.new_zeros(batch_size, plans, self.d_model)
+            node_target_index = batch.get("plan_target_node_index")
+            if node_target_index is not None:
+                is_node_target = plan_target_type == TARGET_TYPE_INDEX["NODE"]
+                safe_node_index = node_target_index.clamp(min=0)
+                gathered_node = torch.gather(
+                    role_hidden["strategist"], 1,
+                    safe_node_index.unsqueeze(-1).expand(-1, -1, self.d_model),
+                )
+                target_embedding = torch.where(is_node_target.unsqueeze(-1), gathered_node, target_embedding)
+            link_target_index = batch.get("plan_target_link_index")
+            edge_index_for_targets = batch.get("edge_index")
+            if link_target_index is not None and edge_index_for_targets is not None:
+                if edge_index_for_targets.ndim == 2:
+                    edge_index_for_targets = edge_index_for_targets.unsqueeze(0).expand(batch_size, -1, -1)
+                is_link_target = plan_target_type == TARGET_TYPE_INDEX["LINK"]
+                safe_link_index = link_target_index.clamp(min=0)
+                edge_src, edge_dst = edge_index_for_targets[:, 0, :], edge_index_for_targets[:, 1, :]
+                src_node_idx = torch.gather(edge_src, 1, safe_link_index)
+                dst_node_idx = torch.gather(edge_dst, 1, safe_link_index)
+                src_embed = torch.gather(
+                    role_hidden["strategist"], 1, src_node_idx.unsqueeze(-1).expand(-1, -1, self.d_model)
+                )
+                dst_embed = torch.gather(
+                    role_hidden["strategist"], 1, dst_node_idx.unsqueeze(-1).expand(-1, -1, self.d_model)
+                )
+                link_embed = (src_embed + dst_embed) * 0.5
+                target_embedding = torch.where(is_link_target.unsqueeze(-1), link_embed, target_embedding)
+            plan_hidden = self.candidate_plan_encoder(
+                template_ids=plan_template_ids,
+                target_type=plan_target_type,
+                target_embedding=target_embedding,
+                plan_features=plan_features,
+                plan_mask=plan_mask_tensor,
+                incident_context=pooled,
+            )
+        else:
+            plan_hidden = self.plan_query_tokens.unsqueeze(0) + pooled[:, None, :]
         plan_hidden = self.adapters["strategist"](plan_hidden)
         pointer_logits = torch.einsum(
             "bqd,bnd->bqn", self.pointer_query(plan_hidden), role_hidden["strategist"]
@@ -838,6 +945,8 @@ class HydroCore(nn.Module):
             )
         if self.consequence_prescreening_heads:
             heads += count(self.consequence_proxy_heads)
+        if self.strategist_mode == "candidate_conditioned":
+            heads += count(self.candidate_plan_encoder)
         return ParameterReport(
             total=self.parameter_count(),
             trainable=self.parameter_count(trainable_only=True),
