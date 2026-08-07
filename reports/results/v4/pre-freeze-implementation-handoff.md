@@ -17,13 +17,17 @@ remain untouched.
 | 0 | Audit current HEAD | **DONE** |
 | 1 | Reconstruct exact scenario hydraulic state | **DONE** (code + tests) |
 | 2 | Governed signature-artifact policy | **DONE** (documented + wired; approximation error unmeasured, flagged) |
-| 3 | Repair Strategist label semantics | **DONE** (code + tests); corpus regeneration running |
-| 4 | Candidate-conditioned Strategist | not started |
-| 5 | Closed-loop Scout states | not started |
+| 3 | Repair Strategist label semantics | **DONE** (code + tests) |
+| 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
+| 5 | Closed-loop Scout states | not started; scoped below |
 | 6 | OOD taxonomy / event-cause | not started |
 | 7 | Auxiliary objectives / regression losses | not started |
 | 8 | Second-pass calibrated control targets | not started |
 | 9-20 | Architecture v4, training, gates, selection | not started |
+
+Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
+`validation`/`calibration` complete with 0 errors, `train`/
+`development_holdout` in progress — see its own section below.
 
 ## Commits this pass (newest last)
 
@@ -35,8 +39,13 @@ remain untouched.
 6. `93d5bc3` fix(data): use stored scenario data for trajectories, not regenerated arrays
 7. `668092b` docs(handoff): publish pre-freeze implementation handoff after Phase 1-2
 8. `bfaf676` fix(strategist): derive exact consequence values and semantic targets
+9. `849accf` docs(handoff): update after Phase 3 completion and corpus regeneration restart
+10. `7628714` feat(model): add candidate-conditioned strategist architecture v4
 
-All pushed to `origin/agent/gcp-multitopology-v3`.
+All pushed to `origin/agent/gcp-multitopology-v3`. Working tree clean apart
+from the in-progress `data/learning-v2/cycle-b2-trajectories-v2/` and its
+`experiments/jobs/cycle-b2-trajectories-v2-*/` job directories (uncommitted
+until generation finishes with 0 errors on every split).
 
 ## Phase 1: reconstruct exact scenario hydraulic state — DONE
 
@@ -256,6 +265,32 @@ Job status: `cat experiments/jobs/cycle-b2-trajectories-v2-<split>/status.json`
 running, since nothing auto-reconciles `status.json` when a plain script
 process exits on its own).
 
+## Phase 4: candidate-conditioned Strategist architecture — DONE (architecture only)
+
+`hydroswarm.model.candidate_plan_encoder.CandidatePlanEncoder` (commit
+`7628714`) replaces the anonymous learned plan-query representation with one
+built from each candidate plan's own template/target/features. Wired into
+`HydroCore` behind a new `strategist_mode` flag
+(`"anonymous_queries"` default / `"candidate_conditioned"`), following the
+existing net-new-parameters-gated-behind-a-flag convention
+(`event_control_heads`/`auxiliary_heads`/`consequence_prescreening_heads`):
+zero new parameters and zero behavior change in default mode. Added to
+`architecture_config()`/`verify_architecture_compatibility()`.
+
+**Real regression found and fixed during this phase, not just the intended
+work**: raising `action_vocabulary_size`'s default from 8 to 9 (attempted as
+part of Phase 3, reverted) broke the promoted checkpoint's strict reload.
+Learned from that: before committing Phase 4, re-ran
+`test_default_pipeline_factory.py` specifically (the file that caught it)
+in addition to the full suite — both clean.
+
+**Not done in this pass** (explicitly deferred, not silently dropped):
+wiring real training data into this path. That requires Phase 10's
+Strategist collator (variable candidate count per incident, none of which
+exists yet) and the runtime top-K-exact-verification integration Phase 15
+describes. This commit delivers and tests the architecture component and
+its `HydroCore` integration; nothing trains through it yet.
+
 ## Restrictions honored
 
 No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
@@ -266,22 +301,46 @@ pushed to `origin/agent/gcp-multitopology-v3`.
 
 ## Next steps
 
-1. Let the (restarted, post-Phase-3) 4-split regeneration finish (~2 hours
-   from relaunch at the observed ~1.3-1.5 scenarios/s), verify each split's
-   `report.json` shows `errors_this_run: 0`, then commit the new corpus's
-   JSONL/manifests/reports (this stage only produces JSONL, not tensor
-   shards — no Git LFS needed for this artifact).
-2. Phase 4: candidate-conditioned Strategist architecture —
-   `CandidatePlanEncoder`, per-candidate plan features/masks, removing the
-   fixed anonymous plan-query positions (`plan_queries=8`) as candidate
-   identity. This is a genuinely large model-architecture change; given
-   this pass just found that even a same-cardinality default change
-   (`action_vocabulary_size`) broke promoted-checkpoint reload, budget real
-   time for full-suite verification before/after, not just the new
-   architecture's own unit tests.
-3. Phase 5: real closed-loop Scout states (reveal evidence incrementally,
-   enforce observation cutoffs, arbitrary-node sampling).
-4. Phase 6: split OOD category (11-class) from deterministic severity
+1. Let the 4-split regeneration finish (`train`/`development_holdout` were
+   at ~1150/9000 and ~1300/2550 respectively as of this report, ~0.75-0.8
+   scenarios/s; `validation`/`calibration` already complete with 0 errors),
+   verify each split's `report.json` shows `errors_this_run: 0`, then
+   commit the new corpus's JSONL/manifests/reports (this stage only
+   produces JSONL, not tensor shards — no Git LFS needed).
+2. **Phase 5: real closed-loop Scout states** — the largest remaining
+   labeled-data gap. Concrete scope for the next pass:
+   - The core missing capability is **arbitrary-node simulated truth**:
+     `GeneratedScenario` only stores concentration for its originally-chosen
+     sensor subset, but Scout must be able to sample any accessible
+     candidate node. Phase 1's `reconstruct_scenario_network` now makes this
+     tractable — it returns the exact randomized network a scenario was
+     simulated against, which can be re-run through
+     `HydraulicSimulator.simulate_incident` reading out concentration at
+     every candidate node, not just the original sensor subset.
+   - Each Scout step must reveal a genuinely NEW observation (deterministic
+     measurement seed = `scenario_id + step_index + node_id`, degraded
+     through the same governed noise/quantization policy `_degrade` already
+     uses) and fold only that into the NEXT state's evidence -- never
+     re-rank against the same fixed base observations the current
+     `generate_scout_label`/`build_scout_trajectory` do (see
+     `scout_labels.py`'s own module docstring, which already documents this
+     exact simplification and names Phase 7/5 as where it gets fixed).
+   - Add explicit cutoff assertions (no input timestamp beyond the current
+     state's cutoff, no future sample outcome visible before it's selected)
+     -- Phase 5 item 5.3's own required tests.
+   - Accessibility/hard-case generation (best-EIG-node inaccessible,
+     already-sampled, near-tied EIG, exhausted budget) can follow once
+     incremental revelation itself works; do not attempt both in the same
+     change.
+   - This is comparable in size to Phase 3's Strategist repair. Budget a
+     dedicated pass for it rather than a partial attempt appended to
+     another phase's work.
+3. Phase 6: split OOD category (11-class) from deterministic severity
    (3-class) — currently conflated.
-5. Phase 7: masked-regression helper honoring target masks (currently the
+4. Phase 7: masked-regression helper honoring target masks (currently the
    generic MSE path ignores mask companions for several targets).
+5. Phase 9: architecture-v4 contract — `strategist_mode` and every other
+   Phase-4.x flag this pass and prior passes added are already individually
+   recorded in `architecture_config()`, but Phase 9 wants a single strictly-
+   validated contract (trained/validated/runtime-enabled output sets, not
+   role-level gating) rather than the current per-flag compatibility checks.
