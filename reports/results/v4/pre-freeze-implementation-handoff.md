@@ -2114,6 +2114,22 @@ python scripts/run_stage_b_control_ood_auxiliary.py
 # smoke test only -- never for a real run)
 ```
 
+### Stage C cross-check (no new work required -- already satisfied)
+
+core-issues3.txt Phase 12 Stage C's text is exactly: "Fit exact hybrid
+calibration and regenerate complete control labels as described above.
+Train control heads." Cross-checked against already-completed work rather
+than re-run from scratch: Phase 8 steps 1-9 (`v4-stage-a-sentinel`'s
+calibration.json, fit on the exact deployed hybrid predictor) + Section F
+step 6a/6b (`persist_second_pass_control_labels.py`/
+`merge_second_pass_control_labels.py`, "regenerate complete control
+labels") + `train_control_heads.py` ("train control heads", real metrics
+in `reports/results/v4/control-heads-training.json`) already satisfy this
+stage's text verbatim, completed in a prior pass of this same branch
+(commits `5ab9165`/`75161ff`, see the "core-issues4.txt continuation pass,
+part 2" section above). Recorded here explicitly so Stage C is not
+mistaken for unstarted work in a future pass's status check.
+
 ### Full suite, Ruff, Pyright
 
 `ruff check scripts/run_stage_b_control_ood_auxiliary.py` and `pyright`
