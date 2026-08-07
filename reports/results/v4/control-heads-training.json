@@ -1,0 +1,86 @@
+{
+  "corpus": "data/learning-v2/cycle-b2-control-v2/tensors-normalized",
+  "failure": null,
+  "result": {
+    "best_validation_loss": 0.6077033813510623,
+    "epochs_completed": 12,
+    "final_checkpoint": "experiments/runs/v4-control-heads/20260807T051710Z-a235a8e5/checkpoints/checkpoint-0012",
+    "load_report": {
+      "missing_keys": [
+        "event_presence_head.network.0.weight",
+        "event_presence_head.network.0.bias",
+        "event_presence_head.network.1.weight",
+        "event_presence_head.network.1.bias",
+        "event_cause_head.network.0.weight",
+        "event_cause_head.network.0.bias",
+        "event_cause_head.network.1.weight",
+        "event_cause_head.network.1.bias",
+        "next_step_head.network.0.weight",
+        "next_step_head.network.0.bias",
+        "next_step_head.network.1.weight",
+        "next_step_head.network.1.bias"
+      ],
+      "unexpected_keys": []
+    },
+    "metrics": {
+      "evidence_sufficiency": {
+        "accuracy": 0.95,
+        "f1": 0.9456521739130435,
+        "precision": 0.9436008676789588,
+        "recall": 0.9477124183006536
+      },
+      "evidence_sufficiency_ece": 0.008497184960171593,
+      "examples_evaluated": 1000,
+      "generate_plans_with_empty_candidate_set_count": 10,
+      "next_step": {
+        "accuracy": 0.82,
+        "macro_f1": 0.6576025235643008,
+        "per_class": {
+          "ABSTAIN": {
+            "f1": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "support": 0
+          },
+          "COLLECT_SAMPLE": {
+            "f1": 0.802646085997795,
+            "precision": 0.7207920792079208,
+            "recall": 0.9054726368159204,
+            "support": 402
+          },
+          "GENERATE_PLANS": {
+            "f1": 0.9479392624728852,
+            "precision": 0.9438444924406048,
+            "recall": 0.9520697167755992,
+            "support": 459
+          },
+          "INSPECT_FAULTY_SENSOR": {
+            "f1": 0.22222222222222224,
+            "precision": 0.59375,
+            "recall": 0.1366906474820144,
+            "support": 139
+          }
+        }
+      },
+      "policy_agreement": 0.787,
+      "unsafe_non_abstention_count": 10
+    },
+    "run_id": "20260807T051710Z-1a7258b6",
+    "teacher_checkpoint": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors",
+    "teacher_checkpoint_hash": "ca31dd665908fd6e7c2797c22ffc708bfd436162ca0367dba3ddc670df5ad9de",
+    "trainable_parameters": [
+      "evidence_head.0.weight",
+      "evidence_head.1.weight",
+      "evidence_head.1.bias",
+      "next_step_head.network.0.weight",
+      "next_step_head.network.0.bias",
+      "next_step_head.network.1.weight",
+      "next_step_head.network.1.bias"
+    ],
+    "wall_seconds": 822.7574925759982
+  },
+  "schema_version": 1,
+  "seed": 20260807,
+  "stage": "core-issues4.txt Section F step 6b / core-issues3.txt Phase 8 step 6: frozen-backbone control-head training",
+  "wall_seconds": 822.9571981469999
+}

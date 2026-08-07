@@ -1,0 +1,43 @@
+OK (822.8s); metrics: {
+  "examples_evaluated": 1000,
+  "evidence_sufficiency": {
+    "accuracy": 0.95,
+    "precision": 0.9436008676789588,
+    "recall": 0.9477124183006536,
+    "f1": 0.9456521739130435
+  },
+  "evidence_sufficiency_ece": 0.008497184960171593,
+  "next_step": {
+    "macro_f1": 0.6576025235643008,
+    "accuracy": 0.82,
+    "per_class": {
+      "COLLECT_SAMPLE": {
+        "precision": 0.7207920792079208,
+        "recall": 0.9054726368159204,
+        "f1": 0.802646085997795,
+        "support": 402
+      },
+      "INSPECT_FAULTY_SENSOR": {
+        "precision": 0.59375,
+        "recall": 0.1366906474820144,
+        "f1": 0.22222222222222224,
+        "support": 139
+      },
+      "GENERATE_PLANS": {
+        "precision": 0.9438444924406048,
+        "recall": 0.9520697167755992,
+        "f1": 0.9479392624728852,
+        "support": 459
+      },
+      "ABSTAIN": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    }
+  },
+  "policy_agreement": 0.787,
+  "unsafe_non_abstention_count": 10,
+  "generate_plans_with_empty_candidate_set_count": 10
+}

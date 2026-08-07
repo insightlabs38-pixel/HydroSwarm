@@ -7,6 +7,7 @@ import pytest
 from hydroswarm.training.output_governance import (
     CANONICAL_OUTPUT_NAMES,
     OutputGovernanceError,
+    require_runtime_enabled,
     validate_output_governance,
 )
 
@@ -103,3 +104,26 @@ def test_training_only_cannot_overlap_runtime_enabled() -> None:
             diagnostic_only_outputs=frozenset(),
             training_only_outputs=frozenset({"sensor_reconstruction"}),
         )
+
+
+def test_require_runtime_enabled_accepts_an_enabled_output() -> None:
+    require_runtime_enabled(frozenset({"source_node"}), "source_node")
+
+
+def test_require_runtime_enabled_rejects_a_trained_but_not_runtime_enabled_output() -> None:
+    # core-issues4.txt Section H: "untrained output requested by runtime" --
+    # a head can be trained (even validated) and still correctly be absent
+    # from runtime_enabled_outputs (core-issues2.txt Phase 10's promotion
+    # gate); this must fail closed exactly like a never-trained output.
+    with pytest.raises(OutputGovernanceError, match="is not runtime-enabled"):
+        require_runtime_enabled(frozenset({"source_node"}), "source_region")
+
+
+def test_require_runtime_enabled_rejects_a_completely_unknown_name() -> None:
+    with pytest.raises(OutputGovernanceError, match="is not runtime-enabled"):
+        require_runtime_enabled(frozenset({"source_node"}), "not_a_real_output")
+
+
+def test_require_runtime_enabled_rejects_when_nothing_is_enabled() -> None:
+    with pytest.raises(OutputGovernanceError, match="is not runtime-enabled"):
+        require_runtime_enabled(frozenset(), "source_node")

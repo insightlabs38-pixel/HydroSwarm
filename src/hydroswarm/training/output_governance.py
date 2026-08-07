@@ -157,3 +157,29 @@ def validate_output_governance(
             "training_only_outputs overlaps runtime_enabled_outputs -- a training-only output "
             f"(e.g. an auxiliary head) must never be runtime-enabled: {sorted(training_and_runtime)}"
         )
+
+
+def require_runtime_enabled(runtime_enabled_outputs: frozenset[str], name: str) -> None:
+    """Fail closed the moment ANY caller (live inference, a benchmark
+    script, a demo) tries to consume a learned output that is not in
+    ``runtime_enabled_outputs`` -- core-issues4.txt Section H's "untrained
+    output requested by runtime" adversarial case. This is the one
+    governance check meant to run at actual output-consumption time, not
+    only when a checkpoint identity is first constructed/validated (that is
+    ``validate_output_governance``'s job, above). A caller with a
+    genuinely-validated identity always has a `runtime_enabled_outputs` set
+    that already passed the full subset chain, so this check is deliberately
+    narrow: it is not re-deriving governance, only refusing to let anything
+    read an output outside the one, already-validated allowlist.
+
+    Unknown names fail closed too (they can never legitimately be
+    runtime-enabled -- see CANONICAL_OUTPUT_NAMES), not merely names that
+    are known-but-not-enabled.
+    """
+
+    if name not in runtime_enabled_outputs:
+        raise OutputGovernanceError(
+            f"output {name!r} is not runtime-enabled ({sorted(runtime_enabled_outputs)}) -- "
+            "an unvalidated or untrained output must contribute exactly zero to runtime "
+            "decisions (core-issues2.txt Phase 10, core-issues4.txt Section C)"
+        )
