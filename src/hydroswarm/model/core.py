@@ -477,6 +477,25 @@ class HydroCore(nn.Module):
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
+        # core-issues3.txt Phase 9.1: previously only d_model/num_layers/
+        # latent_tokens_count/plan_feature_dim were retained as instance
+        # attributes -- every other dimension/layer-count constructor
+        # argument was used locally to build submodules and then
+        # forgotten, so architecture_config() could not record it even
+        # though it is a real architecture-identity fact a checkpoint
+        # loader needs to reconstruct the model from. Pure additive
+        # attribute recording; changes no forward()-visible behavior.
+        self.nhead = nhead
+        self.dim_feedforward = dim_feedforward
+        self.modality_layers = modality_layers
+        self.plan_queries = plan_queries
+        self.action_vocabulary_size = action_vocabulary_size
+        self.adapter_dims = tuple(adapter_dims)
+        self.sentinel_output_dim = sentinel_output_dim
+        self.scout_output_dim = scout_output_dim
+        self.strategist_output_dim = strategist_output_dim
+        self.normalization_kind = normalization
+        self.activation_kind = activation
         self.use_adapters = use_adapters
         self.prior_mode = prior_mode
         self.incident_pooling = incident_pooling
@@ -670,7 +689,27 @@ class HydroCore(nn.Module):
         core-issues.txt repair item 9: `variant` and `use_adapters` were
         added alongside the pre-existing dimensions above -- both are real
         identity facts a runtime loader must reconstruct the model from,
-        not leave at their constructor defaults."""
+        not leave at their constructor defaults.
+
+        core-issues3.txt Phase 9.1 (partial): added every remaining
+        dimension/layer-count/output-width constructor argument that was
+        previously used only to build submodules and then forgotten, not
+        recorded here -- a real gap for "strictly reconstruct the model
+        from its checkpoint metadata" even though load_state_dict's own
+        shape check happens to catch most of these today (unlike
+        prior_mode/pooling/message_direction, which change zero parameter
+        shapes and need the explicit verify_architecture_compatibility
+        checks above). Deliberately NOT included here: schema hashes owned
+        by other layers (ACTION_TEMPLATE_SCHEMA_HASH in
+        hydroswarm.planning.action_templates, targets_v2's schema version,
+        the feature schema fingerprint, PlanValuePolicy/signature-artifact-
+        policy versions) -- model/core.py currently has zero external
+        hydroswarm-package imports, and reaching into planning/training
+        modules from here would invert that layering. Assembling those
+        alongside this dict into one complete checkpoint identity belongs
+        in whatever layer already orchestrates checkpoint export (e.g. a
+        future dedicated checkpoint-identity module), not here -- the rest
+        of Phase 9.1 remains open, tracked in the handoff report."""
 
         return {
             "architecture_version": ARCHITECTURE_VERSION,
@@ -684,6 +723,21 @@ class HydroCore(nn.Module):
             "consequence_prescreening_heads": self.consequence_prescreening_heads,
             "strategist_mode": self.strategist_mode,
             "ood_category_head": self.ood_category_head_enabled,
+            "d_model": self.d_model,
+            "nhead": self.nhead,
+            "dim_feedforward": self.dim_feedforward,
+            "num_layers": self.num_layers,
+            "modality_layers": self.modality_layers,
+            "latent_tokens": self.latent_tokens_count,
+            "plan_queries": self.plan_queries,
+            "action_vocabulary_size": self.action_vocabulary_size,
+            "adapter_dims": self.adapter_dims,
+            "sentinel_output_dim": self.sentinel_output_dim,
+            "scout_output_dim": self.scout_output_dim,
+            "strategist_output_dim": self.strategist_output_dim,
+            "plan_feature_dim": self.plan_feature_dim,
+            "normalization": self.normalization_kind,
+            "activation": self.activation_kind,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:

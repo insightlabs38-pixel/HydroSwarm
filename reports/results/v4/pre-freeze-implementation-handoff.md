@@ -23,7 +23,8 @@ remain untouched.
 | 6 | OOD taxonomy / event-cause | **DONE** (6.1 crash-bug + 6.2/6.4/6.5/6.6 all done + tested; 6.3 scoped to a tested recipe, full-scale corpus deferred to post-Phase-8 — see below) |
 | 7 | Auxiliary objectives / regression losses | **IN PROGRESS** (7.1/7.2/7.3/7.4/7.5 done + tested; 7.6/7.7 scoped and deferred, see below) |
 | 8 | Second-pass calibrated control targets | **DONE** (steps 1-5, 7, 8, 9 complete + run against a real checkpoint; step 6 -- training control heads from these labels -- scoped as a documented, immediately-resumable follow-up, see below) |
-| 9-20 | Architecture v4, training, gates, selection | not started |
+| 9 | Architecture v4 contract | **BOUNDED FIRST STEP DONE** (9.1 partial: `architecture_config()` now records every dimension/layer-count/output-width fact; rest of 9.1/9.2/9.3/9.4 deliberately deferred, see below) |
+| 10-20 | Datasets/collation, loss config, staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
 `validation`/`calibration`/`development_holdout` complete with 0 errors,
@@ -814,6 +815,71 @@ tests (synthetic model, deterministic edge cases -- already committed)
 and as a real-data check** (`scripts/run_second_pass_control_labels.py`'s
 own summary output, run against the real checkpoint above, zero unsafe
 cases found).
+
+## Phase 9: architecture v4 contract — BOUNDED FIRST STEP ONLY
+
+Phase 9 is a large, cross-cutting change (9.1's full field list, 9.2's
+granular trained/validated/runtime-enabled output gating, 9.3's orphaned-
+output audit, 9.4's candidate-count assumptions) that touches
+`model/core.py`'s live `architecture_config()`/checkpoint-compatibility
+path directly. Given this session's own established lesson (the Phase 3/4
+`action_vocabulary_size` regression: *"any shared model-constructor
+default change needs a full test run before being treated as safe"*),
+attempting the full scope in the time remaining after completing Phases
+6-8 thoroughly risked exactly that kind of under-tested change. Took one
+bounded, purely-additive, fully-tested slice instead:
+
+**Done**: `HydroCore.__init__` previously stored only `d_model`,
+`num_layers`, `latent_tokens_count`, and `plan_feature_dim` as instance
+attributes -- every other dimension/layer-count/output-width constructor
+argument (`nhead`, `dim_feedforward`, `modality_layers`, `plan_queries`,
+`action_vocabulary_size`, `adapter_dims`, `sentinel_output_dim`,
+`scout_output_dim`, `strategist_output_dim`, `normalization`,
+`activation`) was used only to build submodules in `__init__` and then
+forgotten -- `architecture_config()` could not record it even though it
+is a real architecture-identity fact. Now stored and returned. Pure
+additive attribute recording -- changes no `forward()`-visible behavior,
+confirmed by the full test suite (587 passed both before and after,
+`tests/integration/test_default_pipeline_factory.py` -- the file that
+caught the earlier regression -- specifically re-run and passing). New
+test `test_architecture_config_records_every_dimension_layer_count_and_
+output_width` round-trips every new field through a real constructor call.
+
+**Deliberately NOT done, and why**:
+
+- **Schema-hash assembly** (action-template/OOD-category/target/feature
+  schema hashes, `PlanValuePolicy`/signature-artifact-policy versions):
+  `ACTION_TEMPLATE_SCHEMA_HASH` already exists
+  (`hydroswarm.planning.action_templates`, built in Phase 3.5 specifically
+  "so a future change... cannot silently drift" and explicitly naming
+  "checkpoint metadata" as a consumer), but `model/core.py` currently has
+  **zero external `hydroswarm`-package imports** -- it is a clean leaf
+  module. Importing from `planning` or `training` into it to pull these
+  hashes in would invert that layering. Assembling `architecture_config()`
+  plus these externally-owned hashes into one complete checkpoint identity
+  belongs in whichever layer already orchestrates checkpoint export (a
+  future dedicated checkpoint-identity module), not inside
+  `model/core.py` itself.
+- **9.2's granular trained/validated/runtime-enabled output gating**: a
+  new governance concept requiring design work across every head, the
+  loss/eval code, and the checkpoint save/load path -- not an incremental
+  addition to the existing per-flag `verify_architecture_compatibility()`
+  checks.
+- **9.3's orphaned-output audit** and **9.4's candidate-count/fixed-query
+  cleanup**: require deciding which existing outputs to keep, demote, or
+  remove -- product/architecture decisions, not mechanical additions.
+- **`verify_architecture_compatibility()`'s enforcement logic**: untouched.
+  Confirmed by reading it that `metadata.get(key)`-based checks are
+  additive-safe by construction (an old checkpoint's metadata simply won't
+  have the new keys, so no new check fires against it) -- but no NEW
+  checks were added for the newly-recorded fields either, since most of
+  them (dimensions) already have their mismatch caught by
+  `load_state_dict(strict=True)`'s own shape check, and adding redundant
+  explicit checks was judged not worth the additional surface area in a
+  bounded pass.
+- **`ARCHITECTURE_VERSION` bump to `hydrocore-v4`**: not done -- bumping
+  it before the rest of the v4 contract exists would only create
+  compatibility friction without the payoff Phase 9 is meant to deliver.
 
 ## Restrictions honored
 

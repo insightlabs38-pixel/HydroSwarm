@@ -119,6 +119,36 @@ def test_from_variant_records_the_variant_name_in_architecture_config() -> None:
     assert direct.architecture_config()["variant"] is None
 
 
+def test_architecture_config_records_every_dimension_layer_count_and_output_width() -> None:
+    """core-issues3.txt Phase 9.1 (partial): dimension/layer-count/output-
+    width constructor arguments used to be forgotten the instant __init__
+    finished (used only to build submodules) -- confirm each now
+    round-trips into architecture_config() with the exact value passed."""
+
+    model = HydroCore(
+        d_model=64, nhead=4, dim_feedforward=128, num_layers=2, modality_layers=2,
+        latent_tokens=64, plan_queries=3, action_vocabulary_size=7,
+        adapter_dims=(32, 48, 64), sentinel_output_dim=3, scout_output_dim=4,
+        strategist_output_dim=5, plan_feature_dim=12, normalization="rmsnorm", activation="silu",
+    )
+    config = model.architecture_config()
+    assert config["d_model"] == 64
+    assert config["nhead"] == 4
+    assert config["dim_feedforward"] == 128
+    assert config["num_layers"] == 2
+    assert config["modality_layers"] == 2
+    assert config["latent_tokens"] == 64
+    assert config["plan_queries"] == 3
+    assert config["action_vocabulary_size"] == 7
+    assert config["adapter_dims"] == (32, 48, 64)
+    assert config["sentinel_output_dim"] == 3
+    assert config["scout_output_dim"] == 4
+    assert config["strategist_output_dim"] == 5
+    assert config["plan_feature_dim"] == 12
+    assert config["normalization"] == "rmsnorm"
+    assert config["activation"] == "silu"
+
+
 def test_verify_architecture_compatibility_rejects_use_adapters_mismatch() -> None:
     kwargs = {
         "node_feature_dim": 3,
