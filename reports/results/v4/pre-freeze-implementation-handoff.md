@@ -19,15 +19,17 @@ remain untouched.
 | 2 | Governed signature-artifact policy | **DONE** (documented + wired; approximation error unmeasured, flagged) |
 | 3 | Repair Strategist label semantics | **DONE** (code + tests) |
 | 4 | Candidate-conditioned Strategist | **DONE** (architecture + tests; not yet wired to real training data) |
-| 5 | Closed-loop Scout states | not started; scoped below |
+| 5 | Closed-loop Scout states | **DONE** (core mechanism + tests; hard-case generation not started) |
 | 6 | OOD taxonomy / event-cause | not started |
 | 7 | Auxiliary objectives / regression losses | not started |
 | 8 | Second-pass calibrated control targets | not started |
 | 9-20 | Architecture v4, training, gates, selection | not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
-`validation`/`calibration` complete with 0 errors, `train`/
-`development_holdout` in progress — see its own section below.
+`validation`/`calibration`/`development_holdout` complete with 0 errors,
+`train` in progress (~2725/9000 as of this update) — see its own section
+below. Note: `train`'s in-progress run predates Phase 5's Scout
+improvement (not restarted a third time for it — see Phase 5's own section).
 
 ## Commits this pass (newest last)
 
@@ -41,6 +43,10 @@ Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) running;
 8. `bfaf676` fix(strategist): derive exact consequence values and semantic targets
 9. `849accf` docs(handoff): update after Phase 3 completion and corpus regeneration restart
 10. `7628714` feat(model): add candidate-conditioned strategist architecture v4
+11. `3db51d5` docs(handoff): update after Phase 4 completion, scope Phase 5
+12. `aa3589d` feat(sampling): add arbitrary-node scenario truth extraction
+13. `d56f976` feat(sampling): reveal genuinely new evidence in closed-loop Scout states
+14. `1c1ae02` fix(test): stop seeding a scout test from Python's randomized string hash()
 
 All pushed to `origin/agent/gcp-multitopology-v3`. Working tree clean apart
 from the in-progress `data/learning-v2/cycle-b2-trajectories-v2/` and its
@@ -299,42 +305,70 @@ Locked test not opened; `final-selection.json` does not exist. No destructive
 git/filesystem commands used. No sudo, no credential exposure. All commits
 pushed to `origin/agent/gcp-multitopology-v3`.
 
+## Phase 5: closed-loop Scout states — DONE (core mechanism)
+
+**Root capability delivered**: `hydroswarm.training.scenario_reconstruction.
+simulate_all_node_truth` (commit `aa3589d`) reruns `simulate_incident`
+against the already-reconstructed exact randomized network and the
+manifest's own recorded incident parameters — no fresh RNG draws needed —
+returning concentration at EVERY node, not just a scenario's originally-
+chosen sensor subset. Verified two ways: its values at the original sensor
+nodes reproduce the corpus's own stored `truth_concentration` array
+exactly (not just within tolerance), and it successfully reaches nodes
+outside that subset with finite values.
+
+**Incremental revelation wired in** (commit `d56f976`):
+`generate_scout_label` gained an optional `revealed_samples` parameter
+(merged into the signature-matching observation grid before computing the
+posterior); `build_scout_trajectory` gained an optional `reconstruction`
+parameter — when supplied, each step reveals a genuinely new deterministic
+measurement (seed = `scenario_id + step_index + node_id`) at the PREVIOUS
+step's recommended node and folds it into evidence for every subsequent
+step, replacing the old behavior where every step re-ranked the same fixed
+base observations. Proven with a real test scenario constructed to have
+nonzero baseline posterior entropy (1.0 bits): entropy provably changes
+after a genuine reveal. Omitting `reconstruction` reproduces the exact
+pre-Phase-5 behavior (backward-compatibility test included) — existing
+callers are unaffected.
+
+**Real bug found while testing** (not by inspection): the observation
+arrays `_reindex_to_signature_grid` returns can be read-only pandas-backed
+views; mutating them for a revealed sample raised `ValueError` the moment
+a real (non-synthetic-array) test exercised the path. Fixed by copying
+before mutation.
+
+**Incidental fix**: found and fixed an unrelated pre-existing flaky test
+(`test_information_gain_is_nonnegative_within_tolerance` seeded itself from
+Python's per-process-randomized `hash(str)`) while working in the same file
+(commit `1c1ae02`).
+
+**Not done in this pass** (Phase 5 items 5.4, explicitly deferred):
+accessibility/hard-case generation (best-EIG-node inaccessible, near-tied
+EIG, exhausted budget, severe missingness). The mechanism these cases need
+to exercise (real incremental revelation) now exists; generating the cases
+themselves is a smaller, separable follow-up. Also not done: wiring
+`reconstruction` into the currently in-progress `train` corpus regeneration
+(would require a third restart of an already-90%-complete run for an
+enhancement, not a correctness fix — deferred to the next full
+regeneration).
+
+## Restrictions honored
+
+No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
+promoted checkpoints, and every existing v3 result artifact are untouched.
+Locked test not opened; `final-selection.json` does not exist. No destructive
+git/filesystem commands used. No sudo, no credential exposure. All commits
+pushed to `origin/agent/gcp-multitopology-v3`.
+
 ## Next steps
 
-1. Let the 4-split regeneration finish (`train`/`development_holdout` were
-   at ~1150/9000 and ~1300/2550 respectively as of this report, ~0.75-0.8
-   scenarios/s; `validation`/`calibration` already complete with 0 errors),
-   verify each split's `report.json` shows `errors_this_run: 0`, then
-   commit the new corpus's JSONL/manifests/reports (this stage only
-   produces JSONL, not tensor shards — no Git LFS needed).
-2. **Phase 5: real closed-loop Scout states** — the largest remaining
-   labeled-data gap. Concrete scope for the next pass:
-   - The core missing capability is **arbitrary-node simulated truth**:
-     `GeneratedScenario` only stores concentration for its originally-chosen
-     sensor subset, but Scout must be able to sample any accessible
-     candidate node. Phase 1's `reconstruct_scenario_network` now makes this
-     tractable — it returns the exact randomized network a scenario was
-     simulated against, which can be re-run through
-     `HydraulicSimulator.simulate_incident` reading out concentration at
-     every candidate node, not just the original sensor subset.
-   - Each Scout step must reveal a genuinely NEW observation (deterministic
-     measurement seed = `scenario_id + step_index + node_id`, degraded
-     through the same governed noise/quantization policy `_degrade` already
-     uses) and fold only that into the NEXT state's evidence -- never
-     re-rank against the same fixed base observations the current
-     `generate_scout_label`/`build_scout_trajectory` do (see
-     `scout_labels.py`'s own module docstring, which already documents this
-     exact simplification and names Phase 7/5 as where it gets fixed).
-   - Add explicit cutoff assertions (no input timestamp beyond the current
-     state's cutoff, no future sample outcome visible before it's selected)
-     -- Phase 5 item 5.3's own required tests.
-   - Accessibility/hard-case generation (best-EIG-node inaccessible,
-     already-sampled, near-tied EIG, exhausted budget) can follow once
-     incremental revelation itself works; do not attempt both in the same
-     change.
-   - This is comparable in size to Phase 3's Strategist repair. Budget a
-     dedicated pass for it rather than a partial attempt appended to
-     another phase's work.
+1. Let `train`'s regeneration finish (~2725/9000 as of this update,
+   ~0.74 scenarios/s), verify `errors_this_run: 0`, then commit the new
+   corpus's JSONL/manifests/reports (JSONL only — no Git LFS needed for
+   this artifact).
+2. Phase 5 follow-up (optional, smaller): accessibility/hard-case
+   generation now that incremental revelation works; consider a future
+   regeneration pass with `reconstruction` wired into Scout for `train`.
 3. Phase 6: split OOD category (11-class) from deterministic severity
    (3-class) — currently conflated.
 4. Phase 7: masked-regression helper honoring target masks (currently the
