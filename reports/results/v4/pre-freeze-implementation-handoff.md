@@ -1922,6 +1922,206 @@ integration files independently reported 663 passed, 0 failed -- both
 runs agree (a full-suite run necessarily includes more files than the
 targeted subset, hence the different totals; neither reported a failure).
 
+## Phase 12 Stage B (core-issues3.txt "PHASE 12 -- STAGED TRAINING AND ABLATIONS", Stage B: flat control/OOD/auxiliary) -- DONE
+
+Continuation within the same overnight autonomous run, immediately after
+Phase 11's completion (`0b6b456`). Phase 12 begins the staged-training
+curriculum core-issues3.txt Phase 12 specifies (Stage A -- Sentinel
+foundation, already effectively satisfied by the existing Stage-A
+checkpoint from Phase 8; Stage B is the first genuinely new real training
+work in this phase). Two commits, both pushed to
+`origin/agent/gcp-multitopology-v3`:
+
+1. `PHASE12_STAGE_B_SCRIPT_COMMIT` feat(training): Stage B control/OOD/auxiliary ablation script and real run (core-issues3.txt Phase 12 Stage B)
+
+No work on `main`. Every protected artifact untouched. `data/learning-v2/
+cycle-b2` and `cycle-b2-trajectories-v3` were only READ (via
+`scripts/merge_trajectory_targets.py`, which "never mutates the source
+shard directory" per its own docstring) to build a derived, gitignored
+merge under `experiments/runs/v4-stage-b-control-ood-auxiliary/
+merged-corpus/`. Locked test not opened; `final-selection.json` does not
+exist.
+
+### Real finding #1, caught before wasting compute: `cycle-b2-control-v2` is the wrong corpus for this ablation
+
+The first design draft planned to reuse `data/learning-v2/
+cycle-b2-control-v2` (Phase 8/Section F's second-pass control corpus) for
+Stage B, since it already carries corrected `event_cause` and calibrated
+`evidence_sufficiency`/`next_step`. A smoke-test run before launching the
+real job caught that this corpus has **no `ood_class`, `sensor_reconstruction`,
+or `travel_time` targets at all** -- confirmed by directly inspecting a real
+loaded example's `targets.keys()`, not assumed. Training against it would
+have made the entire ablation vacuous: the "no auxiliary" and "all
+auxiliary" arms would have been computationally IDENTICAL, since those
+loss terms would never reach `compute_multitask_loss` regardless of
+`task_weights` (the targets are simply absent from every batch).
+
+Fixed by using `scripts/merge_trajectory_targets.py` (Phase 10.5's own
+mechanism) to merge `data/learning-v2/cycle-b2`'s base tensors with
+`cycle-b2-trajectories-v3`'s per-example flat targets -- verified for real
+to carry `ood_class`/`sensor_reconstruction`/`travel_time`/`future_concentration`
+alongside `event_presence`/`event_cause`/`evidence_sufficiency`/`next_step`.
+This also turns out to be the LITERALLY correct corpus for Stage B's own
+wording ("**preliminary** control targets"): the trajectory corpus's
+`evidence_sufficiency`/`next_step` are the FIRST-pass (sensor-health-only-
+derived) labels, genuinely preliminary relative to Stage C's already-
+completed second-pass calibrated ones in `cycle-b2-control-v2` -- not
+merely a fallback choice made necessary by the missing targets, but the
+better-matching corpus on both counts. Merged for real: train 9000/9000
+matched, validation 1000/1000 matched (0 unmatched in either split),
+written to `experiments/runs/v4-stage-b-control-ood-auxiliary/
+merged-corpus/{train,validation}` (gitignored, reproducible on demand from
+two already-committed inputs, not a new governed corpus needing its own
+manifest/gates infrastructure just for an ablation run).
+
+### Ablation design
+
+One consistent architecture across all 4 arms (`event_control_heads=True`,
+`ood_category_head=True`, `auxiliary_heads=True` -- every new head
+physically exists in every arm's model), ablated via `task_weights` alone
+(`sensor_reconstruction`/`travel_time` zeroed or not per arm) --
+guarantees "identical manifests, seeds, budgets, and policies" (Phase
+12's own requirement) trivially, and avoids a fourth, subtly-different
+`verify_architecture_compatibility` identity per arm. Base task weights
+loaded from `configs/training.yaml` via `TrainingConfig.from_yaml(
+require_complete_task_weights=True)` (Phase 11.1) -- every arm's
+`task_weights` differs from every other ONLY in the two ablated entries,
+directly exercising Phase 11.1's new completeness-validated config in real
+Phase 12 work. Every arm initializes from the same Stage-A Sentinel
+teacher checkpoint (`experiments/runs/v4-stage-a-sentinel/
+E1-seed20260810/.../checkpoint-0016`) via `strict=False` load +
+fail-closed verification that the ONLY missing keys are the 7 brand-new
+Stage-B head prefixes (verified against the actual checkpoint's real
+parameter names, not assumed from the training overrides that produced
+it) -- unlike `train_control_heads.py`'s frozen-backbone ablation
+baseline, the backbone is left UNFROZEN here: Stage B's new heads all
+initialize from scratch and need real gradient flow through the shared
+backbone to mean anything as a joint-multitask integration test.
+
+8 epochs/arm, `maximum_runtime_seconds=2400`, `learning_rate=1e-4`
+(lower than `train_control_heads.py`'s `3e-4` -- unfrozen backbone,
+avoid disturbing Stage-A's already-good Sentinel weights too fast),
+`batch_size=16`, single seed (`20260807`, matching every other v4 training
+script in this repo). Single-seed, 8-epoch runs are a real, honest
+scientific limitation of this pass (see "Limitations" below), not
+concealed.
+
+### Real results (real training, all 4 arms, 4332.3s / 72.2 min total)
+
+| arm | source_node_acc | event_cause_acc | sensor_reconstruction_mse | travel_time_mse |
+|---|---|---|---|---|
+| `no_aux` (baseline) | 0.512 | 0.831 | 83693 | 45.62 |
+| `aux_sensor_reconstruction_only` | 0.515 | 0.832 | 83554 | 50.93 |
+| `aux_travel_time_only` | 0.511 | 0.829 | 83638 | **5.11** |
+| `all_aux` | 0.510 | 0.829 | 83555 | **5.28** |
+
+`sensor_fault_accuracy` was 1.0 in every arm (this corpus's real
+`sensor_fault` prevalence is heavily one-sided -- not a useful
+discriminating metric for this particular ablation, reported for
+completeness rather than treated as a signal).
+
+### Real finding #2: `travel_time` is a clean win; `sensor_reconstruction` is not, but does not hurt either
+
+**`travel_time`**: enabling it drops `travel_time_mse` from ~46-51 down to
+~5.1-5.3 -- a genuine ~9x improvement -- with primary-task metrics
+essentially unchanged (source_node_accuracy within 0.2pp, event_cause
+within 0.3pp of baseline in every arm). A clean, unambiguous retain case.
+
+**`sensor_reconstruction`**: `sensor_reconstruction_mse` does NOT improve
+when its loss is enabled (83554-83638 across all arms, indistinguishable
+from the `no_aux` baseline's 83693 within noise) -- 8 epochs at this
+learning rate did not teach the head anything useful. Primary-task metrics
+are ALSO not measurably hurt (same <0.5pp range as `travel_time`'s arms).
+Digging into WHY the auxiliary made no progress surfaced a real,
+concrete, previously-unquantified problem: `sensor_reconstruction`'s
+target is raw, unnormalized mg/L concentration (unlike `travel_time`,
+which Phase 7.5 already log1p-transforms) --
+
+- its raw per-batch loss spikes as high as **50.6 million** in outlier
+  batches (a batch containing an example near a high-concentration
+  source), driving `gradient_norm` as high as **59,377** against a
+  typical ~5-7 for every other batch;
+- `gradient_clip_norm=1.0` keeps training numerically stable throughout
+  (zero NaN/Inf across any arm's full `metrics.jsonl`, confirmed by
+  scanning every row, not sampling) -- but clipping preserves gradient
+  DIRECTION while only rescaling magnitude, so on an outlier batch the
+  entire parameter update is effectively 100% driven by
+  `sensor_reconstruction`'s noisy signal, drowning out every other task
+  that batch;
+- more concretely damaging: `aux_sensor_reconstruction_only`'s
+  `best_validation_loss` (16328.13, `all_aux`'s is 16329.25) is almost
+  entirely `sensor_reconstruction`'s own unweighted validation loss
+  (~65,300) times its 0.25 weight (~16,326) -- meaning `Trainer`'s
+  epoch/checkpoint SELECTION criterion for these two arms is effectively
+  noise-dominated by which epoch happened to have the least-extreme rare
+  high-concentration validation example, not by genuine overall multitask
+  quality. (`no_aux`/`aux_travel_time_only`'s `best_validation_loss`
+  values, 3.10/3.62, are sane by comparison -- direct confirmation this is
+  specific to `sensor_reconstruction`'s scale, not a systemic issue.)
+
+**Verdict** (script-computed, `>2pp primary-task-accuracy-drop` threshold,
+matching Phase 12's "materially degrade" language): all three
+auxiliary-enabled arms verdict `retain` -- no arm shows a primary-task
+degradation past the threshold. This is accurate as stated, but the fuller
+picture is: `travel_time` is a genuine, clean win; `sensor_reconstruction`
+is retain-by-the-letter-of-the-threshold but is not currently learning
+anything useful and its unnormalized scale makes any run that includes it
+unreliable for automatic checkpoint selection. **Concrete recommendation,
+not attempted this pass**: apply a `log1p`-style transform to
+`sensor_reconstruction`'s target (mirroring Phase 7.5's own precedent for
+`travel_time`) before relying on it in any promotion-quality run's
+`best_validation_loss` selection.
+
+### Limitations, reported honestly
+
+- Single seed, 8 epochs, one corpus, one learning rate per arm -- a real
+  first ablation pass, not a statistically robust multi-seed comparison.
+  Phase 12 does not require more at this stage; a future Stage F joint
+  fine-tuning pass should re-examine this with more seeds if
+  `sensor_reconstruction`'s scale is fixed and it becomes a real
+  promotion candidate.
+- `ood_class`/`next_step` were present in every arm's `task_weights` and
+  training loss (confirmed via `metrics.jsonl`'s `task_losses`/
+  `task_valid_counts` -- both reached real, positive-valid-count
+  supervision every batch) but were not separately evaluated in this
+  script's `evaluate()` (which only covers `source_node`/`event_cause`/
+  `sensor_fault`/the two auxiliaries) -- real, scoped follow-up, not
+  silently dropped: OOD-category and control-head evaluation already has
+  dedicated, more thorough treatment in Phase 8/Section F's own scripts
+  and was not the point of THIS ablation (which is specifically about the
+  two validated auxiliaries per Phase 12 Stage B's own text).
+
+Reproduce:
+
+```bash
+export PYTHONPATH=src
+# 1. Build the merged corpus (fast, deterministic join, ~20s total):
+python scripts/merge_trajectory_targets.py \
+  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/train \
+  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/train.jsonl \
+  --output experiments/runs/v4-stage-b-control-ood-auxiliary/merged-corpus/train \
+  --split train
+python scripts/merge_trajectory_targets.py \
+  --tensor-shard-dir data/learning-v2/cycle-b2/tensors-normalized/validation \
+  --trajectory-jsonl data/learning-v2/cycle-b2-trajectories-v3/validation.jsonl \
+  --output experiments/runs/v4-stage-b-control-ood-auxiliary/merged-corpus/validation \
+  --split validation
+
+# 2. Run all 4 ablation arms (~72 min total on this environment):
+python scripts/run_stage_b_control_ood_auxiliary.py
+# (--arms <name> [<name> ...] to run/resume a subset; --train-limit/
+# --validation-limit/--max-epochs/--maximum-runtime-seconds for a fast
+# smoke test only -- never for a real run)
+```
+
+### Full suite, Ruff, Pyright
+
+`ruff check scripts/run_stage_b_control_ood_auxiliary.py` and `pyright`
+on it both clean. Full `pytest` suite re-run after this pass: **697
+passed, 0 failed** (548s) -- identical count to the post-Phase-11 baseline
+(this pass added one new script, no new/changed library code or tests, so
+an unchanged count is the expected, correct outcome, not a gap).
+
 ## Restrictions honored
 
 No work on `main`. `data/learning-v2/cycle-b2`'s existing contents, all
@@ -1935,15 +2135,18 @@ first run -- was this same session's own untracked, never-committed
 scratch output). No sudo, no credential exposure. All commits pushed to
 `origin/agent/gcp-multitopology-v3`.
 
-## Next steps (current, as of the completed Phase 11 pass)
+## Next steps (current, as of the completed Phase 12 Stage B pass)
 
 **Phase 8, Phase 9 (core-issues4.txt Sections A-I), Phase 10
-(core-issues4.txt Section I / core-issues3.txt Phase 10, all 5 items), and
-Phase 11 (all 5 items) are all fully DONE.** See "core-issues4.txt
-continuation pass, part 2" above for the Section H stop-gate checklist (all
-16 items verified true), the "Phase 10" section for its full item-by-item
-detail, and the "Phase 11" section immediately above this one for 11.1-11.5.
-Phase 10 summary (unchanged from the prior pass):
+(core-issues4.txt Section I / core-issues3.txt Phase 10, all 5 items),
+Phase 11 (all 5 items), and Phase 12 Stage B are all fully DONE.** See
+"core-issues4.txt continuation pass, part 2" above for the Section H
+stop-gate checklist (all 16 items verified true), the "Phase 10" section
+for its full item-by-item detail, "Phase 11" for 11.1-11.5, and "Phase 12
+Stage B" immediately above this one for the real ablation results
+(`travel_time` is a clean win; `sensor_reconstruction` needs a scale fix
+before it is a reliable promotion candidate, though it does not currently
+hurt primary tasks). Phase 10 summary (unchanged from the prior pass):
 
 1. Regenerate the final non-provisional trajectory corpus -- **DONE**, all
    4 splits, 13150/13150 real scenarios processed (400 coastal-branch
@@ -1987,15 +2190,23 @@ decision):
   `unsafe_non_abstention_count`/`INSPECT_FAULTY_SENSOR` recall enough to
   justify it -- not attempted this pass, see the honest-limitation note
   above.
-- **`class_weights` (Phase 11.2) exist but are not yet applied to any real
-  training run** -- 11.2's own text ("use... when justified") gates that on
-  a real evaluation showing it's warranted, which needs the Phase 12
-  staged-training run that hasn't started yet.
-- Phase 12 (staged training and ablations, Stage A-G) is the natural next
-  step: it is the first phase that actually consumes Phase 10's full-scale
-  Scout/Strategist/OOD-extension datasets and Phase 11's now-complete loss/
-  checkpoint infrastructure at real training scale (a genuine joint-
-  multitask run, not merely stride-sampled smoke batches).
+- **`class_weights` (Phase 11.2) exist but are still not applied to any
+  real training run** -- 11.2's own text ("use... when justified") gates
+  that on a real evaluation showing it's warranted; Stage B's ablation was
+  scoped to auxiliary objectives specifically, not class balance.
+- **`sensor_reconstruction`'s target-scale fix** (log1p or similar,
+  matching Phase 7.5's travel_time precedent) -- concrete, scoped,
+  recommended by Stage B's real results but not attempted this pass.
+- **Phase 12 Stages C-G** (C: calibrated control second pass -- already
+  effectively satisfied by Phase 8/Section F's existing work, worth an
+  explicit cross-check rather than a fresh run; D: Scout ablation
+  comparisons against random/fixed/classical-EIG sampling; E: Strategist
+  ablation comparisons against deterministic/exact-WNTR-only ordering; F:
+  joint fine-tuning across roles; G: HydroCore-M, conditional on a
+  measured capacity-limited case) -- Stage D (Scout) is the natural next
+  real training step: Phase 10.2 already built and proved the Scout-state
+  dataset trainable, but nothing has compared learned-Scout selection
+  against the required classical baselines yet.
 - Phases 13-20 (required metrics/baselines, promotion gates, runtime
   integration, corpus gates, CI, artifact governance, architecture
   selection, locked-test boundary) not started.

@@ -1,0 +1,240 @@
+{
+  "base_task_weights_source": "configs/training.yaml",
+  "corpus": "experiments/runs/v4-stage-b-control-ood-auxiliary/merged-corpus",
+  "failures": {},
+  "results": {
+    "all_aux": {
+      "arm": "all_aux",
+      "best_validation_loss": 16329.249337294745,
+      "epochs_completed": 8,
+      "final_checkpoint": "experiments/runs/v4-stage-b-control-ood-auxiliary/all_aux/20260807T155641Z-e95d31c7/checkpoints/checkpoint-0008",
+      "load_report": {
+        "missing_keys": [
+          "ood_category_head.network.0.weight",
+          "ood_category_head.network.0.bias",
+          "ood_category_head.network.1.weight",
+          "ood_category_head.network.1.bias",
+          "event_presence_head.network.0.weight",
+          "event_presence_head.network.0.bias",
+          "event_presence_head.network.1.weight",
+          "event_presence_head.network.1.bias",
+          "event_cause_head.network.0.weight",
+          "event_cause_head.network.0.bias",
+          "event_cause_head.network.1.weight",
+          "event_cause_head.network.1.bias",
+          "next_step_head.network.0.weight",
+          "next_step_head.network.0.bias",
+          "next_step_head.network.1.weight",
+          "next_step_head.network.1.bias",
+          "sensor_reconstruction_head.network.0.weight",
+          "sensor_reconstruction_head.network.0.bias",
+          "sensor_reconstruction_head.network.1.weight",
+          "sensor_reconstruction_head.network.1.bias",
+          "future_concentration_head.network.0.weight",
+          "future_concentration_head.network.0.bias",
+          "future_concentration_head.network.1.weight",
+          "future_concentration_head.network.1.bias",
+          "travel_time_head.network.0.weight",
+          "travel_time_head.network.0.bias",
+          "travel_time_head.network.1.weight",
+          "travel_time_head.network.1.bias"
+        ],
+        "unexpected_keys": []
+      },
+      "metrics": {
+        "event_cause_accuracy": 0.829,
+        "examples_evaluated": 1000,
+        "sensor_fault_accuracy": 1.0,
+        "sensor_reconstruction_mse": 83555.2852239244,
+        "sensor_reconstruction_valid_count": 350,
+        "source_node_accuracy": 0.51,
+        "travel_time_mse": 5.27582839012146,
+        "travel_time_valid_count": 2400
+      },
+      "run_id": "20260807T155640Z-eb64e963",
+      "task_weight_overrides": {},
+      "wall_seconds": 1092.893937396002
+    },
+    "aux_sensor_reconstruction_only": {
+      "arm": "aux_sensor_reconstruction_only",
+      "best_validation_loss": 16328.133959645316,
+      "epochs_completed": 8,
+      "final_checkpoint": "experiments/runs/v4-stage-b-control-ood-auxiliary/aux_sensor_reconstruction_only/20260807T152037Z-8a52a097/checkpoints/checkpoint-0008",
+      "load_report": {
+        "missing_keys": [
+          "ood_category_head.network.0.weight",
+          "ood_category_head.network.0.bias",
+          "ood_category_head.network.1.weight",
+          "ood_category_head.network.1.bias",
+          "event_presence_head.network.0.weight",
+          "event_presence_head.network.0.bias",
+          "event_presence_head.network.1.weight",
+          "event_presence_head.network.1.bias",
+          "event_cause_head.network.0.weight",
+          "event_cause_head.network.0.bias",
+          "event_cause_head.network.1.weight",
+          "event_cause_head.network.1.bias",
+          "next_step_head.network.0.weight",
+          "next_step_head.network.0.bias",
+          "next_step_head.network.1.weight",
+          "next_step_head.network.1.bias",
+          "sensor_reconstruction_head.network.0.weight",
+          "sensor_reconstruction_head.network.0.bias",
+          "sensor_reconstruction_head.network.1.weight",
+          "sensor_reconstruction_head.network.1.bias",
+          "future_concentration_head.network.0.weight",
+          "future_concentration_head.network.0.bias",
+          "future_concentration_head.network.1.weight",
+          "future_concentration_head.network.1.bias",
+          "travel_time_head.network.0.weight",
+          "travel_time_head.network.0.bias",
+          "travel_time_head.network.1.weight",
+          "travel_time_head.network.1.bias"
+        ],
+        "unexpected_keys": []
+      },
+      "metrics": {
+        "event_cause_accuracy": 0.832,
+        "examples_evaluated": 1000,
+        "sensor_fault_accuracy": 1.0,
+        "sensor_reconstruction_mse": 83553.94098436649,
+        "sensor_reconstruction_valid_count": 350,
+        "source_node_accuracy": 0.515,
+        "travel_time_mse": 50.93099151611328,
+        "travel_time_valid_count": 2400
+      },
+      "run_id": "20260807T152037Z-2d063619",
+      "task_weight_overrides": {
+        "travel_time": 0.0
+      },
+      "wall_seconds": 1081.1542426740052
+    },
+    "aux_travel_time_only": {
+      "arm": "aux_travel_time_only",
+      "best_validation_loss": 3.6219785648678977,
+      "epochs_completed": 8,
+      "final_checkpoint": "experiments/runs/v4-stage-b-control-ood-auxiliary/aux_travel_time_only/20260807T153838Z-91acd8ce/checkpoints/checkpoint-0008",
+      "load_report": {
+        "missing_keys": [
+          "ood_category_head.network.0.weight",
+          "ood_category_head.network.0.bias",
+          "ood_category_head.network.1.weight",
+          "ood_category_head.network.1.bias",
+          "event_presence_head.network.0.weight",
+          "event_presence_head.network.0.bias",
+          "event_presence_head.network.1.weight",
+          "event_presence_head.network.1.bias",
+          "event_cause_head.network.0.weight",
+          "event_cause_head.network.0.bias",
+          "event_cause_head.network.1.weight",
+          "event_cause_head.network.1.bias",
+          "next_step_head.network.0.weight",
+          "next_step_head.network.0.bias",
+          "next_step_head.network.1.weight",
+          "next_step_head.network.1.bias",
+          "sensor_reconstruction_head.network.0.weight",
+          "sensor_reconstruction_head.network.0.bias",
+          "sensor_reconstruction_head.network.1.weight",
+          "sensor_reconstruction_head.network.1.bias",
+          "future_concentration_head.network.0.weight",
+          "future_concentration_head.network.0.bias",
+          "future_concentration_head.network.1.weight",
+          "future_concentration_head.network.1.bias",
+          "travel_time_head.network.0.weight",
+          "travel_time_head.network.0.bias",
+          "travel_time_head.network.1.weight",
+          "travel_time_head.network.1.bias"
+        ],
+        "unexpected_keys": []
+      },
+      "metrics": {
+        "event_cause_accuracy": 0.829,
+        "examples_evaluated": 1000,
+        "sensor_fault_accuracy": 1.0,
+        "sensor_reconstruction_mse": 83637.74032828586,
+        "sensor_reconstruction_valid_count": 350,
+        "source_node_accuracy": 0.511,
+        "travel_time_mse": 5.111017424265544,
+        "travel_time_valid_count": 2400
+      },
+      "run_id": "20260807T153838Z-85fba9a4",
+      "task_weight_overrides": {
+        "sensor_reconstruction": 0.0
+      },
+      "wall_seconds": 1082.0885731300077
+    },
+    "no_aux": {
+      "arm": "no_aux",
+      "best_validation_loss": 3.098112474358271,
+      "epochs_completed": 8,
+      "final_checkpoint": "experiments/runs/v4-stage-b-control-ood-auxiliary/no_aux/20260807T150241Z-418850cf/checkpoints/checkpoint-0008",
+      "load_report": {
+        "missing_keys": [
+          "ood_category_head.network.0.weight",
+          "ood_category_head.network.0.bias",
+          "ood_category_head.network.1.weight",
+          "ood_category_head.network.1.bias",
+          "event_presence_head.network.0.weight",
+          "event_presence_head.network.0.bias",
+          "event_presence_head.network.1.weight",
+          "event_presence_head.network.1.bias",
+          "event_cause_head.network.0.weight",
+          "event_cause_head.network.0.bias",
+          "event_cause_head.network.1.weight",
+          "event_cause_head.network.1.bias",
+          "next_step_head.network.0.weight",
+          "next_step_head.network.0.bias",
+          "next_step_head.network.1.weight",
+          "next_step_head.network.1.bias",
+          "sensor_reconstruction_head.network.0.weight",
+          "sensor_reconstruction_head.network.0.bias",
+          "sensor_reconstruction_head.network.1.weight",
+          "sensor_reconstruction_head.network.1.bias",
+          "future_concentration_head.network.0.weight",
+          "future_concentration_head.network.0.bias",
+          "future_concentration_head.network.1.weight",
+          "future_concentration_head.network.1.bias",
+          "travel_time_head.network.0.weight",
+          "travel_time_head.network.0.bias",
+          "travel_time_head.network.1.weight",
+          "travel_time_head.network.1.bias"
+        ],
+        "unexpected_keys": []
+      },
+      "metrics": {
+        "event_cause_accuracy": 0.831,
+        "examples_evaluated": 1000,
+        "sensor_fault_accuracy": 1.0,
+        "sensor_reconstruction_mse": 83693.49757581737,
+        "sensor_reconstruction_valid_count": 350,
+        "source_node_accuracy": 0.512,
+        "travel_time_mse": 45.621556193033854,
+        "travel_time_valid_count": 2400
+      },
+      "run_id": "20260807T150241Z-2052edef",
+      "task_weight_overrides": {
+        "sensor_reconstruction": 0.0,
+        "travel_time": 0.0
+      },
+      "wall_seconds": 1076.1908358670044
+    }
+  },
+  "schema_version": 1,
+  "seed": 20260807,
+  "stage": "core-issues3.txt Phase 12 Stage B: flat control/OOD/auxiliary ablations",
+  "verdicts": {
+    "all_aux": {
+      "degradations": [],
+      "verdict": "retain"
+    },
+    "aux_sensor_reconstruction_only": {
+      "degradations": [],
+      "verdict": "retain"
+    },
+    "aux_travel_time_only": {
+      "degradations": [],
+      "verdict": "retain"
+    }
+  },
+  "wall_seconds": 4332.342265266998
+}
