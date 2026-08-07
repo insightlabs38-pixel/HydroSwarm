@@ -13,7 +13,26 @@ import torch.nn.functional as F
 @dataclass(frozen=True, slots=True)
 class MultiTaskLoss:
     total: Tensor
+    #: Mean UNWEIGHTED loss per task (core-issues3.txt Phase 11.1: "mean
+    #: unweighted loss" is a required record, distinct from `total`, which
+    #: is the weighted sum actually backpropagated).
     tasks: Mapping[str, Tensor]
+    #: Number of positions/examples that actually contributed to each
+    #: task's loss this batch (post-mask, post-finite-check) -- Phase
+    #: 11.1's "valid target counts". A task present in `tasks` with
+    #: `valid_counts[task] == 0` produced a real, graph-connected zero loss
+    #: (so backward() still runs) but had nothing to actually learn from in
+    #: this particular batch -- distinguishable from a task that reached
+    #: real supervision, which a bare loss VALUE of ~0 cannot tell you.
+    valid_counts: Mapping[str, int]
+    #: The weight actually applied to each task this call (post
+    #: `task_weights` override / auxiliary-default fallback) -- Phase
+    #: 11.1's "task weights" record, resolved per-task rather than left
+    #: implicit in the caller's own config dict.
+    weights: Mapping[str, float]
+    #: `weights[task] * tasks[task]` -- Phase 11.1's "weighted
+    #: contribution", i.e. what each task actually contributed to `total`.
+    weighted: Mapping[str, Tensor]
 
 
 PROFILE_CLASS_COUNTS = {
@@ -34,13 +53,14 @@ AUXILIARY_TASKS = frozenset({"sensor_reconstruction", "future_concentration", "t
 AUXILIARY_TASK_DEFAULT_WEIGHT = 0.1
 
 
-def _cross_entropy(logits: Tensor, target: Tensor) -> Tensor:
+def _cross_entropy(logits: Tensor, target: Tensor) -> tuple[Tensor, int]:
     flattened_target = target.long().reshape(-1)
     valid = flattened_target != -100
+    count = int(valid.sum())
     if not valid.any():
-        return logits.sum() * 0.0
+        return logits.sum() * 0.0, count
     flattened_logits = logits.reshape(-1, logits.shape[-1])
-    return F.cross_entropy(flattened_logits[valid], flattened_target[valid])
+    return F.cross_entropy(flattened_logits[valid], flattened_target[valid]), count
 
 
 def _ordinal_classification_loss(
@@ -49,7 +69,7 @@ def _ordinal_classification_loss(
     *,
     class_count: int,
     ordinal_weight: float,
-) -> Tensor:
+) -> tuple[Tensor, int]:
     """Combine categorical fit with distance-aware supervision over ordered bins."""
 
     usable_logits = logits[..., :class_count]
@@ -57,20 +77,21 @@ def _ordinal_classification_loss(
     valid = (flattened_target != -100) & (flattened_target >= 0) & (
         flattened_target < class_count
     )
+    count = int(valid.sum())
     if not valid.any():
-        return usable_logits.sum() * 0.0
+        return usable_logits.sum() * 0.0, count
     flattened_logits = usable_logits.reshape(-1, class_count)[valid]
     valid_target = flattened_target[valid]
     categorical = F.cross_entropy(flattened_logits, valid_target)
     if ordinal_weight == 0:
-        return categorical
+        return categorical, count
     positions = torch.linspace(
         0.0, 1.0, class_count, device=flattened_logits.device, dtype=flattened_logits.dtype
     )
     expected_position = (torch.softmax(flattened_logits, dim=-1) * positions).sum(dim=-1)
     target_position = valid_target.to(flattened_logits.dtype) / max(class_count - 1, 1)
     ordinal = F.smooth_l1_loss(expected_position, target_position)
-    return categorical + ordinal_weight * ordinal
+    return categorical + ordinal_weight * ordinal, count
 
 
 def _apply_target_mask(task: str, target: Tensor, targets: Mapping[str, Tensor]) -> Tensor:
@@ -93,7 +114,9 @@ def _apply_target_mask(task: str, target: Tensor, targets: Mapping[str, Tensor])
     return target.masked_fill(~mask.bool(), -100)
 
 
-def masked_regression(prediction: Tensor, target: Tensor, mask: Tensor | None = None) -> Tensor:
+def masked_regression(
+    prediction: Tensor, target: Tensor, mask: Tensor | None = None
+) -> tuple[Tensor, int]:
     """Single governed masked-regression helper (core-issues3.txt Phase 7.1).
 
     The previous per-call regression path (``_masked_mse``) checked only
@@ -116,6 +139,11 @@ def masked_regression(prediction: Tensor, target: Tensor, mask: Tensor | None = 
     or reduce the prediction to the target's shape (or vice versa) before
     calling this rather than depending on broadcasting to paper over a
     shape disagreement.
+
+    Returns ``(loss, valid_count)`` -- core-issues3.txt Phase 11.1's
+    required per-task valid-target-count record; `valid_count` is the
+    number of positions that actually passed the finite-and-mask check,
+    not merely `target.numel()`.
     """
 
     prediction = prediction.float()
@@ -135,12 +163,13 @@ def masked_regression(prediction: Tensor, target: Tensor, mask: Tensor | None = 
                 f"shape {tuple(target.shape)}"
             )
         valid = valid & mask
+    count = int(valid.sum())
     if not valid.any():
         # A graph-connected zero (not a detached Python float) so backward()
         # still runs cleanly through this term in a batch where every
         # example happens to mask this particular task.
-        return prediction.sum() * 0.0
-    return F.mse_loss(prediction[valid], target[valid])
+        return prediction.sum() * 0.0, count
+    return F.mse_loss(prediction[valid], target[valid]), count
 
 
 def compute_multitask_loss(
@@ -206,13 +235,16 @@ def compute_multitask_loss(
         "containment_time_proxy": "containment_time_proxy",
         "plan_regret_proxy": "plan_regret_proxy",
     }
+    counts: dict[str, int] = {}
     for task, output_name in classifications.items():
         if task in targets and output_name in outputs:
-            losses[task] = _cross_entropy(outputs[output_name], _apply_target_mask(task, targets[task], targets))
+            losses[task], counts[task] = _cross_entropy(
+                outputs[output_name], _apply_target_mask(task, targets[task], targets)
+            )
     for task, class_count in PROFILE_CLASS_COUNTS.items():
         output_name = f"{task}_logits"
         if task in targets and output_name in outputs:
-            losses[task] = _ordinal_classification_loss(
+            losses[task], counts[task] = _ordinal_classification_loss(
                 outputs[output_name],
                 _apply_target_mask(task, targets[task], targets),
                 class_count=class_count,
@@ -220,13 +252,16 @@ def compute_multitask_loss(
             )
     for task, output_name in regressions.items():
         if task in targets and output_name in outputs:
-            losses[task] = masked_regression(outputs[output_name], targets[task], targets.get(f"{task}_mask"))
+            losses[task], counts[task] = masked_regression(
+                outputs[output_name], targets[task], targets.get(f"{task}_mask")
+            )
     if "sensor_fault" in targets and "sensor_fault_logits" in outputs:
         fault_target = targets["sensor_fault"].float()
         valid = torch.isfinite(fault_target) & (fault_target >= 0)
         fault_mask = targets.get("sensor_fault_mask")
         if fault_mask is not None:
             valid = valid & fault_mask.bool()
+        counts["sensor_fault"] = int(valid.sum())
         losses["sensor_fault"] = (
             F.binary_cross_entropy_with_logits(
                 outputs["sensor_fault_logits"].float()[valid], fault_target[valid]
@@ -237,6 +272,7 @@ def compute_multitask_loss(
     if "event_presence" in targets and "event_presence_logits" in outputs:
         presence_target = targets["event_presence"].float()
         valid = torch.isfinite(presence_target) & (presence_target >= 0)
+        counts["event_presence"] = int(valid.sum())
         losses["event_presence"] = (
             F.binary_cross_entropy_with_logits(
                 outputs["event_presence_logits"].float()[valid], presence_target[valid]
@@ -248,6 +284,7 @@ def compute_multitask_loss(
         losses["evidence_sufficiency"] = F.binary_cross_entropy(
             outputs["evidence_sufficiency"].float(), targets["evidence_sufficiency"].float()
         )
+        counts["evidence_sufficiency"] = int(targets["evidence_sufficiency"].numel())
     if "should_continue_sampling" in targets and "should_continue_sampling_logits" in outputs:
         # core-issues4.txt Section D item 3: targets_v2 declares this
         # target "Never masked; always defined by the budget policy", so
@@ -257,6 +294,7 @@ def compute_multitask_loss(
         # separate mask field).
         continue_target = targets["should_continue_sampling"].float()
         valid = torch.isfinite(continue_target) & (continue_target >= 0)
+        counts["should_continue_sampling"] = int(valid.sum())
         losses["should_continue_sampling"] = (
             F.binary_cross_entropy_with_logits(
                 outputs["should_continue_sampling_logits"].float()[valid], continue_target[valid]
@@ -270,8 +308,85 @@ def compute_multitask_loss(
     def _default_weight(name: str) -> float:
         return AUXILIARY_TASK_DEFAULT_WEIGHT if name in AUXILIARY_TASKS else 1.0
 
-    weighted = [loss * float(weights.get(name, _default_weight(name))) for name, loss in losses.items()]
-    return MultiTaskLoss(total=torch.stack(weighted).sum(), tasks=losses)
+    resolved_weights = {name: float(weights.get(name, _default_weight(name))) for name in losses}
+    weighted = {name: loss * resolved_weights[name] for name, loss in losses.items()}
+    return MultiTaskLoss(
+        total=torch.stack(list(weighted.values())).sum(),
+        tasks=losses,
+        valid_counts=counts,
+        weights=resolved_weights,
+        weighted=weighted,
+    )
+
+
+#: Every task-name key core-issues3.txt Phase 11.1 requires an EXPLICIT
+#: `task_weights` entry for -- i.e. every name `compute_multitask_loss`
+#: could possibly add to its `losses`/`tasks` dict, given a model/target
+#: batch with every gated head/target present. Deliberately the union of
+#: every dict/branch above, kept next to `compute_multitask_loss` itself
+#: (not hand-copied into configs/training.yaml or a second module) so a
+#: future new task is a one-place addition, not a "two lists drift apart"
+#: repeat of the class of defect this project has already hit three times
+#: (8-vs-9 action templates, ood_head-vs-ood_category_head, the
+#: NODE_INDEXED_TARGET_KEYS/permutation.py duplicate lists -- see
+#: reports/results/v4/pre-freeze-implementation-handoff.md's Phase 10.2
+#: section).
+ALL_TASK_NAMES: frozenset[str] = frozenset(
+    {
+        "source_node",
+        "source_region",
+        "sample_node",
+        "action_template",
+        "target_pointer",
+        "plan_validity",
+        "ood_class",
+        "event_cause",
+        "next_step",
+    }
+    | set(PROFILE_CLASS_COUNTS)
+    | {
+        "plan_value",
+        "information_gain",
+        "candidate_reduction",
+        "sensor_reconstruction",
+        "future_concentration",
+        "travel_time",
+        "exposure_proxy",
+        "pressure_risk_proxy",
+        "service_loss_proxy",
+        "containment_time_proxy",
+        "plan_regret_proxy",
+        "sensor_fault",
+        "event_presence",
+        "evidence_sufficiency",
+        "should_continue_sampling",
+    }
+)
+
+
+class IncompleteTaskWeightsError(Exception):
+    """Raised by validate_task_weights_complete when a task_weights mapping
+    (typically loaded from configs/training.yaml) omits an explicit entry
+    for a retained task -- core-issues3.txt Phase 11.1: "Do not depend on
+    hidden defaults for the final experiments." A missing key does not
+    fail training (compute_multitask_loss's own `_default_weight` fallback
+    still applies), but it fails THIS check, which a training entry point
+    is expected to call before a real/promotion-quality run."""
+
+
+def validate_task_weights_complete(task_weights: Mapping[str, float]) -> None:
+    """Fail closed if `task_weights` omits an explicit entry for any task
+    in ALL_TASK_NAMES. Extra keys (e.g. a name reserved for a future task)
+    are tolerated -- only a missing key for a CURRENTLY known task is an
+    error, since that is the specific "hidden default" Phase 11.1 forbids."""
+
+    missing = ALL_TASK_NAMES - set(task_weights)
+    if missing:
+        raise IncompleteTaskWeightsError(
+            f"task_weights is missing explicit weight(s) for: {sorted(missing)} -- "
+            "core-issues3.txt Phase 11.1 requires an explicit weight for every retained "
+            "target rather than relying on compute_multitask_loss's hidden default"
+        )
 
 
 def task_gradient_norms(

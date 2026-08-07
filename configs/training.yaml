@@ -19,18 +19,53 @@ training:
   deterministic: true
   gradnorm_logging: true
   pcgrad_enabled: false
+  # core-issues3.txt Phase 11.1: every retained target (hydroswarm.training.
+  # losses.ALL_TASK_NAMES) gets an explicit weight here rather than relying
+  # on compute_multitask_loss's hidden per-call default (1.0, or 0.1 for
+  # AUXILIARY_TASKS) -- validated at training-entry-point time by
+  # hydroswarm.training.losses.validate_task_weights_complete. Grouped and
+  # commented by role so a reviewer can see the reasoning, not just the
+  # numbers.
   task_weights:
+    # --- Sentinel: primary scientific objectives -----------------------
     source_node: 1.0
+    source_region: 0.5  # coarser, secondary localization signal alongside source_node
     start_time: 0.5
     duration: 0.5
     relative_strength: 0.5
+    event_presence: 1.0  # incident on/off gate -- upstream of every other Sentinel head
+    event_cause: 1.0
+    sensor_fault: 1.0
+    evidence_sufficiency: 1.0  # safety-adjacent control signal; must not be deprioritized
+    # --- Scout: next-sample selection -----------------------------------
     sample_node: 1.0
-    action_template: 1.0
-    target_pointer: 1.0
+    information_gain: 0.5
+    candidate_reduction: 0.5  # secondary Scout signal, same tier as information_gain
+    should_continue_sampling: 0.5  # incident-level Scout stop/continue advisory
+    # --- Strategist: bounded-plan ranking -------------------------------
+    action_template: 1.0  # v3-legacy head; still trained by the unmodified default v3 model
+    target_pointer: 1.0  # v3-legacy head; see action_template above
     plan_validity: 1.0
     plan_value: 0.5
-    information_gain: 0.5
+    # Consequence proxies are explicitly non-authoritative (mission
+    # statement) -- weighted below plan_value/plan_validity, the two
+    # outputs that actually drive ranking/verification.
+    exposure_proxy: 0.3
+    pressure_risk_proxy: 0.3
+    service_loss_proxy: 0.3
+    containment_time_proxy: 0.3
+    plan_regret_proxy: 0.3
+    # --- OOD / control: advisory, never authoritative over deterministic
+    # severity/fail-closed gating -----------------------------------------
     ood_class: 1.0
-    sensor_fault: 1.0
+    next_step: 1.0
+    # --- Auxiliary: shape the shared backbone, never operator-authoritative
     sensor_reconstruction: 0.25
+    travel_time: 0.1  # matches losses.AUXILIARY_TASK_DEFAULT_WEIGHT
+    # future_concentration is structurally disabled (core-issues3.txt Phase
+    # 7.4 / checkpoint_identity.py Section D item 11: its target generator
+    # always returns an all-masked placeholder, so this weight never
+    # multiplies a real loss). Recorded explicitly, at 0.0, so its absence
+    # is never mistaken for an omission this config forgot.
+    future_concentration: 0.0
 

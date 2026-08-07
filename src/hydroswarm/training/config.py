@@ -83,7 +83,20 @@ class TrainingConfig:
         return asdict(self)
 
     @classmethod
-    def from_yaml(cls, path: str | Path) -> TrainingConfig:
+    def from_yaml(cls, path: str | Path, *, require_complete_task_weights: bool = False) -> TrainingConfig:
+        """Load a TrainingConfig from YAML.
+
+        ``require_complete_task_weights`` (core-issues3.txt Phase 11.1):
+        when True, fails closed unless the loaded ``task_weights`` mapping
+        has an explicit entry for every task
+        ``hydroswarm.training.losses.compute_multitask_loss`` could
+        possibly produce -- "Do not depend on hidden defaults for the
+        final experiments." Defaults to False so ad-hoc/partial configs
+        (tests, ablations that only care about a handful of tasks) keep
+        working; a real/promotion-quality training entry point should pass
+        True.
+        """
+
         values = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
         if set(values) == {"training"}:
             values = values["training"]
@@ -93,4 +106,9 @@ class TrainingConfig:
         unknown = set(values) - known
         if unknown:
             raise ValueError(f"unknown training settings: {sorted(unknown)}")
-        return cls(**values)
+        config = cls(**values)
+        if require_complete_task_weights:
+            from .losses import validate_task_weights_complete
+
+            validate_task_weights_complete(config.task_weights)
+        return config

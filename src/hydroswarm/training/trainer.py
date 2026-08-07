@@ -264,8 +264,22 @@ class Trainer:
                     "batch": batch_index,
                     "global_step": self.global_step,
                     "loss": loss_value,
+                    # core-issues3.txt Phase 11.1: "mean unweighted loss" per task.
                     "task_losses": {
                         name: float(value.detach()) for name, value in result.tasks.items()
+                    },
+                    # Phase 11.1: "valid target counts" -- how many positions in
+                    # THIS batch actually contributed to each task's loss.
+                    "task_valid_counts": dict(result.valid_counts),
+                    # Phase 11.1: "task weights" as actually resolved/applied
+                    # this call (task_weights override or the auxiliary-task
+                    # default), not merely the caller's raw config dict.
+                    "task_weights": dict(result.weights),
+                    # Phase 11.1: "weighted contribution" -- weight * mean
+                    # unweighted loss, i.e. what each task actually added to
+                    # the backpropagated `total`.
+                    "task_weighted_losses": {
+                        name: float(value.detach()) for name, value in result.weighted.items()
                     },
                     "task_gradient_norms": gradnorm,
                     "gradient_norm": gradient_norm,

@@ -22,7 +22,14 @@ from .data import (
     validate_split_isolation,
 )
 from .label_audit import audit_corpus, audit_split, cross_split_leakage
-from .losses import MultiTaskLoss, compute_multitask_loss, task_gradient_norms
+from .losses import (
+    ALL_TASK_NAMES,
+    IncompleteTaskWeightsError,
+    MultiTaskLoss,
+    compute_multitask_loss,
+    task_gradient_norms,
+    validate_task_weights_complete,
+)
 from .ood_categories import (
     OOD_CATEGORY_BEHAVIOR,
     AbstentionOutcome,
@@ -84,7 +91,10 @@ __all__ = [
     "FullTrajectory",
     "GovernedScenarioDataset",
     "IncidentTrajectory",
+    "ALL_TASK_NAMES",
+    "IncompleteTaskWeightsError",
     "MultiTaskLoss",
+    "validate_task_weights_complete",
     "NextStep",
     "OODCategory",
     "RegistryError",
