@@ -294,6 +294,7 @@ def main(argv: list[str] | None = None) -> int:
                     maximum_samples=args.maximum_samples,
                     maximum_exact_simulations=args.maximum_exact_simulations,
                     maximum_plans=args.maximum_plans,
+                    reconstruction=reconstruction,
                 )
             except Exception as error:  # noqa: BLE001 -- record and continue (incl. ScenarioReconstructionError), never silently drop the corpus
                 error_count += 1

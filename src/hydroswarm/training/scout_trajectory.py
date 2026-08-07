@@ -32,11 +32,14 @@ should_continue_sampling/accessibility and already-sampled masks."
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any, Sequence
 from uuid import NAMESPACE_URL, uuid5
 
+import numpy as np
+import pandas as pd
 import torch
 
 from hydroswarm.classical.signatures import SignatureArtifact
@@ -44,6 +47,7 @@ from hydroswarm.data.scenarios import GeneratedScenario
 from hydroswarm.domain import ActionType, IncidentState, OperationalAction
 from hydroswarm.sampling.active import SamplingConstraints
 
+from .scenario_reconstruction import ReconstructedScenarioContext, simulate_all_node_truth
 from .scout_labels import ScoutLabel, generate_scout_label
 from .trajectory_v2 import FullTrajectory, RemainingBudgets, TrajectoryState
 
@@ -109,6 +113,45 @@ def _scout_step_diagnostics(label: ScoutLabel, already_sampled: Sequence[str]) -
     }
 
 
+def _reveal_sample_measurement(
+    reconstruction: ReconstructedScenarioContext,
+    all_node_truth: pd.DataFrame,
+    node_id: str,
+    step_index: int,
+    *,
+    noise_scale_mg_l: float,
+) -> float:
+    """core-issues3.txt Phase 5: a genuinely NEW, deterministic measurement
+    at `node_id`, revealed only after step `step_index` selects it --
+    never visible to that same step's own decision (see
+    build_scout_trajectory's ordering: this is called only after
+    generate_scout_label returns, using its result, and only feeds the
+    NEXT step's revealed_samples).
+
+    Deterministic measurement seed = scenario_id + step_index + node_id
+    (Phase 5 item 5.2), independent of any other RNG stream in this
+    module. The true value comes from simulate_all_node_truth (the exact
+    randomized scenario's own simulation, not a pristine topology or
+    signature-predicted value -- item Q), read at the scenario's own final
+    observation timestamp (the represented "current state" at the moment
+    of sampling -- this synthetic corpus has no notion of a Scout sample
+    being collected before the observation window ends). Degraded with
+    the same noise_scale_mg_l the posterior's own likelihood model
+    assumes, so the reveal is consistent with what generate_scout_label
+    already treats as the measurement noise floor -- clamped at zero since
+    concentration cannot be negative."""
+
+    scenario_id = str(reconstruction.scenario.manifest.scenario_id)
+    seed_material = f"{scenario_id}:{step_index}:{node_id}".encode()
+    seed = int.from_bytes(hashlib.sha256(seed_material).digest()[:8], "big")
+    rng = np.random.default_rng(seed)
+    reference_time = reconstruction.scenario.timestamps_seconds[-1]
+    true_value = float(
+        all_node_truth[node_id].reindex([reference_time], method="nearest").iloc[0]
+    )
+    return max(0.0, true_value + float(rng.normal(0.0, noise_scale_mg_l)))
+
+
 def _chain_states(states: Sequence[TrajectoryState]) -> tuple[TrajectoryState, ...]:
     """Set each step's resulting_next_state_hash to the following step's
     actual state_hash, satisfying FullTrajectory's hash-chain integrity
@@ -136,6 +179,7 @@ def build_scout_trajectory(
     maximum_samples: int = MAXIMUM_SAMPLES_BOUND,
     constraints: SamplingConstraints | None = None,
     noise_scale_mg_l: float = 0.5,
+    reconstruction: ReconstructedScenarioContext | None = None,
 ) -> ScoutTrajectory:
     """Repeatedly call generate_scout_label with a growing already_sampled
     set, terminating when should_continue_sampling is false, no candidate is
@@ -148,6 +192,16 @@ def build_scout_trajectory(
     randomness here is scenario.manifest.seed-derived upstream, and
     trajectory_id/incident_id are uuid5-derived from the scenario id rather
     than randomly generated.
+
+    `reconstruction` (core-issues3.txt Phase 5, optional for backward
+    compatibility with callers that only have a scenario, e.g. cheap
+    synthetic tests): when supplied, each step after the first reveals a
+    genuinely NEW measurement at the PREVIOUS step's recommended sample
+    node (via simulate_all_node_truth against the exact randomized
+    scenario) and folds it into evidence for every subsequent step's
+    posterior -- fixing the pre-Phase-5 behavior where every step re-ranked
+    the same fixed base observations and only `already_sampled` changed.
+    When omitted, behavior is identical to before Phase 5.
 
     `node_ids` MUST be the canonical full topology node space (junctions +
     reservoirs + tanks -- e.g. hydroswarm.training.data.TopologyMetadata.
@@ -176,18 +230,31 @@ def build_scout_trajectory(
     )
     incident_id = uuid5(NAMESPACE_URL, f"https://hydroswarm.local/incidents/scout/{scenario_id}")
 
+    all_node_truth = simulate_all_node_truth(reconstruction) if reconstruction is not None else None
+    revealed_samples: dict[str, float] = {}
     already_sampled: list[str] = []
     labels: list[ScoutLabel] = []
     states: list[TrajectoryState] = []
     diagnostics: list[dict[str, Any]] = []
     step_index = 0
     while True:
+        # Phase 5 item 5.3 cutoff assertion: this step's decision may only
+        # use evidence revealed by STRICTLY earlier steps -- revealed_samples
+        # is only ever appended to below, after generate_scout_label has
+        # already returned for the step whose own recommendation produced
+        # the new value, so it can never contain the current step's own
+        # not-yet-made selection. Asserted explicitly since this invariant
+        # is easy to silently break in a future refactor of this loop.
+        assert not (already_sampled and already_sampled[-1] not in revealed_samples and all_node_truth is not None), (
+            "the immediately preceding step's sample must be revealed before this step's decision"
+        )
         label = generate_scout_label(
             scenario,
             artifact,
             already_sampled=already_sampled,
             constraints=constraints,
             noise_scale_mg_l=noise_scale_mg_l,
+            revealed_samples=revealed_samples,
         )
         incident_state = IncidentState(
             incident_id=incident_id,
@@ -225,6 +292,17 @@ def build_scout_trajectory(
         # step that requests a sample, not run one further step past it.
         would_have_sampled = len(already_sampled) + 1
         already_sampled.append(label.sample_node_id)
+        if all_node_truth is not None:
+            # Reveal happens strictly AFTER this step's own decision was
+            # already made above -- the assertion at the top of the next
+            # iteration checks this ordering held.
+            revealed_samples[label.sample_node_id] = _reveal_sample_measurement(
+                reconstruction,
+                all_node_truth,
+                label.sample_node_id,
+                step_index,
+                noise_scale_mg_l=noise_scale_mg_l,
+            )
         if would_have_sampled >= maximum_samples:
             break
         step_index += 1

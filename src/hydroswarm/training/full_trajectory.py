@@ -54,6 +54,7 @@ from .corpus import (
 from .data import ScenarioExample
 from .ood_categories import OODCategory
 from .ood_labels import classify_ood_category, ood_class_target
+from .scenario_reconstruction import ReconstructedScenarioContext
 from .scout_trajectory import ScoutTrajectory, build_scout_trajectory
 from .strategist_trajectory import StrategistTrajectory, build_strategist_trajectory
 
@@ -81,6 +82,7 @@ def build_incident_trajectory(
     maximum_samples: int = 5,
     maximum_exact_simulations: int = 3,
     maximum_plans: int = 9,
+    reconstruction: ReconstructedScenarioContext | None = None,
 ) -> IncidentTrajectory:
     context = feature_context or build_feature_context(network)
     example = scenario_to_example(
@@ -141,7 +143,9 @@ def build_incident_trajectory(
     )
 
     edge_ids = example.topology.edge_ids if example.topology is not None else ()
-    scout = build_scout_trajectory(scenario, artifact, node_ids, maximum_samples=maximum_samples)
+    scout = build_scout_trajectory(
+        scenario, artifact, node_ids, maximum_samples=maximum_samples, reconstruction=reconstruction
+    )
     strategist = build_strategist_trajectory(
         scenario,
         network,

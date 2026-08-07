@@ -36,7 +36,7 @@ same governance shape as the existing classical_prior Sentinel input.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -123,8 +123,36 @@ def generate_scout_label(
     already_sampled: Sequence[str] = (),
     constraints: SamplingConstraints | None = None,
     noise_scale_mg_l: float = 0.5,
+    revealed_samples: Mapping[str, float] | None = None,
 ) -> ScoutLabel:
+    """`revealed_samples` (core-issues3.txt Phase 5): node_id -> a single
+    degraded measurement value revealed by an EARLIER Scout step in the
+    same trajectory (see scout_trajectory.build_scout_trajectory), for
+    nodes outside the scenario's own original sensor set. Broadcast across
+    every time-grid column for that node -- a documented simplification
+    (a Scout grab sample is one point-in-time reading, not a continuous
+    sensor feed like the scenario's own original sensors; the signature-
+    matching grid this module already uses has no representation for
+    "a single instant" observation finer than that). Without this
+    parameter, behavior is identical to before Phase 5 (the scenario's own
+    fixed original observations only) -- this is what made every prior
+    Scout "trajectory" re-rank the same fixed evidence at every step."""
+
     observed, valid = _reindex_to_signature_grid(scenario, artifact.sensor_nodes, artifact.sample_times_seconds)
+    if revealed_samples:
+        # pandas' reindex().to_numpy() can return a read-only view sharing
+        # memory with its source frame -- copy before mutating regardless
+        # of whether that view happens to be writable for any given pandas
+        # version, rather than relying on an implementation detail.
+        observed = observed.copy()
+        valid = valid.copy()
+        node_positions = {node_id: index for index, node_id in enumerate(artifact.sensor_nodes)}
+        for node_id, value in revealed_samples.items():
+            column = node_positions.get(node_id)
+            if column is None:
+                continue
+            observed[:, column] = value
+            valid[:, column] = True
     posterior = bayesian_source_posterior(observed, artifact.library, observation_mask=valid, noise_scale=noise_scale_mg_l)
 
     base_constraints = constraints or SamplingConstraints()
