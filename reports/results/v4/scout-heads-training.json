@@ -1,0 +1,52 @@
+{
+  "corpus": "data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized",
+  "failure": null,
+  "result": {
+    "best_validation_loss": 5.685205304433429,
+    "epochs_completed": 10,
+    "final_checkpoint": "experiments/runs/v4-scout-heads/20260807T164149Z-adf93d12/checkpoints/checkpoint-0010",
+    "load_report": {
+      "missing_keys": [
+        "candidate_reduction_head.0.weight",
+        "candidate_reduction_head.1.weight",
+        "candidate_reduction_head.1.bias",
+        "should_continue_sampling_head.network.0.weight",
+        "should_continue_sampling_head.network.0.bias",
+        "should_continue_sampling_head.network.1.weight",
+        "should_continue_sampling_head.network.1.bias"
+      ],
+      "unexpected_keys": []
+    },
+    "metrics": {
+      "candidate_reduction_mse": 0.02127011486787665,
+      "examples_evaluated": 1000,
+      "information_gain_mse": 2.7718322496620553,
+      "sample_node_top1_accuracy": 0.5640074211502782,
+      "sample_node_valid_count": 539,
+      "should_continue_sampling_accuracy": 0.925
+    },
+    "run_id": "20260807T164149Z-8a33a3f7",
+    "teacher_checkpoint": "experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260807T020714Z-12fe7f02/checkpoints/checkpoint-0016/model.safetensors",
+    "trainable_parameters": [
+      "sample_node_head.network.0.weight",
+      "sample_node_head.network.0.bias",
+      "sample_node_head.network.1.weight",
+      "sample_node_head.network.1.bias",
+      "information_gain_head.0.weight",
+      "information_gain_head.1.weight",
+      "information_gain_head.1.bias",
+      "candidate_reduction_head.0.weight",
+      "candidate_reduction_head.1.weight",
+      "candidate_reduction_head.1.bias",
+      "should_continue_sampling_head.network.0.weight",
+      "should_continue_sampling_head.network.0.bias",
+      "should_continue_sampling_head.network.1.weight",
+      "should_continue_sampling_head.network.1.bias"
+    ],
+    "wall_seconds": 619.6077162059955
+  },
+  "schema_version": 1,
+  "seed": 20260807,
+  "stage": "core-issues3.txt Phase 12 Stage D prep: Scout head training",
+  "wall_seconds": 619.8358099489997
+}
