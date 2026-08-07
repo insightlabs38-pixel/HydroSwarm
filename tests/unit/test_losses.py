@@ -12,16 +12,36 @@ from pathlib import Path
 import pytest
 import torch
 
+from hydroswarm.model import HydroCore
 from hydroswarm.training import TrainingConfig
 from hydroswarm.training.losses import (
     ALL_TASK_NAMES,
+    PRIMARY_TASKS,
     IncompleteTaskWeightsError,
     compute_multitask_loss,
+    task_gradient_conflict,
     validate_task_weights_complete,
 )
 
 _ROOT = Path(__file__).resolve().parents[2]
 _TRAINING_YAML = _ROOT / "configs" / "training.yaml"
+
+
+def _tiny_model(**overrides) -> HydroCore:
+    base = dict(
+        node_feature_dim=3,
+        temporal_feature_dim=2,
+        quality_feature_dim=2,
+        d_model=32,
+        nhead=4,
+        dim_feedforward=64,
+        num_layers=1,
+        modality_layers=1,
+        adapter_dims=(32, 32, 32),
+        dropout=0.0,
+    )
+    base.update(overrides)
+    return HydroCore(**base)
 
 
 def _complete_batch() -> tuple[dict[str, torch.Tensor], dict[str, torch.Tensor]]:
@@ -164,3 +184,67 @@ def test_from_yaml_raises_on_an_incomplete_config_when_required(tmp_path: Path) 
     TrainingConfig.from_yaml(incomplete_yaml)  # default: not required, must not raise
     with pytest.raises(IncompleteTaskWeightsError):
         TrainingConfig.from_yaml(incomplete_yaml, require_complete_task_weights=True)
+
+
+# --- Phase 11.1/11.4: gradient-conflict diagnostic -------------------------
+
+
+def _two_task_batch(nodes: int = 4) -> dict:
+    generator = torch.Generator().manual_seed(41)
+    return {
+        "node_features": torch.randn(2, nodes, 3, generator=generator),
+        "temporal_features": torch.randn(2, 3, nodes, 2, generator=generator),
+        "quality_features": torch.randn(2, 3, nodes, 2, generator=generator),
+        "source_candidate_mask": torch.ones(2, nodes, dtype=torch.bool),
+    }
+
+
+def test_task_gradient_conflict_reports_every_primary_vs_other_pair() -> None:
+    # source_node and sensor_fault are both in PRIMARY_TASKS and share the
+    # backbone, so this exercises real primary-vs-primary pairs (both
+    # directions) through a real model, not a synthetic disconnected
+    # tensor pair.
+    model = _tiny_model()
+    model.train()
+    nodes = 4
+    output = model(_two_task_batch(nodes))
+    targets = {
+        "source_node": torch.tensor([0, 1]),
+        "sensor_fault": torch.zeros(2, nodes),
+    }
+    result = compute_multitask_loss(output, targets)
+    assert set(result.tasks) == {"source_node", "sensor_fault"}
+    conflict = task_gradient_conflict(result.tasks, model)
+    assert set(conflict) == {"source_node|sensor_fault", "sensor_fault|source_node"}
+    for value in conflict.values():
+        assert -1.0 - 1e-6 <= value <= 1.0 + 1e-6
+
+
+def test_task_gradient_conflict_is_empty_when_no_primary_task_is_present() -> None:
+    model = _tiny_model()
+    model.train()
+    output = model(_two_task_batch())
+    targets = {"sensor_fault": torch.zeros(2, 4)}
+    result = compute_multitask_loss(output, targets)
+    assert task_gradient_conflict(result.tasks, model, primary_tasks=PRIMARY_TASKS) == {}
+
+
+def test_task_gradient_conflict_omits_a_pair_with_only_one_present_task() -> None:
+    model = _tiny_model()
+    model.train()
+    output = model(_two_task_batch())
+    targets = {"source_node": torch.tensor([0, 1])}
+    result = compute_multitask_loss(output, targets)
+    assert set(result.tasks) == {"source_node"}
+    assert task_gradient_conflict(result.tasks, model) == {}
+
+
+def test_pcgrad_and_gradient_conflict_logging_default_off() -> None:
+    # core-issues3.txt Phase 11.4: "Do not enable PCGrad or a complex
+    # automatic weighting scheme by default. Enable it only after measured
+    # conflict and compare against the simpler baseline." A guard against
+    # either default silently flipping in a future edit.
+    assert TrainingConfig().pcgrad_enabled is False
+    assert TrainingConfig().gradient_conflict_logging is False
+    config = TrainingConfig.from_yaml(_TRAINING_YAML)
+    assert config.pcgrad_enabled is False

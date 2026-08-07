@@ -27,7 +27,7 @@ from .data import (
     ScenarioExample,
     collate_scenarios,
 )
-from .losses import compute_multitask_loss, task_gradient_norms
+from .losses import compute_multitask_loss, task_gradient_conflict, task_gradient_norms
 
 CollateFn = Callable[[Sequence[ScenarioExample]], tuple[dict[str, Tensor], dict[str, Tensor]]]
 
@@ -228,12 +228,15 @@ class Trainer:
             )
             if not torch.isfinite(result.total):
                 raise FloatingPointError("non-finite multitask loss")
+            should_log_gradient_diagnostics = batch_index % self.config.gradnorm_log_every_n_batches == 0
             gradnorm = (
                 task_gradient_norms(result.tasks, self.model)
-                if (
-                    self.config.gradnorm_logging
-                    and batch_index % self.config.gradnorm_log_every_n_batches == 0
-                )
+                if (self.config.gradnorm_logging and should_log_gradient_diagnostics)
+                else {}
+            )
+            gradient_conflict = (
+                task_gradient_conflict(result.tasks, self.model)
+                if (self.config.gradient_conflict_logging and should_log_gradient_diagnostics)
                 else {}
             )
             if self.config.pcgrad_enabled:
@@ -282,6 +285,11 @@ class Trainer:
                         name: float(value.detach()) for name, value in result.weighted.items()
                     },
                     "task_gradient_norms": gradnorm,
+                    # core-issues3.txt Phase 11.1/11.4: pairwise cosine
+                    # conflict between each PRIMARY_TASKS member and every
+                    # other present task's gradient -- empty unless
+                    # gradient_conflict_logging is explicitly enabled.
+                    "task_gradient_conflict": gradient_conflict,
                     "gradient_norm": gradient_norm,
                     "learning_rate": self.optimizer.param_groups[0]["lr"],
                 }
@@ -289,26 +297,39 @@ class Trainer:
         return total_loss / max(batches, 1)
 
     @torch.no_grad()
-    def _validate(self, *, epoch: int) -> float:
+    def _validate(self, *, epoch: int) -> tuple[float, dict[str, float]]:
+        """Returns ``(overall_mean_loss, per_task_mean_unweighted_loss)``.
+
+        core-issues3.txt Phase 11.4: "Log gradient norms and primary-task
+        regressions" -- the per-task breakdown is what a caller comparing
+        two configs/ablations actually needs to see WHICH task's
+        validation loss moved, not just that the scalar total did.
+        Previously this method threw the per-task breakdown away
+        entirely (only `float(result.total)` was kept).
+        """
+
         if self.validation_dataset is None:
-            return math.nan
+            return math.nan, {}
         self.model.eval()
         losses = []
+        task_loss_sums: dict[str, float] = {}
+        task_loss_counts: dict[str, int] = {}
         for inputs, targets in self._loader(
             self.validation_dataset, epoch=epoch, shuffle=False
         ):
             output = self.model(self._to_cpu_float(inputs))
-            losses.append(
-                float(
-                    compute_multitask_loss(
-                        output,
-                        targets,
-                        task_weights=self.config.task_weights,
-                        profile_ordinal_weight=self.config.profile_ordinal_weight,
-                    ).total
-                )
+            result = compute_multitask_loss(
+                output,
+                targets,
+                task_weights=self.config.task_weights,
+                profile_ordinal_weight=self.config.profile_ordinal_weight,
             )
-        return float(np.mean(losses))
+            losses.append(float(result.total))
+            for name, value in result.tasks.items():
+                task_loss_sums[name] = task_loss_sums.get(name, 0.0) + float(value)
+                task_loss_counts[name] = task_loss_counts.get(name, 0) + 1
+        per_task = {name: task_loss_sums[name] / task_loss_counts[name] for name in task_loss_sums}
+        return float(np.mean(losses)), per_task
 
     def fit(self, *, resume_from: str | Path | None = None) -> TrainingSummary:
         started = time.monotonic()
@@ -344,7 +365,16 @@ class Trainer:
                 except TimeoutError:
                     runtime_budget_reached = True
                     break
-                validation_loss = self._validate(epoch=epoch)
+                validation_loss, validation_task_losses = self._validate(epoch=epoch)
+                self.artifacts.append_jsonl(
+                    "validation_history.jsonl",
+                    {
+                        "epoch": epoch,
+                        "curriculum_stage": stage.name,
+                        "validation_loss": validation_loss,
+                        "validation_task_losses": validation_task_losses,
+                    },
+                )
                 criterion = train_loss if math.isnan(validation_loss) else validation_loss
                 improved = criterion < best - self.config.minimum_delta
                 if improved:
@@ -386,6 +416,7 @@ class Trainer:
                         "curriculum_stage": stage.name,
                         "train_loss": train_loss,
                         "validation_loss": validation_loss,
+                        "validation_task_losses": validation_task_losses,
                         "best_validation_loss": best,
                     },
                 )

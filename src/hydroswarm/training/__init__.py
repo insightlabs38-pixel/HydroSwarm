@@ -24,9 +24,11 @@ from .data import (
 from .label_audit import audit_corpus, audit_split, cross_split_leakage
 from .losses import (
     ALL_TASK_NAMES,
+    PRIMARY_TASKS,
     IncompleteTaskWeightsError,
     MultiTaskLoss,
     compute_multitask_loss,
+    task_gradient_conflict,
     task_gradient_norms,
     validate_task_weights_complete,
 )
@@ -92,8 +94,10 @@ __all__ = [
     "GovernedScenarioDataset",
     "IncidentTrajectory",
     "ALL_TASK_NAMES",
+    "PRIMARY_TASKS",
     "IncompleteTaskWeightsError",
     "MultiTaskLoss",
+    "task_gradient_conflict",
     "validate_task_weights_complete",
     "NextStep",
     "OODCategory",

@@ -8,6 +8,7 @@ import os
 import signal
 from pathlib import Path
 
+import pytest
 import torch
 
 from hydroswarm.model import HydroCore
@@ -255,6 +256,68 @@ def test_trainer_trains_directly_from_a_sharded_scenario_dataset(tmp_path: Path)
 
     assert Path(summary.export_path).is_file()
     assert math.isfinite(summary.best_validation_loss)
+
+
+def test_validation_produces_a_per_epoch_per_task_history(tmp_path: Path) -> None:
+    # core-issues3.txt Phase 11.4: "Log gradient norms and primary-task
+    # regressions" -- validation_history.jsonl accumulates ONE entry per
+    # epoch (unlike epoch_summary.json, which atomic_json always
+    # overwrites, so only the latest epoch survives there), each carrying
+    # the per-task mean validation loss, not just the overall scalar.
+    trainer = Trainer(
+        _tiny_model(),
+        _dataset(),
+        config=_config(2),
+        run_root=tmp_path / "runs",
+        validation_dataset=_dataset(),
+        workdir=tmp_path,
+    )
+    trainer.fit()
+    history = [
+        json.loads(line)
+        for line in (trainer.artifacts.path / "validation_history.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    assert [entry["epoch"] for entry in history] == [0, 1]
+    for entry in history:
+        assert math.isfinite(entry["validation_task_losses"]["source_node"])
+        # The smoke dataset carries only one task, so the overall mean
+        # equals that task's own mean exactly (up to float summation order).
+        assert entry["validation_loss"] == pytest.approx(
+            entry["validation_task_losses"]["source_node"], abs=1e-4
+        )
+    summary = json.loads((trainer.artifacts.path / "epoch_summary.json").read_text())
+    assert "source_node" in summary["validation_task_losses"]
+
+
+def test_gradient_conflict_logging_is_off_by_default_and_calls_the_diagnostic_only_when_enabled(
+    tmp_path: Path, monkeypatch
+) -> None:
+    import hydroswarm.training.trainer as trainer_module
+
+    calls = []
+    real = trainer_module.task_gradient_conflict
+
+    def _spy(*args, **kwargs):
+        calls.append(1)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(trainer_module, "task_gradient_conflict", _spy)
+
+    off = Trainer(_tiny_model(), _dataset(), config=_config(1), run_root=tmp_path / "off", workdir=tmp_path)
+    off.fit()
+    assert calls == []
+    off_metrics = [
+        json.loads(line)
+        for line in (off.artifacts.path / "metrics.jsonl").read_text().splitlines()
+        if line.strip()
+    ]
+    assert all(entry["task_gradient_conflict"] == {} for entry in off_metrics)
+
+    config = dataclasses.replace(_config(1), gradient_conflict_logging=True)
+    on = Trainer(_tiny_model(), _dataset(), config=config, run_root=tmp_path / "on", workdir=tmp_path)
+    on.fit()
+    assert len(calls) > 0
 
 
 def test_gradnorm_logging_only_runs_on_the_configured_batch_interval(tmp_path: Path) -> None:

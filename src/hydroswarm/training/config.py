@@ -38,6 +38,16 @@ class TrainingConfig:
     #: preserves the exact prior per-batch behavior for anything that does
     #: not opt in.
     gradnorm_log_every_n_batches: int = 1
+    #: core-issues3.txt Phase 11.1/11.4: opt-in gradient-conflict
+    #: diagnostic (hydroswarm.training.losses.task_gradient_conflict).
+    #: Off by default -- like task_gradient_norms, it costs one extra
+    #: torch.autograd.grad call per (present) task, every batch it runs
+    #: on; unlike task_gradient_norms it is not already relied on by any
+    #: existing screening/promotion path, so it stays opt-in rather than
+    #: on-by-default-with-a-sparse-interval. When enabled, still gated by
+    #: gradnorm_log_every_n_batches (the same "how often do we pay for
+    #: extra backward passes" knob), not a second interval.
+    gradient_conflict_logging: bool = False
     pcgrad_enabled: bool = False
     profile_ordinal_weight: float = 0.0
     task_weights: dict[str, float] = field(default_factory=dict)

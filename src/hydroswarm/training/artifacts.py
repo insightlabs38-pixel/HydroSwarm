@@ -77,8 +77,18 @@ class RunArtifacts:
         )
 
     def append_metric(self, metric: Mapping[str, Any]) -> None:
-        with (self.path / "metrics.jsonl").open("a", encoding="utf-8") as stream:
-            stream.write(json.dumps(metric, sort_keys=True, default=str) + "\n")
+        self.append_jsonl("metrics.jsonl", metric)
+
+    def append_jsonl(self, filename: str, value: Mapping[str, Any]) -> None:
+        """Generic accumulating-JSONL append, used for anything that needs
+        a full history across the run rather than a single latest-value
+        snapshot (e.g. core-issues3.txt Phase 11.4's per-epoch,
+        per-task validation-loss history in "validation_history.jsonl" --
+        epoch_summary.json only ever keeps the MOST RECENT epoch, since
+        atomic_json always overwrites the same path)."""
+
+        with (self.path / filename).open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(value, sort_keys=True, default=str) + "\n")
 
     def check_disk(self, minimum_free_gb: float) -> None:
         free_gb = shutil.disk_usage(self.path).free / (1024**3)

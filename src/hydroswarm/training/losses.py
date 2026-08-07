@@ -407,3 +407,62 @@ def task_gradient_norms(
         )
         norms[name] = squared**0.5
     return norms
+
+
+#: Tasks whose gradient direction is the primary safety/scientific concern
+#: (core-issues3.txt Phase 11.1's "gradient cosine/conflict diagnostics
+#: where practical" / Phase 11.4's "Log gradient norms and primary-task
+#: regressions"). Deliberately a small, named subset of ALL_TASK_NAMES, not
+#: every task: a full T x T pairwise sweep is O(T^2) extra
+#: torch.autograd.grad calls on top of the T calls task_gradient_norms
+#: already costs (already documented there as expensive), and would mostly
+#: measure pairs nobody is making a promotion decision about. One
+#: representative governed head per role (Sentinel/Scout/Strategist/
+#: OOD-control) that a newly added or reweighted task must not silently
+#: degrade.
+PRIMARY_TASKS: frozenset[str] = frozenset(
+    {"source_node", "event_presence", "sensor_fault", "sample_node", "plan_validity", "ood_class"}
+)
+
+
+def task_gradient_conflict(
+    task_losses: Mapping[str, Tensor],
+    model: nn.Module,
+    *,
+    primary_tasks: frozenset[str] = PRIMARY_TASKS,
+) -> dict[str, float]:
+    """Cosine similarity between each present PRIMARY task's gradient and
+    every other present task's gradient, keyed ``f"{primary}|{other}"``. A
+    negative value is a genuine gradient conflict (the two tasks pull
+    shared parameters in opposing directions); this function only reports
+    the diagnostic -- core-issues3.txt Phase 11.4 explicitly says not to
+    enable PCGrad or another automatic intervention by default, only after
+    a measured conflict justifies it.
+
+    Deliberately primary-vs-all rather than all-vs-all (see PRIMARY_TASKS'
+    own docstring for why). A pair is omitted if either task's gradient
+    is entirely `None` (allow_unused -- the loss does not actually depend
+    on any shared trainable parameter this batch)."""
+
+    parameters = tuple(parameter for parameter in model.parameters() if parameter.requires_grad)
+    present_primary = sorted(primary_tasks & set(task_losses))
+    if not present_primary:
+        return {}
+    flattened: dict[str, Tensor | None] = {}
+    for name, loss in task_losses.items():
+        gradients = torch.autograd.grad(loss, parameters, retain_graph=True, allow_unused=True)
+        pieces = [gradient.detach().float().reshape(-1) for gradient in gradients if gradient is not None]
+        flattened[name] = torch.cat(pieces) if pieces else None
+    conflict: dict[str, float] = {}
+    for primary in present_primary:
+        primary_vector = flattened[primary]
+        if primary_vector is None:
+            continue
+        for other, vector in flattened.items():
+            if other == primary or vector is None:
+                continue
+            denominator = float(primary_vector.norm() * vector.norm())
+            conflict[f"{primary}|{other}"] = (
+                float(torch.dot(primary_vector, vector)) / denominator if denominator > 0 else 0.0
+            )
+    return conflict
