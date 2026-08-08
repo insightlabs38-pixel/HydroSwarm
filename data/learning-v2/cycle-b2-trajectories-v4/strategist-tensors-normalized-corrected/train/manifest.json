@@ -1,0 +1,189 @@
+{
+  "index_file": "index.jsonl",
+  "index_sha256": "8b47091e93388e5d086e7c3b31679c617ce1f23ed48af5cefa86fe08c54714fb",
+  "schema_version": 1,
+  "shard_size": 256,
+  "shards": [
+    {
+      "example_count": 256,
+      "file": "shard-00000.safetensors",
+      "sha256": "b4ace02fdc27c6aef206cf64043be7b5c4a8a58fe43d273fadf489852f51f777"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00001.safetensors",
+      "sha256": "c20d70c6dc9ac8b8162475207b2ada0d03cc3ecd2d2d3c81280dfce29d5b3e17"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00002.safetensors",
+      "sha256": "4b24799a091b3588e5c0e7eb6a6eee7685434f1ee58a8e936a5c47d0ab0b00cf"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00003.safetensors",
+      "sha256": "22d7c967490477e130ce426513d836c3cb244a864409b5c0664aa1ce528089c9"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00004.safetensors",
+      "sha256": "5155c2625c2b81c499f69b021b3de5a35ae830091e051655c1d55019790d6a05"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00005.safetensors",
+      "sha256": "afba54bd432ea1e641f316f94b1c3721dd628977a9ddd4610dd1a14542dcb52e"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00006.safetensors",
+      "sha256": "b5ddab8647276c4df9d5e53bd2931e4bb8f5fd597ff87d4fa3f99481cad01ad4"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00007.safetensors",
+      "sha256": "7c0aad8d5c07d784bac656b00c4b1bb61135254eb0f93617a005402b271834bc"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00008.safetensors",
+      "sha256": "5f66655833b5ce66abae133345f5a3c43d0cfcc0e63348e6682feb15f5a8c1a3"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00009.safetensors",
+      "sha256": "b2fc1f90026411f4a5b8e0c3a9823e8082e4190ef36ae542f5b51872ecd54b0d"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00010.safetensors",
+      "sha256": "f3284d7ff63413975eeefd885a855f82e678834a8a27e5540e1f981a3e47fdce"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00011.safetensors",
+      "sha256": "df530fa207134a92f4cdcf18b9c282cad286b092b18d6fb66df3b8e560bc5f0e"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00012.safetensors",
+      "sha256": "57346ac1d207f61acbaf0803ca042a9c2d49f933cd8dacd165251ecd1aa78944"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00013.safetensors",
+      "sha256": "cb8b90d54bbbfdd0a07c85a800c6be5d01db1156b6f08fcfd82ef0d3ab8a532e"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00014.safetensors",
+      "sha256": "92a274c498167bcda90800526eb00175e5a98f039ff7a7dc41ff21b8528eb2da"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00015.safetensors",
+      "sha256": "3ed022c3749912c8f88ca0170cc6d9944c832fecf181fe9c66ed73456b84e604"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00016.safetensors",
+      "sha256": "7c4114147df403f1e93894ea06893ead1ad619bfe2465efdc8b15d18247d1de7"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00017.safetensors",
+      "sha256": "960e2cf8d78bb5699eb50fc16774c1e022b2003c0134ab1b1e74db2497eac7c8"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00018.safetensors",
+      "sha256": "e140a7780cc869c5f147d5baea09c670e6b4007935df93744a6f3afa3caf4125"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00019.safetensors",
+      "sha256": "5848f8ae649705640b2419f386ac6155507ac623e3c25caa5443aa529bd23081"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00020.safetensors",
+      "sha256": "bdca98e6a655fc17c310fad2e0f94ee4c95a5a8a9a1ce467c544e1646d1631df"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00021.safetensors",
+      "sha256": "c8b90ea56f1f35f2f0b7f6884e9f6f65b22ba112110adfab10f3865b63fcae3a"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00022.safetensors",
+      "sha256": "e0f3ea17c2fb9d2737f2794173ddbf6210bd8204cf7cffaea3dfec81325acd86"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00023.safetensors",
+      "sha256": "8d7421a265d9aae0c9c2560cca42c2cc580c86acdd77e97d96883227f5cd1031"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00024.safetensors",
+      "sha256": "6b1032c760bdec73858f9305188797d213242038eaa40224fb78f0cfc0b424e5"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00025.safetensors",
+      "sha256": "2b45bffa430d32e6bd4c516099f45f85c055195657e3fe9b905a94de06b2388b"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00026.safetensors",
+      "sha256": "ebaaaec9555db68aaa0c383c4da14277a4f8ca638ae4ac0495c6b3f2a72ebd70"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00027.safetensors",
+      "sha256": "4b19fbf02f8d7cfdb27bc01430548ad22d5bb970de6766aac4860dfc7520f3fb"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00028.safetensors",
+      "sha256": "9cac9e2fb56b78873dfa6c9581085fdbc54f81fba6eef4835c4eb6c317d4a417"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00029.safetensors",
+      "sha256": "c9c9db27776c526a2c97c8c516cd806a298178e7046111ace53ece4b817ba44e"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00030.safetensors",
+      "sha256": "3025a2e6cdb56347b17652a159507c7ab43763f0c3e2036a028e41712eaaedb9"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00031.safetensors",
+      "sha256": "17c3ecafd00c5f6123779d43ce5527c25edce6c2fb2f7eb6b3d38f6a2c735525"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00032.safetensors",
+      "sha256": "7147d067a28a60ab098f1ae202b7c1ac84fb605fe7fc06b0c28c9ce39f14c3fe"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00033.safetensors",
+      "sha256": "7c2798a01882c466fd6c019828ed4c40c06680d9af495b6c6e62e82128fe234e"
+    },
+    {
+      "example_count": 256,
+      "file": "shard-00034.safetensors",
+      "sha256": "0c3a10bef972cdcfbaa1d07c3da5a61d46a40582b81a191a795be06631b492c4"
+    },
+    {
+      "example_count": 40,
+      "file": "shard-00035.safetensors",
+      "sha256": "f7e8ccf3aed658d2dca86aa4aa37f47c4ed69f6abaa8160a77dab673dc0c8379"
+    }
+  ],
+  "total_examples": 9000
+}

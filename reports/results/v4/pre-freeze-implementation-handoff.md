@@ -26,7 +26,7 @@ remain untouched.
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
 | 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **DONE (all of 10.1-10.5)** -- see "Phase 10" section below |
 | 11 | Loss system and training configuration | **DONE (11.1-11.5)** -- see "Phase 11" section below |
-| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | not started; `important-issues.txt`'s emergency exposure-blind-verification fix that was blocking Stage F is now **fully resolved** (code fix, corpus regen, gates, retrain, and Stage E rerun all DONE — see dedicated section below); Stage F itself not yet started |
+| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | Stage F **data-path fix DONE** — the governed joint corpus (`data/learning-v2/cycle-b2-joint-v4/`) merging Sentinel/control/Scout/Strategist per scenario_id now exists, passes all fail-closed merge gates and all 5 pre-training gates (corpus integrity, leakage, multi-topology batch load, gradient smoke test across 21 real tasks, checkpoint save/resume) — see "Stage F data-path fix" section below. The full Stage F joint-multitask **training run itself has NOT been started** (out of this pass's scope); 13-20 (metrics/promotion/runtime/CI/artifact governance/architecture selection/locked-test boundary) remain not started |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
 **complete and committed** — all 4 splits finished with 0 errors (see its
@@ -3195,3 +3195,279 @@ of the actual dataset/trainer code before attempting it. Not designed or
 attempted in this pass, which was scoped to the important-issues.txt
 emergency fix; recorded here rather than either guessed at with an unverified
 command or silently left implicit.
+
+## Stage F data-path fix (this pass)
+
+Scope was explicitly bounded to **only** the Stage F data-path issue
+recorded at the end of the previous section above: `scripts/train.py`
+cannot train Stage F's joint multitask objective because the three real
+governed datasets that exist are three separate derived corpora, each
+overlaying only its own role's targets onto the shared `cycle-b2` base.
+This pass did **not** redo any already-completed pre-freeze work, did not
+begin final architecture selection, and did not open the locked test.
+
+### Merge design chosen
+
+A deterministic, offline, governed merge (`scripts/build_stage_f_joint_corpus.py`)
+producing `data/learning-v2/cycle-b2-joint-v4/tensors-normalized/<population>/`
+— one canonical `ScenarioExample` per `scenario_id`, joined by scenario_id
+across every source corpus that covers that population, rather than a
+runtime multi-source batch loader. Chosen because: (a) every source corpus
+is already a `ShardedScenarioDataset` with governed, hash-verified,
+per-scenario tensors — a batch-time multi-source join would have to
+re-derive the same scenario_id alignment on every single training step for
+no benefit; (b) a materialized merge produces one manifest/checksum/report
+set that can itself be gated (Phase 16-style corpus gates) before any
+training starts, exactly what this pass's required deliverables ask for;
+(c) `collate_variable_topology` already requires every example in one batch
+to share an identical target-key set, so the merge output's per-population
+uniform key set is not an extra constraint introduced by this design, it is
+what the existing collator already demands.
+
+For every population (the four canonical splits, plus `cycle-b2`'s own two
+OOD-development categories), the join order is: `cycle-b2/tensors-normalized`
+(base) ← `cycle-b2-control-v2` (train/validation only: `event_cause`
+correction, `evidence_sufficiency` second-pass, new `next_step`) ←
+`cycle-b2-trajectories-v3/scout-tensors-normalized` (train/validation only:
+`sample_node`, `information_gain`, `candidate_reduction`,
+`should_continue_sampling`) ← `cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected`
+(all four splits: `plan_validity`/`plan_value`/five consequence proxies plus
+the six `plan_*` candidate-conditioning input keys). Every key an overlay
+shares with base outside its own documented owned-key set must be
+byte-identical or the merge fails closed (`StageFMergeError`) — this is the
+same check that caught the Strategist-v4 defect below, kept in the script as
+a permanent, automated safety net rather than a one-off manual finding.
+
+### Source corpora and hashes
+
+Full detail in `data/learning-v2/cycle-b2-joint-v4/source-manifest-hashes.json`
+(per-population `index_sha256`, shard counts, example counts) and
+`data/learning-v2/cycle-b2-joint-v4/checksums.json` (per-output-population
+`dataset_manifest_hash` + `index_sha256`). Top-level dataset fingerprint
+(sha256 over every output population's `dataset_manifest_hash`):
+
+```
+d1665a891013a8ba2d56c78a8334ee574c6de0d0e97750f36a2be71e0386bfd1
+```
+
+Source directories used: `data/learning-v2/cycle-b2/tensors-normalized`
+(base, unmodified), `data/learning-v2/cycle-b2-control-v2/tensors-normalized`
+(unmodified), `data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized`
+(unmodified), `data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected`
+(new — see next section).
+
+### Scout-v3 / Strategist-v4 compatibility finding
+
+Checked programmatically, not by inspection alone, before merging (per
+this pass's instruction): for every population, every source's
+`TopologyMetadata` (`topology_hash`, `network_hash`, `hydraulic_state_hash`,
+`signature_library_hash`, `target_schema_version`, `feature_schema_version`)
+and every shared input/target tensor's byte value.
+
+- **Scout-v3: fully compatible, zero mismatches.** Its scenario_id set is
+  identical to base's for train/validation (9000/1000), every topology
+  identity field matches, and every shared input tensor
+  (`node_features`/`edge_features`/`temporal_features`/`quality_features`/
+  `classical_prior`/`demand_centrality`/`reservoir_reachability`/
+  `travel_time`/masks/`edge_index`) is byte-identical to
+  `cycle-b2/tensors-normalized` (450/450 and 450/450 checks across 30
+  sampled scenarios × 15 shared input keys, both splits). Scout-v3 was
+  built correctly (`scripts/build_scout_state_dataset.py --tensor-shard-dir
+  cycle-b2/tensors-normalized/...`, confirmed by reading both the script and
+  this handoff's own recorded command history).
+
+- **Strategist-v4: FAILED the initial check — a real, confirmed defect, not
+  a Scout regeneration need.** Strategist-v4's shared input tensors were
+  byte-identical to `cycle-b2/tensors` (the RAW, pre-training-only-
+  normalization shard) and NOT to `cycle-b2/tensors-normalized` (the
+  governed shard every other corpus uses) — 300/300 checks matched the raw
+  shard, 0/300 matched the normalized shard (masks/indices aside), across
+  all four splits. Root cause, confirmed by reading both the generation
+  script and this handoff's own previously-recorded command: the
+  `important-issues.txt` emergency-fix pass's regeneration command (commit
+  `9a0c364`/`d681d9e`, recorded in this same file, "Build the sharded
+  candidate-conditioned tensors" section) passed
+  `--tensor-shard-dir data/learning-v2/cycle-b2/tensors/train` to
+  `build_strategist_candidate_dataset.py` instead of
+  `.../tensors-normalized/train` — a wrong-argument bug, not an intentional
+  Strategist-specific normalization change and not something Scout needs to
+  regenerate for. `build_strategist_candidate_dataset.py` only ever copies
+  whatever `--tensor-shard-dir` it is given verbatim and adds its own
+  `plan_*` keys (confirmed by reading the script), so the Strategist-owned
+  target VALUES (`plan_validity`/`plan_value`/the five consequence proxies —
+  all sourced from `targets` in the trajectory JSONL, never from
+  `--tensor-shard-dir`) were unaffected; only the incidentally-embedded
+  shared graph-feature copies were wrong-scale. **This means the
+  already-trained Strategist checkpoint's labels were always correct; only
+  its input feature distribution was inconsistent with the rest of the
+  governed corpus.**
+
+  Per this pass's instruction ("stop and report exactly what data must be
+  regenerated instead of silently mixing versions"), this was fixed by
+  rebuilding `data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/`
+  (all 4 splits) with the SAME script and SAME immutable trajectory JSONL,
+  only correcting `--tensor-shard-dir` to `.../tensors-normalized/<split>`.
+  No re-simulation, no re-verification, nothing invented. Verified after
+  rebuild: 100% scenario coverage on all 4 splits (9000/1000/1000/1750,
+  matching the original build's counts exactly), shared inputs now
+  byte-identical to `cycle-b2/tensors-normalized` (0/300 mismatches, all 4
+  splits), and the 7 Strategist-owned target values byte-identical between
+  the original (wrong-input) and corrected (right-input) builds (0/140
+  mismatches, all 4 splits) — confirming the fix changed only the
+  incidentally-wrong input features, nothing governed. **The original
+  `strategist-tensors-normalized/` directory (and the checkpoint/Stage-E
+  results already trained/evaluated against it) is left completely
+  untouched** for audit — this pass did not retrain or re-evaluate
+  Strategist (out of scope: "do not redo work already covered by the
+  pre-freeze plan"). Whether the already-promoted-provisional Strategist
+  checkpoint should itself be retrained on the corrected tensors is a real
+  open question, flagged here, deferred to whoever runs Stage F training
+  (the corrected corpus this pass produces is unaffected by that decision
+  either way, since Stage F would train fresh regardless).
+
+- **`cycle-b2-control-v2`'s `event_cause`/`evidence_sufficiency` divergence
+  from base is intentional and documented, not a defect**: `control-v2`'s
+  own `manifest.json` records `event_cause_recomputed_via:
+  "hydroswarm.training.corpus._event_cause (post-Phase-6.4 fix)"` and
+  `event_cause_changed_by_phase_6_4_fix: 450` (of 9000 train examples) —
+  a real, governed, versioned bugfix recomputation, matching this pass's
+  own sampled finding (2/50 event_cause, 17/50 evidence_sufficiency
+  differences). Treated as authoritative over base for train/validation;
+  every other target/input key control-v2 carries was verified
+  byte-identical to base (checked, not assumed).
+
+- **Known, reported (not silently patched) limitation**: the Phase-6.4
+  `event_cause` fix and the second-pass `evidence_sufficiency` regeneration
+  were only ever applied to train/validation (control-v2 has no
+  calibration/development_holdout split). The joint corpus's `calibration`
+  and `development_holdout` populations therefore carry base `cycle-b2`'s
+  original (pre-fix) `event_cause`/`evidence_sufficiency`, and omit
+  `next_step` and every Scout key entirely (not masked-with-a-fabricated-
+  placeholder — genuinely absent, because neither corpus was ever generated
+  for those populations). This is recorded per-population in
+  `unavailable_task_groups` inside `merge-report.json` and
+  `target-availability-report.json`, not implied by a silently-missing key.
+
+- **A second real defect found and worked around (not fixed) by this pass**:
+  attempting to also join `cycle-b2-ood-extension`'s four learned-`ood_class`
+  categories (`EXTREME_DEMAND`/`FROZEN_DRIFTING_SENSOR`/`ROUGHNESS_MISMATCH`/
+  `TANK_STATE_SHIFT`) revealed that corpus's `seed_family` LABELS collide
+  with train/validation/calibration's own labels for genuinely different
+  `scenario_id`s (confirmed: e.g. `("golden-reference",
+  "golden-reference:910")` resolves to `0b2adaeb-...` in `train` and
+  `f75309b9-...` in `ood-EXTREME_DEMAND` — different scenarios, same
+  seed_family namespace slot). This is a pre-existing seed-family-numbering
+  defect in the already-generated `cycle-b2-ood-extension` corpus, not
+  something this merge introduces, and violates "a seed family may appear
+  only once per governed split" once combined with the populations it
+  collides with. Regenerating `cycle-b2-ood-extension` with a disjoint
+  numbering scheme is out of this pass's Stage-F-data-path scope, so
+  `build_stage_f_joint_corpus.py` excludes those four categories by default
+  (`include_ood_extension=False`) and records exactly why in
+  `merge-report.json`'s `skipped_populations`. `cycle-b2`'s own two
+  OOD-development categories (`ood-SEVERE_MISSINGNESS`/`ood-UNSEEN_TOPOLOGY`)
+  do **not** collide (verified: zero leaks) and are always included.
+
+### Merged corpus counts
+
+| population | output split | base | joined | control | scout | strategist | ood_class | unavailable |
+|---|---|---:|---:|---:|---:|---:|---:|---|
+| train | train | 9000 | 9000 | 9000 | 9000 | 9000 | 0 | ood_class |
+| validation | validation | 1000 | 1000 | 1000 | 1000 | 1000 | 0 | ood_class |
+| calibration | calibration | 1000 | 1000 | 0 | 0 | 1000 | 0 | control.next_step, scout, ood_class |
+| development_holdout | development_holdout | 1750 | 1750 | 0 | 0 | 1750 | 0 | control.next_step, scout, ood_class |
+| ood-SEVERE_MISSINGNESS | development_holdout | 400 | 400 | 0 | 0 | 0 | 0 | control.next_step, scout, strategist, ood_class |
+| ood-UNSEEN_TOPOLOGY | development_holdout | 400 | 400 | 0 | 0 | 0 | 0 | control.next_step, scout, strategist, ood_class |
+
+Totals across all 6 populations: **0 missing joins, 0 duplicate joins, 0
+identity conflicts, 0 cross-population scenario_id leaks, 0 cross-population
+seed_family leaks** — every `requirement_status` field in
+`data/learning-v2/cycle-b2-joint-v4/merge-report.json` is `true`. Full
+per-population masked-target counts (e.g. train: `duration_mask` 6300/9000
+valid, matching the known 6300/9000 CONTAMINATION-cause population exactly)
+are in `data/learning-v2/cycle-b2-joint-v4/target-availability-report.json`.
+
+### Gate results
+
+`scripts/run_stage_f_joint_corpus_gates.py` against the merged corpus —
+full detail in `reports/results/v4/stage-f-joint-corpus-gates.json`,
+`overall_status: "passed"`:
+
+| gate | result |
+|---|---|
+| `corpus_integrity` | passed — `merge-report.json` requirement_status all true; every population's on-disk shard checksums re-verified independently and example counts re-confirmed against the report |
+| `leakage` | passed — `leakage-report.json` re-verified directly against every emitted `index.jsonl` (not merely re-reading the stored report); zero scenario_id/seed_family collisions |
+| `batch_load` | passed — one real 16-example batch from `train` spans all 3 topologies (`branched-loop`, `golden-reference`, `loop-grid`) |
+| `gradient_smoke` | passed — a full-config HydroCore-small (`prior_mode=feature_only`, `event_control_heads=True`, `scout_control_heads=True`, `strategist_mode=candidate_conditioned`, `action_vocabulary_size=9`, `consequence_prescreening_heads=True`) forward+backward pass on that batch reached **21 real tasks** simultaneously (every Sentinel/profile/control/Scout/Strategist/proxy task compute_multitask_loss knows about that this corpus supervises), every one with a positive valid count and nonzero gradient norm, finite total loss (25.32) |
+| `checkpoint_resume` | passed — `Trainer.fit()` 1 epoch then `fit(resume_from=...)` 2 more epochs against real joint-corpus subsets; global steps advanced, validation loss finite and improved (14.24 → 11.61), resumed checkpoint reloads strictly under `verify_architecture_compatibility` |
+
+Per this pass's explicit scope, these are **pre-training gates only** — the
+full Stage F joint-multitask training run was deliberately **not started**.
+
+### Exact command to start Stage F once safe
+
+Gates above only prove the corpus and a full-config model are compatible at
+smoke scale; a real Stage F run still needs its own run-root/registry
+wiring and a deliberate task-weight/epoch/seed decision (Phase 12 Stage F:
+"shared backbone + adapters" vs. "shared backbone without adapters", at
+least two seeds), which is intentionally not decided by this pass. The
+corpus and model config to start from:
+
+```bash
+export PYTHONPATH=src
+python scripts/run_stage_f_joint_corpus_gates.py   # re-verify gates still pass before any real run
+
+# Real Stage F run (adapt run-root/registry/seed/epochs to the actual
+# staged-training decision -- this is the corpus+config wiring, not a
+# pre-committed hyperparameter choice):
+python - <<'PY'
+from pathlib import Path
+from hydroswarm.model import HydroCore
+from hydroswarm.planning.action_templates import ACTION_TEMPLATE_COUNT
+from hydroswarm.training import ShardedScenarioDataset, Trainer, TrainingConfig, collate_variable_topology
+
+train = ShardedScenarioDataset("data/learning-v2/cycle-b2-joint-v4/tensors-normalized/train", expected_split="train")
+validation = ShardedScenarioDataset("data/learning-v2/cycle-b2-joint-v4/tensors-normalized/validation", expected_split="validation")
+train.verify_shard_checksums()
+validation.verify_shard_checksums()
+
+model = HydroCore.from_variant(
+    "small",
+    prior_mode="feature_only",
+    event_control_heads=True,
+    scout_control_heads=True,
+    strategist_mode="candidate_conditioned",
+    action_vocabulary_size=ACTION_TEMPLATE_COUNT,
+    consequence_prescreening_heads=True,
+)
+config = TrainingConfig.from_yaml(Path("configs/training.yaml"))
+trainer = Trainer(
+    model, train, validation_dataset=validation, config=config,
+    run_root=Path("experiments/runs/stage-f-joint-v4"), workdir=".",
+    collate_fn=collate_variable_topology,
+)
+summary = trainer.fit()
+print(summary)
+PY
+```
+
+`calibration` and `development_holdout` populations in the same corpus are
+available for calibration fitting and architecture-comparison evaluation
+respectively (never for training/tuning), each missing `next_step`/Scout
+per the documented limitation above.
+
+### Files changed this pass
+
+- `scripts/build_stage_f_joint_corpus.py` (new) — the merge itself.
+- `scripts/run_stage_f_joint_corpus_gates.py` (new) — the 5 pre-training gates.
+- `data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/` (new) — Strategist-v4 tensors rebuilt with the corrected `--tensor-shard-dir`; original `strategist-tensors-normalized/` untouched.
+- `data/learning-v2/cycle-b2-joint-v4/` (new) — the merged corpus: `tensors-normalized/<population>/` (shards + index + manifest), `merge-report.json`, `leakage-report.json`, `source-manifest-hashes.json`, `target-availability-report.json`, `checksums.json`.
+- `reports/results/v4/stage-f-joint-corpus-gates.json` (new) — gate results.
+- `.gitattributes` — LFS patterns added for the two new `*.safetensors` directory trees, matching every existing sharded-tensor corpus's convention.
+- `data/learning-v2/cycle-b2`, `data/learning-v2/cycle-b2-control-v2`, `data/learning-v2/cycle-b2-trajectories-v3`, `data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized` (original) — **untouched**, read-only sources.
+
+Not attempted this pass (explicitly out of scope): starting the Stage F
+training run itself, retraining Strategist on the corrected tensors,
+regenerating `cycle-b2-ood-extension`'s seed-family numbering, architecture
+selection, or the locked test. `final-selection.json` does not exist. The
+locked final test was not opened.

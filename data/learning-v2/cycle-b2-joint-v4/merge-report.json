@@ -1,0 +1,1199 @@
+{
+  "corpus_name": "cycle-b2-joint-v4",
+  "dataset_fingerprint_sha256": "d1665a891013a8ba2d56c78a8334ee574c6de0d0e97750f36a2be71e0386bfd1",
+  "populations": [
+    {
+      "conflicts": 0,
+      "control_target_count": 9000,
+      "dataset_manifest_hash": "a0cbc8603d0fcfe948a91b90d84628495a5cb7143ef2e0dd7a128f7e20724c26",
+      "duplicate_joins": 0,
+      "expected_base_examples": 9000,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "plan_features",
+        "plan_mask",
+        "plan_target_link_index",
+        "plan_target_node_index",
+        "plan_target_type",
+        "plan_template_ids",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 9000,
+      "joined_scenario_ids_sample": [
+        "17a6bd1d-8b08-57d4-99e6-340ca174bcc8",
+        "4b9a4079-d28d-51b2-956d-063c060a0300",
+        "a6e6ef48-36ee-5212-b841-e767f659d599",
+        "2730a0d5-ac5b-5084-b278-545d26168d79",
+        "da59b752-5ed7-5bf2-b34c-ff207df03713"
+      ],
+      "masked_target_counts": {
+        "candidate_reduction_mask": {
+          "masked": 12000,
+          "total": 69000,
+          "valid": 57000
+        },
+        "containment_time_proxy_mask": {
+          "masked": 21478,
+          "total": 81000,
+          "valid": 59522
+        },
+        "duration_mask": {
+          "masked": 2700,
+          "total": 9000,
+          "valid": 6300
+        },
+        "exposure_proxy_mask": {
+          "masked": 21478,
+          "total": 81000,
+          "valid": 59522
+        },
+        "information_gain_mask": {
+          "masked": 12000,
+          "total": 69000,
+          "valid": 57000
+        },
+        "plan_regret_proxy_mask": {
+          "masked": 21478,
+          "total": 81000,
+          "valid": 59522
+        },
+        "plan_validity_mask": {
+          "masked": 0,
+          "total": 81000,
+          "valid": 81000
+        },
+        "plan_value_mask": {
+          "masked": 21478,
+          "total": 81000,
+          "valid": 59522
+        },
+        "pressure_risk_proxy_mask": {
+          "masked": 21478,
+          "total": 81000,
+          "valid": 59522
+        },
+        "relative_strength_mask": {
+          "masked": 2700,
+          "total": 9000,
+          "valid": 6300
+        },
+        "sample_node_mask": {
+          "masked": 4191,
+          "total": 9000,
+          "valid": 4809
+        },
+        "sensor_fault_mask": {
+          "masked": 34000,
+          "total": 69000,
+          "valid": 35000
+        },
+        "service_loss_proxy_mask": {
+          "masked": 21478,
+          "total": 81000,
+          "valid": 59522
+        },
+        "source_node_mask": {
+          "masked": 2700,
+          "total": 9000,
+          "valid": 6300
+        },
+        "source_region_mask": {
+          "masked": 2700,
+          "total": 9000,
+          "valid": 6300
+        },
+        "start_time_mask": {
+          "masked": 2700,
+          "total": 9000,
+          "valid": 6300
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 0,
+      "output_split": "train",
+      "population": "train",
+      "scout_target_count": 9000,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "763a21a7c8cf2037abc88de4e68eb28afc92e2e98f3d858b75ea0a5a468922ce",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "0f8fcf89ad56ae9be73d21c58ec55aaf3ff1e9d6a9fabacd704d082fd0349a94"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00001.safetensors",
+            "sha256": "c1da01d9fbd140699cdb4fbffdd29bce29db94049f12b933cd2ca6b30f40d0c8"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00002.safetensors",
+            "sha256": "6fb73b2790360481311f44de386b56ecd85b9a9909f749708462396aefe74bea"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00003.safetensors",
+            "sha256": "1d0489b2db4f96bca7f10df7bd1e00bf15d510dee9e105b07b6f1af41d7dc1be"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00004.safetensors",
+            "sha256": "f5372211d7f9d5160ed759c6720e40a1ae8767b8080bfdbc32c050088cf3e028"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00005.safetensors",
+            "sha256": "53866b26e7ca8fc968240434af618d380837d703785423b6d0204cfd2ba642b7"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00006.safetensors",
+            "sha256": "e3bf4a75da2d654b6c90687b5a64d977c9f8a87f4828b7fe6b30ff2c2253d788"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00007.safetensors",
+            "sha256": "b0a424bb7869b4d3698d7e95d7a741682b93e151c840d69eeb45d969277054ba"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00008.safetensors",
+            "sha256": "d193efb0f27f3c7514c5ec3aaf8813388d05fe4ea38a8e3e3e41ef9a0e52faf7"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00009.safetensors",
+            "sha256": "c396e153e6b06d902fe2c7b3688c4a51e7d94693519b0d316cd3c1790b9cea1a"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00010.safetensors",
+            "sha256": "0549d70ce716320e5bc02db78d38b0e10c4b37f7113666006df70bafc49046d7"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00011.safetensors",
+            "sha256": "278e6bffa206826305740dae26f91276f2b31a26c14da7fd0d4eb5c933cbfcea"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00012.safetensors",
+            "sha256": "27222122332986ee7f9c63940c41d1612b3b693bf8a97385c4a912e055f8d686"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00013.safetensors",
+            "sha256": "e81927b0b4e61ccd0b060c68d8f8e185915c79cf28ddebc9538b65cf3fb7f67e"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00014.safetensors",
+            "sha256": "b05047d36ddb80d7f11facf8b84365ba5107f863c97f7072548d447576f27101"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00015.safetensors",
+            "sha256": "cdbc3feb7fd64717d25b7370fb60bb6aa6841d672b2275d9f80e9ed90466b8bd"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00016.safetensors",
+            "sha256": "b4c57d2e13491a0bafd30dfe32bd618259c622145f02d21f69b54a884fa4a9c6"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00017.safetensors",
+            "sha256": "f68f18e8e2d703f1125f323eae39b46914bac7ef96d318a44d3c614f1ad05dce"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00018.safetensors",
+            "sha256": "8eb27659fcb63807788462605d110aa7b640d565a160ee1754d6a5f7a3036412"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00019.safetensors",
+            "sha256": "ce8d0e4aa8701110d3533df7ea1a34bd0607fe1dd78e0a5ba23789b7a21137e1"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00020.safetensors",
+            "sha256": "9a7f477afe0fc1452e97c2c8e27938cf46b0f8939d942c4d9effc13621a0eab0"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00021.safetensors",
+            "sha256": "b565bb16c1eeb245af2b421812f4b7da076d3cd544d752af276d30aa6df41958"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00022.safetensors",
+            "sha256": "d486254ecdae5b73351a7f8bdb2015473cd4ef767b9159c60ed8eefc40ad8199"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00023.safetensors",
+            "sha256": "a5111ccc9512d8137710ae39c7a7704f94c1d209847eb5e1fd4dc4eb69c3a634"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00024.safetensors",
+            "sha256": "0e2ee753981490fc72e7e564619a93055eb724590009361981c2cdbf5f649be3"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00025.safetensors",
+            "sha256": "8dffaa21781c03f958bc411608082b2e2c0e59a07392a9e934da41cfe415b155"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00026.safetensors",
+            "sha256": "299fe7557171a1cf43b25e98be3bc9f199685c715586345dcc4bbc6336d612e3"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00027.safetensors",
+            "sha256": "2f627def37a0a1a2902cfd1f908f735c08c181e303f4bd095fd328e6d785721c"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00028.safetensors",
+            "sha256": "429c7c997f7e204f25fa6ee23b35b7029115a35cfe4be2a61be40acc59c79c9c"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00029.safetensors",
+            "sha256": "0c3fcbac5e3b5aedef69491db0b98ee3b684f8bf718d8809ba45cf8126a9931c"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00030.safetensors",
+            "sha256": "0b1c8cd69c2dcff0fa8a2fb18995e858c637c2d07ac525bd4fe8b82a869473db"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00031.safetensors",
+            "sha256": "a57fca605aaee5e34e182d95d1b5cc9cd7f23efa2cbae3eba172328479711be7"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00032.safetensors",
+            "sha256": "a660636582143916209a0c27a2cd559f6c9297fdc8bfd8b1d5c05e31f0b2d564"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00033.safetensors",
+            "sha256": "b1090dd1b508a2ee1b58ade69e95550559fc360450bd84a1680e42827522b524"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00034.safetensors",
+            "sha256": "0eff2675372d685d7531ed05f091c97b08f67e5c2d8dd17bc4fdee3dca0248bf"
+          },
+          {
+            "example_count": 40,
+            "file": "shard-00035.safetensors",
+            "sha256": "ff55e9c253c1732928186395c7a6f29598052964656f6131ce162aa86e940e79"
+          }
+        ],
+        "total_examples": 9000
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2/tensors-normalized/train",
+        "control": "data/learning-v2/cycle-b2-control-v2/tensors-normalized/train",
+        "scout": "data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/train",
+        "strategist": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/train"
+      },
+      "strategist_target_count": 9000,
+      "target_keys": [
+        "candidate_reduction",
+        "candidate_reduction_mask",
+        "containment_time_proxy",
+        "containment_time_proxy_mask",
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "exposure_proxy",
+        "exposure_proxy_mask",
+        "information_gain",
+        "information_gain_mask",
+        "next_step",
+        "plan_regret_proxy",
+        "plan_regret_proxy_mask",
+        "plan_validity",
+        "plan_validity_mask",
+        "plan_value",
+        "plan_value_mask",
+        "pressure_risk_proxy",
+        "pressure_risk_proxy_mask",
+        "relative_strength",
+        "relative_strength_mask",
+        "sample_node",
+        "sample_node_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "service_loss_proxy",
+        "service_loss_proxy_mask",
+        "should_continue_sampling",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "ood_class"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 1000,
+      "dataset_manifest_hash": "6e9ca16f8070a7fec8c4c4576418d9c2be04581a1cc388fc7d11815f7e9021f3",
+      "duplicate_joins": 0,
+      "expected_base_examples": 1000,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "plan_features",
+        "plan_mask",
+        "plan_target_link_index",
+        "plan_target_node_index",
+        "plan_target_type",
+        "plan_template_ids",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 1000,
+      "joined_scenario_ids_sample": [
+        "8e486d3c-4190-5e90-b9ae-c248f0152da9",
+        "f2b2048e-0b74-5fec-8e03-1b8430919187",
+        "72a2e630-9ca2-58fd-a4b2-630f7a53a0f5",
+        "c6a11057-3b62-5417-b018-00fa5de647a0",
+        "24f8521f-fd99-5194-957e-6f93d754a101"
+      ],
+      "masked_target_counts": {
+        "candidate_reduction_mask": {
+          "masked": 1334,
+          "total": 7665,
+          "valid": 6331
+        },
+        "containment_time_proxy_mask": {
+          "masked": 2371,
+          "total": 9000,
+          "valid": 6629
+        },
+        "duration_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "exposure_proxy_mask": {
+          "masked": 2371,
+          "total": 9000,
+          "valid": 6629
+        },
+        "information_gain_mask": {
+          "masked": 1334,
+          "total": 7665,
+          "valid": 6331
+        },
+        "plan_regret_proxy_mask": {
+          "masked": 2371,
+          "total": 9000,
+          "valid": 6629
+        },
+        "plan_validity_mask": {
+          "masked": 0,
+          "total": 9000,
+          "valid": 9000
+        },
+        "plan_value_mask": {
+          "masked": 2371,
+          "total": 9000,
+          "valid": 6629
+        },
+        "pressure_risk_proxy_mask": {
+          "masked": 2371,
+          "total": 9000,
+          "valid": 6629
+        },
+        "relative_strength_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "sample_node_mask": {
+          "masked": 461,
+          "total": 1000,
+          "valid": 539
+        },
+        "sensor_fault_mask": {
+          "masked": 3777,
+          "total": 7665,
+          "valid": 3888
+        },
+        "service_loss_proxy_mask": {
+          "masked": 2371,
+          "total": 9000,
+          "valid": 6629
+        },
+        "source_node_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "source_region_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "start_time_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 0,
+      "output_split": "validation",
+      "population": "validation",
+      "scout_target_count": 1000,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "d2c716798362abe7a75dabff0059bbcf7f91cd8083723fb7bbbee8e3b8af6a69",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "d4265b186c8f8c9084886ee71d9a9d68b8b31ca24d5605550770530afd232fed"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00001.safetensors",
+            "sha256": "da7e632dc2b0e57247d42cfc27f1a4497860526da0ecb40cd4ef518093d76ed5"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00002.safetensors",
+            "sha256": "a281c90fea20d4ef8521484ae077a8339d88f3ae061122c602fcd1e3c70c1f6c"
+          },
+          {
+            "example_count": 232,
+            "file": "shard-00003.safetensors",
+            "sha256": "59a2da6ae6f7cc55a72c2c979eca006c750fac98e448a95a6e9625ecae2a3de4"
+          }
+        ],
+        "total_examples": 1000
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2/tensors-normalized/validation",
+        "control": "data/learning-v2/cycle-b2-control-v2/tensors-normalized/validation",
+        "scout": "data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/validation",
+        "strategist": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/validation"
+      },
+      "strategist_target_count": 1000,
+      "target_keys": [
+        "candidate_reduction",
+        "candidate_reduction_mask",
+        "containment_time_proxy",
+        "containment_time_proxy_mask",
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "exposure_proxy",
+        "exposure_proxy_mask",
+        "information_gain",
+        "information_gain_mask",
+        "next_step",
+        "plan_regret_proxy",
+        "plan_regret_proxy_mask",
+        "plan_validity",
+        "plan_validity_mask",
+        "plan_value",
+        "plan_value_mask",
+        "pressure_risk_proxy",
+        "pressure_risk_proxy_mask",
+        "relative_strength",
+        "relative_strength_mask",
+        "sample_node",
+        "sample_node_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "service_loss_proxy",
+        "service_loss_proxy_mask",
+        "should_continue_sampling",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "ood_class"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "900f55add24de88837eb9886962fa1bf93284e7a38d140d1511da59adf9693fd",
+      "duplicate_joins": 0,
+      "expected_base_examples": 1000,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "plan_features",
+        "plan_mask",
+        "plan_target_link_index",
+        "plan_target_node_index",
+        "plan_target_type",
+        "plan_template_ids",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 1000,
+      "joined_scenario_ids_sample": [
+        "034f3dbb-1e86-5d04-b82e-43cebf76253c",
+        "42ef43ee-09df-5c67-b582-dffc8affa7d6",
+        "b4900436-5b13-56a7-b2c7-5d72524084cf",
+        "8cb6dadd-5ffb-5b09-a71a-4155f655bb94",
+        "4294eeeb-6559-59c2-9913-cc2555f2756a"
+      ],
+      "masked_target_counts": {
+        "containment_time_proxy_mask": {
+          "masked": 2407,
+          "total": 9000,
+          "valid": 6593
+        },
+        "duration_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "exposure_proxy_mask": {
+          "masked": 2407,
+          "total": 9000,
+          "valid": 6593
+        },
+        "plan_regret_proxy_mask": {
+          "masked": 2407,
+          "total": 9000,
+          "valid": 6593
+        },
+        "plan_validity_mask": {
+          "masked": 0,
+          "total": 9000,
+          "valid": 9000
+        },
+        "plan_value_mask": {
+          "masked": 2407,
+          "total": 9000,
+          "valid": 6593
+        },
+        "pressure_risk_proxy_mask": {
+          "masked": 2407,
+          "total": 9000,
+          "valid": 6593
+        },
+        "relative_strength_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "sensor_fault_mask": {
+          "masked": 3777,
+          "total": 7665,
+          "valid": 3888
+        },
+        "service_loss_proxy_mask": {
+          "masked": 2407,
+          "total": 9000,
+          "valid": 6593
+        },
+        "source_node_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "source_region_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        },
+        "start_time_mask": {
+          "masked": 288,
+          "total": 1000,
+          "valid": 712
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 0,
+      "output_split": "calibration",
+      "population": "calibration",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "6ec7afa3850af5629d784c801190b5e027c672fb1bdc09a19f0c01e0a8dcf310",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "8a00f1e93350eb89d806a5572a8922d334a32f9c1faa0087fde9e976627bf7b6"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00001.safetensors",
+            "sha256": "b078d786f9b5cff313a04676dc935fd0da62a8c05f5af1425e13ac1f82fecb7d"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00002.safetensors",
+            "sha256": "ccba0af0303ddc7f2a4c941a2853d06b3f6c8709db3de825a6d859cfc2caaf6d"
+          },
+          {
+            "example_count": 232,
+            "file": "shard-00003.safetensors",
+            "sha256": "5df4c5b1f6f51ce3292880796b3fae8fbf2d7e09c33dd09947ab640879ab7f2a"
+          }
+        ],
+        "total_examples": 1000
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2/tensors-normalized/calibration",
+        "strategist": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/calibration"
+      },
+      "strategist_target_count": 1000,
+      "target_keys": [
+        "containment_time_proxy",
+        "containment_time_proxy_mask",
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "exposure_proxy",
+        "exposure_proxy_mask",
+        "plan_regret_proxy",
+        "plan_regret_proxy_mask",
+        "plan_validity",
+        "plan_validity_mask",
+        "plan_value",
+        "plan_value_mask",
+        "pressure_risk_proxy",
+        "pressure_risk_proxy_mask",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "service_loss_proxy",
+        "service_loss_proxy_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "ood_class"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "8365b350c17d803fa5f1c48bf1297a3d76a74a2882a7772691ce980e2d5cece0",
+      "duplicate_joins": 0,
+      "expected_base_examples": 1750,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "plan_features",
+        "plan_mask",
+        "plan_target_link_index",
+        "plan_target_node_index",
+        "plan_target_type",
+        "plan_template_ids",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 1750,
+      "joined_scenario_ids_sample": [
+        "714bc634-6f24-590c-9f7e-ed369b89719d",
+        "fb5acf50-13f2-581c-9cb4-2fad32e91847",
+        "71bc1b7b-23e3-5df0-b3dc-868b7aeb58ed",
+        "6893e76a-8d7a-5849-bc89-7c0910833ae8",
+        "6eb59bb6-aed9-59be-a73f-4a9345a41cb1"
+      ],
+      "masked_target_counts": {
+        "containment_time_proxy_mask": {
+          "masked": 4164,
+          "total": 15750,
+          "valid": 11586
+        },
+        "duration_mask": {
+          "masked": 522,
+          "total": 1750,
+          "valid": 1228
+        },
+        "exposure_proxy_mask": {
+          "masked": 4164,
+          "total": 15750,
+          "valid": 11586
+        },
+        "plan_regret_proxy_mask": {
+          "masked": 4164,
+          "total": 15750,
+          "valid": 11586
+        },
+        "plan_validity_mask": {
+          "masked": 0,
+          "total": 15750,
+          "valid": 15750
+        },
+        "plan_value_mask": {
+          "masked": 4164,
+          "total": 15750,
+          "valid": 11586
+        },
+        "pressure_risk_proxy_mask": {
+          "masked": 4164,
+          "total": 15750,
+          "valid": 11586
+        },
+        "relative_strength_mask": {
+          "masked": 522,
+          "total": 1750,
+          "valid": 1228
+        },
+        "sensor_fault_mask": {
+          "masked": 6612,
+          "total": 13415,
+          "valid": 6803
+        },
+        "service_loss_proxy_mask": {
+          "masked": 4164,
+          "total": 15750,
+          "valid": 11586
+        },
+        "source_node_mask": {
+          "masked": 522,
+          "total": 1750,
+          "valid": 1228
+        },
+        "source_region_mask": {
+          "masked": 522,
+          "total": 1750,
+          "valid": 1228
+        },
+        "start_time_mask": {
+          "masked": 522,
+          "total": 1750,
+          "valid": 1228
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 0,
+      "output_split": "development_holdout",
+      "population": "development_holdout",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "79a1223fd9a3b36a9828fba6745d147455e81470a69eea76edcfa124ff8b5225",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "13257086651aca349933afe46488ccbafb6883295a8d89e82c26fa2a33b3d266"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00001.safetensors",
+            "sha256": "ef1a2247d26747dbc34c46df2fa537556a54d0579182e8bea9d0004ef2628936"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00002.safetensors",
+            "sha256": "eb7e71918f79675ec0e4870bdb620a92515ec8b6e6aecf7624b500b0a28d4fe2"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00003.safetensors",
+            "sha256": "5b1d934f2c9435d1fa6c05fd84b37f32fb8432c6eb786318f62ccb1405628210"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00004.safetensors",
+            "sha256": "becacf70722336b75bcdb7aaff1e75b0949dcf0c00c1220328ce5ea77c8b874c"
+          },
+          {
+            "example_count": 256,
+            "file": "shard-00005.safetensors",
+            "sha256": "0dbc4e868895aef8357d01eab6d9d3665d3e95d872e6b0d2c62ef9a2a656c71f"
+          },
+          {
+            "example_count": 214,
+            "file": "shard-00006.safetensors",
+            "sha256": "dcb87c36eb678c70d3fd7822fa130364400317bf19e56980e200db8d1951f086"
+          }
+        ],
+        "total_examples": 1750
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout",
+        "strategist": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/development_holdout"
+      },
+      "strategist_target_count": 1750,
+      "target_keys": [
+        "containment_time_proxy",
+        "containment_time_proxy_mask",
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "exposure_proxy",
+        "exposure_proxy_mask",
+        "plan_regret_proxy",
+        "plan_regret_proxy_mask",
+        "plan_validity",
+        "plan_validity_mask",
+        "plan_value",
+        "plan_value_mask",
+        "pressure_risk_proxy",
+        "pressure_risk_proxy_mask",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "service_loss_proxy",
+        "service_loss_proxy_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "ood_class"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "431e8e06ea70d021bb88c7c78df9708794ca1934182959edb001b38658f2c9e2",
+      "duplicate_joins": 0,
+      "expected_base_examples": 400,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 400,
+      "joined_scenario_ids_sample": [
+        "bbcb6989-838f-5dc3-a02e-08809793038f",
+        "9b31663b-e99a-53ec-9eaf-bcd31f0fa224",
+        "604e9cef-7ba3-5ebd-828c-8aae40c98eb3",
+        "bf5421b3-5b88-5af9-8aa4-b886db0056f3",
+        "e6d34952-6b1e-5d07-a2b0-9a196d989b6f"
+      ],
+      "masked_target_counts": {
+        "duration_mask": {
+          "masked": 108,
+          "total": 400,
+          "valid": 292
+        },
+        "relative_strength_mask": {
+          "masked": 108,
+          "total": 400,
+          "valid": 292
+        },
+        "sensor_fault_mask": {
+          "masked": 1465,
+          "total": 3065,
+          "valid": 1600
+        },
+        "source_node_mask": {
+          "masked": 108,
+          "total": 400,
+          "valid": 292
+        },
+        "source_region_mask": {
+          "masked": 108,
+          "total": 400,
+          "valid": 292
+        },
+        "start_time_mask": {
+          "masked": 108,
+          "total": 400,
+          "valid": 292
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 0,
+      "output_split": "development_holdout",
+      "population": "ood-SEVERE_MISSINGNESS",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "cd952c083d89b6a64595b99b091b6ce86de8bd4f34d9f31a826ee6cd301a4bc5",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "875497eacd355adfca41f9e62f941ce6b4267eb9b5437160f8998585d0c79ccb"
+          },
+          {
+            "example_count": 144,
+            "file": "shard-00001.safetensors",
+            "sha256": "2e789a7e866106e335414dd7ffab9f818434775bc4622a151db59456fbc72b92"
+          }
+        ],
+        "total_examples": 400
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2/tensors-normalized/ood-SEVERE_MISSINGNESS"
+      },
+      "strategist_target_count": 0,
+      "target_keys": [
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "strategist",
+        "ood_class"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "9a53ad7b25bf4ad1d6a44f91c53479565124de8e1b7be1374742bf91cf495b2c",
+      "duplicate_joins": 0,
+      "expected_base_examples": 400,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 400,
+      "joined_scenario_ids_sample": [
+        "e67d60c3-dcd1-5efe-9ca9-f1a86bfcc5a2",
+        "763c6fe8-7283-5d22-8bb4-077a657369b5",
+        "217c3c48-fc9d-58af-9e00-a7ae280fb50e",
+        "2f098385-16e2-526f-a4ac-e81dc4c4bfa4",
+        "05c67515-70f7-5315-bfeb-679d03acd9dd"
+      ],
+      "masked_target_counts": {
+        "duration_mask": {
+          "masked": 120,
+          "total": 400,
+          "valid": 280
+        },
+        "relative_strength_mask": {
+          "masked": 120,
+          "total": 400,
+          "valid": 280
+        },
+        "sensor_fault_mask": {
+          "masked": 1600,
+          "total": 3200,
+          "valid": 1600
+        },
+        "source_node_mask": {
+          "masked": 120,
+          "total": 400,
+          "valid": 280
+        },
+        "source_region_mask": {
+          "masked": 120,
+          "total": 400,
+          "valid": 280
+        },
+        "start_time_mask": {
+          "masked": 120,
+          "total": 400,
+          "valid": 280
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 0,
+      "output_split": "development_holdout",
+      "population": "ood-UNSEEN_TOPOLOGY",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "cb0228e96353d3352179eb6a2d8dbafaa24a7eea917f80eee63031046ede788f",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "485ce1a64651b2d7e650f443019dc4c630bf552376ac256bad0eb575608c6db7"
+          },
+          {
+            "example_count": 144,
+            "file": "shard-00001.safetensors",
+            "sha256": "65d4f4000a2e2876b125fc09548d47aa4d29a166f2826468ec7fc18ceeff0e49"
+          }
+        ],
+        "total_examples": 400
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2/tensors-normalized/ood-UNSEEN_TOPOLOGY"
+      },
+      "strategist_target_count": 0,
+      "target_keys": [
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "strategist",
+        "ood_class"
+      ]
+    }
+  ],
+  "requirement_status": {
+    "zero_cross_population_leakage": true,
+    "zero_duplicates": true,
+    "zero_identity_conflicts": true,
+    "zero_missing_required_joins": true
+  },
+  "skipped_populations": {
+    "ood_extension_categories": [
+      "ood-EXTREME_DEMAND",
+      "ood-FROZEN_DRIFTING_SENSOR",
+      "ood-ROUGHNESS_MISMATCH",
+      "ood-TANK_STATE_SHIFT"
+    ],
+    "reason": "cycle-b2-ood-extension seed_family labels collide with train/validation/calibration's own seed_family labels for different underlying scenario_ids (pre-existing namespace defect in that corpus, found by this merge's own cross-population leakage gate) -- excluded by default; pass --include-ood-extension to attempt the join anyway and see the resulting zero_cross_population_leakage=false failure directly."
+  },
+  "totals": {
+    "conflicts": 0,
+    "duplicate_joins": 0,
+    "missing_joins": 0,
+    "scenario_id_leaks": 0,
+    "seed_family_leaks": 0
+  }
+}

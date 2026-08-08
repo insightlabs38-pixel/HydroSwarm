@@ -1,0 +1,13 @@
+{
+  "populations_checked": [
+    "calibration",
+    "development_holdout",
+    "ood-SEVERE_MISSINGNESS",
+    "ood-UNSEEN_TOPOLOGY",
+    "train",
+    "validation"
+  ],
+  "scenario_id_leaks": [],
+  "seed_family_leaks": [],
+  "total_examples_checked": 13550
+}

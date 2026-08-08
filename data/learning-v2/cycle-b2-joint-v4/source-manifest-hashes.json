@@ -1,0 +1,82 @@
+{
+  "base": {
+    "calibration": {
+      "index_sha256": "a2c5a5ad1691a627ae9a4aca2bf7bb0c5deb3921396a6a657b3d29154c561a75",
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/calibration",
+      "shard_count": 4,
+      "total_examples": 1000
+    },
+    "development_holdout": {
+      "index_sha256": "1c21df5f0e39ea4659ab31fda61e60c157c7703c64cdde8c8a114efba42c4bcd",
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/development_holdout",
+      "shard_count": 7,
+      "total_examples": 1750
+    },
+    "train": {
+      "index_sha256": "a4e05a19cab4c999d6c2f98f5c2b4bd26e1349ddd85ed80ef69f9292fd63ada9",
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/train",
+      "shard_count": 36,
+      "total_examples": 9000
+    },
+    "validation": {
+      "index_sha256": "2f629c9c1020e2fa125be7c87a33e79f5dba655899b4dd06240c8befa8556b16",
+      "path": "data/learning-v2/cycle-b2/tensors-normalized/validation",
+      "shard_count": 4,
+      "total_examples": 1000
+    }
+  },
+  "control": {
+    "train": {
+      "index_sha256": "5700bbf3da122160406df3021bd0631eb4619357ad2729d6ce241ea999b04d14",
+      "path": "data/learning-v2/cycle-b2-control-v2/tensors-normalized/train",
+      "shard_count": 36,
+      "total_examples": 9000
+    },
+    "validation": {
+      "index_sha256": "e1d9619ed385fbd038a3bf21cb257371480e7b99f3281403176ec95d09f46859",
+      "path": "data/learning-v2/cycle-b2-control-v2/tensors-normalized/validation",
+      "shard_count": 4,
+      "total_examples": 1000
+    }
+  },
+  "scout": {
+    "train": {
+      "index_sha256": "1e0e25d647fac655ff0b82f09c9619c6034b6462a5c4f7c6ac3aa394fe795c5a",
+      "path": "data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/train",
+      "shard_count": 36,
+      "total_examples": 9000
+    },
+    "validation": {
+      "index_sha256": "971175680f494718bb1f0fd5a6106caaf4103c30e7672dc06a239aff140a5a4f",
+      "path": "data/learning-v2/cycle-b2-trajectories-v3/scout-tensors-normalized/validation",
+      "shard_count": 4,
+      "total_examples": 1000
+    }
+  },
+  "strategist": {
+    "calibration": {
+      "index_sha256": "6ec7afa3850af5629d784c801190b5e027c672fb1bdc09a19f0c01e0a8dcf310",
+      "path": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/calibration",
+      "shard_count": 4,
+      "total_examples": 1000
+    },
+    "development_holdout": {
+      "index_sha256": "79a1223fd9a3b36a9828fba6745d147455e81470a69eea76edcfa124ff8b5225",
+      "path": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/development_holdout",
+      "shard_count": 7,
+      "total_examples": 1750
+    },
+    "train": {
+      "index_sha256": "8b47091e93388e5d086e7c3b31679c617ce1f23ed48af5cefa86fe08c54714fb",
+      "path": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/train",
+      "shard_count": 36,
+      "total_examples": 9000
+    },
+    "validation": {
+      "index_sha256": "f9677550ded024ecae0e6e301245da904cd447e404a07e41fcb8d9786e8d5365",
+      "path": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected/validation",
+      "shard_count": 4,
+      "total_examples": 1000
+    }
+  }
+}

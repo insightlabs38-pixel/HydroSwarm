@@ -1,0 +1,608 @@
+{
+  "calibration": {
+    "control_target_count": 0,
+    "joined_examples": 1000,
+    "masked_target_counts": {
+      "containment_time_proxy_mask": {
+        "masked": 2407,
+        "total": 9000,
+        "valid": 6593
+      },
+      "duration_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "exposure_proxy_mask": {
+        "masked": 2407,
+        "total": 9000,
+        "valid": 6593
+      },
+      "plan_regret_proxy_mask": {
+        "masked": 2407,
+        "total": 9000,
+        "valid": 6593
+      },
+      "plan_validity_mask": {
+        "masked": 0,
+        "total": 9000,
+        "valid": 9000
+      },
+      "plan_value_mask": {
+        "masked": 2407,
+        "total": 9000,
+        "valid": 6593
+      },
+      "pressure_risk_proxy_mask": {
+        "masked": 2407,
+        "total": 9000,
+        "valid": 6593
+      },
+      "relative_strength_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "sensor_fault_mask": {
+        "masked": 3777,
+        "total": 7665,
+        "valid": 3888
+      },
+      "service_loss_proxy_mask": {
+        "masked": 2407,
+        "total": 9000,
+        "valid": 6593
+      },
+      "source_node_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "source_region_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "start_time_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      }
+    },
+    "ood_target_count": 0,
+    "scout_target_count": 0,
+    "strategist_target_count": 1000,
+    "target_keys": [
+      "containment_time_proxy",
+      "containment_time_proxy_mask",
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "exposure_proxy",
+      "exposure_proxy_mask",
+      "plan_regret_proxy",
+      "plan_regret_proxy_mask",
+      "plan_validity",
+      "plan_validity_mask",
+      "plan_value",
+      "plan_value_mask",
+      "pressure_risk_proxy",
+      "pressure_risk_proxy_mask",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "service_loss_proxy",
+      "service_loss_proxy_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "ood_class"
+    ]
+  },
+  "development_holdout": {
+    "control_target_count": 0,
+    "joined_examples": 1750,
+    "masked_target_counts": {
+      "containment_time_proxy_mask": {
+        "masked": 4164,
+        "total": 15750,
+        "valid": 11586
+      },
+      "duration_mask": {
+        "masked": 522,
+        "total": 1750,
+        "valid": 1228
+      },
+      "exposure_proxy_mask": {
+        "masked": 4164,
+        "total": 15750,
+        "valid": 11586
+      },
+      "plan_regret_proxy_mask": {
+        "masked": 4164,
+        "total": 15750,
+        "valid": 11586
+      },
+      "plan_validity_mask": {
+        "masked": 0,
+        "total": 15750,
+        "valid": 15750
+      },
+      "plan_value_mask": {
+        "masked": 4164,
+        "total": 15750,
+        "valid": 11586
+      },
+      "pressure_risk_proxy_mask": {
+        "masked": 4164,
+        "total": 15750,
+        "valid": 11586
+      },
+      "relative_strength_mask": {
+        "masked": 522,
+        "total": 1750,
+        "valid": 1228
+      },
+      "sensor_fault_mask": {
+        "masked": 6612,
+        "total": 13415,
+        "valid": 6803
+      },
+      "service_loss_proxy_mask": {
+        "masked": 4164,
+        "total": 15750,
+        "valid": 11586
+      },
+      "source_node_mask": {
+        "masked": 522,
+        "total": 1750,
+        "valid": 1228
+      },
+      "source_region_mask": {
+        "masked": 522,
+        "total": 1750,
+        "valid": 1228
+      },
+      "start_time_mask": {
+        "masked": 522,
+        "total": 1750,
+        "valid": 1228
+      }
+    },
+    "ood_target_count": 0,
+    "scout_target_count": 0,
+    "strategist_target_count": 1750,
+    "target_keys": [
+      "containment_time_proxy",
+      "containment_time_proxy_mask",
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "exposure_proxy",
+      "exposure_proxy_mask",
+      "plan_regret_proxy",
+      "plan_regret_proxy_mask",
+      "plan_validity",
+      "plan_validity_mask",
+      "plan_value",
+      "plan_value_mask",
+      "pressure_risk_proxy",
+      "pressure_risk_proxy_mask",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "service_loss_proxy",
+      "service_loss_proxy_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "ood_class"
+    ]
+  },
+  "ood-SEVERE_MISSINGNESS": {
+    "control_target_count": 0,
+    "joined_examples": 400,
+    "masked_target_counts": {
+      "duration_mask": {
+        "masked": 108,
+        "total": 400,
+        "valid": 292
+      },
+      "relative_strength_mask": {
+        "masked": 108,
+        "total": 400,
+        "valid": 292
+      },
+      "sensor_fault_mask": {
+        "masked": 1465,
+        "total": 3065,
+        "valid": 1600
+      },
+      "source_node_mask": {
+        "masked": 108,
+        "total": 400,
+        "valid": 292
+      },
+      "source_region_mask": {
+        "masked": 108,
+        "total": 400,
+        "valid": 292
+      },
+      "start_time_mask": {
+        "masked": 108,
+        "total": 400,
+        "valid": 292
+      }
+    },
+    "ood_target_count": 0,
+    "scout_target_count": 0,
+    "strategist_target_count": 0,
+    "target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "strategist",
+      "ood_class"
+    ]
+  },
+  "ood-UNSEEN_TOPOLOGY": {
+    "control_target_count": 0,
+    "joined_examples": 400,
+    "masked_target_counts": {
+      "duration_mask": {
+        "masked": 120,
+        "total": 400,
+        "valid": 280
+      },
+      "relative_strength_mask": {
+        "masked": 120,
+        "total": 400,
+        "valid": 280
+      },
+      "sensor_fault_mask": {
+        "masked": 1600,
+        "total": 3200,
+        "valid": 1600
+      },
+      "source_node_mask": {
+        "masked": 120,
+        "total": 400,
+        "valid": 280
+      },
+      "source_region_mask": {
+        "masked": 120,
+        "total": 400,
+        "valid": 280
+      },
+      "start_time_mask": {
+        "masked": 120,
+        "total": 400,
+        "valid": 280
+      }
+    },
+    "ood_target_count": 0,
+    "scout_target_count": 0,
+    "strategist_target_count": 0,
+    "target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "strategist",
+      "ood_class"
+    ]
+  },
+  "train": {
+    "control_target_count": 9000,
+    "joined_examples": 9000,
+    "masked_target_counts": {
+      "candidate_reduction_mask": {
+        "masked": 12000,
+        "total": 69000,
+        "valid": 57000
+      },
+      "containment_time_proxy_mask": {
+        "masked": 21478,
+        "total": 81000,
+        "valid": 59522
+      },
+      "duration_mask": {
+        "masked": 2700,
+        "total": 9000,
+        "valid": 6300
+      },
+      "exposure_proxy_mask": {
+        "masked": 21478,
+        "total": 81000,
+        "valid": 59522
+      },
+      "information_gain_mask": {
+        "masked": 12000,
+        "total": 69000,
+        "valid": 57000
+      },
+      "plan_regret_proxy_mask": {
+        "masked": 21478,
+        "total": 81000,
+        "valid": 59522
+      },
+      "plan_validity_mask": {
+        "masked": 0,
+        "total": 81000,
+        "valid": 81000
+      },
+      "plan_value_mask": {
+        "masked": 21478,
+        "total": 81000,
+        "valid": 59522
+      },
+      "pressure_risk_proxy_mask": {
+        "masked": 21478,
+        "total": 81000,
+        "valid": 59522
+      },
+      "relative_strength_mask": {
+        "masked": 2700,
+        "total": 9000,
+        "valid": 6300
+      },
+      "sample_node_mask": {
+        "masked": 4191,
+        "total": 9000,
+        "valid": 4809
+      },
+      "sensor_fault_mask": {
+        "masked": 34000,
+        "total": 69000,
+        "valid": 35000
+      },
+      "service_loss_proxy_mask": {
+        "masked": 21478,
+        "total": 81000,
+        "valid": 59522
+      },
+      "source_node_mask": {
+        "masked": 2700,
+        "total": 9000,
+        "valid": 6300
+      },
+      "source_region_mask": {
+        "masked": 2700,
+        "total": 9000,
+        "valid": 6300
+      },
+      "start_time_mask": {
+        "masked": 2700,
+        "total": 9000,
+        "valid": 6300
+      }
+    },
+    "ood_target_count": 0,
+    "scout_target_count": 9000,
+    "strategist_target_count": 9000,
+    "target_keys": [
+      "candidate_reduction",
+      "candidate_reduction_mask",
+      "containment_time_proxy",
+      "containment_time_proxy_mask",
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "exposure_proxy",
+      "exposure_proxy_mask",
+      "information_gain",
+      "information_gain_mask",
+      "next_step",
+      "plan_regret_proxy",
+      "plan_regret_proxy_mask",
+      "plan_validity",
+      "plan_validity_mask",
+      "plan_value",
+      "plan_value_mask",
+      "pressure_risk_proxy",
+      "pressure_risk_proxy_mask",
+      "relative_strength",
+      "relative_strength_mask",
+      "sample_node",
+      "sample_node_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "service_loss_proxy",
+      "service_loss_proxy_mask",
+      "should_continue_sampling",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "ood_class"
+    ]
+  },
+  "validation": {
+    "control_target_count": 1000,
+    "joined_examples": 1000,
+    "masked_target_counts": {
+      "candidate_reduction_mask": {
+        "masked": 1334,
+        "total": 7665,
+        "valid": 6331
+      },
+      "containment_time_proxy_mask": {
+        "masked": 2371,
+        "total": 9000,
+        "valid": 6629
+      },
+      "duration_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "exposure_proxy_mask": {
+        "masked": 2371,
+        "total": 9000,
+        "valid": 6629
+      },
+      "information_gain_mask": {
+        "masked": 1334,
+        "total": 7665,
+        "valid": 6331
+      },
+      "plan_regret_proxy_mask": {
+        "masked": 2371,
+        "total": 9000,
+        "valid": 6629
+      },
+      "plan_validity_mask": {
+        "masked": 0,
+        "total": 9000,
+        "valid": 9000
+      },
+      "plan_value_mask": {
+        "masked": 2371,
+        "total": 9000,
+        "valid": 6629
+      },
+      "pressure_risk_proxy_mask": {
+        "masked": 2371,
+        "total": 9000,
+        "valid": 6629
+      },
+      "relative_strength_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "sample_node_mask": {
+        "masked": 461,
+        "total": 1000,
+        "valid": 539
+      },
+      "sensor_fault_mask": {
+        "masked": 3777,
+        "total": 7665,
+        "valid": 3888
+      },
+      "service_loss_proxy_mask": {
+        "masked": 2371,
+        "total": 9000,
+        "valid": 6629
+      },
+      "source_node_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "source_region_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      },
+      "start_time_mask": {
+        "masked": 288,
+        "total": 1000,
+        "valid": 712
+      }
+    },
+    "ood_target_count": 0,
+    "scout_target_count": 1000,
+    "strategist_target_count": 1000,
+    "target_keys": [
+      "candidate_reduction",
+      "candidate_reduction_mask",
+      "containment_time_proxy",
+      "containment_time_proxy_mask",
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "exposure_proxy",
+      "exposure_proxy_mask",
+      "information_gain",
+      "information_gain_mask",
+      "next_step",
+      "plan_regret_proxy",
+      "plan_regret_proxy_mask",
+      "plan_validity",
+      "plan_validity_mask",
+      "plan_value",
+      "plan_value_mask",
+      "pressure_risk_proxy",
+      "pressure_risk_proxy_mask",
+      "relative_strength",
+      "relative_strength_mask",
+      "sample_node",
+      "sample_node_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "service_loss_proxy",
+      "service_loss_proxy_mask",
+      "should_continue_sampling",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "ood_class"
+    ]
+  }
+}
