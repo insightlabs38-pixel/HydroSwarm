@@ -44,6 +44,13 @@ from .signatures import (
     localize_with_signatures,
 )
 from .signature_registry import SignatureRegistry, SignatureRegistryEntry, SignatureRegistryError
+from .signature_policy import (
+    GOVERNED_TRAINING_SIGNATURE_POLICY,
+    KNOWN_TRAINING_TOPOLOGY_HASHES,
+    SignatureMode,
+    SignaturePolicy,
+    resolve_signature_mode,
+)
 
 __all__ = [
     "AbstentionMetrics",
@@ -53,9 +60,11 @@ __all__ = [
     "ClassicalLocalizationResult",
     "CandidateSetMetrics",
     "DirectedHydraulicGraph",
+    "GOVERNED_TRAINING_SIGNATURE_POLICY",
     "HydraulicLink",
     "HydraulicStateEstimator",
     "EstimatedHydraulicState",
+    "KNOWN_TRAINING_TOPOLOGY_HASHES",
     "NodeId",
     "PressureViolationMetrics",
     "OperationalTelemetry",
@@ -66,6 +75,8 @@ __all__ = [
     "SignatureBuilder",
     "SignatureCache",
     "SignatureCacheKey",
+    "SignatureMode",
+    "SignaturePolicy",
     "SignatureRegistry",
     "SignatureRegistryEntry",
     "SignatureRegistryError",
@@ -83,5 +94,6 @@ __all__ = [
     "localize_with_signatures",
     "mean_reciprocal_rank",
     "pressure_violations",
+    "resolve_signature_mode",
     "screen_candidates",
 ]

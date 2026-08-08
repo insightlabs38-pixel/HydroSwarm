@@ -251,6 +251,96 @@ def test_normalization_hash_mismatch_fails_closed(tmp_path: Path) -> None:
     assert factory.fallback_reason == "v4_trained_assets_unavailable:NormalizationBundleError"
 
 
+# core-issues5.txt Section 4 (P0 blocker): the served network's signature-
+# policy mode and the real policy hash used to generate its
+# SignatureArtifact must be recorded, and the policy itself must be the
+# real governed training policy -- not an independently-invented, smaller
+# runtime hypothesis grid (start_time_bins=(0, 60) etc, a real defect this
+# fix closes).
+
+
+def test_committed_training_topology_file_resolves_to_governed_mode(tmp_path: Path) -> None:
+    """`data/topology-transfer/branched-loop.inp`, loaded directly (no
+    write/re-read round trip), is one of the exact committed .inp files
+    scripts/generate_cycle_b_corpus.py's own TOPOLOGY_BUILDERS load this
+    same way -- must resolve to GOVERNED_KNOWN_NETWORK.
+
+    Deliberately NOT testing this via `hydroswarm.simulation.
+    build_wntr_network()` (golden-reference) written out with
+    `wntr.network.write_inpfile` and reloaded: WNTR's own SI/US round trip
+    introduces ~1e-9 relative floating-point noise into
+    length/diameter/roughness (confirmed directly -- e.g. `0.3` becomes
+    `0.2999999999988`), which changes `network_sha256`'s hash despite
+    describing the physically identical network. golden-reference has no
+    single canonical `.inp` file to load byte-identically the way
+    branched-loop/loop-grid do (it is only ever constructed in-memory at
+    both training and evaluation time), so it cannot be used for this
+    specific "loaded twice, same bytes on disk" integration test --
+    covered instead at the unit level in
+    tests/unit/test_signature_policy.py, which computes
+    `network_sha256(build_wntr_network())` directly with no disk round
+    trip at all.
+    """
+
+    if wntr is None:
+        return
+    from hydroswarm.classical import GOVERNED_TRAINING_SIGNATURE_POLICY
+
+    directory = tmp_path / "checkpoint"
+    _save_v4_checkpoint(directory)
+    factory = V4PipelineFactory(directory)
+    network_path = _REPO_ROOT / "data" / "topology-transfer" / "branched-loop.inp"
+    factory(None, network_path)
+
+    assert factory.signature_mode == "GOVERNED_KNOWN_NETWORK"
+    assert factory.signature_policy_hash == GOVERNED_TRAINING_SIGNATURE_POLICY.policy_hash
+
+
+def test_golden_fixture_snapshot_resolves_to_runtime_generated_mode(tmp_path: Path) -> None:
+    """data/frozen/golden_network.inp is a single frozen RANDOMIZED
+    scenario snapshot (see data/frozen/manifest.json's
+    hydroswarm.evaluation.golden.freeze_golden_inputs generator), not the
+    pristine base network -- it must NOT be claimed as governed/training-
+    owned provenance this exact-hash check cannot actually verify."""
+
+    if wntr is None:
+        return
+
+    checkpoint_dir = tmp_path / "checkpoint"
+    _save_v4_checkpoint(checkpoint_dir)
+    factory = V4PipelineFactory(checkpoint_dir)
+    network_path = _REPO_ROOT / "data" / "frozen" / "golden_network.inp"
+    factory(None, network_path)
+
+    assert factory.signature_mode == "RUNTIME_GENERATED_IMPORTED_NETWORK"
+
+
+def test_governed_policy_produces_the_full_training_hypothesis_grid(tmp_path: Path) -> None:
+    """The runtime-generated SignatureArtifact's own recorded hypotheses
+    must reflect the REAL governed training policy's bins
+    (start_time_bins=(0, 60, 120, 240) etc), not a smaller ad-hoc runtime
+    grid -- the concrete train/serve mismatch this fix closes."""
+
+    if wntr is None:
+        return
+    from hydroswarm.classical import GOVERNED_TRAINING_SIGNATURE_POLICY
+
+    directory = tmp_path / "checkpoint"
+    _save_v4_checkpoint(directory)
+    factory = V4PipelineFactory(directory)
+    network_path = _REPO_ROOT / "data" / "frozen" / "golden_network.inp"
+    pipeline = factory(None, network_path)
+
+    junction_count = len({h.source_node for h in pipeline.signature_artifact.hypotheses})
+    assert len(pipeline.signature_artifact.hypotheses) == junction_count * (
+        len(GOVERNED_TRAINING_SIGNATURE_POLICY.start_time_bins)
+        * len(GOVERNED_TRAINING_SIGNATURE_POLICY.duration_bins)
+        * len(GOVERNED_TRAINING_SIGNATURE_POLICY.strength_bins)
+        * len(GOVERNED_TRAINING_SIGNATURE_POLICY.demand_regimes)
+    )
+    assert pipeline.signature_artifact.sample_times_seconds == GOVERNED_TRAINING_SIGNATURE_POLICY.sample_times_seconds
+
+
 def test_sentinel_normalization_hash_skips_bundle_loading(tmp_path: Path) -> None:
     """A checkpoint that honestly declares NO_NORMALIZATION_SENTINEL (truly
     trained without governed normalization) must load successfully with a

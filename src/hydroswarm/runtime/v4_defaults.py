@@ -29,7 +29,15 @@ from pathlib import Path
 from typing import Any
 
 from hydroswarm.calibration import SplitConformalCalibrator
-from hydroswarm.classical import SignatureBuilder, SignatureCache, SignatureCacheKey
+from hydroswarm.classical import (
+    GOVERNED_TRAINING_SIGNATURE_POLICY,
+    SignatureBuilder,
+    SignatureCache,
+    SignatureCacheKey,
+    SignatureMode,
+    resolve_signature_mode,
+)
+from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
 from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
 from hydroswarm.runtime.v4_normalization import (
@@ -108,6 +116,15 @@ class V4PipelineFactory:
         self._model_hash: str | None = None
         self._load_attempted = False
         self.fallback_reason: str | None = None
+        # core-issues5.txt Section 4 (P0 blocker): set by the most recent
+        # __call__ -- which of the two required explicit signature modes the
+        # last served network fell under, and the real policy hash the
+        # resulting SignatureArtifact was generated with (fed into
+        # SignatureCacheKey.configuration_hash, so it is also recoverable
+        # from the returned pipeline's own signature_artifact.key). None
+        # until __call__ has run at least once.
+        self.signature_mode: SignatureMode | None = None
+        self.signature_policy_hash: str | None = None
 
     @property
     def identity(self) -> CheckpointIdentity | None:
@@ -199,24 +216,40 @@ class V4PipelineFactory:
         source_nodes = tuple(map(str, network.junction_name_list))
         if not source_nodes:
             raise ValueError("network has no junction source candidates")
+        # core-issues5.txt Section 4 (P0 blocker): sensor_nodes models EVERY
+        # junction as a possible sensor LOCATION (matching
+        # GOVERNED_TRAINING_SIGNATURE_POLICY.sensor_layout_policy =
+        # "all_junctions_as_sensor_candidates", the same convention training
+        # used) -- this is deliberately NOT "which sensors are actually
+        # deployed for this incident"; that real per-incident subset is
+        # supplied later via sensor_series/observation_mask at analyze()
+        # time (HybridInferencePipeline._signature_observations), not here.
         sensor_nodes = source_nodes
-        sample_times = tuple(range(0, 6 * 3_600 + 1, 3_600))
+        policy = GOVERNED_TRAINING_SIGNATURE_POLICY
+        topology_hash = network_sha256(network)
+        self.signature_mode = resolve_signature_mode(topology_hash)
+        self.signature_policy_hash = policy.policy_hash
         key = SignatureCacheKey(
             network_hash=simulator.state_hash(),
             hydraulic_state_hash=simulator.state_hash(),
             simulator_version=simulator.simulator_version,
-            configuration_hash="runtime-signatures-v4",
+            # core-issues5.txt Section 4: a REAL hash of the policy that
+            # will generate this artifact, not a bare version-label string --
+            # two runs under a genuinely different policy can no longer
+            # collide in SignatureCache and silently serve a mismatched
+            # artifact under the same cache key.
+            configuration_hash=policy.policy_hash,
             sensor_layout_hash=hashlib.sha256("|".join(sensor_nodes).encode()).hexdigest(),
         )
         artifact = SignatureBuilder(simulator, SignatureCache(self.signature_cache)).build_or_load(
             key=key,
             source_nodes=source_nodes,
-            start_time_bins=(0, 60),
-            duration_bins=(30, 60),
-            strength_bins=(0.5, 1.0),
-            demand_regimes=("nominal",),
+            start_time_bins=policy.start_time_bins,
+            duration_bins=policy.duration_bins,
+            strength_bins=policy.strength_bins,
+            demand_regimes=policy.demand_regimes,
             sensor_nodes=sensor_nodes,
-            sample_times_seconds=sample_times,
+            sample_times_seconds=policy.sample_times_seconds,
         )
         calibration = self._calibrator.artifact if self._calibrator is not None else None
         return HybridInferencePipeline(
