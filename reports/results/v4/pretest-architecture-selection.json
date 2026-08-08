@@ -35,9 +35,11 @@
     "pressure_risk_proxy",
     "service_loss_proxy",
     "containment_time_proxy",
-    "plan_regret_proxy",
-    "ood_category"
+    "plan_regret_proxy"
   ],
+  "present_but_untrained_outputs": {
+    "ood_category": "head physically constructed and forward-passes cleanly, but the governed train split has zero ood_class coverage by design (OOD-extension populations are development-holdout-only), so it never received a real training gradient this run (near-chance macro F1 0.095). Not 'trained'; excluded from every governance set. See Section 18.1 for the preserved one-retrain path."
+  },
   "never_trained_outputs": [
     "sensor_reconstruction",
     "travel_time",
@@ -60,7 +62,9 @@
   "strategist_second_seed": {
     "run": "v4-strategist-heads-v4corpus-corrected-seed2",
     "seed": 20260812,
+    "seed_agreement": "close (every metric within ~2-3% relative); gate 7's repeatability requirement is satisfied",
     "decision": "do_not_promote",
+    "decision_reason": "learned_prescreen does not beat deterministic_heuristic ordering at the same 3-call exact-simulator budget (lower regret, higher oracle-match rate for the deterministic policy in both seeds) -- not a seed-disagreement failure",
     "report": "reports/results/v4/strategist-second-seed-promotion-decision.md"
   },
   "calibration": {
