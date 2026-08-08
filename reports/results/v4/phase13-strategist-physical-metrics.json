@@ -1,0 +1,101 @@
+{
+  "checkpoint": "experiments/runs/v4-strategist-heads-v4corpus-corrected/20260808T023023Z-df9549a5/checkpoints/checkpoint-0010/model.safetensors",
+  "corpus": "data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected",
+  "mean_latency_seconds": 0.0031020226679778773,
+  "peak_rss_bytes": 878583808,
+  "policies": {
+    "deterministic_heuristic": {
+      "containment_time_minutes": 0.02045264390896921,
+      "exposure_reduction_vs_no_action": 0.02273318811832183,
+      "ndcg": 0.7543492223577459,
+      "pressure_violation_minutes": 0.0,
+      "scenarios_with_data": {
+        "containment_time_minutes": 996,
+        "exposure_reduction_vs_no_action": 996,
+        "ndcg": 1000,
+        "pressure_violation_minutes": 996,
+        "service_availability": 996
+      },
+      "service_availability": 0.9999999999997549
+    },
+    "exact_all": {
+      "containment_time_minutes": 0.020373159303882192,
+      "exposure_reduction_vs_no_action": 0.026302271219621223,
+      "ndcg": 1.0,
+      "pressure_violation_minutes": 0.0,
+      "scenarios_with_data": {
+        "containment_time_minutes": 996,
+        "exposure_reduction_vs_no_action": 996,
+        "ndcg": 1000,
+        "pressure_violation_minutes": 996,
+        "service_availability": 996
+      },
+      "service_availability": 0.9999999999997549
+    },
+    "learned_ordering": {
+      "containment_time_minutes": 0.02048192771084337,
+      "exposure_reduction_vs_no_action": 0.0177568196651926,
+      "ndcg": 0.4698240185587597,
+      "pressure_violation_minutes": 0.0,
+      "scenarios_with_data": {
+        "containment_time_minutes": 996,
+        "exposure_reduction_vs_no_action": 996,
+        "ndcg": 1000,
+        "pressure_violation_minutes": 996,
+        "service_availability": 996
+      },
+      "service_availability": 0.9999999999998161
+    },
+    "learned_prescreen": {
+      "containment_time_minutes": 0.020410809906291832,
+      "exposure_reduction_vs_no_action": 0.020336160099650002,
+      "ndcg": 0.9930719943406542,
+      "pressure_violation_minutes": 0.0,
+      "scenarios_with_data": {
+        "containment_time_minutes": 996,
+        "exposure_reduction_vs_no_action": 996,
+        "ndcg": 1000,
+        "pressure_violation_minutes": 996,
+        "service_availability": 996
+      },
+      "service_availability": 0.9999999999998161
+    }
+  },
+  "proxy_error_physical_units": {
+    "containment_time_proxy": {
+      "mean_absolute_error": 0.15413910872545297,
+      "rmse": 0.27262597452162823,
+      "unit": "seconds",
+      "valid_count": 6629
+    },
+    "exposure_proxy": {
+      "mean_absolute_error": 0.23348276946299718,
+      "rmse": 0.3282363655771301,
+      "unit": "mg",
+      "valid_count": 6629
+    },
+    "plan_regret_proxy": {
+      "mean_absolute_error": 0.06771728762343747,
+      "rmse": 0.12106493604887593,
+      "unit": "plan_value scale",
+      "valid_count": 6629
+    },
+    "pressure_risk_proxy": {
+      "mean_absolute_error": 0.0019833124400776675,
+      "rmse": 0.002884271654116016,
+      "unit": "pressure-violation minutes",
+      "valid_count": 6629
+    },
+    "service_loss_proxy": {
+      "mean_absolute_error": 0.002822781916598428,
+      "rmse": 0.0040177535533000835,
+      "unit": "fraction [0,1]",
+      "valid_count": 6629
+    }
+  },
+  "scenarios_evaluated": 1000,
+  "scenarios_requested": 1000,
+  "skipped_no_real_candidates": 0,
+  "split": "validation",
+  "wall_seconds": 4.481030992999877
+}

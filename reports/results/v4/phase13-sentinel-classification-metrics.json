@@ -1,0 +1,784 @@
+{
+  "checkpoints": [
+    "experiments/runs/stage-f/no_adapters-seed20260810/20260808T041727Z-de5f4b0e/model-export.safetensors",
+    "experiments/runs/stage-f/no_adapters-seed20260811/20260808T050419Z-b1d15d98/model-export.safetensors"
+  ],
+  "corpus": "data/learning-v2/cycle-b2-joint-v4/tensors-normalized",
+  "results": {
+    "experiments/runs/stage-f/no_adapters-seed20260810/20260808T041727Z-de5f4b0e/model-export.safetensors": {
+      "development_holdout": {
+        "event_cause": {
+          "accuracy": 0.8114285714285714,
+          "examples": 1750,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.5197407160540359,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1750
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.8428571428571429,
+              "f1": 0.8929544569871545,
+              "positive_support": 1228,
+              "precision": 0.8553318419090231,
+              "recall": 0.9340390879478827,
+              "support": 1750
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 0.9502857142857143,
+              "f1": 0.0,
+              "positive_support": 87,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1750
+            },
+            "NORMAL": {
+              "accuracy": 0.8988571428571429,
+              "f1": 0.40802675585284276,
+              "positive_support": 174,
+              "precision": 0.488,
+              "recall": 0.3505747126436782,
+              "support": 1750
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.9308571428571428,
+              "f1": 0.7779816513761467,
+              "positive_support": 261,
+              "precision": 0.7464788732394366,
+              "recall": 0.8122605363984674,
+              "support": 1750
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.8445714285714285,
+          "f1": 0.89358372456964,
+          "positive_support": 1228,
+          "precision": 0.8599397590361446,
+          "recall": 0.9299674267100977,
+          "support": 1750
+        },
+        "examples": 1750,
+        "localization": {
+          "candidate_coverage_at_3": 0.8721498371335505,
+          "ece": 0.03199301820236235,
+          "examples": 1228,
+          "mrr": 0.8037236311462695,
+          "source_top1": 0.7043973941368078,
+          "source_top3": 0.8721498371335505
+        },
+        "mean_latency_seconds": 0.0040370601420535775,
+        "p50_latency_seconds": 0.003550358312509161,
+        "p95_latency_seconds": 0.0077023451469131025,
+        "peak_rss_bytes": 854282240,
+        "profile": {
+          "duration": {
+            "accuracy": 0.5293159609120521,
+            "examples": 1228,
+            "ordinal_mean_absolute_error_bins": 0.5578175895765473
+          },
+          "relative_strength": {
+            "accuracy": 0.7133550488599348,
+            "examples": 1228,
+            "ordinal_mean_absolute_error_bins": 0.3713355048859935
+          },
+          "start_time": {
+            "accuracy": 0.6669381107491856,
+            "examples": 1228,
+            "ordinal_mean_absolute_error_bins": 0.48697068403908794
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 6803,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 6803
+        }
+      },
+      "ood-SEVERE_MISSINGNESS": {
+        "event_cause": {
+          "accuracy": 0.8375,
+          "examples": 400,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.5212732832201973,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.8675,
+              "f1": 0.912396694214876,
+              "positive_support": 292,
+              "precision": 0.8817891373801917,
+              "recall": 0.9452054794520548,
+              "support": 400
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 0.955,
+              "f1": 0.0,
+              "positive_support": 18,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "NORMAL": {
+              "accuracy": 0.8975,
+              "f1": 0.3278688524590164,
+              "positive_support": 36,
+              "precision": 0.4,
+              "recall": 0.2777777777777778,
+              "support": 400
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.955,
+              "f1": 0.8448275862068966,
+              "positive_support": 54,
+              "precision": 0.7903225806451613,
+              "recall": 0.9074074074074074,
+              "support": 400
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.87,
+          "f1": 0.9139072847682119,
+          "positive_support": 292,
+          "precision": 0.8846153846153846,
+          "recall": 0.9452054794520548,
+          "support": 400
+        },
+        "examples": 400,
+        "localization": {
+          "candidate_coverage_at_3": 0.8698630136986302,
+          "ece": 0.05599058205134248,
+          "examples": 292,
+          "mrr": 0.7796966731898238,
+          "source_top1": 0.660958904109589,
+          "source_top3": 0.8698630136986302
+        },
+        "mean_latency_seconds": 0.0035085315575088317,
+        "p50_latency_seconds": 0.002845286312549433,
+        "p95_latency_seconds": 0.0065437841626135185,
+        "peak_rss_bytes": 891609088,
+        "profile": {
+          "duration": {
+            "accuracy": 0.4931506849315068,
+            "examples": 292,
+            "ordinal_mean_absolute_error_bins": 0.5684931506849316
+          },
+          "relative_strength": {
+            "accuracy": 0.6472602739726028,
+            "examples": 292,
+            "ordinal_mean_absolute_error_bins": 0.4691780821917808
+          },
+          "start_time": {
+            "accuracy": 0.565068493150685,
+            "examples": 292,
+            "ordinal_mean_absolute_error_bins": 0.5856164383561644
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 1600,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1600
+        }
+      },
+      "ood-UNSEEN_TOPOLOGY": {
+        "event_cause": {
+          "accuracy": 0.7475,
+          "examples": 400,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.4908665466007581,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.77,
+              "f1": 0.8315018315018315,
+              "positive_support": 280,
+              "precision": 0.8533834586466166,
+              "recall": 0.8107142857142857,
+              "support": 400
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 0.95,
+              "f1": 0.0,
+              "positive_support": 20,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "NORMAL": {
+              "accuracy": 0.8575,
+              "f1": 0.35955056179775274,
+              "positive_support": 40,
+              "precision": 0.32653061224489793,
+              "recall": 0.4,
+              "support": 400
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.9175,
+              "f1": 0.7724137931034482,
+              "positive_support": 60,
+              "precision": 0.6588235294117647,
+              "recall": 0.9333333333333333,
+              "support": 400
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.765,
+          "f1": 0.8284671532846715,
+          "positive_support": 280,
+          "precision": 0.8470149253731343,
+          "recall": 0.8107142857142857,
+          "support": 400
+        },
+        "examples": 400,
+        "localization": {
+          "candidate_coverage_at_3": 0.7892857142857143,
+          "ece": 0.23401029221713543,
+          "examples": 280,
+          "mrr": 0.6499404761904762,
+          "source_top1": 0.4642857142857143,
+          "source_top3": 0.7892857142857143
+        },
+        "mean_latency_seconds": 0.002652731402477002,
+        "p50_latency_seconds": 0.002550398749917804,
+        "p95_latency_seconds": 0.0036565804250585643,
+        "peak_rss_bytes": 876699648,
+        "profile": {
+          "duration": {
+            "accuracy": 0.46785714285714286,
+            "examples": 280,
+            "ordinal_mean_absolute_error_bins": 0.6428571428571429
+          },
+          "relative_strength": {
+            "accuracy": 0.4142857142857143,
+            "examples": 280,
+            "ordinal_mean_absolute_error_bins": 0.7642857142857142
+          },
+          "start_time": {
+            "accuracy": 0.45714285714285713,
+            "examples": 280,
+            "ordinal_mean_absolute_error_bins": 0.8464285714285714
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 1600,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1600
+        }
+      },
+      "validation": {
+        "event_cause": {
+          "accuracy": 0.828,
+          "examples": 1000,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.6978216770318034,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1000
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.85,
+              "f1": 0.8982360922659429,
+              "positive_support": 712,
+              "precision": 0.868766404199475,
+              "recall": 0.9297752808988764,
+              "support": 1000
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1000
+            },
+            "NORMAL": {
+              "accuracy": 0.878,
+              "f1": 0.4245283018867924,
+              "positive_support": 144,
+              "precision": 0.6617647058823529,
+              "recall": 0.3125,
+              "support": 1000
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.928,
+              "f1": 0.7707006369426751,
+              "positive_support": 144,
+              "precision": 0.711764705882353,
+              "recall": 0.8402777777777778,
+              "support": 1000
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.845,
+          "f1": 0.894629503738953,
+          "positive_support": 712,
+          "precision": 0.8669301712779973,
+          "recall": 0.9241573033707865,
+          "support": 1000
+        },
+        "examples": 1000,
+        "localization": {
+          "candidate_coverage_at_3": 0.8679775280898876,
+          "ece": 0.027955978460023907,
+          "examples": 712,
+          "mrr": 0.8112593632958801,
+          "source_top1": 0.7205056179775281,
+          "source_top3": 0.8679775280898876
+        },
+        "mean_latency_seconds": 0.00407504355456377,
+        "p50_latency_seconds": 0.003320110000004206,
+        "p95_latency_seconds": 0.00750434866258729,
+        "peak_rss_bytes": 837619712,
+        "profile": {
+          "duration": {
+            "accuracy": 0.5028089887640449,
+            "examples": 712,
+            "ordinal_mean_absolute_error_bins": 0.5884831460674157
+          },
+          "relative_strength": {
+            "accuracy": 0.75,
+            "examples": 712,
+            "ordinal_mean_absolute_error_bins": 0.31741573033707865
+          },
+          "start_time": {
+            "accuracy": 0.6544943820224719,
+            "examples": 712,
+            "ordinal_mean_absolute_error_bins": 0.5154494382022472
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 3888,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 3888
+        }
+      }
+    },
+    "experiments/runs/stage-f/no_adapters-seed20260811/20260808T050419Z-b1d15d98/model-export.safetensors": {
+      "development_holdout": {
+        "event_cause": {
+          "accuracy": 0.8102857142857143,
+          "examples": 1750,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.5122440920844388,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1750
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.8417142857142857,
+              "f1": 0.8928433268858801,
+              "positive_support": 1228,
+              "precision": 0.8504053058216654,
+              "recall": 0.9397394136807817,
+              "support": 1750
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 0.9502857142857143,
+              "f1": 0.0,
+              "positive_support": 87,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1750
+            },
+            "NORMAL": {
+              "accuracy": 0.8977142857142857,
+              "f1": 0.38062283737024216,
+              "positive_support": 174,
+              "precision": 0.4782608695652174,
+              "recall": 0.3160919540229885,
+              "support": 1750
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.9308571428571428,
+              "f1": 0.7755102040816326,
+              "positive_support": 261,
+              "precision": 0.7517985611510791,
+              "recall": 0.8007662835249042,
+              "support": 1750
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.8468571428571429,
+          "f1": 0.8952306489444878,
+          "positive_support": 1228,
+          "precision": 0.8609022556390977,
+          "recall": 0.9324104234527687,
+          "support": 1750
+        },
+        "examples": 1750,
+        "localization": {
+          "candidate_coverage_at_3": 0.8762214983713354,
+          "ece": 0.028774791837029835,
+          "examples": 1228,
+          "mrr": 0.8100317977353808,
+          "source_top1": 0.7141693811074918,
+          "source_top3": 0.8762214983713354
+        },
+        "mean_latency_seconds": 0.003796840677459427,
+        "p50_latency_seconds": 0.003183827531188399,
+        "p95_latency_seconds": 0.007362203234333719,
+        "peak_rss_bytes": 892821504,
+        "profile": {
+          "duration": {
+            "accuracy": 0.5236156351791531,
+            "examples": 1228,
+            "ordinal_mean_absolute_error_bins": 0.5667752442996743
+          },
+          "relative_strength": {
+            "accuracy": 0.6970684039087948,
+            "examples": 1228,
+            "ordinal_mean_absolute_error_bins": 0.38192182410423453
+          },
+          "start_time": {
+            "accuracy": 0.6498371335504886,
+            "examples": 1228,
+            "ordinal_mean_absolute_error_bins": 0.5138436482084691
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 6803,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 6803
+        }
+      },
+      "ood-SEVERE_MISSINGNESS": {
+        "event_cause": {
+          "accuracy": 0.8375,
+          "examples": 400,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.5033541599202493,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.865,
+              "f1": 0.9120521172638435,
+              "positive_support": 292,
+              "precision": 0.8695652173913043,
+              "recall": 0.958904109589041,
+              "support": 400
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 0.955,
+              "f1": 0.0,
+              "positive_support": 18,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "NORMAL": {
+              "accuracy": 0.9,
+              "f1": 0.25925925925925924,
+              "positive_support": 36,
+              "precision": 0.3888888888888889,
+              "recall": 0.19444444444444445,
+              "support": 400
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.955,
+              "f1": 0.8421052631578948,
+              "positive_support": 54,
+              "precision": 0.8,
+              "recall": 0.8888888888888888,
+              "support": 400
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.8775,
+          "f1": 0.9198036006546645,
+          "positive_support": 292,
+          "precision": 0.8808777429467085,
+          "recall": 0.9623287671232876,
+          "support": 400
+        },
+        "examples": 400,
+        "localization": {
+          "candidate_coverage_at_3": 0.886986301369863,
+          "ece": 0.05670702365571505,
+          "examples": 292,
+          "mrr": 0.7845727332028702,
+          "source_top1": 0.660958904109589,
+          "source_top3": 0.886986301369863
+        },
+        "mean_latency_seconds": 0.003616823332495187,
+        "p50_latency_seconds": 0.003176026749997618,
+        "p95_latency_seconds": 0.005379542737455267,
+        "peak_rss_bytes": 901271552,
+        "profile": {
+          "duration": {
+            "accuracy": 0.4965753424657534,
+            "examples": 292,
+            "ordinal_mean_absolute_error_bins": 0.5616438356164384
+          },
+          "relative_strength": {
+            "accuracy": 0.6335616438356164,
+            "examples": 292,
+            "ordinal_mean_absolute_error_bins": 0.4726027397260274
+          },
+          "start_time": {
+            "accuracy": 0.565068493150685,
+            "examples": 292,
+            "ordinal_mean_absolute_error_bins": 0.6301369863013698
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 1600,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1600
+        }
+      },
+      "ood-UNSEEN_TOPOLOGY": {
+        "event_cause": {
+          "accuracy": 0.775,
+          "examples": 400,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.4671875,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.795,
+              "f1": 0.8576388888888888,
+              "positive_support": 280,
+              "precision": 0.8344594594594594,
+              "recall": 0.8821428571428571,
+              "support": 400
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 0.95,
+              "f1": 0.0,
+              "positive_support": 20,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 400
+            },
+            "NORMAL": {
+              "accuracy": 0.885,
+              "f1": 0.23333333333333334,
+              "positive_support": 40,
+              "precision": 0.35,
+              "recall": 0.175,
+              "support": 400
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.92,
+              "f1": 0.7777777777777778,
+              "positive_support": 60,
+              "precision": 0.6666666666666666,
+              "recall": 0.9333333333333333,
+              "support": 400
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.755,
+          "f1": 0.8136882129277566,
+          "positive_support": 280,
+          "precision": 0.8699186991869918,
+          "recall": 0.7642857142857142,
+          "support": 400
+        },
+        "examples": 400,
+        "localization": {
+          "candidate_coverage_at_3": 0.8357142857142857,
+          "ece": 0.1783664729978357,
+          "examples": 280,
+          "mrr": 0.6851190476190475,
+          "source_top1": 0.5035714285714286,
+          "source_top3": 0.8357142857142857
+        },
+        "mean_latency_seconds": 0.002978910222509512,
+        "p50_latency_seconds": 0.002754030250116557,
+        "p95_latency_seconds": 0.004562785637335765,
+        "peak_rss_bytes": 875597824,
+        "profile": {
+          "duration": {
+            "accuracy": 0.475,
+            "examples": 280,
+            "ordinal_mean_absolute_error_bins": 0.6535714285714286
+          },
+          "relative_strength": {
+            "accuracy": 0.425,
+            "examples": 280,
+            "ordinal_mean_absolute_error_bins": 0.7607142857142857
+          },
+          "start_time": {
+            "accuracy": 0.41785714285714287,
+            "examples": 280,
+            "ordinal_mean_absolute_error_bins": 0.9321428571428572
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 1600,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 1600
+        }
+      },
+      "validation": {
+        "event_cause": {
+          "accuracy": 0.831,
+          "examples": 1000,
+          "known_data_quality_caveat": "data/learning-v2/cycle-b2 (folded unchanged into cycle-b2-joint-v4) contains ~5% (633/12750) HYDRAULIC_MISMATCH-mislabeled event_cause examples predating the Phase 6.4 fix; this checkpoint's event_cause head was trained on that data.",
+          "macro_f1": 0.6930034195803664,
+          "per_class": {
+            "AMBIGUOUS": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1000
+            },
+            "CONTAMINATION": {
+              "accuracy": 0.852,
+              "f1": 0.9005376344086021,
+              "positive_support": 712,
+              "precision": 0.8634020618556701,
+              "recall": 0.9410112359550562,
+              "support": 1000
+            },
+            "HYDRAULIC_MISMATCH": {
+              "accuracy": 1.0,
+              "f1": 0.0,
+              "positive_support": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "support": 1000
+            },
+            "NORMAL": {
+              "accuracy": 0.884,
+              "f1": 0.41414141414141414,
+              "positive_support": 144,
+              "precision": 0.7592592592592593,
+              "recall": 0.2847222222222222,
+              "support": 1000
+            },
+            "SENSOR_FAULT": {
+              "accuracy": 0.926,
+              "f1": 0.7643312101910827,
+              "positive_support": 144,
+              "precision": 0.7058823529411765,
+              "recall": 0.8333333333333334,
+              "support": 1000
+            }
+          }
+        },
+        "event_presence": {
+          "accuracy": 0.848,
+          "f1": 0.8967391304347827,
+          "positive_support": 712,
+          "precision": 0.868421052631579,
+          "recall": 0.9269662921348315,
+          "support": 1000
+        },
+        "examples": 1000,
+        "localization": {
+          "candidate_coverage_at_3": 0.8679775280898876,
+          "ece": 0.01920879747341857,
+          "examples": 712,
+          "mrr": 0.8180527688603532,
+          "source_top1": 0.7331460674157303,
+          "source_top3": 0.8679775280898876
+        },
+        "mean_latency_seconds": 0.003370427438467809,
+        "p50_latency_seconds": 0.0028865314375252638,
+        "p95_latency_seconds": 0.005791339125062222,
+        "peak_rss_bytes": 882520064,
+        "profile": {
+          "duration": {
+            "accuracy": 0.49859550561797755,
+            "examples": 712,
+            "ordinal_mean_absolute_error_bins": 0.5941011235955056
+          },
+          "relative_strength": {
+            "accuracy": 0.7331460674157303,
+            "examples": 712,
+            "ordinal_mean_absolute_error_bins": 0.32865168539325845
+          },
+          "start_time": {
+            "accuracy": 0.6502808988764045,
+            "examples": 712,
+            "ordinal_mean_absolute_error_bins": 0.5196629213483146
+          }
+        },
+        "sensor_fault": {
+          "accuracy": 1.0,
+          "f1": 1.0,
+          "positive_support": 3888,
+          "precision": 1.0,
+          "recall": 1.0,
+          "support": 3888
+        }
+      }
+    }
+  },
+  "schema_version": 1,
+  "use_adapters": false,
+  "wall_seconds": 34.08377707299951
+}

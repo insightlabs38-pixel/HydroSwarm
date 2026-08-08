@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "phase": "core-issues3.txt PHASE 13 -- REQUIRED METRICS AND BASELINES",
+  "narrative_report": "reports/results/v4/phase13-metrics-and-baselines.md",
+  "new_scripts_this_pass": [
+    "scripts/run_phase13_sentinel_metrics.py",
+    "scripts/run_phase13_ood_control_metrics.py",
+    "scripts/run_phase13_strategist_physical_metrics.py"
+  ],
+  "new_result_files_this_pass": [
+    "reports/results/v4/phase13-sentinel-classification-metrics.json",
+    "reports/results/v4/phase13-ood-control-metrics.json",
+    "reports/results/v4/phase13-strategist-physical-metrics.json"
+  ],
+  "pre_existing_result_files_cited": [
+    "reports/results/v4/stage-a-sentinel-training.json",
+    "reports/results/v4/stage-d-scout-policy-comparison.json",
+    "reports/results/v4/stage-e-strategist-comparison-v4corpus-corrected.json",
+    "reports/results/v4/control-heads-training.json",
+    "reports/results/v4/class-prevalence.json",
+    "reports/results/v4/stage-f-adapters-comparison.json"
+  ],
+  "findings": {
+    "sensor_fault_degenerate_population": {
+      "summary": "sensor_fault F1=1.0 across all evaluated populations (joint-v4 and base cycle-b2 validation) because every masked sensor node is a true positive -- zero true negatives in the evaluated data, confirmed on two independently-trained checkpoints.",
+      "status": "flagged, not fixed -- out of Phase 13 scope, needs src/hydroswarm/data/scenarios.py fault-injection audit"
+    },
+    "ood_category_head_untrained": {
+      "summary": "ood_category_head received no real training gradient during the Stage F run (train split has zero ood_class coverage by governed design); near-chance metrics (macro_f1=0.095) are the expected, correct result.",
+      "status": "documented; disqualifies ood_category from Phase 14 runtime_enabled_outputs as-is"
+    }
+  },
+  "deferred_to_later_phases": [
+    "Scout regret-vs-EIG / inaccessible-node / already-sampled / unnecessary-sample / budget-violation / per-decision-latency metrics -- blocked on HydroBatch already_sampled input (architecture change, not Phase 13 scope)",
+    "System: complete-incident success rate and live v4 runtime-bundle loader with fail-closed tests -- this is Phase 15's own deliverable",
+    "ood_category real (non-near-chance) classification metrics -- would require a new authorized OOD-extension train population (Phase 6 data-generation scope)"
+  ],
+  "locked_test_opened": false
+}

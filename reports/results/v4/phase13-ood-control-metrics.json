@@ -1,0 +1,113 @@
+{
+  "checkpoint": "experiments/runs/stage-f/no_adapters-seed20260810/20260808T041727Z-de5f4b0e/model-export.safetensors",
+  "corpus": "data/learning-v2/cycle-b2-joint-v4/tensors-normalized",
+  "deterministic_vs_learned_disagreement": {
+    "disagreement_rate": 0.0449438202247191,
+    "disagreement_threshold": 0.5,
+    "examples": 712,
+    "mean_js_divergence": 0.19278005780106394
+  },
+  "false_normal_and_plan_suppression": {
+    "deterministic_plan_suppression_correctness_rate": 1.0,
+    "learned_false_normal_rate_overall": 0.04625,
+    "note": "learned_false_normal_rate reflects a head with zero real training-gradient exposure this run (see module docstring) -- expected near/at the 1/11 chance rate for predicting NONE, not a validated safety number. deterministic_plan_suppression_correctness_rate is the number that matters for runtime safety: it verifies the governed OOD_CATEGORY_BEHAVIOR table itself (independent of any learned head) correctly forbids planning for every real non-NONE category in this evaluation.",
+    "per_population": {
+      "ood-EXTREME_DEMAND": {
+        "deterministic_calibration_valid": false,
+        "deterministic_planning_permitted": false,
+        "examples": 400,
+        "learned_false_normal_rate": 0.07,
+        "true_category": "EXTREME_DEMAND"
+      },
+      "ood-FROZEN_DRIFTING_SENSOR": {
+        "deterministic_calibration_valid": false,
+        "deterministic_planning_permitted": false,
+        "examples": 400,
+        "learned_false_normal_rate": 0.015,
+        "true_category": "FROZEN_DRIFTING_SENSOR"
+      },
+      "ood-ROUGHNESS_MISMATCH": {
+        "deterministic_calibration_valid": false,
+        "deterministic_planning_permitted": false,
+        "examples": 400,
+        "learned_false_normal_rate": 0.065,
+        "true_category": "ROUGHNESS_MISMATCH"
+      },
+      "ood-SEVERE_MISSINGNESS": {
+        "deterministic_calibration_valid": false,
+        "deterministic_planning_permitted": false,
+        "examples": 400,
+        "learned_false_normal_rate": 0.03,
+        "true_category": "SEVERE_MISSINGNESS"
+      },
+      "ood-TANK_STATE_SHIFT": {
+        "deterministic_calibration_valid": false,
+        "deterministic_planning_permitted": false,
+        "examples": 400,
+        "learned_false_normal_rate": 0.0725,
+        "true_category": "TANK_STATE_SHIFT"
+      },
+      "ood-UNSEEN_TOPOLOGY": {
+        "deterministic_calibration_valid": false,
+        "deterministic_planning_permitted": false,
+        "examples": 400,
+        "learned_false_normal_rate": 0.025,
+        "true_category": "UNSEEN_TOPOLOGY"
+      }
+    }
+  },
+  "labeled_ood_classification": {
+    "accuracy": 0.105,
+    "calibration_error": 0.10350084290839733,
+    "class_index_reference": [
+      "NONE",
+      "UNSEEN_TOPOLOGY",
+      "UNSEEN_SENSOR_LAYOUT",
+      "EXTREME_DEMAND",
+      "TANK_STATE_SHIFT",
+      "VALVE_PUMP_MISMATCH",
+      "ROUGHNESS_MISMATCH",
+      "SEVERE_MISSINGNESS",
+      "FROZEN_DRIFTING_SENSOR",
+      "TIMING_OUTSIDE_TRAINING_RANGE",
+      "UNSUPPORTED_NETWORK_ELEMENT_OR_INVALID_CALIBRATION"
+    ],
+    "examples_with_real_ood_class_target": 1600,
+    "macro_f1": 0.0945099597352212,
+    "per_category_recall_f1": {
+      "EXTREME_DEMAND": {
+        "f1": 0.03431372549019608,
+        "precision": 0.875,
+        "recall": 0.0175,
+        "support": 1600
+      },
+      "FROZEN_DRIFTING_SENSOR": {
+        "f1": 0.013698630136986299,
+        "precision": 0.07894736842105263,
+        "recall": 0.0075,
+        "support": 1600
+      },
+      "ROUGHNESS_MISMATCH": {
+        "f1": 0.08444444444444445,
+        "precision": 0.38,
+        "recall": 0.0475,
+        "support": 1600
+      },
+      "TANK_STATE_SHIFT": {
+        "f1": 0.24558303886925795,
+        "precision": 0.18989071038251365,
+        "recall": 0.3475,
+        "support": 1600
+      }
+    },
+    "populations": {
+      "ood-EXTREME_DEMAND": 400,
+      "ood-FROZEN_DRIFTING_SENSOR": 400,
+      "ood-ROUGHNESS_MISMATCH": 400,
+      "ood-TANK_STATE_SHIFT": 400
+    }
+  },
+  "schema_version": 1,
+  "use_adapters": false,
+  "wall_seconds": 25.592699474000256
+}
