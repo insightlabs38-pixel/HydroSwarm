@@ -41,6 +41,11 @@ from hydroswarm.sampling import ActiveSamplingResult, SamplingConstraints, rank_
 from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS
 from hydroswarm.tasks import RUNTIME_TASKS, validate_tasks
 
+# hydroswarm.training's package __init__ imports hydroswarm.training.full_trajectory,
+# which imports HybridInferencePipeline from this module -- a module-level
+# import here of anything under hydroswarm.training would be a circular
+# import. See _model_semantics's own local imports below.
+
 from .ood import OODDetector
 from .results import (
     EvidenceChange,
@@ -115,6 +120,7 @@ class HybridInferencePipeline:
         clock: Callable[[], float] = time.perf_counter,
         trained_tasks: frozenset[str] | None = None,
         fusion_config_hash: str | None = None,
+        runtime_enabled_outputs: frozenset[str] | None = None,
     ) -> None:
         if maximum_planning_candidates < 1:
             raise ValueError("maximum_planning_candidates must be positive")
@@ -126,6 +132,17 @@ class HybridInferencePipeline:
         # only place this actually needs to fail closed.
         self.trained_tasks = RUNTIME_TASKS if trained_tasks is None else frozenset(trained_tasks)
         validate_tasks(self.trained_tasks, label="trained_tasks")
+        # core-issues3.txt Phase 15 item 2: granular output-level gating,
+        # additive to (not a replacement for) trained_tasks's coarser
+        # role-level gating above -- trained_tasks still governs
+        # Scout/Strategist/OOD wholesale (none of those roles are promoted
+        # today; see reports/results/v4/phase14-promotion-gates.md).
+        # `None` (the default) means "no v4 checkpoint identity available",
+        # exactly like trained_tasks=None -- every existing caller/test
+        # keeps behaving exactly as before. A v4-aware factory
+        # (hydroswarm.runtime.v4_defaults) always passes the checkpoint
+        # identity's own declared runtime_enabled_outputs.
+        self.runtime_enabled_outputs = runtime_enabled_outputs
         # core-issues.txt repair item 10: `None` (the default) skips the
         # fusion_config_hash check entirely -- every existing
         # CalibrationArtifact test fixture and the currently-promoted
@@ -224,21 +241,65 @@ class HybridInferencePipeline:
             raise ValueError("signature localization requires at least one valid concentration observation")
         return observations, mask
 
-    @staticmethod
     def _model_semantics(
-        output: Mapping[str, Any], node_ids: tuple[str, ...]
+        self, output: Mapping[str, Any], node_ids: tuple[str, ...]
     ) -> SemanticPredictions:
+        # Local imports: see this module's top-of-file circular-import note.
+        from hydroswarm.training.control_labels import NEXT_STEP_RUNTIME_ENABLED
+        from hydroswarm.training.corpus import EVENT_CAUSE_INDEX, SUPPORTED_EVENT_CAUSES
+        from hydroswarm.training.targets_v2 import EventCause, NextStep
+
         def scalar(key: str) -> float | None:
             value = output.get(key)
             return float(_array(value).reshape(-1)[0]) if value is not None else None
+
+        # core-issues3.txt Phase 15 item 2: when a v4 checkpoint identity is
+        # active (runtime_enabled_outputs is not None), an output not in it
+        # must contribute exactly zero -- checked per-field below, distinct
+        # from "the head is simply absent from this model" (which already,
+        # separately, produces None via output.get(...) returning None).
+        enabled = self.runtime_enabled_outputs
+
+        def granular_enabled(canonical_name: str) -> bool:
+            return enabled is None or canonical_name in enabled
 
         sample_values = output.get("expected_information_gain")
         faults = output.get("sensor_fault_logits")
         plan_values = output.get("plan_value")
         plan_validity = output.get("plan_validity_logits")
+
+        event_presence_probability: float | None = None
+        event_presence: bool | None = None
+        if granular_enabled("event_presence"):
+            event_presence_probability = scalar("event_presence_logits")
+            if event_presence_probability is not None:
+                event_presence_probability = float(1.0 / (1.0 + np.exp(-event_presence_probability)))
+                event_presence = event_presence_probability >= 0.5
+
+        event_cause: str | None = None
+        cause_logits = output.get("event_cause_logits")
+        if granular_enabled("event_cause") and cause_logits is not None:
+            predicted_index = int(np.argmax(_array(cause_logits).reshape(-1)[: len(EventCause)]))
+            predicted_cause = next(cause for cause, index in EVENT_CAUSE_INDEX.items() if index == predicted_index)
+            # Phase 6.5/9.3: never surface a currently-unsupported class
+            # (AMBIGUOUS/HYDRAULIC_MISMATCH have zero real training
+            # examples -- see reports/results/v4/phase13-metrics-and-baselines.md)
+            # as a live prediction.
+            if predicted_cause in SUPPORTED_EVENT_CAUSES:
+                event_cause = predicted_cause.value
+
+        next_step: str | None = None
+        next_step_logits = output.get("next_step_logits")
+        if granular_enabled("next_step") and next_step_logits is not None:
+            ordered_next_steps = tuple(NextStep)
+            predicted_index = int(np.argmax(_array(next_step_logits).reshape(-1)[: len(ordered_next_steps)]))
+            predicted_step = ordered_next_steps[predicted_index]
+            if predicted_step in NEXT_STEP_RUNTIME_ENABLED:
+                next_step = predicted_step.value
+
         return SemanticPredictions(
-            evidence_sufficiency=scalar("evidence_sufficiency"),
-            uncertainty=scalar("uncertainty"),
+            evidence_sufficiency=scalar("evidence_sufficiency") if granular_enabled("evidence_sufficiency") else None,
+            uncertainty=scalar("uncertainty") if granular_enabled("uncertainty") else None,
             expected_information_gain=(
                 dict(zip(node_ids, _array(sample_values).reshape(-1)[-len(node_ids):], strict=True))
                 if sample_values is not None
@@ -252,7 +313,7 @@ class HybridInferencePipeline:
                         strict=True,
                     )
                 )
-                if faults is not None
+                if faults is not None and granular_enabled("sensor_fault")
                 else None
             ),
             plan_values=tuple(float(value) for value in _array(plan_values).reshape(-1))
@@ -263,6 +324,10 @@ class HybridInferencePipeline:
             )
             if plan_validity is not None
             else (),
+            event_presence=event_presence,
+            event_presence_probability=event_presence_probability,
+            event_cause=event_cause,
+            next_step=next_step,
         )
 
     def _run_model(self, built: BuiltHydroBatch) -> Mapping[str, Any]:

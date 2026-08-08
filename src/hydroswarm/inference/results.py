@@ -29,6 +29,24 @@ class SemanticPredictions:
     sensor_fault_probability: Mapping[str, float] | None = None
     plan_values: tuple[float, ...] = ()
     plan_validity: tuple[float, ...] = ()
+    #: core-issues3.txt Phase 15 item 3/8: v4-only advisory outputs, gated
+    #: by HybridInferencePipeline's own runtime_enabled_outputs (granular,
+    #: not the coarse trained_tasks role check the fields above still use)
+    #: -- None whenever the checkpoint has not declared the corresponding
+    #: output runtime-enabled, exactly like the fields above default to
+    #: None for a checkpoint with no matching head at all. Never
+    #: authoritative: the deterministic controller/OOD/calibration
+    #: machinery elsewhere in this pipeline does not read these.
+    event_presence: bool | None = None
+    event_presence_probability: float | None = None
+    #: None both when the head is absent/unvalidated AND when the
+    #: predicted class itself is a currently-unsupported EventCause member
+    #: (AMBIGUOUS/HYDRAULIC_MISMATCH -- core-issues3.txt Phase 6.5/9.3:
+    #: "do not runtime-enable unsupported classes") -- the two cases are
+    #: deliberately indistinguishable to a caller, since both mean "no
+    #: trustworthy value available", not "false"/"zero".
+    event_cause: str | None = None
+    next_step: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
