@@ -2,7 +2,11 @@ name: HydroSwarm CI
 
 on:
   push:
-    branches: [main]
+    # core-issues3.txt Phase 17: CI must run on the development branch,
+    # not only main -- agent/** covers this pre-freeze work
+    # (agent/gcp-multitopology-v3) and any future agent branch without
+    # needing a change here each time one is created.
+    branches: [main, "agent/**"]
   pull_request:
   workflow_dispatch:
 
