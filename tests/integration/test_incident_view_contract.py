@@ -406,6 +406,64 @@ def test_incident_view_returns_complete_verified_contract(tmp_path) -> None:
     # with status 200 is itself part of the contract.
 
 
+def test_view_never_recommends_a_plan_whose_verification_has_gone_stale(tmp_path) -> None:
+    """core-issues5.txt delta item 6: recommended_plan_id must not point at
+    a plan whose own verification is STALE -- the other half of
+    evidence_bundle()'s current-vs-stale invariant, exercised here through
+    a real completed hybrid analysis (test_api.py's own coverage of this
+    same invariant uses a minimal fixture that cannot reach /view at all)."""
+
+    pipeline, network = _build_pipeline()
+    client = TestClient(
+        create_app(
+            pipeline_factory=pipeline,
+            verifier=_authority,
+            database_path=tmp_path / "runtime.sqlite3",
+        )
+    )
+    imported = _import_network(client, network)
+
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": imported["network_id"],
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation("S1", "J1", 0.0, 0.0), _observation("S1", "J1", 3600.0, 0.78)],
+            # _drive_to_planning_allowed uses 3 of these; one more is spent
+            # below to push the recorded verification stale.
+            "maximum_samples": 4,
+        },
+    )
+    incident_id = created.json()["incident_id"]
+    _drive_to_planning_allowed(client, incident_id)
+
+    generated = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
+    plans = generated.json()
+    top_plan_id = plans[0]["plan_id"]
+    verified = client.post(f"/api/incidents/{incident_id}/plans/{top_plan_id}/verify")
+    assert verified.json()["decision"] == "VERIFIED"
+
+    fresh_view = client.get(f"/api/incidents/{incident_id}/view")
+    assert fresh_view.status_code == 200
+    assert fresh_view.json()["recommended_plan_id"] == top_plan_id
+
+    # New evidence arrives -- the recorded verification becomes STALE.
+    fourth_sample = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        json=_observation("S4", "J4", 3600.0, 0.02),
+    )
+    assert fourth_sample.status_code == 200
+
+    stale_view = client.get(f"/api/incidents/{incident_id}/view")
+    assert stale_view.status_code == 200
+    assert stale_view.json()["recommended_plan_id"] != top_plan_id
+    plan_entry = next(
+        entry for entry in stale_view.json()["plans"] if entry["plan"]["plan_id"] == top_plan_id
+    )
+    assert plan_entry["verification"]["decision"] == "VERIFIED"
+    assert plan_entry["verification"]["verification_status"] == "STALE"
+
+
 def test_incident_view_rejects_unknown_fields_client_side_too() -> None:
     """Guards the contract itself: IncidentView must stay extra='forbid' so a
     server-side typo (an extra or misspelled field) fails loudly instead of

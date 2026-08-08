@@ -1059,14 +1059,32 @@ def create_app(
         )
 
     def evidence_bundle(record: IncidentRuntime) -> EvidenceBundle:
+        # core-issues5.txt delta item 6 (P0 fix): every "selected/current"
+        # verification lookup below requires BOTH decision == VERIFIED (or
+        # REJECTED, for the rejected-plan explanation fact) AND
+        # verification_status == "CURRENT" -- a verification whose evidence
+        # context has since changed (Section 10) must not be surfaced here
+        # as if it still describes the incident's current state, even
+        # though it correctly remains decision == VERIFIED forever (that
+        # field records what WNTR concluded at verification time; it is
+        # verification_status that tracks whether that conclusion still
+        # applies). Historical/stale verifications remain fully accessible
+        # via /api/incidents/{id}/export and /api/incidents/{id}/events --
+        # only THIS "current evidence" surface is restricted.
         analysis = analysis_response(record)
         leading = max(analysis.fused_belief, key=analysis.fused_belief.get) if analysis.fused_belief else None
         verification = next(
-            (item for item in record.verifications.values() if item.decision == PlanDecision.VERIFIED),
+            (
+                item for item in record.verifications.values()
+                if item.decision == PlanDecision.VERIFIED and item.verification_status == "CURRENT"
+            ),
             None,
         )
         rejected = next(
-            (item for item in record.verifications.values() if item.decision == PlanDecision.REJECTED),
+            (
+                item for item in record.verifications.values()
+                if item.decision == PlanDecision.REJECTED and item.verification_status == "CURRENT"
+            ),
             None,
         )
         consequence = verification.consequences if verification else None
@@ -1085,6 +1103,7 @@ def create_app(
                 for plan_id, item in record.verifications.items()
                 if plan_id in record.plans
                 and all(action.action_type == ActionType.END_PLAN for action in record.plans[plan_id].actions)
+                and item.verification_status == "CURRENT"
             ),
             None,
         )
@@ -1276,9 +1295,18 @@ def create_app(
             ),
             None,
         )
-        recommended_plan_id = (
-            analysis.plan_proposals[0].plan.plan_id if analysis.plan_proposals else None
-        )
+        # core-issues5.txt delta item 6: never recommend a plan whose own
+        # verification is STALE -- the ranking-order top proposal is not
+        # "recommended" if its last known verification no longer reflects
+        # the incident's current evidence context; an unverified proposal
+        # (verification is None) is still a legitimate "try this one next"
+        # recommendation, only a known-STALE one is suppressed.
+        recommended_plan_id = None
+        if analysis.plan_proposals:
+            top_plan_id = analysis.plan_proposals[0].plan.plan_id
+            top_verification = record.verifications.get(top_plan_id)
+            if top_verification is None or top_verification.verification_status == "CURRENT":
+                recommended_plan_id = top_plan_id
         counterfactual_consequences = {
             str(plan_id): item.consequences
             for plan_id, item in record.verifications.items()

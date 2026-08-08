@@ -359,6 +359,63 @@ def test_unchanged_context_leaves_verification_current_and_approvable(tmp_path) 
     assert first["verification_status"] == "CURRENT"
 
 
+# core-issues5.txt delta item 6 (P0 fix): stale verification leakage into
+# "current evidence" surfaces (evidence_bundle() and everything built from
+# it -- /summary text, /view's recommended_plan_id/explanations).
+
+
+def test_stale_verification_does_not_appear_as_current_evidence_but_stays_in_audit_history(
+    tmp_path,
+) -> None:
+    """/view requires a completed real hybrid analysis
+    (IncidentAnalysisResult), which this file's minimal injected-verifier
+    fixture does not produce -- the recommended_plan_id half of this same
+    invariant is covered separately by
+    test_incident_view_contract.py's real-pipeline fixture. This test
+    covers /summary (which only needs evidence_bundle(), same as /view's
+    explanations) and /export (the raw per-plan verification record)."""
+
+    client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
+    incident_id, plan_id, first = _create_incident_with_verified_plan(client)
+
+    # While CURRENT: the summary surfaces the verified plan as current
+    # evidence.
+    fresh_summary = client.get(f"/api/incidents/{incident_id}/summary").json()["summary"]
+    assert plan_id in fresh_summary
+    assert "none verified" not in fresh_summary
+
+    # New evidence arrives -- the verification becomes STALE.
+    client.post(f"/api/incidents/{incident_id}/samples", json=_observation("S3", "J2"))
+
+    stale_summary_response = client.get(f"/api/incidents/{incident_id}/summary")
+    assert stale_summary_response.status_code == 200
+    stale_summary = stale_summary_response.json()["summary"]
+    # The stale plan must no longer be surfaced as the current/selected
+    # plan -- deterministic_operational_summary falls back to "none
+    # verified" exactly like an incident with no verification at all.
+    assert plan_id not in stale_summary
+    assert "none verified" in stale_summary
+
+    # Audit history retains the original verification event -- staleness
+    # is a "not currently approvable" status, never a deletion.
+    events = client.get(f"/api/incidents/{incident_id}/events").json()
+    event_types = {event["event_type"] for event in events}
+    assert "PLAN_VERIFIED" in event_types
+    assert "PLAN_VERIFICATION_STALE" in event_types
+
+    # The raw per-plan verification record (distinct from the "current
+    # evidence" surfaces above) is also still retrievable via /export,
+    # still shows decision == VERIFIED, and now also shows
+    # verification_status == STALE -- historical/stale verification
+    # remains accessible, just not presented as current.
+    export = client.get(f"/api/incidents/{incident_id}/export").json()
+    exported_verification = next(
+        item for item in export["verifications"] if item["plan_id"] == plan_id
+    )
+    assert exported_verification["decision"] == "VERIFIED"
+    assert exported_verification["verification_status"] == "STALE"
+
+
 def test_api_enforces_schema_and_validated_network(tmp_path) -> None:
     client = TestClient(create_app(ledger_path=tmp_path / "audit.sqlite3"))
     unvalidated = client.post(
