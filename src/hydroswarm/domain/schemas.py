@@ -366,6 +366,15 @@ class EvidenceCertificate(FrozenModel):
     posterior_entropy_bits: float
     candidate_set_size: int
     candidate_nodes: tuple[str, ...]
+    #: core-issues5.txt delta item 8 (P1 fix): True only when
+    #: candidate_nodes/candidate_set_size is a real calibrated conformal
+    #: set (SplitConformalCalibrator.candidate_set); False when it is the
+    #: uncalibrated credible-region fallback
+    #: (HybridInferencePipeline._credible_nodes -- a real, current
+    #: candidate/posterior snapshot, never fabricated as empty, but NOT
+    #: conformal coverage). Callers must never present the False case as
+    #: if it carried the same statistical guarantee as the True case.
+    candidate_region_calibrated: bool
     recommended_sample_node: str | None = None
     expected_information_gain_bits: float | None = None
     expected_candidate_reduction: float | None = None

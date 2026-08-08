@@ -20,17 +20,29 @@ from hydroswarm.inference.results import IncidentAnalysisResult
 __all__ = ["build_evidence_certificate"]
 
 
+def _region_label(candidate_set_size: int, *, calibrated: bool) -> str:
+    """core-issues5.txt delta item 8: the candidate-region size alone
+    never appears without an explicit calibrated/uncalibrated label --
+    an uncalibrated credible-region snapshot must never be presented as
+    if it carried conformal coverage's statistical guarantee."""
+
+    kind = "calibrated conformal set" if calibrated else "UNCALIBRATED credible region"
+    return f"Candidate region ({kind}): {candidate_set_size} node(s)"
+
+
 def _message(
     status: EvidenceCertificateStatus,
     *,
     candidate_set_size: int,
+    candidate_region_calibrated: bool,
     expected_information_gain_bits: float | None,
     sample_budget_remaining: int,
 ) -> str:
+    region = _region_label(candidate_set_size, calibrated=candidate_region_calibrated)
     if status == EvidenceCertificateStatus.EVIDENCE_SUFFICIENT:
         gain = f"{expected_information_gain_bits:.2f} bits" if expected_information_gain_bits is not None else "unavailable"
         return (
-            f"EVIDENCE SUFFICIENT\nCandidate region: {candidate_set_size} node(s)\n"
+            f"EVIDENCE SUFFICIENT\n{region}\n"
             f"Additional expected information gain: {gain}\nPlanning gate satisfied"
         )
     if status == EvidenceCertificateStatus.STOP_BUDGET_EXHAUSTED:
@@ -39,10 +51,7 @@ def _message(
         return "STOP: NO USEFUL SAMPLE CANDIDATE REMAINS\nDecision remains uncertain\nPlanning suppressed"
     if status == EvidenceCertificateStatus.STOP_ABSTAIN:
         return "STOP: ABSTAINING\nEvidence is too ambiguous or out of distribution\nPlanning suppressed"
-    return (
-        f"CONTINUE SAMPLING\nCandidate region: {candidate_set_size} node(s)\n"
-        f"Sample budget remaining: {sample_budget_remaining}"
-    )
+    return f"CONTINUE SAMPLING\n{region}\nSample budget remaining: {sample_budget_remaining}"
 
 
 def build_evidence_certificate(
@@ -83,6 +92,7 @@ def build_evidence_certificate(
     message = _message(
         status,
         candidate_set_size=len(candidate_nodes),
+        candidate_region_calibrated=analysis.calibrated,
         expected_information_gain_bits=expected_information_gain_bits,
         sample_budget_remaining=sample_budget_remaining,
     )
@@ -93,6 +103,15 @@ def build_evidence_certificate(
         posterior_entropy_bits=posterior_entropy_bits,
         candidate_set_size=len(candidate_nodes),
         candidate_nodes=candidate_nodes,
+        # core-issues5.txt delta item 8: candidate_nodes above is ALWAYS a
+        # real, current candidate/posterior snapshot -- when analysis.
+        # calibrated is False, HybridInferencePipeline.analyze() already
+        # populates conformal_candidate_nodes from the uncalibrated
+        # credible-region fallback (_credible_nodes), never leaves it
+        # empty merely because calibration is unavailable. This flag is
+        # what lets a caller distinguish the two, rather than presenting
+        # the uncalibrated fallback as if it were conformal coverage.
+        candidate_region_calibrated=analysis.calibrated,
         recommended_sample_node=recommended_node,
         expected_information_gain_bits=expected_information_gain_bits,
         expected_candidate_reduction=expected_candidate_reduction,
