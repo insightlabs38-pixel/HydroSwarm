@@ -3635,7 +3635,7 @@ against the `v4corpus` (uncorrected-shared-features) run's own numbers
 role-specific baseline for Stage F. Not yet run — recorded here so the
 exact comparison is unambiguous once both results exist.
 
-### Requirement 2: OOD extension seed-family fix — CODE DONE, DATA REGENERATION IN PROGRESS (background job running)
+### Requirement 2: OOD extension seed-family fix — DONE (data regenerated, merged, all gates pass)
 
 Root cause confirmed (matches the previous pass's own finding exactly):
 `generate_ood_extension_corpus.py`'s default `--seed 91_000` plus its
@@ -3713,24 +3713,51 @@ own comment and in this session's memory record: it guarantees live
 simulation works, not cross-architecture bit-for-bit reproduction of a
 pre-existing corpus.
 
-**Background job — OOD extension corpus regeneration (fixed script, real run)**
+**Regeneration — completed, two more real issues found and fixed along the way**
 
-```
-command: python -u scripts/generate_ood_extension_corpus.py \
-  --cycle-b2-root data/learning-v2/cycle-b2 \
-  --output data/learning-v2/cycle-b2-ood-extension
-env: PYTHONPATH=src
-log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/ood-extension-regen.log
-started: 2026-08-08T01:3{2,3}Z (immediately after the signature-loading fix landed)
-expected wall time: ~5-6 min (matches the original defective run's own
-  generation_seconds of 330.0s -- WNTR simulation cost is unchanged,
-  only the signature-loading step got cheaper)
-```
+First real-scale attempt (`--seed 500000037` — the default `SEED_NAMESPACE_BASE`,
+500_000_000, hit the seed-family/recipe-priority overlap below on its
+very first try, then a `--seed` nudged by exactly `+1000` reproduced the
+SAME failure at a DIFFERENT index purely because 1000 is a multiple of
+100 — the per-scenario stride — so it mapped a different `index` onto
+the identical absolute seed; `+37` finally broke the coincidence)
+surfaced:
 
-Once this closes (1600/1600 scenarios generated and `ood_class`-verified
-across all 4 categories, `seed_family_verification.collisions == []`
-recorded in `generation-report.json`), the remaining commands for
-requirement 2 are:
+1. **A genuine, documented recipe-priority overlap, not a bug**:
+   `classify_ood_category`'s own priority order checks
+   `SEVERE_MISSINGNESS` before `FROZEN_DRIFTING_SENSOR`; one
+   `FROZEN_DRIFTING_SENSOR`-recipe scenario's realized missingness (a
+   random draw) happened to also exceed `SEVERE_MISSINGNESS_THRESHOLD`,
+   so `classify_ood_category` correctly (by its own documented rule)
+   returned `SEVERE_MISSINGNESS` instead — the generation script's own
+   fail-closed trigger-reliability check caught this correctly rather
+   than silently mislabeling it. Resolved by retrying with a different
+   seed (not by loosening the check), landing cleanly at
+   `--seed 500000037`.
+2. **This script's default `--categories` argument (`sorted(category.value
+   for category in OOD_TRIGGERING_CONFIG_OVERRIDES)`) evaluates to 5
+   categories, not 4** — `OOD_TRIGGERING_CONFIG_OVERRIDES` has always
+   included `SEVERE_MISSINGNESS` alongside the 4 this corpus exists to
+   fill; the ORIGINAL (defective) run must have passed `--categories`
+   explicitly (its own `generation-report.json` shows exactly 4). Running
+   with the bare default would have generated a redundant, unused 5th
+   `ood-SEVERE_MISSINGNESS` extension category (cycle-b2 already has its
+   own, via a different path, and `build_stage_f_joint_corpus.py`'s
+   `OOD_EXTENSION_POPULATIONS` only ever looks for the 4). Fixed by
+   passing `--categories EXTREME_DEMAND FROZEN_DRIFTING_SENSOR
+   ROUGHNESS_MISMATCH TANK_STATE_SHIFT` explicitly, matching the original
+   run's real scope.
+
+Final, correct run: **1600/1600 scenarios generated and `ood_class`-verified
+across all 4 categories** (400 each), `seed_family_verification`:
+`{"collisions": [], "cycle_b2_families_checked": 13550,
+"new_families_checked": 1600}` — the real, at-scale proof the
+seed-family fix holds, not just the 3 small regression tests.
+`generation_seconds` ≈ 311s, matching the original defective run's own
+330s (WNTR simulation cost unchanged; only signature loading got
+cheaper, per the requirement-2 signature-loading fix above).
+
+**tensors-normalized/, merge, and gates — completed**
 
 ```bash
 export PYTHONPATH=src
@@ -3751,39 +3778,124 @@ for category in ("EXTREME_DEMAND", "FROZEN_DRIFTING_SENSOR", "ROUGHNESS_MISMATCH
                    expected_split="development_holdout", node_stats=node_stats, edge_stats=edge_stats)
 PY
 
-# Then re-merge into the joint corpus WITH the extension included, and
-# rerun every gate:
 python scripts/build_stage_f_joint_corpus.py --include-ood-extension
 python scripts/run_stage_f_joint_corpus_gates.py
 ```
 
-Acceptance per this pass's instructions: `build_stage_f_joint_corpus.py`'s
-own `requirement_status` must be all-`true` (`zero_cross_population_leakage`
-included — this is the actual proof the seed-family fix held at scale,
-not just the small regression tests), and the gates script's
-`gradient_smoke` gate must show `ood_class` among the tasks with a
-positive valid count and nonzero gradient (it was completely absent
-before this fix, since `include_ood_extension` defaulted to `False`).
-Not yet run — queued behind the regeneration job above.
+`build_stage_f_joint_corpus.py --include-ood-extension`'s
+`merge-report.json`: `requirement_status` all `true`
+(`zero_missing_required_joins`, `zero_duplicates`,
+`zero_identity_conflicts`, and critically
+**`zero_cross_population_leakage: true`** — the real, at-scale proof the
+seed-family fix holds under the exact leakage check that originally
+found the defect, not just the unit-scale regression tests).
 
-### Stage F training script prepared, not yet run
+**A third real defect found while adding the gates script's 6th check
+(`ood_class_gradient_smoke`, added this pass specifically to prove the
+"real valid count and nonzero gradient" requirement — nothing in the
+pre-existing 5 gates could have, see below) — the most consequential one
+found this pass**: `run_stage_f_joint_corpus_gates.py`'s pre-existing
+`gate_gradient_smoke` only ever draws its batch from `train`, and
+`train` structurally carries **zero** `ood_class` supervision (confirmed
+via `target-availability-report.json`: `train`/`validation` both list
+`ood_class` as an `unavailable_task_group`; even cycle-b2's own
+`ood-SEVERE_MISSINGNESS`/`ood-UNSEEN_TOPOLOGY` populations never
+attached a real `ood_class` *target*, only real OOD *scenarios* — the 4
+newly-merged extension categories are the ONLY populations in the entire
+joint corpus with real `ood_class` labels). So no existing gate could
+ever have demonstrated this requirement regardless of whether the merge
+succeeded.
 
-`scripts/run_stage_f_training.py` (new this pass, commit `e04b65d`):
-the `use_adapters` True/False comparison, ≥2 seeds each
-(20260810/20260811, matching this project's established seed
-convention), same joint-v4 corpus/training budget (Bundle-F-Stage-3's
-own established budget: 16 epochs, patience 3, 7200s ceiling, batch 16)/
-evaluation protocol (best-validation-loss checkpoint selection, then a
-no-grad multitask pass over `development_holdout`) across both arms.
-Both arms share the exact full config `run_stage_f_joint_corpus_gates.py`
-already verified end-to-end. Smoke-tested directly against tiny dataset
-slices (24/8/8 examples) with a reduced epoch/runtime budget — the real
-code path (model construction, `Trainer.fit`, checkpoint export,
-development_holdout evaluation, registry open/close, model
-fingerprinting) runs cleanly. Not yet run at real scale — blocked
-behind requirements 1 and 2 above per this pass's explicit instruction
-("If both of those checks pass, proceed directly into the full Stage F
-run").
+Worse, while building the new gate: **both `FULL_STAGE_F_MODEL_OVERRIDES`
+here and `SHARED_MODEL_CONFIG` in `run_stage_f_training.py` never set
+`ood_category_head=True`.** `HydroCore.from_variant`'s own
+`OOD_CATEGORY_HEAD_DEFAULT` is `False` — every model either dict ever
+built therefore never constructed `self.ood_category_head` at all, so
+`ood_category_logits` never appeared in a forward pass's outputs, and
+`compute_multitask_loss`'s own `if task in targets and output_name in
+outputs` silently skipped `ood_class` unconditionally, regardless of
+whether the corpus supervised it. This is the exact "silently changing
+the shared backbone without supervising the retained learned OOD head"
+failure mode the user-directed requirement warned against — found and
+fixed in both scripts before either was used for a real run (a fresh
+`run_stage_f_training.py`, written this pass, had never yet been run at
+scale; the pre-existing `run_stage_f_joint_corpus_gates.py`'s own prior
+gate runs, including in the previous pass, never actually proved
+anything about `ood_class` as a result — worth noting for anyone reading
+this file's earlier "21 real tasks" gate description above: `ood_class`
+was never one of the 21, even though `event_control_heads`/etc. were).
+
+Two more attempts before the gate was right: an OOD-extension-only batch
+fails outright (`strategist_mode=candidate_conditioned` unconditionally
+requires `plan_template_ids`/`plan_target_type`/`plan_mask`/
+`plan_features` present batch-wide — `hydroswarm.model.core`'s own
+`batch.get(...) is None` check — and the OOD-extension categories never
+carry Strategist inputs at all); mixing in real `train` examples to
+supply those fields instead trips `collate_variable_topology`'s own
+per-example "some but not all candidate-plan input fields" consistency
+check the other direction (confirmed a genuine architectural
+constraint, not a fixable oversight: a single forward pass cannot
+process a batch where some examples carry Strategist inputs and others
+don't). Resolved with a separate `OOD_CLASS_MODEL_OVERRIDES` (identical
+to `FULL_STAGE_F_MODEL_OVERRIDES` minus `strategist_mode`/
+`action_vocabulary_size`/`consequence_prescreening_heads`) against a
+homogeneous OOD-extension-only batch — `ood_class`'s own gradient flow
+does not depend on `strategist_mode` at all (independent heads), so this
+is an honestly-scoped test, not a weakened one.
+
+**Final gate results, all 6 passing**:
+
+| gate | result |
+|---|---|
+| `corpus_integrity` | passed |
+| `leakage` | passed |
+| `batch_load` | passed |
+| `gradient_smoke` | passed (unchanged from before — still proves the original 21-task set) |
+| `ood_class_gradient_smoke` (new) | **passed** — `ood_class_valid_count=16`, `ood_class_gradient_norm=17.37`, `categories_in_batch=["ood-EXTREME_DEMAND","ood-FROZEN_DRIFTING_SENSOR","ood-ROUGHNESS_MISMATCH","ood-TANK_STATE_SHIFT"]` (all 4, one real batch) |
+| `checkpoint_resume` | passed |
+
+Full detail: `reports/results/v4/stage-f-joint-corpus-gates.json`.
+712/712 unit+scientific tests pass (including the 9/9 in
+`test_generate_ood_extension_corpus.py`); ruff clean; pyright clean on
+every file touched.
+
+**Known, documented limitation carried forward, not glossed over**: the
+OOD-extension categories remain `development_holdout`-only (matching
+cycle-b2's own established `SEVERE_MISSINGNESS`/`UNSEEN_TOPOLOGY`
+convention) — Stage F's actual `train` split still has zero `ood_class`
+coverage, so the now-correctly-wired OOD head will **not** receive
+training gradient during the real Stage F run itself, only evaluation/
+calibration signal against real labels post-training (exactly how this
+project's own pre-existing OOD categories are already used elsewhere —
+not a new limitation this pass introduced). Backfilling Strategist
+candidate-plan fields for OOD-extension scenarios (the only way to mix
+them into `train`-population batches under
+`strategist_mode=candidate_conditioned`) would require full WNTR-verified
+plan generation for those scenarios — a materially larger undertaking,
+out of this pass's scope, flagged here for whoever makes Stage F's
+actual task-weight/data-mixing decision.
+
+### Stage F training script prepared, not yet run at real scale
+
+`scripts/run_stage_f_training.py` (new this pass, commit `e04b65d`,
+`ood_category_head=True` fix in commit `69243e4`): the `use_adapters`
+True/False comparison, ≥2 seeds each (20260810/20260811, matching this
+project's established seed convention), same joint-v4 corpus/training
+budget (Bundle-F-Stage-3's own established budget: 16 epochs, patience
+3, 7200s ceiling, batch 16)/evaluation protocol (best-validation-loss
+checkpoint selection, then a no-grad multitask pass over
+`development_holdout`) across both arms. Both arms share the exact full
+config `run_stage_f_joint_corpus_gates.py` already verified end-to-end,
+including the `ood_category_head=True` fix (see requirement 2 above —
+found while building the new gate, fixed in this script the same day it
+was first written, before any real run used it). Smoke-tested directly
+against tiny dataset slices (24/8/8 examples) with a reduced epoch/
+runtime budget — the real code path (model construction, `Trainer.fit`,
+checkpoint export, development_holdout evaluation, registry open/close,
+model fingerprinting) runs cleanly. Not yet run at real scale — blocked
+behind requirement 1 (Strategist retrain, still running) per this pass's
+explicit instruction ("If both of those checks pass, proceed directly
+into the full Stage F run") — requirement 2 is now done.
 
 ```bash
 export PYTHONPATH=src
@@ -3799,20 +3911,21 @@ python scripts/run_stage_f_training.py
 
 | item | status |
 |---|---|
-| Stage-A Sentinel regen (teacher checkpoint) | running (background job, ~70-75 min/seed x 2) |
-| cycle-b2 train scenario cache restore | abandoned -- confirmed cross-arch non-reproducible on this sandbox, not needed anymore (see below) |
+| Stage-A Sentinel regen (teacher checkpoint) | running (background job; seed 20260810 done, val_top1=0.725, consistent with the historical 0.7247; seed 20260811 in progress) |
+| cycle-b2 train scenario cache restore | abandoned -- confirmed cross-arch non-reproducible on this sandbox, not needed (signature-loading redesign made it unnecessary) |
 | native EPANET build (aarch64) | done -- makes live simulation work; does NOT guarantee cross-arch bit-for-bit reproduction (corrected claim) |
-| OOD extension seed-family fix (code) | done, committed, tests passing |
-| OOD extension signature-loading redesign (code) | done, committed, tests passing (9/9, including real-scale WNTR recipe tests) |
-| OOD extension regeneration (data) | running (background job, ~5-6 min) |
+| OOD extension seed-family fix (code) | **done**, committed (`3860ca7`), tests passing |
+| OOD extension signature-loading redesign (code) | **done**, committed (`c83bd5d`), tests passing (9/9, including real-scale WNTR recipe tests) |
+| OOD extension regeneration (data) | **done** -- 1600/1600 scenarios, 0 seed_family collisions at scale |
+| Stage F joint-corpus rebuild + gates (with OOD extension) | **done** -- `requirement_status` all true, all 6 gates pass (including new `ood_class_gradient_smoke`) |
+| `ood_category_head=True` model-config fix (gates + training script) | **done**, committed (`69243e4`) -- real defect, found and fixed before any real run used either script |
 | Strategist retrain on corrected tensors | queued behind Stage-A regen |
 | Stage E rerun on corrected-input Strategist | queued behind the retrain above |
-| Stage F joint-corpus rebuild + gates (with OOD extension) | queued behind OOD extension regeneration |
-| Stage F training script | written, smoke-tested, not yet run at scale |
-| Stage F real run (adapters vs. no-adapters, 2 seeds each) | not started -- blocked on both requirements above per explicit instruction |
+| Stage F training script | written, smoke-tested, not yet run at real scale |
+| Stage F real run (adapters vs. no-adapters, 2 seeds each) | not started -- blocked on requirement 1 (Strategist retrain) per explicit instruction |
 | `final-selection.json` | does not exist |
 | Locked final test | not opened |
 
-This section will be updated again once the background jobs above close
-and the subsequent requirement-1/requirement-2/Stage-F steps actually
-run (not merely planned).
+This section will be updated again once Stage-A regen closes and
+requirement 1's remaining steps (Strategist retrain, Stage E rerun) and
+the real Stage F run actually run (not merely planned).
