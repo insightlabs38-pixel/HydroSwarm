@@ -176,6 +176,16 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
         "PRESSURE_BELOW_THRESHOLD"
     ]
 
+    # core-issues5.txt Section 14 (P1 product feature): only the real
+    # VERIFIED plan enters the frontier -- the REJECTED one never does,
+    # regardless of how its consequences might otherwise compare.
+    frontier = client.get(f"/api/incidents/{incident_id}/frontier")
+    assert frontier.status_code == 200
+    frontier_plan_ids = {entry["plan_id"] for entry in frontier.json()}
+    assert str(safe_plan["plan_id"]) in frontier_plan_ids
+    assert str(unsafe_plan["plan_id"]) not in frontier_plan_ids
+    assert frontier.json()[0]["mode"] == "posterior_weighted"
+
 
 # core-issues5.txt Section 10 (P0 safety fix): a plan verified under
 # evidence state A must not remain approvable after a new sample changes

@@ -40,6 +40,7 @@ from hydroswarm.explanation import (
 from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController
 from hydroswarm.calibration.conformal import CALIBRATION_SCHEMA_VERSION
 from hydroswarm.inference import MODEL_VERSION, IncidentAnalysisResult, build_decision_certificates
+from hydroswarm.planning import FrontierMode, compute_verified_pareto_frontier
 from hydroswarm.preprocessing import SensorSeries
 from hydroswarm.storage import AuditEvent
 from hydroswarm.networks import MAX_INP_BYTES, NetworkImportError, NetworkImporter
@@ -67,6 +68,7 @@ from .state import (
     NetworkNodeView,
     NetworkRecord,
     NetworkValidationRequest,
+    ParetoFrontierEntryView,
     PlanGenerationRequest,
     PlanView,
     ProvenanceView,
@@ -486,6 +488,46 @@ def create_app(
         return list(
             build_decision_certificates(analysis, verifications=tuple(record.verifications.values()))
         )
+
+    @app.get(
+        "/api/incidents/{incident_id}/frontier",
+        response_model=list[ParetoFrontierEntryView],
+    )
+    def get_pareto_frontier(
+        incident_id: UUID, mode: FrontierMode = "posterior_weighted"
+    ) -> list[ParetoFrontierEntryView]:
+        """core-issues5.txt Section 14 (P1 product feature): the
+        deterministic non-dominated frontier over EXACT, WNTR/EPANET-
+        verified plan consequences only -- never a learned-model choice of
+        the operator's tradeoff. A stale verification (Section 10) or a
+        REJECTED/ABSTAINED one never enters; NO_ACTION, when present among
+        this incident's verified plans, is always included as a
+        comparator even if dominated."""
+
+        record = incident_or_404(incident_id)
+        analysis = record.analysis if isinstance(record.analysis, IncidentAnalysisResult) else None
+        template_by_plan_id = (
+            {proposal.plan.plan_id: proposal.template for proposal in analysis.plan_proposals}
+            if analysis is not None
+            else {}
+        )
+        labeled = [
+            (template_by_plan_id.get(plan_id, record.plans[plan_id].name), verification)
+            for plan_id, verification in record.verifications.items()
+            if plan_id in record.plans
+        ]
+        entries = compute_verified_pareto_frontier(labeled, mode=mode)
+        return [
+            ParetoFrontierEntryView(
+                plan_id=entry.plan_id,
+                label=entry.label,
+                consequences=entry.consequences,
+                mode=entry.mode,
+                dominated=entry.dominated,
+                is_no_action_comparator=entry.is_no_action_comparator,
+            )
+            for entry in entries
+        ]
 
     @app.post("/api/incidents/{incident_id}/analyze/jobs")
     def queue_analysis(incident_id: UUID):

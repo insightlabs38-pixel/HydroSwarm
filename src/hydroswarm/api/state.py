@@ -105,6 +105,19 @@ class IncidentExport(ApiModel):
     analysis: dict[str, Any] | None = None
 
 
+class ParetoFrontierEntryView(ApiModel):
+    """core-issues5.txt Section 14: one entry in the verified response
+    Pareto frontier -- API-layer view of hydroswarm.planning.pareto.
+    FrontierEntry (a plain dataclass, not itself a Pydantic model)."""
+
+    plan_id: UUID
+    label: str
+    consequences: ConsequenceMetrics
+    mode: Literal["posterior_weighted", "worst_case"]
+    dominated: bool
+    is_no_action_comparator: bool
+
+
 class AnalysisResponse(ApiModel):
     incident_id: UUID
     runtime_mode: str
