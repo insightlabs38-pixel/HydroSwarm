@@ -1,0 +1,99 @@
+{
+  "evaluation_scenario_id": "600e30e5-5f5b-57bd-b311-8ae52363f4c8",
+  "fields": [
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=1.46120954; diverging columns: ['classical_source_prior (max_abs_diff=1.461210)'] -- entirely attributable to the documented classical_prior algorithm mismatch above, not an independent defect",
+      "field": "node_features",
+      "known_finding": true,
+      "passed": false
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "known_finding": false,
+      "passed": true
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'J1': 0.7625769972801208, 'J2': 0.06470563262701035, 'J3': 0.07365241646766663, 'J4': 0.09906496852636337}, live={'J1': 1.0, 'J2': 0.0, 'J3': 0.0, 'J4': 0.0}, max_abs_diff=0.2374 -- corpus path uses hydroswarm.training.corpus.SignatureLibrary.posterior (log1p-residual softmax), live path uses hydroswarm.classical.signatures.localize_with_signatures (Bayesian posterior over a SignatureArtifact hypothesis grid) -- two structurally different algorithms, see this script's module docstring",
+      "field": "classical_prior",
+      "known_finding": true,
+      "passed": false
+    }
+  ],
+  "gate": "train_serve_parity",
+  "generated_at": "2026-08-08T18:20:46.893749+00:00",
+  "known_findings": [
+    "classical_prior comparison FAILS by design: governed corpus generation and live serving compute the classical_prior input feature via two structurally different algorithms (see module docstring). This is a real, previously-undocumented train/serve skew requiring a deliberate architectural decision, not a bug in this gate.",
+    "node_features consequently also fails, but ONLY in its classical_source_prior column (index 11) -- every other one of the 19 node feature columns matches exactly (max_abs_diff below float32 precision), and node_mask/edge_mask/sensor_mask/source_candidate_mask/edge_features/feature_schema_hash/normalization_hash all match exactly. The underlying hydraulic state/graph reconstruction and normalization are NOT the source of any divergence here."
+  ],
+  "normalization_dir": "data/learning-v2/cycle-b2/normalization",
+  "normalization_fingerprint": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+  "passed": false,
+  "schema_version": 1
+}
