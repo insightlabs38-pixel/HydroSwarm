@@ -147,6 +147,103 @@ def test_cpu_smoke_training_checkpoint_export_and_resume(tmp_path: Path) -> None
     assert Path(resumed.final_checkpoint, "model.safetensors").is_file()
 
 
+# core-issues5.txt Section 18.3: PCGrad audit items -- neither of these had
+# a test before this pass. `_pcgrad_backward` used to be called with
+# `result.tasks` (unweighted), silently discarding any configured
+# `task_weights` the instant PCGrad was enabled; the fix passes
+# `result.weighted` instead. Deterministic resume with PCGrad enabled was
+# entirely unverified.
+
+
+def _pcgrad_config(epochs: int, *, task_weights: dict[str, float] | None = None) -> TrainingConfig:
+    return TrainingConfig(
+        seed=7,
+        epochs=epochs,
+        batch_size=1,
+        gradient_accumulation_steps=1,  # PCGrad requires this
+        learning_rate=1e-2,
+        warmup_steps=0,
+        checkpoint_every_epochs=1,
+        early_stopping_patience=0,
+        maximum_runtime_seconds=60,
+        minimum_free_disk_gb=0,
+        pcgrad_enabled=True,
+        task_weights=task_weights or {},
+    )
+
+
+def test_pcgrad_respects_configured_task_weights_instead_of_silently_ignoring_them(
+    tmp_path: Path,
+) -> None:
+    model = _tiny_model()
+    initial_state = {name: tensor.clone() for name, tensor in model.state_dict().items()}
+
+    def _run(label: str, task_weights: dict[str, float]) -> dict[str, torch.Tensor]:
+        trained = _tiny_model()
+        trained.load_state_dict(initial_state)
+        Trainer(
+            trained,
+            _dataset(),
+            config=_pcgrad_config(1, task_weights=task_weights),
+            run_root=tmp_path / f"runs-{label}",
+            workdir=tmp_path,
+        ).fit()
+        return {name: tensor.clone() for name, tensor in trained.state_dict().items()}
+
+    uniform = _run("uniform", {})
+    skewed = _run("skewed", {"source_node": 100.0})
+
+    assert any(not torch.equal(uniform[name], skewed[name]) for name in uniform), (
+        "a 100x task_weights override produced identical parameters to the default weight "
+        "under PCGrad -- task_weights is being ignored"
+    )
+
+
+def test_pcgrad_resume_from_the_same_checkpoint_is_itself_deterministic(tmp_path: Path) -> None:
+    """The trainer's resume contract (proven independently of PCGrad by
+    `test_cpu_smoke_training_checkpoint_export_and_resume`) is reproducible
+    resume, not bit-identical-to-an-uninterrupted-run -- an uncut 2-epoch
+    run and a 1-epoch-then-resume run are NOT expected to match (confirmed
+    empirically: they diverge even with PCGrad disabled, since resume
+    restarts the epoch-level dataloader/curriculum state rather than
+    mid-epoch iterator state). What Section 18.3 actually asks to be
+    verified is that resume itself doesn't introduce nondeterminism when
+    PCGrad is enabled: resuming from one fixed checkpoint twice, with the
+    same config, must reach bit-identical final parameters both times.
+    """
+
+    model = _tiny_model()
+    initial_state = {name: tensor.clone() for name, tensor in model.state_dict().items()}
+
+    base_model = _tiny_model()
+    base_model.load_state_dict(initial_state)
+    first = Trainer(
+        base_model,
+        _dataset(),
+        config=_pcgrad_config(1),
+        run_root=tmp_path / "base",
+        workdir=tmp_path,
+    ).fit()
+    checkpoint = Path(first.final_checkpoint)
+
+    def _resume_once(label: str) -> dict[str, torch.Tensor]:
+        resumed = _tiny_model()
+        resumed.load_state_dict(initial_state)
+        Trainer(
+            resumed,
+            _dataset(),
+            config=_pcgrad_config(2),
+            run_root=tmp_path / f"resume-{label}",
+            workdir=tmp_path,
+        ).fit(resume_from=checkpoint)
+        return {name: tensor.clone() for name, tensor in resumed.state_dict().items()}
+
+    first_resume = _resume_once("a")
+    second_resume = _resume_once("b")
+    for name in first_resume:
+        assert torch.equal(first_resume[name], second_resume[name]), name
+
+
 def test_trainer_accepts_a_custom_collate_fn_for_variable_topology_batches(tmp_path: Path) -> None:
     # Bundle E smoke-job prerequisite: a genuinely multi-topology corpus
     # (different node counts within one split) requires

@@ -173,6 +173,16 @@ class Trainer:
         }
 
     def _pcgrad_backward(self, task_losses: Mapping[str, Tensor]) -> None:
+        """`task_losses` must be the already-weighted per-task losses
+        (`MultiTaskLoss.weighted`, i.e. `weights[task] * tasks[task]`), not
+        the raw unweighted ones (`MultiTaskLoss.tasks`) -- core-issues5.txt
+        Section 18.3: PCGrad must "operate on the intended weighted or
+        explicitly unweighted task losses", and this project's
+        `task_weights` config (auxiliary tasks default to 0.1x, callers can
+        override any task) is otherwise silently ignored the moment PCGrad
+        is enabled, projecting/combining every task as if uniformly
+        weighted regardless of what the caller configured."""
+
         parameters = tuple(parameter for parameter in self.model.parameters() if parameter.requires_grad)
         gradients = [
             torch.autograd.grad(loss, parameters, retain_graph=True, allow_unused=True)
@@ -240,7 +250,7 @@ class Trainer:
                 else {}
             )
             if self.config.pcgrad_enabled:
-                self._pcgrad_backward(result.tasks)
+                self._pcgrad_backward(result.weighted)
             else:
                 (result.total / self.config.gradient_accumulation_steps).backward()
             should_step = (

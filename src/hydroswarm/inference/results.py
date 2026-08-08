@@ -47,6 +47,17 @@ class SemanticPredictions:
     #: trustworthy value available", not "false"/"zero".
     event_cause: str | None = None
     next_step: str | None = None
+    #: core-issues5.txt Section 18.1: the learned 11-category OOD taxonomy
+    #: (hydroswarm.training.ood_categories.OODCategory), advisory only --
+    #: DO NOT confuse with `IncidentAnalysisResult.ood_level`, the
+    #: deterministic 3-level severity, which remains authoritative
+    #: regardless of this field (see hydroswarm.inference.authority.
+    #: ood_certificate). None whenever the head is absent, unpromoted
+    #: (gated by runtime_enabled_outputs, like event_cause above), or the
+    #: predicted class is one of the four categories with no real training
+    #: examples yet (ood_labels.UNSUPPORTED_OOD_CATEGORIES) -- same
+    #: "no trustworthy value" convention as event_cause.
+    ood_category: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

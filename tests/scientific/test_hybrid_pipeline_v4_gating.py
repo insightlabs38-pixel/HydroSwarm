@@ -28,6 +28,16 @@ class EventAwareModel(PriorFollowingModel):
         output["event_presence_logits"] = torch.tensor([[4.0]])
         output["event_cause_logits"] = torch.tensor([[8.0, -8.0, -8.0, -8.0, -8.0]])
         output["next_step_logits"] = torch.tensor([[-8.0, -8.0, 8.0, -8.0]])
+        # index 1 == UNSEEN_TOPOLOGY (OODCategory enum declaration order:
+        # NONE, UNSEEN_TOPOLOGY, UNSEEN_SENSOR_LAYOUT, EXTREME_DEMAND,
+        # TANK_STATE_SHIFT, VALVE_PUMP_MISMATCH, ROUGHNESS_MISMATCH,
+        # SEVERE_MISSINGNESS, FROZEN_DRIFTING_SENSOR,
+        # TIMING_OUTSIDE_TRAINING_RANGE,
+        # UNSUPPORTED_NETWORK_ELEMENT_OR_INVALID_CALIBRATION) -- a
+        # supported class, per ood_labels.SUPPORTED_OOD_CATEGORIES.
+        output["ood_category_logits"] = torch.tensor(
+            [[-8.0, 8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0]]
+        )
         return output
 
 
@@ -50,6 +60,7 @@ def test_runtime_enabled_outputs_none_preserves_legacy_behavior() -> None:
     assert semantics.next_step == "GENERATE_PLANS"
     assert semantics.evidence_sufficiency is not None
     assert semantics.sensor_fault_probability is not None
+    assert semantics.ood_category == "UNSEEN_TOPOLOGY"
 
 
 def test_output_not_in_runtime_enabled_outputs_is_suppressed_to_none() -> None:
@@ -68,6 +79,7 @@ def test_output_not_in_runtime_enabled_outputs_is_suppressed_to_none() -> None:
     assert semantics.next_step is None
     assert semantics.evidence_sufficiency is None
     assert semantics.sensor_fault_probability is None
+    assert semantics.ood_category is None
 
 
 def test_empty_runtime_enabled_outputs_suppresses_everything_gated() -> None:
@@ -79,6 +91,31 @@ def test_empty_runtime_enabled_outputs_suppresses_everything_gated() -> None:
     assert semantics.next_step is None
     assert semantics.evidence_sufficiency is None
     assert semantics.sensor_fault_probability is None
+    assert semantics.ood_category is None
+
+
+def test_unsupported_ood_category_class_never_surfaces_even_when_enabled() -> None:
+    """4 of the 11 governed OOD categories have no real, reproducible
+    training examples yet (ood_labels.UNSUPPORTED_OOD_CATEGORIES) -- even a
+    v4 identity that validated ood_category overall must never surface one
+    of them as a live prediction (same convention as event_cause's
+    AMBIGUOUS/HYDRAULIC_MISMATCH, core-issues5.txt Section 18.1)."""
+
+    class UnseenSensorLayoutModel(EventAwareModel):
+        def __call__(self, batch):
+            output = super().__call__(batch)
+            # index 2 == UNSEEN_SENSOR_LAYOUT, an unsupported category.
+            output["ood_category_logits"] = torch.tensor(
+                [[-8.0, -8.0, 8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0, -8.0]]
+            )
+            return output
+
+    result = _analyze(UnseenSensorLayoutModel(), runtime_enabled_outputs=frozenset({"ood_category"}))
+    assert result.semantic_predictions.ood_category is None
+    # This test's own deterministic OOD severity must remain untouched by
+    # the (suppressed) learned category prediction -- the two are
+    # independent authority tiers, never coupled.
+    assert result.ood_level is not None
 
 
 def test_unsupported_event_cause_class_never_surfaces_even_when_enabled() -> None:

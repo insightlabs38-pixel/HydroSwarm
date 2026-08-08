@@ -247,8 +247,10 @@ class HybridInferencePipeline:
         self, output: Mapping[str, Any], node_ids: tuple[str, ...]
     ) -> SemanticPredictions:
         # Local imports: see this module's top-of-file circular-import note.
+        from hydroswarm.training.checkpoint_identity import OOD_CATEGORY_NAMES
         from hydroswarm.training.control_labels import NEXT_STEP_RUNTIME_ENABLED
         from hydroswarm.training.corpus import EVENT_CAUSE_INDEX, SUPPORTED_EVENT_CAUSES
+        from hydroswarm.training.ood_labels import SUPPORTED_OOD_CATEGORIES
         from hydroswarm.training.targets_v2 import EventCause, NextStep
 
         def scalar(key: str) -> float | None:
@@ -299,6 +301,21 @@ class HybridInferencePipeline:
             if predicted_step in NEXT_STEP_RUNTIME_ENABLED:
                 next_step = predicted_step.value
 
+        # core-issues5.txt Section 18.1: advisory only -- never read by
+        # OODDetector/the deterministic controller. Gated by
+        # runtime_enabled_outputs like every other v4 advisory field above;
+        # every real checkpoint identity built so far excludes
+        # "ood_category" from it (see output_governance.OOD_CONTROL_OUTPUTS),
+        # so this resolves to None in production today, exactly like
+        # sensor_fault_probability.
+        ood_category: str | None = None
+        ood_category_logits = output.get("ood_category_logits")
+        if granular_enabled("ood_category") and ood_category_logits is not None:
+            predicted_index = int(np.argmax(_array(ood_category_logits).reshape(-1)[: len(OOD_CATEGORY_NAMES)]))
+            predicted_category_name = OOD_CATEGORY_NAMES[predicted_index]
+            if predicted_category_name in {category.value for category in SUPPORTED_OOD_CATEGORIES}:
+                ood_category = predicted_category_name
+
         return SemanticPredictions(
             evidence_sufficiency=scalar("evidence_sufficiency") if granular_enabled("evidence_sufficiency") else None,
             uncertainty=scalar("uncertainty") if granular_enabled("uncertainty") else None,
@@ -340,6 +357,7 @@ class HybridInferencePipeline:
             event_presence_probability=event_presence_probability,
             event_cause=event_cause,
             next_step=next_step,
+            ood_category=ood_category,
         )
 
     def _run_model(self, built: BuiltHydroBatch) -> Mapping[str, Any]:

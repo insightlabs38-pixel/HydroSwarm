@@ -53,6 +53,13 @@ from .registry import ExperimentRegistry, RegistryError, RunHandle
 from .sampler import GroupBalancedSampler, by_curriculum_stage, by_network, by_source_node, composite_key
 from .scale_safety import ScaleSafetyError, ScaleSafetyReport, run_scale_safety_check
 from .scout_labels import ScoutLabel, build_signature_artifact_for_network, generate_scout_label
+from .scout_state_contract import (
+    SCOUT_STATE_CONTRACT,
+    SCOUT_STATE_ITEMS,
+    ScoutStateChannelBinding,
+    contract_hash as scout_state_contract_hash,
+    unwired_items as scout_state_unwired_items,
+)
 from .scout_trajectory import ScoutTrajectory, ScoutTrajectoryStep, build_scout_trajectory
 from .sharded_data import ShardedScenarioDataset, write_shards
 from .split_policy import SplitPolicyViolation, authorize_locked_final_test, load_policy
@@ -118,7 +125,10 @@ __all__ = [
     "run_scale_safety_check",
     "ScenarioDatasetView",
     "ScenarioExample",
+    "SCOUT_STATE_CONTRACT",
+    "SCOUT_STATE_ITEMS",
     "ScoutLabel",
+    "ScoutStateChannelBinding",
     "ScoutTrajectory",
     "ScoutTrajectoryStep",
     "StrategistLabel",
@@ -157,6 +167,8 @@ __all__ = [
     "classify_evidence_sufficiency",
     "classify_next_step",
     "classify_ood_category",
+    "scout_state_contract_hash",
+    "scout_state_unwired_items",
     "collate_scenarios",
     "collate_variable_topology",
     "composite_key",
