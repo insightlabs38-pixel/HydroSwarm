@@ -4238,3 +4238,44 @@ sub-report under `reports/results/v4/` only, and distinguishes a
 `deterministic_replay`-only failure caused specifically by a missing
 scenario file (`"passed_except_environment_limitation"`) from a real
 corpus defect (still hard-fails the whole suite).
+
+### Phase 17 — CI and clean-clone reproducibility — DONE
+
+Full writeup: `reports/results/v4/phase17-ci-clean-clone.md`. CI workflow
+already existed; fixed its push trigger (was `main`-only, missed this
+branch). Performed a real, complete clean-clone reproduction on this same
+Arm sandbox: fresh clone, `uv sync`, raw scenario archive extraction, Arm
+EPANET build, all 9 original Cycle B2 gates (**including
+`deterministic_replay`**, unverifiable in the primary session — raw
+scenario `.npz` arrays are gitignored/ephemeral there), full 728-test
+pytest suite, and Phase 16's trajectory corpus gates — **all passed**.
+
+Found and closed a real gap: `cycle-b2-joint-v4`'s tensor shards are not
+actually committed (dangling `.gitattributes` LFS rule, no matching
+`.gitignore` exception). Regenerated it
+(`build_stage_f_joint_corpus.py --include-ood-extension`); the result's
+`dataset_fingerprint_sha256` matched the primary session's committed
+`checksums.json` byte-for-byte — real, deterministic, cross-environment
+reproducibility confirmed, not merely "a" similar corpus.
+
+### Phase 18 — artifact and LFS governance — DONE
+
+Full writeup: `reports/results/v4/phase18-artifact-and-lfs-governance.md`.
+`scripts/build_artifact_inventory.py` (new): 1,331 tracked files, 2.35GB
+(1.56GB LFS / 793MB standard-git), 0 forbidden-pattern findings, 0
+unpulled LFS pointers, secret scan clean (reuses the project's own
+`scripts/scan_secrets.py`). Documented the `cycle-b2-joint-v4` LFS
+inconsistency found in Phase 17 with its real regeneration command rather
+than silently fixing the config without understanding original intent.
+
+### This pass's scope — complete
+
+Phase 13 (metrics/baselines), Phase 12 Stage G (scaling screen — decision:
+do not train HydroCore-M), Phase 14 (promotion gates), Phase 15 (runtime
+integration — granular output governance wired, additive only), Phase 16
+(trajectory corpus gates), Phase 17 (CI + clean-clone reproducibility),
+and Phase 18 (artifact/LFS governance) are all done, committed, and
+pushed to `agent/gcp-multitopology-v3`. Phases 19-20 (architecture
+selection, locked-test boundary) were explicitly out of this pass's scope
+and were not attempted. `final-selection.json` does not exist. The locked
+final test was not opened.
