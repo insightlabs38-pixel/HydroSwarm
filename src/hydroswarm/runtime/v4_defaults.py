@@ -31,6 +31,12 @@ from typing import Any
 from hydroswarm.calibration import SplitConformalCalibrator
 from hydroswarm.classical import SignatureBuilder, SignatureCache, SignatureCacheKey
 from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
+from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
+from hydroswarm.runtime.v4_normalization import (
+    NO_NORMALIZATION_SENTINEL,
+    NormalizationBundleError,
+    load_runtime_normalization_bundle,
+)
 from hydroswarm.simulation import HydraulicSimulator
 from hydroswarm.simulation.wrapper import wntr
 from hydroswarm.training.checkpoint_identity import (
@@ -39,6 +45,20 @@ from hydroswarm.training.checkpoint_identity import (
     NotAV4CheckpointError,
     load_v4_checkpoint,
 )
+
+#: core-issues5.txt Section 3: the real, committed, train-split-fit
+#: normalization artifact Stage F's joint-v4 corpus was actually built
+#: from (data/learning-v2/cycle-b2/tensors-normalized, merged into
+#: cycle-b2-joint-v4 by scripts/build_stage_f_joint_corpus.py) -- NOT a
+#: models/-prefixed path, because unlike the V3 baseline (which genuinely
+#: trained without governed normalization -- see DefaultPipelineFactory's
+#: own comment), this is the real corpus-owned artifact the currently
+#: identified v4 checkpoint depends on. A future promoted V4 release
+#: bundle (core-issues5.txt Section 12) should copy this artifact
+#: alongside the model rather than reference the corpus tree directly;
+#: this constant is this pass's correct, truthful default until that
+#: packaging step exists.
+DEFAULT_V4_NORMALIZATION_DIR = Path("data/learning-v2/cycle-b2/normalization")
 
 #: Matches DefaultPipelineFactory's own established convention: only
 #: "sentinel" is ever passed, since Scout/Strategist/OOD have not passed
@@ -60,16 +80,31 @@ class V4PipelineFactory:
     HybridInferencePipeline, granularly gated by the checkpoint's own
     declared `runtime_enabled_outputs`."""
 
-    def __init__(self, checkpoint_dir: str | Path, *, project_root: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        checkpoint_dir: str | Path,
+        *,
+        project_root: str | Path | None = None,
+        normalization_dir: str | Path | None = None,
+    ) -> None:
         self.checkpoint_dir = Path(checkpoint_dir)
         self.project_root = (
             Path(project_root).resolve() if project_root is not None else Path(__file__).resolve().parents[3]
         )
         self.calibration_path: Path | None = None
         self.signature_cache = self.project_root / "data" / "generated" / "signatures"
+        # core-issues5.txt Section 3: where to load the governed train-owned
+        # node/edge normalization artifact from, keyed off
+        # identity.normalization_hash at load time (NO_NORMALIZATION_SENTINEL
+        # skips this entirely -- see _load_assets).
+        self.normalization_dir = (
+            Path(normalization_dir) if normalization_dir is not None
+            else self.project_root / DEFAULT_V4_NORMALIZATION_DIR
+        )
         self._model: Any | None = None
         self._identity: CheckpointIdentity | None = None
         self._calibrator: SplitConformalCalibrator | None = None
+        self._feature_builder: HydraulicFeatureBuilder | None = None
         self._model_hash: str | None = None
         self._load_attempted = False
         self.fallback_reason: str | None = None
@@ -93,6 +128,28 @@ class V4PipelineFactory:
             model_weights_path = self.checkpoint_dir / "model.safetensors"
             model_hash = hashlib.sha256(model_weights_path.read_bytes()).hexdigest()
 
+            # core-issues5.txt Section 3 (P0 blocker): a checkpoint that
+            # declares normalized training input (normalization_hash is not
+            # the sentinel) MUST have its exact train-owned normalization
+            # artifact loaded, hash-verified against the checkpoint identity,
+            # and injected into the live feature-building path -- never
+            # silently served with an unnormalized HydraulicFeatureBuilder.
+            # Any failure here (missing/stale/corrupted/schema-incompatible
+            # artifact, or a fingerprint mismatch) falls into the same
+            # except-block below as every other asset-loading failure: fail
+            # closed, no neural branch, classical-safe remains available.
+            if identity.normalization_hash == NO_NORMALIZATION_SENTINEL:
+                feature_builder = HydraulicFeatureBuilder()
+            else:
+                bundle = load_runtime_normalization_bundle(self.normalization_dir)
+                if bundle.fingerprint != identity.normalization_hash:
+                    raise NormalizationBundleError(
+                        f"runtime normalization bundle fingerprint ({bundle.fingerprint}) at "
+                        f"{self.normalization_dir} does not match checkpoint identity's "
+                        f"normalization_hash ({identity.normalization_hash})"
+                    )
+                feature_builder = bundle.feature_builder()
+
             calibrator: SplitConformalCalibrator | None = None
             if self.calibration_path is not None and self.calibration_path.exists():
                 calibrator = SplitConformalCalibrator.load(self.calibration_path)
@@ -114,6 +171,7 @@ class V4PipelineFactory:
             self._model = model
             self._identity = identity
             self._calibrator = calibrator
+            self._feature_builder = feature_builder
             self._model_hash = model_hash
         except (
             OSError,
@@ -123,10 +181,12 @@ class V4PipelineFactory:
             RuntimeError,
             NotAV4CheckpointError,
             CheckpointIdentityError,
+            NormalizationBundleError,
         ) as error:
             self._model = None
             self._identity = None
             self._calibrator = None
+            self._feature_builder = None
             self._model_hash = None
             self.fallback_reason = f"v4_trained_assets_unavailable:{type(error).__name__}"
 
@@ -165,6 +225,14 @@ class V4PipelineFactory:
             model=self._model,
             model_hash=self._model_hash,
             calibration_artifact=calibration,
+            # core-issues5.txt Section 3: inject the same governed,
+            # hash-verified train-owned feature builder _load_assets
+            # resolved above -- None only when the model itself is None
+            # (trained_assets_ready is False), in which case
+            # HybridInferencePipeline falls back to its own default
+            # unnormalized builder, which is moot since model=None already
+            # forces CLASSICAL_SAFE for every analyze() call regardless.
+            feature_builder=self._feature_builder,
             trained_tasks=V4_TRAINED_TASKS,
             runtime_enabled_outputs=self._identity.runtime_enabled_outputs if self._identity is not None else frozenset(),
             fusion_config_hash=DYNAMIC_TRUST_FUSION_CONFIG,

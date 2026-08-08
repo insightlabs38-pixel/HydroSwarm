@@ -20,7 +20,9 @@ import torch
 
 from hydroswarm.model.core import HydroCore
 from hydroswarm.planning.action_templates import ACTION_TEMPLATE_COUNT
+from hydroswarm.preprocessing.builder import NO_NORMALIZATION_SENTINEL
 from hydroswarm.runtime.v4_defaults import V4PipelineFactory
+from hydroswarm.runtime.v4_normalization import load_runtime_normalization_bundle
 from hydroswarm.simulation.wrapper import wntr
 from hydroswarm.training import checkpoint_identity as ci
 
@@ -45,8 +47,15 @@ def _tiny_model() -> HydroCore:
 
 
 def _identity_for(model: HydroCore, **overrides: object) -> ci.CheckpointIdentity:
+    # core-issues5.txt Section 3: these tiny test fixtures genuinely train
+    # without any governed normalization artifact, so the honest value is
+    # the real sentinel V4PipelineFactory checks for -- NOT an arbitrary
+    # placeholder string, which (after the Section 3 fix) V4PipelineFactory
+    # would instead interpret as "a real normalization artifact must be
+    # loaded and hash-verified", spuriously failing closed for every test
+    # here that does not care about normalization at all.
     kwargs = dict(
-        normalization_hash="no-normalization",
+        normalization_hash=NO_NORMALIZATION_SENTINEL,
         fusion_policy_hash="fixed-weight-v1:neural=0.5",
         source_corpus_manifest_hashes=("abc123",),
         trained_outputs=frozenset({"source_node"}),
@@ -181,3 +190,78 @@ def test_pipeline_from_v4_factory_uses_sentinel_only_trained_tasks_and_declared_
     assert pipeline.trained_tasks == frozenset({"sentinel"})
     assert pipeline.runtime_enabled_outputs == identity.runtime_enabled_outputs
     assert pipeline.runtime_enabled_outputs == frozenset({"source_node", "event_presence"})
+
+
+# core-issues5.txt Section 3 (P0 blocker): a checkpoint that declares real
+# normalized training input must have that exact train-owned normalization
+# artifact loaded, hash-verified, and injected into the live feature-
+# building path -- never silently served with an unnormalized
+# HydraulicFeatureBuilder. These tests use the real, committed
+# data/learning-v2/cycle-b2/normalization artifact (the one Stage F's
+# actual joint-v4 training corpus was built from), not a synthetic fixture,
+# so a real fingerprint mismatch would be caught the same way it would in
+# production.
+_REAL_NORMALIZATION_DIR = _REPO_ROOT / "data" / "learning-v2" / "cycle-b2" / "normalization"
+
+
+def test_real_normalization_bundle_is_loaded_and_wired_into_feature_builder(tmp_path: Path) -> None:
+    bundle = load_runtime_normalization_bundle(_REAL_NORMALIZATION_DIR)
+    directory = tmp_path / "checkpoint"
+    _save_v4_checkpoint(directory, normalization_hash=bundle.fingerprint)
+
+    factory = V4PipelineFactory(directory, normalization_dir=_REAL_NORMALIZATION_DIR)
+    assert factory.trained_assets_ready is True
+    assert factory.fallback_reason is None
+    assert factory._feature_builder is not None
+    assert factory._feature_builder.normalization_fingerprint == bundle.fingerprint
+
+    if wntr is None:
+        return
+    network_path = _REPO_ROOT / "data" / "frozen" / "golden_network.inp"
+    pipeline = factory(None, network_path)
+    assert pipeline.feature_builder.normalization_fingerprint == bundle.fingerprint
+
+
+def test_missing_normalization_artifact_directory_fails_closed(tmp_path: Path) -> None:
+    """A checkpoint that declares real (non-sentinel) normalized training
+    input, pointed at a normalization_dir with no artifacts at all, must
+    fail closed rather than silently serve unnormalized features."""
+
+    directory = tmp_path / "checkpoint"
+    _save_v4_checkpoint(directory, normalization_hash="a" * 64)
+
+    factory = V4PipelineFactory(directory, normalization_dir=tmp_path / "no-such-normalization-dir")
+    assert factory.trained_assets_ready is False
+    assert factory.fallback_reason == "v4_trained_assets_unavailable:NormalizationBundleError"
+    assert factory._feature_builder is None
+
+
+def test_normalization_hash_mismatch_fails_closed(tmp_path: Path) -> None:
+    """The real committed artifact loads fine on its own, but if the
+    checkpoint identity's recorded normalization_hash does not match its
+    real fingerprint (a stale identity, or a checkpoint actually trained
+    against a different normalization artifact), the factory must fail
+    closed rather than silently serve a mismatched normalization."""
+
+    directory = tmp_path / "checkpoint"
+    _save_v4_checkpoint(directory, normalization_hash="0" * 64)
+
+    factory = V4PipelineFactory(directory, normalization_dir=_REAL_NORMALIZATION_DIR)
+    assert factory.trained_assets_ready is False
+    assert factory.fallback_reason == "v4_trained_assets_unavailable:NormalizationBundleError"
+
+
+def test_sentinel_normalization_hash_skips_bundle_loading(tmp_path: Path) -> None:
+    """A checkpoint that honestly declares NO_NORMALIZATION_SENTINEL (truly
+    trained without governed normalization) must load successfully with a
+    plain, unnormalized HydraulicFeatureBuilder -- normalization_dir is
+    never even consulted, so a missing/wrong directory there must not
+    matter."""
+
+    directory = tmp_path / "checkpoint"
+    _save_v4_checkpoint(directory)  # default normalization_hash is the sentinel
+
+    factory = V4PipelineFactory(directory, normalization_dir=tmp_path / "does-not-exist")
+    assert factory.trained_assets_ready is True
+    assert factory._feature_builder is not None
+    assert factory._feature_builder.normalization_fingerprint == NO_NORMALIZATION_SENTINEL

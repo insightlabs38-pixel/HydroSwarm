@@ -48,6 +48,7 @@ from safetensors.torch import load_file
 
 from hydroswarm.model import HydroCore
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
+from hydroswarm.runtime.v4_normalization import load_runtime_normalization_bundle
 from hydroswarm.training.checkpoint_identity import build_checkpoint_identity, save_v4_checkpoint
 from hydroswarm.training.trainer import TrainingConfig, _scheduler
 
@@ -120,6 +121,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--use-adapters", action="store_true")
     parser.add_argument("--output-dir", type=Path, default=Path("experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810"))
+    parser.add_argument(
+        "--normalization-dir",
+        type=Path,
+        default=Path("data/learning-v2/cycle-b2/normalization"),
+        help=(
+            "the real, committed, train-split-fit node/edge NormalizationStats artifact "
+            "cycle-b2/tensors-normalized (and therefore cycle-b2-joint-v4, Stage F's actual "
+            "training corpus) was built from -- core-issues5.txt Section 3"
+        ),
+    )
     return parser
 
 
@@ -130,9 +141,17 @@ def main(argv: list[str] | None = None) -> int:
     model.load_state_dict(load_file(str(args.source_checkpoint), device="cpu"), strict=True)
     model.eval()
 
+    # core-issues5.txt Section 3 (P0 blocker): this checkpoint's training
+    # corpus (cycle-b2-joint-v4) really was built with governed node/edge
+    # normalization applied (see scripts/rebuild_normalized_shards.py) --
+    # "none" was a real defect (train/serve normalization skew), not an
+    # honest description of an unnormalized model. Load the real artifact
+    # and record its actual fingerprint so the runtime loader can verify it.
+    normalization_bundle = load_runtime_normalization_bundle(args.normalization_dir)
+
     identity = build_checkpoint_identity(
         model,
-        normalization_hash="none",  # joint-v4 tensors are pre-normalized at corpus-build time, not by a runtime feature-builder artifact
+        normalization_hash=normalization_bundle.fingerprint,
         fusion_policy_hash="fixed_weight_fusion-v1:neural_weight=0.6",
         source_corpus_manifest_hashes=("data/learning-v2/cycle-b2-joint-v4",),
         trained_outputs=TRAINED_OUTPUTS,
@@ -172,6 +191,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"identity fingerprint: {identity.fingerprint()}")
     print(f"runtime_enabled_outputs: {sorted(RUNTIME_ENABLED_OUTPUTS)}")
     print(f"feature_schema_hash: {DEFAULT_FEATURE_SCHEMA.fingerprint}")
+    print(f"normalization_hash: {normalization_bundle.fingerprint} (from {args.normalization_dir})")
     return 0
 
 
