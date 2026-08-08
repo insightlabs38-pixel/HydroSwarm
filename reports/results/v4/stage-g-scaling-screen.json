@@ -1,0 +1,100 @@
+{
+  "corpus": "data/learning-v2/cycle-b2-joint-v4",
+  "results": {
+    "medium": {
+      "best_validation_loss": 8.406614205193899,
+      "checkpoint": "experiments/runs/stage-g-scaling-screen/medium-seed20260810/20260808T063536Z-b5844316/model-export.safetensors",
+      "epochs_completed": 3,
+      "model_hash": "493850e33578b955e4937fed2128cb0db58094aef89c7a7156a73a1eb6945a71",
+      "parameter_count": 12673108,
+      "run_id": "20260808T063536Z-847658cc",
+      "seed": 20260810,
+      "stopped_early": false,
+      "validation_full_pass": {
+        "examples": 1000,
+        "mean_loss": 8.406614205193899,
+        "per_task_mean_loss": {
+          "candidate_reduction": 0.02030952102578585,
+          "containment_time_proxy": 0.09539658557401881,
+          "duration": 1.0348160058733016,
+          "event_cause": 0.5787438560085046,
+          "event_presence": 0.36673481085722054,
+          "evidence_sufficiency": 0.15309052547765156,
+          "exposure_proxy": 0.10595010103110875,
+          "information_gain": 1.0263620990786761,
+          "next_step": 0.46178831798689707,
+          "plan_regret_proxy": 0.01686990575584036,
+          "plan_validity": 0.022488312113897076,
+          "plan_value": 0.005556661290087042,
+          "pressure_risk_proxy": 8.552377720849426e-05,
+          "relative_strength": 1.1010040461070953,
+          "sample_node": 0.7241139231574913,
+          "sensor_fault": 0.0013853034728931056,
+          "service_loss_proxy": 0.0001681726366985545,
+          "should_continue_sampling": 0.1512984735152078,
+          "source_node": 0.8559719368312804,
+          "source_region": 0.5249064410962756,
+          "start_time": 1.1595737612436687
+        }
+      },
+      "variant": "medium",
+      "wall_seconds": 612.0312409360013
+    },
+    "small": {
+      "best_validation_loss": 8.204608114938887,
+      "checkpoint": "experiments/runs/stage-g-scaling-screen/small-seed20260810/20260808T063037Z-bc78f452/model-export.safetensors",
+      "epochs_completed": 3,
+      "model_hash": "443d12a70a14c8f003f44b5575c7d75d61e46c4766e23a6b535d6c606aacf736",
+      "parameter_count": 4182612,
+      "run_id": "20260808T063037Z-9def25f4",
+      "seed": 20260810,
+      "stopped_early": false,
+      "validation_full_pass": {
+        "examples": 1000,
+        "mean_loss": 8.204608114938887,
+        "per_task_mean_loss": {
+          "candidate_reduction": 0.01786078736814301,
+          "containment_time_proxy": 0.09407545854559257,
+          "duration": 1.0268482953783065,
+          "event_cause": 0.5514165082621196,
+          "event_presence": 0.3477887998054188,
+          "evidence_sufficiency": 0.1333240011174764,
+          "exposure_proxy": 0.10471031609331331,
+          "information_gain": 0.997326154040084,
+          "next_step": 0.43010387741147527,
+          "plan_regret_proxy": 0.02033752596027972,
+          "plan_validity": 0.02187491663443368,
+          "plan_value": 0.006220438880273067,
+          "pressure_risk_proxy": 0.00020308620508922826,
+          "relative_strength": 1.0725869678315663,
+          "sample_node": 0.7113619466563539,
+          "sensor_fault": 0.002193312746443091,
+          "service_loss_proxy": 0.00010544809837093843,
+          "should_continue_sampling": 0.1355938927699176,
+          "source_node": 0.8240625557327081,
+          "source_region": 0.554345637086838,
+          "start_time": 1.1522682820047652
+        }
+      },
+      "variant": "small",
+      "wall_seconds": 297.32256086800044
+    }
+  },
+  "schema_version": 1,
+  "screen_budget": {
+    "batch_size": 16,
+    "epochs": 3,
+    "runtime_ceiling_seconds": 2400.0,
+    "seed": 20260810
+  },
+  "shared_model_config": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned"
+  },
+  "wall_seconds": 909.3643699019995
+}
