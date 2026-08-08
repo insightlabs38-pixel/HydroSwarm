@@ -1,0 +1,639 @@
+{
+  "gates": {
+    "cycle_b2_original_nine": {
+      "exit_code": 1,
+      "note": "deterministic_replay could not run: raw scenario .npz arrays are not present in this environment (gitignored, ephemeral -- see this function's docstring). All 8 other sub-gates passed. Re-run in an environment with the raw scenario arrays present to fully re-verify.",
+      "report": {
+        "corpus_dir": "data/learning-v2/cycle-b2",
+        "gates": {
+          "deterministic_replay": {
+            "reason": "FileNotFoundError: [Errno 2] No such file or directory: 'data/learning-v2/cycle-b2/scenarios/train/3aa8a4ac-84d6-5c2b-acd2-bca62ceeafd7.npz'",
+            "status": "error"
+          },
+          "finite_values": {
+            "splits_checked": [
+              "calibration",
+              "development_holdout",
+              "ood-SEVERE_MISSINGNESS",
+              "ood-UNSEEN_TOPOLOGY",
+              "train",
+              "validation"
+            ],
+            "status": "passed"
+          },
+          "label_audit_present": {
+            "decision_splits": [
+              "calibration",
+              "train",
+              "validation"
+            ],
+            "splits_present": [
+              "calibration",
+              "development_holdout",
+              "ood-SEVERE_MISSINGNESS",
+              "ood-UNSEEN_TOPOLOGY",
+              "train",
+              "validation"
+            ],
+            "status": "passed"
+          },
+          "leakage": {
+            "cross_split_leakage": {
+              "examples_missing_topology_metadata": 0,
+              "scenario_id_leaks": [],
+              "seed_family_leaks": [],
+              "topology_hash_conflicts": {},
+              "topology_leak_note": "topology_hash_conflicts lists any network_id that resolved to more than one distinct topology_hash across these splits -- a real leak/labeling bug, not expected reuse. examples_missing_topology_metadata counts examples with no TopologyMetadata at all (e.g. generated before repair item 5), for which this check cannot run at all; a nonzero count here means topology-hash leakage may still be silently undetected for those specific examples."
+            },
+            "status": "passed"
+          },
+          "mask_round_trip": {
+            "families_checked": [
+              "branched-loop",
+              "golden-reference"
+            ],
+            "regression_suite": "tests/unit/test_variable_collate.py passed",
+            "status": "passed"
+          },
+          "normalization_ownership": {
+            "edge_normalization_sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
+            "node_normalization_sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
+            "status": "passed",
+            "train_examples_used_to_refit": 9000
+          },
+          "shard_checksums": {
+            "checked_splits": [
+              {
+                "example_count": 1000,
+                "split_dir": "calibration"
+              },
+              {
+                "example_count": 1750,
+                "split_dir": "development_holdout"
+              },
+              {
+                "example_count": 400,
+                "split_dir": "ood-SEVERE_MISSINGNESS"
+              },
+              {
+                "example_count": 400,
+                "split_dir": "ood-UNSEEN_TOPOLOGY"
+              },
+              {
+                "example_count": 9000,
+                "split_dir": "train"
+              },
+              {
+                "example_count": 1000,
+                "split_dir": "validation"
+              }
+            ],
+            "status": "passed"
+          },
+          "target_mask_validation": {
+            "splits_checked": [
+              "calibration",
+              "development_holdout",
+              "ood-SEVERE_MISSINGNESS",
+              "ood-UNSEEN_TOPOLOGY",
+              "train",
+              "validation"
+            ],
+            "status": "passed"
+          },
+          "topology_provenance": {
+            "checked": {
+              "branched-loop": {
+                "examples_checked": 6,
+                "mismatches": []
+              },
+              "coastal-branch": {
+                "examples_checked": 6,
+                "mismatches": []
+              },
+              "golden-reference": {
+                "examples_checked": 6,
+                "mismatches": []
+              },
+              "loop-grid": {
+                "examples_checked": 6,
+                "mismatches": []
+              }
+            },
+            "status": "passed"
+          }
+        },
+        "overall_status": "failed",
+        "schema_version": 1
+      },
+      "status": "passed_except_environment_limitation"
+    },
+    "joint_v4_six": {
+      "argv": [
+        "--corpus-root",
+        "data/learning-v2/cycle-b2-joint-v4",
+        "--output",
+        "reports/results/v4/trajectory-gates-stage-f-joint-corpus-gates.json"
+      ],
+      "exit_code": 0,
+      "report": {
+        "corpus_root": "data/learning-v2/cycle-b2-joint-v4",
+        "gates": {
+          "batch_load": {
+            "batch_size": 16,
+            "input_keys": [
+              "classical_prior",
+              "demand_centrality",
+              "edge_features",
+              "edge_index",
+              "edge_mask",
+              "node_features",
+              "node_mask",
+              "plan_features",
+              "plan_mask",
+              "plan_target_link_index",
+              "plan_target_node_index",
+              "plan_target_type",
+              "plan_template_ids",
+              "quality_features",
+              "quality_mask",
+              "reservoir_reachability",
+              "sensor_mask",
+              "source_candidate_mask",
+              "temporal_features",
+              "timestamps",
+              "travel_time"
+            ],
+            "status": "passed",
+            "target_keys": [
+              "candidate_reduction",
+              "candidate_reduction_mask",
+              "containment_time_proxy",
+              "containment_time_proxy_mask",
+              "duration",
+              "duration_mask",
+              "event_cause",
+              "event_presence",
+              "evidence_sufficiency",
+              "exposure_proxy",
+              "exposure_proxy_mask",
+              "information_gain",
+              "information_gain_mask",
+              "next_step",
+              "plan_regret_proxy",
+              "plan_regret_proxy_mask",
+              "plan_validity",
+              "plan_validity_mask",
+              "plan_value",
+              "plan_value_mask",
+              "pressure_risk_proxy",
+              "pressure_risk_proxy_mask",
+              "relative_strength",
+              "relative_strength_mask",
+              "sample_node",
+              "sample_node_mask",
+              "sensor_fault",
+              "sensor_fault_mask",
+              "service_loss_proxy",
+              "service_loss_proxy_mask",
+              "should_continue_sampling",
+              "source_node",
+              "source_node_mask",
+              "source_region",
+              "source_region_mask",
+              "start_time",
+              "start_time_mask"
+            ],
+            "topologies_in_batch": [
+              "branched-loop",
+              "golden-reference",
+              "loop-grid"
+            ]
+          },
+          "checkpoint_resume": {
+            "final_checkpoint": "experiments/runs/stage-f-joint-corpus-smoke/20260808T070157Z-bd897f1b/checkpoints/checkpoint-0002",
+            "first_pass_best_validation_loss": 15.673791885375977,
+            "first_pass_epochs": 1,
+            "resumed_best_validation_loss": 12.368598937988281,
+            "resumed_epochs": 2,
+            "resumed_global_steps": 6,
+            "status": "passed"
+          },
+          "corpus_integrity": {
+            "populations_reverified": [
+              "train",
+              "validation",
+              "calibration",
+              "development_holdout",
+              "ood-SEVERE_MISSINGNESS",
+              "ood-UNSEEN_TOPOLOGY",
+              "ood-EXTREME_DEMAND",
+              "ood-FROZEN_DRIFTING_SENSOR",
+              "ood-ROUGHNESS_MISMATCH",
+              "ood-TANK_STATE_SHIFT"
+            ],
+            "requirement_status": {
+              "zero_cross_population_leakage": true,
+              "zero_duplicates": true,
+              "zero_identity_conflicts": true,
+              "zero_missing_required_joins": true
+            },
+            "status": "passed"
+          },
+          "gradient_smoke": {
+            "gradient_norms": {
+              "candidate_reduction": 2.2886700846297137,
+              "containment_time_proxy": 33.423959587887246,
+              "duration": 5.743890011370456,
+              "event_cause": 26.280603221132893,
+              "event_presence": 14.501118138719306,
+              "evidence_sufficiency": 2.180038785933312,
+              "exposure_proxy": 17.188854004009517,
+              "information_gain": 10.557544379219781,
+              "next_step": 21.483183696881987,
+              "plan_regret_proxy": 3.333473132401082,
+              "plan_validity": 6.140197030094534,
+              "plan_value": 53.285173554401844,
+              "pressure_risk_proxy": 7.343685457732716,
+              "relative_strength": 22.190541916710824,
+              "sample_node": 19.958048936984444,
+              "sensor_fault": 15.360575902646673,
+              "service_loss_proxy": 6.621597671035707,
+              "should_continue_sampling": 11.415392707858736,
+              "source_node": 7.297441465932463,
+              "source_region": 14.424428492605255,
+              "start_time": 11.4311292297253
+            },
+            "status": "passed",
+            "tasks_present": [
+              "candidate_reduction",
+              "containment_time_proxy",
+              "duration",
+              "event_cause",
+              "event_presence",
+              "evidence_sufficiency",
+              "exposure_proxy",
+              "information_gain",
+              "next_step",
+              "plan_regret_proxy",
+              "plan_validity",
+              "plan_value",
+              "pressure_risk_proxy",
+              "relative_strength",
+              "sample_node",
+              "sensor_fault",
+              "service_loss_proxy",
+              "should_continue_sampling",
+              "source_node",
+              "source_region",
+              "start_time"
+            ],
+            "total_loss": 26.65121078491211,
+            "valid_counts": {
+              "candidate_reduction": 99,
+              "containment_time_proxy": 106,
+              "duration": 13,
+              "event_cause": 16,
+              "event_presence": 16,
+              "evidence_sufficiency": 16,
+              "exposure_proxy": 106,
+              "information_gain": 99,
+              "next_step": 16,
+              "plan_regret_proxy": 106,
+              "plan_validity": 144,
+              "plan_value": 106,
+              "pressure_risk_proxy": 106,
+              "relative_strength": 13,
+              "sample_node": 4,
+              "sensor_fault": 61,
+              "service_loss_proxy": 106,
+              "should_continue_sampling": 16,
+              "source_node": 13,
+              "source_region": 13,
+              "start_time": 13
+            }
+          },
+          "leakage": {
+            "populations_reverified": [
+              "calibration",
+              "development_holdout",
+              "ood-EXTREME_DEMAND",
+              "ood-FROZEN_DRIFTING_SENSOR",
+              "ood-ROUGHNESS_MISMATCH",
+              "ood-SEVERE_MISSINGNESS",
+              "ood-TANK_STATE_SHIFT",
+              "ood-UNSEEN_TOPOLOGY",
+              "train",
+              "validation"
+            ],
+            "status": "passed",
+            "total_examples_reverified": 15150
+          },
+          "ood_class_gradient_smoke": {
+            "batch_size": 16,
+            "categories_in_batch": [
+              "ood-EXTREME_DEMAND",
+              "ood-FROZEN_DRIFTING_SENSOR",
+              "ood-ROUGHNESS_MISMATCH",
+              "ood-TANK_STATE_SHIFT"
+            ],
+            "ood_class_gradient_norm": 18.249552151695802,
+            "ood_class_valid_count": 16,
+            "status": "passed",
+            "total_loss": 12.85774040222168
+          }
+        },
+        "note": "Pre-training gates only -- the full Stage F joint-multitask training run was not started.",
+        "overall_status": "passed"
+      },
+      "status": "passed"
+    },
+    "schema_version_compatibility": {
+      "checked": {
+        "data/learning-v2/cycle-b2-ood-extension/generation-report.json": 1,
+        "data/learning-v2/cycle-b2-trajectories-v4/calibration-report.json": "cycle-b2-trajectories-v2",
+        "data/learning-v2/cycle-b2-trajectories-v4/development_holdout-report.json": "cycle-b2-trajectories-v2",
+        "data/learning-v2/cycle-b2-trajectories-v4/train-report.json": "cycle-b2-trajectories-v2",
+        "data/learning-v2/cycle-b2-trajectories-v4/validation-report.json": "cycle-b2-trajectories-v2"
+      },
+      "status": "passed"
+    },
+    "scout_already_sampled_monotonicity": {
+      "multi_step_scenarios_checked": 143,
+      "scenarios_checked": 500,
+      "status": "passed"
+    },
+    "scout_state_cutoff_no_future_evidence": {
+      "evidence": "scout_trajectory.py's own assertion (a later sample's outcome cannot appear before its own selection) would have raised and failed generation; every *-report.json under data/learning-v2/cycle-b2-trajectories-v4 records errors_this_run=0",
+      "status": "evidenced_by_generation_time_assertion"
+    },
+    "scout_trajectory_hash_chain_integrity": {
+      "evidence": "full_trajectory.build_incident_trajectory constructs ScoutTrajectory/StrategistTrajectory via trajectory_v2.FullTrajectory, which self-validates its hash chain at construction (raises TrajectoryIntegrityError on mismatch); generation completed with 0 errors",
+      "status": "evidenced_by_generation_time_assertion"
+    },
+    "strategist_five": {
+      "argv": [
+        "--trajectory-dir",
+        "data/learning-v2/cycle-b2-trajectories-v4",
+        "--report",
+        "reports/results/v4/trajectory-gates-strategist-corpus-gates.json"
+      ],
+      "exit_code": 0,
+      "report": {
+        "any_valid_plan_beats_no_action": true,
+        "distributions_by_split": {
+          "calibration": {
+            "exposure_mg": {
+              "count": 6593,
+              "max": 206558147.99306232,
+              "mean": 23982940.106695443,
+              "min": 0.0,
+              "stdev": 33270554.214624833
+            },
+            "plan_value": {
+              "count": 6593,
+              "max": 1.0,
+              "mean": 0.9772226813332224,
+              "min": 0.2584559505714529,
+              "stdev": 0.07757324835788788
+            }
+          },
+          "development_holdout": {
+            "exposure_mg": {
+              "count": 14224,
+              "max": 194253284.67986107,
+              "mean": 25800703.86487653,
+              "min": 0.0,
+              "stdev": 35520577.056521736
+            },
+            "plan_value": {
+              "count": 14224,
+              "max": 1.0,
+              "mean": 0.9768538039783036,
+              "min": 0.26568529720494316,
+              "stdev": 0.07493510245125046
+            }
+          },
+          "train": {
+            "exposure_mg": {
+              "count": 59522,
+              "max": 204112252.75128314,
+              "mean": 25503855.947966207,
+              "min": 0.0,
+              "stdev": 35520272.36433044
+            },
+            "plan_value": {
+              "count": 59522,
+              "max": 1.0,
+              "mean": 0.9762305721070892,
+              "min": 0.2652206993122586,
+              "stdev": 0.07552777339927194
+            }
+          },
+          "validation": {
+            "exposure_mg": {
+              "count": 6629,
+              "max": 194253284.67986107,
+              "mean": 25030542.927684754,
+              "min": 0.0,
+              "stdev": 34015354.16207649
+            },
+            "plan_value": {
+              "count": 6629,
+              "max": 1.0,
+              "mean": 0.9764877713869927,
+              "min": 0.2990665274415374,
+              "stdev": 0.0741340181226062
+            }
+          }
+        },
+        "distributions_by_template": {
+          "ALTERNATE_VALVE_CUT": {
+            "exposure_mg": {
+              "count": 8764,
+              "max": 176324232.14459956,
+              "mean": 24733695.799057454,
+              "min": 0.0,
+              "stdev": 33857952.8146061
+            },
+            "plan_value": {
+              "count": 8764,
+              "max": 1.0,
+              "mean": 0.9672886906007041,
+              "min": 0.36913031196431556,
+              "stdev": 0.09400119484756812
+            }
+          },
+          "FLUSH_DOWNSTREAM": {
+            "exposure_mg": {
+              "count": 12854,
+              "max": 206558147.99306232,
+              "mean": 24873329.817361586,
+              "min": 0.0,
+              "stdev": 34754440.78135285
+            },
+            "plan_value": {
+              "count": 12854,
+              "max": 1.0,
+              "mean": 0.98334125900122,
+              "min": 0.2584559505714529,
+              "stdev": 0.07238741703841746
+            }
+          },
+          "INCREASE_MONITORING": {
+            "exposure_mg": {
+              "count": 13070,
+              "max": 206558147.99306232,
+              "mean": 25594320.23327633,
+              "min": 0.0,
+              "stdev": 35519400.48591176
+            },
+            "plan_value": {
+              "count": 13070,
+              "max": 1.0,
+              "mean": 0.9762929543637889,
+              "min": 0.37055752950508747,
+              "stdev": 0.07311877739269292
+            }
+          },
+          "NO_ACTION": {
+            "exposure_mg": {
+              "count": 13070,
+              "max": 206558147.99306232,
+              "mean": 25594320.23327633,
+              "min": 0.0,
+              "stdev": 35519400.48591176
+            },
+            "plan_value": {
+              "count": 13070,
+              "max": 1.0,
+              "mean": 0.9762929543637889,
+              "min": 0.37055752950508747,
+              "stdev": 0.07311877739269292
+            }
+          },
+          "PROTECT_CRITICAL": {
+            "exposure_mg": {
+              "count": 13070,
+              "max": 206558147.99306232,
+              "mean": 25594320.23327633,
+              "min": 0.0,
+              "stdev": 35519400.48591176
+            },
+            "plan_value": {
+              "count": 13070,
+              "max": 1.0,
+              "mean": 0.9762929543637889,
+              "min": 0.37055752950508747,
+              "stdev": 0.07311877739269292
+            }
+          },
+          "REQUEST_SAMPLE": {
+            "exposure_mg": {
+              "count": 13070,
+              "max": 206558147.99306232,
+              "mean": 25594320.23327633,
+              "min": 0.0,
+              "stdev": 35519400.48591176
+            },
+            "plan_value": {
+              "count": 13070,
+              "max": 1.0,
+              "mean": 0.9762929543637889,
+              "min": 0.37055752950508747,
+              "stdev": 0.07311877739269292
+            }
+          },
+          "WAIT_OBSERVE": {
+            "exposure_mg": {
+              "count": 13070,
+              "max": 206558147.99306232,
+              "mean": 25594320.23327633,
+              "min": 0.0,
+              "stdev": 35519400.48591176
+            },
+            "plan_value": {
+              "count": 13070,
+              "max": 1.0,
+              "mean": 0.9762929543637889,
+              "min": 0.37055752950508747,
+              "stdev": 0.07311877739269292
+            }
+          }
+        },
+        "exposure_variance": 1242180855837720.0,
+        "gates": {
+          "exposure_variance": {
+            "passed": true
+          },
+          "no_action_not_universally_identical": {
+            "passed": true
+          },
+          "per_scenario_cost_variation": {
+            "passed": true
+          },
+          "plan_value_variance": {
+            "passed": true
+          },
+          "some_valid_plan_improves_exposure": {
+            "passed": true
+          }
+        },
+        "no_action_always_identical": false,
+        "passed": true,
+        "plan_value_variance": 0.00569780530640051,
+        "scenarios_total": 13150,
+        "scenarios_with_cost_variation": 4726,
+        "scenarios_with_step0": 13150,
+        "scenarios_with_strategist_step0": 13150,
+        "splits": [
+          "train",
+          "validation",
+          "calibration",
+          "development_holdout"
+        ],
+        "trajectory_dir": "data/learning-v2/cycle-b2-trajectories-v4"
+      },
+      "status": "passed"
+    },
+    "strategist_no_action_present": {
+      "scenarios_checked": 500,
+      "status": "passed"
+    },
+    "zero_unreviewed_generation_errors": {
+      "findings": {
+        "data/learning-v2/cycle-b2-ood-extension/generation-report.json": {
+          "seed_family_collisions": []
+        },
+        "data/learning-v2/cycle-b2-trajectories-v4/calibration-report.json": {
+          "errors_this_run": 0,
+          "skipped_unsupported_topology_this_run": {}
+        },
+        "data/learning-v2/cycle-b2-trajectories-v4/development_holdout-report.json": {
+          "errors_this_run": 0,
+          "skipped_unsupported_topology_this_run": {
+            "coastal-branch": 400
+          }
+        },
+        "data/learning-v2/cycle-b2-trajectories-v4/train-report.json": {
+          "errors_this_run": 0,
+          "skipped_unsupported_topology_this_run": {}
+        },
+        "data/learning-v2/cycle-b2-trajectories-v4/validation-report.json": {
+          "errors_this_run": 0,
+          "skipped_unsupported_topology_this_run": {}
+        }
+      },
+      "reviewed_known_omissions": {
+        "development_holdout": {
+          "coastal-branch": 400
+        }
+      },
+      "reviewed_known_omissions_citation": "reports/results/v4/pre-freeze-implementation-handoff.md (repeated across multiple prior-pass sections): coastal-branch is an unsupported topology family for trajectory generation, by design -- reviewed and accepted, not a new discovery",
+      "status": "passed"
+    }
+  },
+  "overall_status": "passed",
+  "schema_version": 1,
+  "wall_seconds": 29.07747930000187
+}

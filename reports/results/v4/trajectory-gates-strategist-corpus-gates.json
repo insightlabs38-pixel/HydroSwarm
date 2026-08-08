@@ -1,0 +1,215 @@
+{
+  "any_valid_plan_beats_no_action": true,
+  "distributions_by_split": {
+    "calibration": {
+      "exposure_mg": {
+        "count": 6593,
+        "max": 206558147.99306232,
+        "mean": 23982940.106695443,
+        "min": 0.0,
+        "stdev": 33270554.214624833
+      },
+      "plan_value": {
+        "count": 6593,
+        "max": 1.0,
+        "mean": 0.9772226813332224,
+        "min": 0.2584559505714529,
+        "stdev": 0.07757324835788788
+      }
+    },
+    "development_holdout": {
+      "exposure_mg": {
+        "count": 14224,
+        "max": 194253284.67986107,
+        "mean": 25800703.86487653,
+        "min": 0.0,
+        "stdev": 35520577.056521736
+      },
+      "plan_value": {
+        "count": 14224,
+        "max": 1.0,
+        "mean": 0.9768538039783036,
+        "min": 0.26568529720494316,
+        "stdev": 0.07493510245125046
+      }
+    },
+    "train": {
+      "exposure_mg": {
+        "count": 59522,
+        "max": 204112252.75128314,
+        "mean": 25503855.947966207,
+        "min": 0.0,
+        "stdev": 35520272.36433044
+      },
+      "plan_value": {
+        "count": 59522,
+        "max": 1.0,
+        "mean": 0.9762305721070892,
+        "min": 0.2652206993122586,
+        "stdev": 0.07552777339927194
+      }
+    },
+    "validation": {
+      "exposure_mg": {
+        "count": 6629,
+        "max": 194253284.67986107,
+        "mean": 25030542.927684754,
+        "min": 0.0,
+        "stdev": 34015354.16207649
+      },
+      "plan_value": {
+        "count": 6629,
+        "max": 1.0,
+        "mean": 0.9764877713869927,
+        "min": 0.2990665274415374,
+        "stdev": 0.0741340181226062
+      }
+    }
+  },
+  "distributions_by_template": {
+    "ALTERNATE_VALVE_CUT": {
+      "exposure_mg": {
+        "count": 8764,
+        "max": 176324232.14459956,
+        "mean": 24733695.799057454,
+        "min": 0.0,
+        "stdev": 33857952.8146061
+      },
+      "plan_value": {
+        "count": 8764,
+        "max": 1.0,
+        "mean": 0.9672886906007041,
+        "min": 0.36913031196431556,
+        "stdev": 0.09400119484756812
+      }
+    },
+    "FLUSH_DOWNSTREAM": {
+      "exposure_mg": {
+        "count": 12854,
+        "max": 206558147.99306232,
+        "mean": 24873329.817361586,
+        "min": 0.0,
+        "stdev": 34754440.78135285
+      },
+      "plan_value": {
+        "count": 12854,
+        "max": 1.0,
+        "mean": 0.98334125900122,
+        "min": 0.2584559505714529,
+        "stdev": 0.07238741703841746
+      }
+    },
+    "INCREASE_MONITORING": {
+      "exposure_mg": {
+        "count": 13070,
+        "max": 206558147.99306232,
+        "mean": 25594320.23327633,
+        "min": 0.0,
+        "stdev": 35519400.48591176
+      },
+      "plan_value": {
+        "count": 13070,
+        "max": 1.0,
+        "mean": 0.9762929543637889,
+        "min": 0.37055752950508747,
+        "stdev": 0.07311877739269292
+      }
+    },
+    "NO_ACTION": {
+      "exposure_mg": {
+        "count": 13070,
+        "max": 206558147.99306232,
+        "mean": 25594320.23327633,
+        "min": 0.0,
+        "stdev": 35519400.48591176
+      },
+      "plan_value": {
+        "count": 13070,
+        "max": 1.0,
+        "mean": 0.9762929543637889,
+        "min": 0.37055752950508747,
+        "stdev": 0.07311877739269292
+      }
+    },
+    "PROTECT_CRITICAL": {
+      "exposure_mg": {
+        "count": 13070,
+        "max": 206558147.99306232,
+        "mean": 25594320.23327633,
+        "min": 0.0,
+        "stdev": 35519400.48591176
+      },
+      "plan_value": {
+        "count": 13070,
+        "max": 1.0,
+        "mean": 0.9762929543637889,
+        "min": 0.37055752950508747,
+        "stdev": 0.07311877739269292
+      }
+    },
+    "REQUEST_SAMPLE": {
+      "exposure_mg": {
+        "count": 13070,
+        "max": 206558147.99306232,
+        "mean": 25594320.23327633,
+        "min": 0.0,
+        "stdev": 35519400.48591176
+      },
+      "plan_value": {
+        "count": 13070,
+        "max": 1.0,
+        "mean": 0.9762929543637889,
+        "min": 0.37055752950508747,
+        "stdev": 0.07311877739269292
+      }
+    },
+    "WAIT_OBSERVE": {
+      "exposure_mg": {
+        "count": 13070,
+        "max": 206558147.99306232,
+        "mean": 25594320.23327633,
+        "min": 0.0,
+        "stdev": 35519400.48591176
+      },
+      "plan_value": {
+        "count": 13070,
+        "max": 1.0,
+        "mean": 0.9762929543637889,
+        "min": 0.37055752950508747,
+        "stdev": 0.07311877739269292
+      }
+    }
+  },
+  "exposure_variance": 1242180855837720.0,
+  "gates": {
+    "exposure_variance": {
+      "passed": true
+    },
+    "no_action_not_universally_identical": {
+      "passed": true
+    },
+    "per_scenario_cost_variation": {
+      "passed": true
+    },
+    "plan_value_variance": {
+      "passed": true
+    },
+    "some_valid_plan_improves_exposure": {
+      "passed": true
+    }
+  },
+  "no_action_always_identical": false,
+  "passed": true,
+  "plan_value_variance": 0.00569780530640051,
+  "scenarios_total": 13150,
+  "scenarios_with_cost_variation": 4726,
+  "scenarios_with_step0": 13150,
+  "scenarios_with_strategist_step0": 13150,
+  "splits": [
+    "train",
+    "validation",
+    "calibration",
+    "development_holdout"
+  ],
+  "trajectory_dir": "data/learning-v2/cycle-b2-trajectories-v4"
+}
