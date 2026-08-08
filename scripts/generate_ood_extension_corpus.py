@@ -77,6 +77,29 @@ from hydroswarm.training.sharded_data import write_shards  # noqa: E402
 #: "balanced" means every supported category gets the same real count.
 COUNT_PER_CATEGORY = 400
 
+#: Real defect found while joining this corpus into cycle-b2-joint-v4
+#: (scripts/build_stage_f_joint_corpus.py's `_cross_population_leakage`
+#: gate): the original default `--seed 91_000` put this script's own
+#: `seed_base + topology_index * 1_000_000 + index * 100` numbering
+#: directly inside generate_cycle_b_corpus.py's occupied seed space for
+#: the SAME network_family/topology_index (e.g. `golden-reference`'s
+#: train split occupies seed 71_000..~371_000, so `--seed 91_000` landed
+#: a real train-split seed_family exactly at index=200 --
+#: `("golden-reference", "golden-reference:910")` resolved to two
+#: different scenario_ids on each side). generate_cycle_b_corpus.py's own
+#: numbering for training topology `i` never exceeds roughly
+#: `i * 10_000_000 + 71_000 + 5_013_300` (train + validation + calibration
+#: + development_holdout + its own SEVERE_MISSINGNESS OOD holdout, i in
+#: {0, 1, 2}), so this script's own worst case
+#: (`SEED_NAMESPACE_BASE + 3 * 10_000_000 + 2 * 1_000_000 + ~13_300`,
+#: category_index in 0..3, topology_index in 0..2) must clear
+#: `2 * 10_000_000 + 5_084_300 (~25.1M)` with a wide margin -- chosen far
+#: enough above that no future growth of either script's counts can
+#: reintroduce a collision by coincidence. `main()` below still verifies
+#: this programmatically against the real corpus rather than trusting the
+#: arithmetic alone.
+SEED_NAMESPACE_BASE = 500_000_000
+
 _EVENT_TYPE_CYCLE = (EventType.CONTAMINATION, EventType.CONTAMINATION, EventType.SENSOR_FAULT_ONLY)
 
 #: Real defect found while dry-running this script, not by inspection:
@@ -226,11 +249,79 @@ def generate_category(
     }
 
 
+#: Every population cycle-b2 itself owns -- this script's regenerated
+#: categories must be disjoint from all of them, not just train/validation/
+#: calibration (the ones the Stage-F joint corpus actually joins).
+CYCLE_B2_OWN_POPULATIONS = (
+    "train",
+    "validation",
+    "calibration",
+    "development_holdout",
+    "ood-SEVERE_MISSINGNESS",
+    "ood-UNSEEN_TOPOLOGY",
+)
+
+
+def _seed_families_from_index(index_path: Path) -> set[tuple[str, str]]:
+    families: set[tuple[str, str]] = set()
+    with index_path.open(encoding="utf-8") as stream:
+        for line in stream:
+            record = json.loads(line)
+            families.add((record["network_id"], record["seed_family"]))
+    return families
+
+
+def _verify_disjoint_seed_families(cycle_b2_root: Path, output: Path, category_names: list[str]) -> dict[str, Any]:
+    """Fail-closed check (per this script's own governed-recipe discipline:
+    a triggering recipe/seed scheme is not trusted until it is actually
+    verified against real generated data, not merely assumed from the
+    arithmetic). Confirms the real defect this script's SEED_NAMESPACE_BASE
+    was chosen to avoid did not recur, by reading every emitted index.jsonl
+    directly rather than re-deriving seed_family values by hand."""
+
+    existing: dict[tuple[str, str], str] = {}
+    for population in CYCLE_B2_OWN_POPULATIONS:
+        index_path = cycle_b2_root / "tensors" / population / "index.jsonl"
+        if not index_path.exists():
+            continue
+        for family in _seed_families_from_index(index_path):
+            existing[family] = population
+
+    collisions: list[dict[str, Any]] = []
+    seen_here: dict[tuple[str, str], str] = {}
+    for category_name in category_names:
+        population = f"ood-{category_name}"
+        index_path = output / "tensors" / population / "index.jsonl"
+        for family in _seed_families_from_index(index_path):
+            if family in existing:
+                collisions.append(
+                    {"seed_family": list(family), "populations": [existing[family], population]}
+                )
+            if family in seen_here and seen_here[family] != population:
+                collisions.append(
+                    {"seed_family": list(family), "populations": [seen_here[family], population]}
+                )
+            else:
+                seen_here.setdefault(family, population)
+
+    if collisions:
+        raise ValueError(
+            f"{len(collisions)} seed_family collision(s) between the regenerated cycle-b2-ood-extension "
+            f"and cycle-b2's own populations (or across the regenerated categories themselves) -- the "
+            f"disjoint-namespace fix did not hold: {collisions[:5]}"
+        )
+    return {
+        "cycle_b2_families_checked": len(existing),
+        "new_families_checked": len(seen_here),
+        "collisions": collisions,
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--cycle-b2-root", type=Path, default=Path("data/learning-v2/cycle-b2"))
     parser.add_argument("--output", type=Path, default=Path("data/learning-v2/cycle-b2-ood-extension"))
-    parser.add_argument("--seed", type=int, default=91_000)
+    parser.add_argument("--seed", type=int, default=SEED_NAMESPACE_BASE)
     parser.add_argument("--count-per-category", type=int, default=COUNT_PER_CATEGORY)
     parser.add_argument(
         "--categories",
@@ -273,12 +364,20 @@ def main(argv: list[str] | None = None) -> int:
         category_reports[category_name] = report
         print(f"{category_name}: {report['generated_count']}/{report['requested_count']} generated and verified")
 
+    # Requirement 2 (core-issues3.txt Stage F prerequisite fix): verify the
+    # disjoint-namespace fix actually held, against the real regenerated
+    # data on disk, not merely trust SEED_NAMESPACE_BASE's arithmetic.
+    seed_family_verification = _verify_disjoint_seed_families(args.cycle_b2_root, args.output, list(args.categories))
+    print(f"seed_family collision check: {seed_family_verification}")
+
     report = {
         "schema_version": 1,
         "generation_seconds": time.perf_counter() - started,
         "cycle_b2_root": str(args.cycle_b2_root),
+        "seed_namespace_base": args.seed,
         "categories": category_reports,
         "manifest_hashes": manifest_hashes,
+        "seed_family_verification": seed_family_verification,
     }
     (args.output / "generation-report.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
     print(json.dumps(report, indent=2, sort_keys=True))
