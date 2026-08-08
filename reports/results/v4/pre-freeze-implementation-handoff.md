@@ -4688,3 +4688,94 @@ exist. The locked final test has not been opened. Per this pass's own
 instructions, Section 19 (final V4 calibration against the now-frozen
 serving path) is the next and only remaining step before the Section 20
 architecture-freeze acceptance gates.
+
+## Section 19 — final V4 calibration + Section 20 acceptance gates + Section 21 report (COMPLETE)
+
+Started from HEAD `c5d2dd5` (Delta 10's commit). Rebuilt the real v4
+checkpoint identity (`scripts/build_phase15_v4_checkpoint.py`, model
+SHA-256 `a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7`)
+and fit the final conformal calibration artifact against it.
+
+**Two real defects found and fixed while fitting, not by inspection**:
+
+1. `scripts/fit_dynamic_fusion_calibration.py`'s `--identity-dir` path
+   computed `model_hash` via `HybridInferencePipeline._fingerprint_model`
+   (a state-dict-tensor hash), but the REAL runtime validator
+   (`hydroswarm.runtime.v4_defaults.V4PipelineFactory._load_assets`, and
+   this session's own `scripts/build_v4_inference_release_bundle.py`
+   calibration packaging) both compute `model_hash` as the raw
+   `model.safetensors` FILE content hash — a genuine formula mismatch that
+   would have failed `validate_runtime` at every real load site. Fixed to
+   use the file-hash convention when `identity_dir` is supplied; the
+   legacy `checkpoint`/`variant`/`overrides` path is unchanged (kept its
+   original convention, matching its own existing tests). New regression
+   test proves the two now agree.
+2. `validated_topology_hashes` was recorded from each calibration
+   scenario's own roughness-randomized `network_sha256`, which is
+   different for essentially every scenario (`WNTRScenarioGenerator`
+   always randomizes roughness) and would never match a real served
+   (pristine) network's hash — silently making calibration validate
+   against no real network in practice. Fixed to record the PRISTINE
+   per-family hash instead, matching `hydroswarm.classical.
+   signature_policy`'s own `GOVERNED_KNOWN_NETWORK` precedent (topology
+   governance identity is the pristine family hash; scenario-level
+   randomization is a training/calibration-time concern only). New
+   regression test proves `validated_topology_hashes` equals the 3 known
+   pristine family hashes, not per-scenario hashes.
+
+**Environment limitation, handled transparently, not worked around
+silently**: this sandbox does not have the calibration split's raw
+scenario `.npz` archives materialized (gitignored/ephemeral, matching the
+`hydroswarm_checkpoint_persistence` memory record and Delta 10's own
+`deterministic_replay` finding). Added a fallback: when the `.npz` file is
+missing, the script uses the scenario object `generate_with_network`
+already returns (identical seeded call, real EPANET simulation) instead of
+raising. Every example's provenance (`reconstructed_from_replay`) is
+recorded in the report, never silently indistinguishable from disk-verified
+data. When present, disk-verified data is still preferred.
+
+**Real fit, run twice** (once with each defect fix applied, final numbers
+identical/deterministic across both runs — `calibration_artifact_hash`
+byte-identical): 1000 calibration-split scenarios read, 288 non-CONTAMINATION
+scenarios correctly skipped, **712 real examples used**. Empirical coverage
+**91.43%** against a 90% target (alpha=0.1), mean candidate-set size 2.80,
+ECE 0.088. Coverage held up consistently across every curriculum condition
+(89.4%-92.8%) and every topology (90.7%-92.9%) — no single stratum
+collapsed.
+
+Built the final release bundle
+(`experiments/runs/v4-release-bundle/no_adapters-seed20260810/`) with this
+calibration artifact included (`scripts/build_v4_inference_release_bundle.py`
+extended with a `--calibration-artifact` option: validates the artifact's
+`model_hash`/`feature_schema_hash`/`normalization_hash` against the
+checkpoint identity before packaging, writes `calibration.json` +
+`.sha256` sidecar, updates `calibration-status.json`/`runtime_manifest.json`
+to `FITTED` with real hashes). Verified end-to-end, for real: loaded the
+bundle via `load_v4_inference_bundle` (`calibration_status="FITTED"`,
+`calibration is not None`), then constructed a live `V4PipelineFactory`
+from it and ran `analyze()` against the real pristine golden-reference
+topology with real sensor evidence — `runtime_mode=FULL_HYBRID`,
+`neural_failure=None`, **`calibrated=True`**, `calibration_alpha=0.1`.
+(An earlier manual check against `data/frozen/golden_network.inp` showed
+`calibrated=False` — investigated and confirmed as expected: that frozen
+regression fixture is a randomized snapshot, not the pristine topology, so
+its hash correctly does not validate; not a bug.)
+
+Full pytest suite re-run after all Section 19 changes: **859 passed**, 0
+failed (up from Delta 10's 857 — 2 new regression tests). Ruff/Pyright
+clean. Train/serve parity gate re-verified passing. Secret scan clean.
+
+Wrote `reports/results/v4/section20-architecture-freeze-acceptance-gates.md`
+(every Section 20 gate A-F checked for real, all green) and
+`reports/results/v4/pretest-architecture-selection.{md,json}` (Section 21's
+full report: selected variant, adapter decision, promoted/disabled outputs
+with reasons, deterministic authorities, calibration identity, release
+bundle hash, train/serve parity result, Strategist second-seed result,
+simulation-budget policy, verification-staleness policy, known
+limitations, optional post-freeze one-retrain opportunities, exact
+reproduction commands for the gitignored `experiments/runs/` artifacts).
+
+**Architecture is ready to be considered frozen.** `final-selection.json`
+does not exist. The locked final test has not been opened. Per this pass's
+explicit instructions: stopping here, at the authorized pre-test
+architecture-freeze boundary, with every mandatory gate green.

@@ -31,6 +31,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from hydroswarm.calibration import SplitConformalCalibrator
 from hydroswarm.classical.signature_policy import GOVERNED_TRAINING_SIGNATURE_POLICY
 from hydroswarm.runtime.v4_normalization import load_runtime_normalization_bundle
 from hydroswarm.simulation.wrapper import PlanEvaluationContext
@@ -127,6 +128,7 @@ def build(
     normalization_dir: Path,
     output_dir: Path,
     workdir: Path,
+    calibration_artifact: Path | None = None,
 ) -> Path:
     if output_dir.exists() and any(output_dir.iterdir()):
         raise SystemExit(f"refusing to overwrite non-empty release bundle directory: {output_dir}")
@@ -167,21 +169,47 @@ def build(
     # --- calibration -------------------------------------------------------
     # core-issues5.txt Section 19: the final conformal calibration artifact
     # must be refit AFTER the serving path (this bundle) is frozen, against
-    # the exact deployed path -- not available yet at bundle-build time for
-    # a bundle that has not itself been selected/frozen. Recorded honestly
-    # as absent rather than reusing a calibration artifact fit against an
-    # earlier/different preprocessing path.
-    calibration_status = {
-        "schema_version": 1,
-        "status": "NOT_YET_FIT",
-        "reason": (
-            "core-issues5.txt Section 19: final calibration must be refit against the exact frozen "
-            "serving path (incident-only/candidate-scoring separation, normalization parity, "
-            "signature-policy parity, output governance) AFTER this bundle exists, not before. This "
-            "bundle intentionally ships without a calibration artifact rather than reusing one fit "
-            "against an earlier or different preprocessing path."
-        ),
-    }
+    # the exact deployed path. When calibration_artifact is not supplied,
+    # this is recorded honestly as absent rather than reusing an artifact
+    # fit against an earlier/different preprocessing path.
+    calibration_hash: str | None = None
+    calibration_alpha: float | None = None
+    calibration_coverage: float | None = None
+    if calibration_artifact is not None:
+        calibrator = SplitConformalCalibrator.load(calibration_artifact)
+        # Fails closed if this calibration was not actually fit against
+        # THIS exact model/feature-schema/normalization identity -- never
+        # package a calibration artifact that does not truthfully describe
+        # the bundle it ships inside.
+        calibrator.artifact.validate_runtime(
+            model_hash=model_sha256,
+            feature_schema_hash=identity.feature_schema_hash,
+            normalization_hash=identity.normalization_hash,
+        )
+        calibrator.save(output_dir / "calibration.json")
+        calibration_hash = calibrator.artifact.artifact_hash
+        calibration_alpha = calibrator.artifact.alpha
+        calibration_coverage = calibrator.artifact.report.coverage
+        calibration_status = {
+            "schema_version": 1,
+            "status": "FITTED",
+            "calibration_artifact_hash": calibration_hash,
+            "alpha": calibration_alpha,
+            "coverage": calibration_coverage,
+            "fusion_config_hash": calibrator.artifact.fusion_config_hash,
+        }
+    else:
+        calibration_status = {
+            "schema_version": 1,
+            "status": "NOT_YET_FIT",
+            "reason": (
+                "core-issues5.txt Section 19: final calibration must be refit against the exact frozen "
+                "serving path (incident-only/candidate-scoring separation, normalization parity, "
+                "signature-policy parity, output governance) AFTER this bundle exists, not before. This "
+                "bundle intentionally ships without a calibration artifact rather than reusing one fit "
+                "against an earlier or different preprocessing path."
+            ),
+        }
     _write_json(output_dir / "calibration-status.json", calibration_status)
 
     # --- runtime manifest (top-level, ties everything together) ----------
@@ -205,7 +233,10 @@ def build(
         "edge_normalization_sha256": _sha256_file(output_dir / "edge-normalization.json"),
         "signature_policy_hash": GOVERNED_TRAINING_SIGNATURE_POLICY.policy_hash,
         "fusion_policy_hash": identity.fusion_policy_hash,
-        "calibration_status": "NOT_YET_FIT",
+        "calibration_status": calibration_status["status"],
+        "calibration_artifact_hash": calibration_hash,
+        "calibration_alpha": calibration_alpha,
+        "calibration_coverage": calibration_coverage,
         "source_corpus_manifest_hashes": list(identity.source_corpus_manifest_hashes),
         "supported_outputs": sorted(identity.trained_outputs | identity.diagnostic_only_outputs),
         "validated_outputs": sorted(identity.validated_outputs),
@@ -248,6 +279,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("experiments/runs/v4-release-bundle/no_adapters-seed20260810"),
     )
     parser.add_argument("--workdir", type=Path, default=Path("."))
+    parser.add_argument(
+        "--calibration-artifact",
+        type=Path,
+        default=None,
+        help=(
+            "core-issues5.txt Section 19: a real conformal calibration artifact "
+            "(SplitConformalCalibrator.save's own output, with its .sha256 sidecar) fit against this "
+            "exact model/feature-schema/normalization identity -- when omitted, the bundle honestly "
+            "records calibration status NOT_YET_FIT"
+        ),
+    )
     return parser
 
 
@@ -258,6 +300,7 @@ def main(argv: list[str] | None = None) -> int:
         normalization_dir=args.normalization_dir,
         output_dir=args.output_dir,
         workdir=args.workdir,
+        calibration_artifact=args.calibration_artifact,
     )
     print(f"wrote v4 inference release bundle to {output_dir}")
     for line in (output_dir / "SHA256SUMS").read_text(encoding="utf-8").splitlines():

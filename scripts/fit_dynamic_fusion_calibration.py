@@ -53,6 +53,7 @@ src/hydroswarm/runtime/defaults.py's production wiring actually computes.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -77,6 +78,7 @@ from hydroswarm.data.scenarios import (
     ScenarioGenerationConfig,
     ScenarioManifest,
     WNTRScenarioGenerator,
+    network_sha256,
 )
 from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
 from hydroswarm.inference.pipeline import RUNTIME_TASKS
@@ -190,17 +192,46 @@ def load_model(checkpoint: Path, *, variant: str, overrides: dict[str, Any]) -> 
 def fit(
     *,
     corpus_dir: Path,
-    checkpoint: Path,
-    variant: str,
-    overrides: dict[str, Any],
+    checkpoint: Path | None = None,
+    variant: str = "small",
+    overrides: dict[str, Any] | None = None,
+    identity_dir: Path | None = None,
     node_normalization: Path,
     edge_normalization: Path,
     signature_cache_dir: Path,
     alpha: float,
     sample_per_topology: int | None,
 ) -> dict[str, Any]:
-    model = load_model(checkpoint, variant=variant, overrides=overrides)
-    model_hash = HybridInferencePipeline._fingerprint_model(model)
+    # core-issues5.txt Section 19: fit against the exact frozen V4 serving
+    # path -- the real governed checkpoint identity (architecture,
+    # trained/validated/runtime_enabled_outputs), not a hand-specified
+    # variant/overrides dict that could silently drift from what the
+    # checkpoint was actually built/governed as. identity_dir takes
+    # priority when supplied; checkpoint/variant/overrides remain for the
+    # pre-v4 caller/tests this script has always supported.
+    runtime_enabled_outputs: frozenset[str] | None = None
+    if identity_dir is not None:
+        from hydroswarm.training.checkpoint_identity import load_v4_checkpoint
+
+        model, identity, _trainer_state = load_v4_checkpoint(identity_dir)
+        model.eval()
+        runtime_enabled_outputs = identity.runtime_enabled_outputs
+        # core-issues5.txt Section 19: model_hash must match what the REAL
+        # runtime loader actually validates a calibration artifact against
+        # -- hydroswarm.runtime.v4_defaults.V4PipelineFactory._load_assets
+        # (and, downstream, scripts/build_v4_inference_release_bundle.py's
+        # own calibration packaging) both compute model_hash as the raw
+        # model.safetensors FILE content hash, NOT
+        # HybridInferencePipeline._fingerprint_model's state-dict-tensor
+        # hash (a different, incompatible formula used only by this
+        # script's own legacy checkpoint/variant/overrides path below). A
+        # calibration artifact fit with the wrong formula would fail
+        # validate_runtime at every real load site.
+        model_hash = hashlib.sha256((identity_dir / "model.safetensors").read_bytes()).hexdigest()
+    else:
+        assert checkpoint is not None
+        model = load_model(checkpoint, variant=variant, overrides=overrides or {})
+        model_hash = HybridInferencePipeline._fingerprint_model(model)
 
     node_stats = NormalizationStats.load(node_normalization)
     edge_stats = NormalizationStats.load(edge_normalization)
@@ -243,26 +274,9 @@ def fit(
             artifacts_by_family[family] = build_signature_artifact(family, pristine, cache_dir=signature_cache_dir)
 
         generator = WNTRScenarioGenerator()
-        artifact_path = scenarios_root / manifest.split.value / f"{manifest.scenario_id}.npz"
-        with np.load(artifact_path) as arrays:
-            scenario = GeneratedScenario(
-                manifest=manifest,
-                timestamps_seconds=arrays["timestamps_seconds"],
-                truth_concentration=arrays["truth_concentration"],
-                observed_concentration=arrays["observed_concentration"],
-                observation_mask=arrays["observation_mask"],
-                frozen_mask=arrays["frozen_mask"],
-                communication_outage_mask=arrays["communication_outage_mask"],
-                timestamp_jitter_seconds=arrays["timestamp_jitter_seconds"],
-                sensor_nodes=manifest.sensor_nodes,
-                flow_reversal_mask=arrays["flow_reversal_mask"],
-                drift_mask=arrays["drift_mask"],
-                unit_mismatch_mask=arrays["unit_mismatch_mask"],
-            )
         # Rebuild the exact randomized network this scenario was simulated
         # against, deterministically from its recorded seed/config (same
-        # mechanism as run_corpus_gates.py's deterministic_replay gate) --
-        # the raw .npz artifact stores telemetry arrays, not the model.
+        # mechanism as run_corpus_gates.py's deterministic_replay gate).
         config = ScenarioGenerationConfig(
             seed=manifest.seed,
             network_id=manifest.network_id,
@@ -275,7 +289,41 @@ def fit(
             pipe_outage_probability=0.0,
             **_degradation_probabilities(manifest.stage),
         )
-        _replayed_scenario, randomized_network = generator.generate_with_network(pristine, config)
+        replayed_scenario, randomized_network = generator.generate_with_network(pristine, config)
+        artifact_path = scenarios_root / manifest.split.value / f"{manifest.scenario_id}.npz"
+        # core-issues5.txt Section 19: prefer the committed, disk-verified
+        # raw scenario artifact when present (byte-identical telemetry
+        # arrays); fall back to the deterministic in-process reconstruction
+        # above when it is not -- e.g. this sandbox's raw scenario .npz
+        # archives are gitignored/ephemeral (see hydroswarm_checkpoint_
+        # persistence memory record / Phase 17's own established handling
+        # of this exact condition) and are not materialized here. Both
+        # paths use the identical seeded WNTRScenarioGenerator call; the
+        # fallback is real physics (a real EPANET simulation just run),
+        # not fabricated data -- only unverified against a persisted
+        # baseline that does not exist in this environment. Counted
+        # separately in the report so this is never silently indistinguishable
+        # from a disk-verified run.
+        if artifact_path.exists():
+            with np.load(artifact_path) as arrays:
+                scenario = GeneratedScenario(
+                    manifest=manifest,
+                    timestamps_seconds=arrays["timestamps_seconds"],
+                    truth_concentration=arrays["truth_concentration"],
+                    observed_concentration=arrays["observed_concentration"],
+                    observation_mask=arrays["observation_mask"],
+                    frozen_mask=arrays["frozen_mask"],
+                    communication_outage_mask=arrays["communication_outage_mask"],
+                    timestamp_jitter_seconds=arrays["timestamp_jitter_seconds"],
+                    sensor_nodes=manifest.sensor_nodes,
+                    flow_reversal_mask=arrays["flow_reversal_mask"],
+                    drift_mask=arrays["drift_mask"],
+                    unit_mismatch_mask=arrays["unit_mismatch_mask"],
+                )
+            reconstructed_from_replay = False
+        else:
+            scenario = replayed_scenario
+            reconstructed_from_replay = True
 
         context = build_feature_context(randomized_network)
         series = build_sensor_series(scenario, context)
@@ -289,6 +337,15 @@ def fit(
             feature_builder=feature_builder,
             trained_tasks=frozenset({"sentinel"}) & RUNTIME_TASKS,
             fusion_config_hash=DYNAMIC_TRUST_FUSION_CONFIG,
+            # core-issues5.txt Section 19: None (legacy behavior) unless
+            # identity_dir governs this run, in which case the real
+            # checkpoint identity's own runtime_enabled_outputs is
+            # authoritative here exactly as it is in live V4 serving
+            # (hydroswarm.runtime.v4_defaults.V4PipelineFactory) -- source_
+            # node itself is gated by it (core-issues5.txt delta item 2),
+            # so calibration must be fit under the same gating live serving
+            # will actually apply, not a permissive default.
+            runtime_enabled_outputs=runtime_enabled_outputs,
         )
         result = pipeline.analyze(manifest.scenario_id, randomized_network, series)
 
@@ -309,7 +366,18 @@ def fit(
                 network_id=manifest.network_id,
             )
         )
-        topology_hashes_used.add(manifest.network_sha256)
+        # core-issues5.txt Section 19: record the PRISTINE per-family
+        # network hash, not manifest.network_sha256 (that scenario's own
+        # roughness-randomized network) -- a real served network is the
+        # unrandomized pristine topology (matching hydroswarm.classical.
+        # signature_policy's own GOVERNED_KNOWN_NETWORK precedent: topology
+        # governance identity is the pristine family hash, since training/
+        # calibration scenarios randomize per-scenario roughness but a live
+        # operator serves the base topology file). Recording the
+        # per-scenario randomized hash instead would make
+        # validated_topology_hashes match essentially no real served
+        # network ever, silently making calibration unusable in practice.
+        topology_hashes_used.add(network_sha256(pristine))
         classical_top1 = max(result.classical_belief, key=result.classical_belief.get)
         neural_top1 = (
             max(result.neural_belief, key=result.neural_belief.get) if result.neural_belief else None
@@ -330,6 +398,7 @@ def fit(
                 "classical_top1_correct": classical_top1 == true_source,
                 "neural_top1_correct": (neural_top1 == true_source) if neural_top1 is not None else None,
                 "fused_top1_correct": fused_top1 == true_source,
+                "reconstructed_from_replay": reconstructed_from_replay,
             }
         )
 
@@ -350,6 +419,9 @@ def fit(
         "calibrator": calibrator,
         "examples_used": len(examples),
         "examples_skipped": len(lines) - len(examples),
+        "examples_reconstructed_from_replay": sum(
+            1 for row in per_scenario_diagnostics if row["reconstructed_from_replay"]
+        ),
         "per_scenario_diagnostics": per_scenario_diagnostics,
     }
 
@@ -357,9 +429,20 @@ def fit(
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--corpus-dir", type=Path, required=True)
-    parser.add_argument("--checkpoint", type=Path, required=True)
+    parser.add_argument("--checkpoint", type=Path, default=None)
     parser.add_argument("--variant", default="small")
     parser.add_argument("--overrides-json", default="{}")
+    parser.add_argument(
+        "--identity-dir",
+        type=Path,
+        default=None,
+        help=(
+            "core-issues5.txt Section 19: a real v4 checkpoint directory "
+            "(hydroswarm.training.checkpoint_identity.save_v4_checkpoint's own output) -- when "
+            "given, the model and runtime_enabled_outputs are loaded from the identity itself "
+            "instead of --checkpoint/--variant/--overrides-json"
+        ),
+    )
     parser.add_argument("--node-normalization", type=Path, required=True)
     parser.add_argument("--edge-normalization", type=Path, required=True)
     parser.add_argument("--signature-cache-dir", type=Path, default=Path("experiments/cache/signatures"))
@@ -377,11 +460,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.identity_dir is None and args.checkpoint is None:
+        raise SystemExit("one of --identity-dir or --checkpoint is required")
     result = fit(
         corpus_dir=args.corpus_dir,
         checkpoint=args.checkpoint,
         variant=args.variant,
         overrides=json.loads(args.overrides_json),
+        identity_dir=args.identity_dir,
         node_normalization=args.node_normalization,
         edge_normalization=args.edge_normalization,
         signature_cache_dir=args.signature_cache_dir,
@@ -393,12 +479,14 @@ def main(argv: list[str] | None = None) -> int:
     report = {
         "schema_version": 1,
         "fusion_config": DYNAMIC_TRUST_FUSION_CONFIG,
-        "checkpoint": str(args.checkpoint),
+        "checkpoint": str(args.checkpoint) if args.checkpoint else None,
+        "identity_dir": str(args.identity_dir) if args.identity_dir else None,
         "calibration_artifact": str(args.calibration_artifact_output),
         "calibration_artifact_hash": calibrator.artifact.artifact_hash,
         "alpha": args.alpha,
         "examples_used": result["examples_used"],
         "examples_skipped": result["examples_skipped"],
+        "examples_reconstructed_from_replay": result["examples_reconstructed_from_replay"],
         "coverage": calibrator.artifact.report.coverage,
         "mean_set_size": calibrator.artifact.report.mean_set_size,
         "expected_calibration_error": calibrator.artifact.report.expected_calibration_error,

@@ -131,6 +131,43 @@ def test_fit_produces_a_real_dynamic_fusion_calibration_artifact(mini_corpus, tm
     assert reloaded["fusion_config_hash"] == DYNAMIC_TRUST_FUSION_CONFIG
 
 
+def test_validated_topology_hashes_are_the_pristine_family_hash_not_randomized_scenario_hashes(
+    mini_corpus, tmp_path
+) -> None:
+    """core-issues5.txt Section 19: a real served network is the pristine
+    (unrandomized) topology file -- validated_topology_hashes must match
+    that, not each calibration scenario's own roughness-randomized
+    network_sha256 (which would make calibration validate against
+    essentially no real served network ever, since generate_with_network
+    always randomizes roughness -- see hydroswarm.classical.
+    signature_policy's own GOVERNED_KNOWN_NETWORK precedent for the same
+    distinction)."""
+
+    from hydroswarm.data.scenarios import network_sha256
+
+    model = HydroCore.from_variant("small")
+    result = calib.fit(
+        corpus_dir=mini_corpus,
+        checkpoint=_save_checkpoint(model, tmp_path / "topology-hash-checkpoint"),
+        variant="small",
+        overrides={},
+        node_normalization=mini_corpus / "normalization" / "node-normalization.json",
+        edge_normalization=mini_corpus / "normalization" / "edge-normalization.json",
+        signature_cache_dir=tmp_path / "signature-cache-topology",
+        alpha=0.1,
+        sample_per_topology=None,
+    )
+    calibrator = result["calibrator"]
+    pristine_hashes = {network_sha256(loader()) for _family, loader in _FAMILIES}
+    assert set(calibrator.artifact.validated_topology_hashes) == pristine_hashes
+    # None of the individual (roughness-randomized) scenario network
+    # hashes recorded in per_scenario_diagnostics should equal a pristine
+    # hash by coincidence -- this corpus's own roughness_variation_fraction
+    # default (0.05) makes that astronomically unlikely, confirming the
+    # two hash families really are different, not accidentally identical.
+    assert pristine_hashes, "expected at least one training topology"
+
+
 def test_fit_skips_non_contamination_scenarios(mini_corpus, tmp_path) -> None:
     # Copy the mini corpus and inject one NORMAL-event manifest record with a
     # deliberately nonexistent .npz artifact: if fit() did not skip it before
@@ -174,3 +211,69 @@ def _save_checkpoint(model: HydroCore, directory: Path) -> Path:
     path = directory / "checkpoint.safetensors"
     save_file(model.state_dict(), str(path))
     return path
+
+
+def test_identity_dir_path_uses_the_real_runtime_model_hash_convention(mini_corpus, tmp_path) -> None:
+    """core-issues5.txt Section 19: a calibration artifact fit via
+    --identity-dir must be loadable by the REAL runtime validator
+    (hydroswarm.runtime.v4_defaults.V4PipelineFactory._load_assets, and
+    scripts/build_v4_inference_release_bundle.py's own calibration
+    packaging) -- both compute model_hash as the raw model.safetensors
+    FILE content hash, not HybridInferencePipeline._fingerprint_model's
+    state-dict-tensor hash (a real, previously-shipped mismatch: the first
+    version of this identity_dir path used the wrong formula, which would
+    have failed validate_runtime at every real load site)."""
+
+    import hashlib
+
+    import torch
+
+    from hydroswarm.planning.action_templates import ACTION_TEMPLATE_COUNT
+    from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
+    from hydroswarm.training import checkpoint_identity as ci
+
+    model = HydroCore.from_variant("small", action_vocabulary_size=ACTION_TEMPLATE_COUNT)
+    node_stats = NormalizationStats.load(mini_corpus / "normalization" / "node-normalization.json")
+    edge_stats = NormalizationStats.load(mini_corpus / "normalization" / "edge-normalization.json")
+    normalization_hash = HydraulicFeatureBuilder(
+        node_normalization=node_stats, edge_normalization=edge_stats
+    ).normalization_fingerprint
+
+    identity_dir = tmp_path / "identity"
+    identity = ci.build_checkpoint_identity(
+        model,
+        normalization_hash=normalization_hash,
+        fusion_policy_hash="fixed-weight-v1:neural=0.5",
+        source_corpus_manifest_hashes=("abc123",),
+        trained_outputs=frozenset({"source_node"}),
+        validated_outputs=frozenset({"source_node"}),
+        runtime_enabled_outputs=frozenset({"source_node"}),
+    )
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    scheduler = torch.optim.lr_scheduler.ConstantLR(optimizer)
+    ci.save_v4_checkpoint(
+        identity_dir,
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        epoch=1,
+        global_step=1,
+        best_validation_loss=1.0,
+        identity=identity,
+        resolved_training_config={},
+        dataset_manifest_hashes={"train": "abc123"},
+        task_weights={"source_node": 1.0},
+    )
+
+    result = calib.fit(
+        corpus_dir=mini_corpus,
+        identity_dir=identity_dir,
+        node_normalization=mini_corpus / "normalization" / "node-normalization.json",
+        edge_normalization=mini_corpus / "normalization" / "edge-normalization.json",
+        signature_cache_dir=tmp_path / "signature-cache-identity",
+        alpha=0.1,
+        sample_per_topology=None,
+    )
+    calibrator = result["calibrator"]
+    expected_model_hash = hashlib.sha256((identity_dir / "model.safetensors").read_bytes()).hexdigest()
+    assert calibrator.artifact.model_hash == expected_model_hash

@@ -635,7 +635,7 @@
     }
   ],
   "gate": "train_serve_parity",
-  "generated_at": "2026-08-08T21:36:54.493251+00:00",
+  "generated_at": "2026-08-08T23:26:30.293911+00:00",
   "normalization_dir": "data/learning-v2/cycle-b2/normalization",
   "normalization_fingerprint": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
   "passed": true,

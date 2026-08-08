@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "branch": "agent/gcp-multitopology-v3",
+  "head_commit": "c5d2dd5",
+  "selected_variant": "small",
+  "use_adapters": false,
+  "strategist_mode": "candidate_conditioned",
+  "checkpoint_identity_dir": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810",
+  "checkpoint_identity_fingerprint": "a94069adba25230f58f24f57901b855fab3a702aabd5e30cf0bc105e002e90a1",
+  "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+  "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "normalization_hash": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+  "fusion_policy_hash": "fuse_source_probabilities-v1",
+  "signature_policy_version": "hydroswarm-signature-policy-v1",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "next_step",
+    "relative_strength",
+    "source_node"
+  ],
+  "not_promoted_outputs": [
+    "source_region",
+    "start_time",
+    "duration",
+    "sensor_fault",
+    "sample_node",
+    "information_gain",
+    "candidate_reduction",
+    "should_continue_sampling",
+    "plan_value",
+    "plan_validity",
+    "exposure_proxy",
+    "pressure_risk_proxy",
+    "service_loss_proxy",
+    "containment_time_proxy",
+    "plan_regret_proxy",
+    "ood_category"
+  ],
+  "never_trained_outputs": [
+    "sensor_reconstruction",
+    "travel_time",
+    "future_concentration"
+  ],
+  "orphaned_outputs": [
+    "action_logits",
+    "action_pointer_logits",
+    "ood_logits",
+    "uncertainty"
+  ],
+  "release_bundle_dir": "experiments/runs/v4-release-bundle/no_adapters-seed20260810",
+  "release_bundle_calibration_status": "FITTED",
+  "train_serve_parity_gate": {
+    "passed": true,
+    "report": "reports/results/v4/train-serve-parity-gate.json",
+    "topologies_covered": ["golden-reference", "branched-loop", "loop-grid"],
+    "conditions_covered": ["clean", "degraded"]
+  },
+  "strategist_second_seed": {
+    "run": "v4-strategist-heads-v4corpus-corrected-seed2",
+    "seed": 20260812,
+    "decision": "do_not_promote",
+    "report": "reports/results/v4/strategist-second-seed-promotion-decision.md"
+  },
+  "calibration": {
+    "fit_report": "reports/results/v4/section19-final-calibration-fit.json",
+    "artifact_path": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810/calibration.json",
+    "artifact_hash": "829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa",
+    "alpha": 0.1,
+    "coverage_target": 0.9,
+    "empirical_coverage": 0.9143258426966292,
+    "mean_set_size": 2.800561797752809,
+    "expected_calibration_error": 0.0878951730544455,
+    "examples_used": 712,
+    "examples_skipped_non_contamination": 288,
+    "examples_reconstructed_from_replay": 712,
+    "validated_topology_hashes": [
+      "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+      "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+      "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88"
+    ],
+    "data_provenance_note": "raw scenario .npz archives not materialized in this sandbox (gitignored/ephemeral); all examples reconstructed via the identical seeded WNTRScenarioGenerator.generate_with_network call the original corpus used (real EPANET simulation), not loaded from a disk-verified baseline that does not exist in this environment"
+  },
+  "known_limitations": [
+    "sensor_fault evaluation population is degenerate (Phase 13 finding, unresolved this pass)",
+    "model_input_signature_mode not yet threaded into DecisionProvenance",
+    "frontend TypeScript ApiIncidentView type does not yet declare verification_status/context_hash",
+    "calibration fit against reconstructed (not disk-verified) scenario data due to sandbox environment limitation"
+  ],
+  "locked_test_opened": false,
+  "final_selection_json_exists": false
+}
