@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import hashlib
+import json
 from collections import defaultdict
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 
 import networkx as nx
@@ -571,6 +573,13 @@ def create_app(
             perform_analysis(record)
         else:
             runtime().persist(record)
+        # core-issues5.txt Section 10 (P0 safety fix): a new sample changes
+        # the incident's evidence -- any plan verified under the PRIOR
+        # evidence state must stop being approvable, not remain valid
+        # forever. Runs after perform_analysis/persist above so the
+        # comparison uses the fully updated posterior/analysis context.
+        _invalidate_stale_verifications(record)
+        runtime().persist(record)
         return record.state
 
     @app.post(
@@ -658,6 +667,68 @@ def create_app(
             hypotheses=hypotheses,
         )
 
+    def _verification_context_hash(record: IncidentRuntime) -> str:
+        """core-issues5.txt Section 10 (P0 safety fix): one canonical hash
+        over every behavior-critical component a plan verification depends
+        on. `record.analysis.provenance_hashes` (when a real analysis has
+        run) already bundles model/checkpoint, network, topology,
+        signature-artifact, normalization, fusion-config, and calibration
+        identity plus the incident's own evidence hash (see
+        HybridInferencePipeline.analyze's own `provenance` dict) -- reused
+        directly here rather than re-derived, so this can never silently
+        drift out of sync with what analysis actually used. Source
+        hypothesis-set identity/probabilities come from
+        `record.state.candidates` directly (changes whenever a new sample
+        changes the posterior); consequence-policy identity is
+        approximated by the incident's own configured contamination
+        threshold (the one consequence-policy parameter this API layer
+        currently exposes per-incident).
+
+        Any change to this hash between when a verification was recorded
+        and when approval is attempted means that verification's context is
+        no longer current -- see verify_plan/approve_plan.
+        """
+
+        payload: dict[str, Any] = {
+            "network_id": record.state.network_id,
+            "observations": [item.model_dump(mode="json") for item in record.state.observations],
+            "candidates": (
+                record.state.candidates.model_dump(mode="json")
+                if record.state.candidates is not None
+                else None
+            ),
+            "contamination_threshold_mg_l": record.create.contamination_threshold_mg_l,
+        }
+        if record.analysis is not None and hasattr(record.analysis, "provenance_hashes"):
+            payload["analysis_provenance"] = dict(record.analysis.provenance_hashes)
+        return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+
+    def _invalidate_stale_verifications(record: IncidentRuntime) -> None:
+        """core-issues5.txt Section 10: after evidence/analysis changes,
+        mark every existing CURRENT verification whose recorded
+        context_hash no longer matches the incident's current context as
+        STALE -- retained in `record.verifications` (audit history), never
+        deleted, but no longer approvable. A verification with no
+        context_hash at all (predates this field) is treated as stale too:
+        there is nothing to prove it still matches."""
+
+        current_hash = _verification_context_hash(record)
+        for plan_id, verification in list(record.verifications.items()):
+            if verification.verification_status != "CURRENT":
+                continue
+            if verification.context_hash == current_hash:
+                continue
+            record.verifications[plan_id] = verification.model_copy(
+                update={"verification_status": "STALE"}
+            )
+            runtime().append_event(
+                record,
+                event_type="PLAN_VERIFICATION_STALE",
+                actor="SYSTEM",
+                payload={"plan_id": str(plan_id), "reason": "EVIDENCE_CHANGED"},
+                simulator_version=verification.simulator_version,
+            )
+
     @app.post(
         "/api/incidents/{incident_id}/plans/{plan_id}/verify",
         response_model=PlanVerification,
@@ -701,6 +772,16 @@ def create_app(
                 exact_runs_consumed = simulator.exact_runs
         if verification.plan_id != plan_id:
             raise HTTPException(status_code=500, detail="verifier returned the wrong plan_id")
+        # core-issues5.txt Section 10: stamp the context this verification
+        # was computed against -- CURRENT now (evidence has not moved since
+        # `record` was read above), but note that approve_plan below always
+        # recomputes and compares the hash fresh rather than trusting this
+        # flag alone, so a change that lands between this write and a later
+        # approval attempt is still caught even if some other evidence-
+        # mutating path failed to eagerly mark it STALE.
+        verification = verification.model_copy(
+            update={"context_hash": _verification_context_hash(record), "verification_status": "CURRENT"}
+        )
         record.verifications[plan_id] = verification
         verified = verification.decision == PlanDecision.VERIFIED
         # core-issues5.txt Section 8: plans_exactly_verified counts THIS
@@ -770,6 +851,19 @@ def create_app(
         if verification is None or verification.decision != PlanDecision.VERIFIED:
             raise HTTPException(
                 status_code=409, detail="only a VERIFIED plan can be approved"
+            )
+        # core-issues5.txt Section 10 (P0 safety fix): approval requires
+        # decision == VERIFIED (checked above) AND status == CURRENT AND
+        # context_hash == the incident's CURRENT context hash, recomputed
+        # fresh here rather than trusting verification_status alone -- a
+        # defensive re-check that catches any evidence-changing path that
+        # did not (or could not) eagerly call _invalidate_stale_verifications.
+        current_hash = _verification_context_hash(record)
+        if verification.verification_status != "CURRENT" or verification.context_hash != current_hash:
+            raise HTTPException(
+                status_code=409,
+                detail="verification is stale: incident evidence has changed since this plan was "
+                "verified; re-verify before approval",
             )
         approved_at = datetime.now(UTC)
         receipt = ApprovalReceipt(

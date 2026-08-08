@@ -159,6 +159,70 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
     assert len(exported.json()["verifications"]) == 2
 
 
+# core-issues5.txt Section 10 (P0 safety fix): a plan verified under
+# evidence state A must not remain approvable after a new sample changes
+# the incident's evidence state to B.
+
+
+def test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability(
+    tmp_path,
+) -> None:
+    client = TestClient(
+        create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3")
+    )
+    client.post(
+        "/api/networks/net-test/validate",
+        json={"node_ids": ["J1", "J2"], "link_count": 1},
+    )
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": "net-test",
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation()],
+            "maximum_samples": 3,
+        },
+    )
+    incident_id = created.json()["incident_id"]
+    client.post(f"/api/incidents/{incident_id}/analyze")
+
+    plans_response = client.post(
+        f"/api/incidents/{incident_id}/plans/generate", json={"count": 2}
+    )
+    _unsafe_plan, safe_plan = plans_response.json()
+
+    verified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/verify")
+    assert verified.json()["decision"] == "VERIFIED"
+    assert verified.json()["verification_status"] == "CURRENT"
+    assert verified.json()["context_hash"]
+
+    # New evidence arrives -- the prior verification must no longer be
+    # approvable, and must be visibly marked STALE (retained, not deleted).
+    client.post(f"/api/incidents/{incident_id}/samples", json=_observation("S3", "J2"))
+
+    stale_approval = client.post(
+        f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/approve",
+        json={"approved": True, "operator_id": "operator-1"},
+    )
+    assert stale_approval.status_code == 409
+
+    # Re-verifying under the new evidence produces a fresh CURRENT
+    # verification, which is approvable again.
+    reverified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/verify")
+    assert reverified.json()["decision"] == "VERIFIED"
+    assert reverified.json()["verification_status"] == "CURRENT"
+    assert reverified.json()["context_hash"] != verified.json()["context_hash"]
+
+    approved = client.post(
+        f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/approve",
+        json={"approved": True, "operator_id": "operator-1"},
+    )
+    assert approved.status_code == 200
+
+    events = client.get(f"/api/incidents/{incident_id}/events").json()
+    assert "PLAN_VERIFICATION_STALE" in {event["event_type"] for event in events}
+
+
 def test_api_enforces_schema_and_validated_network(tmp_path) -> None:
     client = TestClient(create_app(ledger_path=tmp_path / "audit.sqlite3"))
     unvalidated = client.post(

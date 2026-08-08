@@ -200,6 +200,21 @@ class PlanVerification(FrozenModel):
     rejection_codes: tuple[str, ...] = ()
     abstention_reason: AbstentionReason | None = None
     verified_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    #: core-issues5.txt Section 10 (P0 safety fix): one canonical hash over
+    #: every behavior-critical piece of context this verification was
+    #: computed against (incident evidence, source hypothesis-set identity/
+    #: probabilities, calibration/model/network/signature/normalization
+    #: identity, consequence-policy version) -- set by the API layer (which
+    #: has access to that context; PlanVerifier itself does not), never by
+    #: PlanVerifier. None only for verifications predating this field.
+    context_hash: str | None = None
+    #: CURRENT until a behavior-critical context component changes (new
+    #: sample, re-analysis, recalibration, ...), at which point this plan's
+    #: PRIOR verification is marked STALE / SUPERSEDED here -- retained in
+    #: audit history, never deleted, but no longer approvable
+    #: (approve_plan requires decision == VERIFIED AND status == "CURRENT"
+    #: AND context_hash == the incident's current context hash).
+    verification_status: Literal["CURRENT", "STALE"] = "CURRENT"
 
     @model_validator(mode="after")
     def validate_decision_evidence(self) -> PlanVerification:
