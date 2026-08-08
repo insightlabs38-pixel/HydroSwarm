@@ -4,8 +4,20 @@ from uuid import uuid4
 
 import pytest
 
-from hydroswarm.domain import ActionType, OperationalAction, OperationalPlan, PlanDecision
+from hydroswarm.domain import (
+    AbstentionReason,
+    ActionType,
+    OperationalAction,
+    OperationalPlan,
+    PlanDecision,
+)
 from hydroswarm.simulation import HydraulicSimulator, PlanVerifier, build_wntr_network
+from hydroswarm.simulation.wrapper import (
+    SimulationBudgetExceeded,
+    SimulationIncompleteError,
+    SimulationTimeoutError,
+    SimulationUnstableError,
+)
 
 
 pytest.importorskip("wntr")
@@ -85,3 +97,101 @@ def test_incident_uses_epanet_quality_without_cwd_artifacts(
     assert incident.concentration_mg_l.to_numpy().max() > 0.0
     assert len(incident.state_hash) == 64
     assert not list(tmp_path.glob("temp.*"))
+
+
+# core-issues5.txt Section 9 (P0 safety fix): governed simulator failures
+# must persist exact-run consumption, categorize into a specific
+# AbstentionReason (not one generic bucket), never fabricate a
+# VERIFIED/zero-exposure result, and fail closed.
+
+
+@pytest.mark.parametrize(
+    ("exception_type", "expected_reason"),
+    [
+        (SimulationTimeoutError, AbstentionReason.SIMULATION_TIMEOUT),
+        (SimulationBudgetExceeded, AbstentionReason.SIMULATION_BUDGET_EXCEEDED),
+        (SimulationUnstableError, AbstentionReason.SIMULATION_UNSTABLE),
+        (SimulationIncompleteError, AbstentionReason.SIMULATION_INCOMPLETE),
+        (RuntimeError, AbstentionReason.SIMULATION_FAILURE),
+    ],
+)
+def test_legacy_path_failure_categorizes_and_fails_closed(
+    verifier: PlanVerifier, monkeypatch: pytest.MonkeyPatch, exception_type: type, expected_reason
+) -> None:
+    plan = _plan(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J2"))
+
+    def _raise(_plan):
+        verifier.simulator.exact_runs += 1  # the real code path consumes a run before it can fail
+        raise exception_type("synthetic failure")
+
+    monkeypatch.setattr(verifier.simulator, "evaluate_plan", _raise)
+    result = verifier.verify(plan)
+
+    assert result.decision == PlanDecision.ABSTAINED
+    assert result.abstention_reason == expected_reason
+    assert result.consequences is None  # never a fabricated zero-exposure result
+    assert result.evaluation_provenance is not None
+    assert result.evaluation_provenance["exact_simulation_count"] == 1
+    assert result.evaluation_provenance["failure_type"] == exception_type.__name__
+
+
+def test_exposure_aware_path_failure_categorizes_and_records_partial_consumption(
+    verifier: PlanVerifier, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A failure partway through a multi-hypothesis loop must still report
+    exactly how many of the hypotheses were actually simulated before the
+    failure -- not 0, and not the full hypothesis count."""
+
+    from hydroswarm.simulation.wrapper import (
+        IncidentSourceProfile,
+        PlanEvaluationContext,
+        WeightedSourceHypothesis,
+    )
+
+    plan = _plan(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J2"))
+    context = PlanEvaluationContext(
+        contamination_threshold_mg_l=0.01,
+        hypotheses=(
+            WeightedSourceHypothesis(IncidentSourceProfile(source_node_id="J1"), 0.5),
+            WeightedSourceHypothesis(IncidentSourceProfile(source_node_id="J3"), 0.5),
+        ),
+    )
+
+    def _raise(_plan, _context):
+        verifier.simulator.exact_runs += 2  # simulate 2 of the 2 hypotheses having already run
+        raise SimulationUnstableError("synthetic mid-loop failure")
+
+    monkeypatch.setattr(verifier.simulator, "evaluate_plan_consequences", _raise)
+    result = verifier.verify(plan, context)
+
+    assert result.decision == PlanDecision.ABSTAINED
+    assert result.abstention_reason == AbstentionReason.SIMULATION_UNSTABLE
+    assert result.consequences is None
+    assert result.evaluation_provenance is not None
+    assert result.evaluation_provenance["exact_simulation_count"] == 2
+    assert result.evaluation_provenance["hypotheses_per_plan"] == 2
+
+
+def test_budget_exceeded_mid_loop_is_categorized_distinctly(
+    verifier: PlanVerifier, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from hydroswarm.simulation.wrapper import (
+        IncidentSourceProfile,
+        PlanEvaluationContext,
+        WeightedSourceHypothesis,
+    )
+
+    plan = _plan(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J2"))
+    context = PlanEvaluationContext(
+        contamination_threshold_mg_l=0.01,
+        hypotheses=(WeightedSourceHypothesis(IncidentSourceProfile(source_node_id="J1"), 1.0),),
+    )
+    monkeypatch.setattr(
+        verifier.simulator, "evaluate_plan_consequences",
+        lambda *_: (_ for _ in ()).throw(SimulationBudgetExceeded("budget exhausted")),
+    )
+    result = verifier.verify(plan, context)
+
+    assert result.abstention_reason == AbstentionReason.SIMULATION_BUDGET_EXCEEDED
+    assert result.decision == PlanDecision.ABSTAINED
+    assert result.consequences is None

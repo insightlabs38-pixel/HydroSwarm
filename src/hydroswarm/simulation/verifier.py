@@ -10,7 +10,43 @@ from hydroswarm.domain import (
     PlanVerification,
 )
 
-from .wrapper import HydraulicSimulator, PlanEvaluationContext
+from .wrapper import (
+    HydraulicSimulator,
+    PlanEvaluationContext,
+    SimulationBudgetExceeded,
+    SimulationIncompleteError,
+    SimulationTimeoutError,
+    SimulationUnstableError,
+)
+
+#: core-issues5.txt Section 9: map hydroswarm.simulation.wrapper's own
+#: already-distinct SimulationError subclasses to a specific, auditable
+#: AbstentionReason instead of collapsing every failure into one generic
+#: SIMULATION_FAILURE bucket. Checked in this order (most specific first)
+#: since SimulationBudgetExceeded etc. are all SimulationError subclasses,
+#: not siblings of it.
+_FAILURE_CATEGORY: tuple[tuple[type[Exception], AbstentionReason], ...] = (
+    (SimulationTimeoutError, AbstentionReason.SIMULATION_TIMEOUT),
+    (SimulationBudgetExceeded, AbstentionReason.SIMULATION_BUDGET_EXCEEDED),
+    (SimulationUnstableError, AbstentionReason.SIMULATION_UNSTABLE),
+    (SimulationIncompleteError, AbstentionReason.SIMULATION_INCOMPLETE),
+)
+
+
+def _categorize_failure(error: Exception) -> AbstentionReason:
+    for exception_type, reason in _FAILURE_CATEGORY:
+        if isinstance(error, exception_type):
+            return reason
+    return AbstentionReason.SIMULATION_FAILURE
+
+
+def _hypotheses_per_plan(evaluation_context: PlanEvaluationContext) -> int:
+    """The real number of source hypotheses this evaluation covers -- NOT
+    `len(evaluation_context.hypothesis_identity)`, which is a fixed-shape
+    `{"mode": ..., ...}` dict (always 1-2 keys) and would silently report
+    the wrong count regardless of the actual hypothesis set size."""
+
+    return len(evaluation_context.hypotheses) if evaluation_context.hypotheses else 1
 
 
 class PlanVerifier:
@@ -76,16 +112,35 @@ class PlanVerifier:
                 rejection_codes=rejection_codes,
             )
         if evaluation_context is not None:
+            # core-issues5.txt Section 9: captured BEFORE the call so the
+            # except branch can still report exactly how many new exact
+            # EPANET runs were consumed before a mid-loop failure, even
+            # though evaluate_plan_consequences itself never returns in
+            # that case.
+            runs_before = self.simulator.exact_runs
             try:
                 exposure_evaluation = self.simulator.evaluate_plan_consequences(plan, evaluation_context)
-            except Exception:
+            except Exception as error:
                 return PlanVerification(
                     plan_id=plan.plan_id,
                     decision=PlanDecision.ABSTAINED,
                     simulator=self.simulator.simulator_name,
                     simulator_version=self.simulator.simulator_version,
                     state_hash=state_hash,
-                    abstention_reason=AbstentionReason.SIMULATION_FAILURE,
+                    abstention_reason=_categorize_failure(error),
+                    evaluation_provenance={
+                        "aggregation_policy": evaluation_context.aggregation_policy,
+                        "hypotheses": evaluation_context.hypothesis_identity,
+                        "hypotheses_per_plan": _hypotheses_per_plan(evaluation_context),
+                        #: requirement 10 / Section 9: the real number of new
+                        #: exact EPANET runs consumed before this failure --
+                        #: never silently dropped just because the call
+                        #: raised instead of returning.
+                        "exact_simulation_count": self.simulator.exact_runs - runs_before,
+                        "simulator_version": self.simulator.simulator_version,
+                        "cache_hit": False,
+                        "failure_type": type(error).__name__,
+                    },
                 )
             decision = (
                 PlanDecision.REJECTED if exposure_evaluation.rejection_codes else PlanDecision.VERIFIED
@@ -96,6 +151,7 @@ class PlanVerifier:
                 "population_map_identity": evaluation_context.population_map_identity,
                 "consequence_policy_version": evaluation_context.consequence_policy_version,
                 "hypotheses": evaluation_context.hypothesis_identity,
+                "hypotheses_per_plan": _hypotheses_per_plan(evaluation_context),
                 #: requirement 10: real EPANET runs THIS verify() call
                 #: consumed -- never silently reported as one simulator call.
                 "exact_simulation_count": exposure_evaluation.exact_simulation_count,
@@ -113,16 +169,22 @@ class PlanVerifier:
                 evaluation_provenance=provenance,
                 rejection_codes=exposure_evaluation.rejection_codes,
             )
+        runs_before = self.simulator.exact_runs
         try:
             evaluation = self.simulator.evaluate_plan(plan)
-        except Exception:
+        except Exception as error:
             return PlanVerification(
                 plan_id=plan.plan_id,
                 decision=PlanDecision.ABSTAINED,
                 simulator=self.simulator.simulator_name,
                 simulator_version=self.simulator.simulator_version,
                 state_hash=state_hash,
-                abstention_reason=AbstentionReason.SIMULATION_FAILURE,
+                abstention_reason=_categorize_failure(error),
+                evaluation_provenance={
+                    "exact_simulation_count": self.simulator.exact_runs - runs_before,
+                    "simulator_version": self.simulator.simulator_version,
+                    "failure_type": type(error).__name__,
+                },
             )
         decision = PlanDecision.REJECTED if evaluation.rejection_codes else PlanDecision.VERIFIED
         return PlanVerification(

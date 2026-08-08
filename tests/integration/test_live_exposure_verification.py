@@ -157,3 +157,83 @@ def test_live_verify_falls_back_to_hydraulic_only_without_calibrated_candidates(
     assert body["consequences"]["exposure_evaluated"] is False
     assert body["worst_case_consequences"] is None
     assert body["evaluation_provenance"] is None
+
+
+# core-issues5.txt Section 8 (P0 safety fix): "one plan verification" and
+# "one EPANET simulation" are not equivalent -- the incident's own budget
+# counters must reflect this distinction and cannot be reset by retrying.
+
+
+def test_incident_budget_counters_update_after_multi_hypothesis_verify(tmp_path) -> None:
+    app = create_app(
+        network_directory=tmp_path / "networks",
+        ledger_path=tmp_path / "ledger.db",
+        database_path=tmp_path / "db.sqlite",
+    )
+    client = TestClient(app)
+    network_id = _import_network(client, tmp_path)
+
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": network_id,
+            "detected_at": NOW.isoformat(),
+            "observations": [
+                {
+                    "sensor_id": "S-J2",
+                    "node_id": "J2",
+                    "observed_at": NOW.isoformat(),
+                    "received_at": NOW.isoformat(),
+                    "concentration_mg_l": 0.05,
+                    "pressure_m": 20.0,
+                }
+            ],
+            "contamination_threshold_mg_l": 0.001,
+        },
+    )
+    incident_id = UUID(created.json()["incident_id"])
+    assert client.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+
+    # Freshly created incident: full budget, no verifications yet.
+    initial = client.get(f"/api/incidents/{incident_id}").json()
+    assert initial["remaining_epanet_budget"] == 3  # ApiSettings.exact_plan_simulation_limit default
+    assert initial["plans_exactly_verified"] == 0
+    assert initial["exact_simulation_cache_hits"] == 0
+
+    record = app.state.runtime.incidents[incident_id]
+    record.state = record.state.model_copy(
+        update={
+            "candidates": CandidateSet(
+                node_probabilities={"J1": 0.7, "J3": 0.3},
+                node_ids=("J1", "J3"),
+                calibrated=True,
+            )
+        }
+    )
+    plan = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 1}).json()[0]
+
+    response = client.post(f"/api/incidents/{incident_id}/plans/{plan['plan_id']}/verify")
+    assert response.status_code == 200
+    provenance = response.json()["evaluation_provenance"]
+    assert provenance["hypotheses_per_plan"] == 2
+
+    # 1 cached baseline + 2 per-hypothesis EPANET runs = 3 -- exactly the
+    # default budget, all consumed by this ONE plan verification.
+    after_first = client.get(f"/api/incidents/{incident_id}").json()
+    assert after_first["exact_simulations_used"] == 3
+    assert after_first["remaining_epanet_budget"] == 0
+    assert after_first["plans_exactly_verified"] == 1
+
+    # Retrying (even a different plan) must not reclaim any budget --
+    # a fresh HydraulicSimulator is constructed per request, but the
+    # incident-level counter is what actually gates it.
+    second_plan = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 1}).json()[0]
+    retry = client.post(f"/api/incidents/{incident_id}/plans/{second_plan['plan_id']}/verify")
+    assert retry.status_code == 409
+
+    still_exhausted = client.get(f"/api/incidents/{incident_id}").json()
+    assert still_exhausted["remaining_epanet_budget"] == 0
+    assert still_exhausted["exact_simulations_used"] == 3
+    # The failed/blocked retry must not be counted as a real verification
+    # attempt (it never reached the verifier at all).
+    assert still_exhausted["plans_exactly_verified"] == 1

@@ -431,6 +431,11 @@ def create_app(
             network_id=request.network_id,
             status="DETECTED",
             observations=request.observations,
+            # core-issues5.txt Section 8: seed the incident's own exact-
+            # simulation budget from the currently configured limit -- every
+            # later verification only ever spends down from here, never
+            # resets to a fresh full budget.
+            remaining_epanet_budget=settings.exact_plan_simulation_limit,
         )
         record = IncidentRuntime(create=request, state=state)
         runtime().incidents[state.incident_id] = record
@@ -698,21 +703,52 @@ def create_app(
             raise HTTPException(status_code=500, detail="verifier returned the wrong plan_id")
         record.verifications[plan_id] = verification
         verified = verification.decision == PlanDecision.VERIFIED
+        # core-issues5.txt Section 8: plans_exactly_verified counts THIS
+        # plan verification attempt (one per /verify call, regardless of
+        # decision) -- distinct from exact_simulations_used, which counts
+        # the underlying EPANET executions it consumed (0 for a cache hit
+        # or an injected/non-simulator verifier, possibly >1 for a
+        # multi-hypothesis exposure-aware evaluation).
+        cache_hit = bool(
+            verification.evaluation_provenance and verification.evaluation_provenance.get("cache_hit")
+        )
+        new_exact_simulations_used = record.state.exact_simulations_used + exact_runs_consumed
         record.state = record.state.model_copy(
             update={
                 "status": "APPROVAL" if verified else "PLANNING",
                 "approval_pending": verified,
-                "exact_simulations_used": record.state.exact_simulations_used + exact_runs_consumed,
+                "exact_simulations_used": new_exact_simulations_used,
+                "plans_exactly_verified": record.state.plans_exactly_verified + 1,
+                "exact_simulation_cache_hits": (
+                    record.state.exact_simulation_cache_hits + (1 if cache_hit else 0)
+                ),
+                "remaining_epanet_budget": max(
+                    0, settings.exact_plan_simulation_limit - new_exact_simulations_used
+                ),
             }
         )
         runtime().append_event(
             record,
-            event_type="PLAN_VERIFIED" if verified else "PLAN_REJECTED",
+            # core-issues5.txt Section 9: distinguish a real WNTR REJECTED
+            # decision from an ABSTAINED (simulator/governed failure)
+            # decision in the audit trail -- both previously collapsed into
+            # the same "PLAN_REJECTED" event type.
+            event_type=(
+                "PLAN_VERIFIED"
+                if verified
+                else "PLAN_VERIFICATION_FAILED"
+                if verification.decision == PlanDecision.ABSTAINED
+                else "PLAN_REJECTED"
+            ),
             actor="HYDRO_VERIFIER",
             payload={
                 "plan_id": str(plan_id),
                 "decision": verification.decision.value,
                 "rejection_codes": list(verification.rejection_codes),
+                "abstention_reason": (
+                    verification.abstention_reason.value if verification.abstention_reason else None
+                ),
+                "exact_simulation_count": exact_runs_consumed,
                 "runtime_mode": record.runtime_mode,
                 "fallback_reasons": list(record.fallback_reasons),
             },
@@ -1171,12 +1207,28 @@ def create_app(
         try:
             result = record.swarm.run()
         finally:
-            if real_simulator is not None and real_simulator.exact_runs:
+            # core-issues5.txt Section 8/9: persisted in `finally` so a
+            # swarm run that raises or times out mid-way still records
+            # whatever exact EPANET executions/plan-verification attempts
+            # it actually consumed -- never silently dropped. Reads
+            # record.swarm.result() (the swarm's own live internal state,
+            # updated incrementally as it steps) rather than the `result`
+            # local above, which is never assigned if `.run()` itself
+            # raised.
+            if real_simulator is not None:
+                new_exact_simulations_used = (
+                    record.state.exact_simulations_used + real_simulator.exact_runs
+                )
                 record.state = record.state.model_copy(
                     update={
-                        "exact_simulations_used": (
-                            record.state.exact_simulations_used + real_simulator.exact_runs
-                        )
+                        "exact_simulations_used": new_exact_simulations_used,
+                        "plans_exactly_verified": (
+                            record.state.plans_exactly_verified
+                            + record.swarm.result().plans_exactly_verified
+                        ),
+                        "remaining_epanet_budget": max(
+                            0, settings.exact_plan_simulation_limit - new_exact_simulations_used
+                        ),
                     }
                 )
         if result.selected_plan:

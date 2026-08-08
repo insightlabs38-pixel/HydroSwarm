@@ -600,6 +600,7 @@ class SwarmController:
             termination_reason=self.termination_reason,
             events=tuple(self.events),
             run_key=self._run_key or GENESIS_HASH,
+            plans_exactly_verified=len(runtime.verifications) if runtime else 0,
         )
 
     @classmethod

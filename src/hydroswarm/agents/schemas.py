@@ -159,6 +159,15 @@ class SwarmResult(AgentModel):
     termination_reason: str | None = None
     events: tuple[SwarmEvent, ...]
     run_key: str
+    #: core-issues5.txt Section 8: how many distinct plans this run actually
+    #: submitted for exact verification (WNTR_VERIFY state), regardless of
+    #: decision -- separate from `verification` above, which only ever
+    #: carries the single SELECTED plan's outcome. Callers that need the
+    #: underlying EPANET execution count (which may exceed this, under
+    #: multi-hypothesis exposure-aware verification) read it from the
+    #: HydraulicSimulator/IncidentState budget fields instead, not from
+    #: this count.
+    plans_exactly_verified: int = 0
 
 
 class ReplayResult(AgentModel):

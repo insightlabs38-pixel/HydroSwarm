@@ -234,6 +234,7 @@ def run(
     registry: ExperimentRegistry,
     max_epochs: int = MAX_EPOCHS,
     maximum_runtime_seconds: float = MAXIMUM_RUNTIME_SECONDS,
+    seed: int = SEED,
 ) -> dict[str, Any]:
     started = time.perf_counter()
     train = _load_dataset(corpus_root, "train")
@@ -243,7 +244,7 @@ def run(
     trainable_parameters = freeze_backbone(model)
 
     config = TrainingConfig(
-        seed=SEED,
+        seed=seed,
         epochs=max_epochs,
         batch_size=BATCH_SIZE,
         gradient_accumulation_steps=1,
@@ -258,13 +259,12 @@ def run(
 
     handle = registry.open_run(
         kind="training",
-        purpose="core-issues3.txt Phase 12 Stage E prep: train candidate-conditioned Strategist heads "
-        "(plan_validity, plan_value, 5 consequence proxies) from cycle-b2-trajectories-v3's "
-        "strategist-tensors-normalized, frozen Sentinel backbone initialized from the Stage-A teacher "
-        "checkpoint (action_head dropped: excluded from the v4 output vocabulary and vocab-size-incompatible)",
+        purpose="core-issues5.txt Section 7: a second corrected-input Strategist seed, same governed "
+        "dataset/evaluation protocol as the first (core-issues3.txt Phase 12 Stage E prep), to test "
+        "outcome consistency before promoting learned Strategist prescreening/ordering",
         architecture="hydrocore",
         variant=VARIANT,
-        seed=SEED,
+        seed=seed,
         resolved_config={
             "overrides": OVERRIDES,
             "teacher_checkpoint": str(teacher_checkpoint),
@@ -338,6 +338,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", type=Path, default=Path("reports/results/v4/strategist-heads-training.json"))
     parser.add_argument("--max-epochs", type=int, default=MAX_EPOCHS, help="smoke-testing only")
     parser.add_argument("--maximum-runtime-seconds", type=float, default=MAXIMUM_RUNTIME_SECONDS, help="smoke-testing only")
+    parser.add_argument(
+        "--seed", type=int, default=SEED,
+        help="core-issues5.txt Section 7: pass a second, different seed to train an independent "
+        "finalist for the promotion-consistency comparison",
+    )
     return parser
 
 
@@ -354,6 +359,7 @@ def main(argv: list[str] | None = None) -> int:
             registry=registry,
             max_epochs=args.max_epochs,
             maximum_runtime_seconds=args.maximum_runtime_seconds,
+            seed=args.seed,
         )
         failure: str | None = None
         print(f"OK ({result['wall_seconds']:.1f}s); metrics: {json.dumps(result['metrics'], indent=2)}")

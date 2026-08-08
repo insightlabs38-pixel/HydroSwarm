@@ -52,7 +52,30 @@ class AbstentionReason(StrEnum):
     OUT_OF_DISTRIBUTION = "OUT_OF_DISTRIBUTION"
     INVALID_NETWORK = "INVALID_NETWORK"
     NO_VALID_PLAN = "NO_VALID_PLAN"
+    #: core-issues5.txt Section 9: generic fallback only -- reserved for a
+    #: verification failure that does not originate from one of
+    #: hydroswarm.simulation.wrapper's own distinct SimulationError
+    #: subclasses (an unexpected, non-simulator exception). Any real
+    #: SimulationError is categorized into one of the specific reasons
+    #: below instead; this must never be the ONLY category a governed
+    #: simulator failure is capable of producing.
     SIMULATION_FAILURE = "SIMULATION_FAILURE"
+    #: hydroswarm.simulation.wrapper.SimulationTimeoutError.
+    SIMULATION_TIMEOUT = "SIMULATION_TIMEOUT"
+    #: hydroswarm.simulation.wrapper.SimulationIncompleteError.
+    SIMULATION_INCOMPLETE = "SIMULATION_INCOMPLETE"
+    #: hydroswarm.simulation.wrapper.SimulationUnstableError.
+    SIMULATION_UNSTABLE = "SIMULATION_UNSTABLE"
+    #: hydroswarm.simulation.wrapper.SimulationBudgetExceeded -- the
+    #: incident's exact-simulation budget was exhausted mid-verification
+    #: (possibly partway through a multi-hypothesis evaluation).
+    SIMULATION_BUDGET_EXCEEDED = "SIMULATION_BUDGET_EXCEEDED"
+    #: A real SimulationError occurred specifically while computing
+    #: consequence metrics from otherwise-valid simulation results (e.g.
+    #: SimulationIncompleteError raised inside calculate_consequences),
+    #: distinct from a failure during the hydraulic/chemical simulation
+    #: run itself.
+    CONSEQUENCE_EVALUATION_FAILURE = "CONSEQUENCE_EVALUATION_FAILURE"
     AMBIGUOUS_EVIDENCE = "AMBIGUOUS_EVIDENCE"
 
 
@@ -206,4 +229,24 @@ class IncidentState(FrozenModel):
     #: request) so a caller cannot bypass the budget simply by triggering
     #: another verify/plan request against the same incident.
     exact_simulations_used: int = Field(default=0, ge=0)
+    #: core-issues5.txt Section 8: "one plan verification" and "one EPANET
+    #: simulation" are not equivalent under multi-hypothesis exposure-aware
+    #: verification -- exact_simulations_used above is the raw EPANET
+    #: execution count; this is the distinct count of PLANS that received a
+    #: real exact-verification attempt (VERIFIED, REJECTED, or ABSTAINED),
+    #: regardless of how many underlying hypotheses/executions each one
+    #: consumed.
+    plans_exactly_verified: int = Field(default=0, ge=0)
+    #: core-issues5.txt Section 8: cumulative count of verify() calls this
+    #: incident satisfied entirely from cache (PlanExposureEvaluation.
+    #: cache_hit=True) -- these consume zero new EPANET executions and
+    #: must be visible separately from exact_simulations_used, not merged
+    #: into it or silently dropped.
+    exact_simulation_cache_hits: int = Field(default=0, ge=0)
+    #: core-issues5.txt Section 8: settings.exact_plan_simulation_limit -
+    #: exact_simulations_used, recomputed and persisted by the API layer on
+    #: every verification, so a caller reading IncidentState directly (GET
+    #: /api/incidents/{id}) always sees the current budget without needing
+    #: to know the configured limit itself or recompute the subtraction.
+    remaining_epanet_budget: int = Field(default=0, ge=0)
 
