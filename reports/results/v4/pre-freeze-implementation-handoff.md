@@ -3883,7 +3883,7 @@ plan generation for those scenarios — a materially larger undertaking,
 out of this pass's scope, flagged here for whoever makes Stage F's
 actual task-weight/data-mixing decision.
 
-### Stage F training script prepared, not yet run at real scale
+### Stage F real run — LAUNCHED (background job running)
 
 `scripts/run_stage_f_training.py` (new this pass, commit `e04b65d`,
 `ood_category_head=True` fix in commit `69243e4`): the `use_adapters`
@@ -3894,16 +3894,38 @@ budget (Bundle-F-Stage-3's own established budget: 16 epochs, patience
 checkpoint selection, then a no-grad multitask pass over
 `development_holdout`) across both arms. Both arms share the exact full
 config `run_stage_f_joint_corpus_gates.py` already verified end-to-end,
-including the `ood_category_head=True` fix (see requirement 2 above —
-found while building the new gate, fixed in this script the same day it
-was first written, before any real run used it). Smoke-tested directly
-against tiny dataset slices (24/8/8 examples) with a reduced epoch/
-runtime budget — the real code path (model construction, `Trainer.fit`,
-checkpoint export, development_holdout evaluation, registry open/close,
-model fingerprinting) runs cleanly. Not yet run at real scale — blocked
-behind requirement 1 (Strategist retrain, still running) per this pass's
-explicit instruction ("If both of those checks pass, proceed directly
-into the full Stage F run") — requirement 2 is now done.
+including the `ood_category_head=True` fix. Re-smoke-tested after that
+fix (tiny 24/8/8-example dataset slices, reduced epoch/runtime budget)
+immediately before the real launch below — the real code path (model
+construction, `Trainer.fit`, checkpoint export, development_holdout
+evaluation, registry open/close, model fingerprinting) still runs
+cleanly.
+
+Both prerequisite requirements are now satisfied (Strategist retrained
+on corrected tensors and Stage E rerun; OOD extension regenerated,
+merged, all 6 gates passing) — launched directly into the real Stage F
+run per this pass's explicit instruction.
+
+```
+command: python -u scripts/run_stage_f_training.py
+env: PYTHONPATH=src OMP_NUM_THREADS=10 MKL_NUM_THREADS=10 OPENBLAS_NUM_THREADS=10
+log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/stage-f-training.log
+started: 2026-08-08T02:43Z
+run-root: experiments/runs/stage-f/{adapters,no_adapters}-seed{20260810,20260811}
+registry: experiments/registry/stage-f.jsonl
+output: reports/results/v4/stage-f-adapters-comparison.json
+expected wall time: runs sequentially (adapters seed 20260810, adapters
+  seed 20260811, no_adapters seed 20260810, no_adapters seed 20260811)
+  -- up to 4 x 7200s = 8h worst case, likely less given early stopping
+  (patience=3); polled at 10-minute intervals via a persistent Monitor
+resume: this script has no --resume-from; a re-invocation would restart
+  every arm/seed from scratch. If interrupted, the exact same command
+  above resumes the overall matrix (already-completed arm/seed results
+  are only preserved by re-running with --arms/--seeds narrowed to what
+  is still missing, since the script writes its combined report only at
+  the end -- a real limitation, noted here rather than silently assumed
+  away).
+```
 
 ```bash
 export PYTHONPATH=src
@@ -3930,7 +3952,7 @@ python scripts/run_stage_f_training.py
 | Strategist retrain on corrected tensors | **done** -- plan_validity_f1=0.9972, metrics retained/improved vs. uncorrected-input run; commit `d7e540e` |
 | Stage E rerun on corrected-input Strategist | **done** -- selected_valid_rate=1.0 all policies, regret comparable/better; commit `d7e540e` |
 | Stage F training script | written, smoke-tested, `ood_category_head` fix applied; not yet run at real scale |
-| Stage F real run (adapters vs. no-adapters, 2 seeds each) | **both requirements now satisfied — launching next** |
+| Stage F real run (adapters vs. no-adapters, 2 seeds each) | **running** (background job, started 2026-08-08T02:43Z, up to ~8h worst case) |
 | `final-selection.json` | does not exist |
 | Locked final test | not opened |
 
