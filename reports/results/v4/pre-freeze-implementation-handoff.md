@@ -3883,7 +3883,7 @@ plan generation for those scenarios — a materially larger undertaking,
 out of this pass's scope, flagged here for whoever makes Stage F's
 actual task-weight/data-mixing decision.
 
-### Stage F real run — LAUNCHED (background job running)
+### Stage F real run — DONE
 
 `scripts/run_stage_f_training.py` (new this pass, commit `e04b65d`,
 `ood_category_head=True` fix in commit `69243e4`): the `use_adapters`
@@ -3909,33 +3909,58 @@ run per this pass's explicit instruction.
 ```
 command: python -u scripts/run_stage_f_training.py
 env: PYTHONPATH=src OMP_NUM_THREADS=10 MKL_NUM_THREADS=10 OPENBLAS_NUM_THREADS=10
-log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/stage-f-training.log
 started: 2026-08-08T02:43Z
+finished: 2026-08-08T05:57Z (wall_seconds=11307, ~3.14h -- well under the
+  8h worst case; all 4 runs completed the full 16-epoch budget with no
+  early stopping and no runtime-ceiling cutoff)
 run-root: experiments/runs/stage-f/{adapters,no_adapters}-seed{20260810,20260811}
-registry: experiments/registry/stage-f.jsonl
-output: reports/results/v4/stage-f-adapters-comparison.json
-expected wall time: runs sequentially (adapters seed 20260810, adapters
-  seed 20260811, no_adapters seed 20260810, no_adapters seed 20260811)
-  -- up to 4 x 7200s = 8h worst case, likely less given early stopping
-  (patience=3); polled at 10-minute intervals via a persistent Monitor
-resume: this script has no --resume-from; a re-invocation would restart
-  every arm/seed from scratch. If interrupted, the exact same command
-  above resumes the overall matrix (already-completed arm/seed results
-  are only preserved by re-running with --arms/--seeds narrowed to what
-  is still missing, since the script writes its combined report only at
-  the end -- a real limitation, noted here rather than silently assumed
-  away).
+registry: experiments/registry/stage-f.jsonl (committed, commit `a525d32`)
+output: reports/results/v4/stage-f-adapters-comparison.json (committed, commit `a525d32`)
 ```
 
-```bash
-export PYTHONPATH=src
-python scripts/run_stage_f_training.py
-# writes reports/results/v4/stage-f-adapters-comparison.json and appends
-# to experiments/registry/stage-f.jsonl; runs sequentially (adapters
-# seed 20260810, adapters seed 20260811, no_adapters seed 20260810,
-# no_adapters seed 20260811) -- up to 4 x 7200s = 8h worst case, likely
-# less given early stopping (patience=3).
-```
+**Results — all 4 runs completed successfully, no failures**:
+
+| run | wall time | best_validation_loss | dev_holdout mean_loss | stopped_early |
+|---|---|---|---|---|
+| `adapters`-seed20260810 | 2811.0s | 5.4408 | 8.9439 | False |
+| `adapters`-seed20260811 | 2799.0s | 5.4049 | 9.0099 | False |
+| `no_adapters`-seed20260810 | 2812.5s | 5.3512 | 8.7911 | False |
+| `no_adapters`-seed20260811 | 2884.5s | 5.4240 | 8.8739 | False |
+
+Means: `adapters` validation_loss=5.4229, dev_holdout=8.9769;
+`no_adapters` validation_loss=5.3876, dev_holdout=8.8325.
+**`no_adapters` is consistently (both seeds, both metrics) slightly
+better** — a real, direction-consistent screening signal (not noise:
+the same ordering holds independently in both seed pairs), though not
+grounds for a final architecture decision on its own (this project's
+own "do not promote based on one seed" discipline applies equally to "do
+not promote based on one screening comparison" — 2 seeds here is
+exactly the plan's own minimum for a screening comparison, not a final
+candidate's 3-seed bar).
+
+Per-task `development_holdout` breakdown (all 21 real tasks reach every
+run — full detail in `reports/results/v4/stage-f-adapters-comparison.json`)
+shows the small `no_adapters` advantage is concentrated in
+`evidence_sufficiency` (the dominant per-task loss by a wide margin in
+every run, ~4.1-4.3) and `source_node`/`relative_strength`;
+`plan_validity`/`plan_value`/the five consequence proxies are
+essentially identical across arms (expected: adapters are per-role
+bottleneck modules downstream of the shared backbone, and Strategist's
+own heads sit behind the `strategist` adapter specifically, which this
+ablation does affect, but the joint corpus's Strategist targets are
+governed WNTR-verified values dominated by signal the shared backbone
+already carries well regardless of the adapter ablation).
+
+Model hashes and full resolved config (task weights, manifest hashes,
+topology hashes, checkpoint hashes) for all 4 runs:
+`experiments/registry/stage-f.jsonl`. Checkpoints (gitignored, per this
+session's own established persistence pattern):
+`experiments/runs/stage-f/<arm>-seed<seed>/<timestamp>/model-export.safetensors`.
+
+**Per this pass's explicit instruction, no architecture selection was
+attempted from these results** — this is a screening comparison
+result, not a final-candidate decision. `final-selection.json` still
+does not exist, and the locked test was not opened.
 
 ### Status summary as of this update
 
@@ -3951,12 +3976,16 @@ python scripts/run_stage_f_training.py
 | `ood_category_head=True` model-config fix (gates + training script) | **done**, committed (`69243e4`) -- real defect, found and fixed before any real run used either script |
 | Strategist retrain on corrected tensors | **done** -- plan_validity_f1=0.9972, metrics retained/improved vs. uncorrected-input run; commit `d7e540e` |
 | Stage E rerun on corrected-input Strategist | **done** -- selected_valid_rate=1.0 all policies, regret comparable/better; commit `d7e540e` |
-| Stage F training script | written, smoke-tested, `ood_category_head` fix applied; not yet run at real scale |
-| Stage F real run (adapters vs. no-adapters, 2 seeds each) | **running** (background job, started 2026-08-08T02:43Z, up to ~8h worst case) |
-| `final-selection.json` | does not exist |
+| Stage F training script | written, smoke-tested, `ood_category_head` fix applied, used for the real run below |
+| Stage F real run (adapters vs. no-adapters, 2 seeds each) | **done** -- 11307s (~3.14h) total, all 4 runs completed cleanly, `no_adapters` consistently slightly better (both seeds, both metrics); commit `a525d32` |
+| `final-selection.json` | does not exist -- no architecture selection attempted, per explicit instruction |
 | Locked final test | not opened |
 
-Both prerequisite requirements are complete. This section will be
-updated again once the real Stage F run (4 arm/seed combinations,
-sequential, up to ~8h worst case) actually runs and produces real
-results.
+**This pass's full scope (both prerequisite requirements plus the real
+Stage F run) is complete.** Everything in this section is committed and
+pushed to `agent/gcp-multitopology-v3`. Remaining work for a future
+continuation: a real architecture-selection decision (this pass's
+screening comparison gives a direction-consistent but 2-seed-only signal
+favoring `no_adapters`; the plan's own 3-seed bar for a final candidate
+has not been met), `final-selection.json`, and the locked test — none of
+which this pass was authorized or instructed to attempt.
