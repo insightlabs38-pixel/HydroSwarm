@@ -40,12 +40,14 @@ reconstruction.
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 from typing import Any
 
 import torch
 from safetensors.torch import load_file
 
+from hydroswarm.inference.fusion import DYNAMIC_TRUST_FUSION_CONFIG
 from hydroswarm.model import HydroCore
 from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA
 from hydroswarm.runtime.v4_normalization import load_runtime_normalization_bundle
@@ -63,9 +65,25 @@ SHARED_MODEL_CONFIG: dict[str, Any] = {
 }
 
 #: Every output that received real governed supervision this run (matches
-#: Stage F's own "21 real tasks" plus ood_class, which is present in the
-#: architecture even though it never reached train-split gradient -- see
-#: TRAINED vs VALIDATED distinction below).
+#: Stage F's own 19 real gradient-receiving tasks plus ood_class, which is
+#: present in the architecture even though it never reached train-split
+#: gradient -- see TRAINED vs VALIDATED distinction below).
+#:
+#: core-issues5.txt delta item 4 (P0 governance fix), Section C: does NOT
+#: include "sensor_reconstruction"/"travel_time" -- SHARED_MODEL_CONFIG
+#: above never sets `auxiliary_heads=True` (matching
+#: scripts/run_stage_f_training.py's own real model config, which also
+#: never sets it, so it took HydroCore's AUXILIARY_HEADS_DEFAULT=False),
+#: which means the real Stage-F run's model never even PHYSICALLY
+#: CONSTRUCTED sensor_reconstruction_head/travel_time_head
+#: (hydroswarm.model.core.HydroCore.__init__: those heads only exist
+#: `if self.auxiliary_heads`) -- claiming them "trained" was a real,
+#: previously-undetected defect (claiming an output was trained merely
+#: because the architecture COULD support it, not because the selected
+#: run actually did), confirmed by their total absence from Phase 13's own
+#: metrics report and Stage F's comparison results. main() asserts this
+#: stays true against the actual constructed model rather than trusting
+#: this comment alone.
 TRAINED_OUTPUTS: frozenset[str] = frozenset({
     "source_node", "source_region", "start_time", "duration", "relative_strength",
     "event_presence", "event_cause", "sensor_fault", "evidence_sufficiency",
@@ -73,8 +91,16 @@ TRAINED_OUTPUTS: frozenset[str] = frozenset({
     "plan_validity", "plan_value", "exposure_proxy", "pressure_risk_proxy",
     "service_loss_proxy", "containment_time_proxy", "plan_regret_proxy",
     "next_step",
-    "sensor_reconstruction", "travel_time",
 })
+
+#: core-issues5.txt delta item 4, Section C: heads that exist in the
+#: architecture (auxiliary_heads=True would build them) but were NOT
+#: physically constructed by this run's real model config -- must never
+#: appear in TRAINED_OUTPUTS/TRAINING_ONLY_OUTPUTS/VALIDATED_OUTPUTS/
+#: RUNTIME_ENABLED_OUTPUTS for a checkpoint identity built from this
+#: SHARED_MODEL_CONFIG. Checked for real in main(), not just documented
+#: here.
+AUXILIARY_HEAD_OUTPUTS: frozenset[str] = frozenset({"sensor_reconstruction", "travel_time", "future_concentration"})
 
 #: reports/results/v4/phase14-promotion-gates.md's own per-output verdicts,
 #: restricted to outputs that PASSED gates 1-4 with real evidence.
@@ -122,7 +148,39 @@ RUNTIME_ENABLED_OUTPUTS: frozenset[str] = frozenset({
 #: validated/runtime-enabled per Phase 14's findings, so they simply stay
 #: out of VALIDATED_OUTPUTS/RUNTIME_ENABLED_OUTPUTS above instead.
 DIAGNOSTIC_ONLY_OUTPUTS: frozenset[str] = frozenset()
-TRAINING_ONLY_OUTPUTS: frozenset[str] = frozenset({"sensor_reconstruction", "travel_time"})
+#: core-issues5.txt delta item 4, Section C: empty, not
+#: {"sensor_reconstruction", "travel_time"} -- see AUXILIARY_HEAD_OUTPUTS'
+#: own comment above for why those heads were never even physically
+#: constructed by this run's real model config, let alone trained.
+TRAINING_ONLY_OUTPUTS: frozenset[str] = frozenset()
+
+
+def _real_source_corpus_manifest_hashes(joint_corpus_dir: Path) -> tuple[str, ...]:
+    """core-issues5.txt delta item 4, Section B: real content
+    hashes/fingerprints for the joint-v4 corpus this checkpoint was
+    actually trained on -- NOT the bare path string the identity
+    previously recorded under this field. Reads
+    `<joint_corpus_dir>/checksums.json`'s own whole-corpus
+    `dataset_fingerprint_sha256` plus every individual population's
+    `index_sha256` from `<joint_corpus_dir>/source-manifest-hashes.json`
+    (both already real, already-committed governed artifacts --
+    scripts/build_stage_f_joint_corpus.py's own output -- not computed
+    fresh here)."""
+
+    checksums = json.loads((joint_corpus_dir / "checksums.json").read_text(encoding="utf-8"))
+    source_manifest = json.loads((joint_corpus_dir / "source-manifest-hashes.json").read_text(encoding="utf-8"))
+
+    hashes: list[str] = [checksums["dataset_fingerprint_sha256"]]
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict) and "index_sha256" in node:
+            hashes.append(node["index_sha256"])
+        elif isinstance(node, dict):
+            for value in node.values():
+                walk(value)
+
+    walk(source_manifest)
+    return tuple(dict.fromkeys(hashes))  # de-duplicated, order-preserving
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -144,6 +202,16 @@ def build_parser() -> argparse.ArgumentParser:
             "training corpus) was built from -- core-issues5.txt Section 3"
         ),
     )
+    parser.add_argument(
+        "--joint-corpus-dir",
+        type=Path,
+        default=Path("data/learning-v2/cycle-b2-joint-v4"),
+        help=(
+            "Stage F's actual training corpus -- source of real content hashes for "
+            "source_corpus_manifest_hashes/dataset_manifest_hashes (core-issues5.txt delta item 4, "
+            "Section B), not merely this path string"
+        ),
+    )
     return parser
 
 
@@ -154,6 +222,20 @@ def main(argv: list[str] | None = None) -> int:
     model.load_state_dict(load_file(str(args.source_checkpoint), device="cpu"), strict=True)
     model.eval()
 
+    # core-issues5.txt delta item 4, Section C: fail loudly if
+    # TRAINED_OUTPUTS/TRAINING_ONLY_OUTPUTS ever claim an auxiliary output
+    # the ACTUAL constructed model (not merely SHARED_MODEL_CONFIG's
+    # intent) does not physically have -- checked against the real model
+    # instance, not just the config dict, so a HydroCore default change
+    # cannot silently reintroduce this class of defect unnoticed.
+    claimed_auxiliary_outputs = AUXILIARY_HEAD_OUTPUTS & (TRAINED_OUTPUTS | TRAINING_ONLY_OUTPUTS)
+    if claimed_auxiliary_outputs and not model.auxiliary_heads:
+        raise SystemExit(
+            f"refusing to build a checkpoint identity that claims {sorted(claimed_auxiliary_outputs)} as "
+            "trained/training-only while the constructed model has auxiliary_heads=False (those heads were "
+            "never physically constructed, let alone supervised) -- core-issues5.txt delta item 4, Section C"
+        )
+
     # core-issues5.txt Section 3 (P0 blocker): this checkpoint's training
     # corpus (cycle-b2-joint-v4) really was built with governed node/edge
     # normalization applied (see scripts/rebuild_normalized_shards.py) --
@@ -162,11 +244,24 @@ def main(argv: list[str] | None = None) -> int:
     # and record its actual fingerprint so the runtime loader can verify it.
     normalization_bundle = load_runtime_normalization_bundle(args.normalization_dir)
 
+    # core-issues5.txt delta item 4, Section B: real content hashes, not
+    # the corpus directory path.
+    source_corpus_manifest_hashes = _real_source_corpus_manifest_hashes(args.joint_corpus_dir)
+    dataset_fingerprint = source_corpus_manifest_hashes[0]
+
     identity = build_checkpoint_identity(
         model,
         normalization_hash=normalization_bundle.fingerprint,
-        fusion_policy_hash="fixed_weight_fusion-v1:neural_weight=0.6",
-        source_corpus_manifest_hashes=("data/learning-v2/cycle-b2-joint-v4",),
+        # core-issues5.txt delta item 4, Section A: the real canonical
+        # dynamic-trust-fusion policy identity V4 serving actually uses
+        # (hydroswarm.inference.fusion.DYNAMIC_TRUST_FUSION_CONFIG, the
+        # same constant hydroswarm.runtime.v4_defaults.V4PipelineFactory
+        # and HybridInferencePipeline.fusion_config_hash are keyed against)
+        # -- NOT a hand-written fixed_weight_fusion-v1 string describing a
+        # fusion policy V4 serving does not run. One canonical
+        # constant/function, not two independently-maintained literals.
+        fusion_policy_hash=DYNAMIC_TRUST_FUSION_CONFIG,
+        source_corpus_manifest_hashes=source_corpus_manifest_hashes,
         trained_outputs=TRAINED_OUTPUTS,
         validated_outputs=VALIDATED_OUTPUTS,
         runtime_enabled_outputs=RUNTIME_ENABLED_OUTPUTS,
@@ -192,10 +287,15 @@ def main(argv: list[str] | None = None) -> int:
             "see this script's module docstring",
             "source_checkpoint": str(args.source_checkpoint),
             "source_run": "scripts/run_stage_f_training.py, arm=no_adapters, seed=20260810",
+            # Paths recorded separately from the real hashes above
+            # (core-issues5.txt delta item 4, Section B: "Record paths
+            # separately if useful").
+            "source_corpus_path": str(args.joint_corpus_dir),
+            "normalization_dir": str(args.normalization_dir),
             "shared_model_config": SHARED_MODEL_CONFIG,
             "use_adapters": args.use_adapters,
         },
-        dataset_manifest_hashes={"joint_v4_corpus": "data/learning-v2/cycle-b2-joint-v4"},
+        dataset_manifest_hashes={"joint_v4_corpus": dataset_fingerprint},
         task_weights={name: 1.0 for name in TRAINED_OUTPUTS},
         calibration_hash=None,
     )

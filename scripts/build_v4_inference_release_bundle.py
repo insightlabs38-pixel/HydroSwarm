@@ -75,12 +75,24 @@ def _output_governance_payload(identity: CheckpointIdentity) -> dict[str, Any]:
                 "training_only by construction (masked/corrupted-observation "
                 "reconstruction target has no live-inference use)"
                 if "sensor_reconstruction" in identity.training_only_outputs
-                else "not training_only in this identity -- verify against Phase 14 before trusting"
+                else (
+                    "not trained by the selected run at all (core-issues5.txt delta item 4, Section C): "
+                    "auxiliary_heads=False for this model config, so sensor_reconstruction_head was never "
+                    "even physically constructed, let alone supervised -- absent from every governance set"
+                    if "sensor_reconstruction" not in identity.trained_outputs
+                    else "trained but not training_only in this identity -- verify against Phase 14 before trusting"
+                )
             ),
             "travel_time": (
                 "training_only by construction"
                 if "travel_time" in identity.training_only_outputs
-                else "not training_only in this identity -- verify against Phase 14 before trusting"
+                else (
+                    "not trained by the selected run at all (core-issues5.txt delta item 4, Section C): "
+                    "auxiliary_heads=False for this model config, so travel_time_head was never even "
+                    "physically constructed, let alone supervised -- absent from every governance set"
+                    if "travel_time" not in identity.trained_outputs
+                    else "trained but not training_only in this identity -- verify against Phase 14 before trusting"
+                )
             ),
             "ood_category": (
                 "excluded from all governance sets: near-chance macro F1 (~1/11 chance), zero real "
