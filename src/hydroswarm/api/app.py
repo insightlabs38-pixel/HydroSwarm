@@ -22,6 +22,7 @@ from hydroswarm import __version__
 from hydroswarm.domain import (
     ActionType,
     CandidateSet,
+    DecisionCertificate,
     IncidentCreate,
     IncidentState,
     OperationalAction,
@@ -38,7 +39,7 @@ from hydroswarm.explanation import (
 )
 from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController
 from hydroswarm.calibration.conformal import CALIBRATION_SCHEMA_VERSION
-from hydroswarm.inference import MODEL_VERSION, IncidentAnalysisResult
+from hydroswarm.inference import MODEL_VERSION, IncidentAnalysisResult, build_decision_certificates
 from hydroswarm.preprocessing import SensorSeries
 from hydroswarm.storage import AuditEvent
 from hydroswarm.networks import MAX_INP_BYTES, NetworkImportError, NetworkImporter
@@ -466,6 +467,25 @@ def create_app(
     @app.get("/api/incidents/{incident_id}/analysis", response_model=AnalysisResponse)
     def get_analysis(incident_id: UUID) -> AnalysisResponse:
         return analysis_response(incident_or_404(incident_id))
+
+    @app.get(
+        "/api/incidents/{incident_id}/authority",
+        response_model=list[DecisionCertificate],
+    )
+    def get_decision_certificates(incident_id: UUID) -> list[DecisionCertificate]:
+        """core-issues5.txt Section 13 (P1 product/architecture feature):
+        one stable contract exposing HydroSwarm's authority hierarchy for
+        every significant current result -- source localization, Scout
+        recommendation, OOD state, and every plan's exact-verification
+        outcome -- so a frontend never has to infer authority from loosely
+        related fields scattered across /analysis, /plans, and individual
+        /verify responses."""
+
+        record = incident_or_404(incident_id)
+        analysis = record.analysis if isinstance(record.analysis, IncidentAnalysisResult) else None
+        return list(
+            build_decision_certificates(analysis, verifications=tuple(record.verifications.values()))
+        )
 
     @app.post("/api/incidents/{incident_id}/analyze/jobs")
     def queue_analysis(incident_id: UUID):

@@ -265,3 +265,61 @@ class IncidentState(FrozenModel):
     #: to know the configured limit itself or recompute the subtraction.
     remaining_epanet_budget: int = Field(default=0, ge=0)
 
+
+class AuthorityLevel(StrEnum):
+    """core-issues5.txt Section 13: HydroSwarm's explicit authority
+    hierarchy -- how much operational weight a given result is allowed to
+    carry, independent of how confident it looks. Ordered from least to
+    most operationally binding; a UI should never let a lower authority
+    result visually outrank a higher one."""
+
+    UNAVAILABLE = "UNAVAILABLE"
+    SUPPRESSED = "SUPPRESSED"
+    ADVISORY = "ADVISORY"
+    CALIBRATED_ADVISORY = "CALIBRATED_ADVISORY"
+    DETERMINISTIC = "DETERMINISTIC"
+    SIMULATOR_VERIFIED = "SIMULATOR_VERIFIED"
+    HUMAN_APPROVED = "HUMAN_APPROVED"
+
+
+class ApplicabilityStatus(StrEnum):
+    """core-issues5.txt Section 13: why a result's authority is what it
+    is -- the specific governance/data condition, not just the resulting
+    authority level."""
+
+    VALIDATED = "VALIDATED"
+    UNVALIDATED = "UNVALIDATED"
+    OOD = "OOD"
+    CALIBRATION_UNAVAILABLE = "CALIBRATION_UNAVAILABLE"
+    STALE = "STALE"
+    SIMULATOR_SENSITIVE = "SIMULATOR_SENSITIVE"
+    INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+    DISABLED_BY_GOVERNANCE = "DISABLED_BY_GOVERNANCE"
+    FAILED_PROMOTION_GATE = "FAILED_PROMOTION_GATE"
+
+
+class DecisionProvenance(FrozenModel):
+    model: str | None = None
+    calibration: str | None = None
+    network: str | None = None
+    evidence: str | None = None
+
+
+class DecisionCertificate(FrozenModel):
+    """core-issues5.txt Section 13 (P1 product/architecture feature): one
+    stable backend contract making HydroSwarm's authority hierarchy
+    explicit for a single significant result (source localization, Scout
+    recommendation, plan consequence, OOD state, ...), so the frontend
+    never has to infer authority from loosely related fields scattered
+    across other endpoints."""
+
+    name: str = Field(min_length=1)
+    value: Any = None
+    source: str = Field(min_length=1)
+    authority: AuthorityLevel
+    applicability: ApplicabilityStatus
+    enabled: bool
+    calibrated: bool
+    suppression_reasons: tuple[str, ...] = ()
+    provenance: DecisionProvenance = Field(default_factory=DecisionProvenance)
+

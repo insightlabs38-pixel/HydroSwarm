@@ -158,6 +158,24 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
     assert len(exported.json()["plans"]) == 2
     assert len(exported.json()["verifications"]) == 2
 
+    # core-issues5.txt Section 13 (P1 product feature): every verified/
+    # rejected plan must have a decision certificate exposing its real
+    # authority (SIMULATOR_VERIFIED either way -- WNTR ran regardless of
+    # the resulting decision). This fixture never configures a real
+    # pipeline_factory (record.analysis stays a DEMO_FALLBACK dict, not a
+    # real IncidentAnalysisResult), so only the per-plan certificates are
+    # expected here -- source_localization/scout_recommendation/ood_state
+    # require a real analysis and are covered separately in
+    # tests/scientific/test_decision_certificates.py.
+    certificates = client.get(f"/api/incidents/{incident_id}/authority")
+    assert certificates.status_code == 200
+    by_name = {c["name"]: c for c in certificates.json()}
+    assert by_name[f"plan_consequence:{safe_plan['plan_id']}"]["authority"] == "SIMULATOR_VERIFIED"
+    assert by_name[f"plan_consequence:{unsafe_plan['plan_id']}"]["authority"] == "SIMULATOR_VERIFIED"
+    assert by_name[f"plan_consequence:{unsafe_plan['plan_id']}"]["suppression_reasons"] == [
+        "PRESSURE_BELOW_THRESHOLD"
+    ]
+
 
 # core-issues5.txt Section 10 (P0 safety fix): a plan verified under
 # evidence state A must not remain approvable after a new sample changes
