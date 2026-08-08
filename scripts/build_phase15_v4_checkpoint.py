@@ -83,21 +83,34 @@ TRAINED_OUTPUTS: frozenset[str] = frozenset({
 #: worse than random), ood_category (gate 3 FAILS -- zero real gradient),
 #: action_logits/action_pointer_logits (not in TRAINED_OUTPUTS at all under
 #: strategist_mode=candidate_conditioned).
+#:
+#: core-issues5.txt delta item 2: "source_node" included -- Phase 14's own
+#: table records it as PASS on every gate ("top1 0.72 vs. classical-only
+#: baseline already in production fusion"; "0.7247/0.7149 Stage-A;
+#: 0.7205/0.7331 Stage-F, all close"), with a note to "re-verify under v4
+#: metadata in Phase 15." Leaving it out of VALIDATED_OUTPUTS while
+#: hydroswarm.inference.pipeline.HybridInferencePipeline.analyze()
+#: unconditionally consumed source_node_logits regardless of
+#: runtime_enabled_outputs was a real metadata/behavior contradiction, not
+#: a deliberate exclusion -- see that method's own governance comment.
 VALIDATED_OUTPUTS: frozenset[str] = frozenset({
+    "source_node",
     "event_presence", "event_cause", "start_time", "relative_strength",
     "evidence_sufficiency", "next_step",
     "plan_validity", "plan_value", "exposure_proxy", "pressure_risk_proxy",
     "service_loss_proxy", "containment_time_proxy", "plan_regret_proxy",
 })
 
-#: Of VALIDATED_OUTPUTS, only the Sentinel/control-family outputs are
-#: promoted to runtime_enabled -- Strategist's outputs are held back
-#: because Phase 14's gate 7 (>= 2 finalist seeds) is not yet satisfied
-#: (only one seed, v4-strategist-heads-v4corpus-corrected, has been
-#: trained). `duration` stays diagnostic-only (Phase 14: "flag as
-#: lower-confidence", accuracy 0.50 vs ~33% chance -- real signal but the
-#: weakest of the three profile heads).
+#: Of VALIDATED_OUTPUTS, only the Sentinel/control-family outputs (plus
+#: source_node -- delta item 2) are promoted to runtime_enabled --
+#: Strategist's outputs are held back because Phase 14's gate 7 (>= 2
+#: finalist seeds) is not yet satisfied (only one seed,
+#: v4-strategist-heads-v4corpus-corrected, has been trained). `duration`
+#: stays diagnostic-only (Phase 14: "flag as lower-confidence", accuracy
+#: 0.50 vs ~33% chance -- real signal but the weakest of the three profile
+#: heads).
 RUNTIME_ENABLED_OUTPUTS: frozenset[str] = frozenset({
+    "source_node",
     "event_presence", "event_cause", "relative_strength",
     "evidence_sufficiency", "next_step",
 })

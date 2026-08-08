@@ -1,10 +1,17 @@
-"""core-issues5.txt Section 5 (P0 GATE): consolidated train/serve parity
-gate regression coverage.
+"""core-issues5.txt Section 5 (P0 GATE) / delta item 1: consolidated
+train/serve parity gate regression coverage.
 
 Runs the real `scripts/run_train_serve_parity_gate.py` gate (not a mock)
-against the real committed `data/learning-v2/cycle-b2/normalization`
-artifact and a small, self-generated, non-locked fixture scenario -- the
+against the real committed `data/learning-v2/cycle-b2/normalization` and
+`data/learning-v2/cycle-b2/signatures` artifacts across every governed
+training topology and more than one operating/fault condition each -- the
 same gate a CI/pre-freeze run would execute.
+
+Delta item 1 fixed the classical_prior algorithm mismatch this gate used
+to document as a known, accepted failure (governed corpus generation and
+live serving previously used two structurally different posterior
+algorithms). This gate must now PASS outright, with no accepted
+classical_prior failure.
 """
 
 from __future__ import annotations
@@ -21,13 +28,23 @@ import run_train_serve_parity_gate as gate  # noqa: E402
 def _run() -> dict:
     return gate.run_gate(
         normalization_dir=_REPO_ROOT / "data" / "learning-v2" / "cycle-b2" / "normalization",
+        cycle_b2_root=_REPO_ROOT / "data" / "learning-v2" / "cycle-b2",
         seed_base=920_000,
     )
 
 
-def test_schema_and_normalization_and_mask_fields_match_exactly() -> None:
+def test_gate_report_passes_overall() -> None:
     report = _run()
-    by_field = {field["field"]: field for field in report["fields"]}
+    failures = [field for field in report["fields"] if not field["passed"]]
+    assert not failures, failures
+    assert report["passed"] is True
+
+
+def test_every_behavior_critical_field_matches_exactly_or_within_tolerance() -> None:
+    report = _run()
+    by_field: dict[str, list[dict]] = {}
+    for field in report["fields"]:
+        by_field.setdefault(field["field"], []).append(field)
     for name in (
         "node_ids",
         "feature_schema_hash",
@@ -39,53 +56,49 @@ def test_schema_and_normalization_and_mask_fields_match_exactly() -> None:
         "sensor_mask",
         "source_candidate_mask",
         "edge_features",
+        "node_features",
+        "classical_prior",
+        "signature_policy_identity",
+        "signature_mode_is_governed",
     ):
-        assert by_field[name]["passed"] is True, by_field[name]["detail"]
-        assert by_field[name]["known_finding"] is False
+        assert name in by_field, f"missing field {name!r} from gate report"
+        for entry in by_field[name]:
+            assert entry["passed"] is True, entry["detail"]
 
 
-def test_classical_prior_mismatch_is_a_known_documented_finding() -> None:
-    """This must keep failing until the underlying algorithm mismatch is
-    deliberately resolved -- a silent pass here would hide a real defect,
-    not fix one."""
+def test_classical_prior_matches_to_float_precision() -> None:
+    """The formerly-documented known algorithm mismatch is now a real,
+    tight-tolerance match -- both paths compute classical_prior via the
+    identical hydroswarm.training.corpus.model_input_classical_prior
+    function against the same committed signature library."""
 
     report = _run()
-    by_field = {field["field"]: field for field in report["fields"]}
-    assert by_field["classical_prior"]["passed"] is False
-    assert by_field["classical_prior"]["known_finding"] is True
-    assert by_field["node_features"]["passed"] is False
-    assert by_field["node_features"]["known_finding"] is True
-    assert "classical_source_prior" in by_field["node_features"]["detail"]
+    prior_fields = [field for field in report["fields"] if field["field"] == "classical_prior"]
+    assert prior_fields
+    for entry in prior_fields:
+        assert entry["passed"] is True
+        assert entry["comparison"] == "tolerance"
 
 
-def test_gate_report_is_not_passed_overall() -> None:
+def test_covers_every_governed_training_topology_and_more_than_one_condition() -> None:
     report = _run()
-    assert report["passed"] is False
+    families = {fixture["network_family"] for fixture in report["evaluated_fixtures"]}
+    conditions = {fixture["condition"] for fixture in report["evaluated_fixtures"]}
+    assert families == {"golden-reference", "branched-loop", "loop-grid"}
+    assert len(conditions) > 1
+    assert all(fixture["passed"] for fixture in report["evaluated_fixtures"])
 
 
-def test_gate_exits_nonzero_by_default_and_zero_with_the_known_mismatch_flag(tmp_path: Path) -> None:
+def test_gate_exits_zero(tmp_path: Path) -> None:
     report_path = tmp_path / "report.json"
-    strict_exit = gate.main([
+    exit_code = gate.main([
         "--report-output", str(report_path),
         "--seed-base", "930000",
     ])
-    assert strict_exit == 1
-
-    lenient_exit = gate.main([
-        "--report-output", str(report_path),
-        "--seed-base", "930000",
-        "--allow-known-classical-prior-mismatch",
-    ])
-    assert lenient_exit == 0
+    assert exit_code == 0
 
 
-def test_a_real_unrelated_regression_still_fails_even_with_the_lenient_flag(
-    tmp_path: Path, monkeypatch
-) -> None:
-    """The lenient flag must only ever whitelist the one documented
-    classical_prior/node_features finding -- never become a blanket
-    override that silently accepts an unrelated new defect."""
-
+def test_gate_fails_closed_on_a_real_regression(tmp_path: Path, monkeypatch) -> None:
     report_path = tmp_path / "report.json"
     original_run_gate = gate.run_gate
 
@@ -96,7 +109,7 @@ def test_a_real_unrelated_regression_still_fails_even_with_the_lenient_flag(
             "comparison": "exact",
             "passed": False,
             "detail": "synthetic regression for this test",
-            "known_finding": False,
+            "scenario_id": "synthetic",
         })
         report["passed"] = False
         return report
@@ -105,6 +118,5 @@ def test_a_real_unrelated_regression_still_fails_even_with_the_lenient_flag(
     exit_code = gate.main([
         "--report-output", str(report_path),
         "--seed-base", "940000",
-        "--allow-known-classical-prior-mismatch",
     ])
     assert exit_code == 1

@@ -137,8 +137,26 @@ def _import_network(client: TestClient, network) -> dict[str, object]:
 
 
 def _drive_to_planning_allowed(client: TestClient, incident_id: str) -> None:
-    """Two analysis rounds -- mirrors test_iterative_pipeline.py's before/after
-    -- pushes planning_allowed True via a real candidate-set contraction."""
+    """Three analysis rounds -- mirrors test_iterative_pipeline.py's
+    before/after -- pushes planning_allowed True via a real candidate-set
+    contraction.
+
+    core-issues5.txt delta item 1: the MODEL-INPUT classical_prior this
+    incident's neural belief now reflects is computed via the same
+    governed algorithm/distribution Stage-F training tensors were built
+    with, decoupled from this fixture's own hand-rolled
+    live_classical_localization SignatureArtifact (see _build_pipeline) --
+    previously the two were structurally IDENTICAL (the fake model just
+    echoed classical_prior, and classical_prior was itself
+    live_classical_localization's own output), so classical/neural
+    disagreement was always exactly zero by construction, regardless of
+    how little real evidence existed. With the two genuinely decoupled,
+    two sensors (J1, J2) leave J3/J4 completely unobserved, which is not
+    enough real evidence for the two independently-computed posteriors to
+    agree closely -- a third sample at J3 (this fixture's `maximum_samples`
+    budget already allows exactly one more) resolves the disagreement
+    with real evidence, exactly as a genuine incident would need, rather
+    than by loosening any disagreement threshold."""
 
     assert client.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
     for offset, concentration in ((0.0, 0.0), (3600.0, 1.0)):
@@ -147,6 +165,11 @@ def _drive_to_planning_allowed(client: TestClient, incident_id: str) -> None:
             json=_observation("S2", "J2", offset, concentration),
         )
         assert added.status_code == 200
+    third = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        json=_observation("S3", "J3", 3600.0, 0.05),
+    )
+    assert third.status_code == 200
     analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
     assert analysis["planning_allowed"] is True
     assert analysis["runtime_mode"] == "FULL_HYBRID"
@@ -348,16 +371,19 @@ def test_incident_view_returns_complete_verified_contract(tmp_path) -> None:
 
     # Sensor health reflects the accumulated live observations.
     sensor_nodes = {entry["node_id"] for entry in view["sensor_health"]}
-    assert sensor_nodes == {"J1", "J2"}
+    assert sensor_nodes == {"J1", "J2", "J3"}
     assert all(entry["health"] == "HEALTHY" for entry in view["sensor_health"])
 
     # Evidence, plans, counterfactuals, explanations, audit, and runtime metrics.
-    # Three rounds: the initial /analyze, then one real reanalysis per
+    # Four rounds: the initial /analyze, then one real reanalysis per
     # /samples call (each call appends exactly one observation and triggers
     # its own full reanalysis -- unlike the direct-pipeline test this mirrors,
     # which batches both new J2 readings into a single reanalyze_after_sample
-    # call and so only sees one extra round).
-    assert len(view["evidence_history"]) == 3
+    # call and so only sees one extra round). _drive_to_planning_allowed
+    # makes three /samples calls (two J2 readings, one J3 reading -- see its
+    # own docstring for why a third, genuinely corroborating sensor is now
+    # needed), so 1 (/analyze) + 3 (/samples) = 4.
+    assert len(view["evidence_history"]) == 4
     returned_plan_ids = {plan["plan"]["plan_id"] for plan in view["plans"]}
     assert returned_plan_ids == {plan["plan_id"] for plan in plans}
     assert all(plan["verification"] is not None for plan in view["plans"])

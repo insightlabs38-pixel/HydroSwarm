@@ -595,6 +595,13 @@ class HybridInferencePipeline:
             )
             for hypothesis in artifact.hypotheses
         }
+        # core-issues5.txt delta item 1: `classical` below is
+        # `live_classical_localization` -- the richer Bayesian posterior
+        # over the runtime hypothesis-grid artifact, kept for deterministic
+        # reasoning/fusion/operator evidence (classical_vector/
+        # classical_belief, trust features, explanation). It must NOT be
+        # fed to HydroCore as the model input; see
+        # `model_input_prior` immediately below.
         classical = stage(
             "classical_localization",
             lambda: self.localizer(
@@ -607,6 +614,47 @@ class HybridInferencePipeline:
                 hydraulic_graph=graph,
             ),
         )
+
+        def _model_input_classical_prior() -> tuple[Mapping[str, float], str, str]:
+            # Local import: see this module's top-of-file circular-import
+            # note (hydroswarm.training's package __init__ imports
+            # full_trajectory, which imports HybridInferencePipeline from
+            # this same module).
+            from hydroswarm.training.corpus import (
+                model_input_classical_prior,
+                resolve_model_input_signature_library,
+            )
+
+            junctions = tuple(sorted(network.junction_name_list))
+            library, reference_timestamps, mode = resolve_model_input_signature_library(
+                topology_hash, junctions, network
+            )
+            prior = model_input_classical_prior(library, junctions, sensor_series, reference_timestamps)
+            return prior, mode, library.manifest_hash
+
+        # core-issues5.txt delta item 1 (P0): the MODEL INPUT
+        # `classical_prior` feature HydroCore was actually trained on must
+        # reproduce the SAME governed algorithm/distribution Stage-F
+        # training tensors were built with
+        # (hydroswarm.training.corpus.SignatureLibrary.
+        # posterior_from_observations) -- NOT `classical.
+        # source_probabilities` above, which is a structurally different
+        # Bayesian-posterior algorithm over a different (hypothesis-grid)
+        # signature representation. Feeding the richer live localizer's
+        # posterior here would be exactly the "silently substitute a
+        # different algorithm as the neural model's training prior"
+        # train/serve skew scripts/run_train_serve_parity_gate.py's own
+        # module docstring documents.
+        #
+        # `model_input_signature_mode` (GOVERNED_KNOWN_NETWORK vs.
+        # RUNTIME_GENERATED_IMPORTED_NETWORK -- see
+        # hydroswarm.classical.signature_policy) is computed here but not
+        # yet threaded into `DecisionProvenance` (Section 13); flagged as a
+        # deferred follow-up rather than expanding that schema
+        # speculatively in this fix.
+        model_input_prior, _model_input_signature_mode, model_input_signature_hash = stage(
+            "model_input_classical_prior", _model_input_classical_prior
+        )
         built = stage(
             "feature_building",
             lambda: self.feature_builder.build(
@@ -614,10 +662,13 @@ class HybridInferencePipeline:
                 graph,
                 estimated,
                 sensor_series,
-                classical_prior=classical.source_probabilities,
+                classical_prior=model_input_prior,
             ),
         )
         node_ids = built.node_ids
+        # live_classical_localization's own belief vector -- used for
+        # deterministic reasoning/fusion/trust/explanation, deliberately
+        # NOT the tensor HydroCore consumed above.
         classical_vector = _normalise(
             np.asarray([classical.source_probabilities.get(node, 0.0) for node in node_ids])
         )
@@ -631,31 +682,29 @@ class HybridInferencePipeline:
         semantics = SemanticPredictions()
         try:
             model_output = stage("neural_inference", lambda: self._run_model(built))
-            # core-issues5.txt Section 11: KNOWN, DELIBERATELY UNCHANGED GAP
-            # -- source_node_logits feeds classical/neural fusion
-            # unconditionally, never checked against
-            # self.runtime_enabled_outputs, even though "source_node" is a
-            # real CANONICAL_OUTPUT_NAMES entry a v4 identity could in
-            # principle exclude. Every v4 identity built so far
-            # (scripts/build_phase15_v4_checkpoint.py) happens to also
-            # exclude "source_node" from its own runtime_enabled_outputs --
-            # if that identity were ever wired into V4PipelineFactory
-            # as-is (not yet done; see runtime/v4_defaults.py's own
-            # docstring), taking output governance fully literally would
-            # require suppressing the ONE output HydroSentinel/fusion is
-            # fundamentally built around, degrading the whole hybrid
-            # architecture to classical-only. That is too large and
-            # consequential an architectural/product decision (does
-            # "source_node" belong in the same disable-by-omission
-            # mechanism as advisory outputs like event_presence, or is it
-            # governed by calibration/trained_tasks instead, as it is
-            # today?) to resolve unilaterally inside this governance-gap
-            # fix; left exactly as-is, documented here rather than changed
-            # silently, and flagged as a required decision before any v4
-            # identity's runtime_enabled_outputs is treated as literally
-            # authoritative over source localization itself.
-            neural_logits = _array(model_output["source_node_logits"]).reshape(-1)[-len(node_ids):]
-            neural_vector = _softmax(neural_logits)
+            # core-issues5.txt delta item 2 (P0 governance fix): the
+            # governed decision is that "source_node" is a normal granular
+            # output like every other -- gated by runtime_enabled_outputs
+            # exactly like event_presence/plan_value/etc. above, not
+            # unconditionally authoritative regardless of governance. This
+            # was previously a documented, deliberately-unenforced gap
+            # (every v4 identity built so far happened to already exclude
+            # "source_node", so the gap was latent, not yet exercised).
+            # Phase 14's own evidence
+            # (reports/results/v4/phase14-promotion-gates.md: "PASS ...
+            # already runtime-enabled (v3 path); re-verify under v4
+            # metadata in Phase 15") supports treating it as validated when
+            # a checkpoint's own governance says so --
+            # scripts/build_phase15_v4_checkpoint.py now includes it in
+            # VALIDATED_OUTPUTS/RUNTIME_ENABLED_OUTPUTS accordingly. When a
+            # v4 identity explicitly excludes it, source localization falls
+            # back to classical-only belief (fused_vector below), the same
+            # "no learned signal available" degradation Scout/Strategist
+            # already use -- deterministic/classical localization and
+            # fail-closed behavior are unaffected either way.
+            if self.runtime_enabled_outputs is None or "source_node" in self.runtime_enabled_outputs:
+                neural_logits = _array(model_output["source_node_logits"]).reshape(-1)[-len(node_ids):]
+                neural_vector = _softmax(neural_logits)
             semantics = self._model_semantics(model_output, node_ids)
             # core-issues.txt repair item 8: Scout (sample_node/
             # information_gain heads) and Strategist (plan_value/
@@ -928,6 +977,15 @@ class HybridInferencePipeline:
             "network": network_hash,
             "topology": topology_hash,
             "signature_artifact": artifact.artifact_hash,
+            # model_input_signature_mode (a SignatureMode string, not a
+            # hash) deliberately excluded from this hash-only mapping --
+            # provenance_hashes' own contract is "every value is either a
+            # 64-hex-char hash or the literal 'none'"
+            # (test_hybrid_result_aligns_native_beliefs_and_records_
+            # provenance). Surfacing the mode itself belongs to the
+            # Decision Authority / Applicability Certificate contract
+            # (core-issues5.txt Section 13), not this dict.
+            "model_input_signature_hash": model_input_signature_hash,
             "feature_schema": built.feature_schema_hash,
             "normalization": built.normalization_hash,
             "fusion_config": _hash(DYNAMIC_TRUST_FUSION_CONFIG),

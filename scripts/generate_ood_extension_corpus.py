@@ -61,7 +61,6 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
-import hashlib
 import json
 import sys
 import time
@@ -69,7 +68,6 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-import numpy as np
 
 _ROOT = Path(__file__).resolve().parents[0]
 sys.path.insert(0, str(_ROOT))
@@ -85,7 +83,11 @@ from hydroswarm.data.scenarios import (  # noqa: E402
     WNTRScenarioGenerator,
     network_sha256,
 )
-from hydroswarm.training.corpus import SignatureLibrary, build_feature_context, scenario_to_example  # noqa: E402
+from hydroswarm.training.corpus import (  # noqa: E402
+    build_feature_context,
+    load_committed_signature_library,
+    scenario_to_example,
+)
 from hydroswarm.training.data import ScenarioExample  # noqa: E402
 from hydroswarm.training.ood_labels import OOD_TRIGGERING_CONFIG_OVERRIDES, classify_ood_category, ood_class_target  # noqa: E402
 from hydroswarm.training.sharded_data import write_shards  # noqa: E402
@@ -141,58 +143,6 @@ def _stage_for_index(index: int) -> CurriculumStage:
     return _OOD_STAGE_CYCLE[index % len(_OOD_STAGE_CYCLE)]
 
 
-def _load_committed_signature_library(cycle_b2_root: Path, network_family: str, junctions: tuple[str, ...]) -> SignatureLibrary:
-    """Load cycle-b2's own already-fit signature library directly from
-    ``signatures/<family>.json``, rather than re-simulating TRAIN
-    scenarios and refitting (see this module's own docstring for the
-    real, empirically-confirmed reason: cross-architecture EPANET
-    floating-point divergence makes scenario regeneration untrustworthy
-    on some hosts, and there is no way to tell a diverged scenario from a
-    faithful one without re-simulating cycle-b2 entirely, which
-    restriction #3 forbids anyway).
-
-    Self-consistency check, not a re-derivation from scratch:
-    ``fit_signature_library``'s own hashing convention
-    (``np.nan_to_num(value, nan=-1.0).round(7).tolist()`` per node,
-    JSON-serialized with sorted keys) is applied to the values already
-    stored in the file and compared against that same file's own
-    recorded ``sha256`` -- this proves the file parses correctly and its
-    hash truly describes the values sitting next to it, without
-    requiring any simulation at all.
-    """
-
-    recorded_path = cycle_b2_root / "signatures" / f"{network_family}.json"
-    recorded = json.loads(recorded_path.read_text(encoding="utf-8"))
-    node_ids = tuple(recorded["node_ids"])
-    if node_ids != junctions:
-        raise ValueError(
-            f"{network_family!r}: signatures/{network_family}.json node_ids do not match this topology's "
-            f"real junction list -- refusing to use a mismatched signature artifact"
-        )
-    stored = {node_id: np.asarray(values, dtype=np.float32) for node_id, values in recorded["signatures"].items()}
-    hash_payload = {node_id: value.round(7).tolist() for node_id, value in stored.items()}
-    recomputed_hash = hashlib.sha256(
-        json.dumps(hash_payload, sort_keys=True, separators=(",", ":")).encode()
-    ).hexdigest()
-    if recomputed_hash != recorded["sha256"]:
-        raise ValueError(
-            f"{network_family!r}: signatures/{network_family}.json's stored values do not reproduce its own "
-            f"recorded sha256 (recomputed {recomputed_hash}, recorded {recorded['sha256']}) -- the file is "
-            "corrupted or was hand-edited; refusing to use it"
-        )
-    # fit_signature_library's own sentinel: -1.0 stands in for NaN
-    # (np.nan_to_num(nan=-1.0)) because JSON has no NaN literal. Every
-    # real value here is np.log1p(nonnegative observation) >= 0, so -1.0
-    # is never a legitimate signature value -- reversing it back to NaN
-    # is unambiguous, and required for posterior()'s own
-    # np.isfinite(signature) check to behave the same as it would against
-    # a freshly-fit (never-serialized) SignatureLibrary.
-    runtime_signatures = {
-        node_id: np.where(value == -1.0, np.nan, value).astype(np.float32) for node_id, value in stored.items()
-    }
-    return SignatureLibrary(node_ids=node_ids, signatures=runtime_signatures, manifest_hash=recorded["sha256"])
-
-
 class _TopologyContext:
     """Everything about one training topology that is genuinely shared
     across every OOD category -- computed once in main() rather than
@@ -205,7 +155,7 @@ class _TopologyContext:
         self.network = network
         self.junctions = tuple(sorted(network.junction_name_list))
         self.topology_hash = network_sha256(network)
-        self.library = _load_committed_signature_library(cycle_b2_root, network_family, self.junctions)
+        self.library = load_committed_signature_library(cycle_b2_root, network_family, self.junctions)
 
 
 def generate_category(

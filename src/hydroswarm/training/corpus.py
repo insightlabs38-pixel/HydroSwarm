@@ -17,6 +17,7 @@ from hydroswarm.classical import HydraulicStateEstimator, OperationalTelemetry
 from hydroswarm.data.scenarios import EventType, GeneratedScenario
 from hydroswarm.preprocessing import HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.preprocessing.schema import NormalizationStats
+from hydroswarm.simulation import build_wntr_network
 from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
 from .data import CurriculumStage, ScenarioExample, TopologyMetadata
@@ -45,6 +46,25 @@ class SignatureLibrary:
 
     def posterior(self, scenario: GeneratedScenario) -> np.ndarray:
         observed, valid = aligned_observations(scenario, self.node_ids)
+        return self.posterior_from_observations(observed, valid)
+
+    def posterior_from_observations(self, observed: np.ndarray, valid: np.ndarray) -> np.ndarray:
+        """The governed MODEL-INPUT ``classical_prior`` algorithm
+        (core-issues5.txt delta item 1): per-source-node log1p-residual
+        softmax. ``posterior()`` (training, from a ``GeneratedScenario``'s
+        raw arrays) and live serving's ``model_input_classical_prior``
+        (from live ``SensorSeries`` evidence via
+        ``aligned_observations_from_series``) both call this one
+        implementation so the two paths can never independently drift --
+        before this fix, live serving instead called
+        ``hydroswarm.classical.signatures.localize_with_signatures``, a
+        structurally different Bayesian-posterior algorithm over a
+        different (hypothesis-grid) signature representation, which is a
+        real train/serve input-distribution skew HydroCore's
+        ``classical_prior`` feature is directly sensitive to (see
+        ``scripts/run_train_serve_parity_gate.py``'s module docstring for
+        the original finding)."""
+
         transformed = np.log1p(np.nan_to_num(observed, nan=0.0))
         residuals = []
         for node_id in self.node_ids:
@@ -142,6 +162,49 @@ def aligned_observations(
     return values, valid
 
 
+def aligned_observations_from_series(
+    node_ids: Sequence[str],
+    series: Sequence[Any],
+    target_timestamps_seconds: Sequence[float],
+) -> tuple[np.ndarray, np.ndarray]:
+    """Live-serving equivalent of ``aligned_observations``: builds the same
+    ``(steps, node)`` observation grid from live ``SensorSeries`` evidence
+    (``hydroswarm.preprocessing.SensorSeries``) instead of a
+    ``GeneratedScenario``'s raw arrays, resampled onto
+    ``target_timestamps_seconds`` by nearest-time matching -- the same
+    resampling convention
+    ``HybridInferencePipeline._signature_observations`` already uses to
+    align live evidence onto a *different* (hypothesis-grid) target time
+    axis. Feeding real telemetry timestamps (which need not coincide with
+    any training scenario's own report timesteps) through this function is
+    what lets ``model_input_classical_prior`` reuse
+    ``SignatureLibrary.posterior_from_observations`` unchanged
+    (core-issues5.txt delta item 1)."""
+
+    targets = np.asarray(target_timestamps_seconds, dtype=float)
+    if targets.size == 0:
+        raise ValueError("target_timestamps_seconds must not be empty")
+    values = np.full((targets.size, len(node_ids)), np.nan, dtype=np.float32)
+    valid = np.zeros_like(values, dtype=bool)
+    positions = {node_id: index for index, node_id in enumerate(node_ids)}
+    by_node = {item.node_id: item for item in series}
+    for node_id, column in positions.items():
+        item = by_node.get(node_id)
+        if item is None:
+            continue
+        timestamps = np.asarray(item.timestamps_seconds, dtype=float)
+        if timestamps.size == 0:
+            continue
+        for row, target in enumerate(targets):
+            source_index = int(np.argmin(np.abs(timestamps - target)))
+            value = item.concentration_mg_l[source_index]
+            is_missing = item.missing[source_index]
+            if value is not None and not is_missing and np.isfinite(value):
+                values[row, column] = float(value)
+                valid[row, column] = True
+    return values, valid
+
+
 def fit_signature_library(
     scenarios: Sequence[GeneratedScenario], node_ids: Sequence[str]
 ) -> SignatureLibrary:
@@ -173,6 +236,230 @@ def fit_signature_library(
         json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
     return SignatureLibrary(tuple(node_ids), signatures, digest)
+
+
+#: Default location of the committed per-topology-family MODEL-INPUT
+#: signature libraries (data/learning-v2/cycle-b2 is a protected artifact;
+#: this module only ever reads from it, never writes).
+DEFAULT_MODEL_INPUT_SIGNATURE_ROOT = Path("data/learning-v2/cycle-b2")
+
+
+def load_committed_signature_library(
+    cycle_b2_root: str | Path, network_family: str, node_ids: Sequence[str]
+) -> SignatureLibrary:
+    """Load a topology family's already-fit, already-committed
+    ``SignatureLibrary`` straight from
+    ``<cycle_b2_root>/signatures/<network_family>.json`` -- the exact real
+    training-fit artifact ``fit_signature_library`` produced and Stage-F's
+    training tensors were built from -- rather than re-simulating and
+    refitting (cross-architecture EPANET floating-point divergence makes
+    scenario regeneration untrustworthy on some hosts; see
+    ``scripts/generate_ood_extension_corpus.py``'s own original docstring
+    for this same reasoning, which this function was factored out of so
+    live serving -- ``resolve_model_input_signature_library`` below -- and
+    every corpus/OOD-extension caller share one implementation rather than
+    two independently-maintained copies (core-issues5.txt delta item 1)).
+
+    Self-consistency check, not a re-derivation from scratch:
+    ``fit_signature_library``'s own hashing convention
+    (``np.nan_to_num(value, nan=-1.0).round(7).tolist()`` per node,
+    JSON-serialized with sorted keys) is applied to the values already
+    stored in the file and compared against that same file's own recorded
+    ``sha256`` -- this proves the file parses correctly and its hash truly
+    describes the values sitting next to it, without requiring any
+    simulation at all.
+    """
+
+    recorded_path = Path(cycle_b2_root) / "signatures" / f"{network_family}.json"
+    recorded = json.loads(recorded_path.read_text(encoding="utf-8"))
+    stored_node_ids = tuple(recorded["node_ids"])
+    if stored_node_ids != tuple(node_ids):
+        raise ValueError(
+            f"{network_family!r}: signatures/{network_family}.json node_ids do not match the "
+            "supplied junction list -- refusing to use a mismatched signature artifact"
+        )
+    stored = {node_id: np.asarray(values, dtype=np.float32) for node_id, values in recorded["signatures"].items()}
+    hash_payload = {node_id: value.round(7).tolist() for node_id, value in stored.items()}
+    recomputed_hash = hashlib.sha256(
+        json.dumps(hash_payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    if recomputed_hash != recorded["sha256"]:
+        raise ValueError(
+            f"{network_family!r}: signatures/{network_family}.json's stored values do not reproduce its "
+            f"own recorded sha256 (recomputed {recomputed_hash}, recorded {recorded['sha256']}) -- the "
+            "file is corrupted or was hand-edited; refusing to use it"
+        )
+    # fit_signature_library's own sentinel: -1.0 stands in for NaN
+    # (np.nan_to_num(nan=-1.0)) because JSON has no NaN literal.
+    runtime_signatures = {
+        node_id: np.where(value == -1.0, np.nan, value).astype(np.float32) for node_id, value in stored.items()
+    }
+    return SignatureLibrary(node_ids=stored_node_ids, signatures=runtime_signatures, manifest_hash=recorded["sha256"])
+
+
+def reference_training_timestamps_seconds(network: Any) -> np.ndarray:
+    """The canonical scenario observation-window timestamps a topology
+    family's committed signature library
+    (``data/learning-v2/cycle-b2/signatures/<family>.json``) was fit
+    against.
+
+    ``WNTRScenarioGenerator.generate_with_network`` never randomizes
+    simulation TIMING (only demand/roughness/tank/pipe state -- see
+    ``_randomize_hydraulics``); a scenario's own ``timestamps_seconds`` is
+    simply ``simulate_incident(...).concentration_mg_l.index``, which
+    depends only on the network's own WNTR time configuration
+    (``report_timestep``/``duration``), not on which source/start/duration/
+    strength was simulated. Reproduced here by running one real
+    ``simulate_incident`` call rather than hand-deriving the report-time
+    formula, so this can never silently drift from what
+    ``generate_with_network`` actually does."""
+
+    junctions = sorted(network.junction_name_list)
+    if not junctions:
+        raise ValueError("network has no junction source candidates")
+    simulation = HydraulicSimulator(network).simulate_incident(junctions[0])
+    return np.asarray(simulation.concentration_mg_l.index, dtype=np.float64)
+
+
+#: The exact same three topology-family loaders
+#: ``scripts/generate_cycle_b_corpus.py``'s own ``TRAIN_TOPOLOGIES`` uses,
+#: mirrored here (``training/corpus.py`` cannot import from ``scripts/``)
+#: so ``resolve_model_input_signature_library`` can load a FRESH pristine
+#: reference network for a ``GOVERNED_KNOWN_NETWORK`` match, rather than
+#: trusting the served ``network`` object's own WNTR time configuration --
+#: ``network_sha256`` deliberately hashes only node/link topology and
+#: link roughness/length/diameter (see its own docstring), NOT
+#: ``options.time`` (report_timestep/duration), so a hash-matched served
+#: network could in principle carry different simulation timing than the
+#: pristine network the committed signature library was actually fit
+#: against (this is exactly what several `HybridInferencePipeline` test
+#: fixtures do: build the real golden-reference topology but shorten its
+#: simulation duration for fast tests). Kept in sync with
+#: ``KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH`` by
+#: ``tests/unit/test_signature_policy.py``'s own hash-reproduction test.
+def _load_pristine_reference_network(family: str) -> Any:
+    if family == "golden-reference":
+        return build_wntr_network()
+    import wntr
+
+    if family == "branched-loop":
+        return wntr.network.WaterNetworkModel("data/topology-transfer/branched-loop.inp")
+    if family == "loop-grid":
+        return wntr.network.WaterNetworkModel("data/topologies/loop-grid.inp")
+    raise ValueError(f"unknown known-training-topology family: {family!r}")
+
+
+def fit_runtime_signature_library(network: Any) -> SignatureLibrary:
+    """RUNTIME_GENERATED_IMPORTED_NETWORK equivalent of
+    ``fit_signature_library`` for the MODEL-INPUT ``classical_prior``
+    algorithm (core-issues5.txt delta item 1) -- one ``simulate_incident``
+    per junction source against a network this policy's training corpus
+    never saw, mirroring
+    ``hydroswarm.classical.signature_policy``'s already-established
+    two-mode pattern (``GOVERNED_KNOWN_NETWORK`` vs.
+    ``RUNTIME_GENERATED_IMPORTED_NETWORK``) for the *other* (hypothesis-grid)
+    signature artifact. Deterministically reproducible, but MUST be labeled
+    ``RUNTIME_GENERATED_IMPORTED_NETWORK`` by callers -- never presented as
+    equivalent to a training-owned artifact fit from many independent
+    scenarios."""
+
+    junctions = tuple(sorted(network.junction_name_list))
+    if not junctions:
+        raise ValueError("network has no junction source candidates")
+    simulator = HydraulicSimulator(network)
+    signatures: dict[str, np.ndarray] = {}
+    for node_id in junctions:
+        simulation = simulator.simulate_incident(node_id)
+        frame = simulation.concentration_mg_l.loc[:, list(junctions)]
+        signatures[node_id] = np.log1p(frame.to_numpy(dtype=np.float32))
+    payload = {
+        node_id: np.nan_to_num(value, nan=-1.0).round(7).tolist() for node_id, value in signatures.items()
+    }
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    return SignatureLibrary(junctions, signatures, digest)
+
+
+#: In-process cache of resolved model-input signature libraries, keyed by
+#: topology_hash -- avoids re-simulating (either loading + hashing a
+#: committed artifact, or, for imported networks, re-running one
+#: simulate_incident per junction) on every single HybridInferencePipeline.
+#: analyze() call for what is, for a fixed topology_hash, always the exact
+#: same deterministic result. Not persisted to disk: purely a same-process
+#: performance cache, safe to lose on restart.
+_MODEL_INPUT_SIGNATURE_CACHE: dict[str, tuple[SignatureLibrary, tuple[float, ...], str]] = {}
+
+
+def resolve_model_input_signature_library(
+    topology_hash: str,
+    node_ids: Sequence[str],
+    network: Any,
+    *,
+    cycle_b2_root: str | Path = DEFAULT_MODEL_INPUT_SIGNATURE_ROOT,
+) -> tuple[SignatureLibrary, tuple[float, ...], str]:
+    """Resolve the governed MODEL-INPUT ``classical_prior`` signature
+    library for a served network (core-issues5.txt delta item 1).
+
+    Returns ``(library, reference_timestamps_seconds, mode)`` where
+    ``mode`` is a ``hydroswarm.classical.signature_policy.SignatureMode``
+    string. For ``GOVERNED_KNOWN_NETWORK``, ``library`` is the real
+    training-fit ``SignatureLibrary`` loaded from the committed
+    ``data/learning-v2/cycle-b2/signatures/<family>.json`` artifact -- the
+    exact object ``scenario_to_example`` uses to build Stage-F training
+    tensors. For ``RUNTIME_GENERATED_IMPORTED_NETWORK``, no governed
+    training-owned artifact exists; ``library`` is a
+    ``fit_runtime_signature_library`` best-effort approximation using the
+    identical algorithm, and callers must record/surface the mode rather
+    than silently presenting it as training-owned provenance."""
+
+    from hydroswarm.classical.signature_policy import (
+        KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH,
+        resolve_signature_mode,
+    )
+
+    cached = _MODEL_INPUT_SIGNATURE_CACHE.get(topology_hash)
+    if cached is not None and cached[0].node_ids == tuple(node_ids):
+        return cached
+
+    mode = resolve_signature_mode(topology_hash)
+    if mode == "GOVERNED_KNOWN_NETWORK":
+        family = KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH[topology_hash]
+        # Reference timestamps come from a FRESH pristine copy of the
+        # training topology, not the served `network` object -- see
+        # _load_pristine_reference_network's own docstring for why.
+        reference_timestamps = tuple(
+            map(float, reference_training_timestamps_seconds(_load_pristine_reference_network(family)))
+        )
+        library = load_committed_signature_library(cycle_b2_root, family, node_ids)
+    else:
+        reference_timestamps = tuple(map(float, reference_training_timestamps_seconds(network)))
+        library = fit_runtime_signature_library(network)
+    result = (library, reference_timestamps, mode)
+    _MODEL_INPUT_SIGNATURE_CACHE[topology_hash] = result
+    return result
+
+
+def model_input_classical_prior(
+    library: SignatureLibrary,
+    node_ids: Sequence[str],
+    series: Sequence[Any],
+    target_timestamps_seconds: Sequence[float],
+) -> dict[str, float]:
+    """The MODEL-INPUT ``classical_prior`` HydroCore actually consumes,
+    computed with the exact same algorithm Stage-F training tensors were
+    built with (``SignatureLibrary.posterior_from_observations``) --
+    distinct from
+    ``hydroswarm.inference.pipeline.HybridInferencePipeline``'s richer
+    ``live_classical_localization`` (``localize_with_signatures``'s
+    Bayesian posterior over the runtime hypothesis-grid artifact), which
+    remains available for deterministic reasoning/fusion/operator evidence
+    but must never be silently substituted here (core-issues5.txt delta
+    item 1)."""
+
+    observed, valid = aligned_observations_from_series(node_ids, series, target_timestamps_seconds)
+    vector = library.posterior_from_observations(observed, valid)
+    return dict(zip(library.node_ids, map(float, vector), strict=True))
 
 
 #: Canonical integer ordering for the event_cause target.

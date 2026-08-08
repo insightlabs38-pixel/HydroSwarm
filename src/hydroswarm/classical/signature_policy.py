@@ -80,6 +80,7 @@ from typing import Literal
 
 __all__ = [
     "GOVERNED_TRAINING_SIGNATURE_POLICY",
+    "KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH",
     "KNOWN_TRAINING_TOPOLOGY_HASHES",
     "SignatureMode",
     "SignaturePolicy",
@@ -158,11 +159,19 @@ GOVERNED_TRAINING_SIGNATURE_POLICY = SignaturePolicy(
 #: (data/topologies/loop-grid.inp). Computed directly from those three
 #: network sources (see this module's own test suite for the
 #: reproduction), not hand-copied from a report.
-KNOWN_TRAINING_TOPOLOGY_HASHES: frozenset[str] = frozenset({
-    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",  # golden-reference
-    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",  # branched-loop
-    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",  # loop-grid
-})
+#: The same three hashes, mapped to the ``data/learning-v2/cycle-b2/
+#: signatures/<family>.json`` filename stem each corresponds to -- the
+#: single source of truth ``hydroswarm.training.corpus.
+#: resolve_model_input_signature_library`` uses to locate the right
+#: committed MODEL-INPUT signature library for a ``GOVERNED_KNOWN_NETWORK``
+#: match (core-issues5.txt delta item 1). ``KNOWN_TRAINING_TOPOLOGY_HASHES``
+#: is derived from this mapping's keys so the two can never drift apart.
+KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH: dict[str, str] = {
+    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e": "golden-reference",
+    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056": "branched-loop",
+    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88": "loop-grid",
+}
+KNOWN_TRAINING_TOPOLOGY_HASHES: frozenset[str] = frozenset(KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH)
 
 
 def resolve_signature_mode(

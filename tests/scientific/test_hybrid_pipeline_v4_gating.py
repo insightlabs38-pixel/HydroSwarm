@@ -12,6 +12,7 @@ from uuid import uuid4
 import torch
 
 from hydroswarm.inference import HybridInferencePipeline
+from hydroswarm.inference.results import HybridRuntimeMode
 
 from test_hybrid_pipeline import PriorFollowingModel, _pipeline, _series
 
@@ -254,3 +255,51 @@ def test_enabled_strategist_plan_scores_do_reach_semantic_predictions() -> None:
     )
     assert result.semantic_predictions.plan_values != ()
     assert result.semantic_predictions.plan_validity != ()
+
+
+def test_disabled_source_node_falls_back_to_classical_only_belief() -> None:
+    """core-issues5.txt delta item 2: source_node is a normal granular
+    output like any other -- excluding it from runtime_enabled_outputs must
+    make the neural source belief provably unable to influence the fused
+    result, degrading to classical-only belief exactly like a neural
+    inference failure would, not silently ignored the way the pre-fix code
+    unconditionally consumed source_node_logits regardless of governance."""
+
+    disabled = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset())
+    assert disabled.neural_belief is None
+    assert disabled.fusion_diagnostics is None
+    assert disabled.fused_belief == disabled.classical_belief
+    assert disabled.runtime_mode == HybridRuntimeMode.FULL_HYBRID
+
+
+def test_enabled_source_node_does_influence_the_fused_result() -> None:
+    """The other half of the same invariant: when a v4 identity DOES
+    validate/runtime-enable source_node, the neural belief must actually
+    reach fusion -- proving the gate in
+    HybridInferencePipeline.analyze() is a real two-way switch, not a
+    one-way suppression that happens to always look disabled."""
+
+    enabled = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset({"source_node"}))
+    assert enabled.neural_belief is not None
+    assert enabled.fusion_diagnostics is not None
+
+
+def test_extreme_source_node_logits_cannot_move_the_result_when_disabled() -> None:
+    """core-issues5.txt Section 11's general regression-test pattern
+    (mutate a disabled head's logits to extreme values, assert the
+    operational result is unchanged), applied to source_node specifically
+    -- the one output every prior pass left ungoverned."""
+
+    class ExtremeSourceModel(PriorFollowingModel):
+        def __call__(self, batch):
+            output = super().__call__(batch)
+            output["source_node_logits"] = torch.full_like(output["source_node_logits"], 1_000.0)
+            output["source_node_logits"][0, 0] = -1_000.0
+            return output
+
+    moderate = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset())
+    extreme = _analyze(ExtremeSourceModel(), runtime_enabled_outputs=frozenset())
+
+    assert moderate.fused_belief == extreme.fused_belief
+    assert moderate.neural_belief is None
+    assert extreme.neural_belief is None
