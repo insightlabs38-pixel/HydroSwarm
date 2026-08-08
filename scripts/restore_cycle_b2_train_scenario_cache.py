@@ -4,10 +4,33 @@ data/learning-v2/**/scenarios/**/*.npz -- only the JSONL manifests and the
 pre-built tensor shards are committed; the raw per-scenario simulation
 arrays are treated as a regenerable cache, not a governed artifact).
 
-scripts/generate_ood_extension_corpus.py needs these to refit each training
-topology's signature library from real TRAIN scenarios
-(_load_train_scenarios_for_family -> load_generated_scenarios), which fails
-outright if even one referenced .npz is absent.
+**2026-08-08 finding, real and empirically confirmed -- read before relying
+on this script's output for anything semantically load-bearing**:
+same-seed same-config WNTR/EPANET regeneration is NOT guaranteed
+bit-for-bit reproducible across CPU architectures. A real run of this
+script on an aarch64 host reproduced golden-reference's CLEAN-stage
+scenario (index 0, seed 71000) exactly, but its ADVERSARIAL-stage
+scenario (index 4, seed 71400, with model_mismatch flags set) did NOT
+match cycle-b2's own committed artifact_sha256 -- caught by this script's
+own fail-closed verification below, not silently accepted. Root cause is
+believed to be genuine cross-architecture floating-point divergence in
+EPANET's iterative hydraulic/water-quality solver (more complex/longer
+simulation paths appear more likely to diverge), not a bug in this
+script's config reconstruction -- the mismatched scenario's scenario_id
+matched exactly (proving the config was reconstructed correctly); only
+the simulated array VALUES differed. Because of this, do not assume a
+successful run of this script on any given host reproduces the FULL
+train split correctly merely because some scenarios verify -- every
+scenario must pass its own fail-closed check, and if even one fails (as
+happened here), the correct response is to stop, not to skip and
+continue. scripts/generate_ood_extension_corpus.py no longer depends on
+this script for its signature-library needs for exactly this reason (it
+now loads cycle-b2's own already-committed signatures/<family>.json
+directly instead -- see that script's own docstring). This script remains
+useful for narrow, verified spot-checks (e.g. confirming a specific
+scenario reproduces on a given host) but should not be treated as a
+general-purpose full-cache restoration tool until/unless a host is
+independently confirmed to reproduce cycle-b2 bit-for-bit end to end.
 
 This script does NOT regenerate cycle-b2 (restriction #3: cycle-b2 is
 immutable and must never be regenerated to produce different values). It
@@ -22,7 +45,10 @@ recomputes each scenario's artifact_sha256 from the loaded arrays and
 raises ValueError on any mismatch against the committed manifest -- this
 script calls that same loader immediately after writing, per family, and
 fails closed if the committed corpus's recorded hashes do not match what
-this environment's WNTR/numpy reproduces bit-for-bit.
+this environment's WNTR/numpy reproduces bit-for-bit. On failure, this
+script does not clean up whatever it already wrote -- the caller is
+responsible for removing any partial, unverified scenarios/train/
+contents before treating the directory as trustworthy again.
 """
 
 from __future__ import annotations

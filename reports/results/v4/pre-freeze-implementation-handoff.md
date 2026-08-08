@@ -3518,30 +3518,54 @@ this pass launched complete.
    host's real architecture (`scripts/dev/build_native_epanet.sh`, new
    this pass) and installing it at the exact path wntr's toolkit.py
    expects, backing up the original x86_64 binary rather than deleting
-   it. **Verified bit-for-bit, not assumed**: a regenerated
-   `golden-reference` train scenario (seed 71000) via the native build
-   produces the exact same `scenario_id` and `artifact_sha256` as
-   `cycle-b2`'s own already-committed manifest record.
+   it. This makes live WNTR simulation work (a real `EpanetSimulator.
+   run_sim()` succeeds) — but does **not** guarantee cross-architecture
+   bit-for-bit reproduction of scenarios originally generated on a
+   different host; see item 3 below for the real, empirically-confirmed
+   finding that it does not, in general. (An earlier draft of this
+   section claimed "verified bit-for-bit" based on a single trivial
+   spot-check; corrected here once a harder case disproved it — the
+   script's own comment is corrected too.)
 
 3. **`data/learning-v2/cycle-b2/scenarios/train/*.npz` (raw simulation
    arrays) are gitignored and were also missing** — needed by
-   `generate_ood_extension_corpus.py`'s per-topology signature-library
-   refit step (`_load_train_scenarios_for_family` →
+   `generate_ood_extension_corpus.py`'s ORIGINAL per-topology
+   signature-library refit step (`_load_train_scenarios_for_family` →
    `load_generated_scenarios`, which eagerly loads every train `.npz`
    the manifest references, all 9000, not just one topology's share).
-   Fixed by `scripts/restore_cycle_b2_train_scenario_cache.py` (new this
-   pass): replays `generate_cycle_b_corpus.py`'s own unmodified
-   `_generate_topology_scenarios()` per training topology (same
-   `seed_base` formula), writes ONLY the raw `.npz` arrays (never
-   touching the already-committed `manifests/train.jsonl`), then
-   immediately reloads through `load_generated_scenarios` — the same
-   loader `generate_ood_extension_corpus.py` itself uses, which
-   independently recomputes `artifact_sha256` from the written arrays
-   and raises on any mismatch against the committed manifest. Fails
-   closed if this environment's WNTR/numpy ever fails to reproduce
-   cycle-b2 bit-for-bit; per item 2's spot-check, it does not.
-   `cycle-b2` itself is never regenerated or mutated — restriction #3
-   holds throughout.
+   `scripts/restore_cycle_b2_train_scenario_cache.py` (new this pass)
+   attempted to fix this by replaying `generate_cycle_b_corpus.py`'s own
+   unmodified `_generate_topology_scenarios()` and writing only the raw
+   `.npz` arrays, then immediately reloading through
+   `load_generated_scenarios` (the same loader
+   `generate_ood_extension_corpus.py` itself uses) to verify each
+   scenario's recomputed `artifact_sha256` against the committed
+   manifest before trusting it.
+
+   **This verification is what caught a real, more serious finding**:
+   `golden-reference`'s CLEAN-stage scenario (index 0, seed 71000)
+   reproduced bit-for-bit, but its ADVERSARIAL-stage scenario (index 4,
+   seed 71400, `model_mismatch` flags set) did **not** — a genuine
+   cross-architecture floating-point divergence in EPANET's iterative
+   solver, confirmed real (not a config bug) because the mismatched
+   scenario's `scenario_id` matched exactly while only the simulated
+   array VALUES differed. This makes bulk scenario-cache restoration via
+   regeneration fundamentally untrustworthy on this sandbox — not a
+   one-off fluke to retry past, since there is no way to tell which
+   scenarios will silently diverge without checking every single one.
+   The partial (3000/9000, unverified-as-a-whole) cache this produced
+   was deleted, not left in place — `cycle-b2` itself was never touched
+   (restriction #3 holds), and this script's own docstring now carries
+   this finding prominently so it is not silently trusted again.
+
+   **Resolved differently, not forced through**: since the actual need
+   was a signature library matching cycle-b2's own governed artifact —
+   not literally re-deriving it from raw scenarios — `generate_ood_
+   extension_corpus.py` was changed to load `cycle-b2`'s own
+   already-committed `signatures/<family>.json` directly (see
+   requirement 2's own section below for the full account). This needs
+   no scenario regeneration at all, sidestepping the cross-architecture
+   reproducibility problem entirely rather than working around it.
 
 Both are one-time-per-sandbox environment fixes, not repository defects
 in the governed sense; recorded in a project memory
@@ -3611,7 +3635,7 @@ against the `v4corpus` (uncorrected-shared-features) run's own numbers
 role-specific baseline for Stage F. Not yet run — recorded here so the
 exact comparison is unambiguous once both results exist.
 
-### Requirement 2: OOD extension seed-family fix — CODE DONE AND COMMITTED, REGENERATION BLOCKED ON SCENARIO-CACHE RESTORE (background job running)
+### Requirement 2: OOD extension seed-family fix — CODE DONE, DATA REGENERATION IN PROGRESS (background job running)
 
 Root cause confirmed (matches the previous pass's own finding exactly):
 `generate_ood_extension_corpus.py`'s default `--seed 91_000` plus its
@@ -3637,41 +3661,83 @@ all passing. The old (defective) corpus was renamed, not deleted, to
 `data/learning-v2/cycle-b2-ood-extension-v1-seed-collision-defect/` for
 audit.
 
-Regeneration itself (`python scripts/generate_ood_extension_corpus.py
---cycle-b2-root data/learning-v2/cycle-b2 --output
-data/learning-v2/cycle-b2-ood-extension`) needs live WNTR (environment
-defect 2 above, now fixed) AND the restored train scenario cache
-(environment defect 3 above) to refit each topology's signature
-library. Both fixes are in place; the cache-restoration background job
-is running now (see below) — regeneration has not started yet, it is
-queued to start the moment that job closes.
+**A second real defect surfaced while trying to run the regeneration,
+required a design change, not just a data fix (commit follows this
+section)**: `generate_ood_extension_corpus.py`'s per-topology signature
+library was originally REFIT from real `cycle-b2` TRAIN-split scenarios
+loaded from `.npz` arrays on disk — but those `.npz` files are
+gitignored (regenerable cache, not a governed artifact) and were simply
+absent on this sandbox. A same-seed same-config regeneration attempt
+(`scripts/restore_cycle_b2_train_scenario_cache.py`, written this pass)
+reproduced `golden-reference`'s CLEAN-stage scenario (index 0, seed
+71000) bit-for-bit, but its ADVERSARIAL-stage scenario (index 4, seed
+71400, `model_mismatch` flags set) did **not** reproduce
+`cycle-b2`'s own committed `artifact_sha256` — a real cross-architecture
+floating-point divergence in EPANET's iterative solver on this
+sandbox's aarch64 host, caught by the restore script's own fail-closed
+verification (not silently accepted), confirmed real by checking that
+the mismatched scenario's `scenario_id` DID match exactly (proving
+config reconstruction was correct) while only the simulated array
+VALUES differed. This makes "refit signatures by regenerating raw
+scenarios" fundamentally untrustworthy on this sandbox — not fixable by
+retrying, since some fraction of scenarios silently diverge and only a
+per-scenario hash check catches which ones.
 
-**Background job — cycle-b2 train scenario cache restoration (prerequisite for OOD-extension regeneration)**
+Fixed by changing what the signature library is built FROM, not by
+forcing the regeneration to work: `generate_ood_extension_corpus.py`'s
+`_load_committed_signature_library` (replacing
+`_refit_and_verify_signature_library`) now loads `cycle-b2`'s own
+already-fit `signatures/<family>.json` directly — the values a correct
+refit against the ORIGINAL (correct) generation run already produced,
+requiring no re-simulation at all. Self-consistency-verified (not
+merely trusted): `fit_signature_library`'s own hashing convention
+(`np.nan_to_num(nan=-1.0).round(7)` per node, sorted-key JSON, sha256)
+is recomputed from the values already stored in the file and compared
+against that file's own recorded `sha256` — empirically confirmed to
+match exactly for `golden-reference` before relying on it. The `-1.0`
+NaN-sentinel is reversed back to real `NaN` for runtime use (every
+legitimate signature value is `np.log1p(nonnegative)` ≥ 0, so `-1.0` is
+never ambiguous). `cycle-b2` itself is still never mutated or
+regenerated — restriction #3 holds. All 9 tests in
+`tests/scientific/test_generate_ood_extension_corpus.py` pass, including
+the 5 real-scale WNTR recipe-trigger tests (previously blocked by the
+same missing-`.npz` problem, now unblocked since no `.npz` scenarios are
+needed for signature loading at all).
+
+The native-EPANET-build fix (environment defect 2 above) is still
+required and still correct — it makes live WNTR simulation of the OOD
+scenarios themselves work — but the earlier claim that it reproduces
+`cycle-b2` "bit-for-bit" was premature (checked against exactly one
+trivial scenario). Corrected in `scripts/dev/build_native_epanet.sh`'s
+own comment and in this session's memory record: it guarantees live
+simulation works, not cross-architecture bit-for-bit reproduction of a
+pre-existing corpus.
+
+**Background job — OOD extension corpus regeneration (fixed script, real run)**
 
 ```
-command: python -u scripts/restore_cycle_b2_train_scenario_cache.py
+command: python -u scripts/generate_ood_extension_corpus.py \
+  --cycle-b2-root data/learning-v2/cycle-b2 \
+  --output data/learning-v2/cycle-b2-ood-extension
 env: PYTHONPATH=src
-log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/restore-train-scenarios.log
-started: 2026-08-08T01:11Z
-expected wall time: ~100-110 min (replays generate_cycle_b_corpus.py's
-  full 4-split generation per topology to reach the train portion --
-  see the script's own docstring for why; only .npz arrays are written,
-  manifests/train.jsonl is untouched)
+log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/ood-extension-regen.log
+started: 2026-08-08T01:3{2,3}Z (immediately after the signature-loading fix landed)
+expected wall time: ~5-6 min (matches the original defective run's own
+  generation_seconds of 330.0s -- WNTR simulation cost is unchanged,
+  only the signature-loading step got cheaper)
 ```
 
-Once this closes (all 3 topologies restored and hash-verified), the
-remaining commands for requirement 2 are:
+Once this closes (1600/1600 scenarios generated and `ood_class`-verified
+across all 4 categories, `seed_family_verification.collisions == []`
+recorded in `generation-report.json`), the remaining commands for
+requirement 2 are:
 
 ```bash
 export PYTHONPATH=src
-python scripts/generate_ood_extension_corpus.py \
-  --cycle-b2-root data/learning-v2/cycle-b2 \
-  --output data/learning-v2/cycle-b2-ood-extension
-# then, matching cycle-b2's own two-step convention (raw tensors first,
-# tensors-normalized/ second) -- rebuild_split() called directly per
-# category, same as the previous (defective) generation's own approach,
-# since rebuild_normalized_shards.py's main() hard-requires a "train"
-# split this corpus deliberately does not have:
+# tensors-normalized/ counterpart, matching cycle-b2's own two-step
+# convention -- rebuild_split() called directly per category since
+# rebuild_normalized_shards.py's main() hard-requires a "train" split
+# this corpus deliberately does not have:
 python - <<'PY'
 from pathlib import Path
 from hydroswarm.preprocessing.schema import NormalizationStats
@@ -3698,7 +3764,7 @@ not just the small regression tests), and the gates script's
 `gradient_smoke` gate must show `ood_class` among the tasks with a
 positive valid count and nonzero gradient (it was completely absent
 before this fix, since `include_ood_extension` defaulted to `False`).
-Not yet run — queued behind the scenario-cache restoration job.
+Not yet run — queued behind the regeneration job above.
 
 ### Stage F training script prepared, not yet run
 
@@ -3734,10 +3800,11 @@ python scripts/run_stage_f_training.py
 | item | status |
 |---|---|
 | Stage-A Sentinel regen (teacher checkpoint) | running (background job, ~70-75 min/seed x 2) |
-| cycle-b2 train scenario cache restore | running (background job, ~100-110 min) |
-| native EPANET build (aarch64) | done, verified bit-for-bit |
+| cycle-b2 train scenario cache restore | abandoned -- confirmed cross-arch non-reproducible on this sandbox, not needed anymore (see below) |
+| native EPANET build (aarch64) | done -- makes live simulation work; does NOT guarantee cross-arch bit-for-bit reproduction (corrected claim) |
 | OOD extension seed-family fix (code) | done, committed, tests passing |
-| OOD extension regeneration (data) | queued behind scenario-cache restore |
+| OOD extension signature-loading redesign (code) | done, committed, tests passing (9/9, including real-scale WNTR recipe tests) |
+| OOD extension regeneration (data) | running (background job, ~5-6 min) |
 | Strategist retrain on corrected tensors | queued behind Stage-A regen |
 | Stage E rerun on corrected-input Strategist | queued behind the retrain above |
 | Stage F joint-corpus rebuild + gates (with OOD extension) | queued behind OOD extension regeneration |
@@ -3746,6 +3813,6 @@ python scripts/run_stage_f_training.py
 | `final-selection.json` | does not exist |
 | Locked final test | not opened |
 
-This section will be updated again once the two background jobs above
-close and the subsequent requirement-1/requirement-2/Stage-F steps
-actually run (not merely planned).
+This section will be updated again once the background jobs above close
+and the subsequent requirement-1/requirement-2/Stage-F steps actually
+run (not merely planned).

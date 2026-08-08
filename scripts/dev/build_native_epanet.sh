@@ -12,11 +12,24 @@
 #
 # This script builds the OWA EPANET 2.2 C toolkit from source for the
 # current architecture and drops it in at the exact path wntr expects,
-# after backing up whatever was there. Verified (2026-08-08) to reproduce
-# data/learning-v2/cycle-b2's own committed scenario artifact_sha256
-# bit-for-bit -- i.e. this is not an approximation, it is the same governed
-# EPANET 2.2 toolkit API, just compiled for this host's real architecture
-# instead of a foreign one that cannot even load.
+# after backing up whatever was there -- the same governed EPANET 2.2
+# toolkit API, just compiled for this host's real architecture instead of
+# a foreign one that cannot even load. This makes live WNTR simulation
+# work at all (verified: a real EpanetSimulator.run_sim() succeeds).
+#
+# IMPORTANT caveat, found real and confirmed 2026-08-08 (see
+# scripts/restore_cycle_b2_train_scenario_cache.py's own docstring for the
+# full account): this does NOT guarantee bit-for-bit reproduction of
+# scenarios originally generated on a different CPU architecture. A
+# same-seed same-config regeneration reproduced a simple (CLEAN-stage)
+# scenario's artifact_sha256 exactly, but did NOT reproduce a more complex
+# (ADVERSARIAL-stage, model-mismatch-perturbed) one -- real cross-
+# architecture floating-point divergence in EPANET's iterative solver, not
+# a config/determinism bug. Live simulation of NEW scenarios (this
+# session, this host) is fine; treat any attempt to bit-for-bit reproduce
+# a PRE-EXISTING x86_64-generated corpus's raw scenario arrays on this
+# architecture as unverified until each individual scenario's own
+# artifact_sha256 is checked, not assumed from one spot-check.
 #
 # Only needed on Linux hosts where `python3 -c "import wntr"` + a real
 # EpanetSimulator.run_sim() raises the OSError above. Safe to re-run.

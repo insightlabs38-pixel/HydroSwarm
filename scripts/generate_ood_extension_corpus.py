@@ -20,13 +20,27 @@ Governed constraints this script honors (core-issues3.txt Phase 2 items
   layout so existing tooling (ShardedScenarioDataset, run_corpus_gates.py-
   style consumers) recognizes it without modification.
 - Never fits a NEW signature artifact from these OOD scenarios. Each
-  training topology's signature library is REFIT from that same
-  topology's real cycle-b2 TRAIN-split scenarios (deterministic --
-  fit_signature_library's own "deterministic rebuild" guarantee, already
-  tested in tests/scientific/test_signature_registry.py) and its hash is
-  verified against cycle-b2's own recorded signatures/<family>.json before
-  use, so this script is provably using the identical artifact, not a
-  drifted or newly-fit one.
+  training topology's signature library is LOADED directly from cycle-b2's
+  own already-committed signatures/<family>.json (see
+  _load_committed_signature_library), self-consistency-hash-verified
+  against that file's own recorded sha256 (fit_signature_library's exact
+  nan_to_num(-1.0)+round(7) hashing convention, applied to the stored
+  values), so this script is provably using the identical artifact, not a
+  drifted or newly-fit one. This deliberately does NOT re-simulate
+  cycle-b2's TRAIN scenarios and refit from them at generation time
+  (2026-08-08 finding, real and empirically confirmed, not theoretical):
+  a same-seed same-config WNTR/EPANET regeneration on an aarch64 host
+  reproduced a CLEAN-stage scenario's simulated arrays bit-for-bit but
+  did NOT reproduce an ADVERSARIAL-stage scenario's (real cross-
+  architecture floating-point divergence in EPANET's iterative solver,
+  confirmed via load_generated_scenarios' own artifact_sha256 check
+  raising on the regenerated ADVERSARIAL scenario while the CLEAN one
+  passed) -- refitting from regenerated scenarios on such a host would
+  silently risk an incorrect signature library that only a hash check
+  would catch, if anyone thought to add one. Loading the artifact
+  cycle-b2 already committed sidesteps the entire question: those values
+  came from the original (correct, governed) generation run, are already
+  hash-identified, and require no re-simulation at all.
 - Every generated scenario is verified for real: classify_ood_category()
   must actually return the intended category, not merely assumed from the
   override recipe (which is itself tested only at small synthetic scale).
@@ -47,12 +61,15 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import hashlib
 import json
 import sys
 import time
 from collections import Counter
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 _ROOT = Path(__file__).resolve().parents[0]
 sys.path.insert(0, str(_ROOT))
@@ -68,7 +85,7 @@ from hydroswarm.data.scenarios import (  # noqa: E402
     WNTRScenarioGenerator,
     network_sha256,
 )
-from hydroswarm.training.corpus import build_feature_context, fit_signature_library, scenario_to_example  # noqa: E402
+from hydroswarm.training.corpus import SignatureLibrary, build_feature_context, scenario_to_example  # noqa: E402
 from hydroswarm.training.data import ScenarioExample  # noqa: E402
 from hydroswarm.training.ood_labels import OOD_TRIGGERING_CONFIG_OVERRIDES, classify_ood_category, ood_class_target  # noqa: E402
 from hydroswarm.training.sharded_data import write_shards  # noqa: E402
@@ -124,35 +141,62 @@ def _stage_for_index(index: int) -> CurriculumStage:
     return _OOD_STAGE_CYCLE[index % len(_OOD_STAGE_CYCLE)]
 
 
-def _load_train_scenarios_for_family(cycle_b2_root: Path, network_family: str) -> list[Any]:
-    from hydroswarm.data.scenarios import load_generated_scenarios
+def _load_committed_signature_library(cycle_b2_root: Path, network_family: str, junctions: tuple[str, ...]) -> SignatureLibrary:
+    """Load cycle-b2's own already-fit signature library directly from
+    ``signatures/<family>.json``, rather than re-simulating TRAIN
+    scenarios and refitting (see this module's own docstring for the
+    real, empirically-confirmed reason: cross-architecture EPANET
+    floating-point divergence makes scenario regeneration untrustworthy
+    on some hosts, and there is no way to tell a diverged scenario from a
+    faithful one without re-simulating cycle-b2 entirely, which
+    restriction #3 forbids anyway).
 
-    scenarios = load_generated_scenarios(cycle_b2_root / "scenarios", DatasetSplit.TRAIN)
-    return [scenario for scenario in scenarios if scenario.manifest.network_family == network_family]
+    Self-consistency check, not a re-derivation from scratch:
+    ``fit_signature_library``'s own hashing convention
+    (``np.nan_to_num(value, nan=-1.0).round(7).tolist()`` per node,
+    JSON-serialized with sorted keys) is applied to the values already
+    stored in the file and compared against that same file's own
+    recorded ``sha256`` -- this proves the file parses correctly and its
+    hash truly describes the values sitting next to it, without
+    requiring any simulation at all.
+    """
 
-
-def _refit_and_verify_signature_library(cycle_b2_root: Path, network_family: str, junctions: tuple[str, ...]) -> Any:
-    train_scenarios = _load_train_scenarios_for_family(cycle_b2_root, network_family)
-    if not train_scenarios:
-        raise ValueError(f"no cycle-b2 TRAIN scenarios found for network_family={network_family!r}")
-    library = fit_signature_library(train_scenarios, junctions)
     recorded_path = cycle_b2_root / "signatures" / f"{network_family}.json"
     recorded = json.loads(recorded_path.read_text(encoding="utf-8"))
-    if library.manifest_hash != recorded["sha256"]:
+    node_ids = tuple(recorded["node_ids"])
+    if node_ids != junctions:
         raise ValueError(
-            f"refit signature library for {network_family!r} (hash {library.manifest_hash}) does not match "
-            f"cycle-b2's own recorded artifact (hash {recorded['sha256']}) -- refusing to generate OOD "
-            "scenarios against a drifted signature library"
+            f"{network_family!r}: signatures/{network_family}.json node_ids do not match this topology's "
+            f"real junction list -- refusing to use a mismatched signature artifact"
         )
-    return library
+    stored = {node_id: np.asarray(values, dtype=np.float32) for node_id, values in recorded["signatures"].items()}
+    hash_payload = {node_id: value.round(7).tolist() for node_id, value in stored.items()}
+    recomputed_hash = hashlib.sha256(
+        json.dumps(hash_payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    if recomputed_hash != recorded["sha256"]:
+        raise ValueError(
+            f"{network_family!r}: signatures/{network_family}.json's stored values do not reproduce its own "
+            f"recorded sha256 (recomputed {recomputed_hash}, recorded {recorded['sha256']}) -- the file is "
+            "corrupted or was hand-edited; refusing to use it"
+        )
+    # fit_signature_library's own sentinel: -1.0 stands in for NaN
+    # (np.nan_to_num(nan=-1.0)) because JSON has no NaN literal. Every
+    # real value here is np.log1p(nonnegative observation) >= 0, so -1.0
+    # is never a legitimate signature value -- reversing it back to NaN
+    # is unambiguous, and required for posterior()'s own
+    # np.isfinite(signature) check to behave the same as it would against
+    # a freshly-fit (never-serialized) SignatureLibrary.
+    runtime_signatures = {
+        node_id: np.where(value == -1.0, np.nan, value).astype(np.float32) for node_id, value in stored.items()
+    }
+    return SignatureLibrary(node_ids=node_ids, signatures=runtime_signatures, manifest_hash=recorded["sha256"])
 
 
 class _TopologyContext:
     """Everything about one training topology that is genuinely shared
     across every OOD category -- computed once in main() rather than
-    redundantly refit (network load + signature library refit) once per
-    category. Signature-library refitting in particular is not free (a
-    real pass over every cycle-b2 TRAIN scenario for that topology)."""
+    redundantly re-loaded once per category."""
 
     __slots__ = ("network_family", "network", "junctions", "topology_hash", "library")
 
@@ -161,7 +205,7 @@ class _TopologyContext:
         self.network = network
         self.junctions = tuple(sorted(network.junction_name_list))
         self.topology_hash = network_sha256(network)
-        self.library = _refit_and_verify_signature_library(cycle_b2_root, network_family, self.junctions)
+        self.library = _load_committed_signature_library(cycle_b2_root, network_family, self.junctions)
 
 
 def generate_category(
