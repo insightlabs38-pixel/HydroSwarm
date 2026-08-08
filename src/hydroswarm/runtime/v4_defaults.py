@@ -40,6 +40,10 @@ from hydroswarm.classical import (
 from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
 from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
+from hydroswarm.runtime.v4_inference_bundle import (
+    InferenceBundleError,
+    load_v4_inference_bundle,
+)
 from hydroswarm.runtime.v4_normalization import (
     NO_NORMALIZATION_SENTINEL,
     NormalizationBundleError,
@@ -141,49 +145,75 @@ class V4PipelineFactory:
             return
         self._load_attempted = True
         try:
-            model, identity, _trainer_state = load_v4_checkpoint(self.checkpoint_dir)
-            model_weights_path = self.checkpoint_dir / "model.safetensors"
-            model_hash = hashlib.sha256(model_weights_path.read_bytes()).hexdigest()
-
-            # core-issues5.txt Section 3 (P0 blocker): a checkpoint that
-            # declares normalized training input (normalization_hash is not
-            # the sentinel) MUST have its exact train-owned normalization
-            # artifact loaded, hash-verified against the checkpoint identity,
-            # and injected into the live feature-building path -- never
-            # silently served with an unnormalized HydraulicFeatureBuilder.
-            # Any failure here (missing/stale/corrupted/schema-incompatible
-            # artifact, or a fingerprint mismatch) falls into the same
-            # except-block below as every other asset-loading failure: fail
-            # closed, no neural branch, classical-safe remains available.
-            if identity.normalization_hash == NO_NORMALIZATION_SENTINEL:
-                feature_builder = HydraulicFeatureBuilder()
-            else:
-                bundle = load_runtime_normalization_bundle(self.normalization_dir)
-                if bundle.fingerprint != identity.normalization_hash:
-                    raise NormalizationBundleError(
-                        f"runtime normalization bundle fingerprint ({bundle.fingerprint}) at "
-                        f"{self.normalization_dir} does not match checkpoint identity's "
-                        f"normalization_hash ({identity.normalization_hash})"
-                    )
+            # core-issues5.txt delta item 3 (P0 blocker): a self-contained
+            # inference release bundle
+            # (scripts/build_v4_inference_release_bundle.py) is
+            # distinguished from a resumable TRAINING checkpoint directory
+            # (hydroswarm.training.checkpoint_identity.save_v4_checkpoint's
+            # own output) by the presence of runtime_manifest.json, a file
+            # only the release-bundle builder writes. A bundle is fully
+            # self-contained -- normalization/calibration live INSIDE
+            # checkpoint_dir itself, not a separately-configured
+            # normalization_dir/calibration_path -- which is the whole
+            # point: no dependency on the original training corpus or
+            # checkpoint directory. See v4_inference_bundle's own module
+            # docstring for why load_v4_checkpoint cannot load this format
+            # directly (it requires trainer_state.json, which a bundle
+            # deliberately does not have).
+            if (self.checkpoint_dir / "runtime_manifest.json").exists():
+                bundle = load_v4_inference_bundle(self.checkpoint_dir)
+                model = bundle.model
+                identity = bundle.identity
+                model_hash = bundle.model_hash
                 feature_builder = bundle.feature_builder()
-
-            calibrator: SplitConformalCalibrator | None = None
-            if self.calibration_path is not None and self.calibration_path.exists():
-                calibrator = SplitConformalCalibrator.load(self.calibration_path)
-                calibrator.artifact.validate_runtime(
-                    model_hash=model_hash,
-                    feature_schema_hash=identity.feature_schema_hash,
-                    normalization_hash=identity.normalization_hash,
+                calibrator = (
+                    SplitConformalCalibrator(bundle.calibration) if bundle.calibration is not None else None
                 )
-            # Phase 2 item 5 / Phase 6.1: no calibration artifact means
-            # calibration is invalid -- HybridInferencePipeline is handed
-            # calibration_artifact=None exactly like DefaultPipelineFactory
-            # does for an unsupported topology, which its own downstream
-            # logic already treats as "planning must not proceed on a
-            # calibrated candidate set" (CLASSICAL_SAFE / uncalibrated
-            # mode). No separate fail-closed branch is needed here: the
-            # existing pipeline already fails closed on this exact
-            # condition.
+            else:
+                model, identity, _trainer_state = load_v4_checkpoint(self.checkpoint_dir)
+                model_weights_path = self.checkpoint_dir / "model.safetensors"
+                model_hash = hashlib.sha256(model_weights_path.read_bytes()).hexdigest()
+
+                # core-issues5.txt Section 3 (P0 blocker): a checkpoint that
+                # declares normalized training input (normalization_hash is
+                # not the sentinel) MUST have its exact train-owned
+                # normalization artifact loaded, hash-verified against the
+                # checkpoint identity, and injected into the live
+                # feature-building path -- never silently served with an
+                # unnormalized HydraulicFeatureBuilder. Any failure here
+                # (missing/stale/corrupted/schema-incompatible artifact, or
+                # a fingerprint mismatch) falls into the same except-block
+                # below as every other asset-loading failure: fail closed,
+                # no neural branch, classical-safe remains available.
+                if identity.normalization_hash == NO_NORMALIZATION_SENTINEL:
+                    feature_builder = HydraulicFeatureBuilder()
+                else:
+                    norm_bundle = load_runtime_normalization_bundle(self.normalization_dir)
+                    if norm_bundle.fingerprint != identity.normalization_hash:
+                        raise NormalizationBundleError(
+                            f"runtime normalization bundle fingerprint ({norm_bundle.fingerprint}) at "
+                            f"{self.normalization_dir} does not match checkpoint identity's "
+                            f"normalization_hash ({identity.normalization_hash})"
+                        )
+                    feature_builder = norm_bundle.feature_builder()
+
+                calibrator = None
+                if self.calibration_path is not None and self.calibration_path.exists():
+                    calibrator = SplitConformalCalibrator.load(self.calibration_path)
+                    calibrator.artifact.validate_runtime(
+                        model_hash=model_hash,
+                        feature_schema_hash=identity.feature_schema_hash,
+                        normalization_hash=identity.normalization_hash,
+                    )
+                # Phase 2 item 5 / Phase 6.1: no calibration artifact means
+                # calibration is invalid -- HybridInferencePipeline is
+                # handed calibration_artifact=None exactly like
+                # DefaultPipelineFactory does for an unsupported topology,
+                # which its own downstream logic already treats as
+                # "planning must not proceed on a calibrated candidate set"
+                # (CLASSICAL_SAFE / uncalibrated mode). No separate
+                # fail-closed branch is needed here: the existing pipeline
+                # already fails closed on this exact condition.
 
             self._model = model
             self._identity = identity
@@ -199,6 +229,7 @@ class V4PipelineFactory:
             NotAV4CheckpointError,
             CheckpointIdentityError,
             NormalizationBundleError,
+            InferenceBundleError,
         ) as error:
             self._model = None
             self._identity = None

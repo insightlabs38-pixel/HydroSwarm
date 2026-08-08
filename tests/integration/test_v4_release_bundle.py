@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import numpy as np
@@ -245,3 +246,77 @@ def test_refuses_to_overwrite_a_nonempty_output_directory(tmp_path: Path) -> Non
     except SystemExit:
         raised = True
     assert raised
+
+
+def test_clean_runtime_loads_and_analyzes_from_the_bundle_alone(tmp_path: Path) -> None:
+    """core-issues5.txt delta item 3 (P0 blocker): end-to-end clean-runtime
+    proof -- build inference bundle -> load ONLY from that bundle ->
+    construct V4PipelineFactory/runtime -> analyze a real non-locked
+    incident -> neural path loads successfully, with no dependency on the
+    original training corpus/checkpoint directory.
+
+    The original checkpoint_dir/normalization_dir are DELETED after the
+    bundle is built and BEFORE the bundle is loaded, so a real, provable
+    dependency on either would surface as a hard failure here, not merely
+    an untested assumption."""
+
+    checkpoint_dir = tmp_path / "checkpoint"
+    normalization_dir = tmp_path / "normalization"
+    normalization_fingerprint = _write_normalization_dir(normalization_dir)
+    # _save_checkpoint's own fixed governance (event_presence
+    # runtime-enabled, source_node validated but NOT runtime-enabled) is
+    # reused as-is -- this test's job is proving the NEURAL PATH ITSELF
+    # loads and runs from a clean bundle (neural_failure is None,
+    # runtime_mode FULL_HYBRID), not re-testing source_node governance
+    # specifically (delta item 2's own dedicated tests already cover that).
+    _save_checkpoint(checkpoint_dir, normalization_hash=normalization_fingerprint)
+
+    bundle_dir = tmp_path / "bundle"
+    bundle_script.build(
+        checkpoint_dir=checkpoint_dir,
+        normalization_dir=normalization_dir,
+        output_dir=bundle_dir,
+        workdir=Path(__file__).resolve().parents[2],
+    )
+
+    # Provable clean-runtime independence: nothing under checkpoint_dir/
+    # normalization_dir survives past this point.
+    shutil.rmtree(checkpoint_dir)
+    shutil.rmtree(normalization_dir)
+    assert not checkpoint_dir.exists()
+    assert not normalization_dir.exists()
+
+    from hydroswarm.runtime.v4_defaults import V4PipelineFactory
+    from hydroswarm.simulation.wrapper import wntr
+
+    if wntr is None:
+        return
+
+    factory = V4PipelineFactory(bundle_dir)
+    assert factory.trained_assets_ready is True
+    assert factory.fallback_reason is None
+    assert factory.identity is not None
+    assert factory.identity.runtime_enabled_outputs == frozenset({"event_presence"})
+
+    network_path = Path(__file__).resolve().parents[2] / "data" / "frozen" / "golden_network.inp"
+    pipeline = factory(None, network_path)
+
+    from uuid import uuid4
+
+    from hydroswarm.preprocessing import SensorSeries
+
+    series = SensorSeries(
+        node_id="J1",
+        timestamps_seconds=(0.0, 3600.0),
+        concentration_mg_l=(0.0, 0.78),
+        pressure_m=(25.0, 24.0),
+        health=(1.0, 1.0),
+        missing=(False, False),
+        drift=(False, False),
+        delayed=(False, False),
+    )
+    result = pipeline.analyze(uuid4(), wntr.network.WaterNetworkModel(str(network_path)), [series])
+
+    assert result.neural_failure is None
+    assert result.runtime_mode.value == "FULL_HYBRID"
+    assert result.semantic_predictions is not None
