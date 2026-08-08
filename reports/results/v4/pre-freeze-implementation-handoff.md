@@ -3471,3 +3471,281 @@ training run itself, retraining Strategist on the corrected tensors,
 regenerating `cycle-b2-ood-extension`'s seed-family numbering, architecture
 selection, or the locked test. `final-selection.json` does not exist. The
 locked final test was not opened.
+
+## Phase 12 Stage F prerequisites (2026-08-08) — Strategist retrain on corrected tensors + OOD extension seed-family fix — IN PROGRESS
+
+This continuation's task: resolve the two issues the previous pass
+flagged as blocking the real Stage F run (Strategist retrained on the
+wrong-scale tensors; `cycle-b2-ood-extension`'s seed_family collision),
+then proceed into Stage F itself (the `use_adapters` True/False
+comparison, ≥2 seeds each) once both gates pass. Status below is
+current as of this pass; will be updated again as the background jobs
+this pass launched complete.
+
+### Real environment defects found and fixed before any of the above could run
+
+1. **No prior checkpoints survived on this sandbox** (same class of
+   problem the Phase 8 section above already documented once:
+   `experiments/runs/` is gitignored, so nothing under it persists
+   across sessions — only `experiments/registry/*.jsonl` and
+   `experiments/jobs/*/status.json`/`job.log` do). The Stage-A Sentinel
+   teacher checkpoint `train_strategist_heads.py` defaults to
+   (`experiments/runs/v4-stage-a-sentinel/E1-seed20260810/...`) did not
+   exist on disk. Fix: re-ran the exact original command recorded in
+   this file's own Phase 8 section (`scripts/run_stage3_finalist_training.py
+   --corpus-root data/learning-v2/cycle-b2 --tensors-dirname
+   tensors-normalized --finalists E1 --run-root
+   experiments/runs/v4-stage-a-sentinel --registry
+   experiments/registry/v4-stage-a-sentinel.jsonl`), launched as a
+   background job (PID recorded below), same 2 seeds
+   (20260810/20260811), same ~70-75 min/seed budget.
+
+2. **This sandbox is aarch64 (ARM64), but wntr 1.5.0's bundled EPANET
+   toolkit only ships an x86_64 `.so` for Linux** (`wntr/epanet/
+   toolkit.py` hardcodes `libepanet/linux-x64/libepanet22.so` with no
+   Linux-ARM branch at all — unlike its darwin-arm/darwin-x64 split —
+   and wntr has never published a manylinux aarch64 wheel either). Every
+   live WNTR/EPANET simulation failed closed with `OSError: ...
+   libepanet22.so: cannot open shared object file`. This blocks
+   `scripts/generate_ood_extension_corpus.py` (needs live WNTR to
+   generate OOD scenarios) and this pass's own scenario-cache
+   restoration (below) — though NOT `run_stage_e_strategist_comparison.py`,
+   confirmed by reading its own docstring: every value that script reads
+   is an already-exact WNTR-verified target stored in the tensors at
+   dataset-generation time, never a live re-simulation.
+
+   Fixed by building the OWA EPANET v2.2 C toolkit from source for this
+   host's real architecture (`scripts/dev/build_native_epanet.sh`, new
+   this pass) and installing it at the exact path wntr's toolkit.py
+   expects, backing up the original x86_64 binary rather than deleting
+   it. **Verified bit-for-bit, not assumed**: a regenerated
+   `golden-reference` train scenario (seed 71000) via the native build
+   produces the exact same `scenario_id` and `artifact_sha256` as
+   `cycle-b2`'s own already-committed manifest record.
+
+3. **`data/learning-v2/cycle-b2/scenarios/train/*.npz` (raw simulation
+   arrays) are gitignored and were also missing** — needed by
+   `generate_ood_extension_corpus.py`'s per-topology signature-library
+   refit step (`_load_train_scenarios_for_family` →
+   `load_generated_scenarios`, which eagerly loads every train `.npz`
+   the manifest references, all 9000, not just one topology's share).
+   Fixed by `scripts/restore_cycle_b2_train_scenario_cache.py` (new this
+   pass): replays `generate_cycle_b_corpus.py`'s own unmodified
+   `_generate_topology_scenarios()` per training topology (same
+   `seed_base` formula), writes ONLY the raw `.npz` arrays (never
+   touching the already-committed `manifests/train.jsonl`), then
+   immediately reloads through `load_generated_scenarios` — the same
+   loader `generate_ood_extension_corpus.py` itself uses, which
+   independently recomputes `artifact_sha256` from the written arrays
+   and raises on any mismatch against the committed manifest. Fails
+   closed if this environment's WNTR/numpy ever fails to reproduce
+   cycle-b2 bit-for-bit; per item 2's spot-check, it does not.
+   `cycle-b2` itself is never regenerated or mutated — restriction #3
+   holds throughout.
+
+Both are one-time-per-sandbox environment fixes, not repository defects
+in the governed sense; recorded in a project memory
+(`hydroswarm_checkpoint_persistence` in this session's memory store) so
+a future continuation does not need to re-derive them.
+
+### Requirement 1: Strategist retrained on corrected tensors — BLOCKED ON STAGE-A REGEN (background job running)
+
+`scripts/train_strategist_heads.py --corpus-root
+data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected
+--run-root experiments/runs/v4-strategist-heads-v4corpus-corrected
+--registry experiments/registry/v4-strategist-heads-v4corpus-corrected.jsonl
+--output reports/results/v4/strategist-heads-training-v4corpus-corrected.json`
+(unchanged script/methodology, only the corrected-input corpus directory
+and a fresh run-root/registry/output, exactly matching the previous
+`v4corpus` retrain's own pattern) cannot run until its default
+`--teacher-checkpoint` (the clean Stage-A Sentinel foundation) exists —
+see environment defect 1 above. The Stage-A regeneration background job
+is the long pole; once it closes successfully, the commands above,
+followed by the Stage E rerun below, are the entire remaining sequence
+for this requirement.
+
+**Background job — Stage-A Sentinel regeneration (prerequisite, not yet the Strategist retrain itself)**
+
+```
+run dir: experiments/jobs (not job-runner-wrapped this pass -- plain nohup, see note below)
+command: python -u scripts/run_stage3_finalist_training.py \
+  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
+  --finalists E1 \
+  --run-root experiments/runs/v4-stage-a-sentinel \
+  --registry experiments/registry/v4-stage-a-sentinel.jsonl \
+  --output reports/results/v4/stage-a-sentinel-training.json
+env: PYTHONPATH=src OMP_NUM_THREADS=10 MKL_NUM_THREADS=10 OPENBLAS_NUM_THREADS=10
+log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/stage-a-sentinel-regen.log
+registry run_id (seed 20260810, "opened"): 20260808T010104Z-b66c50a8
+started: 2026-08-08T01:01:04Z
+expected wall time: ~70-75 min/seed x 2 seeds (matches this file's own Phase 8 precedent exactly)
+resume command: identical (this script has no --resume-from; a re-invocation starts a fresh
+  timestamped run dir under the same --run-root/--registry, same as Phase 8's own note)
+```
+
+Once this closes (both seeds, `experiments/runs/v4-stage-a-sentinel/
+E1-seed20260810/<new-timestamp>/checkpoints/checkpoint-0016/model.safetensors`
+selected on validation `source_top1` per Phase 8's own established rule),
+the remaining commands for requirement 1 are:
+
+```bash
+export PYTHONPATH=src
+python scripts/train_strategist_heads.py \
+  --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected \
+  --run-root experiments/runs/v4-strategist-heads-v4corpus-corrected \
+  --registry experiments/registry/v4-strategist-heads-v4corpus-corrected.jsonl \
+  --output reports/results/v4/strategist-heads-training-v4corpus-corrected.json
+
+python scripts/run_stage_e_strategist_comparison.py \
+  --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected \
+  --split validation \
+  --strategist-checkpoint <checkpoint path from the training step above> \
+  --limit 1000 \
+  --output reports/results/v4/stage-e-strategist-comparison-v4corpus-corrected.json
+```
+
+Acceptance per this pass's instructions: compare the corrected-input
+Strategist's plan validity / plan value / consequence proxy / regret
+against the `v4corpus` (uncorrected-shared-features) run's own numbers
+(this file's "UPDUATE" section above) before treating it as the
+role-specific baseline for Stage F. Not yet run — recorded here so the
+exact comparison is unambiguous once both results exist.
+
+### Requirement 2: OOD extension seed-family fix — CODE DONE AND COMMITTED, REGENERATION BLOCKED ON SCENARIO-CACHE RESTORE (background job running)
+
+Root cause confirmed (matches the previous pass's own finding exactly):
+`generate_ood_extension_corpus.py`'s default `--seed 91_000` plus its
+`seed_base + topology_index * 1_000_000 + index * 100` numbering landed
+directly inside `generate_cycle_b_corpus.py`'s own occupied seed range
+for the same `network_family`/`topology_index` — e.g.
+`("golden-reference", "golden-reference:910")` resolved to two
+different `scenario_id`s on each side (train's real index=200 scenario
+vs. `ood-EXTREME_DEMAND`'s index=0 scenario, both landing on seed 91000).
+
+Fix (commit `3860ca7`, pushed): moved the extension corpus to
+`SEED_NAMESPACE_BASE = 500_000_000` (documented arithmetic: cycle-b2's
+own worst-case occupied seed across all 3 training topologies is
+~25.1M; the extension's smallest possible seed at the new base already
+exceeds that), and added a real fail-closed post-generation check
+(`_verify_disjoint_seed_families`) that reads every emitted
+`index.jsonl` and cycle-b2's own 6 populations' `index.jsonl` files
+directly and raises if any `(network_id, seed_family)` collision
+remains — not trusting the arithmetic alone, matching this project's
+own "verified programmatically, not assumed" discipline. 3 new
+regression tests (arithmetic bound + both collision-detector branches),
+all passing. The old (defective) corpus was renamed, not deleted, to
+`data/learning-v2/cycle-b2-ood-extension-v1-seed-collision-defect/` for
+audit.
+
+Regeneration itself (`python scripts/generate_ood_extension_corpus.py
+--cycle-b2-root data/learning-v2/cycle-b2 --output
+data/learning-v2/cycle-b2-ood-extension`) needs live WNTR (environment
+defect 2 above, now fixed) AND the restored train scenario cache
+(environment defect 3 above) to refit each topology's signature
+library. Both fixes are in place; the cache-restoration background job
+is running now (see below) — regeneration has not started yet, it is
+queued to start the moment that job closes.
+
+**Background job — cycle-b2 train scenario cache restoration (prerequisite for OOD-extension regeneration)**
+
+```
+command: python -u scripts/restore_cycle_b2_train_scenario_cache.py
+env: PYTHONPATH=src
+log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/restore-train-scenarios.log
+started: 2026-08-08T01:11Z
+expected wall time: ~100-110 min (replays generate_cycle_b_corpus.py's
+  full 4-split generation per topology to reach the train portion --
+  see the script's own docstring for why; only .npz arrays are written,
+  manifests/train.jsonl is untouched)
+```
+
+Once this closes (all 3 topologies restored and hash-verified), the
+remaining commands for requirement 2 are:
+
+```bash
+export PYTHONPATH=src
+python scripts/generate_ood_extension_corpus.py \
+  --cycle-b2-root data/learning-v2/cycle-b2 \
+  --output data/learning-v2/cycle-b2-ood-extension
+# then, matching cycle-b2's own two-step convention (raw tensors first,
+# tensors-normalized/ second) -- rebuild_split() called directly per
+# category, same as the previous (defective) generation's own approach,
+# since rebuild_normalized_shards.py's main() hard-requires a "train"
+# split this corpus deliberately does not have:
+python - <<'PY'
+from pathlib import Path
+from hydroswarm.preprocessing.schema import NormalizationStats
+from scripts.rebuild_normalized_shards import rebuild_split
+node_stats = NormalizationStats.load(Path("data/learning-v2/cycle-b2/normalization/node-normalization.json"))
+edge_stats = NormalizationStats.load(Path("data/learning-v2/cycle-b2/normalization/edge-normalization.json"))
+root = Path("data/learning-v2/cycle-b2-ood-extension")
+for category in ("EXTREME_DEMAND", "FROZEN_DRIFTING_SENSOR", "ROUGHNESS_MISMATCH", "TANK_STATE_SHIFT"):
+    name = f"ood-{category}"
+    rebuild_split(root / "tensors" / name, root / "tensors-normalized" / name,
+                   expected_split="development_holdout", node_stats=node_stats, edge_stats=edge_stats)
+PY
+
+# Then re-merge into the joint corpus WITH the extension included, and
+# rerun every gate:
+python scripts/build_stage_f_joint_corpus.py --include-ood-extension
+python scripts/run_stage_f_joint_corpus_gates.py
+```
+
+Acceptance per this pass's instructions: `build_stage_f_joint_corpus.py`'s
+own `requirement_status` must be all-`true` (`zero_cross_population_leakage`
+included — this is the actual proof the seed-family fix held at scale,
+not just the small regression tests), and the gates script's
+`gradient_smoke` gate must show `ood_class` among the tasks with a
+positive valid count and nonzero gradient (it was completely absent
+before this fix, since `include_ood_extension` defaulted to `False`).
+Not yet run — queued behind the scenario-cache restoration job.
+
+### Stage F training script prepared, not yet run
+
+`scripts/run_stage_f_training.py` (new this pass, commit `e04b65d`):
+the `use_adapters` True/False comparison, ≥2 seeds each
+(20260810/20260811, matching this project's established seed
+convention), same joint-v4 corpus/training budget (Bundle-F-Stage-3's
+own established budget: 16 epochs, patience 3, 7200s ceiling, batch 16)/
+evaluation protocol (best-validation-loss checkpoint selection, then a
+no-grad multitask pass over `development_holdout`) across both arms.
+Both arms share the exact full config `run_stage_f_joint_corpus_gates.py`
+already verified end-to-end. Smoke-tested directly against tiny dataset
+slices (24/8/8 examples) with a reduced epoch/runtime budget — the real
+code path (model construction, `Trainer.fit`, checkpoint export,
+development_holdout evaluation, registry open/close, model
+fingerprinting) runs cleanly. Not yet run at real scale — blocked
+behind requirements 1 and 2 above per this pass's explicit instruction
+("If both of those checks pass, proceed directly into the full Stage F
+run").
+
+```bash
+export PYTHONPATH=src
+python scripts/run_stage_f_training.py
+# writes reports/results/v4/stage-f-adapters-comparison.json and appends
+# to experiments/registry/stage-f.jsonl; runs sequentially (adapters
+# seed 20260810, adapters seed 20260811, no_adapters seed 20260810,
+# no_adapters seed 20260811) -- up to 4 x 7200s = 8h worst case, likely
+# less given early stopping (patience=3).
+```
+
+### Status summary as of this update
+
+| item | status |
+|---|---|
+| Stage-A Sentinel regen (teacher checkpoint) | running (background job, ~70-75 min/seed x 2) |
+| cycle-b2 train scenario cache restore | running (background job, ~100-110 min) |
+| native EPANET build (aarch64) | done, verified bit-for-bit |
+| OOD extension seed-family fix (code) | done, committed, tests passing |
+| OOD extension regeneration (data) | queued behind scenario-cache restore |
+| Strategist retrain on corrected tensors | queued behind Stage-A regen |
+| Stage E rerun on corrected-input Strategist | queued behind the retrain above |
+| Stage F joint-corpus rebuild + gates (with OOD extension) | queued behind OOD extension regeneration |
+| Stage F training script | written, smoke-tested, not yet run at scale |
+| Stage F real run (adapters vs. no-adapters, 2 seeds each) | not started -- blocked on both requirements above per explicit instruction |
+| `final-selection.json` | does not exist |
+| Locked final test | not opened |
+
+This section will be updated again once the two background jobs above
+close and the subsequent requirement-1/requirement-2/Stage-F steps
+actually run (not merely planned).
