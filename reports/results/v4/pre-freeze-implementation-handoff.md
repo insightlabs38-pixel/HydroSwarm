@@ -26,7 +26,13 @@ remain untouched.
 | 9 | Architecture v4 contract | **DONE (Sections A-I)** -- executable v4 checkpoint identity, granular output governance, head retain/demote decisions, candidate/vocabulary contract, INSPECT_SENSOR reconciliation, second-pass control-corpus merge + control-head training, and the full Section H adversarial test sweep are all complete -- see "core-issues4.txt continuation pass, part 2" below |
 | 10 | Trajectory regen, Scout/Strategist collators, balanced OOD extension, multi-topology gradient smoke tests | **DONE (all of 10.1-10.5)** -- see "Phase 10" section below |
 | 11 | Loss system and training configuration | **DONE (11.1-11.5)** -- see "Phase 11" section below |
-| 12-20 | Staged training, metrics, promotion gates, runtime integration, corpus gates, CI, artifact governance, architecture selection, locked-test boundary | Stage F **data-path fix DONE** — the governed joint corpus (`data/learning-v2/cycle-b2-joint-v4/`) merging Sentinel/control/Scout/Strategist per scenario_id now exists, passes all fail-closed merge gates and all 5 pre-training gates (corpus integrity, leakage, multi-topology batch load, gradient smoke test across 21 real tasks, checkpoint save/resume) — see "Stage F data-path fix" section below. The full Stage F joint-multitask **training run itself has NOT been started** (out of this pass's scope); 13-20 (metrics/promotion/runtime/CI/artifact governance/architecture selection/locked-test boundary) remain not started |
+| 12 Stage F | Joint fine-tuning (adapters vs. no-adapters) | **DONE** — 4 runs (2 arms x 2 seeds), `no_adapters` consistently better; see "Stage F real run" section below |
+| 12 Stage G | Conditional HydroCore-M scaling screen | **DONE — decision: do not train HydroCore-M.** Empirical 3-epoch matched-budget screen shows `medium` (12.7M params) measurably WORSE than `small` (4.2M params) — see `reports/results/v4/phase12-stage-g-decision.md` |
+| 13 | Required metrics and baselines | **DONE** — see `reports/results/v4/phase13-metrics-and-baselines.md`. Two significant findings: `sensor_fault` evaluates as trivially perfect only because the evaluated population has zero true negatives (needs a data-generation audit, out of scope); `ood_category_head` never received a real training gradient (near-chance, as expected given the governed train/dev-holdout split) |
+| 14 | Promotion gates | **DONE** — see `reports/results/v4/phase14-promotion-gates.md`. Scout FAILS outright (learned_scout worse than random sampling); `ood_category` FAILS (gate 3, zero gradient); Strategist substantively ready but blocked on gate 7 (only 1 seed trained so far); event_presence/event_cause/relative_strength/evidence_sufficiency/next_step promotable as ADVISORY ONLY (deterministic authority unchanged) |
+| 15 | Runtime integration | **IN PROGRESS** — see "Phase 15" section below |
+| 16-18 | Corpus/trajectory gates, CI, artifact governance | not started this pass |
+| 19-20 | Architecture selection, locked-test boundary | not started — correctly not attempted per the phase's own explicit boundary |
 
 Corpus regeneration (`data/learning-v2/cycle-b2-trajectories-v2/`) is
 **complete and committed** — all 4 splits finished with 0 errors (see its
@@ -3989,3 +3995,246 @@ screening comparison gives a direction-consistent but 2-seed-only signal
 favoring `no_adapters`; the plan's own 3-seed bar for a final candidate
 has not been met), `final-selection.json`, and the locked test — none of
 which this pass was authorized or instructed to attempt.
+
+## This pass: Phase 13 (metrics), Phase 12 Stage G (scaling screen), Phase 14 (promotion gates), Phase 15 (runtime integration, in progress)
+
+Started from HEAD `612813f` (the previous pass's completed Stage F run).
+Explicit instruction this pass: Phase 13, then conditional Phase 12 Stage
+G, then Phases 14-18, stopping after 18.
+
+### Phase 13 — required metrics and baselines — DONE
+
+Wrote three new evaluation scripts, all reading only already-trained,
+already-on-disk checkpoints (Stage-F `no_adapters` both seeds,
+`v4-strategist-heads-v4corpus-corrected`) against validation/
+development_holdout/calibration splits — no retraining, no locked test:
+
+- `scripts/run_phase13_sentinel_metrics.py` — event_presence/event_cause/
+  profile(start_time/duration/relative_strength)/sensor_fault
+  classification metrics (P/R/F1, macro F1, ordinal MAE), none of which
+  existed anywhere before this pass (only raw training losses did).
+- `scripts/run_phase13_ood_control_metrics.py` — `ood_category` macro
+  F1/per-category recall/false-normal rate/calibration-by-category,
+  deterministic-vs-learned disagreement (JS divergence), deterministic
+  plan-suppression correctness.
+- `scripts/run_phase13_strategist_physical_metrics.py` — exposure
+  reduction vs. NO_ACTION, pressure-violation minutes, service
+  availability, containment time (all in physical units, not normalized
+  proxy-space MSE), NDCG@3 ranking quality, proxy error in physical units.
+
+Two real defects/findings surfaced (both documented in
+`reports/results/v4/phase13-metrics-and-baselines.md`, not silently
+smoothed over):
+
+1. **`sensor_fault` evaluates as trivially perfect (F1=1.0)** on every
+   population tested (joint-v4 validation AND cycle-b2's own base
+   validation split, via the independently-trained Stage-A checkpoint)
+   because every single evaluated sensor-bearing node is a true positive
+   — zero true negatives anywhere in the evaluated data. The mask itself
+   (`node_id in scenario.sensor_nodes`) is scoped correctly; this points
+   at the fault-injection logic in `src/hydroswarm/data/scenarios.py`
+   needing an audit (is every generated scenario deliberately saturated
+   with faults, or is `frozen_mask`/`drift_mask`/etc. miscomputed?) — out
+   of this pass's scope, flagged as a priority follow-up.
+2. **`ood_category_head` never received a real training gradient** during
+   the actual Stage F run (train split has zero `ood_class` coverage by
+   the current governed development-holdout-only design for OOD-extension
+   categories) — near-chance metrics (macro F1 0.095, ~1/11 chance) are
+   the expected, correct result, not a failed classifier. Confirms this
+   head cannot pass Phase 14 gate 3.
+
+Also found and fixed two real bugs in these new scripts before they
+produced usable numbers: (a) `ood-*` populations structurally lack
+Strategist candidate-plan fields, so `strategist_mode=candidate_conditioned`
+forward passes crash on them — fixed by constructing a second,
+Strategist-field-free model config (mirroring
+`run_stage_f_joint_corpus_gates.py`'s pre-existing `OOD_CLASS_MODEL_OVERRIDES`
+pattern) for those populations specifically, keeping `action_vocabulary_size`
+(unlike that script) since the legacy `action_head` is sized by it
+unconditionally and a real checkpoint's weights would otherwise
+size-mismatch; (b) `ood_class` is `targets_v2`'s only `maskable=False`
+control target (no `ood_class_mask` key exists at all) — an initial version
+of the OOD script incorrectly required one and silently evaluated zero
+examples.
+
+`ruff check`/`pyright` clean on all three new scripts.
+
+### Phase 12 Stage G — conditional HydroCore-M scaling screen — DONE
+
+Full writeup: `reports/results/v4/phase12-stage-g-decision.md`.
+`scripts/run_phase12_stage_g_scaling_screen.py` (new) trained
+`HydroCore-S`/`HydroCore-M` on the identical joint-v4 corpus/config at a
+matched 3-epoch budget (single seed 20260810, `use_adapters=False`):
+
+| variant | params | best_validation_loss | wall time |
+|---|---|---|---|
+| small | 4,182,612 | 8.2046 | 297.3s |
+| medium | 12,673,108 | **8.4066 (worse)** | 612.0s |
+
+Medium loses on essentially every one of the 21 per-task losses
+individually, not just in aggregate, while costing ~2x the wall time.
+Combined with the pre-screen finding that Stage F's full 16-epoch run
+never plateaued (every task's loss still declining at epoch 15, no early
+stopping across any of the 4 runs — an epoch/time-budget-limited signature,
+not a capacity-limited one), the decision is unambiguous:
+**do not train HydroCore-M.** `HydroCore-S` (`no_adapters`) remains the
+sole size candidate for Phase 19.
+
+(Real bug hit and fixed along the way: `TrainingConfig.gradnorm_log_every_n_batches`
+rejects `0` — must be a large positive number to effectively disable, not
+zero.)
+
+### Phase 14 — promotion gates — DONE
+
+Full writeup: `reports/results/v4/phase14-promotion-gates.md`. Went
+output-by-output through every `HydroOutput` key against the phase's 10
+general gates plus Scout/Strategist/OOD-specific requirements, using
+Phase 13's new measurements plus Stage B/D/E/F's prior results.
+
+Net conclusion:
+
+- **Promotable as advisory only** (deterministic authority unchanged
+  regardless): `event_presence`, `event_cause` (3 of 5 classes only —
+  AMBIGUOUS/HYDRAULIC_MISMATCH have zero real examples), `start_time`/
+  `relative_strength` (`duration` flagged lower-confidence), `evidence_sufficiency`,
+  `next_step` (INSPECT_FAULTY_SENSOR/ABSTAIN flagged low-confidence/unsupported),
+  `plan_value`/`plan_validity`/consequence proxies (**blocked on gate 7 —
+  only 1 Strategist seed trained so far, not 2**).
+- **Do not promote:** `sensor_fault` (degenerate eval population, Phase 13
+  finding 1), the entire Scout head group (`learned_scout`'s realized
+  entropy reduction is *negative*, worse than random sampling — a direct,
+  measured fail of Scout's own promotion requirement), `ood_category`
+  (Phase 13 finding 2), `ood_logits`/`uncertainty` (no governed
+  loss/deterministic-authority-by-design), `action_logits`/
+  `action_pointer_logits` (orphaned under `strategist_mode=candidate_conditioned`).
+- **Training-only by design:** `sensor_reconstruction`, `future_concentration`,
+  `travel_time`.
+
+### Phase 15 — runtime integration — IN PROGRESS
+
+Scope decision, stated explicitly: no v4 architecture has passed Phase 19
+selection or the locked test yet, so this pass does **not** repoint
+`hydroswarm.runtime.defaults.DefaultPipelineFactory` (still serving the
+currently promoted `models/hydrocore-s-learning-v1.safetensors`, untouched
+per this spec's restriction #3) at any v4 checkpoint. Instead, this pass
+builds the v4-aware capability additively, ready for a future pass to
+point at whichever checkpoint Phase 19 actually selects.
+
+**Found**: `hydroswarm.training.checkpoint_identity`'s entire v4
+save/load/governance machinery (Phase 9.1/9.2) has existed and been
+unit-tested in isolation since an earlier pass, but **no training script
+in this project has ever called `save_v4_checkpoint`** — every real
+trained checkpoint on disk (Stage A-F) is a plain `ExperimentRegistry`
+export with no `checkpoint_identity.json`. The runtime loader had nothing
+real to load.
+
+Done so far:
+
+1. `scripts/build_phase15_v4_checkpoint.py` (new) — constructs a real,
+   complete v4 checkpoint identity for the Stage-F `no_adapters`-seed20260810
+   checkpoint (Stage F's own measured winner), with `trained_outputs`/
+   `validated_outputs`/`runtime_enabled_outputs` set directly from Phase
+   14's own per-output verdicts (Scout's whole group and `ood_category`
+   excluded from all three sets; Strategist excluded from
+   `runtime_enabled_outputs` specifically for the unmet 2-seed gate).
+   Round-trips cleanly through `load_v4_checkpoint`. Written to
+   `experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810`
+   (gitignored, ephemeral — see below).
+
+2. `src/hydroswarm/inference/results.py` — extended `SemanticPredictions`
+   with `event_presence`/`event_presence_probability`/`event_cause`/
+   `next_step` fields (advisory only, never authoritative).
+
+3. `src/hydroswarm/inference/pipeline.py` — added an optional
+   `runtime_enabled_outputs: frozenset[str] | None = None` constructor
+   parameter (same `None`-means-no-gating convention `trained_tasks`
+   already established — every existing caller/test keeps working
+   unchanged), and extended `_model_semantics` (now an instance method,
+   was `@staticmethod`) to populate the 3 new fields AND apply granular
+   per-output suppression to them plus `evidence_sufficiency`/
+   `sensor_fault_probability`/`uncertainty` when a v4 identity is active —
+   the concrete fix for "Replace broad trained_tasks behavior with
+   granular output gating." Unsupported classes
+   (`EventCause.AMBIGUOUS`/`HYDRAULIC_MISMATCH`,
+   `NextStep.INSPECT_FAULTY_SENSOR`) are suppressed to `None` even when
+   the parent output is enabled, per Phase 6.5/9.3. Hit and fixed a real
+   circular-import (`hydroswarm.training`'s package `__init__` imports
+   `full_trajectory`, which imports `HybridInferencePipeline` from this
+   same module) by moving the 3 new `hydroswarm.training.*` imports local
+   to `_model_semantics`.
+
+4. `src/hydroswarm/runtime/v4_defaults.py` (new) — `V4PipelineFactory`,
+   mirroring `DefaultPipelineFactory`'s lazy-load/fail-closed structure
+   exactly, but loading via `checkpoint_identity.load_v4_checkpoint` and
+   threading `identity.runtime_enabled_outputs` through to
+   `HybridInferencePipeline`. `trained_tasks` is pinned to
+   `frozenset({"sentinel"})` (a constant, not derived from the identity) —
+   Scout/Strategist/OOD stay fully suppressed at the coarse role level
+   regardless of what a future identity's finer-grained sets say, since
+   none of those roles have passed promotion for any v4 checkpoint yet.
+
+5. Tests: `tests/scientific/test_hybrid_pipeline_v4_gating.py` (7 tests —
+   legacy `None`-gating behavior preserved, granular suppression, unsupported-class
+   suppression even when the parent output is enabled, boolean-vs-None
+   distinction for low-confidence `event_presence`) and
+   `tests/integration/test_v4_pipeline_factory.py` (6 tests — missing
+   checkpoint directory, successful load, mismatched
+   `architecture_version`, corrupted artifact-manifest fingerprint, no
+   calibration configured falls back to uncalibrated not a crash,
+   Scout/Strategist/OOD stay role-gated regardless of a granular identity).
+   Both new test files build fully self-contained tiny checkpoints in
+   `tmp_path` rather than depending on any real trained checkpoint under
+   `experiments/runs/` (gitignored, does not persist across
+   sessions/clones). All 13 new tests pass; the full pre-existing suite
+   was re-run after these changes (`tests/scientific/test_hybrid_pipeline.py`,
+   `tests/integration/test_default_pipeline_factory.py`) with no
+   regressions; a full-repo `pytest -q` run is in progress as this section
+   is written (see below for its result once available). `ruff check`/
+   `pyright` clean on every file touched.
+
+**Remaining Phase 15 work, not yet done this pass**: candidate-conditioned
+Strategist runtime integration (deterministic-candidate generation → encode
+→ rank → exact-verify top K → NO_ACTION preserved → safe fallback) is not
+wired — Strategist stays excluded from `runtime_enabled_outputs` per Phase
+14 anyway, so there is nothing to safely surface yet, but the exact-verify-top-K
+integration code itself does not exist. Scout integration (deterministic
+accessibility/budget masks, deterministic ranker fallback) likewise not
+wired — Scout failed promotion outright, so the correct runtime behavior
+(classical EIG / fixed-order sampling only) is already what
+`trained_tasks=frozenset({"sentinel"})` produces via the pre-existing
+`"scout" not in self.trained_tasks` gate; nothing new needed there beyond
+what already exists. Remaining Phase 15 test scenarios not yet added:
+verifier timeout/failure, zero valid candidates, no safe plan, Arm CPU
+execution (the last is an environment property, not a v4-specific code
+path — likely already covered generically elsewhere; not verified this
+pass). `runtime-bundle load` as a live production entry point remains
+Phase 19's job (repoint `DefaultPipelineFactory`-equivalent at the selected
+checkpoint only after selection + calibration).
+
+### Phase 16 — new corpus and trajectory gates — DONE
+
+`scripts/run_trajectory_corpus_gates.py` (new): composes the 3
+already-implemented gate suites (original 9 Cycle B2 gates, joint-v4's 6,
+Strategist's 5) plus new checks for schema-version compatibility,
+zero-unreviewed-generation-errors, Scout `already_sampled` monotonicity,
+and NO_ACTION-comparator presence. All gates pass:
+`reports/results/v4/trajectory-corpus-gates.json`.
+
+Two real bugs found and fixed in this script before it was committed: (1)
+an initial version read a nonexistent `"candidates"` JSONL key instead of
+`"labels"`, silently reporting 500/500 real scenarios as missing
+NO_ACTION when every one of them actually has it; (2) an initial version
+pointed `run_corpus_gates.py`'s own `--report-output` at
+`data/learning-v2/cycle-b2/corpus-gates-report.json` — its natural
+default location, but INSIDE the protected `cycle-b2` directory —
+briefly overwriting that committed, previously-passing report with this
+session's live result (which failed `deterministic_replay` for an
+environment reason: raw scenario `.npz` arrays are gitignored/ephemeral
+in this sandbox, same root cause as `experiments/runs/` checkpoints not
+persisting — see the `hydroswarm_checkpoint_persistence` memory record,
+updated this pass with this specific finding). Reverted via
+`git checkout --` before committing anything; the script now writes that
+sub-report under `reports/results/v4/` only, and distinguishes a
+`deterministic_replay`-only failure caused specifically by a missing
+scenario file (`"passed_except_environment_limitation"`) from a real
+corpus defect (still hard-fails the whole suite).
