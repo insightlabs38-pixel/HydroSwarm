@@ -72,8 +72,18 @@ GRADNORM_LOG_EVERY_N_BATCHES = 25
 SEEDS: tuple[int, ...] = (20260810, 20260811)
 
 #: The exact full Stage-F config scripts/run_stage_f_joint_corpus_gates.py
-#: already verified end-to-end (21/21 real tasks, positive valid counts,
-#: nonzero gradients) -- shared by both arms; only use_adapters varies.
+#: already verified end-to-end -- shared by both arms; only use_adapters
+#: varies. ``ood_category_head=True`` is not optional: HydroCore.
+#: from_variant's own OOD_CATEGORY_HEAD_DEFAULT is False, so omitting
+#: this would silently train without the retained learned OOD head ever
+#: receiving a gradient at all (ood_category_logits would never appear
+#: in the model's outputs, so compute_multitask_loss's own
+#: `if task in targets and output_name in outputs` would skip ood_class
+#: unconditionally) -- exactly the failure mode requirement 2's own
+#: instruction ("so Stage F has real ood_class supervision rather than
+#: silently changing the shared backbone without supervising the
+#: retained learned OOD head") warned against. Found and fixed the same
+#: day this script was first written, before any real run used it.
 SHARED_MODEL_CONFIG: dict[str, Any] = {
     "prior_mode": "feature_only",
     "event_control_heads": True,
@@ -81,6 +91,7 @@ SHARED_MODEL_CONFIG: dict[str, Any] = {
     "strategist_mode": "candidate_conditioned",
     "action_vocabulary_size": ACTION_TEMPLATE_COUNT,
     "consequence_prescreening_heads": True,
+    "ood_category_head": True,
 }
 ARMS: dict[str, bool] = {"adapters": True, "no_adapters": False}
 

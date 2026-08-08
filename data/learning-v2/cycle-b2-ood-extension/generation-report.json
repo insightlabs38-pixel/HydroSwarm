@@ -1,0 +1,146 @@
+{
+  "categories": {
+    "EXTREME_DEMAND": {
+      "category": "EXTREME_DEMAND",
+      "config_overrides": {
+        "demand_regimes": [
+          2.5
+        ]
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    },
+    "FROZEN_DRIFTING_SENSOR": {
+      "category": "FROZEN_DRIFTING_SENSOR",
+      "config_overrides": {
+        "frozen_probability": 1.0,
+        "sensor_count": 6
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    },
+    "ROUGHNESS_MISMATCH": {
+      "category": "ROUGHNESS_MISMATCH",
+      "config_overrides": {
+        "roughness_variation_fraction": 0.4
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    },
+    "TANK_STATE_SHIFT": {
+      "category": "TANK_STATE_SHIFT",
+      "config_overrides": {
+        "tank_level_variation_fraction": 0.6
+      },
+      "generated_count": 400,
+      "per_topology_counts": {
+        "branched-loop": 133,
+        "golden-reference": 134,
+        "loop-grid": 133
+      },
+      "requested_count": 400
+    }
+  },
+  "cycle_b2_root": "data/learning-v2/cycle-b2",
+  "generation_seconds": 252.2311259140006,
+  "manifest_hashes": {
+    "ood-EXTREME_DEMAND": {
+      "index_file": "index.jsonl",
+      "index_sha256": "243866c9af649bdbf3e7c3a5609b487720365fa114fd0070a0a175b854f2f130",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "838e134afdd603bdf9d0de5d6620148f8103e857d94736c4c98c135b0dd82b98"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "1b2c685bdc92cd5b6ff3a65a9bff8d88e252cc2d01459aba495b50e1602f482f"
+        }
+      ],
+      "total_examples": 400
+    },
+    "ood-FROZEN_DRIFTING_SENSOR": {
+      "index_file": "index.jsonl",
+      "index_sha256": "6c6fdbc3c3fbb865b48fa2c6575c2373768fd6c9be86e45826d48e0d4209b057",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "fea0e3364c3c58bd1a104b1d7459cf7071d412fcaca514556ea700959bfd3605"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "fe10bde9578cabb071fccd45f4b5822efb3950b6c0b8bf560da1610e369dfb62"
+        }
+      ],
+      "total_examples": 400
+    },
+    "ood-ROUGHNESS_MISMATCH": {
+      "index_file": "index.jsonl",
+      "index_sha256": "7d7c812e0f72e8c54c4d84153a9a7f28b741e111fbf735514cf7a1fcedd6b9b3",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "debddb6e0d88fcdb62531322444c2de95f9bb513547b0c118dc08163782392b7"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "a60526ef5505240acd163ac4d9dcd068e8a62f83536774cef12668b23deb33d1"
+        }
+      ],
+      "total_examples": 400
+    },
+    "ood-TANK_STATE_SHIFT": {
+      "index_file": "index.jsonl",
+      "index_sha256": "63472a49de8279aed46b1c453e70719b53bb8ea7cedc9f1f64c1d7409e6b9a36",
+      "schema_version": 1,
+      "shard_size": 256,
+      "shards": [
+        {
+          "example_count": 256,
+          "file": "shard-00000.safetensors",
+          "sha256": "64a2ff347d338c2a4c72c347f0bae767c0870286086c619e0795f3c9fc37301d"
+        },
+        {
+          "example_count": 144,
+          "file": "shard-00001.safetensors",
+          "sha256": "798ff19815e76e621b592dc23e4108ca4aaaae1297e937bfbbcdbf10ec37d8d9"
+        }
+      ],
+      "total_examples": 400
+    }
+  },
+  "schema_version": 1,
+  "seed_family_verification": {
+    "collisions": [],
+    "cycle_b2_families_checked": 13550,
+    "new_families_checked": 1600
+  },
+  "seed_namespace_base": 500000037
+}

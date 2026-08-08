@@ -219,6 +219,192 @@
       "ood_class"
     ]
   },
+  "ood-EXTREME_DEMAND": {
+    "control_target_count": 0,
+    "joined_examples": 400,
+    "masked_target_counts": {
+      "duration_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "relative_strength_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "sensor_fault_mask": {
+        "masked": 1465,
+        "total": 3065,
+        "valid": 1600
+      },
+      "source_node_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "source_region_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "start_time_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      }
+    },
+    "ood_target_count": 400,
+    "scout_target_count": 0,
+    "strategist_target_count": 0,
+    "target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "ood_class",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "strategist"
+    ]
+  },
+  "ood-FROZEN_DRIFTING_SENSOR": {
+    "control_target_count": 0,
+    "joined_examples": 400,
+    "masked_target_counts": {
+      "duration_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "relative_strength_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "sensor_fault_mask": {
+        "masked": 933,
+        "total": 3065,
+        "valid": 2132
+      },
+      "source_node_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "source_region_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "start_time_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      }
+    },
+    "ood_target_count": 400,
+    "scout_target_count": 0,
+    "strategist_target_count": 0,
+    "target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "ood_class",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "strategist"
+    ]
+  },
+  "ood-ROUGHNESS_MISMATCH": {
+    "control_target_count": 0,
+    "joined_examples": 400,
+    "masked_target_counts": {
+      "duration_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "relative_strength_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "sensor_fault_mask": {
+        "masked": 1465,
+        "total": 3065,
+        "valid": 1600
+      },
+      "source_node_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "source_region_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "start_time_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      }
+    },
+    "ood_target_count": 400,
+    "scout_target_count": 0,
+    "strategist_target_count": 0,
+    "target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "ood_class",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "strategist"
+    ]
+  },
   "ood-SEVERE_MISSINGNESS": {
     "control_target_count": 0,
     "joined_examples": 400,
@@ -279,6 +465,68 @@
       "scout",
       "strategist",
       "ood_class"
+    ]
+  },
+  "ood-TANK_STATE_SHIFT": {
+    "control_target_count": 0,
+    "joined_examples": 400,
+    "masked_target_counts": {
+      "duration_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "relative_strength_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "sensor_fault_mask": {
+        "masked": 1465,
+        "total": 3065,
+        "valid": 1600
+      },
+      "source_node_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "source_region_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      },
+      "start_time_mask": {
+        "masked": 132,
+        "total": 400,
+        "valid": 268
+      }
+    },
+    "ood_target_count": 400,
+    "scout_target_count": 0,
+    "strategist_target_count": 0,
+    "target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "ood_class",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "unavailable_task_groups": [
+      "control.next_step",
+      "scout",
+      "strategist"
     ]
   },
   "ood-UNSEEN_TOPOLOGY": {

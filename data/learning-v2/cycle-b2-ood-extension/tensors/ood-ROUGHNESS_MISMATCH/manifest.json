@@ -1,0 +1,19 @@
+{
+  "index_file": "index.jsonl",
+  "index_sha256": "7d7c812e0f72e8c54c4d84153a9a7f28b741e111fbf735514cf7a1fcedd6b9b3",
+  "schema_version": 1,
+  "shard_size": 256,
+  "shards": [
+    {
+      "example_count": 256,
+      "file": "shard-00000.safetensors",
+      "sha256": "debddb6e0d88fcdb62531322444c2de95f9bb513547b0c118dc08163782392b7"
+    },
+    {
+      "example_count": 144,
+      "file": "shard-00001.safetensors",
+      "sha256": "a60526ef5505240acd163ac4d9dcd068e8a62f83536774cef12668b23deb33d1"
+    }
+  ],
+  "total_examples": 400
+}

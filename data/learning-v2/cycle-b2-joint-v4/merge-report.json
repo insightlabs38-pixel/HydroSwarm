@@ -1,6 +1,6 @@
 {
   "corpus_name": "cycle-b2-joint-v4",
-  "dataset_fingerprint_sha256": "d1665a891013a8ba2d56c78a8334ee574c6de0d0e97750f36a2be71e0386bfd1",
+  "dataset_fingerprint_sha256": "32b0528f569d27a0e51e6285d9da696c794c720d8ffc5c6d702042532d67f93c",
   "populations": [
     {
       "conflicts": 0,
@@ -1172,6 +1172,466 @@
         "strategist",
         "ood_class"
       ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "f00577617f0a2898426a8eeddcfd71df9091af2691f9bed64ec7a13a692d8431",
+      "duplicate_joins": 0,
+      "expected_base_examples": 400,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 400,
+      "joined_scenario_ids_sample": [
+        "79a0455c-5653-57b1-95f4-adcf8442f90d",
+        "440d96d1-2818-5ae9-9e61-2959535c9697",
+        "00bcdc21-82d3-5fa6-b1d7-f434bc397034",
+        "f3372a2f-7a9e-5de1-a8e7-a7bf8a21dacd",
+        "3f24e6d7-49a5-5c96-9c4e-336ea5390d62"
+      ],
+      "masked_target_counts": {
+        "duration_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "relative_strength_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "sensor_fault_mask": {
+          "masked": 1465,
+          "total": 3065,
+          "valid": 1600
+        },
+        "source_node_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "source_region_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "start_time_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 400,
+      "output_split": "development_holdout",
+      "population": "ood-EXTREME_DEMAND",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "243866c9af649bdbf3e7c3a5609b487720365fa114fd0070a0a175b854f2f130",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "3529797e210d7d997e4d3fd65087b55c4e0028d6f8a25aa822b355ccbb17a95f"
+          },
+          {
+            "example_count": 144,
+            "file": "shard-00001.safetensors",
+            "sha256": "5dd0724a04a7ccb09387b48b6a310a5e67d7b1ff87a53bde77403e0d6b6f7c1b"
+          }
+        ],
+        "total_examples": 400
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2-ood-extension/tensors-normalized/ood-EXTREME_DEMAND"
+      },
+      "strategist_target_count": 0,
+      "target_keys": [
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "ood_class",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "strategist"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "d2667618402498b7401096927287c8efa8c234968362b2775b2e058e5da34aeb",
+      "duplicate_joins": 0,
+      "expected_base_examples": 400,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 400,
+      "joined_scenario_ids_sample": [
+        "9a6f52b3-39c5-5ecd-bbcc-d5ebc22751ac",
+        "34c73791-c615-53f2-942e-66a0a2d301ed",
+        "14a675e0-0294-57ad-8311-25c26a243fd7",
+        "fdc6dafa-99d2-5f87-87aa-793cbb8edd15",
+        "fd16ba36-85b0-55dd-846d-8b1fe97fc152"
+      ],
+      "masked_target_counts": {
+        "duration_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "relative_strength_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "sensor_fault_mask": {
+          "masked": 933,
+          "total": 3065,
+          "valid": 2132
+        },
+        "source_node_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "source_region_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "start_time_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 400,
+      "output_split": "development_holdout",
+      "population": "ood-FROZEN_DRIFTING_SENSOR",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "6c6fdbc3c3fbb865b48fa2c6575c2373768fd6c9be86e45826d48e0d4209b057",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "7c8ce29e3d6701d2844bfc5b84d1df656f83d0bf6591c18b5973f4fd5b658adf"
+          },
+          {
+            "example_count": 144,
+            "file": "shard-00001.safetensors",
+            "sha256": "bc39961c628c739599dcedefdda9b0410e0fce880286c6b072130f07211a8777"
+          }
+        ],
+        "total_examples": 400
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2-ood-extension/tensors-normalized/ood-FROZEN_DRIFTING_SENSOR"
+      },
+      "strategist_target_count": 0,
+      "target_keys": [
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "ood_class",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "strategist"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "829a63d52ed3087bff0d1ad6a6ea3c78713e4ca1a2cb8dea8600786629de635c",
+      "duplicate_joins": 0,
+      "expected_base_examples": 400,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 400,
+      "joined_scenario_ids_sample": [
+        "ee3f7675-eae8-5a9c-a9b4-afd74f4c982b",
+        "0c6f4b30-1da4-5033-b076-dcce4ba1c1e9",
+        "0a722c2f-f650-5aac-9c2d-af6819438778",
+        "f89c303a-de9c-5368-990a-4dd106b400e0",
+        "928ca558-beb7-5585-900d-ba7192bd8969"
+      ],
+      "masked_target_counts": {
+        "duration_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "relative_strength_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "sensor_fault_mask": {
+          "masked": 1465,
+          "total": 3065,
+          "valid": 1600
+        },
+        "source_node_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "source_region_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "start_time_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 400,
+      "output_split": "development_holdout",
+      "population": "ood-ROUGHNESS_MISMATCH",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "7d7c812e0f72e8c54c4d84153a9a7f28b741e111fbf735514cf7a1fcedd6b9b3",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "a2b41ea8d74470afb8dc9807bf5aa5a02b9448ab300b86580e52545c2563246d"
+          },
+          {
+            "example_count": 144,
+            "file": "shard-00001.safetensors",
+            "sha256": "abbac2c73b7c936bd4f04386c5873a7b5ee34291c5bceb3e6060b252c4b3ddec"
+          }
+        ],
+        "total_examples": 400
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2-ood-extension/tensors-normalized/ood-ROUGHNESS_MISMATCH"
+      },
+      "strategist_target_count": 0,
+      "target_keys": [
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "ood_class",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "strategist"
+      ]
+    },
+    {
+      "conflicts": 0,
+      "control_target_count": 0,
+      "dataset_manifest_hash": "a61020e16c2ffd0153616cfc7cf5f2436333f28fed61662b9220983aadd0ebd4",
+      "duplicate_joins": 0,
+      "expected_base_examples": 400,
+      "input_keys": [
+        "classical_prior",
+        "demand_centrality",
+        "edge_features",
+        "edge_index",
+        "edge_mask",
+        "node_features",
+        "node_mask",
+        "quality_features",
+        "quality_mask",
+        "reservoir_reachability",
+        "sensor_mask",
+        "source_candidate_mask",
+        "temporal_features",
+        "timestamps",
+        "travel_time"
+      ],
+      "joined_examples": 400,
+      "joined_scenario_ids_sample": [
+        "6c14a0bb-1831-52e7-9d44-7cf4616f81c1",
+        "84dd166c-5c7c-5fe1-a5bb-12ebf7ef454d",
+        "3737d47c-6888-5094-a34f-76d4d1155476",
+        "71d8af68-9070-5e61-a9b4-3174d782b81a",
+        "51566823-7e40-55e2-b7ea-783eb900361f"
+      ],
+      "masked_target_counts": {
+        "duration_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "relative_strength_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "sensor_fault_mask": {
+          "masked": 1465,
+          "total": 3065,
+          "valid": 1600
+        },
+        "source_node_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "source_region_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        },
+        "start_time_mask": {
+          "masked": 132,
+          "total": 400,
+          "valid": 268
+        }
+      },
+      "missing_joins": 0,
+      "ood_target_count": 400,
+      "output_split": "development_holdout",
+      "population": "ood-TANK_STATE_SHIFT",
+      "scout_target_count": 0,
+      "shard_manifest": {
+        "index_file": "index.jsonl",
+        "index_sha256": "63472a49de8279aed46b1c453e70719b53bb8ea7cedc9f1f64c1d7409e6b9a36",
+        "schema_version": 1,
+        "shard_size": 256,
+        "shards": [
+          {
+            "example_count": 256,
+            "file": "shard-00000.safetensors",
+            "sha256": "26b6a17bfc9f92cc28f5bcfc5bdb31dcbc84fb8d7e990c5f17b4c7145e3b6863"
+          },
+          {
+            "example_count": 144,
+            "file": "shard-00001.safetensors",
+            "sha256": "0992df5089f6c58d061469d18bb30d0a222fe6ed9a9348fabce46e1a64a71d48"
+          }
+        ],
+        "total_examples": 400
+      },
+      "sources_used": {
+        "base": "data/learning-v2/cycle-b2-ood-extension/tensors-normalized/ood-TANK_STATE_SHIFT"
+      },
+      "strategist_target_count": 0,
+      "target_keys": [
+        "duration",
+        "duration_mask",
+        "event_cause",
+        "event_presence",
+        "evidence_sufficiency",
+        "ood_class",
+        "relative_strength",
+        "relative_strength_mask",
+        "sensor_fault",
+        "sensor_fault_mask",
+        "source_node",
+        "source_node_mask",
+        "source_region",
+        "source_region_mask",
+        "start_time",
+        "start_time_mask"
+      ],
+      "unavailable_task_groups": [
+        "control.next_step",
+        "scout",
+        "strategist"
+      ]
     }
   ],
   "requirement_status": {
@@ -1181,13 +1641,8 @@
     "zero_missing_required_joins": true
   },
   "skipped_populations": {
-    "ood_extension_categories": [
-      "ood-EXTREME_DEMAND",
-      "ood-FROZEN_DRIFTING_SENSOR",
-      "ood-ROUGHNESS_MISMATCH",
-      "ood-TANK_STATE_SHIFT"
-    ],
-    "reason": "cycle-b2-ood-extension seed_family labels collide with train/validation/calibration's own seed_family labels for different underlying scenario_ids (pre-existing namespace defect in that corpus, found by this merge's own cross-population leakage gate) -- excluded by default; pass --include-ood-extension to attempt the join anyway and see the resulting zero_cross_population_leakage=false failure directly."
+    "ood_extension_categories": [],
+    "reason": null
   },
   "totals": {
     "conflicts": 0,

@@ -36,6 +36,28 @@ gates -- it does not start the full Stage F training run:
                           exactly Bundle E's own established smoke pattern
                           (scripts/run_architecture_smoke_jobs.py), against
                           the real joint corpus instead of Cycle A.
+6. ood_class_gradient_smoke -- real user-directed requirement, added once
+                          `include_ood_extension=True` made real ood_class
+                          supervision possible: gradient_smoke's own batch
+                          is drawn only from `train`, which structurally
+                          never carries ood_class (every population's own
+                          target-availability-report.json confirms it --
+                          `train`/`validation` list `ood_class` as
+                          unavailable, and cycle-b2's own
+                          ood-SEVERE_MISSINGNESS/ood-UNSEEN_TOPOLOGY
+                          populations carry real OOD *scenarios* but never
+                          attached a real ood_class *target* either). The 4
+                          newly-merged extension categories
+                          (ood-EXTREME_DEMAND/FROZEN_DRIFTING_SENSOR/
+                          ROUGHNESS_MISMATCH/TANK_STATE_SHIFT) are the ONLY
+                          populations in the whole joint corpus with real
+                          ood_class labels -- this gate loads a batch
+                          spanning all 4 and proves ood_class specifically
+                          (not just the pre-existing REQUIRED_TASK_GROUPS)
+                          reaches a positive valid count and nonzero
+                          gradient, so a real Stage F run cannot silently
+                          retrain the shared backbone while leaving the
+                          retained OOD head unsupervised.
 
 Exits nonzero if any gate fails. Does not start the full Stage F run.
 """
@@ -45,22 +67,28 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from pathlib import Path
 from typing import Any
 
 import torch
 from safetensors.torch import load_file
 
-from hydroswarm.model import HydroCore, verify_architecture_compatibility
-from hydroswarm.planning.action_templates import ACTION_TEMPLATE_COUNT
-from hydroswarm.training import (
+_ROOT = Path(__file__).resolve().parents[0]
+sys.path.insert(0, str(_ROOT))
+
+from build_stage_f_joint_corpus import OOD_EXTENSION_POPULATIONS  # noqa: E402
+
+from hydroswarm.model import HydroCore, verify_architecture_compatibility  # noqa: E402
+from hydroswarm.planning.action_templates import ACTION_TEMPLATE_COUNT  # noqa: E402
+from hydroswarm.training import (  # noqa: E402
     GovernedScenarioDataset,
     ShardedScenarioDataset,
     Trainer,
     TrainingConfig,
     collate_variable_topology,
 )
-from hydroswarm.training.losses import compute_multitask_loss, task_gradient_norms
+from hydroswarm.training.losses import compute_multitask_loss, task_gradient_norms  # noqa: E402
 
 JOINT_CORPUS_ROOT = Path("data/learning-v2/cycle-b2-joint-v4")
 GRADIENT_CHECK_BATCH = 16
@@ -87,7 +115,43 @@ FULL_STAGE_F_MODEL_OVERRIDES: dict[str, Any] = dict(
     strategist_mode="candidate_conditioned",
     action_vocabulary_size=ACTION_TEMPLATE_COUNT,
     consequence_prescreening_heads=True,
+    # Real defect found while adding gate 6 (ood_class_gradient_smoke):
+    # HydroCore.from_variant's own OOD_CATEGORY_HEAD_DEFAULT is False, so
+    # without this explicit override the model this dict builds never
+    # constructs self.ood_category_head at all -- ood_category_logits
+    # never appears in outputs, so compute_multitask_loss's own
+    # `if task in targets and output_name in outputs` silently skips
+    # ood_class every time, regardless of whether the corpus supervises
+    # it. This is the exact "silently changing the shared backbone
+    # without supervising the retained learned OOD head" failure mode
+    # the user-directed Stage F prerequisite explicitly warned against --
+    # every prior gate run using this dict (before this fix) proves
+    # nothing about ood_class, since the head was never even present.
+    ood_category_head=True,
 )
+#: gate_ood_class_gradient_smoke's own model config: identical to
+#: FULL_STAGE_F_MODEL_OVERRIDES except strategist_mode/
+#: action_vocabulary_size/consequence_prescreening_heads are dropped.
+#: Not a simplification for convenience -- the OOD-extension categories
+#: structurally never carry Strategist input fields at all
+#: (target-availability-report.json lists `strategist` as an
+#: `unavailable_task_group` for every one of them), and
+#: strategist_mode="candidate_conditioned" unconditionally requires
+#: plan_template_ids/plan_target_type/plan_mask/plan_features to be
+#: present SOMEWHERE in the batch (hydroswarm.model.core's own
+#: `batch.get(...) is None` check looks at the whole collated batch, not
+#: per example) -- a homogeneous OOD-extension-only batch can never
+#: satisfy that, and mixing in `train` examples that DO carry those
+#: fields instead trips collate_variable_topology's own
+#: "some but not all" per-example consistency check the other direction.
+#: ood_class's own gradient flow does not depend on strategist_mode at
+#: all (independent heads), so testing it under the mode this data can
+#: actually support is honest, not a weaker test.
+OOD_CLASS_MODEL_OVERRIDES: dict[str, Any] = {
+    key: value
+    for key, value in FULL_STAGE_F_MODEL_OVERRIDES.items()
+    if key not in {"strategist_mode", "action_vocabulary_size", "consequence_prescreening_heads"}
+}
 
 
 def gate_corpus_integrity(root: Path) -> dict[str, Any]:
@@ -212,6 +276,66 @@ def gate_gradient_smoke(root: Path) -> dict[str, Any]:
     }
 
 
+def _load_ood_extension_batch(root: Path) -> tuple[list, list[str]]:
+    """A batch spanning every category `build_stage_f_joint_corpus.py`'s
+    OOD_EXTENSION_POPULATIONS merged in -- the only populations in the
+    whole joint corpus carrying a real ood_class target (see this
+    module's own docstring, gate 6). Deliberately homogeneous (no `train`
+    examples mixed in) -- see OOD_CLASS_MODEL_OVERRIDES's own comment for
+    why a mixed batch cannot work here at all."""
+
+    examples = []
+    categories_present = []
+    for category in OOD_EXTENSION_POPULATIONS:
+        category_dir = root / "tensors-normalized" / category
+        if not category_dir.exists():
+            continue
+        dataset = ShardedScenarioDataset(category_dir, expected_split="development_holdout")
+        dataset.verify_shard_checksums()
+        examples.extend(dataset[index] for index in range(min(4, len(dataset))))
+        categories_present.append(category)
+    return examples, categories_present
+
+
+def gate_ood_class_gradient_smoke(root: Path) -> dict[str, Any]:
+    examples, categories_present = _load_ood_extension_batch(root)
+    if not examples:
+        raise RuntimeError(
+            "no OOD-extension populations found under tensors-normalized/ -- "
+            "build_stage_f_joint_corpus.py must be run with --include-ood-extension first"
+        )
+    inputs, targets = collate_variable_topology(examples)
+    if "ood_class" not in targets:
+        raise RuntimeError("ood_class target absent from the OOD-extension batch -- merge did not carry it through")
+
+    model = HydroCore.from_variant("small", **OOD_CLASS_MODEL_OVERRIDES)
+    model.train()
+    output = model(inputs)
+    result = compute_multitask_loss(output, targets)
+    if not torch.isfinite(result.total):
+        raise RuntimeError("non-finite total loss during Stage F ood_class gradient smoke test")
+    if "ood_class" not in result.tasks:
+        raise RuntimeError("ood_class did not reach compute_multitask_loss -- missing model output or target key")
+    ood_class_valid_count = int(result.valid_counts.get("ood_class", 0))
+    if ood_class_valid_count <= 0:
+        raise RuntimeError("ood_class had zero valid positions in the OOD-extension batch")
+
+    norms = task_gradient_norms(result.tasks, model)
+    ood_class_gradient_norm = norms.get("ood_class", 0.0)
+    if ood_class_gradient_norm == 0.0:
+        raise RuntimeError("ood_class received zero gradient in the OOD-extension batch")
+    model.zero_grad(set_to_none=True)
+
+    return {
+        "status": "passed",
+        "batch_size": len(examples),
+        "categories_in_batch": categories_present,
+        "ood_class_valid_count": ood_class_valid_count,
+        "ood_class_gradient_norm": ood_class_gradient_norm,
+        "total_loss": float(result.total.detach()),
+    }
+
+
 def gate_checkpoint_resume(root: Path, run_root: Path) -> dict[str, Any]:
     train_dataset = ShardedScenarioDataset(root / "tensors-normalized" / "train", expected_split="train")
     validation_dataset = ShardedScenarioDataset(root / "tensors-normalized" / "validation", expected_split="validation")
@@ -299,6 +423,7 @@ def main(argv: list[str] | None = None) -> int:
         ("leakage", lambda: gate_leakage(args.corpus_root)),
         ("batch_load", lambda: gate_batch_load(args.corpus_root)),
         ("gradient_smoke", lambda: gate_gradient_smoke(args.corpus_root)),
+        ("ood_class_gradient_smoke", lambda: gate_ood_class_gradient_smoke(args.corpus_root)),
         ("checkpoint_resume", lambda: gate_checkpoint_resume(args.corpus_root, args.run_root)),
     ):
         try:

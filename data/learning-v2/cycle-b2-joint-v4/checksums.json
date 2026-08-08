@@ -1,5 +1,5 @@
 {
-  "dataset_fingerprint_sha256": "d1665a891013a8ba2d56c78a8334ee574c6de0d0e97750f36a2be71e0386bfd1",
+  "dataset_fingerprint_sha256": "32b0528f569d27a0e51e6285d9da696c794c720d8ffc5c6d702042532d67f93c",
   "populations": {
     "calibration": {
       "dataset_manifest_hash": "900f55add24de88837eb9886962fa1bf93284e7a38d140d1511da59adf9693fd",
@@ -11,9 +11,29 @@
       "index_sha256": "79a1223fd9a3b36a9828fba6745d147455e81470a69eea76edcfa124ff8b5225",
       "total_examples": 1750
     },
+    "ood-EXTREME_DEMAND": {
+      "dataset_manifest_hash": "f00577617f0a2898426a8eeddcfd71df9091af2691f9bed64ec7a13a692d8431",
+      "index_sha256": "243866c9af649bdbf3e7c3a5609b487720365fa114fd0070a0a175b854f2f130",
+      "total_examples": 400
+    },
+    "ood-FROZEN_DRIFTING_SENSOR": {
+      "dataset_manifest_hash": "d2667618402498b7401096927287c8efa8c234968362b2775b2e058e5da34aeb",
+      "index_sha256": "6c6fdbc3c3fbb865b48fa2c6575c2373768fd6c9be86e45826d48e0d4209b057",
+      "total_examples": 400
+    },
+    "ood-ROUGHNESS_MISMATCH": {
+      "dataset_manifest_hash": "829a63d52ed3087bff0d1ad6a6ea3c78713e4ca1a2cb8dea8600786629de635c",
+      "index_sha256": "7d7c812e0f72e8c54c4d84153a9a7f28b741e111fbf735514cf7a1fcedd6b9b3",
+      "total_examples": 400
+    },
     "ood-SEVERE_MISSINGNESS": {
       "dataset_manifest_hash": "431e8e06ea70d021bb88c7c78df9708794ca1934182959edb001b38658f2c9e2",
       "index_sha256": "cd952c083d89b6a64595b99b091b6ce86de8bd4f34d9f31a826ee6cd301a4bc5",
+      "total_examples": 400
+    },
+    "ood-TANK_STATE_SHIFT": {
+      "dataset_manifest_hash": "a61020e16c2ffd0153616cfc7cf5f2436333f28fed61662b9220983aadd0ebd4",
+      "index_sha256": "63472a49de8279aed46b1c453e70719b53bb8ea7cedc9f1f64c1d7409e6b9a36",
       "total_examples": 400
     },
     "ood-UNSEEN_TOPOLOGY": {

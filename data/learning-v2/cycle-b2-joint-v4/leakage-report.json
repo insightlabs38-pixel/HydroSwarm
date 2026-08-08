@@ -2,12 +2,16 @@
   "populations_checked": [
     "calibration",
     "development_holdout",
+    "ood-EXTREME_DEMAND",
+    "ood-FROZEN_DRIFTING_SENSOR",
+    "ood-ROUGHNESS_MISMATCH",
     "ood-SEVERE_MISSINGNESS",
+    "ood-TANK_STATE_SHIFT",
     "ood-UNSEEN_TOPOLOGY",
     "train",
     "validation"
   ],
   "scenario_id_leaks": [],
   "seed_family_leaks": [],
-  "total_examples_checked": 13550
+  "total_examples_checked": 15150
 }
