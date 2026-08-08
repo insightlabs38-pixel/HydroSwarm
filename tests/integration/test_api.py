@@ -346,6 +346,36 @@ def test_changed_consequence_policy_invalidates_verification(tmp_path, monkeypat
     assert reverified.json()["context_hash"] != first["context_hash"]
 
 
+def test_newly_created_incident_exposes_the_real_configured_epanet_budget(tmp_path) -> None:
+    """core-issues5.txt delta item 7: remaining_epanet_budget must reflect
+    the real configured exact-simulation limit at incident creation, before
+    any verification occurs -- not IncidentState's own schema-level
+    default of 0 (which exists only as a fallback for incidents
+    constructed outside the live API, e.g. training/evaluation label
+    generators, never for a real operator-facing incident)."""
+
+    from hydroswarm.api.state import ApiSettings
+
+    client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
+    client.post("/api/networks/net-test/validate", json={"node_ids": ["J1", "J2"], "link_count": 1})
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": "net-test",
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation()],
+            "maximum_samples": 3,
+        },
+    )
+    assert created.status_code == 201
+    incident = created.json()
+    configured_limit = ApiSettings().exact_plan_simulation_limit
+    assert configured_limit > 0
+    assert incident["remaining_epanet_budget"] == configured_limit
+    assert incident["exact_simulations_used"] == 0
+    assert incident["plans_exactly_verified"] == 0
+
+
 def test_unchanged_context_leaves_verification_current_and_approvable(tmp_path) -> None:
     client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
     incident_id, plan_id, first = _create_incident_with_verified_plan(client)
