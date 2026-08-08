@@ -536,6 +536,7 @@ def create_app(
                 mode=entry.mode,
                 dominated=entry.dominated,
                 is_no_action_comparator=entry.is_no_action_comparator,
+                group=entry.group,
             )
             for entry in entries
         ]

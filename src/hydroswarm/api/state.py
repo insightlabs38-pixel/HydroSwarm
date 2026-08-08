@@ -116,6 +116,13 @@ class ParetoFrontierEntryView(ApiModel):
     mode: Literal["posterior_weighted", "worst_case"]
     dominated: bool
     is_no_action_comparator: bool
+    #: core-issues5.txt delta item 9: EXPOSURE_AWARE
+    #: (consequences.exposure_evaluated=True) or HYDRAULIC_ONLY (=False).
+    #: `dominated` is only ever computed against other entries in the same
+    #: group -- a caller building "the" contamination-response frontier
+    #: should filter to group == "EXPOSURE_AWARE", never treat the
+    #: combined response as one comparable set.
+    group: Literal["EXPOSURE_AWARE", "HYDRAULIC_ONLY"]
 
 
 class AnalysisResponse(ApiModel):

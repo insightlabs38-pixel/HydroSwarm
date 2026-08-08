@@ -142,9 +142,100 @@ def test_unmeasured_exposure_is_never_compared_as_a_fabricated_zero() -> None:
     )
     entries = compute_verified_pareto_frontier([("hydraulic_only", hydraulic_only), ("real", real_exposure)])
     by_label = {e.label: e for e in entries}
-    # hydraulic_only's fabricated-looking "0.0 mass consumed" must not
-    # dominate real's real 3.0 mg -- they are only compared on the
-    # hydraulic fields both actually have (equal here), so neither
-    # dominates the other.
+    # core-issues5.txt delta item 9: hydraulic_only and real belong to
+    # different FrontierGroups entirely -- dominated is computed only
+    # within a group, so this is not merely "compared on shared fields and
+    # found equal", it is never compared for domination at all.
+    assert by_label["hydraulic_only"].group == "HYDRAULIC_ONLY"
+    assert by_label["real"].group == "EXPOSURE_AWARE"
     assert by_label["hydraulic_only"].dominated is False
     assert by_label["real"].dominated is False
+
+
+# core-issues5.txt delta item 9 (P1 fix): a hydraulic-only plan must never
+# dominate, or be treated as equivalent to, an exposure-evaluated plan on
+# the contamination-response (EXPOSURE_AWARE) frontier -- proven with a
+# case that WOULD have dominated under the old shared-subset-only
+# comparison (strictly better on every hydraulic field both happen to
+# have), which must have no effect now.
+
+
+def test_a_hydraulic_only_plan_strictly_better_on_shared_fields_still_cannot_dominate_an_exposure_evaluated_plan() -> None:
+    hydraulic_only_better_everywhere = _verification(
+        consequences=_metrics(
+            exposure_evaluated=False,
+            pressure_violation_minutes=0.0,
+            unserved_demand_l=0.0,
+            operation_count=1,
+            minimum_pressure_m=30.0,
+            service_availability=1.0,
+        )
+    )
+    exposure_evaluated_worse_hydraulics = _verification(
+        consequences=_metrics(
+            exposure_evaluated=True,
+            contaminant_mass_consumed_mg=3.0,
+            pressure_violation_minutes=5.0,
+            unserved_demand_l=10.0,
+            operation_count=3,
+            minimum_pressure_m=15.0,
+            service_availability=0.85,
+        )
+    )
+    entries = compute_verified_pareto_frontier([
+        ("hydraulic_only", hydraulic_only_better_everywhere),
+        ("exposure", exposure_evaluated_worse_hydraulics),
+    ])
+    by_label = {e.label: e for e in entries}
+    assert by_label["hydraulic_only"].group == "HYDRAULIC_ONLY"
+    assert by_label["exposure"].group == "EXPOSURE_AWARE"
+    # Neither is dominated: each is alone in its own group.
+    assert by_label["hydraulic_only"].dominated is False
+    assert by_label["exposure"].dominated is False
+
+
+def test_hydraulic_only_plans_are_dominated_only_by_other_hydraulic_only_plans() -> None:
+    worse_hydraulic_only = _verification(
+        consequences=_metrics(exposure_evaluated=False, pressure_violation_minutes=10.0)
+    )
+    better_hydraulic_only = _verification(
+        consequences=_metrics(exposure_evaluated=False, pressure_violation_minutes=0.0)
+    )
+    unrelated_exposure_plan = _verification(
+        consequences=_metrics(exposure_evaluated=True, contaminant_mass_consumed_mg=100.0)
+    )
+    entries = compute_verified_pareto_frontier([
+        ("worse", worse_hydraulic_only),
+        ("better", better_hydraulic_only),
+        ("exposure", unrelated_exposure_plan),
+    ])
+    by_label = {e.label: e for e in entries}
+    assert by_label["worse"].group == "HYDRAULIC_ONLY"
+    assert by_label["worse"].dominated is True
+    assert by_label["better"].dominated is False
+    # The lone exposure-evaluated plan is never dominated by (or compared
+    # against) either hydraulic-only entry.
+    assert by_label["exposure"].group == "EXPOSURE_AWARE"
+    assert by_label["exposure"].dominated is False
+
+
+def test_no_action_comparator_never_bridges_hydraulic_only_and_exposure_aware_groups() -> None:
+    """NO_ACTION follows the same group-isolation rule as every other
+    entry -- it is exempted from domination only within its own group,
+    never used to compare across the exposure/hydraulic-only boundary."""
+
+    no_action_hydraulic_only = _verification(
+        consequences=_metrics(exposure_evaluated=False, contaminant_mass_consumed_mg=0.0)
+    )
+    exposure_plan = _verification(
+        consequences=_metrics(exposure_evaluated=True, contaminant_mass_consumed_mg=3.0)
+    )
+    entries = compute_verified_pareto_frontier(
+        [("NO_ACTION", no_action_hydraulic_only), ("ISOLATE_SOURCE", exposure_plan)]
+    )
+    by_label = {e.label: e for e in entries}
+    assert by_label["NO_ACTION"].group == "HYDRAULIC_ONLY"
+    assert by_label["NO_ACTION"].is_no_action_comparator is True
+    assert by_label["NO_ACTION"].dominated is False
+    assert by_label["ISOLATE_SOURCE"].group == "EXPOSURE_AWARE"
+    assert by_label["ISOLATE_SOURCE"].dominated is False
