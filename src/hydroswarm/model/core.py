@@ -938,6 +938,24 @@ class HydroCore(nn.Module):
         }
         sentinel_nodes = role_hidden["sentinel"]
         scout_nodes = role_hidden["scout"]
+        # core-issues5.txt Section 2 (P0 blocker): a candidate-conditioned
+        # model must support two distinct passes. PASS 1 (incident-only
+        # analysis -- Sentinel/localization/event/control outputs) runs
+        # before any response plan exists; no plan tensors are available or
+        # meaningful yet. PASS 2 (plan scoring) supplies real deterministic
+        # candidate-plan tensors once planning is gated open. Previously
+        # this branch treated any missing plan tensor as a hard KeyError
+        # unconditionally, so a live incident-only forward pass on a
+        # candidate_conditioned checkpoint always raised, and
+        # HybridInferencePipeline.analyze()'s broad except-Exception around
+        # `_run_model` silently converted that into an unannounced
+        # CLASSICAL_SAFE fallback -- masking a real neural-path failure as
+        # ordinary fail-closed behavior. plan_hidden stays None (no
+        # fabricated plan-scoring outputs) whenever no plan tensors are
+        # supplied; a partially-supplied set (some but not all four fields)
+        # remains a hard failure, since that is a real caller defect rather
+        # than "no plan yet".
+        plan_hidden: Tensor | None = None
         if self.strategist_mode == "candidate_conditioned":
             # core-issues3.txt Phase 4: build plan_hidden from the actual
             # candidate plans (batch-provided), not anonymous learned query
@@ -960,133 +978,145 @@ class HydroCore(nn.Module):
             plan_target_type = batch.get("plan_target_type")
             plan_mask_optional = batch.get("plan_mask")
             plan_features_optional = batch.get("plan_features")
-            if (
-                plan_template_ids is None
-                or plan_target_type is None
-                or plan_mask_optional is None
-                or plan_features_optional is None
-            ):
-                missing_plan_fields = [
-                    name
-                    for name, value in (
-                        ("plan_template_ids", plan_template_ids),
-                        ("plan_target_type", plan_target_type),
-                        ("plan_mask", plan_mask_optional),
-                        ("plan_features", plan_features_optional),
-                    )
-                    if value is None
-                ]
+            plan_fields = (
+                ("plan_template_ids", plan_template_ids),
+                ("plan_target_type", plan_target_type),
+                ("plan_mask", plan_mask_optional),
+                ("plan_features", plan_features_optional),
+            )
+            provided_plan_fields = [name for name, value in plan_fields if value is not None]
+            if not provided_plan_fields:
+                # Incident-only inference: no candidate plans supplied at
+                # all. This is the expected, valid shape of PASS 1 -- leave
+                # plan_hidden None and fall through without touching any of
+                # the candidate-plan-tensor code below.
+                pass
+            elif len(provided_plan_fields) < len(plan_fields):
+                missing_plan_fields = [name for name, value in plan_fields if value is None]
                 raise KeyError(
                     "missing HydroBatch fields required by strategist_mode=candidate_conditioned: "
                     f"{', '.join(missing_plan_fields)}"
                 )
-            plan_mask_tensor = plan_mask_optional.bool()
-            plan_features = plan_features_optional.float()
-            plans = plan_template_ids.shape[1]
-            # core-issues4.txt Section E: validate dimensions/value ranges
-            # BEFORE any embedding/gather -- an out-of-range template id or
-            # target index previously reached torch.gather/nn.Embedding
-            # directly, which either raises an opaque low-level error or
-            # (for a gather index within the tensor's storage bounds but
-            # semantically wrong) silently reads a real, unrelated node's
-            # embedding instead of failing closed.
-            if plan_template_ids.shape != (batch_size, plans):
-                raise ValueError("plan_template_ids must have shape [batch, plans]")
-            if plan_target_type.shape != (batch_size, plans):
-                raise ValueError("plan_target_type must have shape [batch, plans]")
-            if plan_mask_tensor.shape != (batch_size, plans):
-                raise ValueError("plan_mask must have shape [batch, plans]")
-            if plan_features.shape != (batch_size, plans, self.plan_feature_dim):
-                raise ValueError(
-                    f"plan_features must have shape [batch, plans, {self.plan_feature_dim}]"
-                )
-            # Padded plans (plan_mask False) may legitimately carry a
-            # sentinel/garbage template id -- CandidatePlanEncoder's own
-            # plan_mask handling already zeroes their contribution to
-            # plan_hidden -- so range-check only positions the caller
-            # marked real.
-            if plan_mask_tensor.any():
-                real_template_ids = plan_template_ids[plan_mask_tensor]
-                if bool(((real_template_ids < 0) | (real_template_ids >= self.action_vocabulary_size)).any()):
+            else:
+                # provided_plan_fields has all 4 names here (neither branch
+                # above was taken), so every .get() above returned non-None
+                # -- asserted explicitly so static analysis can narrow these
+                # from `Tensor | None` to `Tensor` for the rest of this
+                # block, matching the runtime guarantee already established
+                # above.
+                assert plan_template_ids is not None
+                assert plan_target_type is not None
+                assert plan_mask_optional is not None
+                assert plan_features_optional is not None
+                plan_mask_tensor = plan_mask_optional.bool()
+                plan_features = plan_features_optional.float()
+                plans = plan_template_ids.shape[1]
+                # core-issues4.txt Section E: validate dimensions/value ranges
+                # BEFORE any embedding/gather -- an out-of-range template id or
+                # target index previously reached torch.gather/nn.Embedding
+                # directly, which either raises an opaque low-level error or
+                # (for a gather index within the tensor's storage bounds but
+                # semantically wrong) silently reads a real, unrelated node's
+                # embedding instead of failing closed.
+                if plan_template_ids.shape != (batch_size, plans):
+                    raise ValueError("plan_template_ids must have shape [batch, plans]")
+                if plan_target_type.shape != (batch_size, plans):
+                    raise ValueError("plan_target_type must have shape [batch, plans]")
+                if plan_mask_tensor.shape != (batch_size, plans):
+                    raise ValueError("plan_mask must have shape [batch, plans]")
+                if plan_features.shape != (batch_size, plans, self.plan_feature_dim):
                     raise ValueError(
-                        f"plan_template_ids contains a value outside [0, {self.action_vocabulary_size}) "
-                        "at a non-padded (plan_mask=True) position"
+                        f"plan_features must have shape [batch, plans, {self.plan_feature_dim}]"
                     )
-                real_target_type = plan_target_type[plan_mask_tensor]
-                if bool(((real_target_type < 0) | (real_target_type >= len(TARGET_TYPE_CLASSES))).any()):
-                    raise ValueError(
-                        f"plan_target_type contains a value outside [0, {len(TARGET_TYPE_CLASSES)}) "
-                        "at a non-padded (plan_mask=True) position"
+                # Padded plans (plan_mask False) may legitimately carry a
+                # sentinel/garbage template id -- CandidatePlanEncoder's own
+                # plan_mask handling already zeroes their contribution to
+                # plan_hidden -- so range-check only positions the caller
+                # marked real.
+                if plan_mask_tensor.any():
+                    real_template_ids = plan_template_ids[plan_mask_tensor]
+                    if bool(((real_template_ids < 0) | (real_template_ids >= self.action_vocabulary_size)).any()):
+                        raise ValueError(
+                            f"plan_template_ids contains a value outside [0, {self.action_vocabulary_size}) "
+                            "at a non-padded (plan_mask=True) position"
+                        )
+                    real_target_type = plan_target_type[plan_mask_tensor]
+                    if bool(((real_target_type < 0) | (real_target_type >= len(TARGET_TYPE_CLASSES))).any()):
+                        raise ValueError(
+                            f"plan_target_type contains a value outside [0, {len(TARGET_TYPE_CLASSES)}) "
+                            "at a non-padded (plan_mask=True) position"
+                        )
+                target_embedding = hidden.new_zeros(batch_size, plans, self.d_model)
+                node_target_index = batch.get("plan_target_node_index")
+                if node_target_index is not None:
+                    is_node_target = (plan_target_type == TARGET_TYPE_INDEX["NODE"]) & plan_mask_tensor
+                    if bool(is_node_target.any()):
+                        real_node_targets = node_target_index[is_node_target]
+                        if bool(((real_node_targets < 0) | (real_node_targets >= nodes)).any()):
+                            raise ValueError(
+                                f"plan_target_node_index contains a value outside [0, {nodes}) at a "
+                                "real (plan_mask=True, target_type=NODE) position"
+                            )
+                    # core-issues4.txt Section E: clamp BOTH bounds, not just
+                    # min=0 -- an unclamped upper bound previously let an
+                    # out-of-range index reach torch.gather directly (an
+                    # opaque runtime error at best). Clamping is safe here
+                    # specifically because it only affects positions the
+                    # `torch.where` below discards (is_node_target is False
+                    # wherever the index is not a real, validated node
+                    # target) -- padded/NONE-type positions never contribute
+                    # their gathered value to target_embedding regardless of
+                    # what clamp(...) resolves their index to.
+                    safe_node_index = node_target_index.clamp(min=0, max=nodes - 1)
+                    gathered_node = torch.gather(
+                        role_hidden["strategist"], 1,
+                        safe_node_index.unsqueeze(-1).expand(-1, -1, self.d_model),
                     )
-            target_embedding = hidden.new_zeros(batch_size, plans, self.d_model)
-            node_target_index = batch.get("plan_target_node_index")
-            if node_target_index is not None:
-                is_node_target = (plan_target_type == TARGET_TYPE_INDEX["NODE"]) & plan_mask_tensor
-                if bool(is_node_target.any()):
-                    real_node_targets = node_target_index[is_node_target]
-                    if bool(((real_node_targets < 0) | (real_node_targets >= nodes)).any()):
-                        raise ValueError(
-                            f"plan_target_node_index contains a value outside [0, {nodes}) at a "
-                            "real (plan_mask=True, target_type=NODE) position"
-                        )
-                # core-issues4.txt Section E: clamp BOTH bounds, not just
-                # min=0 -- an unclamped upper bound previously let an
-                # out-of-range index reach torch.gather directly (an
-                # opaque runtime error at best). Clamping is safe here
-                # specifically because it only affects positions the
-                # `torch.where` below discards (is_node_target is False
-                # wherever the index is not a real, validated node
-                # target) -- padded/NONE-type positions never contribute
-                # their gathered value to target_embedding regardless of
-                # what clamp(...) resolves their index to.
-                safe_node_index = node_target_index.clamp(min=0, max=nodes - 1)
-                gathered_node = torch.gather(
-                    role_hidden["strategist"], 1,
-                    safe_node_index.unsqueeze(-1).expand(-1, -1, self.d_model),
+                    target_embedding = torch.where(is_node_target.unsqueeze(-1), gathered_node, target_embedding)
+                link_target_index = batch.get("plan_target_link_index")
+                edge_index_for_targets = batch.get("edge_index")
+                if link_target_index is not None and edge_index_for_targets is not None:
+                    if edge_index_for_targets.ndim == 2:
+                        edge_index_for_targets = edge_index_for_targets.unsqueeze(0).expand(batch_size, -1, -1)
+                    edge_count = edge_index_for_targets.shape[-1]
+                    is_link_target = (plan_target_type == TARGET_TYPE_INDEX["LINK"]) & plan_mask_tensor
+                    if bool(is_link_target.any()):
+                        real_link_targets = link_target_index[is_link_target]
+                        if bool(((real_link_targets < 0) | (real_link_targets >= edge_count)).any()):
+                            raise ValueError(
+                                f"plan_target_link_index contains a value outside [0, {edge_count}) at "
+                                "a real (plan_mask=True, target_type=LINK) position"
+                            )
+                    # Same both-bounds-clamped, where-discarded-if-invalid
+                    # reasoning as safe_node_index above.
+                    safe_link_index = link_target_index.clamp(min=0, max=max(edge_count - 1, 0))
+                    edge_src, edge_dst = edge_index_for_targets[:, 0, :], edge_index_for_targets[:, 1, :]
+                    src_node_idx = torch.gather(edge_src, 1, safe_link_index)
+                    dst_node_idx = torch.gather(edge_dst, 1, safe_link_index)
+                    src_embed = torch.gather(
+                        role_hidden["strategist"], 1, src_node_idx.unsqueeze(-1).expand(-1, -1, self.d_model)
+                    )
+                    dst_embed = torch.gather(
+                        role_hidden["strategist"], 1, dst_node_idx.unsqueeze(-1).expand(-1, -1, self.d_model)
+                    )
+                    link_embed = (src_embed + dst_embed) * 0.5
+                    target_embedding = torch.where(is_link_target.unsqueeze(-1), link_embed, target_embedding)
+                plan_hidden = self.candidate_plan_encoder(
+                    template_ids=plan_template_ids,
+                    target_type=plan_target_type,
+                    target_embedding=target_embedding,
+                    plan_features=plan_features,
+                    plan_mask=plan_mask_tensor,
+                    incident_context=pooled,
                 )
-                target_embedding = torch.where(is_node_target.unsqueeze(-1), gathered_node, target_embedding)
-            link_target_index = batch.get("plan_target_link_index")
-            edge_index_for_targets = batch.get("edge_index")
-            if link_target_index is not None and edge_index_for_targets is not None:
-                if edge_index_for_targets.ndim == 2:
-                    edge_index_for_targets = edge_index_for_targets.unsqueeze(0).expand(batch_size, -1, -1)
-                edge_count = edge_index_for_targets.shape[-1]
-                is_link_target = (plan_target_type == TARGET_TYPE_INDEX["LINK"]) & plan_mask_tensor
-                if bool(is_link_target.any()):
-                    real_link_targets = link_target_index[is_link_target]
-                    if bool(((real_link_targets < 0) | (real_link_targets >= edge_count)).any()):
-                        raise ValueError(
-                            f"plan_target_link_index contains a value outside [0, {edge_count}) at "
-                            "a real (plan_mask=True, target_type=LINK) position"
-                        )
-                # Same both-bounds-clamped, where-discarded-if-invalid
-                # reasoning as safe_node_index above.
-                safe_link_index = link_target_index.clamp(min=0, max=max(edge_count - 1, 0))
-                edge_src, edge_dst = edge_index_for_targets[:, 0, :], edge_index_for_targets[:, 1, :]
-                src_node_idx = torch.gather(edge_src, 1, safe_link_index)
-                dst_node_idx = torch.gather(edge_dst, 1, safe_link_index)
-                src_embed = torch.gather(
-                    role_hidden["strategist"], 1, src_node_idx.unsqueeze(-1).expand(-1, -1, self.d_model)
-                )
-                dst_embed = torch.gather(
-                    role_hidden["strategist"], 1, dst_node_idx.unsqueeze(-1).expand(-1, -1, self.d_model)
-                )
-                link_embed = (src_embed + dst_embed) * 0.5
-                target_embedding = torch.where(is_link_target.unsqueeze(-1), link_embed, target_embedding)
-            plan_hidden = self.candidate_plan_encoder(
-                template_ids=plan_template_ids,
-                target_type=plan_target_type,
-                target_embedding=target_embedding,
-                plan_features=plan_features,
-                plan_mask=plan_mask_tensor,
-                incident_context=pooled,
-            )
         else:
             plan_hidden = self.plan_query_tokens.unsqueeze(0) + pooled[:, None, :]
-        plan_hidden = self.adapters["strategist"](plan_hidden)
-        pointer_logits = torch.einsum(
-            "bqd,bnd->bqn", self.pointer_query(plan_hidden), role_hidden["strategist"]
-        ).masked_fill(~node_mask[:, None, :], torch.finfo(hidden.dtype).min)
+        pointer_logits: Tensor | None = None
+        if plan_hidden is not None:
+            plan_hidden = self.adapters["strategist"](plan_hidden)
+            pointer_logits = torch.einsum(
+                "bqd,bnd->bqn", self.pointer_query(plan_hidden), role_hidden["strategist"]
+            ).masked_fill(~node_mask[:, None, :], torch.finfo(hidden.dtype).min)
         source_mask = batch.get("source_candidate_mask", node_mask).bool()
         if source_mask.shape != (batch_size, nodes):
             raise ValueError("source_candidate_mask must have shape [batch, nodes]")
@@ -1142,13 +1172,25 @@ class HydroCore(nn.Module):
             sensor_fault_logits=self.sensor_fault_head(sentinel_nodes).squeeze(-1),
             sample_node_logits=self.sample_node_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, torch.finfo(hidden.dtype).min),
             expected_information_gain=self.information_gain_head(scout_nodes).squeeze(-1).masked_fill(~node_mask, 0.0),
-            action_logits=self.action_head(plan_hidden),
-            action_pointer_logits=pointer_logits,
-            plan_value=self.plan_value_head(plan_hidden).squeeze(-1),
-            plan_validity_logits=self.plan_validity_head(plan_hidden),
             uncertainty=self.uncertainty_head(incident_context),
             ood_logits=self.ood_head(incident_context),
         )
+        # core-issues5.txt Section 2: plan-scoring outputs are only ever
+        # produced when plan_hidden exists -- either the anonymous_queries
+        # path (always populated) or candidate_conditioned PASS 2 (real
+        # candidate tensors supplied). Incident-only candidate_conditioned
+        # inference (plan_hidden is None) must not fabricate these keys;
+        # HydroOutput is `total=False`, so simply omitting them is the
+        # correct "not available yet" representation, and every downstream
+        # reader (SemanticPredictions._model_semantics, callers below) already
+        # treats their absence via `.get(...)` as "no plan prediction", not
+        # as an error.
+        if plan_hidden is not None:
+            output["action_logits"] = self.action_head(plan_hidden)
+            assert pointer_logits is not None
+            output["action_pointer_logits"] = pointer_logits
+            output["plan_value"] = self.plan_value_head(plan_hidden).squeeze(-1)
+            output["plan_validity_logits"] = self.plan_validity_head(plan_hidden)
         if self.ood_category_head_enabled:
             output["ood_category_logits"] = self.ood_category_head(incident_context)
         if self.scout_control_heads:
@@ -1172,7 +1214,7 @@ class HydroCore(nn.Module):
             output["travel_time_prediction"] = (
                 self.travel_time_head(sentinel_nodes).squeeze(-1).masked_fill(~node_mask, 0.0)
             )
-        if self.consequence_prescreening_heads:
+        if self.consequence_prescreening_heads and plan_hidden is not None:
             for name, head in self.consequence_proxy_heads.items():
                 output[name] = head(plan_hidden).squeeze(-1)  # type: ignore[literal-required]
         return output

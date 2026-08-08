@@ -18,6 +18,7 @@ from hydroswarm.inference import (
     OODDetector,
     OODReference,
 )
+from hydroswarm.model.core import HydroCore
 from hydroswarm.preprocessing import DEFAULT_FEATURE_SCHEMA, SensorSeries
 from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
 from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS
@@ -220,6 +221,36 @@ def test_scout_strategist_and_ood_neural_outputs_pass_through_when_declared_trai
     # With "ood" declared trained, ood_logits' near-zero last class must
     # actually drive down ood_components.energy rather than falling back.
     assert result.ood_components.energy < 0.05
+
+
+def test_candidate_conditioned_model_does_not_fall_back_to_classical_safe_without_plan_tensors() -> None:
+    """core-issues5.txt Section 2 (P0 blocker) integration regression.
+
+    A real candidate-conditioned HydroCore forward pass over the actual
+    live HydraulicFeatureBuilder-shaped batch (which never contains plan
+    tensors -- planning has not happened at this point in the pipeline)
+    must produce real Sentinel/localization outputs, not silently
+    degrade the whole incident analysis to
+    HybridRuntimeMode.CLASSICAL_SAFE. Before the fix, HydroCore.forward()
+    unconditionally raised KeyError for a candidate_conditioned model
+    given no plan tensors, and _run_model's broad except-Exception
+    converted that architecture mismatch into an indistinguishable,
+    silent classical-only fallback.
+    """
+    model = HydroCore(
+        d_model=32, nhead=4, dim_feedforward=64, num_layers=1, modality_layers=1,
+        latent_tokens=64, plan_queries=2, adapter_dims=(32, 32, 32),
+        strategist_mode="candidate_conditioned",
+    ).eval()
+    pipeline, network = _pipeline(model)
+
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert result.runtime_mode == HybridRuntimeMode.FULL_HYBRID
+    assert result.neural_failure is None
+    assert result.neural_belief is not None
+    assert result.semantic_predictions.plan_values == ()
+    assert result.semantic_predictions.plan_validity == ()
 
 
 def test_disagreement_and_ood_fail_closed_before_planning() -> None:
