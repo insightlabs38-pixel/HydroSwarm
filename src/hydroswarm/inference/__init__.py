@@ -14,6 +14,7 @@ from hydroswarm.inference.fusion import (
 )
 from hydroswarm.calibration import CalibrationArtifact, SplitConformalCalibrator
 from hydroswarm.inference.authority import build_decision_certificates
+from hydroswarm.inference.evidence_certificate import build_evidence_certificate
 from hydroswarm.inference.ood import OODComponents, OODDetector, OODReference
 from hydroswarm.inference.pipeline import MODEL_VERSION, HybridInferencePipeline, HybridPipeline
 from hydroswarm.inference.results import (
@@ -45,6 +46,7 @@ __all__ = [
     "SplitConformalCalibrator",
     "TrustFeatures",
     "build_decision_certificates",
+    "build_evidence_certificate",
     "conformal_candidate_set",
     "fixed_weight_fusion",
     "fixed_weight_fusion_config",

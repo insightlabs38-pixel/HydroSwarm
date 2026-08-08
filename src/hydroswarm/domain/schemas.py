@@ -323,3 +323,37 @@ class DecisionCertificate(FrozenModel):
     suppression_reasons: tuple[str, ...] = ()
     provenance: DecisionProvenance = Field(default_factory=DecisionProvenance)
 
+
+class EvidenceCertificateStatus(StrEnum):
+    """core-issues5.txt Section 15: whether more evidence collection is
+    worthwhile right now, and specifically why not when it is not --
+    converts abstention/stopping into a legible decision-support signal
+    instead of a silent absence of a sample recommendation."""
+
+    EVIDENCE_SUFFICIENT = "EVIDENCE_SUFFICIENT"
+    CONTINUE_SAMPLING = "CONTINUE_SAMPLING"
+    STOP_BUDGET_EXHAUSTED = "STOP_BUDGET_EXHAUSTED"
+    STOP_NO_USEFUL_CANDIDATE = "STOP_NO_USEFUL_CANDIDATE"
+    STOP_ABSTAIN = "STOP_ABSTAIN"
+
+
+class EvidenceCertificate(FrozenModel):
+    """core-issues5.txt Section 15 (P1 product feature): Evidence Value /
+    Stop Certificate. Uses only the currently authoritative DETERMINISTIC
+    sampling logic (hydroswarm.sampling.rank_sample_locations) -- learned
+    Scout is not required and, per Section 13's own scout_recommendation
+    certificate, is not promoted regardless."""
+
+    status: EvidenceCertificateStatus
+    stop: bool
+    message: str = Field(min_length=1)
+    posterior_entropy_bits: float
+    candidate_set_size: int
+    candidate_nodes: tuple[str, ...]
+    recommended_sample_node: str | None = None
+    expected_information_gain_bits: float | None = None
+    expected_candidate_reduction: float | None = None
+    sample_budget_remaining: int = Field(ge=0)
+    already_sampled_nodes: tuple[str, ...] = ()
+    recommended_node_accessible: bool | None = None
+

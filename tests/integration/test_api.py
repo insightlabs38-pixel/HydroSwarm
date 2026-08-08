@@ -186,6 +186,16 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
     assert str(unsafe_plan["plan_id"]) not in frontier_plan_ids
     assert frontier.json()[0]["mode"] == "posterior_weighted"
 
+    # core-issues5.txt Section 15 (P1 product feature): this fixture never
+    # configures a real pipeline_factory (record.analysis is a
+    # DEMO_FALLBACK dict, not a real IncidentAnalysisResult) -- the
+    # evidence certificate correctly refuses to fabricate one rather than
+    # silently returning empty/zero data. The real builder function is
+    # exercised directly, with real data, in
+    # tests/scientific/test_evidence_certificate.py.
+    evidence_certificate = client.get(f"/api/incidents/{incident_id}/evidence-certificate")
+    assert evidence_certificate.status_code == 409
+
 
 # core-issues5.txt Section 10 (P0 safety fix): a plan verified under
 # evidence state A must not remain approvable after a new sample changes

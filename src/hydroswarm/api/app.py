@@ -23,6 +23,7 @@ from hydroswarm.domain import (
     ActionType,
     CandidateSet,
     DecisionCertificate,
+    EvidenceCertificate,
     IncidentCreate,
     IncidentState,
     OperationalAction,
@@ -39,7 +40,12 @@ from hydroswarm.explanation import (
 )
 from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController
 from hydroswarm.calibration.conformal import CALIBRATION_SCHEMA_VERSION
-from hydroswarm.inference import MODEL_VERSION, IncidentAnalysisResult, build_decision_certificates
+from hydroswarm.inference import (
+    MODEL_VERSION,
+    IncidentAnalysisResult,
+    build_decision_certificates,
+    build_evidence_certificate,
+)
 from hydroswarm.planning import FrontierMode, compute_verified_pareto_frontier
 from hydroswarm.preprocessing import SensorSeries
 from hydroswarm.storage import AuditEvent
@@ -528,6 +534,27 @@ def create_app(
             )
             for entry in entries
         ]
+
+    @app.get(
+        "/api/incidents/{incident_id}/evidence-certificate",
+        response_model=EvidenceCertificate,
+    )
+    def get_evidence_certificate(incident_id: UUID) -> EvidenceCertificate:
+        """core-issues5.txt Section 15 (P1 product feature): converts the
+        incident's current sampling/abstention state into a legible
+        EVIDENCE SUFFICIENT / CONTINUE SAMPLING / STOP certificate. Uses
+        only the already-authoritative deterministic sampling logic
+        (analysis.sample_result, from hydroswarm.sampling.
+        rank_sample_locations) -- learned Scout is not required."""
+
+        record = incident_or_404(incident_id)
+        if not isinstance(record.analysis, IncidentAnalysisResult):
+            raise HTTPException(status_code=409, detail="analyze incident first")
+        return build_evidence_certificate(
+            record.analysis,
+            sample_budget_remaining=record.create.maximum_samples - record.state.sample_count,
+            already_sampled_nodes=tuple(sorted({item.node_id for item in record.state.observations})),
+        )
 
     @app.post("/api/incidents/{incident_id}/analyze/jobs")
     def queue_analysis(incident_id: UUID):
