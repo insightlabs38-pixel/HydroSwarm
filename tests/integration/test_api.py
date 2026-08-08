@@ -261,6 +261,104 @@ def test_new_sample_invalidates_prior_verification_and_reverify_restores_approva
     assert "PLAN_VERIFICATION_STALE" in {event["event_type"] for event in events}
 
 
+def _create_incident_with_verified_plan(client: TestClient) -> tuple[str, str, dict]:
+    client.post("/api/networks/net-test/validate", json={"node_ids": ["J1", "J2"], "link_count": 1})
+    created = client.post(
+        "/api/incidents",
+        json={
+            "network_id": "net-test",
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation()],
+            "maximum_samples": 3,
+        },
+    )
+    incident_id = created.json()["incident_id"]
+    client.post(f"/api/incidents/{incident_id}/analyze")
+    plans_response = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
+    _unsafe_plan, safe_plan = plans_response.json()
+    verified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/verify")
+    assert verified.json()["decision"] == "VERIFIED"
+    assert verified.json()["verification_status"] == "CURRENT"
+    return incident_id, safe_plan["plan_id"], verified.json()
+
+
+# core-issues5.txt delta item 5: the verification-context identity must
+# include every behavior-critical verifier policy value, not only
+# evidence/network/model identity -- a change to any of them must
+# invalidate an already-recorded verification exactly like new evidence
+# does.
+
+
+def test_changed_safety_threshold_invalidates_verification(tmp_path, monkeypatch) -> None:
+    client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
+    incident_id, plan_id, first = _create_incident_with_verified_plan(client)
+
+    import importlib
+
+    # hydroswarm.api's own __init__.py binds a module-level `app` (a real
+    # FastAPI instance) that shadows the `hydroswarm.api.app` SUBMODULE as
+    # a package attribute -- `import hydroswarm.api.app as x` would bind
+    # `x` to that FastAPI instance, not the module. importlib.import_module
+    # reads sys.modules directly, sidestepping the shadowing.
+    app_module = importlib.import_module("hydroswarm.api.app")
+    monkeypatch.setattr(app_module, "DEFAULT_MINIMUM_PRESSURE_M", 99.0)
+
+    stale_approval = client.post(
+        f"/api/incidents/{incident_id}/plans/{plan_id}/approve",
+        json={"approved": True, "operator_id": "operator-1"},
+    )
+    assert stale_approval.status_code == 409
+
+    reverified = client.post(f"/api/incidents/{incident_id}/plans/{plan_id}/verify")
+    assert reverified.json()["context_hash"] != first["context_hash"]
+
+    approved = client.post(
+        f"/api/incidents/{incident_id}/plans/{plan_id}/approve",
+        json={"approved": True, "operator_id": "operator-1"},
+    )
+    assert approved.status_code == 200
+
+
+def test_changed_consequence_policy_invalidates_verification(tmp_path, monkeypatch) -> None:
+    """Simulator/consequence-policy identity (PlanEvaluationContext's own
+    governed defaults) invalidates a recorded verification exactly like a
+    changed safety threshold does -- a Field object's `.default` is a real,
+    mutable attribute, so this monkeypatches the actual value
+    _verification_context_hash reads rather than a copy."""
+
+    client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
+    incident_id, plan_id, first = _create_incident_with_verified_plan(client)
+
+    from hydroswarm.simulation import PlanEvaluationContext
+
+    monkeypatch.setattr(
+        PlanEvaluationContext.__dataclass_fields__["consequence_policy_version"], "default",
+        "exposure-consequences-v2-test",
+    )
+
+    stale_approval = client.post(
+        f"/api/incidents/{incident_id}/plans/{plan_id}/approve",
+        json={"approved": True, "operator_id": "operator-1"},
+    )
+    assert stale_approval.status_code == 409
+
+    reverified = client.post(f"/api/incidents/{incident_id}/plans/{plan_id}/verify")
+    assert reverified.json()["context_hash"] != first["context_hash"]
+
+
+def test_unchanged_context_leaves_verification_current_and_approvable(tmp_path) -> None:
+    client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
+    incident_id, plan_id, first = _create_incident_with_verified_plan(client)
+
+    # Nothing changed between verify and approve -- must still succeed.
+    approved = client.post(
+        f"/api/incidents/{incident_id}/plans/{plan_id}/approve",
+        json={"approved": True, "operator_id": "operator-1"},
+    )
+    assert approved.status_code == 200
+    assert first["verification_status"] == "CURRENT"
+
+
 def test_api_enforces_schema_and_validated_network(tmp_path) -> None:
     client = TestClient(create_app(ledger_path=tmp_path / "audit.sqlite3"))
     unvalidated = client.post(

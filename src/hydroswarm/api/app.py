@@ -57,7 +57,12 @@ from hydroswarm.simulation import (
     PlanVerifier,
     WeightedSourceHypothesis,
 )
-from hydroswarm.simulation.wrapper import IncidentSourceProfile, wntr
+from hydroswarm.simulation.wrapper import (
+    DEFAULT_MINIMUM_PRESSURE_M,
+    DEFAULT_MINIMUM_SERVICE_AVAILABILITY,
+    IncidentSourceProfile,
+    wntr,
+)
 from hydroswarm.runtime import DefaultPipelineFactory
 
 from .state import (
@@ -757,27 +762,59 @@ def create_app(
         )
 
     def _verification_context_hash(record: IncidentRuntime) -> str:
-        """core-issues5.txt Section 10 (P0 safety fix): one canonical hash
-        over every behavior-critical component a plan verification depends
-        on. `record.analysis.provenance_hashes` (when a real analysis has
-        run) already bundles model/checkpoint, network, topology,
-        signature-artifact, normalization, fusion-config, and calibration
-        identity plus the incident's own evidence hash (see
-        HybridInferencePipeline.analyze's own `provenance` dict) -- reused
-        directly here rather than re-derived, so this can never silently
-        drift out of sync with what analysis actually used. Source
-        hypothesis-set identity/probabilities come from
-        `record.state.candidates` directly (changes whenever a new sample
-        changes the posterior); consequence-policy identity is
-        approximated by the incident's own configured contamination
-        threshold (the one consequence-policy parameter this API layer
-        currently exposes per-incident).
+        """core-issues5.txt Section 10 (P0 safety fix) / delta item 5: one
+        canonical hash over every behavior-critical component a plan
+        verification depends on. `record.analysis.provenance_hashes` (when
+        a real analysis has run) already bundles model/checkpoint,
+        network, topology, signature-artifact, model-input-signature,
+        normalization, fusion-config, and calibration identity plus the
+        incident's own evidence hash (see HybridInferencePipeline.analyze's
+        own `provenance` dict) -- reused directly here rather than
+        re-derived, so this can never silently drift out of sync with what
+        analysis actually used. Source hypothesis-set identity/
+        probabilities come from `record.state.candidates` directly
+        (changes whenever a new sample changes the posterior, and is the
+        exact field `_runtime_evaluation_context` derives its bounded
+        hypothesis set from, so the two can never disagree).
+
+        Delta item 5 additions -- every other behavior-critical verifier
+        policy value `verify_plan` actually constructs its
+        HydraulicSimulator/PlanEvaluationContext with, composed from the
+        same governed constants/defaults those constructors use rather
+        than duplicated literals:
+
+        - simulator name/version identity (HydraulicSimulator.
+          simulator_name is fixed; simulator_version reflects the
+          installed WNTR build);
+        - minimum-pressure / minimum-service-availability thresholds
+          (DEFAULT_MINIMUM_PRESSURE_M / DEFAULT_MINIMUM_SERVICE_AVAILABILITY
+          -- verify_plan never overrides either, so these ARE the real
+          values in force, not merely illustrative defaults);
+        - consequence-policy version and aggregation policy
+          (PlanEvaluationContext's own field defaults -- the same object
+          _runtime_evaluation_context actually constructs and
+          PlanVerifier.verify actually evaluates against);
+        - population-map identity (`population_by_node` is not currently
+          incident-configurable -- always None/unused today, but recorded
+          explicitly so enabling it later is automatically a context
+          change, not a silent gap).
 
         Any change to this hash between when a verification was recorded
         and when approval is attempted means that verification's context is
         no longer current -- see verify_plan/approve_plan.
         """
 
+        # Read the governed defaults directly from PlanEvaluationContext's
+        # own dataclass field declarations (matching
+        # scripts/build_v4_inference_release_bundle.py's own
+        # CONSEQUENCE_POLICY_VERSION convention) rather than constructing
+        # an instance -- PlanEvaluationContext requires exactly one of
+        # source_profile/hypotheses, which this hash function has no
+        # incident-specific value to supply.
+        _context_fields = PlanEvaluationContext.__dataclass_fields__
+        default_consequence_policy_version = _context_fields["consequence_policy_version"].default
+        default_aggregation_policy = _context_fields["aggregation_policy"].default
+        default_population_by_node = _context_fields["population_by_node"].default
         payload: dict[str, Any] = {
             "network_id": record.state.network_id,
             "observations": [item.model_dump(mode="json") for item in record.state.observations],
@@ -787,6 +824,21 @@ def create_app(
                 else None
             ),
             "contamination_threshold_mg_l": record.create.contamination_threshold_mg_l,
+            "verifier_policy": {
+                "simulator_name": HydraulicSimulator.simulator_name,
+                "simulator_version": getattr(wntr, "__version__", "unavailable"),
+                "minimum_pressure_m": DEFAULT_MINIMUM_PRESSURE_M,
+                "minimum_service_availability": DEFAULT_MINIMUM_SERVICE_AVAILABILITY,
+                "consequence_policy_version": default_consequence_policy_version,
+                "aggregation_policy": default_aggregation_policy,
+                "population_map_identity": (
+                    None
+                    if default_population_by_node is None
+                    else hashlib.sha256(
+                        json.dumps(dict(default_population_by_node), sort_keys=True).encode()
+                    ).hexdigest()
+                ),
+            },
         }
         if record.analysis is not None and hasattr(record.analysis, "provenance_hashes"):
             payload["analysis_provenance"] = dict(record.analysis.provenance_hashes)

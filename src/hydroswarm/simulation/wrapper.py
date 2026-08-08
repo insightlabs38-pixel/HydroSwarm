@@ -428,6 +428,18 @@ def _aggregate_hypothesis_consequences(
 #: diverge on it again.
 FEATURE_SNAPSHOT_TIME_SECONDS = 3_600
 
+#: core-issues5.txt delta item 5: the governed default safety thresholds
+#: HydraulicSimulator/PlanVerifier actually verify plans against when no
+#: per-incident override is supplied (every current call site, including
+#: hydroswarm.api.app.verify_plan, constructs a HydraulicSimulator without
+#: overriding either). Named module-level constants (not bare literal
+#: constructor defaults) so a verification-context identity can reference
+#: the exact same values a change to either constant is required to also
+#: change, rather than duplicating "10.0"/"0.90" as a second, independently
+#: -maintained literal.
+DEFAULT_MINIMUM_PRESSURE_M = 10.0
+DEFAULT_MINIMUM_SERVICE_AVAILABILITY = 0.90
+
 
 class HydraulicSimulator:
     """Load, validate and simulate water networks using WNTR as authority."""
@@ -438,8 +450,8 @@ class HydraulicSimulator:
         self,
         network: Any | str | Path | None = None,
         *,
-        minimum_pressure_m: float = 10.0,
-        minimum_service_availability: float = 0.90,
+        minimum_pressure_m: float = DEFAULT_MINIMUM_PRESSURE_M,
+        minimum_service_availability: float = DEFAULT_MINIMUM_SERVICE_AVAILABILITY,
         pressure_required_m: float = 10.0,
         timeout_seconds: float = 60.0,
         cache: SimulationResultCache | str | Path | None = None,
