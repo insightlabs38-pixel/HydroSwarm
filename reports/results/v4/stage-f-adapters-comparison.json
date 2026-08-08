@@ -1,0 +1,174 @@
+{
+  "arms": [
+    "adapters",
+    "no_adapters"
+  ],
+  "corpus": "data/learning-v2/cycle-b2-joint-v4",
+  "results": {
+    "adapters-seed20260810": {
+      "arm": "adapters",
+      "best_validation_loss": 5.440759335245405,
+      "checkpoint": "experiments/runs/stage-f/adapters-seed20260810/20260808T024356Z-2488d84c/model-export.safetensors",
+      "checkpoint_sha256": "ed2e249e62700143cdf03d6d36113e081628379f2551e33a516ea6cf66503c11",
+      "development_holdout": {
+        "examples": 1750,
+        "mean_loss": 8.943891230496494,
+        "per_task_mean_loss": {
+          "containment_time_proxy": 0.046576914385447955,
+          "duration": 0.8002291411161423,
+          "event_cause": 0.8885792227800596,
+          "event_presence": 0.30269423621622,
+          "evidence_sufficiency": 4.220813251625408,
+          "exposure_proxy": 0.1020639602145159,
+          "plan_regret_proxy": 0.012734653883804143,
+          "plan_validity": 0.02421402803235899,
+          "plan_value": 0.004432667827826332,
+          "pressure_risk_proxy": 7.492127096239446e-06,
+          "relative_strength": 0.6034143806858496,
+          "sensor_fault": 2.734710435147876e-05,
+          "service_loss_proxy": 5.462666797484416e-06,
+          "source_node": 0.7436752081351435,
+          "source_region": 0.3730606806295162,
+          "start_time": 0.8213625880804929
+        }
+      },
+      "epochs_completed": 16,
+      "model_hash": "cbcff3890411101922d94bfae3187cbbfadbf69d6b3d69d10024fe876888d201",
+      "run_id": "20260808T024356Z-583db205",
+      "seed": 20260810,
+      "stop_reason": "maximum_epochs",
+      "stopped_early": false,
+      "use_adapters": true,
+      "wall_seconds": 2811.0113729489985
+    },
+    "adapters-seed20260811": {
+      "arm": "adapters",
+      "best_validation_loss": 5.4048612836807495,
+      "checkpoint": "experiments/runs/stage-f/adapters-seed20260811/20260808T033048Z-f11110fb/model-export.safetensors",
+      "checkpoint_sha256": "2c1b5f8087d45552af4cc57f89f1eb5d5184aa8ea2af335684dd20810b4c9284",
+      "development_holdout": {
+        "examples": 1750,
+        "mean_loss": 9.009934208609842,
+        "per_task_mean_loss": {
+          "containment_time_proxy": 0.04624879566201178,
+          "duration": 0.8240188679911874,
+          "event_cause": 0.892778665233742,
+          "event_presence": 0.3018672074191272,
+          "evidence_sufficiency": 4.287309924038974,
+          "exposure_proxy": 0.10175953166114844,
+          "plan_regret_proxy": 0.01305375286663713,
+          "plan_validity": 0.024942407687194645,
+          "plan_value": 0.0045258504092502835,
+          "pressure_risk_proxy": 8.263327274769173e-06,
+          "relative_strength": 0.6109156593003057,
+          "sensor_fault": 3.424261111914265e-05,
+          "service_loss_proxy": 8.361822119695717e-06,
+          "source_node": 0.7200223544004157,
+          "source_region": 0.3727496235504408,
+          "start_time": 0.809690728241747
+        }
+      },
+      "epochs_completed": 16,
+      "model_hash": "802bc9dca2f8519ed3f1377e4fb4767a89cf1e9a264eaab23f8a920b67266696",
+      "run_id": "20260808T033048Z-188ecaf0",
+      "seed": 20260811,
+      "stop_reason": "maximum_epochs",
+      "stopped_early": false,
+      "use_adapters": true,
+      "wall_seconds": 2798.9554163819994
+    },
+    "no_adapters-seed20260810": {
+      "arm": "no_adapters",
+      "best_validation_loss": 5.35117224663023,
+      "checkpoint": "experiments/runs/stage-f/no_adapters-seed20260810/20260808T041727Z-de5f4b0e/model-export.safetensors",
+      "checkpoint_sha256": "779e63a01dabe738f3ca4bce87e9f850ec381a81708e45d56a83338645ceb17e",
+      "development_holdout": {
+        "examples": 1750,
+        "mean_loss": 8.791133440624584,
+        "per_task_mean_loss": {
+          "containment_time_proxy": 0.04600395810028369,
+          "duration": 0.7964218605648388,
+          "event_cause": 0.9036117216402834,
+          "event_presence": 0.2990715007213029,
+          "evidence_sufficiency": 4.116837540539828,
+          "exposure_proxy": 0.1021135854466014,
+          "plan_regret_proxy": 0.01290437839766541,
+          "plan_validity": 0.023420209518834865,
+          "plan_value": 0.004487589054307054,
+          "pressure_risk_proxy": 7.5401695808481735e-06,
+          "relative_strength": 0.5904959885064851,
+          "sensor_fault": 4.1319572284754195e-05,
+          "service_loss_proxy": 7.043853875901815e-06,
+          "source_node": 0.7243265941868066,
+          "source_region": 0.3729270885296335,
+          "start_time": 0.7984555230899291
+        }
+      },
+      "epochs_completed": 16,
+      "model_hash": "23257ea914c7880898f9ab33adce7adeed245ff71104577ed67c7d4f573d1fb9",
+      "run_id": "20260808T041727Z-031109a2",
+      "seed": 20260810,
+      "stop_reason": "maximum_epochs",
+      "stopped_early": false,
+      "use_adapters": false,
+      "wall_seconds": 2812.544256135003
+    },
+    "no_adapters-seed20260811": {
+      "arm": "no_adapters",
+      "best_validation_loss": 5.42401319079929,
+      "checkpoint": "experiments/runs/stage-f/no_adapters-seed20260811/20260808T050419Z-b1d15d98/model-export.safetensors",
+      "checkpoint_sha256": "aa90a547dab97b933020f9f0b56743653bdcfc970d229d78ff9bd375dfbed6d9",
+      "development_holdout": {
+        "examples": 1750,
+        "mean_loss": 8.873860411210494,
+        "per_task_mean_loss": {
+          "containment_time_proxy": 0.049852314848579805,
+          "duration": 0.7962501043623144,
+          "event_cause": 0.9017186611890793,
+          "event_presence": 0.29961257688701154,
+          "evidence_sufficiency": 4.19223652807149,
+          "exposure_proxy": 0.10199683001212013,
+          "plan_regret_proxy": 0.012924348201539199,
+          "plan_validity": 0.023788259507537903,
+          "plan_value": 0.004495278205616738,
+          "pressure_risk_proxy": 5.153017570013286e-06,
+          "relative_strength": 0.5845371865921399,
+          "sensor_fault": 3.671688775119202e-05,
+          "service_loss_proxy": 6.8022614393405755e-06,
+          "source_node": 0.7258147326784886,
+          "source_region": 0.36897586072075433,
+          "start_time": 0.8116091007536108
+        }
+      },
+      "epochs_completed": 16,
+      "model_hash": "d1e6c7a44d72c89f718c4984dae8995a1728b6b4cf9f80354e95f192ac54db48",
+      "run_id": "20260808T050419Z-0633b864",
+      "seed": 20260811,
+      "stop_reason": "maximum_epochs",
+      "stopped_early": false,
+      "use_adapters": false,
+      "wall_seconds": 2884.460777774999
+    }
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260810,
+    20260811
+  ],
+  "shared_model_config": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned"
+  },
+  "training_budget": {
+    "batch_size": 16,
+    "early_stopping_patience": 3,
+    "max_epochs": 16,
+    "maximum_runtime_seconds": 7200.0
+  },
+  "wall_seconds": 11306.996106827
+}
