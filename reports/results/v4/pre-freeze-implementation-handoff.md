@@ -3572,68 +3572,76 @@ in the governed sense; recorded in a project memory
 (`hydroswarm_checkpoint_persistence` in this session's memory store) so
 a future continuation does not need to re-derive them.
 
-### Requirement 1: Strategist retrained on corrected tensors — BLOCKED ON STAGE-A REGEN (background job running)
+### Requirement 1: Strategist retrained on corrected tensors — DONE
 
-`scripts/train_strategist_heads.py --corpus-root
-data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected
---run-root experiments/runs/v4-strategist-heads-v4corpus-corrected
---registry experiments/registry/v4-strategist-heads-v4corpus-corrected.jsonl
---output reports/results/v4/strategist-heads-training-v4corpus-corrected.json`
-(unchanged script/methodology, only the corrected-input corpus directory
-and a fresh run-root/registry/output, exactly matching the previous
-`v4corpus` retrain's own pattern) cannot run until its default
-`--teacher-checkpoint` (the clean Stage-A Sentinel foundation) exists —
-see environment defect 1 above. The Stage-A regeneration background job
-is the long pole; once it closes successfully, the commands above,
-followed by the Stage E rerun below, are the entire remaining sequence
-for this requirement.
+**Stage-A Sentinel regeneration (prerequisite)** — completed. Reran the
+exact recorded command from this file's own Phase 8 section
+(`scripts/run_stage3_finalist_training.py`, `--corpus-root
+data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized
+--finalists E1`, same 2 seeds), fresh timestamped run dirs under the
+same `--run-root experiments/runs/v4-stage-a-sentinel --registry
+experiments/registry/v4-stage-a-sentinel.jsonl`. Results consistent with
+the historical run: seed 20260810 `val_top1=0.725` (historical: 0.7247),
+seed 20260811 `val_top1=0.715` (historical: 0.7149). Selected seed
+20260810 per Phase 8's own established rule (validation `source_top1`
+alone). New checkpoint: `experiments/runs/v4-stage-a-sentinel/
+E1-seed20260810/20260808T010104Z-4a0ea368/checkpoints/checkpoint-0016/
+model.safetensors` (commit `009c7d1` for the registry/report
+provenance; the checkpoint binary itself is gitignored by design, same
+as always — see this session's memory record).
 
-**Background job — Stage-A Sentinel regeneration (prerequisite, not yet the Strategist retrain itself)**
-
-```
-run dir: experiments/jobs (not job-runner-wrapped this pass -- plain nohup, see note below)
-command: python -u scripts/run_stage3_finalist_training.py \
-  --corpus-root data/learning-v2/cycle-b2 --tensors-dirname tensors-normalized \
-  --finalists E1 \
-  --run-root experiments/runs/v4-stage-a-sentinel \
-  --registry experiments/registry/v4-stage-a-sentinel.jsonl \
-  --output reports/results/v4/stage-a-sentinel-training.json
-env: PYTHONPATH=src OMP_NUM_THREADS=10 MKL_NUM_THREADS=10 OPENBLAS_NUM_THREADS=10
-log: /tmp/claude-0/-workspace/b17a5616-36a9-41b4-8b42-c16973b2540b/scratchpad/stage-a-sentinel-regen.log
-registry run_id (seed 20260810, "opened"): 20260808T010104Z-b66c50a8
-started: 2026-08-08T01:01:04Z
-expected wall time: ~70-75 min/seed x 2 seeds (matches this file's own Phase 8 precedent exactly)
-resume command: identical (this script has no --resume-from; a re-invocation starts a fresh
-  timestamped run dir under the same --run-root/--registry, same as Phase 8's own note)
-```
-
-Once this closes (both seeds, `experiments/runs/v4-stage-a-sentinel/
-E1-seed20260810/<new-timestamp>/checkpoints/checkpoint-0016/model.safetensors`
-selected on validation `source_top1` per Phase 8's own established rule),
-the remaining commands for requirement 1 are:
+**Strategist retrain on corrected-input tensors** — completed:
 
 ```bash
 export PYTHONPATH=src
 python scripts/train_strategist_heads.py \
   --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected \
+  --teacher-checkpoint experiments/runs/v4-stage-a-sentinel/E1-seed20260810/20260808T010104Z-4a0ea368/checkpoints/checkpoint-0016/model.safetensors \
   --run-root experiments/runs/v4-strategist-heads-v4corpus-corrected \
   --registry experiments/registry/v4-strategist-heads-v4corpus-corrected.jsonl \
   --output reports/results/v4/strategist-heads-training-v4corpus-corrected.json
-
-python scripts/run_stage_e_strategist_comparison.py \
-  --corpus-root data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-corrected \
-  --split validation \
-  --strategist-checkpoint <checkpoint path from the training step above> \
-  --limit 1000 \
-  --output reports/results/v4/stage-e-strategist-comparison-v4corpus-corrected.json
 ```
 
-Acceptance per this pass's instructions: compare the corrected-input
-Strategist's plan validity / plan value / consequence proxy / regret
-against the `v4corpus` (uncorrected-shared-features) run's own numbers
-(this file's "UPDUATE" section above) before treating it as the
-role-specific baseline for Stage F. Not yet run — recorded here so the
-exact comparison is unambiguous once both results exist.
+10 epochs, 669.5s. `load_report` confirms `CandidatePlanEncoder`/
+`consequence_proxy_heads.*` were genuinely missing from the teacher
+checkpoint (freshly initialized, not resumed from any prior Strategist
+checkpoint) and `action_head.*` was correctly dropped, never loaded.
+Checkpoint: `experiments/runs/v4-strategist-heads-v4corpus-corrected/
+20260808T023023Z-df9549a5/checkpoints/checkpoint-0010/model.safetensors`.
+
+**Acceptance check (this pass's explicit requirement): compared against
+the previous (uncorrected-shared-features) `v4corpus` run's own numbers**:
+
+| metric | uncorrected input | corrected input |
+|---|---|---|
+| `plan_validity_f1` | 0.997 | 0.9972 |
+| `plan_value_mse` | 0.00537 | 0.00494 |
+| `exposure_proxy_mse` | 0.108 | 0.1077 |
+| `containment_time_proxy_mse` | 0.0809 | 0.0743 |
+| `plan_regret_proxy_mse` | 0.0150 | 0.01466 |
+
+Every metric is retained or slightly improved — the shared-feature
+correction (raw → governed normalized tensor shard) did not degrade
+Strategist performance.
+
+**Stage E 4-policy comparison rerun** (`reports/results/v4/
+stage-e-strategist-comparison-v4corpus-corrected.json`, 1000 validation
+scenarios, 4.2s):
+
+| policy | mean simulator calls | selected-valid rate | found non-NO_ACTION rate | mean regret vs. oracle | matched oracle-best rate |
+|---|---|---|---|---|---|
+| `exact_all` (oracle) | 9.0 | 1.000 | 0.275 | 0.0 | 1.000 |
+| `deterministic_heuristic` | 3.0 | 1.000 | 0.996 | 0.00596 | 0.966 |
+| `learned_prescreen` | 3.0 | 1.000 | 0.892 | 0.00645 | 0.830 |
+| `learned_ordering` | 1.0 | 1.000 | 0.909 | 0.01085 | 0.800 |
+
+`selected_valid_rate` remains 1.0 for every policy (hydraulic/service
+safety never compromised). `mean_regret_vs_oracle` is comparable to or
+slightly BETTER than the previous (uncorrected-input) run
+(`learned_prescreen` 0.00645 vs. 0.00697; `learned_ordering` 0.01085 vs.
+0.01266) — consistent with, not contradicting, the acceptance check
+above. **This checkpoint is now the real role-specific Strategist
+baseline for Stage F.** Commit `d7e540e`, pushed.
 
 ### Requirement 2: OOD extension seed-family fix — DONE (data regenerated, merged, all gates pass)
 
@@ -3911,7 +3919,7 @@ python scripts/run_stage_f_training.py
 
 | item | status |
 |---|---|
-| Stage-A Sentinel regen (teacher checkpoint) | running (background job; seed 20260810 done, val_top1=0.725, consistent with the historical 0.7247; seed 20260811 in progress) |
+| Stage-A Sentinel regen (teacher checkpoint) | **done** -- seed 20260810 val_top1=0.725 (historical 0.7247), seed 20260811 val_top1=0.715 (historical 0.7149); commit `009c7d1` |
 | cycle-b2 train scenario cache restore | abandoned -- confirmed cross-arch non-reproducible on this sandbox, not needed (signature-loading redesign made it unnecessary) |
 | native EPANET build (aarch64) | done -- makes live simulation work; does NOT guarantee cross-arch bit-for-bit reproduction (corrected claim) |
 | OOD extension seed-family fix (code) | **done**, committed (`3860ca7`), tests passing |
@@ -3919,13 +3927,14 @@ python scripts/run_stage_f_training.py
 | OOD extension regeneration (data) | **done** -- 1600/1600 scenarios, 0 seed_family collisions at scale |
 | Stage F joint-corpus rebuild + gates (with OOD extension) | **done** -- `requirement_status` all true, all 6 gates pass (including new `ood_class_gradient_smoke`) |
 | `ood_category_head=True` model-config fix (gates + training script) | **done**, committed (`69243e4`) -- real defect, found and fixed before any real run used either script |
-| Strategist retrain on corrected tensors | queued behind Stage-A regen |
-| Stage E rerun on corrected-input Strategist | queued behind the retrain above |
-| Stage F training script | written, smoke-tested, not yet run at real scale |
-| Stage F real run (adapters vs. no-adapters, 2 seeds each) | not started -- blocked on requirement 1 (Strategist retrain) per explicit instruction |
+| Strategist retrain on corrected tensors | **done** -- plan_validity_f1=0.9972, metrics retained/improved vs. uncorrected-input run; commit `d7e540e` |
+| Stage E rerun on corrected-input Strategist | **done** -- selected_valid_rate=1.0 all policies, regret comparable/better; commit `d7e540e` |
+| Stage F training script | written, smoke-tested, `ood_category_head` fix applied; not yet run at real scale |
+| Stage F real run (adapters vs. no-adapters, 2 seeds each) | **both requirements now satisfied — launching next** |
 | `final-selection.json` | does not exist |
 | Locked final test | not opened |
 
-This section will be updated again once Stage-A regen closes and
-requirement 1's remaining steps (Strategist retrain, Stage E rerun) and
-the real Stage F run actually run (not merely planned).
+Both prerequisite requirements are complete. This section will be
+updated again once the real Stage F run (4 arm/seed combinations,
+sequential, up to ~8h worst case) actually runs and produces real
+results.
