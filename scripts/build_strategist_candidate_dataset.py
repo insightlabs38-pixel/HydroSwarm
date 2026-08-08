@@ -70,6 +70,7 @@ import torch
 
 from hydroswarm.model.candidate_plan_encoder import TARGET_TYPE_INDEX
 from hydroswarm.planning.action_templates import ACTION_TEMPLATE_INDEX
+from hydroswarm.planning.candidate_tensorizer import PLAN_FEATURE_NAMES
 from hydroswarm.training.data import ScenarioExample
 from hydroswarm.training.sharded_data import ShardedScenarioDataset, write_shards
 
@@ -79,17 +80,12 @@ _PLAN_INPUT_KEYS = frozenset(
     {"plan_template_ids", "plan_target_type", "plan_target_node_index", "plan_target_link_index", "plan_features", "plan_mask"}
 )
 
-#: Matches HydroCore.PLAN_FEATURE_DIM's default (model/core.py) -- see
-#: module docstring for why these specific 6 dims and not the richer,
-#: not-yet-generated set CandidatePlanEncoder's own docstring describes.
-PLAN_FEATURE_NAMES = (
-    "is_no_target_template",
-    "is_node_target_template",
-    "is_link_target_template",
-    "has_target",
-    "is_no_response_comparator",
-    "plan_validity_target_present",
-)
+#: core-issues5.txt Section 6: PLAN_FEATURE_NAMES itself now lives in
+#: hydroswarm.planning.candidate_tensorizer (the live-runtime candidate
+#: tensorizer's own module) so the 6-dimensional plan_features schema has
+#: exactly one definition shared by both this training-corpus builder and
+#: live PASS-2 candidate scoring -- see that module's docstring for why the
+#: 6th dimension's live-vs-training meaning differs slightly.
 
 _PLAN_TARGET_VALUE_KEYS = (
     "plan_validity",

@@ -19,6 +19,7 @@ from hydroswarm.inference import (
     OODReference,
 )
 from hydroswarm.model.core import HydroCore
+from hydroswarm.planning.action_templates import ACTION_TEMPLATE_INDEX
 from hydroswarm.preprocessing import DEFAULT_FEATURE_SCHEMA, SensorSeries
 from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
 from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS
@@ -77,6 +78,28 @@ class PriorFollowingModel:
             "plan_value": torch.zeros(1, 8),
             "plan_validity_logits": torch.tensor([[[0.0, 2.0]] * 8]),
         }
+
+
+class CandidateAwareModel(PriorFollowingModel):
+    """Same PASS-1 (incident-only) behavior as PriorFollowingModel, but
+    also handles PASS-2 candidate-conditioned calls (plan tensors
+    present) by returning a controlled plan_value/plan_validity keyed to
+    plan_template_ids -- lets tests verify the resulting deltas are
+    correctly attributed by ACTION_TEMPLATE identity through the full
+    analyze() -> _score_candidate_plans -> generate_response_plans round
+    trip, not merely "doesn't crash"."""
+
+    def __call__(self, batch):
+        if "plan_template_ids" not in batch:
+            return super().__call__(batch)
+        template_ids = batch["plan_template_ids"]
+        plans = template_ids.shape[1]
+        isolate_index = ACTION_TEMPLATE_INDEX["ISOLATE_SOURCE"]
+        values = torch.where(template_ids == isolate_index, 10.0, -10.0)
+        validity_logits = torch.stack(
+            [torch.zeros(1, plans), torch.full((1, plans), 4.0)], dim=-1
+        )
+        return {"plan_value": values.float(), "plan_validity_logits": validity_logits}
 
 
 def _pipeline(model) -> tuple[HybridInferencePipeline, object]:
@@ -274,3 +297,95 @@ def test_disagreement_and_ood_fail_closed_before_planning() -> None:
     assert not result.plan_proposals
     assert "HIGH_CLASSICAL_NEURAL_DISAGREEMENT" in result.planning_suppression_reasons
     assert any(reason.startswith("OOD_") for reason in result.planning_suppression_reasons)
+
+
+# core-issues5.txt Section 6 (P0 blocker): live planning must use the real
+# candidate-conditioned Strategist architecture, keyed by ACTION_TEMPLATE
+# identity, never an anonymous positional-delta approximation.
+
+
+def test_learned_prescreen_promotes_the_template_it_actually_scored_highest() -> None:
+    """End-to-end: a controlled candidate-conditioned model that strongly
+    favors ISOLATE_SOURCE by ACTION_TEMPLATE identity must cause
+    ISOLATE_SOURCE to rank at the top of the final plan proposals --
+    proof the real PASS-2 scores flow through generate_response_plans
+    correctly, keyed by template name, not tensor position."""
+
+    pipeline, network = _pipeline(CandidateAwareModel())
+    pipeline.trained_tasks = frozenset({"sentinel", "scout", "strategist", "ood"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert result.plan_proposals
+    templates = [proposal.template for proposal in result.plan_proposals]
+    assert "ISOLATE_SOURCE" in templates
+    by_value = sorted(result.plan_proposals, key=lambda proposal: -proposal.predicted_value)
+    assert by_value[0].template == "ISOLATE_SOURCE"
+
+
+def test_disabled_strategist_produces_deterministic_ordering_not_failure() -> None:
+    """With "strategist" excluded from trained_tasks, PASS-2 scoring must
+    be skipped entirely -- proposals must match the pure deterministic
+    baseline (no neural influence), and analysis must not fail."""
+
+    pipeline, network = _pipeline(CandidateAwareModel())
+    pipeline.trained_tasks = frozenset({"sentinel"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert result.plan_proposals
+    by_template = {proposal.template: proposal for proposal in result.plan_proposals}
+    # generate_response_plans' own baseline value for ISOLATE_SOURCE
+    # (response.py) is 0.65 -- unperturbed by any neural delta.
+    if "ISOLATE_SOURCE" in by_template:
+        assert by_template["ISOLATE_SOURCE"].predicted_value == pytest.approx(0.65)
+
+
+def test_runtime_enabled_outputs_excluding_plan_value_and_validity_disables_scoring() -> None:
+    """Granular v4 governance must be able to suppress Strategist PASS-2
+    scoring even when the coarser trained_tasks role switch allows it --
+    matches every checkpoint built so far (plan_value/plan_validity are
+    validated but not runtime-enabled, Phase 14 gate 7 unmet)."""
+
+    pipeline, network = _pipeline(CandidateAwareModel())
+    pipeline.trained_tasks = frozenset({"sentinel", "scout", "strategist", "ood"})
+    pipeline.runtime_enabled_outputs = frozenset({"source_node", "event_presence"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    by_template = {proposal.template: proposal for proposal in result.plan_proposals}
+    if "ISOLATE_SOURCE" in by_template:
+        assert by_template["ISOLATE_SOURCE"].predicted_value == pytest.approx(0.65)
+
+
+def test_learned_prescreen_never_marks_a_plan_verified() -> None:
+    """PASS-2 scoring only ever ranks/adjusts PlanProposal.predicted_value/
+    predicted_validity -- it has no mechanism to mark anything VERIFIED;
+    that remains exclusively WNTR's authority, applied downstream of this
+    pipeline entirely."""
+
+    pipeline, network = _pipeline(CandidateAwareModel())
+    pipeline.trained_tasks = frozenset({"sentinel", "scout", "strategist", "ood"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    for proposal in result.plan_proposals:
+        assert not hasattr(proposal, "decision")
+        assert not hasattr(proposal.plan, "decision")
+
+
+def test_a_broken_pass_two_model_falls_back_to_deterministic_ordering() -> None:
+    """A real PASS-2 failure (here: a model that raises on the plan-tensor
+    batch) must fall back to deterministic ordering, never crash the
+    whole incident analysis."""
+
+    class BrokenPassTwoModel(PriorFollowingModel):
+        def __call__(self, batch):
+            if "plan_template_ids" in batch:
+                raise RuntimeError("pass-2 broken")
+            return super().__call__(batch)
+
+    pipeline, network = _pipeline(BrokenPassTwoModel())
+    pipeline.trained_tasks = frozenset({"sentinel", "scout", "strategist", "ood"})
+    result = pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert result.plan_proposals
+    by_template = {proposal.template: proposal for proposal in result.plan_proposals}
+    if "ISOLATE_SOURCE" in by_template:
+        assert by_template["ISOLATE_SOURCE"].predicted_value == pytest.approx(0.65)
