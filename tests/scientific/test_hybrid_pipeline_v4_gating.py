@@ -144,3 +144,76 @@ def test_runtime_enabled_outputs_defaults_to_none_when_unset() -> None:
     pipeline, _network = _pipeline(EventAwareModel())
     assert pipeline.runtime_enabled_outputs is None
     assert isinstance(pipeline, HybridInferencePipeline)
+
+
+# core-issues5.txt Section 11 (P0 governance fix): an output absent from
+# runtime_enabled_outputs must be incapable of changing any operationally
+# relevant final result -- proven here by mutating the disabled head's
+# raw logits to EXTREME values and asserting the result is identical to a
+# moderate/default run, not merely "look plausible."
+
+
+class ExtremeScoutModel(PriorFollowingModel):
+    """expected_information_gain pinned to an extreme, adversarially large
+    value at a specific node -- if this ever leaked into a governed
+    decision, it would dominate any real classical signal."""
+
+    def __call__(self, batch):
+        output = super().__call__(batch)
+        nodes = output["expected_information_gain"].shape[1]
+        output["expected_information_gain"] = torch.full((1, nodes), 1_000.0)
+        return output
+
+
+def test_disabled_scout_information_gain_never_reaches_semantic_predictions() -> None:
+    moderate = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset())
+    extreme = _analyze(ExtremeScoutModel(), runtime_enabled_outputs=frozenset())
+
+    assert moderate.semantic_predictions.expected_information_gain is None
+    assert extreme.semantic_predictions.expected_information_gain is None
+
+
+def test_enabled_scout_information_gain_does_reach_semantic_predictions() -> None:
+    """Sanity check for the test above: when actually governed as
+    runtime-enabled, the same field IS populated -- proves the None result
+    above is real suppression, not an unrelated code path that always
+    returns None."""
+
+    result = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset({"information_gain"}))
+    assert result.semantic_predictions.expected_information_gain is not None
+
+
+class ExtremeStrategistModel(PriorFollowingModel):
+    """plan_value/plan_validity pinned to extreme, maximally-confident
+    values -- if this ever leaked past governance, it would dominate
+    generate_response_plans' deterministic baseline scores."""
+
+    def __call__(self, batch):
+        output = super().__call__(batch)
+        output["plan_value"] = torch.full_like(output["plan_value"], 1_000.0)
+        output["plan_validity_logits"] = torch.stack(
+            [
+                torch.full(output["plan_value"].shape, -1_000.0),
+                torch.full(output["plan_value"].shape, 1_000.0),
+            ],
+            dim=-1,
+        )
+        return output
+
+
+def test_disabled_strategist_plan_scores_never_reach_semantic_predictions() -> None:
+    moderate = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset())
+    extreme = _analyze(ExtremeStrategistModel(), runtime_enabled_outputs=frozenset())
+
+    assert moderate.semantic_predictions.plan_values == ()
+    assert moderate.semantic_predictions.plan_validity == ()
+    assert extreme.semantic_predictions.plan_values == ()
+    assert extreme.semantic_predictions.plan_validity == ()
+
+
+def test_enabled_strategist_plan_scores_do_reach_semantic_predictions() -> None:
+    result = _analyze(
+        PriorFollowingModel(), runtime_enabled_outputs=frozenset({"plan_value", "plan_validity"})
+    )
+    assert result.semantic_predictions.plan_values != ()
+    assert result.semantic_predictions.plan_validity != ()

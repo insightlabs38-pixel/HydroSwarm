@@ -304,7 +304,7 @@ class HybridInferencePipeline:
             uncertainty=scalar("uncertainty") if granular_enabled("uncertainty") else None,
             expected_information_gain=(
                 dict(zip(node_ids, _array(sample_values).reshape(-1)[-len(node_ids):], strict=True))
-                if sample_values is not None
+                if sample_values is not None and granular_enabled("information_gain")
                 else None
             ),
             sensor_fault_probability=(
@@ -318,13 +318,23 @@ class HybridInferencePipeline:
                 if faults is not None and granular_enabled("sensor_fault")
                 else None
             ),
+            # core-issues5.txt Section 11 (P0 governance fix): granular
+            # v4 governance must be independently authoritative here too --
+            # previously only the coarse trained_tasks role switch
+            # (analyze()'s own "strategist" not in self.trained_tasks
+            # override) gated these two fields; a v4 identity that granularly
+            # excluded plan_value/plan_validity from runtime_enabled_outputs
+            # while trained_tasks still permitted "strategist" would not
+            # have been enforced at all at this layer. effective_enabled =
+            # legacy_role_allows AND runtime_enabled_outputs contains
+            # output -- the AND is now real on both sides, not just one.
             plan_values=tuple(float(value) for value in _array(plan_values).reshape(-1))
-            if plan_values is not None
+            if plan_values is not None and granular_enabled("plan_value")
             else (),
             plan_validity=tuple(
                 float(_softmax(row)[-1]) for row in _array(plan_validity).reshape(-1, 2)
             )
-            if plan_validity is not None
+            if plan_validity is not None and granular_enabled("plan_validity")
             else (),
             event_presence=event_presence,
             event_presence_probability=event_presence_probability,
@@ -603,6 +613,29 @@ class HybridInferencePipeline:
         semantics = SemanticPredictions()
         try:
             model_output = stage("neural_inference", lambda: self._run_model(built))
+            # core-issues5.txt Section 11: KNOWN, DELIBERATELY UNCHANGED GAP
+            # -- source_node_logits feeds classical/neural fusion
+            # unconditionally, never checked against
+            # self.runtime_enabled_outputs, even though "source_node" is a
+            # real CANONICAL_OUTPUT_NAMES entry a v4 identity could in
+            # principle exclude. Every v4 identity built so far
+            # (scripts/build_phase15_v4_checkpoint.py) happens to also
+            # exclude "source_node" from its own runtime_enabled_outputs --
+            # if that identity were ever wired into V4PipelineFactory
+            # as-is (not yet done; see runtime/v4_defaults.py's own
+            # docstring), taking output governance fully literally would
+            # require suppressing the ONE output HydroSentinel/fusion is
+            # fundamentally built around, degrading the whole hybrid
+            # architecture to classical-only. That is too large and
+            # consequential an architectural/product decision (does
+            # "source_node" belong in the same disable-by-omission
+            # mechanism as advisory outputs like event_presence, or is it
+            # governed by calibration/trained_tasks instead, as it is
+            # today?) to resolve unilaterally inside this governance-gap
+            # fix; left exactly as-is, documented here rather than changed
+            # silently, and flagged as a required decision before any v4
+            # identity's runtime_enabled_outputs is treated as literally
+            # authoritative over source localization itself.
             neural_logits = _array(model_output["source_node_logits"]).reshape(-1)[-len(node_ids):]
             neural_vector = _softmax(neural_logits)
             semantics = self._model_semantics(model_output, node_ids)
