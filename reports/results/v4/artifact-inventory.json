@@ -6761,6 +6761,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "experiments/registry/v4-strategist-heads-v4corpus-corrected-seed2.jsonl",
+      "sha256": "ce09e114fcdf0af8ad806df0544840d93aa69042b5e1b0e01c82db4207f4af19",
+      "size_bytes": 4916,
+      "source_run": "ExperimentRegistry run provenance records",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "experiments/registry/v4-strategist-heads-v4corpus-corrected.jsonl",
       "sha256": "0ad6c20b183fbfec898114102a72a04fc311de3e6e755fdb8ba8c077697887bd",
       "size_bytes": 5014,
@@ -8161,6 +8169,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "reports/results/v4/artifact-inventory.json",
+      "sha256": "f0b70b6a5090648369bff126e26ad244379bdd93af363dc4d63f3db57b1050ce",
+      "size_bytes": 449929,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "reports/results/v4/class-prevalence.json",
       "sha256": "3a834d9bb0861169c837713738fcbdc89d13980a7d8f4377daad5a188a59fb3e",
       "size_bytes": 1707,
@@ -8233,6 +8249,22 @@
       "tracking": "standard-git"
     },
     {
+      "path": "reports/results/v4/phase17-ci-clean-clone.md",
+      "sha256": "c20f153f50dba8aba31018f8f9817f7c7ea4862c7988465181827644f710733a",
+      "size_bytes": 6417,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "reports/results/v4/phase18-artifact-and-lfs-governance.md",
+      "sha256": "4c341260449141fb7a1ecfcd3d6d769649aebab6614d32146a35ad64c2e9746a",
+      "size_bytes": 7799,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "reports/results/v4/pre-freeze-audit.json",
       "sha256": "ca58fd9b518d7c35d96ead68fbb1f7e4ce84957908224f9c7b1382392383cf84",
       "size_bytes": 6857,
@@ -8250,8 +8282,8 @@
     },
     {
       "path": "reports/results/v4/pre-freeze-implementation-handoff.md",
-      "sha256": "8dd0a00c6895d0e273267268c454ee742f66b22f8f2c7ff0cc2e46f923781542",
-      "size_bytes": 249258,
+      "sha256": "e1e825e61643390a69618ee73d0e78f0488eb2218a5e08aa1695afe8b5c60ebb",
+      "size_bytes": 251532,
       "source_run": "evaluation/gate/handoff reports",
       "status": "required",
       "tracking": "standard-git"
@@ -8281,6 +8313,22 @@
       "tracking": "standard-git"
     },
     {
+      "path": "reports/results/v4/section18-retrain-readiness.md",
+      "sha256": "40eb0ed631a26cd667693007497143bb066aafe3d27f6db788a6d5c029f3453f",
+      "size_bytes": 6751,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "reports/results/v4/sensor-fault-head-decision.md",
+      "sha256": "7e890fe0b61b3f1ef531db8fb3a576b5c02cb26b1ba945b87b61bcaaeaf39bdd",
+      "size_bytes": 5062,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "reports/results/v4/stage-a-sentinel-training.json",
       "sha256": "5b7197986e8348f6a86c49ae19b513108529d062efedfb7155261f634fa331e3",
       "size_bytes": 6752,
@@ -8300,6 +8348,14 @@
       "path": "reports/results/v4/stage-d-scout-policy-comparison.json",
       "sha256": "edcad56a3354c09ef2bd7937099104dd582a8730197f88741be666c6f78a1023",
       "size_bytes": 3693,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "reports/results/v4/stage-e-strategist-comparison-v4corpus-corrected-seed2.json",
+      "sha256": "63b8656e9ffa8e700b6c4e7e9a9a461bc4819c584a9d296a7f2160c4b539fea5",
+      "size_bytes": 2667,
       "source_run": "evaluation/gate/handoff reports",
       "status": "required",
       "tracking": "standard-git"
@@ -8361,6 +8417,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "reports/results/v4/strategist-heads-training-v4corpus-corrected-seed2.json",
+      "sha256": "e4eee932f441b652b7814c06e74273f66da3ab3c3158eec8c1ac677c1e45b414",
+      "size_bytes": 6461,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "reports/results/v4/strategist-heads-training-v4corpus-corrected.json",
       "sha256": "d999b8b36b2b2f46cb87d2c41a232514556bc5d9bcdedadfedc11977c6c1c679",
       "size_bytes": 6453,
@@ -8385,9 +8449,25 @@
       "tracking": "standard-git"
     },
     {
+      "path": "reports/results/v4/strategist-second-seed-promotion-decision.md",
+      "sha256": "b98c944a89b5c05c731d3d076d89d478345d34b1a0238dbf8551c59022596159",
+      "size_bytes": 6060,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "reports/results/v4/train-serve-parity-gate.json",
+      "sha256": "b58679ca488c46ef79b57c89945c144d5bcd3efa282009ffd37e458400791d39",
+      "size_bytes": 21172,
+      "source_run": "evaluation/gate/handoff reports",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "reports/results/v4/trajectory-corpus-gates.json",
-      "sha256": "90b7590d4bf6cacc14aaa5b5c1c40e691bfe77f0bf8c80fc72404285f6bb462c",
-      "size_bytes": 22442,
+      "sha256": "6b4e63c5962301b7bbd6efa4821531390e7b7101012a265c33cdd3b87a2a3f25",
+      "size_bytes": 22444,
       "source_run": "evaluation/gate/handoff reports",
       "status": "required",
       "tracking": "standard-git"
@@ -8402,8 +8482,8 @@
     },
     {
       "path": "reports/results/v4/trajectory-gates-stage-f-joint-corpus-gates.json",
-      "sha256": "ac610030a02b10e4b75e50d6ff30c88cea2790ed8a277777f2757963b7dc2d9d",
-      "size_bytes": 6258,
+      "sha256": "b6a915561b06b8a3c898e2c494f226653d1e318fa1a26830ecfdb8c68a973ea7",
+      "size_bytes": 6260,
       "source_run": "evaluation/gate/handoff reports",
       "status": "required",
       "tracking": "standard-git"
@@ -8449,6 +8529,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "scripts/build_artifact_inventory.py",
+      "sha256": "ff090addc433185e1478d44114280cb2bac43f70a8cf21288422b332afa9b3ea",
+      "size_bytes": 10193,
+      "source_run": "governed generator/evaluation/gate script",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "scripts/build_epanet_arm64.sh",
       "sha256": "e0c59b6a0ea693b303ce7e82b827253f6bce3e7e2d84a399c500f3bb67f4fc89",
       "size_bytes": 3463,
@@ -8474,8 +8562,8 @@
     },
     {
       "path": "scripts/build_phase15_v4_checkpoint.py",
-      "sha256": "5933797794dd1199732bafe17d68e3b3de212540d027ac7956ece41a8a631800",
-      "size_bytes": 8893,
+      "sha256": "405cd1547bb5185a629c51495697e15484f196ae72df63ba2b641843becc95d0",
+      "size_bytes": 16245,
       "source_run": "governed generator/evaluation/gate script",
       "status": "required",
       "tracking": "standard-git"
@@ -8514,8 +8602,16 @@
     },
     {
       "path": "scripts/build_strategist_candidate_dataset.py",
-      "sha256": "bdbd2454018602961f6989946abb8c24ff4b31e648073d9930c84578ba0e90b1",
-      "size_bytes": 12814,
+      "sha256": "5800bf01144fa8bf074bf30f620f0288f3beeab30159996c5db8410c78827915",
+      "size_bytes": 12897,
+      "source_run": "governed generator/evaluation/gate script",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "scripts/build_v4_inference_release_bundle.py",
+      "sha256": "9095f20cb879e9abb4f3b06699449d07417ea6cdc216c35a9881a0db89f2993a",
+      "size_bytes": 13551,
       "source_run": "governed generator/evaluation/gate script",
       "status": "required",
       "tracking": "standard-git"
@@ -8634,8 +8730,8 @@
     },
     {
       "path": "scripts/generate_ood_extension_corpus.py",
-      "sha256": "6eced235209ddaf7c4a84a97dc8419fdccca78c81b5263a7be5ab6260e60ed2a",
-      "size_bytes": 21568,
+      "sha256": "b122613b5a5fcc30ea194192b621e9ff209bac6bf77472ba8b2e4347ed52339a",
+      "size_bytes": 18531,
       "source_run": "governed generator/evaluation/gate script",
       "status": "required",
       "tracking": "standard-git"
@@ -8865,6 +8961,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "scripts/run_train_serve_parity_gate.py",
+      "sha256": "c2251f12352ab0c8cd56d850ac873fb1e6eb1133b021c41998306d79290e80e2",
+      "size_bytes": 15281,
+      "source_run": "governed generator/evaluation/gate script",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "scripts/run_trajectory_corpus_gates.py",
       "sha256": "385aab0dc59a247a3df245e2285fd5a3a4bd7d8020fca7426aedf1d72e7adea8",
       "size_bytes": 18457,
@@ -8938,8 +9042,8 @@
     },
     {
       "path": "scripts/train_strategist_heads.py",
-      "sha256": "e64c5b3a8d4466188399dd1d92bfbe8d39e57a02229fb1d79050a567974bf6db",
-      "size_bytes": 16160,
+      "sha256": "c29e8fd09a8f1fd69005b1697c387fd6208b0e2a981606e4cbc6fcd208c72e4f",
+      "size_bytes": 16322,
       "source_run": "governed generator/evaluation/gate script",
       "status": "required",
       "tracking": "standard-git"
@@ -8986,16 +9090,16 @@
     },
     {
       "path": "src/hydroswarm/agents/controller.py",
-      "sha256": "0bd303ee5ea7d8697085e3b547b7060abd44b592feff22ad6d03819324f5ea12",
-      "size_bytes": 27967,
+      "sha256": "9d73483a195b2e3305074d01bbd10609cea73d935a7f4964a51ea99f506ee534",
+      "size_bytes": 28048,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "src/hydroswarm/agents/schemas.py",
-      "sha256": "8029984400e3d9b1f9a4db27f278bd9b06a96a65fc4a54a716a9cf40cef1aab5",
-      "size_bytes": 5494,
+      "sha256": "ef91b78959532240022b312aee3048d8cd93a28f97aaf53a7125b1401f7f9777",
+      "size_bytes": 6058,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9034,16 +9138,16 @@
     },
     {
       "path": "src/hydroswarm/api/app.py",
-      "sha256": "fb9c1a8ba4fc6d3a5755ac4b8c24ad08cf98f1b6b17c5158afae8993f136df9e",
-      "size_bytes": 57955,
+      "sha256": "722e7b477dfdbf2a3690809faee58d83364db16a74be5af81fac1160fe0f95d3",
+      "size_bytes": 74993,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "src/hydroswarm/api/state.py",
-      "sha256": "7ca797cbf0b7f9f1ac5f98dbc5b6b0b463ac9d857aeab5d44e4c053beb963f51",
-      "size_bytes": 10926,
+      "sha256": "da3df5ee70895f160e215a4ec2c1fbc1314c68e8d2b01d0d82e006c7937b4a6a",
+      "size_bytes": 11803,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9066,8 +9170,8 @@
     },
     {
       "path": "src/hydroswarm/classical/__init__.py",
-      "sha256": "302a1f616c83e2a388ce8c1df4eefb82073e0947786442cfecddbee19fa4ddb3",
-      "size_bytes": 2187,
+      "sha256": "219ef53986c063f2e982b221603c4e3b8f0e056d38a5289931ca39e3d903ae74",
+      "size_bytes": 2519,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9100,6 +9204,14 @@
       "path": "src/hydroswarm/classical/screening.py",
       "sha256": "40c79f683c7e83a25cf5989cb3f1a2b3d58a7d0fe3a7ccd2c0e367ab02e30dd9",
       "size_bytes": 5259,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/classical/signature_policy.py",
+      "sha256": "a3d7f6c231520be6f71e7709bc837fb874b959e993f33a1b2f14c04ed2a07b1e",
+      "size_bytes": 9537,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9178,16 +9290,16 @@
     },
     {
       "path": "src/hydroswarm/domain/__init__.py",
-      "sha256": "bf5b47fae36ba2d89ab2bb79195bce6b337486b111ca03af717240e8c45cb86f",
-      "size_bytes": 609,
+      "sha256": "b2ad8a49adb259c58ba30a78fc9e0a697227148b7fe518c087715c9954c70e03",
+      "size_bytes": 921,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "src/hydroswarm/domain/schemas.py",
-      "sha256": "f7aaa64511f83caf47a66e17038b7214c9f69e9f29c35aacc88ff23c06bf4285",
-      "size_bytes": 8530,
+      "sha256": "ef817df3a7ab3d8279d3e4cd81837a8d8f8b5937bc0e1dcb6f2527c867037f5f",
+      "size_bytes": 17478,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9242,8 +9354,24 @@
     },
     {
       "path": "src/hydroswarm/inference/__init__.py",
-      "sha256": "3f495c3189df4b5c0def4f73f307782ab3cb23877e8c6bb64cc6ffde985e06bb",
-      "size_bytes": 1471,
+      "sha256": "36f71340a262c384301e039fe5597308d9dd61c2a003c06309707fbb1abdf65f",
+      "size_bytes": 1692,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/inference/authority.py",
+      "sha256": "2187d8ef99836087a62e31e05fc85bd45d76e7d1d4c2d4275df0d3487bd074c1",
+      "size_bytes": 6726,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/inference/evidence_certificate.py",
+      "sha256": "17abb5fee8d4919a779e3f6e5e4f8d6df4dd62c2daf7d68aae5acfe7b9340959",
+      "size_bytes": 5819,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9266,16 +9394,16 @@
     },
     {
       "path": "src/hydroswarm/inference/pipeline.py",
-      "sha256": "362dc05ce6043d783c6cb2394736c4159ef17463efae533b549cccc988de7ba1",
-      "size_bytes": 38943,
+      "sha256": "7aa8e636f2fff0b27d3431d5285a06f3b9f8e9d07901528888b4a68209f0a738",
+      "size_bytes": 51188,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "src/hydroswarm/inference/results.py",
-      "sha256": "aa6aacdcbe2d202fb37556080471940b9b4da499b4b83a7fe9683c51cd469bc9",
-      "size_bytes": 4199,
+      "sha256": "9825d527b20264e2a18a58641b7e19fda87add661a25ea896a74b9c0c9712e0b",
+      "size_bytes": 4931,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9306,8 +9434,8 @@
     },
     {
       "path": "src/hydroswarm/model/core.py",
-      "sha256": "3df8797e7c428ad652aaa179ff1f54b32a8978d2b7c1671c50f474cb70cf4a1e",
-      "size_bytes": 66588,
+      "sha256": "76f25aae59cb42a53223422e6362f571f20e571c1314765304557965991bb8aa",
+      "size_bytes": 70009,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9346,8 +9474,8 @@
     },
     {
       "path": "src/hydroswarm/planning/__init__.py",
-      "sha256": "074e530edb0a6437866f971bb741c195ff6c697885f8cced61bed64e93342ee3",
-      "size_bytes": 441,
+      "sha256": "41cae678a1edf517ed12ab323e41cde5e08116ddf6b21009f79bdc747c2d0d12",
+      "size_bytes": 623,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9356,6 +9484,22 @@
       "path": "src/hydroswarm/planning/action_templates.py",
       "sha256": "8fc5cb4c30a8d2ea6dbf82aa8317d756f6f258c524cee7166a6290efb40d0f8b",
       "size_bytes": 2164,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/planning/candidate_tensorizer.py",
+      "sha256": "cad0cfca1b61517ba68ed66c875d0729a57c9039bfa64ad27300644f702691ce",
+      "size_bytes": 6830,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/planning/pareto.py",
+      "sha256": "f8a8f6ad9d38d931359f0c2a955f3c10f1600d685cef4ede8d7356a1c1a2770b",
+      "size_bytes": 9065,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9434,8 +9578,24 @@
     },
     {
       "path": "src/hydroswarm/runtime/v4_defaults.py",
-      "sha256": "e850629e85b9e04bc0848ac422d8f7f48e92dda256b4939dbe8ce8c51e18e0b9",
-      "size_bytes": 7972,
+      "sha256": "488909ff6986806618c0d20b91ce050cda4ca01c0359180b60d0c4423904ed6f",
+      "size_bytes": 15515,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/runtime/v4_inference_bundle.py",
+      "sha256": "7b2b6395dda593a14a0960c3658bd1db05886bbae83b9d14cd041cbd7d2f2524",
+      "size_bytes": 14357,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "src/hydroswarm/runtime/v4_normalization.py",
+      "sha256": "bd1b562824965d2f45cc2bf13973549de8695ebd217910a8e8533aef5347c9eb",
+      "size_bytes": 6099,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9506,16 +9666,16 @@
     },
     {
       "path": "src/hydroswarm/simulation/verifier.py",
-      "sha256": "2ed4771d85164590e8e0adfbc73df3ceb72a56468d8cd8f9293883ac14f9c1ed",
-      "size_bytes": 6441,
+      "sha256": "8511371ea4bca43bd45189d7543f0845f1e88390e0b37a52641cc80f9b770205",
+      "size_bytes": 12013,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "src/hydroswarm/simulation/wrapper.py",
-      "sha256": "33838449b584ba496128e40ab7a3543a6f85ddf487b457c147e7705bc7d6a2d0",
-      "size_bytes": 67790,
+      "sha256": "20f97240b9b67bafd7cea6bfd48d7b83a3d4b1a0b1b14ccb9de414d156eaa8c8",
+      "size_bytes": 68534,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9578,8 +9738,8 @@
     },
     {
       "path": "src/hydroswarm/training/__init__.py",
-      "sha256": "7f0c49c794bc63a1c25649e0855ab16b9ccce595f44f63531bf34ffdb03ca766",
-      "size_bytes": 5595,
+      "sha256": "c0f44656485380142c4be7f9875ed0b7b47a60b5a851974de3315472e63ef78a",
+      "size_bytes": 5959,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9642,8 +9802,8 @@
     },
     {
       "path": "src/hydroswarm/training/corpus.py",
-      "sha256": "a6e9df367183a050f2f3049ea762126ca155ff5e90abb9829778bbaf134881ae",
-      "size_bytes": 22163,
+      "sha256": "4e9f40586cccd8bf588486687bcb9e32b176d656063892503dbbd0af32892204",
+      "size_bytes": 37051,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9761,6 +9921,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "src/hydroswarm/training/scout_state_contract.py",
+      "sha256": "9ffa5a7e9981a9a92bb631dfc68c689abe5523a89143599a9299881558154590",
+      "size_bytes": 8457,
+      "source_run": "application source",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "src/hydroswarm/training/scout_trajectory.py",
       "sha256": "631716b738d847905ae9757398d70f32c722bf110522f57de006b66d013299e0",
       "size_bytes": 17314,
@@ -9818,8 +9986,8 @@
     },
     {
       "path": "src/hydroswarm/training/trainer.py",
-      "sha256": "f7e18b0e54a8a86c413e522ec71d1f8ac7064118cf58cca03f21a48acf981d9a",
-      "size_bytes": 21459,
+      "sha256": "b13e73219573e4921ad650ef9235e986d689315bd8177f436b4525b868825e96",
+      "size_bytes": 22100,
       "source_run": "application source",
       "status": "required",
       "tracking": "standard-git"
@@ -9922,8 +10090,8 @@
     },
     {
       "path": "tests/integration/test_api.py",
-      "sha256": "cc64e0b8a35f2806f8c30733cf684629f131b06404d919274765f49b141ddfa9",
-      "size_bytes": 7818,
+      "sha256": "26fbf602a61b575315e8f5f2e8296bd1bcd69a25cb2263c3a48fce64529f39e5",
+      "size_bytes": 21315,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -9946,16 +10114,16 @@
     },
     {
       "path": "tests/integration/test_incident_view_contract.py",
-      "sha256": "4aa4b2723e733a6f05a0d1ce238e6be067efebc77d4598b378225ad7b1a6649e",
-      "size_bytes": 15995,
+      "sha256": "1f3e799bfac8c05dec5293ba68add4935c7c7aa52676430c49b9883ac03b2ccc",
+      "size_bytes": 19974,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "tests/integration/test_live_exposure_verification.py",
-      "sha256": "f1f10771e4fb1bba12abaf4b3673401305c3768863f7c78f4ea657e64472c3f8",
-      "size_bytes": 6253,
+      "sha256": "585374c216ef4347a10f35b02e006cd85a602b5f57a858be3d37c301ebaf22a5",
+      "size_bytes": 9703,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -9993,9 +10161,17 @@
       "tracking": "standard-git"
     },
     {
+      "path": "tests/integration/test_v4_inference_bundle_loader.py",
+      "sha256": "9db29be9d2bbd93a27668b82b30fd289f09a56e9731e835e453bc6994d0d9ab8",
+      "size_bytes": 6176,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "tests/integration/test_v4_pipeline_factory.py",
-      "sha256": "6291df12b547c117342a0052c2329027f24f5c991016404fe0c351b8ec776931",
-      "size_bytes": 7219,
+      "sha256": "7a6a281c67f161dd752bcec7df4f2a39dd0c439648829d8a6f617932779e5a2e",
+      "size_bytes": 15877,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10004,6 +10180,14 @@
       "path": "tests/integration/test_v4_production_checkpoint.py",
       "sha256": "05a491977190fcf01810e027338bc6b2ebd9c38d3baa9fb30bad94431bc7293f",
       "size_bytes": 7122,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "tests/integration/test_v4_release_bundle.py",
+      "sha256": "ed99650a6e383ea3df0a107247c6667a0deb7f5d46c64d030969fe9ea9dbb1a0",
+      "size_bytes": 12901,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10052,6 +10236,22 @@
       "path": "tests/scientific/test_corpus_sentinel_labels.py",
       "sha256": "46b1c31508a758df9f0d8b0e7921908cb67b7905d461b1fef77d58968e3a540a",
       "size_bytes": 11692,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "tests/scientific/test_decision_certificates.py",
+      "sha256": "113219bae7859fb305408b3c3283fc2946b40de7d19deda52cf3e8d51e9ba954",
+      "size_bytes": 6203,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "tests/scientific/test_evidence_certificate.py",
+      "sha256": "ff815e0b59c1891c2c99661e946ba682d8720995232b86616eac1ddccde24301",
+      "size_bytes": 6109,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10114,16 +10314,16 @@
     },
     {
       "path": "tests/scientific/test_hybrid_pipeline.py",
-      "sha256": "5b8160d88b432a29add74788fd160c3eaed382713e2c6db5e3e136cb10f6bcf8",
-      "size_bytes": 10301,
+      "sha256": "83c3d129d9617126f52609c0f0e609d984aef04d80b7f7f215ca273628cec5b2",
+      "size_bytes": 17439,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
     },
     {
       "path": "tests/scientific/test_hybrid_pipeline_v4_gating.py",
-      "sha256": "fa493785c525c694b0cfb21a04bbba0cf0146df73e18450d88d1ce7610755e25",
-      "size_bytes": 6643,
+      "sha256": "a7cd2819026ea3cfdbf046d02c8884452a9c0e3151619ca3e0ae21b14d441105",
+      "size_bytes": 14266,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10281,9 +10481,17 @@
       "tracking": "standard-git"
     },
     {
+      "path": "tests/scientific/test_train_serve_parity_gate.py",
+      "sha256": "2fe477af9af0b6fb83d30f80f09003794b1d01c613964c9cd4c8af5b9e4570b5",
+      "size_bytes": 4341,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "tests/scientific/test_training_smoke.py",
-      "sha256": "c8f5d8c935a68facd51d2d9ade1f00f6f219a445db645f217539dbf1d3098cd3",
-      "size_bytes": 12888,
+      "sha256": "c66e6986d3d374803b8331ff8272395a956e1a711322daf68d2f552b52b19f5c",
+      "size_bytes": 16681,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10324,6 +10532,14 @@
       "path": "tests/unit/test_candidate_plan_encoder.py",
       "sha256": "feac9a79d3c05514b7bbac0de5ed22ca5adaf96a9eb9da016be3be327ae777fd",
       "size_bytes": 4396,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "tests/unit/test_candidate_tensorizer.py",
+      "sha256": "3abfe0b85bbc6c486b4c00aef1ec563f875b5dac45cf11cc8e25e8ba18ea0fd2",
+      "size_bytes": 6212,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10409,6 +10625,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "tests/unit/test_incident_only_inference.py",
+      "sha256": "5e928c4cf2733d67e2d0b32e70217d056f5e767774f4b59783d7a21c3a4d235f",
+      "size_bytes": 6084,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "tests/unit/test_incident_pooling.py",
       "sha256": "a35ab07897860b3656d1a785b5aca94367deed43d9ec2bd764b6d5576ebcffc4",
       "size_bytes": 7567,
@@ -10489,6 +10713,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "tests/unit/test_pareto_frontier.py",
+      "sha256": "4e8d8cbbedb3832696d79d836fdf107d7ab631b91c8c5b66e11e471aa931b9f1",
+      "size_bytes": 10529,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "tests/unit/test_permutation.py",
       "sha256": "8b2ebfd0222fbd5d56e64a1a0cd9efa66eeec8a52524164b05347532d4888aba",
       "size_bytes": 7624,
@@ -10553,9 +10785,25 @@
       "tracking": "standard-git"
     },
     {
+      "path": "tests/unit/test_scout_state_contract.py",
+      "sha256": "cd980e0f4449efd708b073827e3e1c5efdc9d7730448362708c5e7a5c4ce3264",
+      "size_bytes": 3724,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "tests/unit/test_sharded_data.py",
       "sha256": "391104e817573641bb111d65bc71ca1b68f697beeb6cd36c6df31080fa9c1ef8",
       "size_bytes": 11922,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
+      "path": "tests/unit/test_signature_policy.py",
+      "sha256": "e7df817799f32a8d15a46dcb9e0fa6feebc92ce57198d6b63222e4f720de1342",
+      "size_bytes": 2787,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10625,6 +10873,14 @@
       "tracking": "standard-git"
     },
     {
+      "path": "tests/unit/test_v4_normalization.py",
+      "sha256": "47b375152514efea24e722a10aa95cd40839cd10b77a5f2c3b79ef90f94a1ef8",
+      "size_bytes": 4461,
+      "source_run": "test suite",
+      "status": "required",
+      "tracking": "standard-git"
+    },
+    {
       "path": "tests/unit/test_variable_collate.py",
       "sha256": "afd1a4f5d06a643595dab62bc1daa25c4227422ff79b3a0d13789dc7e48fb08f",
       "size_bytes": 12827,
@@ -10634,8 +10890,8 @@
     },
     {
       "path": "tests/unit/test_verifier.py",
-      "sha256": "af29206e2ff840f5434c822be80a487a562d0128dc728319d2667a70e3b33517",
-      "size_bytes": 3189,
+      "sha256": "24a8e8bc90a187e7c0583a2cfbe4ff48a12ed56d8112cc0ab83ec3bac7f90fe1",
+      "size_bytes": 11050,
       "source_run": "test suite",
       "status": "required",
       "tracking": "standard-git"
@@ -10650,24 +10906,24 @@
     }
   ],
   "forbidden_pattern_findings": [],
-  "generated_at": "2026-08-08T07:09:34Z",
+  "generated_at": "2026-08-08T22:29:37Z",
   "schema_version": 1,
   "secret_scan": {
-    "files_considered": 1334,
+    "files_considered": 1365,
     "findings": [],
     "schema_version": 1,
     "status": "pass",
-    "text_files_scanned": 852
+    "text_files_scanned": 883
   },
-  "source_git_sha": "6b8f8ee0cbafe6c319710a83b5e2fe2990bd332e",
+  "source_git_sha": "8985f3ac7cf13ed54c22202879bb0edf25174c71",
   "summary": {
     "git_lfs_bytes": 1560897940,
     "git_lfs_entries": 474,
-    "standard_git_bytes": 793438696,
-    "standard_git_entries": 857,
-    "total_bytes": 2354336636,
-    "total_entries": 1331
+    "standard_git_bytes": 794268914,
+    "standard_git_entries": 889,
+    "total_bytes": 2355166854,
+    "total_entries": 1363
   },
   "unpulled_lfs_pointers": [],
-  "wall_seconds": 1.7609220189988264
+  "wall_seconds": 1.7796556889952626
 }

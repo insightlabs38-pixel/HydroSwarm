@@ -73,10 +73,10 @@
       ]
     },
     "checkpoint_resume": {
-      "final_checkpoint": "experiments/runs/stage-f-joint-corpus-smoke/20260808T070157Z-bd897f1b/checkpoints/checkpoint-0002",
-      "first_pass_best_validation_loss": 15.673791885375977,
+      "final_checkpoint": "experiments/runs/stage-f-joint-corpus-smoke/20260808T222811Z-1c2ad1d0/checkpoints/checkpoint-0002",
+      "first_pass_best_validation_loss": 15.028948783874512,
       "first_pass_epochs": 1,
-      "resumed_best_validation_loss": 12.368598937988281,
+      "resumed_best_validation_loss": 11.836944103240967,
       "resumed_epochs": 2,
       "resumed_global_steps": 6,
       "status": "passed"
@@ -104,27 +104,27 @@
     },
     "gradient_smoke": {
       "gradient_norms": {
-        "candidate_reduction": 2.2886700846297137,
-        "containment_time_proxy": 33.423959587887246,
-        "duration": 5.743890011370456,
-        "event_cause": 26.280603221132893,
-        "event_presence": 14.501118138719306,
-        "evidence_sufficiency": 2.180038785933312,
-        "exposure_proxy": 17.188854004009517,
-        "information_gain": 10.557544379219781,
-        "next_step": 21.483183696881987,
-        "plan_regret_proxy": 3.333473132401082,
-        "plan_validity": 6.140197030094534,
-        "plan_value": 53.285173554401844,
-        "pressure_risk_proxy": 7.343685457732716,
-        "relative_strength": 22.190541916710824,
-        "sample_node": 19.958048936984444,
-        "sensor_fault": 15.360575902646673,
-        "service_loss_proxy": 6.621597671035707,
-        "should_continue_sampling": 11.415392707858736,
-        "source_node": 7.297441465932463,
-        "source_region": 14.424428492605255,
-        "start_time": 11.4311292297253
+        "candidate_reduction": 2.4896425307246175,
+        "containment_time_proxy": 19.55865460941342,
+        "duration": 7.141147795911413,
+        "event_cause": 19.994888837788974,
+        "event_presence": 9.517553788800578,
+        "evidence_sufficiency": 5.550077952646718,
+        "exposure_proxy": 24.780873667984167,
+        "information_gain": 10.853841967913505,
+        "next_step": 18.995058194563114,
+        "plan_regret_proxy": 13.372350822063508,
+        "plan_validity": 6.038156155578232,
+        "plan_value": 42.267938917479555,
+        "pressure_risk_proxy": 6.198223545890115,
+        "relative_strength": 13.967559227415165,
+        "sample_node": 17.89772584395386,
+        "sensor_fault": 18.703207203262377,
+        "service_loss_proxy": 10.078894308491611,
+        "should_continue_sampling": 10.483421647763816,
+        "source_node": 6.860135301947186,
+        "source_region": 5.2233828418768775,
+        "start_time": 9.270987016655186
       },
       "status": "passed",
       "tasks_present": [
@@ -150,7 +150,7 @@
         "source_region",
         "start_time"
       ],
-      "total_loss": 26.65121078491211,
+      "total_loss": 24.383739471435547,
       "valid_counts": {
         "candidate_reduction": 99,
         "containment_time_proxy": 106,
@@ -199,10 +199,10 @@
         "ood-ROUGHNESS_MISMATCH",
         "ood-TANK_STATE_SHIFT"
       ],
-      "ood_class_gradient_norm": 18.249552151695802,
+      "ood_class_gradient_norm": 14.817527975794949,
       "ood_class_valid_count": 16,
       "status": "passed",
-      "total_loss": 12.85774040222168
+      "total_loss": 13.899984359741211
     }
   },
   "note": "Pre-training gates only -- the full Stage F joint-multitask training run was not started.",

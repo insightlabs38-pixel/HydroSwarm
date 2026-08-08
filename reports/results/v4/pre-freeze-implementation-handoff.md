@@ -4279,3 +4279,412 @@ pushed to `agent/gcp-multitopology-v3`. Phases 19-20 (architecture
 selection, locked-test boundary) were explicitly out of this pass's scope
 and were not attempted. `final-selection.json` does not exist. The locked
 final test was not opened.
+
+## core-issues5.txt (`hydroswarm_final_pre_architecture_freeze_audit_and_fix_plan.md`) — Sections 2-18
+
+Completed in the continuation pass immediately preceding this one (16
+commits, `bd500e0`..`45fa347`, not individually narrated in this document
+but summarized here for continuity):
+
+- Section 2 — incident-only inference support for the candidate-conditioned
+  Strategist (`bd500e0`).
+- Section 3 — real train-owned normalization wired into V4 serving
+  (`ad07ff5`).
+- Section 4 — governed classical signature/prior train/serve policy
+  (`73aa145`, `hydroswarm.classical.signature_policy`).
+- Section 5 — consolidated train/serve parity gate, first version
+  (`24e57d2`).
+- Section 6 — candidate-conditioned Strategist wired into live planning
+  (`ef0da57`).
+- Section 7 — second corrected Strategist seed evaluated; decision: do not
+  promote learned prescreening (`079f9d4`).
+- Section 8/9 — separated verification budgets from EPANET-call budgets,
+  simulator-failure categorization, exact-simulation persistence on
+  failure (`6b01842`).
+- Section 10 — stale-plan-verification invalidation after evidence changes
+  (`821f401`).
+- Section 11 — granular output governance made independently authoritative
+  (`61bbef0`) — this pass's delta item 2 closed the one gap this commit's
+  own comments flagged as deliberately left open (`source_node`).
+- Section 12 — truthful V4 inference release bundle, first version
+  (`eb097d1`) — this pass's delta items 3/4 closed the two gaps that
+  version could not close on its own (the bundle could not actually be
+  loaded; several identity fields were placeholders).
+- Section 13 — Decision Authority / Applicability Certificate contract
+  (`1ed8046`).
+- Section 14 — verified response Pareto frontier, first version
+  (`65e7199`) — this pass's delta item 9 fixed a real cross-group
+  domination defect this version did not catch.
+- Section 15 — Evidence Value / Stop Certificate (`58c6912`) — this pass's
+  delta item 8 closed a calibrated/uncalibrated labeling gap.
+- Section 16 — numerical-sensitivity flag near verification thresholds
+  (`e978428`).
+- Section 17 — sensor-fault learned head kept disabled, decision recorded
+  (`99d09a5`).
+- Section 18 — one-retrain path preserved for OOD/Scout/PCGrad, no new
+  architecture (`45fa347`).
+
+Full pytest/Ruff/Pyright were clean at the end of that pass. Working tree
+clean, all commits pushed. Locked test not opened; `final-selection.json`
+does not exist.
+
+## Final delta audit/fix pass (pre-Section-19 corrective pass)
+
+Started from HEAD `45fa347` (the state above). This pass's instruction was
+a fresh, independent review of the implementation the prior pass had just
+committed — a "what did we get wrong even though every phase above shows
+green" pass — with nine concrete findings, all fixed and independently
+tested. Ends at HEAD `8985f3a`, ready for Section 19 final calibration.
+
+Commits (oldest to newest), all pushed to `origin/agent/gcp-multitopology-v3`:
+
+1. `5bf46d2` fix(inference): eliminate classical_prior train/serve skew;
+   govern source_node output (items 1-2)
+2. `59b3941` feat(runtime): make the V4 inference release bundle actually
+   bootable (item 3)
+3. `f1c2037` fix(release): make checkpoint/release provenance truthful
+   (item 4)
+4. `a776248` feat(safety): complete the verification-context identity
+   (item 5)
+5. `eea8584` fix(safety): stop stale verifications leaking into
+   current-evidence surfaces (item 6)
+6. `dfb6bc5` test(safety): confirm remaining_epanet_budget is set at
+   incident creation (item 7)
+7. `7b8d5da` fix(safety): distinguish calibrated vs uncalibrated
+   evidence-certificate regions (item 8)
+8. `8985f3a` fix(planning): stop mixing exposure-aware and hydraulic-only
+   plans on one Pareto frontier (item 9)
+
+### Item 1 (P0) — classical_prior train/serve skew — FIXED
+
+**Root cause**: governed corpus generation computed the `classical_prior`
+model-input feature via `hydroswarm.training.corpus.SignatureLibrary.
+posterior` (a per-node log1p-residual softmax fit from training scenarios
+only), while live serving computed it via `hydroswarm.classical.signatures.
+localize_with_signatures` (a noise-aware Bayesian posterior over a
+completely different hypothesis-grid signature representation, built for a
+different purpose — Scout/deterministic-reasoning support). These are two
+structurally different algorithms over what was meant to be the same
+physical prior — a real, previously-undocumented train/serve input-
+distribution skew, first surfaced by the Section 5 parity gate itself
+(which had been correctly failing on this one field and documenting it as
+a "known finding" rather than silently passing).
+
+**Fix chosen**: reproduce the exact training algorithm at serving time
+(`hydroswarm.training.corpus.model_input_classical_prior` /
+`SignatureLibrary.posterior_from_observations`, shared by both paths now),
+against the same governed, training-fit `SignatureLibrary` — loaded from
+the real committed `data/learning-v2/cycle-b2/signatures/<family>.json`
+artifact for the three known training topologies
+(`resolve_model_input_signature_library`, `GOVERNED_KNOWN_NETWORK` mode),
+or a best-effort same-algorithm fit for an imported/unknown network
+(`fit_runtime_signature_library`, `RUNTIME_GENERATED_IMPORTED_NETWORK`
+mode, explicitly labeled, never presented as training-owned). The richer
+live Bayesian localizer (`localize_with_signatures`) remains available
+inside `HybridInferencePipeline` as `live_classical_localization` for
+deterministic reasoning/fusion/operator evidence — unchanged, just no
+longer the source of the model-input tensor. Did not retrain: this was a
+serving-side algorithm-selection defect, not an architectural
+impossibility.
+
+**Real defect found while implementing, not by inspection**: reference
+timestamps for the governed signature library must come from a FRESH
+pristine copy of the training topology, not the served network object —
+`network_sha256` deliberately excludes WNTR's `options.time`
+(report_timestep/duration) from its hash (documented in its own
+docstring), so a hash-matched-but-time-shortened test network (several
+existing `HybridInferencePipeline` test fixtures do exactly this, for fast
+tests) would otherwise resolve to the wrong reference-timestamp grid,
+shape-mismatching against the real 25-step committed signature. Fixed via
+`_load_pristine_reference_network`.
+
+**Tests**: `scripts/run_train_serve_parity_gate.py` rewritten to cover all
+3 governed training topologies (golden-reference, branched-loop, loop-grid)
+× 2 operating conditions (clean, degraded) each — 6 fixtures, all fields
+match exactly or within tolerance, **the gate now PASSES outright** (no
+accepted `classical_prior` failure, per this item's explicit requirement).
+`reports/results/v4/train-serve-parity-gate.json` updated and committed.
+Plus `tests/scientific/test_train_serve_parity_gate.py` rewritten to assert
+the pass (was asserting the documented failure before).
+
+**Real-world consequence found and fixed**: `tests/integration/
+test_incident_view_contract.py`'s fixture (a fake model that echoes
+`classical_prior` directly) previously had classical/neural disagreement
+always exactly zero by construction — decoupling the two paths correctly
+exposed that its 2-sensor evidence was not enough for the two
+independently-computed posteriors to agree; fixed by adding a third,
+genuinely corroborating sample (within the fixture's own sample budget),
+not by loosening the disagreement threshold.
+
+### Item 2 (P0) — source_node output governance contradiction — FIXED
+
+**Root cause**: `HybridInferencePipeline.analyze()` unconditionally
+consumed `source_node_logits` for fusion regardless of
+`runtime_enabled_outputs`, while Phase 14's own promotion-gate evidence
+recorded `source_node` as passing every gate ("already runtime-enabled
+(v3 path); re-verify under v4 metadata in Phase 15"). The prior pass's own
+code comment explicitly flagged this as a known, deliberately-unenforced
+gap.
+
+**Fix chosen**: `source_node` is now a normal granular output, gated by
+`runtime_enabled_outputs` exactly like `event_presence`/`plan_value`/etc.
+When excluded, source localization degrades to classical-only belief (the
+same "no learned signal available" pattern Scout/Strategist already use).
+`scripts/build_phase15_v4_checkpoint.py` now includes it in
+`VALIDATED_OUTPUTS`/`RUNTIME_ENABLED_OUTPUTS`, matching the Phase 14
+evidence that was already on record.
+
+**Tests**: three new tests in `test_hybrid_pipeline_v4_gating.py` — disabled
+→ classical-only fallback; enabled → neural belief reaches fusion; extreme
+disabled-head logit values cannot move the fused result (the general
+Section 11 regression pattern, applied to the one output that had been
+left out of it).
+
+### Item 3 (P0) — inference release bundle not actually bootable — FIXED
+
+**Root cause**: `scripts/build_v4_inference_release_bundle.py`'s bundle
+format could not be loaded by anything. The only existing loader,
+`hydroswarm.training.checkpoint_identity.load_v4_checkpoint`, is built for
+the OTHER (resumable training) checkpoint format: it unconditionally reads
+`trainer_state.json` (a real `FileNotFoundError` against an inference
+bundle, which deliberately omits it) and expects `artifact_manifest.json`
+(underscore) to be the checkpoint's own tamper-check schema — a different
+file from the bundle's `artifact-manifest.json` (hyphen, a general
+file-hash inventory).
+
+**Fix chosen**: new `hydroswarm.runtime.v4_inference_bundle.
+load_v4_inference_bundle`, built for the bundle's real shape. Validates
+`SHA256SUMS` against real file content, cross-checks `artifact-manifest.
+json` against `SHA256SUMS`, validates `checkpoint_identity.json`/
+`runtime_manifest.json` fingerprint agreement, `output_governance.json`
+verbatim-matches the identity's own sets, bundled normalization reproduces
+the identity's `normalization_hash`, signature-policy-manifest agreement,
+and calibration artifact/status handled explicitly either way.
+Normalization sidecar resolution: validated through the bundle's own
+`SHA256SUMS` rather than requiring separate `.sha256` sidecar files (the
+bundle builder never wrote those — Option B from the two offered).
+`V4PipelineFactory` now detects a bundle directory (presence of
+`runtime_manifest.json`) and dispatches to this loader automatically,
+alongside the existing training-checkpoint path, unchanged.
+
+**Tests**: end-to-end clean-runtime test — build bundle → delete the
+source checkpoint/normalization directories → load ONLY from the bundle →
+construct `V4PipelineFactory` → analyze a real non-locked incident →
+neural path loads and runs (`neural_failure is None`, `runtime_mode ==
+FULL_HYBRID`), proving no residual dependency on the original training
+corpus/checkpoint directory. Plus 6 dedicated loader unit tests (missing
+file, `SHA256SUMS` tamper, manifest/`SHA256SUMS` disagreement,
+identity/governance drift, missing directory).
+
+### Item 4 (P0) — checkpoint/release provenance not truthful — FIXED
+
+Four sub-issues in `scripts/build_phase15_v4_checkpoint.py`, all confirmed
+by actually rebuilding a real checkpoint identity and release bundle
+end-to-end after the fix (not just by inspection):
+
+- **A. Fusion identity**: `fusion_policy_hash` was a hand-written
+  `fixed_weight_fusion-v1:neural_weight=0.6` string describing a policy V4
+  serving does not run. Now `hydroswarm.inference.fusion.
+  DYNAMIC_TRUST_FUSION_CONFIG` — the one real canonical constant
+  `V4PipelineFactory`/`HybridInferencePipeline` already key their own
+  `fusion_config_hash` checks against.
+- **B. Corpus/dataset identity**: `source_corpus_manifest_hashes` and
+  `dataset_manifest_hashes` recorded the corpus directory PATH
+  (`"data/learning-v2/cycle-b2-joint-v4"`) as if it were a hash. Now built
+  from real, already-committed content hashes: the corpus's own
+  `checksums.json` whole-corpus `dataset_fingerprint_sha256` plus every
+  population's `index_sha256` from its `source-manifest-hashes.json`.
+  Paths are still recorded, separately, under `resolved_training_config`.
+- **C. Trained-output claims**: `TRAINED_OUTPUTS`/`TRAINING_ONLY_OUTPUTS`
+  falsely claimed `sensor_reconstruction`/`travel_time` were trained. The
+  real selected Stage-F run's model config never sets
+  `auxiliary_heads=True` (matches `scripts/run_stage_f_training.py`'s own
+  config), so `HydroCore` never even physically constructed those heads —
+  confirmed by their total absence from Phase 13's metrics report and
+  Stage F's own comparison results. Removed from every governance set; a
+  new build-time assertion checks the real constructed model's
+  `auxiliary_heads` attribute so this cannot silently reoccur.
+  `ood_category`/`future_concentration` were already correctly excluded
+  (unchanged; verified, not assumed).
+- **D. Training checkpoint vs inference bundle**: already correctly
+  separated (verified, not changed) — `resolved_training_config` already
+  documented the optimizer/scheduler state as freshly constructed, and the
+  release bundle already ships without any optimizer/trainer/RNG files.
+
+### Item 5 (P0/P1) — incomplete verification context identity — FIXED
+
+**Root cause**: `_verification_context_hash` (Section 10) composed
+evidence/network/candidate-set identity plus analysis's own
+`provenance_hashes`, but omitted several behavior-critical verifier policy
+values a plan's safety depends on just as much as evidence does:
+simulator name/version, minimum-pressure/minimum-service-availability
+thresholds, consequence-policy version, aggregation policy, population-map
+identity.
+
+**Fix chosen**: added all of the above, composed from the exact same
+governed constants/defaults `verify_plan`'s own `HydraulicSimulator`/
+`PlanEvaluationContext` construction uses — no duplicated literals.
+`HydraulicSimulator`'s pressure/service-availability defaults were
+promoted from bare constructor-default literals to named module-level
+constants (`DEFAULT_MINIMUM_PRESSURE_M`/
+`DEFAULT_MINIMUM_SERVICE_AVAILABILITY`) specifically so the hash can
+reference the same values without a second, independently-maintained copy.
+
+**Tests**: changing the pressure threshold or the consequence-policy
+version between verify and approve now correctly marks the prior
+verification STALE and rejects approval (409) — the same behavior new
+evidence already triggered, now also triggered by a policy change. Plus an
+explicit unchanged-context-stays-approvable test.
+
+### Item 6 (P0) — stale verification leakage into evidence_bundle() — FIXED
+
+**Root cause**: `evidence_bundle()`'s three `next(...)` lookups (selected
+VERIFIED plan, rejected plan, NO_ACTION comparator) selected by `decision`
+alone, never checking `verification_status` — a plan verified under
+evidence state A and later marked STALE by evidence state B would still
+appear as the "current" selected/rejected plan in `/summary` text and
+every explanation fact built from the same bundle. `get_incident_view`'s
+`recommended_plan_id` had the same gap, always pointing at the top-ranked
+proposal regardless of whether that specific plan's own verification had
+gone stale.
+
+**Fix chosen**: all four lookups now require `verification_status ==
+"CURRENT"` in addition to the relevant `decision`. Historical/stale
+verifications remain fully retrievable via `/export` and `/events` (the
+audit trail) — only the "this is current evidence" surfaces are
+restricted. The verified response Pareto frontier
+(`planning/pareto.py`) already filtered on `verification_status`
+correctly (built after Section 10, got it right from the start) — audited,
+no change needed.
+
+**Tests**: a plan verified then made stale by a new sample no longer
+appears in `/summary` text or as `recommended_plan_id` (the latter tested
+via `test_incident_view_contract.py`'s real-pipeline fixture, since
+`/view` requires a completed `IncidentAnalysisResult` the minimal
+`test_api.py` fixture cannot produce), while `/export`/`/events` still
+show it (`VERIFIED` decision, `STALE` status, both `PLAN_VERIFIED` and
+`PLAN_VERIFICATION_STALE` audit events present).
+
+### Item 7 — remaining_epanet_budget default of zero — AUDITED, ALREADY CORRECT
+
+Audited `hydroswarm.api.app.create_incident`: already seeds
+`remaining_epanet_budget` from `settings.exact_plan_simulation_limit`
+(landed in the prior pass's Section 8 work), and
+`tests/integration/test_live_exposure_verification.py` already asserts
+this within its broader multi-hypothesis budget test. `IncidentState`'s
+own schema-level default of 0 is reached only by incidents constructed
+outside the live API (training/evaluation label generators in
+`strategist_trajectory.py`/`scout_trajectory.py`/`evaluation/golden.py`),
+never by a real operator-facing incident — confirmed by reading every
+`IncidentState(` construction site in the repository. Added one small,
+dedicated test isolating this specific invariant, per this item's explicit
+"add a simple API/state test" ask.
+
+### Item 8 (P1) — evidence certificate candidate-state ambiguity — FIXED
+
+**Root cause**: `build_evidence_certificate()` reused `HybridInference
+Pipeline`'s `conformal_candidate_nodes` as-is — already a real, non-empty
+snapshot either way (the pipeline already falls back to an uncalibrated
+credible-region computation, `_credible_nodes`, rather than fabricating an
+empty set when calibration is unavailable) — but exposed no way to tell
+which kind of region it was. A caller reading only
+`candidate_set_size`/`candidate_nodes` could mistake an uncalibrated
+credible region for real conformal coverage.
+
+**Fix chosen**: added `EvidenceCertificate.candidate_region_calibrated`
+(from `analysis.calibrated`), and the certificate's message text now
+explicitly labels the region "calibrated conformal set" or "UNCALIBRATED
+credible region" in every status branch that reports a candidate count.
+
+**Tests**: calibrated analysis reports a calibrated region; `calibrated=
+False` still reports the real non-empty current snapshot, correctly
+labeled uncalibrated, never implying an empty region merely because
+calibration is unavailable.
+
+### Item 9 (P1) — verified Pareto frontier comparability — FIXED
+
+**Root cause**: `compute_verified_pareto_frontier`'s domination check
+compared plans only on their SHARED objective dimensions — a real,
+previously-accepted design choice the prior pass's own test
+(`test_unmeasured_exposure_is_never_compared_as_a_fabricated_zero`)
+documented explicitly. This meant a hydraulic-only plan
+(`exposure_evaluated=False`, no real exposure measurement at all) could
+look exactly as good as, or even dominate, an exposure-evaluated plan by
+comparing only on the hydraulic subset both happened to have — unknown
+exposure visually behaving like favorable exposure.
+
+**Fix chosen**: every verified plan is now assigned to exactly one
+`FrontierGroup` (`EXPOSURE_AWARE` or `HYDRAULIC_ONLY`) by its own
+`consequences.exposure_evaluated`, and non-domination is computed
+independently within each group. `NO_ACTION` follows the same rule:
+exempted from domination only within its own group, never used to bridge
+the two. `FrontierEntry`/`ParetoFrontierEntryView` gained a `group` field.
+
+**Tests**: a hydraulic-only plan strictly better on every shared hydraulic
+field still cannot dominate an exposure-evaluated plan (the exact scenario
+the old shared-subset comparison got wrong); hydraulic-only plans are
+dominated only by other hydraulic-only plans; `NO_ACTION` never bridges
+the two groups.
+
+### Final pre-calibration gates (this pass)
+
+All required gates run for real, against the actual current HEAD
+(`8985f3a`), not asserted from memory:
+
+| Gate | Result |
+|---|---|
+| Full `pytest` | **857 passed**, 0 failed |
+| Ruff (`src tests scripts`) | clean |
+| Pyright | 0 errors, 0 warnings |
+| `scripts/run_trajectory_corpus_gates.py` | all gates passed (`cycle_b2_original_nine` reports `passed_except_environment_limitation` — see below, a known sandbox characteristic, not a regression) |
+| Train/serve parity (`scripts/run_train_serve_parity_gate.py`) | **passed** — 3 topologies × 2 conditions, no accepted `classical_prior` failure |
+| V4 incident-only inference (`tests/unit/test_incident_only_inference.py`) | passed |
+| Candidate-plan PASS-2 (`test_hybrid_pipeline.py`'s PASS-2 tests) | passed |
+| Output-governance mutation tests (`test_hybrid_pipeline_v4_gating.py`) | passed, including this pass's new `source_node` cases |
+| Verification-staleness tests | passed |
+| Simulation-budget/failure tests | passed |
+| Release-bundle clean-load test | passed |
+| Clean non-locked `FULL_HYBRID` inference from the release bundle | passed |
+| Artifact/hash integrity (`scripts/build_artifact_inventory.py`, `scripts/scan_secrets.py`) | clean — 0 forbidden-pattern findings, 0 unpulled LFS pointers, 0 secret-scan findings |
+
+**Known, pre-existing environment limitation, not a regression**: this
+sandbox does not have the raw scenario `.npz` archives under
+`data/learning-v2/cycle-b2/scenarios/` materialized (they are
+gitignored/ephemeral in this environment, matching the memory record
+`hydroswarm_checkpoint_persistence`), so `deterministic_replay` fails
+closed with a real, honest `FileNotFoundError` rather than a fabricated
+pass. `scripts/run_trajectory_corpus_gates.py` already distinguishes this
+exact case (`"passed_except_environment_limitation"`) from a genuine
+corpus defect, per Phase 17's own established handling of the same
+condition on this same sandbox. A fresh clone with LFS-pulled scenario
+archives would not hit this.
+
+### Intentionally deferred, explicitly flagged (not silently dropped)
+
+- `model_input_signature_mode` (`GOVERNED_KNOWN_NETWORK` vs.
+  `RUNTIME_GENERATED_IMPORTED_NETWORK`, item 1) is computed at analyze()
+  time but not yet threaded into `DecisionProvenance`/the Decision
+  Authority certificate (Section 13) — the certificate schema was not
+  expanded speculatively inside this fix; a real, scoped follow-up.
+- The frontend's hand-written TypeScript `ApiIncidentView` type does not
+  declare `verification_status`/`context_hash` on `plans[].verification`,
+  and `planStatusFromApi` labels a plan "RECOMMENDED" from `decision`
+  alone — the backend now correctly excludes a stale-verified plan from
+  `recommended_plan_id` (item 6), but a frontend viewing raw per-plan
+  `verification` data without this backend gate applied would not
+  independently notice staleness either. Frontend work is out of this
+  pass's scope (backend/architecture freeze); flagged here for the UI
+  pass.
+- Approximation error of the `TOPOLOGY_WIDE_REGIME_HASH` signature policy
+  against exact per-scenario state-specific artifacts remains unmeasured
+  (carried over from the prior pass's own Phase 2 finding, not touched by
+  this pass).
+
+### Status: ready for Section 19
+
+All nine delta-audit findings are fixed, independently tested, and the
+full mandatory gate list above is green. `final-selection.json` does not
+exist. The locked final test has not been opened. Per this pass's own
+instructions, Section 19 (final V4 calibration against the now-frozen
+serving path) is the next and only remaining step before the Section 20
+architecture-freeze acceptance gates.
