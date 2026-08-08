@@ -173,6 +173,22 @@ class ConsequenceMetrics(FrozenModel):
     #: used when no incident evaluation context is available. Callers must
     #: never present these fields as measured exposure when this is False.
     exposure_evaluated: bool = False
+    #: core-issues5.txt Section 16 (P1 safety/portability feature): signed
+    #: margin to the configured safety threshold (measured - required;
+    #: positive means the plan passed with room to spare). None only for a
+    #: verification predating this field. Exact simulator arrays are not
+    #: guaranteed bit-identical across every architecture/library build --
+    #: these margins, not bitwise equality, are the real operational
+    #: safety contract.
+    pressure_margin_m: float | None = None
+    service_availability_margin: float | None = None
+    #: True when either margin above falls inside the conservative
+    #: epsilon band (hydroswarm.simulation.verifier.
+    #: PRESSURE_SENSITIVITY_EPSILON_M/SERVICE_AVAILABILITY_SENSITIVITY_
+    #: EPSILON) -- a real VERIFIED/REJECTED decision this close to the
+    #: threshold could plausibly flip under a different (still correct)
+    #: EPANET build. Never hidden behind a plain VERIFIED badge.
+    numerically_sensitive: bool = False
 
 
 class PlanVerification(FrozenModel):

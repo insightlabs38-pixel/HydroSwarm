@@ -5,6 +5,7 @@ from __future__ import annotations
 from hydroswarm.domain import (
     AbstentionReason,
     ActionType,
+    ConsequenceMetrics,
     OperationalPlan,
     PlanDecision,
     PlanVerification,
@@ -18,6 +19,16 @@ from .wrapper import (
     SimulationTimeoutError,
     SimulationUnstableError,
 )
+
+#: core-issues5.txt Section 16 (P1 safety/portability feature): exact
+#: simulator arrays are not guaranteed bit-identical across every
+#: architecture/library build -- these conservative bands, not bitwise
+#: equality, are the real operational safety contract. A margin smaller
+#: than the epsilon means a real VERIFIED/REJECTED decision this close to
+#: the threshold could plausibly flip under a different (still correct)
+#: EPANET build.
+PRESSURE_SENSITIVITY_EPSILON_M = 0.5
+SERVICE_AVAILABILITY_SENSITIVITY_EPSILON = 0.02
 
 #: core-issues5.txt Section 9: map hydroswarm.simulation.wrapper's own
 #: already-distinct SimulationError subclasses to a specific, auditable
@@ -47,6 +58,30 @@ def _hypotheses_per_plan(evaluation_context: PlanEvaluationContext) -> int:
     the wrong count regardless of the actual hypothesis set size."""
 
     return len(evaluation_context.hypotheses) if evaluation_context.hypotheses else 1
+
+
+def _with_numerical_sensitivity(
+    consequences: ConsequenceMetrics, *, minimum_pressure_m: float, minimum_service_availability: float
+) -> ConsequenceMetrics:
+    """core-issues5.txt Section 16: stamp the real, signed margin to each
+    configured safety threshold (positive = passed with room to spare)
+    plus whether either margin falls inside the conservative epsilon band
+    -- computed once, here, so every caller sees the same real numbers
+    rather than recomputing (and potentially drifting) its own copy."""
+
+    pressure_margin_m = consequences.minimum_pressure_m - minimum_pressure_m
+    service_availability_margin = consequences.service_availability - minimum_service_availability
+    numerically_sensitive = (
+        abs(pressure_margin_m) < PRESSURE_SENSITIVITY_EPSILON_M
+        or abs(service_availability_margin) < SERVICE_AVAILABILITY_SENSITIVITY_EPSILON
+    )
+    return consequences.model_copy(
+        update={
+            "pressure_margin_m": pressure_margin_m,
+            "service_availability_margin": service_availability_margin,
+            "numerically_sensitive": numerically_sensitive,
+        }
+    )
 
 
 class PlanVerifier:
@@ -158,14 +193,21 @@ class PlanVerifier:
                 "simulator_version": self.simulator.simulator_version,
                 "cache_hit": exposure_evaluation.cache_hit,
             }
+            sensitivity_kwargs = dict(
+                minimum_pressure_m=self.simulator.minimum_pressure_m,
+                minimum_service_availability=self.simulator.minimum_service_availability,
+            )
+            worst_case = exposure_evaluation.worst_case_consequences
             return PlanVerification(
                 plan_id=plan.plan_id,
                 decision=decision,
                 simulator=self.simulator.simulator_name,
                 simulator_version=self.simulator.simulator_version,
                 state_hash=exposure_evaluation.state_hash,
-                consequences=exposure_evaluation.consequences,
-                worst_case_consequences=exposure_evaluation.worst_case_consequences,
+                consequences=_with_numerical_sensitivity(exposure_evaluation.consequences, **sensitivity_kwargs),
+                worst_case_consequences=(
+                    _with_numerical_sensitivity(worst_case, **sensitivity_kwargs) if worst_case is not None else None
+                ),
                 evaluation_provenance=provenance,
                 rejection_codes=exposure_evaluation.rejection_codes,
             )
@@ -193,7 +235,11 @@ class PlanVerifier:
             simulator=self.simulator.simulator_name,
             simulator_version=self.simulator.simulator_version,
             state_hash=evaluation.state_hash,
-            consequences=evaluation.consequences,
+            consequences=_with_numerical_sensitivity(
+                evaluation.consequences,
+                minimum_pressure_m=self.simulator.minimum_pressure_m,
+                minimum_service_availability=self.simulator.minimum_service_availability,
+            ),
             rejection_codes=evaluation.rejection_codes,
         )
 

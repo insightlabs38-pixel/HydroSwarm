@@ -195,3 +195,90 @@ def test_budget_exceeded_mid_loop_is_categorized_distinctly(
     assert result.abstention_reason == AbstentionReason.SIMULATION_BUDGET_EXCEEDED
     assert result.decision == PlanDecision.ABSTAINED
     assert result.consequences is None
+
+
+# core-issues5.txt Section 16 (P1 safety/portability feature): margins to
+# critical thresholds, not bitwise equality, are the real operational
+# safety contract for a value this close to a boundary.
+
+
+def test_verified_plan_reports_real_margins(verifier: PlanVerifier) -> None:
+    plan = _plan(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J2"))
+    result = verifier.verify(plan)
+
+    assert result.consequences is not None
+    assert result.consequences.pressure_margin_m == pytest.approx(
+        result.consequences.minimum_pressure_m - verifier.simulator.minimum_pressure_m
+    )
+    assert result.consequences.service_availability_margin == pytest.approx(
+        result.consequences.service_availability - verifier.simulator.minimum_service_availability
+    )
+
+
+def test_rejected_plan_also_reports_real_margins(verifier: PlanVerifier) -> None:
+    """A REJECTED decision is exact simulator output too -- margins must
+    not be silently omitted just because the plan failed."""
+
+    plan = _plan(OperationalAction(action_type=ActionType.CLOSE_PIPE, target_id="P_R1_J1"))
+    result = verifier.verify(plan)
+
+    assert result.decision == PlanDecision.REJECTED
+    assert result.consequences is not None
+    assert result.consequences.pressure_margin_m is not None
+    assert result.consequences.pressure_margin_m < 0  # genuinely failed, not a boundary artifact
+
+
+def test_numerical_sensitivity_helper_flags_a_margin_inside_the_epsilon_band() -> None:
+    from hydroswarm.simulation.verifier import (
+        PRESSURE_SENSITIVITY_EPSILON_M,
+        _with_numerical_sensitivity,
+    )
+
+    just_inside = _metrics_with_pressure(10.0 + PRESSURE_SENSITIVITY_EPSILON_M / 2)
+    stamped = _with_numerical_sensitivity(
+        just_inside, minimum_pressure_m=10.0, minimum_service_availability=0.90
+    )
+    assert stamped.numerically_sensitive is True
+    assert stamped.pressure_margin_m == pytest.approx(PRESSURE_SENSITIVITY_EPSILON_M / 2)
+
+
+def test_numerical_sensitivity_helper_does_not_flag_a_comfortable_margin() -> None:
+    from hydroswarm.simulation.verifier import (
+        PRESSURE_SENSITIVITY_EPSILON_M,
+        _with_numerical_sensitivity,
+    )
+
+    comfortable = _metrics_with_pressure(10.0 + PRESSURE_SENSITIVITY_EPSILON_M * 10)
+    stamped = _with_numerical_sensitivity(
+        comfortable, minimum_pressure_m=10.0, minimum_service_availability=0.90
+    )
+    assert stamped.numerically_sensitive is False
+
+
+def test_numerical_sensitivity_helper_flags_a_near_miss_below_threshold_too() -> None:
+    """A REJECTED plan that barely failed is just as numerically sensitive
+    as one that barely passed -- sensitivity is about closeness to the
+    boundary, not which side of it the value landed on."""
+
+    from hydroswarm.simulation.verifier import (
+        PRESSURE_SENSITIVITY_EPSILON_M,
+        _with_numerical_sensitivity,
+    )
+
+    near_miss = _metrics_with_pressure(10.0 - PRESSURE_SENSITIVITY_EPSILON_M / 2)
+    stamped = _with_numerical_sensitivity(
+        near_miss, minimum_pressure_m=10.0, minimum_service_availability=0.90
+    )
+    assert stamped.numerically_sensitive is True
+    assert stamped.pressure_margin_m is not None
+    assert stamped.pressure_margin_m < 0
+
+
+def _metrics_with_pressure(minimum_pressure_m: float):
+    from hydroswarm.domain import ConsequenceMetrics
+
+    return ConsequenceMetrics(
+        minimum_pressure_m=minimum_pressure_m,
+        service_availability=1.0,
+        operation_count=0,
+    )
