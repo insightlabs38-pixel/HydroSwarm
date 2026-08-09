@@ -12,6 +12,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   `c1fc9cc326a9d8ba8f6573fe5d2c200a10ca89cd`
 - Commits this session:
   1. `6cce3a5` — `fix(frontend): align live view models with governed backend data` (UI-0)
+  2. `09d69c8` — `docs(handoff): start UI mission-control run handoff report`
+  3. `2868795` — `feat(ui): introduce HydroSwarm mission-control shell` (UI-1)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -23,14 +25,18 @@ working this session).
   only, not a dependency change).
 - Frontend gate commands: `npm run lint`, `npm run typecheck` (new script, `tsc -b`),
   `npm test -- --run` (vitest), `npm run build`. All four pass as of the latest commit.
-- `npm run format:check` (prettier) **fails on files this session has not touched**:
-  `src/App.tsx`, `src/components/ModelGovernanceTable.tsx`, `src/pages/AuditPage.tsx`,
-  `src/pages/ValidationPage.tsx`, `tests/e2e/visual-regression.spec.ts`,
-  `tests/ModelGovernanceTable.test.tsx`. Confirmed pre-existing (not introduced by this
-  session — those files are absent from every commit's diff so far). Out of scope for
-  ui-work.txt §31's stated UI-0 gate ("lint + typecheck + tests + build"); left as a
-  known gap, worth a small standalone prettier pass later rather than folding into an
-  unrelated phase's commit.
+- `npm run format:check` (prettier): **now passes on the whole repo** — the pre-existing
+  gap noted after UI-0 (6 files failing on `main` before this session touched them) was
+  fixed incidentally in the UI-1 commit when `prettier --write` ran over all of `src/`;
+  diffs verified formatting-only before committing.
+- Playwright/chromium was installed this session (`npx playwright install --with-deps
+  chromium`) and used to manually verify the UI-1 shell renders correctly in a real
+  browser (`vite build` + `vite preview` + a throwaway screenshot script, not committed)
+  at 1920x1080 and 1440x900 — this caught two real bugs (an aria-required-children
+  violation and a CSS grid layout bug in the audit list) that the automated gate
+  (vitest + jsdom + axe) did not catch. **Recommendation: do this manual visual check
+  after every phase with layout/CSS changes**, not just UI-0/UI-1 — jsdom has no real
+  layout engine, so CSS grid/flex bugs are invisible to `npm test`.
 - Backend (Python) test suite was **not** re-run this session (no `src/hydroswarm/**`
   files were touched by any commit so far — 0 backend files changed). The most recent
   commit on `main`/this branch's own history (`c1fc9cc` and its immediate ancestors)
@@ -101,12 +107,48 @@ No backend files were changed. Zero regressions: lint/typecheck/tests/build all 
    hand-authored, clearly-labeled complete trace, not a live-capability stand-in).
 3. **No sample delay/cost fields** on `SampleRecommendationView` — same treatment.
 
-## Remaining phases (UI-1 through UI-11): NOT STARTED
+## UI-1 — design tokens and shell: COMPLETE
 
-Tracked as tasks #3–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `2868795` message for full detail. Summary: new `styles/tokens.css` with the
+exact ui-work.txt §7 token set (legacy `--ink`/`--muted`/`--panel-2`/`--line` aliased
+onto it so unmigrated pages keep working); `store.ts` rebuilt to the full
+`ConsoleUiState` contract from §10 (workspace navigation replaces the old flat page-tab
+model; only layout prefs persist to localStorage); new `shell/` components
+(MissionHeader, ModeBanner, WorkflowRail, WorkspaceToolbar, DecisionInspector,
+TechnicalDock) assembled into the exact header/rail/toolbar+workspace/inspector/dock
+layout from §5. `WorkflowRail` derives every stage's status (complete/current/waiting/
+blocked/caution/unavailable) from real `IncidentView` fields — workspaces without a real
+implementation yet (Source/Sampling/Response/Approval/Replay/Network/Model & Authority)
+are honestly `unavailable`/placeholder rather than faking readiness or content.
+`TechnicalDock`'s six tabs are wired to real data already on `IncidentView` (nothing new
+from the backend): Timeline/Evidence/Hydraulics reuse UI-0's components; Verification/
+Provenance/Audit are new. `Overview.tsx` had its now-redundant hydraulic/timeline/
+evidence panels removed (the dock owns that content now) but keeps everything without a
+dedicated workspace home yet (map, source candidates, sample, sensors, counterfactuals,
+plan table, explanation).
+
+Two small narrowly-additive TS-mirror-only field exposures (`IncidentView.generatedAt`,
+`.runtimeAnalysisMode`) — both fields already exist in the backend's `/view` JSON
+response (`generated_at`, `runtime_mode`), just weren't mapped by the hand-maintained TS
+interface before. No backend files changed.
+
+`AuditPage.tsx`/`TopologyPage.tsx` are temporarily unrouted (not deleted) — their content
+either moved into the dock (Audit) or awaits its own phase (Topology/debug, not yet
+placed in the new IA). Revisit if a UI-9 utilities decision is needed for Topology.
+
+No backend files were changed in either UI-0 or UI-1. Zero regressions: lint/typecheck/
+format:check/tests/build all green, verified visually in a real browser at two viewports.
+
+## Remaining phases (UI-2 through UI-11): NOT STARTED
+
+Tracked as tasks #4–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
+
+Next up: UI-2 (map rebuild) should also finally wire `WorkspaceToolbar`'s currently-
+disabled "Fit network"/"Layers" buttons and `store.ts`'s already-defined-but-unused
+`mapLayers` field into `OperationalMap`, per UI-1's own deferral note in that component.
 
 ## Continuation commands
 
