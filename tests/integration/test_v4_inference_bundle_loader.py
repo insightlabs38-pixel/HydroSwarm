@@ -110,7 +110,14 @@ def test_governance_drift_between_identity_and_output_governance_json_fails_clos
     governance = json.loads(governance_path.read_text(encoding="utf-8"))
     governance["runtime_enabled_outputs"] = sorted({*governance["runtime_enabled_outputs"], "source_node"})
     new_text = json.dumps(governance, indent=2, sort_keys=True, default=str) + "\n"
-    governance_path.write_text(new_text, encoding="utf-8")
+    # newline="" -- new_hash below is computed from this exact string; the
+    # real bundle loader verifies output_governance.json's SHA256SUMS entry
+    # against its real on-disk bytes (hashlib.sha256(path.read_bytes())),
+    # so without this the test's own tampering setup fails Windows' default
+    # write_text LF->CRLF translation BEFORE it can exercise the governance
+    # cross-check this test is actually about (same root cause as
+    # hydroswarm.preprocessing.schema.NormalizationStats.save's fix).
+    governance_path.write_text(new_text, encoding="utf-8", newline="")
     new_hash = hashlib.sha256(new_text.encode()).hexdigest()
 
     # artifact-manifest.json never records a hash for itself (the real

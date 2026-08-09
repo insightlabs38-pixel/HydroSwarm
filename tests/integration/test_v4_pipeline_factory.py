@@ -217,6 +217,10 @@ def test_pipeline_from_v4_factory_uses_sentinel_only_trained_tasks_and_declared_
 _REAL_NORMALIZATION_DIR = _REPO_ROOT / "data" / "learning-v2" / "cycle-b2" / "normalization"
 
 
+#: Masked locally by a warm data/generated/signatures cache (gitignored,
+#: session-accumulated); found by the real_simulation runtime audit in
+#: tests/conftest.py on a clean-cache CI run.
+@pytest.mark.real_simulation
 def test_real_normalization_bundle_is_loaded_and_wired_into_feature_builder(tmp_path: Path) -> None:
     bundle = load_runtime_normalization_bundle(_REAL_NORMALIZATION_DIR)
     directory = tmp_path / "checkpoint"
