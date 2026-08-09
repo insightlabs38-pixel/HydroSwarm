@@ -127,6 +127,17 @@ export interface ParetoFrontierEntry {
   group: 'EXPOSURE_AWARE' | 'HYDRAULIC_ONLY';
 }
 
+/** Mirrors hydroswarm.api.state.ApprovalReceipt field-for-field -- the
+ * durable record that a human, not HydroSwarm, decided to proceed with
+ * a plan (ui-work.txt 13.5). */
+export interface ApprovalReceipt {
+  incidentId: string;
+  planId: string;
+  approved: true;
+  operatorId: string;
+  approvedAt: string;
+}
+
 /**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *

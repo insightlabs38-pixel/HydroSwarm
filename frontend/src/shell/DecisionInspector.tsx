@@ -5,7 +5,6 @@ import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 
 const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {
-  approval: 'UI-6 (guarded approval workflow) adds the approval flow here.',
   replay: 'UI-8 (replay/failure/demo) adds the selected replay-event detail here.',
   network: 'UI-9 (utilities) adds network import/validation detail here.',
   authority: 'UI-9 (utilities) adds the Decision Certificate authority table here.',
@@ -180,6 +179,37 @@ function ResponseSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
+/** ui-work.txt 13.5: the guarded approval form itself lives in the
+ * Approval workspace body -- this is the always-available real-time
+ * summary of where the incident stands. */
+function ApprovalSummary({ incident }: { incident: IncidentView }) {
+  if (incident.selectedPlanId) {
+    return (
+      <div className="inspector-stack">
+        <StatusBadge tone="good">APPROVED</StatusBadge>
+        <p className="supporting">Plan {incident.selectedPlanId} was approved by an operator.</p>
+      </div>
+    );
+  }
+  if (!incident.approvalPending) {
+    return (
+      <EmptyState
+        title="No plan is awaiting approval."
+        detail="A plan must be verified and current before it can be reviewed for approval."
+      />
+    );
+  }
+  return (
+    <div className="inspector-stack">
+      <StatusBadge tone="warn">PENDING</StatusBadge>
+      <p className="supporting">
+        A verified plan is awaiting operator review. Approval records an operator decision only --
+        HydroSwarm does not actuate infrastructure.
+      </p>
+    </div>
+  );
+}
+
 export function DecisionInspector({ incident }: { incident: IncidentView }) {
   const { workspace, inspectorCollapsed, toggleInspector } = useConsoleStore();
 
@@ -205,6 +235,8 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
     body = <SamplingSummary incident={incident} />;
   } else if (workspace === 'response') {
     body = <ResponseSummary incident={incident} />;
+  } else if (workspace === 'approval') {
+    body = <ApprovalSummary incident={incident} />;
   } else if (workspace === 'validation') {
     body = (
       <p className="supporting">

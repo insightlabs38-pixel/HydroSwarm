@@ -65,10 +65,20 @@ test('a workspace with no implementation yet shows an honest placeholder, never 
   const user = userEvent.setup();
   renderApp();
   await screen.findByText('Verified response awaiting approval');
-  await user.click(screen.getByRole('button', { name: /^Approval/ }));
+  await user.click(screen.getByRole('button', { name: /^Network/ }));
   expect(
-    await screen.findByText('Approval has not been implemented in the mission-control shell yet.'),
+    await screen.findByText('Network has not been implemented in the mission-control shell yet.'),
   ).toBeVisible();
+});
+
+test('Approval workspace never performs a real approval mutation in DEMO_FALLBACK mode', async () => {
+  const user = userEvent.setup();
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: /^Approval/ }));
+  expect(await screen.findByRole('heading', { name: 'Operator approval' })).toBeVisible();
+  expect(screen.getByText('Approval is not available in this mode.')).toBeVisible();
+  expect(screen.queryByLabelText('Operator ID')).toBeNull();
 });
 
 test('Response workspace renders full plan verification, the action sequence, and the exposure-aware Pareto frontier, for the DEMO_FALLBACK fixture', async () => {

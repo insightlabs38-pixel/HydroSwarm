@@ -367,7 +367,12 @@ export const demoIncident: IncidentView = {
       },
     },
   ],
-  selectedPlanId: 'B',
+  // Null, not 'B': this fixture's own headline is "Verified response
+  // awaiting approval" and approvalPending is true below -- selectedPlanId
+  // (which types.ts documents as "null until a human has actually
+  // approved one") must stay null until that approval actually happens,
+  // never pre-filled with the plan that's merely recommended.
+  selectedPlanId: null,
   recommendedPlanId: 'B',
   counterfactuals: {
     A: consequenceA,

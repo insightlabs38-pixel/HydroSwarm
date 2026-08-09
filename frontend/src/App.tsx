@@ -26,6 +26,11 @@ const ResponseWorkspace = lazy(() =>
     default: module.ResponseWorkspace,
   })),
 );
+const ApprovalWorkspace = lazy(() =>
+  import('./workspaces/ApprovalWorkspace').then((module) => ({
+    default: module.ApprovalWorkspace,
+  })),
+);
 const ValidationPage = lazy(() =>
   import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
 );
@@ -34,7 +39,6 @@ const BenchmarkPage = lazy(() =>
 );
 
 const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {
-  approval: 'Planned for UI-6 (guarded human plan-approval workflow).',
   replay: 'Planned for UI-8 (deterministic replay and fail-closed demo states).',
   network: 'Planned for UI-9 (network governance and benchmark utilities).',
   authority: 'Planned for UI-9 (network governance and benchmark utilities).',
@@ -64,6 +68,8 @@ export default function App() {
     workspaceBody = <SamplingWorkspace incident={incident} />;
   } else if (workspace === 'response') {
     workspaceBody = <ResponseWorkspace incident={incident} />;
+  } else if (workspace === 'approval') {
+    workspaceBody = <ApprovalWorkspace incident={incident} />;
   } else if (workspace === 'validation') {
     workspaceBody = <ValidationPage incident={incident} />;
   } else if (workspace === 'benchmarks') {
