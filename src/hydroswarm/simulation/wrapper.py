@@ -7,6 +7,7 @@ import hashlib
 import json
 import multiprocessing
 import queue
+import sys
 import tempfile
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
@@ -441,6 +442,48 @@ DEFAULT_MINIMUM_PRESSURE_M = 10.0
 DEFAULT_MINIMUM_SERVICE_AVAILABILITY = 0.90
 
 
+def _multiprocessing_worker_entrypoint(
+    function: Callable[..., Any],
+    args: tuple[Any, ...],
+    result_queue: "multiprocessing.Queue[tuple[bool, Any]]",
+) -> None:
+    """The actual `multiprocessing.Process` target for
+    HydraulicSimulator._run_with_timeout.
+
+    Must be a real module-level function, not a nested closure: under the
+    "spawn" start method (mandatory on Windows; POSIX still uses "fork",
+    which has no such restriction) the child interpreter imports the
+    target by its qualified name rather than inheriting the parent's
+    memory, so the target -- and everything reachable from `args` -- must
+    be picklable-by-reference. A lambda or a function defined inside
+    another function is not."""
+
+    try:
+        result_queue.put((True, function(*args)))
+    except BaseException as exc:  # propagate simulator failures to caller
+        result_queue.put((False, exc))
+
+
+def _invoke_wntr_simulator(model: Any) -> Any:
+    """Picklable stand-in for the ``lambda: wntr.sim.WNTRSimulator(model).
+    run_sim()`` closure _run_hydraulics used to pass directly -- see
+    _multiprocessing_worker_entrypoint's docstring for why a closure can't
+    cross a "spawn" process boundary. `model` itself must also be
+    picklable for the same reason; verified empirically (not merely
+    assumed) in test_simulator_extended.py's spawn-context regression
+    test."""
+    return wntr.sim.WNTRSimulator(model).run_sim()
+
+
+def _invoke_epanet_simulator(model: Any, operation: str) -> Any:
+    """Picklable stand-in for _run_epanet's former nested `execute()`
+    closure -- same "spawn"-cannot-pickle-a-closure reason as
+    _invoke_wntr_simulator above."""
+    with tempfile.TemporaryDirectory(prefix="hydroswarm-epanet-") as directory:
+        prefix = str(Path(directory) / operation)
+        return wntr.sim.EpanetSimulator(model).run_sim(file_prefix=prefix)
+
+
 class HydraulicSimulator:
     """Load, validate and simulate water networks using WNTR as authority."""
 
@@ -546,38 +589,53 @@ class HydraulicSimulator:
         model.options.hydraulic.required_pressure = self.pressure_required_m
         return model
 
-    def _run_with_timeout(self, operation: str, function: Callable[[], Any]) -> Any:
-        """Run `function` with a hard wall-clock deadline in a real, killable
-        OS subprocess -- not a daemon thread (core-issues.txt: a thread that
-        exceeds its timeout cannot be forcibly stopped in Python and simply
-        keeps running in the background, consuming CPU for however long the
-        underlying EPANET/WNTR call takes, or forever if it is genuinely
-        hung).
+    def _run_with_timeout(
+        self, operation: str, function: Callable[..., Any], args: tuple[Any, ...] = ()
+    ) -> Any:
+        """Run `function(*args)` with a hard wall-clock deadline in a real,
+        killable OS subprocess -- not a daemon thread (core-issues.txt: a
+        thread that exceeds its timeout cannot be forcibly stopped in
+        Python and simply keeps running in the background, consuming CPU
+        for however long the underlying EPANET/WNTR call takes, or forever
+        if it is genuinely hung).
 
-        Uses the "fork" start method deliberately, not "spawn": this call
-        sits on the live incident-analysis latency path (real profiling
-        shows single-digit milliseconds today), and spawn's from-scratch
-        interpreter/import cost (numpy/pandas/wntr/torch) turns that into
-        multiple seconds per call -- an unacceptable regression for a
-        function invoked on every hydraulic simulation. Forking a
-        multi-threaded parent (e.g. a live server) carries a narrow,
-        well-documented risk of a child inheriting a lock another thread
-        held at fork time; unlike the daemon-thread version this replaces,
-        that failure mode is still fully contained -- a wedged child is a
-        real OS process, so the timeout below still forcibly terminates it
-        and this call still raises SimulationTimeoutError rather than
-        hanging or leaking the process."""
+        `function` must be a module-level function (not a lambda or a
+        nested closure) and every element of `args` must be picklable --
+        see _multiprocessing_worker_entrypoint's docstring for why: under
+        "spawn" (mandatory on Windows) the child interpreter imports the
+        target by reference rather than inheriting the parent's memory.
 
-        context = multiprocessing.get_context("fork")
+        Uses the "fork" start method deliberately on POSIX, not "spawn":
+        this call sits on the live incident-analysis latency path (real
+        profiling shows single-digit milliseconds today), and spawn's
+        from-scratch interpreter/import cost (numpy/pandas/wntr/torch)
+        turns that into multiple seconds per call -- an unacceptable
+        regression for a function invoked on every hydraulic simulation.
+        Forking a multi-threaded parent (e.g. a live server) carries a
+        narrow, well-documented risk of a child inheriting a lock another
+        thread held at fork time; unlike the daemon-thread version this
+        replaces, that failure mode is still fully contained -- a wedged
+        child is a real OS process, so the timeout below still forcibly
+        terminates it and this call still raises SimulationTimeoutError
+        rather than hanging or leaking the process.
+
+        Windows has no fork() syscall at all -- multiprocessing.get_context
+        ("fork") raises ValueError there unconditionally, not a latency
+        tradeoff to make but a hard platform constraint. "spawn" is the
+        only start method Windows supports, so this falls back to it there
+        (accepting its slower per-call startup cost, and the module-level-
+        function/picklable-args requirement above, on that platform only;
+        POSIX production/CI behavior is unchanged)."""
+
+        context = multiprocessing.get_context("spawn" if sys.platform == "win32" else "fork")
         result_queue: multiprocessing.Queue = context.Queue(maxsize=1)
 
-        def _worker() -> None:
-            try:
-                result_queue.put((True, function()))
-            except BaseException as exc:  # propagate simulator failures to caller
-                result_queue.put((False, exc))
-
-        process = context.Process(target=_worker, name=f"hydroswarm-{operation}", daemon=True)
+        process = context.Process(
+            target=_multiprocessing_worker_entrypoint,
+            args=(function, args, result_queue),
+            name=f"hydroswarm-{operation}",
+            daemon=True,
+        )
         process.start()
         process.join(self.timeout_seconds)
         if process.is_alive():
@@ -629,19 +687,12 @@ class HydraulicSimulator:
             raise SimulationUnstableError("simulation pressure is numerically unstable")
 
     def _run_hydraulics(self, model: Any) -> Any:
-        results = self._run_with_timeout(
-            "hydraulics", lambda: wntr.sim.WNTRSimulator(model).run_sim()
-        )
+        results = self._run_with_timeout("hydraulics", _invoke_wntr_simulator, (model,))
         self._validate_results(results)
         return results
 
     def _run_epanet(self, model: Any, operation: str) -> Any:
-        def execute() -> Any:
-            with tempfile.TemporaryDirectory(prefix="hydroswarm-epanet-") as directory:
-                prefix = str(Path(directory) / operation)
-                return wntr.sim.EpanetSimulator(model).run_sim(file_prefix=prefix)
-
-        results = self._run_with_timeout(operation, execute)
+        results = self._run_with_timeout(operation, _invoke_epanet_simulator, (model, operation))
         self._validate_results(results, require_quality=True)
         return results
 

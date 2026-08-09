@@ -115,6 +115,52 @@ def test_incident_and_plan_cache_hits_do_not_consume_budget_and_corruption_inval
     assert not cache._path(key).exists()
 
 
+def test_run_with_timeout_worker_and_args_survive_a_real_spawn_context() -> None:
+    """Windows' multiprocessing start method is mandatorily "spawn" (no
+    fork() at all there); unlike "fork" (the POSIX default this module
+    otherwise uses), "spawn" pickles the process target and its arguments
+    to send to a brand-new interpreter rather than inheriting the parent's
+    memory. This proves _run_with_timeout's real callers
+    (_invoke_wntr_simulator / _invoke_epanet_simulator, called with a real
+    prepared WNTR model) are actually picklable under spawn -- a lambda or
+    nested-closure worker (what this module used before the Windows
+    portability fix) would fail here with a real PicklingError, which
+    running only under POSIX's default "fork" context would never catch.
+    Runs on every platform: "spawn" is available (just not default) on
+    POSIX too, so this is real coverage on ubuntu-latest CI for the code
+    path Windows CI actually exercises, not merely "does not raise
+    ValueError: cannot find context for 'fork'"."""
+
+    import multiprocessing
+
+    from hydroswarm.simulation.wrapper import (
+        _invoke_epanet_simulator,
+        _invoke_wntr_simulator,
+        _multiprocessing_worker_entrypoint,
+    )
+
+    simulator = HydraulicSimulator(_network(1))
+    model = simulator._prepared_network()
+    context = multiprocessing.get_context("spawn")
+
+    for function, args in (
+        (_invoke_wntr_simulator, (model,)),
+        (_invoke_epanet_simulator, (model, "spawn-regression-check")),
+    ):
+        result_queue = context.Queue(maxsize=1)
+        process = context.Process(
+            target=_multiprocessing_worker_entrypoint,
+            args=(function, args, result_queue),
+            daemon=True,
+        )
+        process.start()
+        process.join(30.0)
+        assert not process.is_alive(), f"spawn worker for {function.__name__} did not finish in time"
+        succeeded, value = result_queue.get_nowait()
+        assert succeeded, f"spawn worker for {function.__name__} failed: {value!r}"
+        process.join()
+
+
 def test_timeout_terminates_the_child_process_rather_than_orphaning_it() -> None:
     # core-issues.txt: a killable subprocess, not an orphanable daemon
     # thread -- verify the process that was still running past the
