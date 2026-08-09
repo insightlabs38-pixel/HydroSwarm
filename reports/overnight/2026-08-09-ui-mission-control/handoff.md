@@ -419,7 +419,7 @@ Commit: `a73d034` — `fix(ui): consolidate mission-control visual hierarchy bef
 (6 files changed, 356 insertions / 361 deletions: `frontend/src/pages/Overview.tsx`,
 `frontend/src/shell/DecisionInspector.tsx`, `frontend/src/styles.css`,
 `frontend/src/workspaces/ResponseWorkspace.tsx`, `frontend/src/workspaces/SourceWorkspace.tsx`,
-`frontend/tests/App.test.tsx`). Not yet pushed to `origin` — see "GitHub push" note below.
+`frontend/tests/App.test.tsx`). Pushed to `origin` — see "GitHub push" note below.
 
 ### Pre-existing uncommitted work found at session start
 
@@ -560,14 +560,10 @@ not moved.
 
 ### GitHub push
 
-This session did not have working GitHub authentication (unlike the session that produced
-the earlier UI-0..UI-10 commits, which explicitly notes "GitHub auth is working this
-session" above) — push was not attempted since no push command exists yet in this
-transcript to report success or failure against; the commit exists locally on
-`feature/ui-mission-control-v1` at `a73d034`. **Next session: attempt
-`git push origin feature/ui-mission-control-v1` and update this section with the result;
-if it fails, continue locally per the standing instruction to not block on GitHub auth
-errors.**
+`git push origin feature/ui-mission-control-v1` succeeded this session
+(`20ae245..ed942d9  feature/ui-mission-control-v1 -> feature/ui-mission-control-v1`),
+carrying both the UI-10.5 commit (`a73d034`) and this handoff-report commit (`ed942d9`) to
+`origin`.
 
 ## Remaining phases (UI-11): NOT STARTED
 
