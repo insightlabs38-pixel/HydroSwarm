@@ -14,6 +14,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   1. `6cce3a5` — `fix(frontend): align live view models with governed backend data` (UI-0)
   2. `09d69c8` — `docs(handoff): start UI mission-control run handoff report`
   3. `2868795` — `feat(ui): introduce HydroSwarm mission-control shell` (UI-1)
+  4. `37f956e` — `docs(handoff): record UI-1 completion and visual-verification finding`
+  5. `3dc2b49` — `feat(ui): rebuild synchronized operational network map` (UI-2)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -139,16 +141,43 @@ placed in the new IA). Revisit if a UI-9 utilities decision is needed for Topolo
 No backend files were changed in either UI-0 or UI-1. Zero regressions: lint/typecheck/
 format:check/tests/build all green, verified visually in a real browser at two viewports.
 
-## Remaining phases (UI-2 through UI-11): NOT STARTED
+## UI-2 — map rebuild: COMPLETE
 
-Tracked as tasks #4–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `3dc2b49` message for full detail. Summary: removed the old static
+`NetworkLink.action` field (a fake per-link property disconnected from which plan was
+actually selected) in favor of rendering the real overlay from whichever plan is
+selected (falling back to recommended), resolved against live geometry, styled per
+ActionType. Added click-to-select on nodes/links (updates the shared store + a visible
+highlight layer + a themed popup via `setDOMContent`, never string-built HTML). Wired
+`WorkspaceToolbar`'s previously-disabled "Fit network"/"Layers" buttons to the
+already-defined `mapLayers`/`mapFitRequestedAt` store fields (this was UI-1's own
+explicit deferral note). All new effects update sources/filters/viewport only, never
+rebuild the map (rebuild still keys only on `incident`/hasFlowData/hasConcentrationData).
+
+**Real bug caught only by browser verification, not the automated gate** (which mocks
+`maplibre-gl` entirely, so it can't catch real async-timing bugs): `map.on('load', ...)`
+fires asynchronously in a real browser, so the plan-overlay-update effect could run and
+bail out (style not loaded yet) before 'load' fired, and never got a second chance —
+silently leaving the default-selected plan's action overlay empty on first render, with
+zero automated test noticing. Fixed by seeding the action sources with real data at
+creation time. **This continues to validate the UI-1 handoff note**: any phase touching
+map/canvas/layout should get a real Playwright screenshot pass before being called done,
+not just a green `npm test`.
+
+## Remaining phases (UI-3 through UI-11): NOT STARTED
+
+Tracked as tasks #5–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-2 (map rebuild) should also finally wire `WorkspaceToolbar`'s currently-
-disabled "Fit network"/"Layers" buttons and `store.ts`'s already-defined-but-unused
-`mapLayers` field into `OperationalMap`, per UI-1's own deferral note in that component.
+Next up: UI-3 (Source/Sentinel workspace) — candidate inspector, calibration/coverage,
+disagreement, OOD, wiring the already-confirmed-present `GET /api/incidents/{id}/authority`
+endpoint (see "Backend API surface" above — `DecisionCertificate`/`AuthorityLevel`/
+`ApplicabilityStatus`), and a real grounded "Why this source?" via
+`GET /api/incidents/{id}/explanations/WHY_SOURCE`. This is the first phase that needs a
+genuinely new frontend API module (`api/authority.ts` per ui-work.txt §9/§27) rather than
+just consuming fields already on `IncidentView`.
 
 ## Continuation commands
 
