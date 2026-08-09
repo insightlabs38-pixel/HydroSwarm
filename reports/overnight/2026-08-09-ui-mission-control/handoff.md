@@ -29,6 +29,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   16. `51c7ff5` — `docs(handoff): record UI-7 completion`
   17. `8d7cba7` — `feat(ui): add deterministic replay and fail-closed demo states` (UI-8)
   18. `f218379` — `UI-9: Network and Model & Authority utility workspaces`
+  19. `bcf398a` — `docs(handoff): record UI-9 completion and UI-10 scoping note`
+  20. `0ccdaf3` — `UI-10: harden accessibility, responsive layout, and reduced-motion`
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -336,25 +338,89 @@ intentionally unrouted from UI-1 — Topology's content now has a real, better h
 into the technical dock in UI-1/UI-7, so neither page needs its own route. No backend
 files changed (0 files under `src/hydroswarm/` this phase, as in every phase so far).
 
-## Remaining phases (UI-10, UI-11): NOT STARTED
+## UI-10 — accessibility, responsive, and reduced-motion hardening: COMPLETE
 
-Tracked as tasks #12–#13 in this session's task list, in ui-work.txt §31 order. Each
-phase's own gate must pass and get its own commit before moving to the next, per
-ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
-placeholders, or "TODO" UI states are to be committed as if finished.
+See commit `0ccdaf3` message for full detail. Started with an explicit audit against
+ui-work.txt §24-26 rather than assuming gaps — this found the shell already had strong
+foundations from earlier phases (skip link, semantic landmarks, correct ARIA tabs, a
+keyboard-accessible dock splitter with arrow-key resize, real map/chart text equivalents
+generated from the same real data as the visual, status badges already distinguished by
+icon shape and not just color, stable TanStack Query keys, memoized GeoJSON transforms in
+`OperationalMap`, and a single persistent MapLibre instance updated in place rather than
+recreated — all confirmed by reading the actual component code, not assumed). The phase's
+real work was the concrete gaps that audit surfaced:
 
-Next up: UI-10 (accessibility, responsive layout, and performance hardening). Axe checks
-already exist per-workspace (all passing, zero violations) from UI-1/UI-7/UI-9, so UI-10's
-real remaining scope is: a full keyboard-only navigation pass across the shell (rail →
-toolbar → workspace → inspector → dock, including the map's click-to-select and the
-approval form's required checkbox), responsive behavior below the desktop breakpoint the
-shell currently assumes (ui-work.txt's layout spec is desktop-first; verify or explicitly
-scope-note what happens narrower), and a performance pass on the two largest chunks
-(`OperationalMap` at ~1.06 MB / 287 kB gzip, `index` at ~819 kB / 270 kB gzip) — confirm
-whether further code-splitting is warranted or whether current lazy-loading already keeps
-initial paint reasonable. Then UI-11 (demo hardening / final QA, including turning the
-manual Playwright screenshot scripts used ad hoc all session into a real committed E2E
-suite, per the plan's own UI-11 scope).
+- **Skip link didn't move keyboard focus.** `<a href="#main-content">` scrolled the
+  target into view but never shifted actual keyboard focus there (the `<main>` had no
+  `tabIndex`), so a keyboard user activating it saw no change to subsequent Tab order —
+  a real, well-known WCAG skip-link pitfall. Fixed with `tabIndex={-1}` on `#main-content`.
+  (jsdom doesn't implement a real browser's native fragment-focus behavior, so this is
+  only unit-tested for its precondition — `tabindex="-1"` present — with the actual
+  post-activation focus move confirmed via a real Playwright/Chromium run instead.)
+- **Responsive breakpoints didn't match ui-work.txt §25's tiers.** The rail was collapsing
+  at 1099px instead of 1439px; the inspector was just narrowing in place at 768-1099px
+  instead of becoming an overlay drawer. Corrected both, and made the inspector a real
+  `position: absolute` drawer within `.mission-shell-body` (now `position: relative`) at
+  that tier. The plan table's redundant Actions-count column (the full action list has
+  its own dedicated `PlanActionSequence` view) is hidden at ≤1439px — deliberately not
+  any safety-relevant column (exposure reduction, pressure violations, service
+  availability, status all stay visible at every width), consistent with this session's
+  standing rule against ever suppressing safety-relevant data for cosmetic reasons.
+- **Real horizontal page-overflow bug at narrow widths**, found only by measuring in a
+  real browser, not by reading the CSS: the mission header's status badge row
+  (`flex: 0 0 auto`, no wrap) forced the whole document wider than the viewport once the
+  badges stopped fitting next to the brand/incident context. Confirmed programmatically
+  before the fix (`document.documentElement.scrollWidth` 643px vs `clientWidth` 600px at
+  a 600px viewport) and after (600px/600px, exact match). Fixed by letting the badge row
+  shrink and scroll horizontally within its own bounded, hidden-scrollbar container
+  instead of forcing page-level scroll or hiding any individual badge.
+- **ECharts animations ignored the app's `reducedMotion` toggle.** The existing
+  `.reduced-motion` CSS class and `prefers-reduced-motion` media query (both already
+  present since UI-1) only govern CSS transitions/animations — ECharts renders to canvas
+  and animates independently of CSS, so `HydraulicChart` and `ParetoFrontier`'s
+  exposure-aware scatter kept animating regardless of the toggle. Threaded
+  `animation: !reducedMotion` into both `setOption` calls.
+
+**Verified with a real Playwright/Chromium pass**, per this session's standing rule for
+any phase touching layout/canvas: four viewports (1920, 1300, 900, 600px) screenshotted
+to confirm each responsive tier renders as intended, plus a keyboard-only navigation run
+(Tab into the rail, Enter to activate a stage, confirmed the Source workspace rendered
+with real data) — not just the automated jsdom-based gate, which can't see real layout or
+real async focus/scroll behavior (the same category of gap that caught real bugs in UI-1
+and UI-2).
+
+Added regression coverage: `ReducedMotionCharts.test.tsx` (2 tests, asserting the real
+`animation` flag ECharts receives under each toggle state — required upgrading the shared
+`echarts/core` test mock's `init` to a real `vi.fn()` in `tests/setup.ts` so its calls
+become inspectable, since it was previously a plain arrow function with no call history),
+plus an `App.test.tsx` assertion for the skip-link fix's precondition.
+
+Gate: tsc/eslint/prettier clean, 84/84 tests (15 files, up from 81/14), production build
+succeeds (chunk sizes unchanged from UI-9 — no new dependencies this phase). No backend
+files changed.
+
+**Deliberately not changed**: the plan table's other columns, the dock's bottom-drawer
+positioning (already full-width/tabbed/collapsible below `.mission-shell-body` in the
+column flex layout, already satisfying "tabbed bottom drawer" with no code change
+needed), and the `.status-icon` shapes (audited and found already shape-distinct per tone
+— filled circle/filled square/filled diamond/hollow ring — not the color-only gap it
+initially looked like from the token list alone; a proposed "fix" here was written, found
+to be a no-op against the real CSS, and reverted rather than left in as dead code).
+
+## Remaining phases (UI-11): NOT STARTED
+
+Tracked as task #13 in this session's task list, in ui-work.txt §31 order.
+
+Next up: UI-11 (demo hardening / final QA). Per ui-work.txt's own UI-11 scope: lock down
+the deterministic demo flow, turn the manual Playwright screenshot scripts used ad hoc in
+every phase this session (UI-1 through UI-10, never committed) into a real committed
+Playwright E2E suite, confirm zero console errors and zero external runtime calls in the
+production build (ui-work.txt §26's "no Google Fonts / Mapbox cloud styles / CDNs / remote
+icon packs / OpenAI / Anthropic / internet-hosted scripts" — worth an explicit grep-based
+check of `dist/` and `index.html`, not just an assumption), do an integrated backend smoke
+test if a real backend can be started in this environment (confirm first whether WNTR/
+EPANET and the Python venv are available here before assuming), and finalize docs. This is
+the last phase per ui-work.txt §31's own ordering.
 
 ## Continuation commands
 
