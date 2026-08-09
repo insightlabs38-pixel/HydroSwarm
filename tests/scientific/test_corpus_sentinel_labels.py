@@ -67,6 +67,9 @@ def test_assign_source_regions_is_deterministic_and_bounded(network) -> None:
     assert all(0 <= region < SOURCE_REGION_COUNT for region in regions_a.values())
 
 
+#: 11 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_contamination_example_has_event_presence_true_and_valid_masks(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.CONTAMINATION)
     validate_targets_v2(example.targets, topology=example.topology)
@@ -149,6 +152,9 @@ def test_normal_scenario_at_shift_and_adversarial_stage_is_not_labeled_hydraulic
         assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.NORMAL]
 
 
+#: 27 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_event_cause_never_assigns_an_unsupported_class(network, signature_library) -> None:
     """corpus._event_cause must only ever return a SUPPORTED_EVENT_CAUSES
     member (HYDRAULIC_MISMATCH and AMBIGUOUS are governed taxonomy members

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from hydroswarm.classical.signatures import SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
 from hydroswarm.simulation.network import build_wntr_network
@@ -10,6 +12,11 @@ from hydroswarm.training.full_trajectory import build_incident_trajectory
 from hydroswarm.training.ood_categories import OODCategory
 from hydroswarm.training.scout_labels import build_signature_artifact_for_network
 from hydroswarm.training.targets_v2 import validate_targets_v2
+
+#: Every test in this module runs many real WNTR/EPANET verifications
+#: (audited call count >=10 each) -- see pyproject.toml's full_simulation
+#: marker docstring.
+pytestmark = pytest.mark.full_simulation
 
 _VALIDATED = frozenset({"reference-topology-hash"})
 

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from hydroswarm.classical.signatures import SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
 from hydroswarm.simulation.network import build_wntr_network
@@ -36,6 +38,9 @@ def _scenario(network, *, source_node: str, seed: int):
     )
 
 
+#: 25 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_trajectory_is_well_formed_with_a_no_response_comparator(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
@@ -51,6 +56,9 @@ def test_trajectory_is_well_formed_with_a_no_response_comparator(tmp_path) -> No
     assert any(label.is_no_response_comparator for label in step.labels)
 
 
+#: 25 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_every_label_targets_pass_validate_targets_v2(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
@@ -63,6 +71,9 @@ def test_every_label_targets_pass_validate_targets_v2(tmp_path) -> None:
         validate_targets_v2(target)  # must not raise -- no diagnostic keys leaked in
 
 
+#: 25 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_action_template_index_matches_the_canonical_vocabulary(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
@@ -77,6 +88,9 @@ def test_action_template_index_matches_the_canonical_vocabulary(tmp_path) -> Non
         assert ACTION_TEMPLATES[index] == label.action_template
 
 
+#: 41 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_plan_validity_is_read_from_wntr_not_the_predicted_score(tmp_path) -> None:
     from hydroswarm.domain import PlanDecision
     from hydroswarm.planning.response import PlanGenerationContext, generate_response_plans
@@ -117,6 +131,9 @@ def test_plan_validity_is_read_from_wntr_not_the_predicted_score(tmp_path) -> No
         assert (verification.decision == PlanDecision.VERIFIED) == label.plan_validity
 
 
+#: 25 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_target_pointer_masked_off_for_no_response_comparator(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
@@ -130,6 +147,9 @@ def test_target_pointer_masked_off_for_no_response_comparator(tmp_path) -> None:
             assert not bool(target["target_pointer_mask"])
 
 
+#: 25 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_link_target_pointer_resolves_against_edge_ids_not_node_ids(tmp_path) -> None:
     """core-issues3.txt Phase 3.4 repair: a LINK-target plan's target_pointer
     must resolve against edge_ids (in sorted(network.link_name_list) order),
@@ -169,6 +189,9 @@ def test_link_target_pointer_resolves_against_edge_ids_not_node_ids(tmp_path) ->
     assert node_ids[resolved_index] != isolate_label.primary_target_id or len(node_ids) != len(link_names)
 
 
+#: 25 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_node_target_pointer_uses_canonical_space_not_junction_only_order(tmp_path) -> None:
     """The old bug: target resolution used sorted(network.junction_name_list)
     (junctions only), which silently disagrees with the canonical node
@@ -241,6 +264,9 @@ def test_resolve_target_pointer_uses_the_space_the_caller_supplies_not_a_recompu
     assert canonical_index != junction_only_index
 
 
+#: 43 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")
@@ -256,6 +282,9 @@ def test_trajectory_is_deterministic_for_the_same_scenario(tmp_path) -> None:
     ]
 
 
+#: 45 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_different_scenarios_get_different_trajectory_and_incident_ids(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")

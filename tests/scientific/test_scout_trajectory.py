@@ -266,6 +266,9 @@ def _reconstruction_for(network, *, source_node: str, seed: int, sensor_count: i
     )
 
 
+#: 10 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_incremental_revelation_produces_a_genuinely_different_posterior_than_before_phase_5(tmp_path) -> None:
     """core-issues3.txt Phase 5: passing revealed_samples must change the
     computed posterior/entropy, not just filter the candidate pool (the
@@ -333,6 +336,9 @@ def test_reveal_sample_measurement_is_deterministic_and_matches_true_value_withi
     assert first >= 0.0  # concentration cannot be negative
 
 
+#: 11 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_incremental_revelation_is_deterministic(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")

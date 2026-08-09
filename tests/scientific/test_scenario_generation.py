@@ -47,6 +47,9 @@ def test_leave_one_network_family_out_is_assigned_before_simulation() -> None:
     assert planner.assign("Net1", 1234) in {DatasetSplit.TRAIN, DatasetSplit.VALIDATION}
 
 
+#: 19 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_deterministic_ids_calibration_split_and_tensor_bridge() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
@@ -88,6 +91,9 @@ def test_deterministic_ids_calibration_split_and_tensor_bridge() -> None:
     assert example.inputs["classical_prior"].sum().item() == pytest.approx(1.0)
 
 
+#: 11 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_development_holdout_split_is_distinct_from_locked_test() -> None:
     # overnight-plan.txt Phase 5's Cycle A/B "development holdout" is the
     # governed architecture-comparison iteration surface

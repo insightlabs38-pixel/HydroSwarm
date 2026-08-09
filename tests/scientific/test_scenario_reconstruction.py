@@ -67,6 +67,9 @@ def two_scenarios(pristine_network):
     return scenario_a, scenario_b
 
 
+#: 10 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_different_seeds_produce_different_network_and_hydraulic_state_hashes(
     pristine_network, two_scenarios
 ) -> None:

@@ -135,6 +135,9 @@ def calibrator(examples):
     )
 
 
+#: 17 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_raises_if_model_is_not_frozen(examples, calibrator):
     model = HydroCore.from_variant("small")
     model.train()

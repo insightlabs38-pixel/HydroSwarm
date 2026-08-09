@@ -5,11 +5,18 @@ from __future__ import annotations
 
 from uuid import uuid4
 
+import pytest
+
 from hydroswarm.planning.response import PlanGenerationContext
 from hydroswarm.simulation.network import build_wntr_network
 from hydroswarm.simulation.verifier import PlanVerifier
 from hydroswarm.simulation.wrapper import HydraulicSimulator
 from hydroswarm.training.strategist_labels import generate_strategist_labels
+
+#: Every test in this module runs many real WNTR/EPANET verifications
+#: (audited call count >=10 each) -- see pyproject.toml's full_simulation
+#: marker docstring.
+pytestmark = pytest.mark.full_simulation
 
 
 def _context(**overrides) -> PlanGenerationContext:

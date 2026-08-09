@@ -53,6 +53,9 @@ where = ["src"]
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+  "full_simulation: invokes real HydraulicSimulator/WNTR/EPANET execution >=10 times (audited call count, not merely 'lives under tests/scientific/') -- pathologically expensive under Windows' mandatory multiprocessing spawn start method (a fresh interpreter reimporting numpy/pandas/wntr/torch per call). Ubuntu CI always runs these; Windows CI's broad job excludes them via -m 'not full_simulation' and instead runs a small, deliberately curated real-simulator smoke group (see tests/scientific/test_windows_simulator_smoke.py) that proves native Windows spawn correctness once rather than paying the startup cost hundreds of times.",
+]
 
 [tool.ruff]
 line-length = 100

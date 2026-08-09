@@ -41,3 +41,9 @@ Repository benchmark files report only runs produced by the checked-in evaluatio
 No synthetic metric is presented as field accuracy, and no `VERIFIED` label is emitted
 without a complete WNTR result. Missing checkpoints, calibration, or frontend assets are
 reported explicitly rather than replaced with embedded demo claims.
+
+Native Windows is correct but not performance-equivalent to Linux/Docker for exact
+simulator-heavy workloads (Windows has no `fork()` syscall, so every real WNTR/EPANET
+call pays a fresh interpreter startup there) -- see
+[Performance: native Windows vs. Linux/Docker](INSTALLATION.md#performance-native-windows-vs-linuxdocker).
+No claim of native Windows performance parity with Linux is made.

@@ -10,6 +10,7 @@ proved out.
 
 from __future__ import annotations
 
+import pytest
 import wntr
 
 from hydroswarm.data.scenarios import CurriculumStage, DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
@@ -69,12 +70,18 @@ def _validate_and_generate_one_example(path: str, family: str):
     return scenario_to_example(scenarios[0], model, library, feature_context=feature_context), junctions
 
 
+#: 18 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_loop_grid_flows_through_the_real_corpus_pipeline() -> None:
     example, junctions = _validate_and_generate_one_example(LOOP_GRID_PATH, "loop-grid")
     assert example.inputs["node_features"].shape == (len(junctions) + 1, 19)
     assert example.targets["source_node"].item() in range(len(junctions) + 1)
 
 
+#: 14 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_coastal_branch_flows_through_the_real_corpus_pipeline() -> None:
     example, junctions = _validate_and_generate_one_example(COASTAL_BRANCH_PATH, "coastal-branch")
     assert example.inputs["node_features"].shape == (len(junctions) + 2, 19)  # + reservoir + tank

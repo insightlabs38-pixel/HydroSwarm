@@ -21,8 +21,12 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-version: ["3.12"]
     runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
+    # Generous, not tight: catches a genuine runaway/hang (e.g. a future
+    # regression reintroducing pathological per-call spawn overhead
+    # broadly rather than just in the audited full_simulation set) without
+    # making ordinary timing variance flaky.
+    timeout-minutes: 45
+    env:
       # Targeted Git-LFS hydration, not `actions/checkout`'s `lfs: true`:
       # this repo carries substantially more LFS data (full training
       # corpora, preserved checkpoints) than the test suite needs, and
@@ -32,17 +36,55 @@ jobs:
       # grepping tests/ for every data/learning-v2/**/*.safetensors path a
       # test references; see scripts/verify_lfs_test_fixtures.py's
       # REQUIRED_TENSOR_DIRS for the exact, single source of truth for
-      # this list (kept identical to the --include patterns below by
+      # this list (kept identical to the --include pattern below by
       # construction, not by convention alone).
+      LFS_REQUIRED_INCLUDE: "data/learning-v2/cycle-b2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/train/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-ood-extension/tensors-normalized/**"
+    steps:
+      - uses: actions/checkout@v4
+
+      # `shell: bash` on every Git-LFS step below: Windows' default step
+      # shell is PowerShell, but windows-latest ships Git Bash (installed
+      # alongside Git for Windows specifically for this purpose) -- using
+      # it here means these commands are identical on both matrix OSes
+      # instead of needing a second, PowerShell-flavored copy.
+      - name: Git LFS -- compute a content-derived cache key for the required fixtures
+        id: lfs-cache-key
+        shell: bash
+        run: |
+          git lfs ls-files -l --include="$LFS_REQUIRED_INCLUDE" | sort > /tmp/lfs-required-oids.txt
+          echo "hash=$(git hash-object /tmp/lfs-required-oids.txt)" >> "$GITHUB_OUTPUT"
+      # Cache is only an optimization: git lfs pull, verify_lfs_test_fixtures.py's
+      # pointer-file and manifest-SHA-256 checks below always still run --
+      # a cache hit is never trusted as a substitute for verification, and
+      # a cache miss/corruption just costs a real re-download, not a wrong
+      # test result.
+      - name: Git LFS -- restore cached objects for exactly this fixture set
+        id: lfs-cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: .git/lfs/objects
+          key: lfs-objects-${{ steps.lfs-cache-key.outputs.hash }}
       - name: Git LFS -- hydrate required test fixture paths only
+        shell: bash
         run: |
           git lfs install --local
-          git lfs pull --include="data/learning-v2/cycle-b2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/train/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-ood-extension/tensors-normalized/**"
+          time git lfs pull --include="$LFS_REQUIRED_INCLUDE"
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - name: Git LFS -- verify hydration (fails closed with a clear message)
         run: uv run --no-project python scripts/verify_lfs_test_fixtures.py
+      # Saved right after hydration+verification succeed, well before the
+      # test-running steps below -- an unrelated pytest/lint failure later
+      # in the job must not prevent a successfully hydrated+verified cache
+      # from being persisted for the next run.
+      - name: Git LFS -- save cache (only on a miss; a hit needs no re-save)
+        if: steps.lfs-cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .git/lfs/objects
+          key: lfs-objects-${{ steps.lfs-cache-key.outputs.hash }}
+
       - name: Install locked environment
         run: uv sync --all-extras --dev
       - name: Package build and editable installation
@@ -53,8 +95,38 @@ jobs:
         run: uv run ruff check src tests
       - name: Type-check
         run: uv run pyright
-      - name: Scientific and application tests with coverage
-        run: uv run pytest --cov=hydroswarm --cov-report=term-missing --cov-report=xml
+
+      # Ubuntu remains the full, authoritative backend suite: every real
+      # WNTR/EPANET scientific test, every training/data integration test,
+      # with coverage. Unchanged from before this split.
+      - name: Full scientific and application test suite with coverage (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: uv run pytest --cov=hydroswarm --cov-report=term-missing --cov-report=xml --durations=30
+
+      # Windows: broad portability/correctness suite, excluding only the
+      # audited full_simulation set (tests making >=10 real simulator
+      # calls each -- pathologically expensive under Windows' mandatory
+      # multiprocessing "spawn" start method, which pays a fresh
+      # interpreter startup importing numpy/pandas/wntr/torch per call;
+      # see pyproject.toml's full_simulation marker docstring) and the
+      # dedicated smoke file below (run separately for clear reporting,
+      # not to avoid it -- it would otherwise also match "not
+      # full_simulation" and run twice).
+      - name: Broad test suite, excluding full_simulation (Windows)
+        if: matrix.os == 'windows-latest'
+        run: uv run pytest -m "not full_simulation" --ignore=tests/scientific/test_windows_simulator_smoke.py --cov=hydroswarm --cov-report=term-missing --cov-report=xml --durations=30
+      # Separate, explicitly-reported step: proves native Windows spawn
+      # correctness for real WNTR simulation, real EPANET simulation, real
+      # timeout/child termination, real exception propagation, one exact
+      # plan-verification path, and one end-to-end API incident workflow
+      # -- once, not hundreds of times. No sys.platform faking; on a real
+      # windows-latest runner this genuinely exercises "spawn" because
+      # HydraulicSimulator._run_with_timeout's own context selection sees
+      # a real win32 platform here.
+      - name: Real-simulator smoke group (Windows)
+        if: matrix.os == 'windows-latest'
+        run: uv run pytest tests/scientific/test_windows_simulator_smoke.py -v --durations=10
+
       - name: Offline self-test
         run: uv run hydroswarm self-test
       - uses: actions/upload-artifact@v4

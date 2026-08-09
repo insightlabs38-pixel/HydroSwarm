@@ -33,6 +33,11 @@ from hydroswarm.preprocessing.schema import DEFAULT_FEATURE_SCHEMA, Normalizatio
 from hydroswarm.training.corpus import build_feature_context, fit_signature_library, scenario_to_example  # noqa: E402
 from hydroswarm.training.sharded_data import write_shards  # noqa: E402
 
+#: Every test in this module runs many real WNTR/EPANET verifications
+#: (audited call count >=10 each) -- see pyproject.toml's full_simulation
+#: marker docstring.
+pytestmark = pytest.mark.full_simulation
+
 _FAMILIES = TRAIN_TOPOLOGIES[:2]  # (golden-reference, branched-loop)
 _SPLIT_COUNTS = ((DatasetSplit.TRAIN, 8), (DatasetSplit.CALIBRATION, 4))
 

@@ -50,6 +50,9 @@ def test_severe_missingness_recipe_never_selects_clean_stage() -> None:
     assert CurriculumStage.CLEAN not in stages
 
 
+#: 27 real WNTR/EPANET verifications per parametrized category (audited
+#: call count) -- see pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 @pytest.mark.parametrize("category_name", sorted(category.value for category in OOD_TRIGGERING_CONFIG_OVERRIDES))
 def test_recipe_reliably_triggers_its_category_at_real_scale(category_name: str, tmp_path: Path) -> None:
     overrides = {category.value: overrides for category, overrides in OOD_TRIGGERING_CONFIG_OVERRIDES.items()}[

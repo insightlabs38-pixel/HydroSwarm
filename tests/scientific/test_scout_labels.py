@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from hydroswarm.classical.signatures import SignatureCache, SignatureCacheKey
 from hydroswarm.data.scenarios import DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
 from hydroswarm.sampling.active import SamplingConstraints
@@ -135,6 +137,9 @@ def test_scout_label_respects_accessibility_constraints(tmp_path) -> None:
     assert label.should_continue_sampling is False
 
 
+#: 12 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_information_gain_is_nonnegative_within_tolerance(tmp_path) -> None:
     network = build_wntr_network()
     artifact = _fast_artifact(network, tmp_path / "cache")

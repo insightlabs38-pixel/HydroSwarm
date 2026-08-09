@@ -107,6 +107,9 @@ def test_future_concentration_is_always_fully_masked_disabled_pending_a_cutoff_a
     assert not bool(beyond_simulated_duration["future_concentration_mask"].any())
 
 
+#: 11 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_future_concentration_disable_is_justified_by_real_input_window_leakage() -> None:
     """Proves the leakage claim in future_concentration_target's docstring
     is real, not hypothetical: the base ScenarioExample's temporal input

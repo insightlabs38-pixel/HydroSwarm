@@ -19,10 +19,17 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO_ROOT / "scripts"))
 
 import run_train_serve_parity_gate as gate  # noqa: E402
+
+#: Every test in this module runs many real WNTR/EPANET verifications
+#: (audited call count >=10 each) -- see pyproject.toml's full_simulation
+#: marker docstring.
+pytestmark = pytest.mark.full_simulation
 
 
 def _run() -> dict:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pytest
 import torch
 
 from hydroswarm.data.scenarios import CurriculumStage, DatasetSplit, ScenarioGenerationConfig, WNTRScenarioGenerator
@@ -139,6 +140,9 @@ def test_supported_and_unsupported_ood_categories_partition_the_full_taxonomy() 
     assert SUPPORTED_OOD_CATEGORIES & UNSUPPORTED_OOD_CATEGORIES == frozenset()
 
 
+#: 28 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_classify_ood_category_never_returns_an_unsupported_category(tmp_path) -> None:
     """core-issues3.txt Phase 6.2: the SUPPORTED_OOD_CATEGORIES registry
     must match classify_ood_category's real behavior, not silently drift
@@ -165,6 +169,9 @@ def test_classify_ood_category_never_returns_an_unsupported_category(tmp_path) -
             assert category in SUPPORTED_OOD_CATEGORIES
 
 
+#: 30 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_every_recipe_override_reliably_triggers_its_category(tmp_path) -> None:
     """core-issues3.txt Phase 6.3: OOD_TRIGGERING_CONFIG_OVERRIDES is the
     reusable recipe a future balanced-OOD corpus-generation pass would use

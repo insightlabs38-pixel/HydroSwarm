@@ -15,6 +15,11 @@ import generate_trajectory_corpus  # noqa: E402
 
 from test_run_corpus_gates import _build_mini_corpus  # noqa: E402
 
+#: Every test in this module runs many real WNTR/EPANET verifications
+#: (audited call count >=10 each) -- see pyproject.toml's full_simulation
+#: marker docstring.
+pytestmark = pytest.mark.full_simulation
+
 
 @pytest.fixture(scope="module")
 def mini_corpus(tmp_path_factory) -> Path:

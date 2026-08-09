@@ -636,25 +636,35 @@ class HydraulicSimulator:
             name=f"hydroswarm-{operation}",
             daemon=True,
         )
-        process.start()
-        process.join(self.timeout_seconds)
-        if process.is_alive():
-            process.terminate()
-            process.join(5.0)
-            if process.is_alive():
-                process.kill()
-                process.join()
-            raise SimulationTimeoutError(
-                f"{operation} exceeded the {self.timeout_seconds:g}-second timeout"
-            )
         try:
-            succeeded, value = result_queue.get_nowait()
-        except queue.Empty:
-            raise SimulationError(
-                f"{operation} worker exited without a result (exit code {process.exitcode})"
-            ) from None
+            process.start()
+            process.join(self.timeout_seconds)
+            if process.is_alive():
+                process.terminate()
+                process.join(5.0)
+                if process.is_alive():
+                    process.kill()
+                    process.join()
+                raise SimulationTimeoutError(
+                    f"{operation} exceeded the {self.timeout_seconds:g}-second timeout"
+                )
+            try:
+                succeeded, value = result_queue.get_nowait()
+            except queue.Empty:
+                raise SimulationError(
+                    f"{operation} worker exited without a result (exit code {process.exitcode})"
+                ) from None
+            finally:
+                process.join()
         finally:
-            process.join()
+            # Release the Queue's background feeder-thread/fd and the
+            # Process object's own OS handle explicitly on every exit path
+            # (success, timeout, or worker-exited-empty) rather than
+            # leaving them for eventual GC -- real, if minor, avoidable
+            # per-call resource accumulation on a path called this often.
+            result_queue.close()
+            result_queue.join_thread()
+            process.close()
         if not succeeded:
             raise value
         return value

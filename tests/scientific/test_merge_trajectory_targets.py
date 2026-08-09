@@ -40,6 +40,9 @@ def trajectory_jsonl(mini_corpus, tmp_path_factory) -> Path:
     return output / "train.jsonl"
 
 
+#: 822 real WNTR/EPANET verifications (audited call count) -- see
+#: pyproject.toml's full_simulation marker docstring.
+@pytest.mark.full_simulation
 def test_every_example_is_matched_and_enriched(mini_corpus, trajectory_jsonl, tmp_path) -> None:
     output = tmp_path / "merged"
     result = merge_trajectory_targets.merge(
