@@ -138,6 +138,36 @@ export interface ApprovalReceipt {
   approvedAt: string;
 }
 
+/** A minimal, honest slice of hydroswarm.domain.schemas.IncidentState --
+ * only the fields this console actually renders (ui-work.txt UI-8's
+ * "no fake historical state": the real /replay endpoint returns the
+ * incident's *current* raw state, not a historical snapshot, so this
+ * type must never be presented as a point-in-time replay frame). This
+ * happens to be the only place `exact_simulations_used`/
+ * `plans_exactly_verified`/`exact_simulation_cache_hits`/
+ * `remaining_epanet_budget` are exposed to the console today -- a known
+ * gap on IncidentView (see UI-3/UI-5 handoff notes), closed here at zero
+ * backend cost since /replay already returns them. */
+export interface ReplayIncidentState {
+  incidentId: string;
+  networkId: string;
+  status: string;
+  sampleCount: number;
+  approvalPending: boolean;
+  oodLevel: string;
+  exactSimulationsUsed: number;
+  plansExactlyVerified: number;
+  exactSimulationCacheHits: number;
+  remainingEpanetBudget: number;
+}
+
+/** Mirrors hydroswarm.api.state.ReplayResponse field-for-field. */
+export interface ReplayResult {
+  state: ReplayIncidentState;
+  events: AuditEvent[];
+  chainValid: boolean;
+}
+
 /**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *

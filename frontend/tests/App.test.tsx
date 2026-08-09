@@ -71,6 +71,18 @@ test('a workspace with no implementation yet shows an honest placeholder, never 
   ).toBeVisible();
 });
 
+test('Replay workspace renders the real event ledger, disables hash-chain verification in DEMO_FALLBACK, and lists every failure-injection category as a real link', async () => {
+  const user = userEvent.setup();
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: /^Replay/ }));
+  expect(await screen.findByRole('heading', { name: 'Event ledger' })).toBeVisible();
+  expect(screen.getByText('Verification is not available in this mode.')).toBeVisible();
+  expect(screen.queryByRole('button', { name: 'Verify hash chain' })).toBeNull();
+  const link = screen.getByRole('link', { name: /missing checkpoint/ });
+  expect(link).toHaveAttribute('href', '?failure=missing_checkpoint');
+});
+
 test('Approval workspace never performs a real approval mutation in DEMO_FALLBACK mode', async () => {
   const user = userEvent.setup();
   renderApp();
@@ -157,6 +169,7 @@ test.each([
   ['Sampling', 'Evidence status'],
   ['Response', 'Action sequence'],
   ['Approval', 'Operator approval'],
+  ['Replay', 'Event ledger'],
 ] as const)('%s workspace has no automated accessibility violations', async (rail, heading) => {
   const user = userEvent.setup();
   const { container } = renderApp();

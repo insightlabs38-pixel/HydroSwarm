@@ -340,6 +340,33 @@
   color: var(--green);
 }
 
+/* ---------- Replay / failure injection ---------- */
+
+.failure-injection-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.6rem;
+}
+.failure-injection-list li {
+  border: 1px solid var(--border);
+  border-radius: var(--shell-panel-radius);
+  padding: 0.6rem 0.7rem;
+}
+.failure-injection-list a {
+  display: block;
+  color: var(--cyan);
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+.failure-injection-list .supporting {
+  margin: 0;
+}
+
 /* ---------- Decision inspector ---------- */
 
 .decision-inspector {

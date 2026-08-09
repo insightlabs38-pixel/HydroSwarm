@@ -5,7 +5,6 @@ import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 
 const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {
-  replay: 'UI-8 (replay/failure/demo) adds the selected replay-event detail here.',
   network: 'UI-9 (utilities) adds network import/validation detail here.',
   authority: 'UI-9 (utilities) adds the Decision Certificate authority table here.',
 };
@@ -210,6 +209,40 @@ function ApprovalSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
+/** ui-work.txt 13.6: the selected replay event's detail. */
+function ReplaySummary({ incident }: { incident: IncidentView }) {
+  const { selectedAuditSequence } = useConsoleStore();
+  const event = incident.audit.find((item) => item.sequence === selectedAuditSequence);
+  if (!event) {
+    return (
+      <EmptyState title="No event selected." detail="Select an event from the event ledger." />
+    );
+  }
+  return (
+    <div className="inspector-stack">
+      <dl className="key-value-grid">
+        <div>
+          <dt>Sequence</dt>
+          <dd>{event.sequence}</dd>
+        </div>
+        <div>
+          <dt>Timestamp</dt>
+          <dd className="mono">{event.timestamp}</dd>
+        </div>
+        <div>
+          <dt>Actor</dt>
+          <dd>{event.actor}</dd>
+        </div>
+        <div>
+          <dt>Type</dt>
+          <dd>{event.type.replaceAll('_', ' ')}</dd>
+        </div>
+      </dl>
+      <p className="supporting">{event.detail}</p>
+    </div>
+  );
+}
+
 export function DecisionInspector({ incident }: { incident: IncidentView }) {
   const { workspace, inspectorCollapsed, toggleInspector } = useConsoleStore();
 
@@ -237,6 +270,8 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
     body = <ResponseSummary incident={incident} />;
   } else if (workspace === 'approval') {
     body = <ApprovalSummary incident={incident} />;
+  } else if (workspace === 'replay') {
+    body = <ReplaySummary incident={incident} />;
   } else if (workspace === 'validation') {
     body = (
       <p className="supporting">

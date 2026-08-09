@@ -38,7 +38,7 @@ export const FAILURE_INJECTION_CATEGORIES = [
 
 export type FailureInjectionCategory = (typeof FAILURE_INJECTION_CATEGORIES)[number];
 
-const FAILURE_INJECTION_REASONS: Record<FailureInjectionCategory, string> = {
+export const FAILURE_INJECTION_REASONS: Record<FailureInjectionCategory, string> = {
   missing_checkpoint:
     'No trained checkpoint is present at the configured path. Falling back to classical-only mode is not simulated here; this demonstration shows the fail-closed ERROR state instead of a false LIVE result.',
   corrupt_checkpoint_hash:
