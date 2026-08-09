@@ -26,6 +26,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   13. `4d50e37` — `feat(ui): implement guarded human plan-approval workflow` (UI-6)
   14. `ab347f5` — `docs(handoff): record UI-6 completion and demo-fixture invariant lesson`
   15. `8c4f38b` — `feat(ui): add synchronized technical evidence dock` (UI-7)
+  16. `51c7ff5` — `docs(handoff): record UI-7 completion`
+  17. `8d7cba7` — `feat(ui): add deterministic replay and fail-closed demo states` (UI-8)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -274,26 +276,42 @@ to the recommended plan the way every workspace since UI-3 does (fixed to match)
 added axe coverage for the Source/Sampling/Response/Approval workspace bodies (UI-1 only
 ever checked the default Incident view) — all pass with zero violations.
 
-## Remaining phases (UI-8 through UI-11): NOT STARTED
+## UI-8 — replay/failure/demo: COMPLETE
 
-Tracked as tasks #10–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `8d7cba7` message for full detail. Confirmed by reading the backend first
+(per the note left in the UI-7 handoff): `/replay`'s `state` field is the incident's
+*current* raw state, not a historical snapshot, so there really is no historical
+map/chart data to replay — this backend only supports real event-ledger replay, and the
+new `ReplayWorkspace` never pretends otherwise. Also closed the "exact-run budget" gap
+(flagged after UI-3/UI-5) at zero backend cost, since `/replay`'s state already carries
+those fields. **`mode: 'REPLAY'` remains genuinely unset by any code path** — there is
+no feature today that constructs a full historical `IncidentView` (nodes/links/
+candidates/plans) from a stored trajectory, and fabricating one just to exercise
+`ModeBanner`'s REPLAY branch would violate ui-work.txt 34's "fabricate replay state".
+That branch stays defined-but-dormant until (if ever) a real "load a stored trajectory"
+feature is built — this is a deliberate honesty choice, not a gap to close later.
+
+## Remaining phases (UI-9 through UI-11): NOT STARTED
+
+Tracked as tasks #11–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-8 (replay/failure/demo). Some of this already exists from before this
-session (the `?failure=<category>` query-param failure-injection mechanism in
-api/incident.ts, covered by tests/api-incident.test.ts). What's likely still needed:
-an actual Replay workspace (currently still a NOT_YET_MIGRATED placeholder — check
-`POST /incidents/{id}/replay`, confirmed present, returns `ReplayResponse{state, events,
-chain_valid}`), replay controls using the existing `replayIndex`/`replayPlaying`/
-`replaySpeed` store fields (already built for the dock's Timeline tab — likely
-reusable/shared rather than rebuilt), mode-banner labeling for REPLAY (ModeBanner
-already handles this mode from UI-1, just unexercised by any real code path yet since
-nothing ever sets `mode: 'REPLAY'`), and verifying "no fake historical state" (the map/
-charts must only animate real historical frames if the replay endpoint actually
-provides them — check what `ReplayResponse` actually contains before building anything
-that assumes more than that).
+Next up: UI-9 (utilities: Network, Validation, Model & Authority, Benchmarks). Validation
+and Benchmarks are already migrated into the shell (mounting the pre-existing
+`ValidationPage`/`BenchmarkPage`, done in UI-1). Still needed: a **Network** workspace
+(confirmed present: `GET /api/networks`, `POST /api/networks/import`,
+`GET /api/networks/{id}`, `POST /api/networks/{id}/validate`, returning `NetworkRecord`
+— node/link counts, sha256, validation_errors, geojson; no live endpoint consumption
+exists anywhere in the frontend yet, this would be the first) and a **Model & Authority**
+workspace (the `/authority` endpoint is already wired for `source_localization`/
+`scout_recommendation`/`ood_state`/`plan_consequence:*` certificates from UI-3 onward,
+but nothing shows them as a single governance table the way ui-work.txt §16 wants —
+"Which subsystem is allowed to be authoritative for which decision?" — plus
+`ModelGovernanceTable.tsx`'s existing static `public/model-governance.json` consumption,
+unrelated but adjacent). `AuditPage.tsx`/`TopologyPage.tsx` remain unrouted from UI-1;
+worth a final decision on whether Topology gets a home in this phase or stays parked.
 
 ## Continuation commands
 
