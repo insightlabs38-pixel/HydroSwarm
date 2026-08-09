@@ -281,14 +281,24 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.1rem 1.2rem;
-  background: linear-gradient(100deg, #14313a, #0d242d);
-  border: 1px solid #31545f;
-  border-left: 4px solid var(--amber);
+  padding: 0.75rem 1rem;
+  background: var(--panel-raised);
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--shell-panel-radius);
 }
 .decision-banner p:last-child {
   color: var(--muted);
   margin-bottom: 0;
+}
+/* ui-work.txt "UI-10.5" 3.A "no giant banner" / 6 "no giant KPI text": the
+ * global h1 scale (up to 2.15rem/34px, sized for a full-page document
+ * title) is oversized for this compact incident-state strip and was the
+ * main reason it wrapped to two lines and pushed the map further below
+ * the fold at laptop heights. */
+.decision-banner h1 {
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
 }
 .decision-badges {
   display: flex;
@@ -296,10 +306,31 @@ footer {
   flex-wrap: wrap;
   justify-content: end;
 }
+/* ui-work.txt "UI-10.5" 3.C: three small at-a-glance panels below the
+ * dominant map, each linking to its dedicated workspace instead of
+ * repeating that workspace's full content. */
+.incident-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+.panel-nav-link {
+  display: block;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0 0.6rem;
+  border: none;
+  background: none;
+  color: var(--cyan);
+  font-size: 11px;
+  text-align: left;
+}
+.panel-nav-link:hover {
+  text-decoration: underline;
+}
 .panel {
-  background: linear-gradient(145deg, rgba(15, 37, 47, 0.96), rgba(9, 27, 36, 0.96));
+  background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: var(--shell-panel-radius);
   overflow: hidden;
   min-width: 0;
 }
@@ -335,9 +366,14 @@ footer {
   grid-column: 1 / -1;
   padding-bottom: 1rem;
 }
+/* ui-work.txt "UI-10.5" 4: the operational map is the primary instrument,
+ * so its height scales with the viewport instead of a fixed 530px that
+ * left it comparatively small on 1080px-tall screens and clipped below
+ * the fold on 768px-tall ones once the technical dock's default 240px
+ * was accounted for. */
 .map-shell {
   position: relative;
-  height: 530px;
+  height: clamp(420px, 62vh, 720px);
 }
 .map-canvas {
   position: absolute;

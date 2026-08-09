@@ -1,8 +1,14 @@
 import type { ReactNode } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import type { IncidentView } from '../types';
 import { useConsoleStore } from '../store';
+import { fetchAuthorityCertificates } from '../api/authority';
+import { demoAuthorityCertificates } from '../demoFixture';
 import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
+import { AuthorityBadge } from '../components/status/AuthorityBadge';
+import { ApplicabilityBadge } from '../components/status/ApplicabilityBadge';
+import { KeyValueGrid } from '../components/common/KeyValueGrid';
 
 // Defensive fallback only -- every Workspace value is handled explicitly
 // below; this stays empty and exists so an unhandled future workspace
@@ -76,10 +82,27 @@ function IncidentSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
-/** ui-work.txt 13.2: real-time summary only -- the full authority
- * certificate and grounded explanation live in the Source workspace
- * body (a separate query), not duplicated here. */
+/** ui-work.txt 13.2: real-time summary. Full ranked candidates, the full
+ * authority certificate, and the grounded explanation stay PRIMARY in the
+ * Source workspace body (ui-work.txt "UI-10.5" 8's duplication rule) --
+ * this queries the same `['authority', incident.id]` cache the Source
+ * workspace populates (TanStack Query dedupes by key, so this never
+ * double-fetches) purely to surface a compact current
+ * authority/applicability summary here, per "UI-10.5" 2's SOURCE list. */
 function SourceSummary({ incident }: { incident: IncidentView }) {
+  const authorityQuery = useQuery({
+    queryKey: ['authority', incident.id],
+    queryFn: ({ signal }) => fetchAuthorityCertificates(incident.id, signal),
+    enabled: incident.mode === 'LIVE',
+  });
+  const certificates =
+    incident.mode === 'LIVE'
+      ? (authorityQuery.data ?? [])
+      : incident.mode === 'DEMO_FALLBACK'
+        ? demoAuthorityCertificates
+        : [];
+  const sourceCertificate = certificates.find((cert) => cert.name === 'source_localization');
+
   if (incident.candidates.length === 0) {
     return <EmptyState title="No source candidates for this incident." />;
   }
@@ -103,6 +126,14 @@ function SourceSummary({ incident }: { incident: IncidentView }) {
           <dd>{Math.round(incident.candidateCoverage * 100)}%</dd>
         </div>
         <div>
+          <dt>Held-out measured coverage</dt>
+          <dd>
+            {typeof incident.measuredCoverage === 'number'
+              ? `${Math.round(incident.measuredCoverage * 100)}%`
+              : 'not measured'}
+          </dd>
+        </div>
+        <div>
           <dt>Calibration</dt>
           <dd>{incident.calibrationValid ? 'valid' : 'invalid'}</dd>
         </div>
@@ -115,6 +146,12 @@ function SourceSummary({ incident }: { incident: IncidentView }) {
           <dd>{incident.ood}</dd>
         </div>
       </dl>
+      {sourceCertificate && (
+        <div className="decision-badges">
+          <AuthorityBadge authority={sourceCertificate.authority} />
+          <ApplicabilityBadge applicability={sourceCertificate.applicability} />
+        </div>
+      )}
     </div>
   );
 }
@@ -142,10 +179,14 @@ function SamplingSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
-/** ui-work.txt 13.4: full plan/verification detail (and the Pareto
- * frontier, a separate query) lives in the Response workspace body --
- * this is the always-available real-time summary for whichever plan is
- * selected (falling back to the recommended plan). */
+/** ui-work.txt "UI-10.5" 2 RESPONSE: this becomes the PRIMARY selected-plan
+ * decision panel (identity, decision, CURRENT/STALE, simulator identity,
+ * margins, numerical sensitivity, rejection/abstention reason, compact
+ * action count) -- the full ordered action sequence, plan comparison
+ * table, and Pareto frontier stay PRIMARY in the Response workspace body,
+ * and the full forensic verification record (every hash, verified-at,
+ * worst-case consequences) stays PRIMARY in TechnicalDock > Verification
+ * (ui-work.txt "UI-10.5" 8's duplication rule). */
 function ResponseSummary({ incident }: { incident: IncidentView }) {
   const { selectedPlanId } = useConsoleStore();
   const plan =
@@ -155,24 +196,78 @@ function ResponseSummary({ incident }: { incident: IncidentView }) {
   if (!plan) {
     return <EmptyState title="No response plans available for this incident." />;
   }
+  const verification = plan.verification;
+  const consequences = verification?.consequences ?? null;
   return (
     <div className="inspector-stack">
       <p className="supporting">
         {plan.id} · {plan.name}
       </p>
-      <StatusBadge
-        tone={
-          plan.status === 'RECOMMENDED' || plan.status === 'VALID'
-            ? 'good'
-            : plan.status === 'REJECTED'
-              ? 'danger'
-              : 'warn'
-        }
-      >
-        {plan.status}
-      </StatusBadge>
-      {plan.verification && (
-        <p className="supporting">Verification: {plan.verification.verificationStatus}</p>
+      <div className="decision-badges">
+        <StatusBadge
+          tone={
+            verification
+              ? verification.decision === 'VERIFIED'
+                ? 'good'
+                : verification.decision === 'REJECTED'
+                  ? 'danger'
+                  : 'warn'
+              : plan.status === 'REJECTED'
+                ? 'danger'
+                : 'warn'
+          }
+        >
+          {verification ? verification.decision : plan.status}
+        </StatusBadge>
+        {verification && (
+          <StatusBadge tone={verification.verificationStatus === 'CURRENT' ? 'good' : 'danger'}>
+            {verification.verificationStatus}
+          </StatusBadge>
+        )}
+      </div>
+      {verification && (
+        <KeyValueGrid
+          entries={[
+            {
+              key: 'simulator',
+              label: 'Simulator',
+              value: `${verification.simulator} ${verification.simulatorVersion}`,
+            },
+          ]}
+        />
+      )}
+      {consequences && (
+        <KeyValueGrid
+          entries={[
+            {
+              key: 'pressure-margin',
+              label: 'Pressure margin',
+              value:
+                consequences.pressureMarginM === null
+                  ? null
+                  : `${consequences.pressureMarginM.toFixed(1)} m`,
+            },
+            {
+              key: 'service-margin',
+              label: 'Service margin',
+              value:
+                consequences.serviceAvailabilityMargin === null
+                  ? null
+                  : `${(consequences.serviceAvailabilityMargin * 100).toFixed(1)} pp`,
+            },
+            {
+              key: 'sensitive',
+              label: 'Numerically sensitive',
+              value: consequences.numericallySensitive ? 'yes' : 'no',
+            },
+          ]}
+        />
+      )}
+      {verification && verification.rejectionCodes.length > 0 && (
+        <p className="supporting">Rejection codes: {verification.rejectionCodes.join(', ')}</p>
+      )}
+      {verification?.abstentionReason && (
+        <p className="supporting">Abstention reason: {verification.abstentionReason}</p>
       )}
       <p className="supporting">{plan.actions.length} action(s) in this plan.</p>
     </div>

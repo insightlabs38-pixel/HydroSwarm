@@ -20,6 +20,15 @@ const OperationalMap = lazy(() =>
  * calibration, disagreement, OOD, grounded WHY_SOURCE explanation) or
  * comes from the real GET /incidents/{id}/authority endpoint in LIVE
  * mode -- never inferred or fabricated (ui-work.txt 9.2).
+ *
+ * ui-work.txt "UI-10.5" 2: no local `.right-rail` beside the map -- the
+ * compact calibration/disagreement/authority summary now lives PRIMARY in
+ * the global DecisionInspector (see DecisionInspector.tsx SourceSummary).
+ * This workspace stacks its full-detail panels (map, ranked candidates,
+ * authority certificate, grounded explanation) below the large map
+ * instead, per "UI-10.5" 2's "1. large operational network map; 2. ranked
+ * candidate distribution; 3. Decision Certificate / authority detail;
+ * 4. grounded explanation" ordering.
  */
 export function SourceWorkspace({ incident }: { incident: IncidentView }) {
   const authorityQuery = useQuery({
@@ -41,7 +50,7 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
 
   return (
     <div className="workspace-grid">
-      <Panel title="Network" eyebrow="2D HYDRAULIC STATE" className="map-panel">
+      <Panel title="Network" eyebrow="2D HYDRAULIC STATE" className="map-panel wide-panel">
         <Suspense
           fallback={
             <div className="visual-loading" role="status">
@@ -52,51 +61,6 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
           <OperationalMap incident={incident} />
         </Suspense>
       </Panel>
-      <aside className="right-rail" aria-label="Calibration and disagreement">
-        <Panel title="Calibrated candidate set" eyebrow="CONFORMAL CALIBRATION">
-          <dl className="key-value-grid">
-            <div>
-              <dt>Candidate-set size</dt>
-              <dd>{incident.candidates.length}</dd>
-            </div>
-            <div>
-              <dt>Conformal target</dt>
-              <dd>{Math.round(incident.candidateCoverage * 100)}%</dd>
-            </div>
-            <div>
-              <dt>Held-out measured coverage</dt>
-              <dd>
-                {typeof incident.measuredCoverage === 'number'
-                  ? `${Math.round(incident.measuredCoverage * 100)}%`
-                  : 'not measured'}
-              </dd>
-            </div>
-            <div>
-              <dt>Calibration state</dt>
-              <dd>{incident.calibrationValid ? 'valid' : 'invalid'}</dd>
-            </div>
-          </dl>
-          <p className="supporting">
-            The conformal target sizes the calibrated candidate set for this network; it is not a
-            per-incident correctness probability.
-          </p>
-        </Panel>
-        <Panel title="Classical / neural disagreement" eyebrow="FUSION DIAGNOSTICS">
-          <p className="supporting">
-            Jensen-Shannon disagreement:{' '}
-            <strong>{(incident.disagreement * 100).toFixed(1)}%</strong>
-          </p>
-          <StatusBadge tone={incident.ood === 'NORMAL' ? 'good' : 'warn'}>
-            OOD {incident.ood}
-          </StatusBadge>
-          {incident.runtimeAnalysisMode === 'CLASSICAL_SAFE' && (
-            <p className="supporting">
-              Running in CLASSICAL_SAFE mode (the neural pipeline did not run for this incident);
-              the exact reason is not yet exposed to the console.
-            </p>
-          )}
-        </Panel>
-      </aside>
       <Panel title="Ranked source candidates" eyebrow="SENTINEL" className="wide-panel">
         {incident.candidates.length === 0 ? (
           <EmptyState title="No source candidates for this incident." />
@@ -114,6 +78,12 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
               </div>
             ))}
           </div>
+        )}
+        {incident.runtimeAnalysisMode === 'CLASSICAL_SAFE' && (
+          <p className="supporting">
+            Running in CLASSICAL_SAFE mode (the neural pipeline did not run for this incident); the
+            exact reason is not yet exposed to the console.
+          </p>
         )}
       </Panel>
       <Panel

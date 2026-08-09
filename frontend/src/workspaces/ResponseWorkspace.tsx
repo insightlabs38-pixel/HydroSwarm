@@ -2,17 +2,14 @@ import { lazy, Suspense, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { IncidentView } from '../types';
 import { fetchParetoFrontier } from '../api/planning';
-import { fetchAuthorityCertificates } from '../api/authority';
-import { demoAuthorityCertificates, demoParetoFrontier } from '../demoFixture';
+import { demoParetoFrontier } from '../demoFixture';
 import { useConsoleStore } from '../store';
 import { Panel } from '../components/Panel';
-import { StatusBadge } from '../components/StatusBadge';
 import { PlanTable } from '../components/PlanTable';
-import { AuthorityBadge } from '../components/status/AuthorityBadge';
+import { Counterfactuals } from '../components/Counterfactuals';
 import { PlanActionSequence } from '../components/plans/PlanActionSequence';
 import { ParetoFrontier } from '../components/plans/ParetoFrontier';
 import { EmptyState } from '../components/common/EmptyState';
-import { KeyValueGrid } from '../components/common/KeyValueGrid';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
@@ -25,6 +22,21 @@ const OperationalMap = lazy(() =>
  * verified Pareto frontier -- consuming the real GET
  * /incidents/{id}/frontier endpoint and the plan_consequence:{plan_id}
  * authority certificates from the same /authority endpoint UI-3 wired.
+ *
+ * ui-work.txt "UI-10.5" 2: no local `.right-rail` beside the map. The
+ * selected plan's decision state (identity, VERIFIED/REJECTED/ABSTAINED,
+ * CURRENT/STALE, simulator identity, hashes, margins, numerical
+ * sensitivity, rejection/abstention reason) moved PRIMARY to the global
+ * DecisionInspector (see DecisionInspector.tsx ResponseSummary); the full
+ * forensic verification record (every hash, worst-case consequences,
+ * verified-at) stays PRIMARY in TechnicalDock > Verification, which
+ * already covered every one of those fields before this phase. This
+ * workspace keeps the map, plan comparison, Pareto frontier, the
+ * no-response counterfactual comparator (moved here from the old Incident
+ * "everything dashboard" -- "UI-10.5" 3.D -- since it is a plan-comparison
+ * view, not incident-overview content), the full ordered action sequence,
+ * and the grounded comparison/rejection explanations as its own PRIMARY
+ * content, per "UI-10.5" 2's RESPONSE ordering.
  */
 export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
   const { selectedPlanId, selectPlan, frontierMode } = useConsoleStore();
@@ -39,26 +51,12 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
     queryFn: ({ signal }) => fetchParetoFrontier(incident.id, frontierMode, signal),
     enabled: incident.mode === 'LIVE',
   });
-  const authorityQuery = useQuery({
-    queryKey: ['authority', incident.id],
-    queryFn: ({ signal }) => fetchAuthorityCertificates(incident.id, signal),
-    enabled: incident.mode === 'LIVE',
-  });
   const frontier =
     incident.mode === 'LIVE'
       ? (frontierQuery.data ?? [])
       : incident.mode === 'DEMO_FALLBACK'
         ? demoParetoFrontier
         : [];
-  const certificates =
-    incident.mode === 'LIVE'
-      ? (authorityQuery.data ?? [])
-      : incident.mode === 'DEMO_FALLBACK'
-        ? demoAuthorityCertificates
-        : [];
-  const planCertificate = activePlan
-    ? certificates.find((cert) => cert.name === `plan_consequence:${activePlan.id}`)
-    : undefined;
   const whyRejected = useMemo(
     () => incident.explanations.find((item) => item.intent === 'WHY_PLAN_REJECTED'),
     [incident.explanations],
@@ -70,7 +68,7 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
 
   return (
     <div className="workspace-grid">
-      <Panel title="Network" eyebrow="RESPONSE ACTION OVERLAY" className="map-panel">
+      <Panel title="Network" eyebrow="RESPONSE ACTION OVERLAY" className="map-panel wide-panel">
         <Suspense
           fallback={
             <div className="visual-loading" role="status">
@@ -81,131 +79,6 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
           <OperationalMap incident={incident} />
         </Suspense>
       </Panel>
-      <aside className="right-rail" aria-label="Selected plan verification">
-        {activePlan ? (
-          <Panel title={`${activePlan.id} · ${activePlan.name}`} eyebrow="VERIFICATION">
-            {activePlan.verification ? (
-              <>
-                <div className="decision-badges">
-                  <StatusBadge
-                    tone={
-                      activePlan.verification.decision === 'VERIFIED'
-                        ? 'good'
-                        : activePlan.verification.decision === 'REJECTED'
-                          ? 'danger'
-                          : 'warn'
-                    }
-                  >
-                    {activePlan.verification.decision}
-                  </StatusBadge>
-                  <StatusBadge
-                    tone={
-                      activePlan.verification.verificationStatus === 'CURRENT' ? 'good' : 'danger'
-                    }
-                  >
-                    {activePlan.verification.verificationStatus}
-                  </StatusBadge>
-                  {planCertificate && <AuthorityBadge authority={planCertificate.authority} />}
-                </div>
-                {activePlan.verification.verificationStatus === 'STALE' && (
-                  <p className="supporting">
-                    Verification is stale because incident evidence or verification context changed.
-                    Re-verify before approval.
-                  </p>
-                )}
-                <KeyValueGrid
-                  entries={[
-                    {
-                      key: 'simulator',
-                      label: 'Simulator',
-                      value: `${activePlan.verification.simulator} ${activePlan.verification.simulatorVersion}`,
-                    },
-                    {
-                      key: 'state-hash',
-                      label: 'State hash',
-                      value: activePlan.verification.stateHash,
-                      hash: true,
-                    },
-                    {
-                      key: 'context-hash',
-                      label: 'Context hash',
-                      value: activePlan.verification.contextHash,
-                      hash: true,
-                    },
-                  ]}
-                />
-                {activePlan.verification.consequences && (
-                  <>
-                    <h3>Expected consequences</h3>
-                    <KeyValueGrid
-                      entries={[
-                        {
-                          key: 'pressure-margin',
-                          label: 'Pressure margin',
-                          value:
-                            activePlan.verification.consequences.pressureMarginM === null
-                              ? null
-                              : `${activePlan.verification.consequences.pressureMarginM.toFixed(1)} m`,
-                        },
-                        {
-                          key: 'service-margin',
-                          label: 'Service margin',
-                          value:
-                            activePlan.verification.consequences.serviceAvailabilityMargin === null
-                              ? null
-                              : `${(activePlan.verification.consequences.serviceAvailabilityMargin * 100).toFixed(1)} pp`,
-                        },
-                        {
-                          key: 'sensitive',
-                          label: 'Numerically sensitive',
-                          value: activePlan.verification.consequences.numericallySensitive
-                            ? 'yes'
-                            : 'no',
-                        },
-                      ]}
-                    />
-                  </>
-                )}
-                {activePlan.verification.worstCaseConsequences && (
-                  <>
-                    <h3>Worst case</h3>
-                    <KeyValueGrid
-                      entries={[
-                        {
-                          key: 'worst-pressure',
-                          label: 'Minimum pressure',
-                          value: `${activePlan.verification.worstCaseConsequences.minimumPressureM.toFixed(1)} m`,
-                        },
-                        {
-                          key: 'worst-service',
-                          label: 'Service availability',
-                          value: `${(activePlan.verification.worstCaseConsequences.serviceAvailability * 100).toFixed(1)}%`,
-                        },
-                      ]}
-                    />
-                  </>
-                )}
-                {activePlan.verification.rejectionCodes.length > 0 && (
-                  <p className="supporting">
-                    Rejection codes: {activePlan.verification.rejectionCodes.join(', ')}
-                  </p>
-                )}
-              </>
-            ) : (
-              <EmptyState title="This plan has not yet been submitted for exact verification." />
-            )}
-          </Panel>
-        ) : (
-          <Panel title="No plan selected" eyebrow="VERIFICATION">
-            <EmptyState title="No response plans available for this incident." />
-          </Panel>
-        )}
-        {activePlan && (
-          <Panel title="Action sequence" eyebrow="FULL PLAN">
-            <PlanActionSequence plan={activePlan} />
-          </Panel>
-        )}
-      </aside>
       <Panel title="Verified plan comparison" eyebrow="WNTR CONSEQUENCES" className="wide-panel">
         <PlanTable plans={incident.plans} />
       </Panel>
@@ -229,6 +102,28 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
           />
         )}
       </Panel>
+      <Panel
+        title="Counterfactual consequence branches"
+        eyebrow="NO-RESPONSE COMPARATOR"
+        className="wide-panel"
+      >
+        <Counterfactuals plans={incident.plans} />
+      </Panel>
+      {activePlan && (
+        <Panel
+          title="Action sequence"
+          eyebrow={`FULL PLAN · ${activePlan.id}`}
+          className="wide-panel"
+        >
+          {activePlan.verification?.verificationStatus === 'STALE' && (
+            <p className="supporting">
+              Verification is stale because incident evidence or verification context changed.
+              Re-verify before approval.
+            </p>
+          )}
+          <PlanActionSequence plan={activePlan} />
+        </Panel>
+      )}
       <Panel title="Compare plans" eyebrow="GROUNDED EXPLANATION" className="wide-panel">
         {comparePlans ? (
           <p>{comparePlans.text}</p>

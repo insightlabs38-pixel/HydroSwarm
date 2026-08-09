@@ -34,16 +34,36 @@ beforeEach(() => {
   });
 });
 
+// ui-work.txt "UI-10.5" 3: the Incident workspace is now a concise mission
+// overview (leading candidate, recommended sample, active plan status, all
+// linking to their dedicated workspace) rather than a page that repeats
+// every workspace's full content -- the plan comparison table and the
+// grounded rejection/comparison explanation now live PRIMARY in the
+// Response workspace (moved there in the same phase), so this test follows
+// the real operator flow across both instead of asserting everything is
+// visible on one page.
 test('passes the 30-second comprehension test in fallback mode', async () => {
+  const user = userEvent.setup();
   renderApp();
   expect(await screen.findByText('Verified response awaiting approval')).toBeVisible();
   expect(screen.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
   expect(screen.getByText('OFFLINE · LOCAL')).toBeVisible();
-  expect(screen.getByText('Collect sample at J123')).toBeVisible();
   expect(screen.getAllByText('76%').length).toBeGreaterThan(0);
+  expect(screen.getByRole('heading', { name: 'Evidence / sampling' })).toBeVisible();
+  expect(screen.getByText('0.37 bits')).toBeVisible();
+
+  await user.click(screen.getByRole('button', { name: /^Response/ }));
+  expect(await screen.findByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
   expect(screen.getByText('RECOMMENDED')).toBeVisible();
   expect(screen.getByText('REJECTED')).toBeVisible();
-  expect(screen.getByText(/four nodes fell below the pressure threshold/i)).toBeVisible();
+
+  // Select the rejected plan to see its real grounded rejection reason
+  // (ui-work.txt 22 cross-panel synchronization).
+  await user.click(screen.getByRole('button', { name: 'A · Aggressive isolation' }));
+  expect(
+    await screen.findByRole('heading', { name: 'Why was Aggressive isolation rejected?' }),
+  ).toBeVisible();
+  expect(screen.getByText(/4 nodes with pressure below the 15 m minimum/i)).toBeVisible();
 });
 
 test('workflow rail navigates to Validation and Benchmarks, and derives stage state from real data (no OOD/CAUTION for this fixture)', async () => {
@@ -146,7 +166,10 @@ test('Source workspace renders real candidate ranking and the DEMO_FALLBACK auth
   expect(
     screen.getByText(/J117 is the leading candidate because its observed concentration/),
   ).toBeVisible();
-  expect(screen.getByText('CALIBRATED ADVISORY')).toBeVisible();
+  // Appears twice by design (ui-work.txt "UI-10.5" 2/7): a compact
+  // authority/applicability summary in the global DecisionInspector, and
+  // the full Decision Certificate detail PRIMARY in this workspace body.
+  expect(screen.getAllByText('CALIBRATED ADVISORY').length).toBeGreaterThan(0);
 });
 
 test('technical dock audit tab shows real audit events, and reduced-motion toggle still works', async () => {
