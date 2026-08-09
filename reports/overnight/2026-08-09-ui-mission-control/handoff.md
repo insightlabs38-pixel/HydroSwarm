@@ -20,6 +20,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   7. `f173a65` — `feat(ui): add governed source-localization workspace` (UI-3)
   8. `83c72d2` — `docs(handoff): record UI-3 completion`
   9. `7381d90` — `feat(ui): add deterministic evidence-value sampling workspace` (UI-4)
+  10. `15538af` — `docs(handoff): record UI-4 completion`
+  11. `bf77697` — `feat(ui): add verified response-plan decision workspace` (UI-5)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -206,28 +208,49 @@ accessibility/alternatives, and the real grounded "Why this sample?" explanation
 card. `demoEvidenceCertificate` added for DEMO_FALLBACK, consistent with the rest of the
 fixture. Verified visually via Playwright.
 
-## Remaining phases (UI-5 through UI-11): NOT STARTED
+## UI-5 — Response/Strategist workspace: COMPLETE
 
-Tracked as tasks #7–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `bf77697` message for full detail (the largest single phase so far). Summary:
+`src/api/planning.ts` + `fetchParetoFrontier()` against the real
+`GET /incidents/{id}/frontier` endpoint (confirmed exact `FrontierMode` literal and
+field shapes from `hydroswarm/planning/pareto.py`); new `ParetoFrontier.tsx` (2D ECharts
+scatter + dense table, two **entirely separate** chart+table pairs for EXPOSURE_AWARE vs
+HYDRAULIC_ONLY — never merged, per ui-work.txt 15) and `PlanActionSequence.tsx` (full
+ordered action list, not just a count); new `ResponseWorkspace.tsx` assembling
+verification detail, action sequence, the existing `PlanTable`, the frontier, and
+"Compare plans?"/"Why plan rejected?" explanations. `WorkspaceToolbar` gained a real
+Response-specific "Posterior-weighted / Worst-case" frontier-context toggle
+(`store.frontierMode`). Verified visually — this run caught and fixed one real
+consistency bug (the frontier chart wasn't highlighting the recommended-plan fallback
+the rest of the workspace uses).
+
+**Deliberate scope decision, not an oversight**: the "exact-run budget" gap flagged
+after UI-3 (`IncidentState.remaining_epanet_budget`/`plans_exactly_verified`/
+`exact_simulation_cache_hits` exist on the backend but not on `IncidentView`) was
+**not** closed with a backend exposure in this phase. Reasoning: doing so would be this
+session's first Python file change, requiring a full backend gate run (pytest/ruff/
+pyright, ~874 tests) per ui-work.txt §3's "covered by Python CI" requirement for any
+backend touch, and would context-switch away from the frontend-focused momentum of this
+run. It remains a legitimate, still-open, narrowly-additive candidate for a future
+session — recorded here explicitly rather than silently dropped.
+
+## Remaining phases (UI-6 through UI-11): NOT STARTED
+
+Tracked as tasks #8–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-5 (Response/Strategist workspace) — the largest remaining single phase.
-Needs: full plan/action display (already have `Plan.actions`/`Plan.verification` typed
-since UI-0), CURRENT/STALE (already on `PlanVerificationView.verificationStatus`),
-expected/worst-case consequences (already typed), exact-run budget (a **known gap**:
-`IncidentState.remaining_epanet_budget`/`plans_exactly_verified`/
-`exact_simulation_cache_hits` exist on the backend but are not yet on `IncidentView` --
-recorded as a gap in UI-3's DecisionInspector too), numerical sensitivity (already on
-`ConsequenceView`), the Pareto frontier (`GET /incidents/{id}/frontier`, confirmed
-present, returns `ParetoFrontierEntryView[]` with an `EXPOSURE_AWARE`/`HYDRAULIC_ONLY`
-`group` field that ui-work.txt 15 says must stay visually separate, never merged), the
-`plan_consequence:{plan_id}` authority certificates (same `/authority` endpoint, already
-wired), and the "Why plan rejected?"/"Compare plans?" explanations (already in
-`incident.explanations`). The exact-run-budget gap should probably get a narrowly-additive
-backend exposure in this phase rather than staying a permanent "not yet exposed" note --
-worth deciding explicitly rather than deferring again.
+Next up: UI-6 (guarded human plan-approval workflow) — the safety-critical approval
+gate. Needs: `POST /incidents/{id}/plans/{plan_id}/approve` (confirmed present, body
+`{approved: true, operator_id}`, fails closed with 409 on stale verification context —
+already exact-matches ui-work.txt 9.7's spec). Required hierarchy per ui-work.txt 13.5:
+SIMULATOR VERIFIED → CURRENT CONTEXT → OPERATOR REVIEW → HUMAN APPROVED. Must require
+operator ID, a "I reviewed the verified actions and consequences" checkbox, disable
+Approve until both are satisfied, re-fetch authoritative state after POST, and show an
+audit receipt. "No one-click approval." This reuses `ResponseWorkspace`'s
+already-selected `activePlan`/verification logic (same fallback pattern) rather than
+duplicating it.
 
 ## Continuation commands
 
