@@ -1,7 +1,8 @@
 name: TEMP regenerate Playwright baselines
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [feature/ui-mission-control-v1]
 
 jobs:
   regen:
