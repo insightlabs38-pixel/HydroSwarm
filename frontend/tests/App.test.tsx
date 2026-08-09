@@ -46,7 +46,7 @@ test('passes the 30-second comprehension test in fallback mode', async () => {
   const user = userEvent.setup();
   renderApp();
   expect(await screen.findByText('Verified response awaiting approval')).toBeVisible();
-  expect(screen.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+  expect(screen.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   expect(screen.getByText('OFFLINE · LOCAL')).toBeVisible();
   expect(screen.getAllByText('76%').length).toBeGreaterThan(0);
   expect(screen.getByRole('heading', { name: 'Evidence / sampling' })).toBeVisible();

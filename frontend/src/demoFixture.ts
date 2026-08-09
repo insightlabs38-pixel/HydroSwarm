@@ -75,9 +75,15 @@ export const demoIncident: IncidentView = {
   status: 'APPROVAL',
   mode: 'DEMO_FALLBACK',
   modeReason:
-    'Live API unavailable or no incident configured. Values shown are a frozen, simulator-derived fixture, not live telemetry.',
+    'Live API unavailable or no incident configured. Values shown are an illustrative, hand-authored DEMO_FALLBACK fixture -- not live telemetry, and not the output of a real inference or simulation run.',
   offline: true,
-  runtimeMs: 438,
+  // Pre-merge polish pass: previously 438 -- a specific, real-looking
+  // latency figure this hand-authored fixture never actually measured (no
+  // inference ran to produce it). MissionHeader only renders the "N ms"
+  // badge when runtimeMs > 0 (the same convention errorIncidentView()
+  // already uses for "no real runtime metric"), so 0 here means "not
+  // shown" rather than a fabricated "0 ms" claim.
+  runtimeMs: 0,
   // UI-11.1 §4: previously 'HydroSwarm-M 0.9.2' -- a specific, real-sounding
   // model name this codebase never actually produces, easy to mistake for a
   // genuine (if older) production identity. This fixture was hand-authored,
@@ -85,7 +91,13 @@ export const demoIncident: IncidentView = {
   // instead of naming a model that never analyzed this incident.
   modelVersion: 'Illustrative DEMO_FALLBACK fixture (not a real trained checkpoint identity)',
   generatedAt: '2026-08-03T08:40:05Z',
-  runtimeAnalysisMode: 'FULL_HYBRID',
+  // Pre-merge polish pass: previously 'FULL_HYBRID' -- this hand-authored
+  // fixture never actually ran the hybrid neural pipeline, so claiming
+  // that analysis mode would misrepresent illustrative content as a real
+  // inference outcome. null is this field's own "no real signal" value
+  // (MissionHeader/DecisionInspector only render a runtime-mode badge/value
+  // when this is non-null; errorIncidentView() uses the same null).
+  runtimeAnalysisMode: null,
   provenance: {
     // UI-11.1 §4: these were previously hand-authored 64-hex-character
     // strings shaped exactly like real SHA-256 hashes but never derived

@@ -17,7 +17,7 @@ export function ModeBanner({
   if (incident.mode === 'DEMO_FALLBACK') {
     return (
       <div className="mode-banner mode-banner-warn" role="status">
-        <strong>DETERMINISTIC DEMO FALLBACK</strong>
+        <strong>ILLUSTRATIVE DEMO / DEMO_FALLBACK</strong>
         <span>{incident.modeReason}</span>
       </div>
     );

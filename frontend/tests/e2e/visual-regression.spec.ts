@@ -15,7 +15,7 @@ import type { Page } from '@playwright/test';
 // strip + dominant map + three small summary panels, so the map canvas
 // is now the right thing to wait for here, not a plan-table row.
 async function waitForOverviewLoaded(page: Page) {
-  await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+  await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   await expect(page.locator('.map-canvas[role="img"]')).toBeVisible();
 }
 
@@ -99,7 +99,7 @@ test.describe('keyboard-only navigation', () => {
     page,
   }) => {
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
 
     for (const { rail, heading } of stages) {
       const railButton = page.getByRole('button', { name: rail });
@@ -118,7 +118,7 @@ test.describe('keyboard-only navigation', () => {
   // is only verifiable end-to-end.
   test('skip link moves real keyboard focus to main content', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await skipLink.focus();
     await expect(skipLink).toBeFocused();
@@ -134,7 +134,7 @@ test.describe('keyboard-only navigation', () => {
   // target of its own. Locks down there is exactly one skip link now.
   test('exactly one skip link exists (no stale static duplicate)', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await expect(page.locator('.skip-link')).toHaveCount(1);
   });
 });
@@ -152,7 +152,7 @@ test.describe('reduced-motion mode', () => {
   test('emulated prefers-reduced-motion still renders a usable page', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   });
 });
 
@@ -161,7 +161,7 @@ test.describe('data-mode banners', () => {
     page,
   }) => {
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     // Both the header's mode badge and the decision inspector's own
     // status badge render the real DEMO_FALLBACK mode -- intentional
     // duplication (ui-work.txt §13: the inspector always echoes the
@@ -189,7 +189,7 @@ test.describe('selected-plan synchronization', () => {
   // duplicated against).
   test('selecting a different plan in the table updates the highlighted row', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
 
@@ -211,7 +211,7 @@ test.describe('selected-plan synchronization', () => {
     page,
   }) => {
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
 
@@ -251,7 +251,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
     test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/');
-      await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+      await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
       const overflow = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
         clientWidth: document.documentElement.clientWidth,
@@ -265,7 +265,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
   }) => {
     await page.setViewportSize({ width: 900, height: 900 });
     await page.goto('/');
-    await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+    await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     const inspector = page.locator('.decision-inspector');
     await expect(inspector).toBeVisible();
     await expect(inspector).toHaveCSS('position', 'absolute');

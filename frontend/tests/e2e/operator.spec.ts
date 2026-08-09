@@ -15,7 +15,7 @@ test('operator can follow the full normal demo flow (ui-work.txt §32) using onl
   // 1. Open HydroSwarm; 2. see local/offline/readiness status.
   await page.goto('/');
   await expect(page.getByText('OFFLINE · LOCAL')).toBeVisible();
-  await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+  await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   await expect(page.getByText('READY')).toBeVisible();
 
   // 3. Open incident; 4. map establishes network context.
@@ -99,7 +99,7 @@ test('OOD / suppressed planning shows the governed caution state, not a fabricat
   // mode banner (ModeBanner.tsx: "REPLAY/DEMO_FALLBACK/ERROR take priority"),
   // so the always-rendered header badges are the real signal here, not the
   // narrow banner strip.
-  await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+  await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   await expect(page.getByText('OOD OUTSIDE_VALIDATED_RANGE')).toBeVisible();
   await expect(page.getByText('DEGRADED')).toBeVisible();
 
@@ -146,7 +146,7 @@ test('stale verification blocks the approval hierarchy from advancing past simul
   page,
 }) => {
   await page.goto('/?demo=stale_verification');
-  await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
+  await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
 
   await page.getByRole('button', { name: /^Approval/ }).click();
   await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
