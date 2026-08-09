@@ -374,3 +374,46 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
     expect(reasons.size).toBe(FAILURE_INJECTION_CATEGORIES.length);
   });
 });
+
+// UI-11: deterministic non-error DEMO_FALLBACK variants (`?demo=<category>`)
+// used by the Playwright suite to exercise OOD/suppressed-planning and
+// stale-verification states without a live backend.
+describe('demo variants (UI-11)', () => {
+  test('ood_suppressed carries OUTSIDE_VALIDATED_RANGE, invalid calibration, and no plans', async () => {
+    window.history.pushState(null, '', '/?demo=ood_suppressed');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
+    const incident = await fetchIncidentWithFallback();
+    expect(incident.mode).toBe('DEMO_FALLBACK');
+    expect(incident.ood).toBe('OUTSIDE_VALIDATED_RANGE');
+    expect(incident.calibrationValid).toBe(false);
+    expect(incident.plans).toEqual([]);
+    expect(incident.approvalPending).toBe(false);
+  });
+
+  test('stale_verification marks every plan verification STALE without changing the decision', async () => {
+    window.history.pushState(null, '', '/?demo=stale_verification');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
+    const incident = await fetchIncidentWithFallback();
+    expect(incident.mode).toBe('DEMO_FALLBACK');
+    const withVerification = incident.plans.filter((plan) => plan.verification);
+    expect(withVerification.length).toBeGreaterThan(0);
+    for (const plan of withVerification) {
+      expect(plan.verification?.verificationStatus).toBe('STALE');
+    }
+    // The underlying decision (VERIFIED/REJECTED) is untouched -- only
+    // currency changed, never the verified outcome itself.
+    expect(incident.plans.some((plan) => plan.verification?.decision === 'VERIFIED')).toBe(true);
+  });
+
+  test('an unrecognized demo category is ignored, not silently accepted', async () => {
+    window.history.pushState(null, '', '/?demo=not_a_real_category');
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
+    const incident = await fetchIncidentWithFallback();
+    expect(incident.mode).toBe('DEMO_FALLBACK');
+    expect(incident.ood).toBe('NORMAL');
+    expect(incident.plans.length).toBeGreaterThan(0);
+  });
+});

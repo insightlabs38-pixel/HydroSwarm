@@ -1,4 +1,5 @@
 import { demoIncident } from '../demoFixture';
+import { normalizeMapCoordinates } from '../geometry';
 import type {
   AuditEvent,
   Candidate,
@@ -65,6 +66,62 @@ function injectedFailure(): FailureInjectionCategory | null {
   return (FAILURE_INJECTION_CATEGORIES as readonly string[]).includes(requested ?? '')
     ? (requested as FailureInjectionCategory)
     : null;
+}
+
+/**
+ * Deterministic DEMO_FALLBACK variants, selected via `?demo=<category>`
+ * (mirrors the existing `?failure=<category>` mechanism for the ERROR
+ * categories above). These exist so UI-11's Playwright suite can exercise
+ * real, non-error governed states -- OOD/suppressed planning and a stale
+ * verification blocking approval -- deterministically, without a live
+ * backend and without altering any scientific/authority semantics: every
+ * field below is a real, already-typed IncidentView field, never a new
+ * fabricated shape, and the base values still come from `demoIncident`.
+ */
+export const DEMO_VARIANT_CATEGORIES = ['ood_suppressed', 'stale_verification'] as const;
+export type DemoVariant = (typeof DEMO_VARIANT_CATEGORIES)[number];
+
+function requestedDemoVariant(): DemoVariant | null {
+  if (typeof window === 'undefined') return null;
+  const requested = new URLSearchParams(window.location.search).get('demo');
+  return (DEMO_VARIANT_CATEGORIES as readonly string[]).includes(requested ?? '')
+    ? (requested as DemoVariant)
+    : null;
+}
+
+function demoFallbackView(variant: DemoVariant | null): IncidentView {
+  if (variant === 'ood_suppressed') {
+    // The incident is outside the model's validated operating range with
+    // invalid calibration: the real, already-wired ModeBanner/WorkflowRail
+    // suppression path (ui-work.txt 7, 13) shows this correctly with no
+    // new UI code -- no plans exist yet because planning is suppressed,
+    // not because none were generated.
+    return {
+      ...demoIncident,
+      ood: 'OUTSIDE_VALIDATED_RANGE',
+      calibrationValid: false,
+      plans: [],
+      selectedPlanId: null,
+      recommendedPlanId: null,
+      approvalPending: false,
+      counterfactuals: {},
+    };
+  }
+  if (variant === 'stale_verification') {
+    // Every plan's verification is marked STALE, as if incident evidence
+    // changed after verification ran -- ApprovalWorkspace's existing
+    // isCurrent = verificationStatus === 'CURRENT' gate (never altered
+    // here) must keep the approval flow from reaching "Current context".
+    return {
+      ...demoIncident,
+      plans: demoIncident.plans.map((plan) =>
+        plan.verification
+          ? { ...plan, verification: { ...plan.verification, verificationStatus: 'STALE' } }
+          : plan,
+      ),
+    };
+  }
+  return { ...demoIncident };
 }
 
 /** Raised when the API is reachable but this specific incident cannot be
@@ -252,7 +309,11 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
   const sensorByNode = new Map(raw.sensor_health.map((entry) => [entry.node_id, entry]));
   const nowMs = Date.now();
 
-  const nodes: NetworkNode[] = raw.nodes.map((node) => {
+  // Normalized together, across the whole network, so real relative
+  // shape/angles are preserved -- see geometry.ts.
+  const normalizedCoordinates = normalizeMapCoordinates(raw.nodes.map((node) => node.coordinates));
+
+  const nodes: NetworkNode[] = raw.nodes.map((node, index) => {
     const sensor = sensorByNode.get(node.node_id);
     const sensorState: SensorState | undefined = sensor
       ? {
@@ -268,7 +329,7 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
       id: node.node_id,
       // EPANET networks only ever have these three node types.
       kind: node.node_type as NetworkNode['kind'],
-      coordinates: node.coordinates,
+      coordinates: normalizedCoordinates[index],
       probability: node.probability,
       concentration: node.concentration_mg_l ?? 0,
       candidate: node.candidate,
@@ -512,6 +573,8 @@ export async function fetchIncidentWithFallback(signal?: AbortSignal): Promise<I
     // rather than a blank screen. This mirrors the plan's product
     // requirement that HydroSwarm remain usable offline; it must never be
     // confused with LIVE, and demoIncident.mode is already DEMO_FALLBACK.
-    return { ...demoIncident };
+    // `?demo=<category>` optionally swaps in a governed non-error variant
+    // (see demoFallbackView above) for deterministic E2E coverage.
+    return demoFallbackView(requestedDemoVariant());
   }
 }
