@@ -238,7 +238,11 @@ export interface NetworkNode {
   kind: 'junction' | 'reservoir' | 'tank';
   coordinates: [number, number];
   probability: number;
-  concentration: number;
+  /** Null when this node's concentration has not been observed/measured
+   * (NetworkNodeView.concentration_mg_l is nullable) -- never a fabricated
+   * 0 (UI-11.1 §2; matches NetworkLink.concentration's established
+   * convention below). */
+  concentration: number | null;
   candidate: boolean;
   sensor?: SensorState;
 }
@@ -264,8 +268,15 @@ export interface SensorState {
   health: 'HEALTHY' | 'DRIFT' | 'MISSING';
   quality: number;
   ageMinutes: number;
-  pressure: number;
-  concentration: number;
+  /** Null when this reading was not supplied (SensorHealthView.pressure_m
+   * is nullable) -- never a fabricated 0 (UI-11.1 §2). A genuine 0 m
+   * reading and "not measured" must remain visually and numerically
+   * distinct: 0 is a real pressure at that node, null means no reading. */
+  pressure: number | null;
+  /** Null when this reading was not supplied
+   * (SensorHealthView.concentration_mg_l is nullable) -- never a
+   * fabricated 0 (UI-11.1 §2). */
+  concentration: number | null;
 }
 
 export interface Candidate {
@@ -440,7 +451,12 @@ export interface IncidentView {
    * artifact in use, if known -- distinct from the per-incident
    * candidateCoverage target. */
   measuredCoverage?: number;
-  disagreement: number;
+  /** Null when no classical/neural fusion diagnostics exist for this
+   * incident (e.g. CLASSICAL_SAFE mode, where the neural pipeline never
+   * ran) -- never a fabricated 0, which would falsely read as "the two
+   * systems perfectly agree" rather than the true "not applicable /
+   * unmeasured" state (UI-11.1 §2). */
+  disagreement: number | null;
   nodes: NetworkNode[];
   links: NetworkLink[];
   candidates: Candidate[];

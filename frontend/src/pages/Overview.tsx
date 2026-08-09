@@ -111,7 +111,9 @@ export function Overview({ incident }: { incident: IncidentView }) {
               </div>
               <p className="supporting">
                 {incident.candidates.length} candidate(s) · disagreement{' '}
-                {(incident.disagreement * 100).toFixed(1)}%
+                {typeof incident.disagreement === 'number'
+                  ? `${(incident.disagreement * 100).toFixed(1)}%`
+                  : 'not measured'}
               </p>
             </>
           ) : (

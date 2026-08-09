@@ -50,6 +50,15 @@ describe('fetchIncidentWithFallback', () => {
 /** Minimal but structurally complete ApiIncidentView payload (overnight-plan.txt
  * Task 3.2), for exercising fetchIncident()/viewFromApi() against the real
  * GET /incidents/{id}/view contract. */
+// UI-11.1 §2: narrow, mutation-only view of the fields the null-vs-zero
+// regression tests below overwrite, so those tests can mutate the fixture
+// without an `any` cast.
+interface MutableFixtureFields {
+  disagreement_js: number | null;
+  nodes: { concentration_mg_l: number | null }[];
+  sensor_health: { pressure_m: number | null; concentration_mg_l: number | null }[];
+}
+
 function apiIncidentViewFixture(): unknown {
   return {
     schema_version: 1,
@@ -258,6 +267,60 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
     const { fetchIncident } = await import('../src/api/incident');
     const incident = await fetchIncident();
     expect(incident.recommendedSample).toBeNull();
+  });
+
+  // UI-11.1 §2: null (unavailable) and legitimate numeric 0 must map to
+  // genuinely different IncidentView values -- both directions tested
+  // together so a regression that collapses either one back into the
+  // other (a real historical bug: `?? 0` silently turning null into 0)
+  // is caught. Covers every field named in the operator's audit request:
+  // sensor pressure/concentration, node concentration, disagreement.
+  test('null sensor/node/disagreement fields stay null -- never coerced to a fabricated 0', async () => {
+    vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
+    const fixture = apiIncidentViewFixture() as MutableFixtureFields;
+    fixture.disagreement_js = null;
+    fixture.nodes[0].concentration_mg_l = null;
+    fixture.sensor_health[0].pressure_m = null;
+    fixture.sensor_health[0].concentration_mg_l = null;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
+        return Promise.resolve(jsonResponse(fixture));
+      }),
+    );
+    const { fetchIncident } = await import('../src/api/incident');
+    const incident = await fetchIncident();
+
+    expect(incident.disagreement).toBeNull();
+    const nodeJ1 = incident.nodes.find((node) => node.id === 'J1');
+    expect(nodeJ1?.concentration).toBeNull();
+    expect(nodeJ1?.sensor?.pressure).toBeNull();
+    expect(nodeJ1?.sensor?.concentration).toBeNull();
+  });
+
+  test('a genuine numeric 0 for the same sensor/node/disagreement fields is preserved exactly, not lost', async () => {
+    vi.stubEnv('VITE_INCIDENT_ID', 'test-incident-id');
+    const fixture = apiIncidentViewFixture() as MutableFixtureFields;
+    fixture.disagreement_js = 0;
+    fixture.nodes[0].concentration_mg_l = 0;
+    fixture.sensor_health[0].pressure_m = 0;
+    fixture.sensor_health[0].concentration_mg_l = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((url: string) => {
+        if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
+        return Promise.resolve(jsonResponse(fixture));
+      }),
+    );
+    const { fetchIncident } = await import('../src/api/incident');
+    const incident = await fetchIncident();
+
+    expect(incident.disagreement).toBe(0);
+    const nodeJ1 = incident.nodes.find((node) => node.id === 'J1');
+    expect(nodeJ1?.concentration).toBe(0);
+    expect(nodeJ1?.sensor?.pressure).toBe(0);
+    expect(nodeJ1?.sensor?.concentration).toBe(0);
   });
 
   test('fetchIncidentWithFallback returns the live-mapped incident, not the demo fixture', async () => {

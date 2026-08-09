@@ -92,6 +92,10 @@ export function HydraulicChart({ incident }: { incident: IncidentView }) {
           {
             name: 'Pressure (m)',
             type: 'bar',
+            // ECharts' own documented convention: `null` renders as a real
+            // gap (no bar drawn) at that index, never coerced to 0 --
+            // UI-11.1 §2, a genuine 0 m reading must stay visually
+            // distinct from "not measured".
             data: sensors.map(({ sensor }) => sensor.pressure),
             color: '#6bd6dd',
           },
@@ -125,7 +129,7 @@ export function HydraulicChart({ incident }: { incident: IncidentView }) {
     : `Text equivalent (latest snapshot, not a time series): ${sensors
         .map(
           ({ node, sensor }) =>
-            `${sensor.id} (${node.id}) pressure ${sensor.pressure} m, concentration ${sensor.concentration} mg/L`,
+            `${sensor.id} (${node.id}) pressure ${sensor.pressure === null ? 'not measured' : `${sensor.pressure} m`}, concentration ${sensor.concentration === null ? 'not measured' : `${sensor.concentration} mg/L`}`,
         )
         .join('; ')}.`;
 

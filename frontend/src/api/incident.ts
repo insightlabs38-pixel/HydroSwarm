@@ -321,8 +321,8 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
           health: sensor.health,
           quality: sensor.quality,
           ageMinutes: Math.max(0, (nowMs - new Date(sensor.observed_at).getTime()) / 60_000),
-          pressure: sensor.pressure_m ?? 0,
-          concentration: sensor.concentration_mg_l ?? 0,
+          pressure: sensor.pressure_m,
+          concentration: sensor.concentration_mg_l,
         }
       : undefined;
     return {
@@ -331,7 +331,7 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
       kind: node.node_type as NetworkNode['kind'],
       coordinates: normalizedCoordinates[index],
       probability: node.probability,
-      concentration: node.concentration_mg_l ?? 0,
+      concentration: node.concentration_mg_l,
       candidate: node.candidate,
       sensor: sensorState,
     };
@@ -442,7 +442,7 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     candidateCoverage: raw.candidates.coverage_target,
     calibrationValid: raw.candidates.calibrated,
     measuredCoverage: raw.candidates.measured_coverage ?? undefined,
-    disagreement: raw.disagreement_js ?? 0,
+    disagreement: raw.disagreement_js,
     nodes,
     links,
     candidates,
@@ -536,7 +536,7 @@ function errorIncidentView(reason: string): IncidentView {
     approvalPending: false,
     candidateCoverage: 0,
     calibrationValid: false,
-    disagreement: 0,
+    disagreement: null,
     nodes: [],
     links: [],
     candidates: [],

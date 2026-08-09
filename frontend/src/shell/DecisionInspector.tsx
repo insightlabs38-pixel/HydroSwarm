@@ -138,7 +138,11 @@ function SourceSummary({ incident }: { incident: IncidentView }) {
         </div>
         <div>
           <dt>Disagreement</dt>
-          <dd>{(incident.disagreement * 100).toFixed(1)}%</dd>
+          <dd>
+            {typeof incident.disagreement === 'number'
+              ? `${(incident.disagreement * 100).toFixed(1)}%`
+              : 'not measured'}
+          </dd>
         </div>
         <div>
           <dt>OOD</dt>
