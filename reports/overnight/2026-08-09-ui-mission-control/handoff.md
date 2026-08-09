@@ -28,6 +28,7 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   15. `8c4f38b` — `feat(ui): add synchronized technical evidence dock` (UI-7)
   16. `51c7ff5` — `docs(handoff): record UI-7 completion`
   17. `8d7cba7` — `feat(ui): add deterministic replay and fail-closed demo states` (UI-8)
+  18. `f218379` — `UI-9: Network and Model & Authority utility workspaces`
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -291,27 +292,69 @@ candidates/plans) from a stored trajectory, and fabricating one just to exercise
 That branch stays defined-but-dormant until (if ever) a real "load a stored trajectory"
 feature is built — this is a deliberate honesty choice, not a gap to close later.
 
-## Remaining phases (UI-9 through UI-11): NOT STARTED
+## UI-9 — utilities workspaces (Network, Model & Authority): COMPLETE
 
-Tracked as tasks #11–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `f218379` message for full detail. Validation and Benchmarks were already
+migrated into the shell in UI-1 (mounting the pre-existing `ValidationPage`/
+`BenchmarkPage`), so this phase's real scope was the two remaining utilities:
+
+- **Network workspace** (new `api/networks.ts` + `NetworkWorkspace.tsx`): the first
+  frontend consumer of `GET /api/networks` / `POST /api/networks/import` anywhere in the
+  app. Import is a real local-file-only multipart/form-data POST (raw `fetch()` with a
+  `FormData` body — deliberately not `requestJson()`, since the browser must set the
+  multipart boundary itself, so no `Content-Type` header is set manually; confirmed via a
+  test asserting `init.headers?.['Content-Type']` is `undefined`). Network detail shows
+  real node/link counts, sha256, validation errors, and a coordinate-coverage percentage
+  computed from real topology metadata (`null`/"not measured" when metadata carries no
+  nodes, never fabricated). `TopologyPreview` renders a Cytoscape graph built only from
+  the real imported node/link list — empty metadata correctly yields an honest
+  `EmptyState`, not a placeholder graph.
+- **Model & Authority workspace** (new `AuthorityWorkspace.tsx`, reusing UI-3's
+  `fetchAuthorityCertificates`/`demoAuthorityCertificates`): a governance table showing
+  every Decision Certificate together (`source_localization`, `scout_recommendation`,
+  `ood_state`, `plan_consequence:*`) instead of just the one UI-3 needed, plus the
+  seven-level authority ladder (`UNAVAILABLE`..`HUMAN_APPROVED`) as a real `<ol>` so a
+  lower-authority result can never be visually confused with a higher one.
+
+Both wired into `App.tsx`, `WorkflowRail` (network/authority stage status no longer
+hardcoded `'unavailable'` — network reflects current/complete regardless of incident
+mode since it's not incident-scoped; authority stays `'unavailable'` in ERROR mode since
+there's no analysis to certify), and `DecisionInspector` (real inline summaries, no new
+queries, following the same query-free pattern as the `validation`/`benchmarks` cases).
+The `NOT_YET_MIGRATED_DETAIL`/`NOT_YET_IMPLEMENTED` placeholder maps are now empty
+(defensive fallback only) since every workspace in the rail is implemented.
+
+Gate: tsc/eslint/prettier clean, 81/81 tests (14 files), production build succeeds
+(`NetworkWorkspace` is its own lazy chunk, 448.63 kB / 143.57 kB gzip — includes
+cytoscape, matching the existing per-workspace code-splitting pattern). Verified visually
+via a real Playwright screenshot against a `vite preview` server: zero console errors,
+both workspaces render correctly (including the Network workspace's honest "Networks
+unavailable / HydroSwarm API 500" state against the actually-unreachable local backend —
+confirms the error path is real, not mocked). `AuditPage.tsx`/`TopologyPage.tsx` remain
+intentionally unrouted from UI-1 — Topology's content now has a real, better home
+(`NetworkWorkspace`'s per-network `TopologyPreview`), and Audit's content already moved
+into the technical dock in UI-1/UI-7, so neither page needs its own route. No backend
+files changed (0 files under `src/hydroswarm/` this phase, as in every phase so far).
+
+## Remaining phases (UI-10, UI-11): NOT STARTED
+
+Tracked as tasks #12–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-9 (utilities: Network, Validation, Model & Authority, Benchmarks). Validation
-and Benchmarks are already migrated into the shell (mounting the pre-existing
-`ValidationPage`/`BenchmarkPage`, done in UI-1). Still needed: a **Network** workspace
-(confirmed present: `GET /api/networks`, `POST /api/networks/import`,
-`GET /api/networks/{id}`, `POST /api/networks/{id}/validate`, returning `NetworkRecord`
-— node/link counts, sha256, validation_errors, geojson; no live endpoint consumption
-exists anywhere in the frontend yet, this would be the first) and a **Model & Authority**
-workspace (the `/authority` endpoint is already wired for `source_localization`/
-`scout_recommendation`/`ood_state`/`plan_consequence:*` certificates from UI-3 onward,
-but nothing shows them as a single governance table the way ui-work.txt §16 wants —
-"Which subsystem is allowed to be authoritative for which decision?" — plus
-`ModelGovernanceTable.tsx`'s existing static `public/model-governance.json` consumption,
-unrelated but adjacent). `AuditPage.tsx`/`TopologyPage.tsx` remain unrouted from UI-1;
-worth a final decision on whether Topology gets a home in this phase or stays parked.
+Next up: UI-10 (accessibility, responsive layout, and performance hardening). Axe checks
+already exist per-workspace (all passing, zero violations) from UI-1/UI-7/UI-9, so UI-10's
+real remaining scope is: a full keyboard-only navigation pass across the shell (rail →
+toolbar → workspace → inspector → dock, including the map's click-to-select and the
+approval form's required checkbox), responsive behavior below the desktop breakpoint the
+shell currently assumes (ui-work.txt's layout spec is desktop-first; verify or explicitly
+scope-note what happens narrower), and a performance pass on the two largest chunks
+(`OperationalMap` at ~1.06 MB / 287 kB gzip, `index` at ~819 kB / 270 kB gzip) — confirm
+whether further code-splitting is warranted or whether current lazy-loading already keeps
+initial paint reasonable. Then UI-11 (demo hardening / final QA, including turning the
+manual Playwright screenshot scripts used ad hoc all session into a real committed E2E
+suite, per the plan's own UI-11 scope).
 
 ## Continuation commands
 
