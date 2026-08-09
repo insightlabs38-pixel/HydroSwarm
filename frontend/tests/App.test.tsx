@@ -65,10 +65,22 @@ test('a workspace with no implementation yet shows an honest placeholder, never 
   const user = userEvent.setup();
   renderApp();
   await screen.findByText('Verified response awaiting approval');
-  await user.click(screen.getByRole('button', { name: /^Sampling/ }));
+  await user.click(screen.getByRole('button', { name: /^Response/ }));
   expect(
-    await screen.findByText('Sampling has not been implemented in the mission-control shell yet.'),
+    await screen.findByText('Response has not been implemented in the mission-control shell yet.'),
   ).toBeVisible();
+});
+
+test('Sampling workspace renders the real evidence certificate, never an empty card, for the DEMO_FALLBACK fixture', async () => {
+  const user = userEvent.setup();
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: /^Sampling/ }));
+  expect(await screen.findByRole('heading', { name: 'Evidence status' })).toBeVisible();
+  expect(screen.getByText('CONTINUE SAMPLING')).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Next sample recommendation' })).toBeVisible();
+  expect(screen.getAllByText('J123').length).toBeGreaterThan(0);
+  expect(screen.getByRole('heading', { name: 'Why this sample?' })).toBeVisible();
 });
 
 test('Source workspace renders real candidate ranking and the DEMO_FALLBACK authority certificate, never a placeholder', async () => {

@@ -16,6 +16,11 @@ const Overview = lazy(() =>
 const SourceWorkspace = lazy(() =>
   import('./workspaces/SourceWorkspace').then((module) => ({ default: module.SourceWorkspace })),
 );
+const SamplingWorkspace = lazy(() =>
+  import('./workspaces/SamplingWorkspace').then((module) => ({
+    default: module.SamplingWorkspace,
+  })),
+);
 const ValidationPage = lazy(() =>
   import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
 );
@@ -24,7 +29,6 @@ const BenchmarkPage = lazy(() =>
 );
 
 const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {
-  sampling: 'Planned for UI-4 (deterministic evidence-value sampling workspace).',
   response: 'Planned for UI-5 (verified response-plan decision workspace).',
   approval: 'Planned for UI-6 (guarded human plan-approval workflow).',
   replay: 'Planned for UI-8 (deterministic replay and fail-closed demo states).',
@@ -52,6 +56,8 @@ export default function App() {
     workspaceBody = <Overview incident={incident} />;
   } else if (workspace === 'source') {
     workspaceBody = <SourceWorkspace incident={incident} />;
+  } else if (workspace === 'sampling') {
+    workspaceBody = <SamplingWorkspace incident={incident} />;
   } else if (workspace === 'validation') {
     workspaceBody = <ValidationPage incident={incident} />;
   } else if (workspace === 'benchmarks') {

@@ -1,6 +1,7 @@
 import type {
   ConsequenceView,
   DecisionCertificate,
+  EvidenceCertificate,
   GroundedExplanation,
   IncidentView,
 } from './types';
@@ -593,3 +594,27 @@ export const demoAuthorityCertificates: DecisionCertificate[] = [
     provenance: { model: null, calibration: null, network: null, evidence: null },
   },
 ];
+
+/**
+ * Illustrative Evidence Value / Stop Certificate for the DEMO_FALLBACK
+ * fixture (core-issues5.txt Section 15). GET
+ * /incidents/{id}/evidence-certificate only exists for a real LIVE
+ * incident; this hand-authored value is consistent with demoIncident's
+ * own recommendedSample and evidenceHistory fields -- never used for a
+ * LIVE incident.
+ */
+export const demoEvidenceCertificate: EvidenceCertificate = {
+  status: 'CONTINUE_SAMPLING',
+  stop: false,
+  message: 'Sampling J123 is expected to further separate the remaining source candidates.',
+  posteriorEntropyBits: 1.02,
+  candidateSetSize: 3,
+  candidateNodes: ['J117', 'J121', 'J109'],
+  candidateRegionCalibrated: true,
+  recommendedSampleNode: 'J123',
+  expectedInformationGainBits: 0.37,
+  expectedCandidateReduction: 2,
+  sampleBudgetRemaining: 3,
+  alreadySampledNodes: ['J109', 'J123'],
+  recommendedNodeAccessible: true,
+};

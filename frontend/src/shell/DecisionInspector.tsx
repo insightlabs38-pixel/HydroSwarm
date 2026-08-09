@@ -5,7 +5,6 @@ import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 
 const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {
-  sampling: 'UI-4 (evidence-value sampling workspace) adds the evidence/stop certificate here.',
   response: 'UI-5 (response-plan decision workspace) adds full plan/verification detail here.',
   approval: 'UI-6 (guarded approval workflow) adds the approval flow here.',
   replay: 'UI-8 (replay/failure/demo) adds the selected replay-event detail here.',
@@ -122,6 +121,29 @@ function SourceSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
+/** ui-work.txt 13.3: full evidence certificate (a separate query) lives
+ * in the Sampling workspace body -- this is the always-available
+ * real-time summary. */
+function SamplingSummary({ incident }: { incident: IncidentView }) {
+  if (!incident.recommendedSample) {
+    return (
+      <EmptyState
+        title="No further sampling recommended."
+        detail="Sampling budget exhausted, or active sampling found no further useful measurement."
+      />
+    );
+  }
+  return (
+    <div className="inspector-stack">
+      <div className="candidate-hero">
+        <strong>{incident.recommendedSample.nodeId}</strong>
+        <span>{incident.recommendedSample.informationGain.toFixed(2)} bits</span>
+      </div>
+      <p className="supporting">{incident.recommendedSample.rationale}</p>
+    </div>
+  );
+}
+
 export function DecisionInspector({ incident }: { incident: IncidentView }) {
   const { workspace, inspectorCollapsed, toggleInspector } = useConsoleStore();
 
@@ -143,6 +165,8 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
     body = <IncidentSummary incident={incident} />;
   } else if (workspace === 'source') {
     body = <SourceSummary incident={incident} />;
+  } else if (workspace === 'sampling') {
+    body = <SamplingSummary incident={incident} />;
   } else if (workspace === 'validation') {
     body = (
       <p className="supporting">

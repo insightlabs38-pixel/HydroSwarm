@@ -76,6 +76,38 @@ export interface DecisionCertificate {
   provenance: DecisionProvenance;
 }
 
+/** Mirrors hydroswarm.domain.schemas.EvidenceCertificateStatus exactly. */
+export type EvidenceCertificateStatus =
+  | 'EVIDENCE_SUFFICIENT'
+  | 'CONTINUE_SAMPLING'
+  | 'STOP_BUDGET_EXHAUSTED'
+  | 'STOP_NO_USEFUL_CANDIDATE'
+  | 'STOP_ABSTAIN';
+
+/** Mirrors hydroswarm.domain.schemas.EvidenceCertificate field-for-field
+ * (core-issues5.txt Section 15, ui-work.txt 9.3/13.3: "Evidence Value /
+ * Stop Certificate"). Converts the incident's current sampling state
+ * into a legible EVIDENCE SUFFICIENT / CONTINUE SAMPLING / STOP
+ * decision -- "no-sample is a real decision state, not an empty card." */
+export interface EvidenceCertificate {
+  status: EvidenceCertificateStatus;
+  stop: boolean;
+  message: string;
+  posteriorEntropyBits: number;
+  candidateSetSize: number;
+  candidateNodes: string[];
+  /** True only when candidateNodes/candidateSetSize is a real calibrated
+   * conformal set; false for the uncalibrated credible-region fallback.
+   * Never present the false case as carrying the same guarantee. */
+  candidateRegionCalibrated: boolean;
+  recommendedSampleNode: string | null;
+  expectedInformationGainBits: number | null;
+  expectedCandidateReduction: number | null;
+  sampleBudgetRemaining: number;
+  alreadySampledNodes: string[];
+  recommendedNodeAccessible: boolean | null;
+}
+
 /**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *
