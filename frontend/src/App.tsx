@@ -21,6 +21,11 @@ const SamplingWorkspace = lazy(() =>
     default: module.SamplingWorkspace,
   })),
 );
+const ResponseWorkspace = lazy(() =>
+  import('./workspaces/ResponseWorkspace').then((module) => ({
+    default: module.ResponseWorkspace,
+  })),
+);
 const ValidationPage = lazy(() =>
   import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
 );
@@ -29,7 +34,6 @@ const BenchmarkPage = lazy(() =>
 );
 
 const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {
-  response: 'Planned for UI-5 (verified response-plan decision workspace).',
   approval: 'Planned for UI-6 (guarded human plan-approval workflow).',
   replay: 'Planned for UI-8 (deterministic replay and fail-closed demo states).',
   network: 'Planned for UI-9 (network governance and benchmark utilities).',
@@ -58,6 +62,8 @@ export default function App() {
     workspaceBody = <SourceWorkspace incident={incident} />;
   } else if (workspace === 'sampling') {
     workspaceBody = <SamplingWorkspace incident={incident} />;
+  } else if (workspace === 'response') {
+    workspaceBody = <ResponseWorkspace incident={incident} />;
   } else if (workspace === 'validation') {
     workspaceBody = <ValidationPage incident={incident} />;
   } else if (workspace === 'benchmarks') {

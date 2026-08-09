@@ -240,6 +240,48 @@
   padding: 0.25rem 0.55rem;
   font-size: 11px;
 }
+.frontier-mode-toggle {
+  display: flex;
+  gap: 2px;
+}
+.frontier-mode-toggle button[aria-pressed='true'] {
+  background: var(--panel-raised);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+/* ---------- Plan action sequence ---------- */
+
+.action-sequence {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.action-sequence li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.action-sequence-index {
+  flex: 0 0 auto;
+  width: 1.4em;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ---------- Pareto frontier ---------- */
+
+.frontier-chart {
+  height: 320px;
+  margin-bottom: 0.6rem;
+}
 
 /* ---------- Decision inspector ---------- */
 

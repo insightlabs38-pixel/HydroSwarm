@@ -108,6 +108,25 @@ export interface EvidenceCertificate {
   recommendedNodeAccessible: boolean | null;
 }
 
+/** Mirrors hydroswarm.planning.pareto.FrontierMode exactly. */
+export type FrontierMode = 'posterior_weighted' | 'worst_case';
+
+/** Mirrors hydroswarm.api.state.ParetoFrontierEntryView field-for-field
+ * (core-issues5.txt Section 14, ui-work.txt 9.4/15). `group` is the P0
+ * safety-relevant field: EXPOSURE_AWARE (consequences.exposureEvaluated
+ * === true) and HYDRAULIC_ONLY (=== false) must never be visually merged
+ * into one comparable frontier. `dominated` is only ever computed
+ * against other entries in the same group. */
+export interface ParetoFrontierEntry {
+  planId: string;
+  label: string;
+  consequences: ConsequenceView;
+  mode: FrontierMode;
+  dominated: boolean;
+  isNoActionComparator: boolean;
+  group: 'EXPOSURE_AWARE' | 'HYDRAULIC_ONLY';
+}
+
 /**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *

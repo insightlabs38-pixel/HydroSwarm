@@ -74,6 +74,9 @@ interface ConsoleUiState {
   replayPlaying: boolean;
   replaySpeed: 0.5 | 1 | 2 | 4;
   reducedMotion: boolean;
+  /** ui-work.txt 12: Response workspace toolbar's "exposure-aware vs
+   * hydraulic-only frontier context" control. */
+  frontierMode: 'posterior_weighted' | 'worst_case';
 
   setWorkspace: (workspace: Workspace) => void;
   selectNode: (nodeId: string | null) => void;
@@ -92,6 +95,7 @@ interface ConsoleUiState {
   toggleReplayPlaying: () => void;
   setReplaySpeed: (value: ConsoleUiState['replaySpeed']) => void;
   toggleReducedMotion: () => void;
+  setFrontierMode: (mode: ConsoleUiState['frontierMode']) => void;
 }
 
 /**
@@ -120,6 +124,7 @@ export const useConsoleStore = create<ConsoleUiState>()(
       replayPlaying: false,
       replaySpeed: 1,
       reducedMotion: false,
+      frontierMode: 'posterior_weighted',
 
       setWorkspace: (workspace) => set({ workspace }),
       selectNode: (selectedNodeId) => set({ selectedNodeId }),
@@ -140,6 +145,7 @@ export const useConsoleStore = create<ConsoleUiState>()(
       toggleReplayPlaying: () => set((state) => ({ replayPlaying: !state.replayPlaying })),
       setReplaySpeed: (replaySpeed) => set({ replaySpeed }),
       toggleReducedMotion: () => set((state) => ({ reducedMotion: !state.reducedMotion })),
+      setFrontierMode: (frontierMode) => set({ frontierMode }),
     }),
     {
       name: 'hydroswarm-console-layout',

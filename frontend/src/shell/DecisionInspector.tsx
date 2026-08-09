@@ -5,7 +5,6 @@ import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 
 const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {
-  response: 'UI-5 (response-plan decision workspace) adds full plan/verification detail here.',
   approval: 'UI-6 (guarded approval workflow) adds the approval flow here.',
   replay: 'UI-8 (replay/failure/demo) adds the selected replay-event detail here.',
   network: 'UI-9 (utilities) adds network import/validation detail here.',
@@ -144,6 +143,43 @@ function SamplingSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
+/** ui-work.txt 13.4: full plan/verification detail (and the Pareto
+ * frontier, a separate query) lives in the Response workspace body --
+ * this is the always-available real-time summary for whichever plan is
+ * selected (falling back to the recommended plan). */
+function ResponseSummary({ incident }: { incident: IncidentView }) {
+  const { selectedPlanId } = useConsoleStore();
+  const plan =
+    incident.plans.find((item) => item.id === selectedPlanId) ??
+    incident.plans.find((item) => item.id === incident.recommendedPlanId) ??
+    incident.plans[0];
+  if (!plan) {
+    return <EmptyState title="No response plans available for this incident." />;
+  }
+  return (
+    <div className="inspector-stack">
+      <p className="supporting">
+        {plan.id} · {plan.name}
+      </p>
+      <StatusBadge
+        tone={
+          plan.status === 'RECOMMENDED' || plan.status === 'VALID'
+            ? 'good'
+            : plan.status === 'REJECTED'
+              ? 'danger'
+              : 'warn'
+        }
+      >
+        {plan.status}
+      </StatusBadge>
+      {plan.verification && (
+        <p className="supporting">Verification: {plan.verification.verificationStatus}</p>
+      )}
+      <p className="supporting">{plan.actions.length} action(s) in this plan.</p>
+    </div>
+  );
+}
+
 export function DecisionInspector({ incident }: { incident: IncidentView }) {
   const { workspace, inspectorCollapsed, toggleInspector } = useConsoleStore();
 
@@ -167,6 +203,8 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
     body = <SourceSummary incident={incident} />;
   } else if (workspace === 'sampling') {
     body = <SamplingSummary incident={incident} />;
+  } else if (workspace === 'response') {
+    body = <ResponseSummary incident={incident} />;
   } else if (workspace === 'validation') {
     body = (
       <p className="supporting">

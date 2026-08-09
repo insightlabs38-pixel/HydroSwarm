@@ -65,10 +65,28 @@ test('a workspace with no implementation yet shows an honest placeholder, never 
   const user = userEvent.setup();
   renderApp();
   await screen.findByText('Verified response awaiting approval');
-  await user.click(screen.getByRole('button', { name: /^Response/ }));
+  await user.click(screen.getByRole('button', { name: /^Approval/ }));
   expect(
-    await screen.findByText('Response has not been implemented in the mission-control shell yet.'),
+    await screen.findByText('Approval has not been implemented in the mission-control shell yet.'),
   ).toBeVisible();
+});
+
+test('Response workspace renders full plan verification, the action sequence, and the exposure-aware Pareto frontier, for the DEMO_FALLBACK fixture', async () => {
+  const user = userEvent.setup();
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: /^Response/ }));
+  expect(await screen.findByRole('heading', { name: 'Action sequence' })).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Verified response Pareto frontier' })).toBeVisible();
+  expect(
+    screen.getByText('Exposure-aware frontier (real measured chemical exposure)'),
+  ).toBeVisible();
+  expect(
+    screen.getByText(
+      'Hydraulic-only frontier (no chemical exposure model -- never comparable to the exposure-aware frontier above)',
+    ),
+  ).toBeVisible();
+  expect(screen.getByRole('heading', { name: 'Compare plans' })).toBeVisible();
 });
 
 test('Sampling workspace renders the real evidence certificate, never an empty card, for the DEMO_FALLBACK fixture', async () => {

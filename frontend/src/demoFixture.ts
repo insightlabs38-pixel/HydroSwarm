@@ -4,6 +4,7 @@ import type {
   EvidenceCertificate,
   GroundedExplanation,
   IncidentView,
+  ParetoFrontierEntry,
 } from './types';
 
 // Illustrative required safety thresholds used only to compute the demo
@@ -618,3 +619,95 @@ export const demoEvidenceCertificate: EvidenceCertificate = {
   alreadySampledNodes: ['J109', 'J123'],
   recommendedNodeAccessible: true,
 };
+
+const noResponseConsequence: ConsequenceView = consequence({
+  populationImpacted: 260,
+  contaminantMassConsumedMg: 6200,
+  volumeAboveThresholdL: 2400,
+  contaminatedPipeExtentM: 780,
+  minimumPressureM: 30,
+  pressureViolationMinutes: 0,
+  unservedDemandL: 0,
+  serviceAvailability: 1,
+  operationCount: 0,
+  containmentTimeMinutes: null,
+});
+
+/** A hydraulic-only evaluation (exposureEvaluated: false) so the frontier
+ * demo can show ui-work.txt 15's required visual separation from
+ * EXPOSURE_AWARE entries -- population/mass/volume/pipe-extent below are
+ * Pydantic defaults, not real zero measurements. */
+const hydraulicOnlyConsequence: ConsequenceView = {
+  populationImpacted: 0,
+  contaminantMassConsumedMg: 0,
+  volumeAboveThresholdL: 0,
+  contaminatedPipeExtentM: 0,
+  minimumPressureM: 22,
+  pressureViolationMinutes: 0,
+  unservedDemandL: 0,
+  serviceAvailability: 0.95,
+  operationCount: 2,
+  containmentTimeMinutes: null,
+  exposureEvaluated: false,
+  pressureMarginM: 7,
+  serviceAvailabilityMargin: 0,
+  numericallySensitive: true,
+};
+
+/**
+ * Illustrative verified response Pareto frontier for the DEMO_FALLBACK
+ * fixture (core-issues5.txt Section 14). GET /incidents/{id}/frontier
+ * only exists for a real LIVE incident; consequences here reuse the same
+ * consequenceA/B/C values as demoIncident.plans/counterfactuals -- never
+ * used for a LIVE incident. `dominated` reflects genuine Pareto
+ * trade-offs among these hand-authored points, not plan approval status
+ * (a Pareto-efficient point can still be REJECTED for safety, e.g. Plan
+ * A here -- verification authority always overrides frontier position).
+ */
+export const demoParetoFrontier: ParetoFrontierEntry[] = [
+  {
+    planId: 'no-response',
+    label: 'No response',
+    consequences: noResponseConsequence,
+    mode: 'posterior_weighted',
+    dominated: false,
+    isNoActionComparator: true,
+    group: 'EXPOSURE_AWARE',
+  },
+  {
+    planId: 'A',
+    label: 'Aggressive isolation',
+    consequences: consequenceA,
+    mode: 'posterior_weighted',
+    dominated: false,
+    isNoActionComparator: false,
+    group: 'EXPOSURE_AWARE',
+  },
+  {
+    planId: 'B',
+    label: 'Isolate + controlled flush',
+    consequences: consequenceB,
+    mode: 'posterior_weighted',
+    dominated: false,
+    isNoActionComparator: false,
+    group: 'EXPOSURE_AWARE',
+  },
+  {
+    planId: 'C',
+    label: 'Monitor + flush only',
+    consequences: consequenceC,
+    mode: 'posterior_weighted',
+    dominated: true,
+    isNoActionComparator: false,
+    group: 'EXPOSURE_AWARE',
+  },
+  {
+    planId: 'legacy-hydraulic',
+    label: 'Reopen prior closure (hydraulic-only evaluation)',
+    consequences: hydraulicOnlyConsequence,
+    mode: 'posterior_weighted',
+    dominated: false,
+    isNoActionComparator: false,
+    group: 'HYDRAULIC_ONLY',
+  },
+];
