@@ -31,15 +31,28 @@ vi.mock('maplibre-gl', () => {
       return this.layers.has(id) ? { id } : undefined;
     }
     setLayoutProperty() {}
+    fitBounds() {}
+    jumpTo() {}
   }
-  return { default: { Map: MapMock, NavigationControl: class {} } };
+  class LngLatBoundsMock {
+    constructor(
+      public sw: [number, number],
+      public ne: [number, number],
+    ) {}
+    extend() {
+      return this;
+    }
+  }
+  return {
+    default: { Map: MapMock, NavigationControl: class {}, LngLatBounds: LngLatBoundsMock },
+  };
 });
 
 vi.mock('echarts/core', () => ({
   use: vi.fn(),
   init: () => ({ setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn() }),
 }));
-vi.mock('echarts/charts', () => ({ LineChart: {} }));
+vi.mock('echarts/charts', () => ({ LineChart: {}, BarChart: {} }));
 vi.mock('echarts/components', () => ({
   GridComponent: {},
   LegendComponent: {},

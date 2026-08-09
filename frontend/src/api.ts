@@ -149,38 +149,67 @@ interface ApiIncidentView {
     expected_information_gain: number;
     alternatives: string[];
   } | null;
+  evidence_history: {
+    round_index: number;
+    observation_count: number;
+    valid_concentration_count: number;
+    sensor_nodes: string[];
+    evidence_hash: string;
+  }[];
   plans: {
     plan: {
       plan_id: string;
       name: string;
-      actions: { action_type: string; target_id: string | null }[];
+      actions: {
+        action_type: string;
+        target_id: string | null;
+        start_minute: number;
+        duration_minutes: number;
+        flow_rate_lps: number | null;
+      }[];
     };
     verification: {
       decision: 'VERIFIED' | 'REJECTED' | 'ABSTAINED' | 'PENDING_APPROVAL';
+      simulator: string;
+      simulator_version: string;
+      state_hash: string;
+      consequences: ApiConsequenceMetrics | null;
+      worst_case_consequences: ApiConsequenceMetrics | null;
+      evaluation_provenance: Record<string, unknown> | null;
       rejection_codes: string[];
       abstention_reason: string | null;
+      verified_at: string;
+      context_hash: string | null;
+      verification_status: 'CURRENT' | 'STALE';
     } | null;
   }[];
   selected_plan_id: string | null;
   recommended_plan_id: string | null;
-  counterfactual_consequences: Record<
-    string,
-    {
-      population_impacted: number;
-      contaminant_mass_consumed_mg: number;
-      volume_above_threshold_l: number;
-      contaminated_pipe_extent_m: number;
-      minimum_pressure_m: number;
-      pressure_violation_minutes: number;
-      unserved_demand_l: number;
-      service_availability: number;
-      operation_count: number;
-      containment_time_minutes: number | null;
-    }
-  >;
+  counterfactual_consequences: Record<string, ApiConsequenceMetrics>;
   explanations: { intent: string; text: string }[];
   audit_events: Record<string, unknown>[];
   runtime_metrics_ms: Record<string, number>;
+}
+
+/** Mirrors hydroswarm.domain.schemas.ConsequenceMetrics field-for-field.
+ * Shared by both counterfactual_consequences and plans[].verification,
+ * since the backend populates the former directly from the latter's
+ * `consequences` (overnight-plan.txt Task 3.2). */
+interface ApiConsequenceMetrics {
+  population_impacted: number;
+  contaminant_mass_consumed_mg: number;
+  volume_above_threshold_l: number;
+  contaminated_pipe_extent_m: number;
+  minimum_pressure_m: number;
+  pressure_violation_minutes: number;
+  unserved_demand_l: number;
+  service_availability: number;
+  operation_count: number;
+  containment_time_minutes: number | null;
+  exposure_evaluated: boolean;
+  pressure_margin_m: number | null;
+  service_availability_margin: number | null;
+  numerically_sensitive: boolean;
 }
 
 function planStatusFromApi(
@@ -193,9 +222,7 @@ function planStatusFromApi(
   return planId === recommendedPlanId ? 'RECOMMENDED' : 'VALID';
 }
 
-function consequenceFromApi(
-  raw: ApiIncidentView['counterfactual_consequences'][string],
-): ConsequenceView {
+function consequenceFromApi(raw: ApiConsequenceMetrics): ConsequenceView {
   return {
     populationImpacted: raw.population_impacted,
     contaminantMassConsumedMg: raw.contaminant_mass_consumed_mg,
@@ -207,6 +234,10 @@ function consequenceFromApi(
     serviceAvailability: raw.service_availability,
     operationCount: raw.operation_count,
     containmentTimeMinutes: raw.containment_time_minutes,
+    exposureEvaluated: raw.exposure_evaluated,
+    pressureMarginM: raw.pressure_margin_m,
+    serviceAvailabilityMargin: raw.service_availability_margin,
+    numericallySensitive: raw.numerically_sensitive,
   };
 }
 
@@ -246,9 +277,11 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     target: link.end_node,
     // Per-link flow is not yet threaded through IncidentAnalysisResult
     // (HydraulicSimulator computes it, but it isn't carried onto the
-    // result today); 0 is an honest "not measured", not a fabricated flow.
-    flow: 0,
-    concentration: 0,
+    // result today); null is honest "not measured" (ui-work.txt 8.1),
+    // never a fabricated 0 that a map layer could draw as if measured.
+    flow: null,
+    // NetworkLinkView carries no per-link concentration field today.
+    concentration: null,
   }));
 
   const candidates: Candidate[] = raw.candidates.node_ids
@@ -258,23 +291,39 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
   const plans: Plan[] = raw.plans.map(({ plan, verification }) => ({
     id: plan.plan_id,
     name: plan.name,
+    actions: plan.actions.map((action) => ({
+      actionType: action.action_type,
+      targetId: action.target_id,
+      startMinute: action.start_minute,
+      durationMinutes: action.duration_minutes,
+      flowRateLps: action.flow_rate_lps,
+    })),
+    status: planStatusFromApi(plan.plan_id, verification, raw.recommended_plan_id),
+    verification: verification
+      ? {
+          decision: verification.decision,
+          simulator: verification.simulator,
+          simulatorVersion: verification.simulator_version,
+          stateHash: verification.state_hash,
+          consequences: verification.consequences
+            ? consequenceFromApi(verification.consequences)
+            : null,
+          worstCaseConsequences: verification.worst_case_consequences
+            ? consequenceFromApi(verification.worst_case_consequences)
+            : null,
+          evaluationProvenance: verification.evaluation_provenance,
+          rejectionCodes: [...verification.rejection_codes],
+          abstentionReason: verification.abstention_reason,
+          verifiedAt: verification.verified_at,
+          contextHash: verification.context_hash,
+          verificationStatus: verification.verification_status,
+        }
+      : null,
     // Not yet computed server-side against a no-response baseline (see
     // hydroswarm.explanation.EvidenceBundle.exposure_reduction_mg, also
-    // always None today) -- 0 here means "not measured", not "no benefit".
-    exposureReduction: 0,
-    pressureViolations:
-      raw.counterfactual_consequences[plan.plan_id]?.pressure_violation_minutes ?? 0,
-    serviceAvailability: raw.counterfactual_consequences[plan.plan_id]?.service_availability ?? 0,
-    actions: plan.actions.length,
-    containmentMinutes:
-      raw.counterfactual_consequences[plan.plan_id]?.containment_time_minutes ?? 0,
-    status: planStatusFromApi(plan.plan_id, verification, raw.recommended_plan_id),
-    rejectionReason:
-      verification?.decision === 'REJECTED'
-        ? verification.rejection_codes.join(', ') || 'rejected by exact simulation'
-        : verification?.decision === 'ABSTAINED'
-          ? (verification.abstention_reason ?? undefined)
-          : undefined,
+    // always None today) -- null means "not measured", not "no benefit"
+    // (ui-work.txt 8.2: render "-- / Not evaluated").
+    exposureReduction: null,
   }));
 
   const sample = raw.sample_recommendation;
@@ -287,8 +336,10 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     ? {
         nodeId: sample.node_id,
         informationGain: sample.expected_information_gain,
-        delayMinutes: 0,
-        cost: 0,
+        // SampleRecommendationView carries no delay/cost fields today --
+        // null, never a fabricated 0 (ui-work.txt 8.3).
+        delayMinutes: null,
+        cost: null,
         rationale: `Expected information gain ${sample.expected_information_gain.toFixed(2)} bits; alternatives: ${sample.alternatives.join(', ') || 'none'}.`,
       }
     : null;
@@ -322,12 +373,16 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     links,
     candidates,
     recommendedSample,
-    evidence: {
-      before: [],
-      after: candidates,
-      uncertaintyReduction: 0,
-      nodesRemoved: 0,
-    },
+    evidenceHistory: raw.evidence_history.map((entry) => ({
+      roundIndex: entry.round_index,
+      observationCount: entry.observation_count,
+      validConcentrationCount: entry.valid_concentration_count,
+      sensorNodes: [...entry.sensor_nodes],
+      evidenceHash: entry.evidence_hash,
+    })),
+    // No backend endpoint exposes a live per-incident hydraulic time
+    // series yet -- null here, never a fabricated series (ui-work.txt 8.5).
+    hydraulicSeries: null,
     plans,
     selectedPlanId: raw.selected_plan_id,
     recommendedPlanId: raw.recommended_plan_id,
@@ -403,7 +458,8 @@ function errorIncidentView(reason: string): IncidentView {
     links: [],
     candidates: [],
     recommendedSample: null,
-    evidence: { before: [], after: [], uncertaintyReduction: 0, nodesRemoved: 0 },
+    evidenceHistory: [],
+    hydraulicSeries: null,
     plans: [],
     selectedPlanId: null,
     recommendedPlanId: null,

@@ -1,11 +1,74 @@
-import type { IncidentView } from './types';
+import type { ConsequenceView, IncidentView } from './types';
+
+// Illustrative required safety thresholds used only to compute the demo
+// fixture's pressure/service-availability margins below (matches the
+// rejection narrative: "Pressure below 15 m for 23 minutes"). Real margins
+// come from hydroswarm.simulation.verifier at runtime; this fixture is
+// hand-authored and clearly labeled DEMO_FALLBACK throughout.
+const REQUIRED_MINIMUM_PRESSURE_M = 15;
+const REQUIRED_SERVICE_AVAILABILITY = 0.95;
+
+function consequence(
+  values: Omit<
+    ConsequenceView,
+    'exposureEvaluated' | 'pressureMarginM' | 'serviceAvailabilityMargin' | 'numericallySensitive'
+  >,
+): ConsequenceView {
+  return {
+    ...values,
+    exposureEvaluated: true,
+    pressureMarginM: values.minimumPressureM - REQUIRED_MINIMUM_PRESSURE_M,
+    serviceAvailabilityMargin: values.serviceAvailability - REQUIRED_SERVICE_AVAILABILITY,
+    numericallySensitive: false,
+  };
+}
+
+const consequenceA = consequence({
+  populationImpacted: 210,
+  contaminantMassConsumedMg: 4820,
+  volumeAboveThresholdL: 1860,
+  contaminatedPipeExtentM: 640,
+  minimumPressureM: 9.4,
+  pressureViolationMinutes: 23,
+  unservedDemandL: 3100,
+  serviceAvailability: 0.918,
+  operationCount: 5,
+  containmentTimeMinutes: 31,
+});
+
+const consequenceB = consequence({
+  populationImpacted: 140,
+  contaminantMassConsumedMg: 2510,
+  volumeAboveThresholdL: 980,
+  contaminatedPipeExtentM: 310,
+  minimumPressureM: 24.1,
+  pressureViolationMinutes: 0,
+  unservedDemandL: 420,
+  serviceAvailability: 0.987,
+  operationCount: 3,
+  containmentTimeMinutes: 44,
+});
+
+const consequenceC = consequence({
+  populationImpacted: 190,
+  contaminantMassConsumedMg: 3340,
+  volumeAboveThresholdL: 1420,
+  contaminatedPipeExtentM: 480,
+  minimumPressureM: 27.8,
+  pressureViolationMinutes: 0,
+  unservedDemandL: 0,
+  serviceAvailability: 1,
+  operationCount: 1,
+  containmentTimeMinutes: 68,
+});
 
 export const demoIncident: IncidentView = {
   id: 'HS-0041',
   networkId: 'Net3',
   status: 'APPROVAL',
   mode: 'DEMO_FALLBACK',
-  modeReason: 'Live API unavailable or no incident configured. Values shown are a frozen, simulator-derived fixture, not live telemetry.',
+  modeReason:
+    'Live API unavailable or no incident configured. Values shown are a frozen, simulator-derived fixture, not live telemetry.',
   offline: true,
   runtimeMs: 438,
   modelVersion: 'HydroSwarm-M 0.9.2',
@@ -127,92 +190,180 @@ export const demoIncident: IncidentView = {
     cost: 1.4,
     rationale: 'Best separation between the two remaining upstream hypotheses.',
   },
-  evidence: {
-    before: [
-      { nodeId: 'J117', probability: 0.38 },
-      { nodeId: 'J121', probability: 0.34 },
-      { nodeId: 'J109', probability: 0.16 },
-    ],
-    after: [
-      { nodeId: 'J117', probability: 0.76 },
-      { nodeId: 'J121', probability: 0.11 },
-      { nodeId: 'J109', probability: 0.05 },
-    ],
-    uncertaintyReduction: 0.41,
-    nodesRemoved: 8,
-  },
+  evidenceHistory: [
+    {
+      roundIndex: 0,
+      observationCount: 6,
+      validConcentrationCount: 5,
+      sensorNodes: ['S4'],
+      evidenceHash: 'e1a9c7d5f3b8024f6a1c9e3b7d5f0824a6c1e9b3d7f50824a6c1e9b3d7f5082',
+    },
+    {
+      roundIndex: 1,
+      observationCount: 9,
+      validConcentrationCount: 8,
+      sensorNodes: ['S4', 'S7'],
+      evidenceHash: 'e2b8d6c4f2a7913e5b0d8f6a1c9e3b7d5f0824a6c1e9b3d7f50824a6c1e9b3d',
+    },
+  ],
+  hydraulicSeries: [
+    { time: '08:00', pressureM: 31, concentrationMgL: 0 },
+    { time: '08:10', pressureM: 29, concentrationMgL: 0.12 },
+    { time: '08:20', pressureM: 27, concentrationMgL: 0.78 },
+    { time: '08:30', pressureM: 28, concentrationMgL: 0.44 },
+    { time: '08:40', pressureM: 30, concentrationMgL: 0.16 },
+  ],
   plans: [
     {
       id: 'A',
       name: 'Aggressive isolation',
       exposureReduction: 0.61,
-      pressureViolations: 4,
-      serviceAvailability: 0.918,
-      actions: 5,
-      containmentMinutes: 31,
+      actions: [
+        {
+          actionType: 'ISOLATE_ZONE',
+          targetId: 'J117',
+          startMinute: 0,
+          durationMinutes: 60,
+          flowRateLps: null,
+        },
+        {
+          actionType: 'CLOSE_PIPE',
+          targetId: 'P4',
+          startMinute: 0,
+          durationMinutes: 60,
+          flowRateLps: null,
+        },
+        {
+          actionType: 'CLOSE_PIPE',
+          targetId: 'P6',
+          startMinute: 0,
+          durationMinutes: 60,
+          flowRateLps: null,
+        },
+        {
+          actionType: 'MONITOR_NODE',
+          targetId: 'J121',
+          startMinute: 0,
+          durationMinutes: 60,
+          flowRateLps: null,
+        },
+        {
+          actionType: 'END_PLAN',
+          targetId: null,
+          startMinute: 60,
+          durationMinutes: 0,
+          flowRateLps: null,
+        },
+      ],
       status: 'REJECTED',
-      rejectionReason: 'Pressure below 15 m for 23 minutes.',
+      verification: {
+        decision: 'REJECTED',
+        simulator: 'wntr-epanet',
+        simulatorVersion: '1.2.0',
+        stateHash: 'a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f9',
+        consequences: consequenceA,
+        worstCaseConsequences: null,
+        evaluationProvenance: { aggregation_policy: 'posterior_weighted', hypotheses_evaluated: 1 },
+        rejectionCodes: ['PRESSURE_BELOW_MINIMUM'],
+        abstentionReason: null,
+        verifiedAt: '2026-08-03T08:28:03Z',
+        contextHash: 'ctx-a1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8',
+        verificationStatus: 'CURRENT',
+      },
     },
     {
       id: 'B',
       name: 'Isolate + controlled flush',
       exposureReduction: 0.48,
-      pressureViolations: 0,
-      serviceAvailability: 0.987,
-      actions: 3,
-      containmentMinutes: 44,
+      actions: [
+        {
+          actionType: 'CLOSE_PIPE',
+          targetId: 'P4',
+          startMinute: 0,
+          durationMinutes: 60,
+          flowRateLps: null,
+        },
+        {
+          actionType: 'FLUSH_NODE',
+          targetId: 'J123',
+          startMinute: 5,
+          durationMinutes: 20,
+          flowRateLps: 4.2,
+        },
+        {
+          actionType: 'END_PLAN',
+          targetId: null,
+          startMinute: 44,
+          durationMinutes: 0,
+          flowRateLps: null,
+        },
+      ],
       status: 'RECOMMENDED',
+      verification: {
+        decision: 'VERIFIED',
+        simulator: 'wntr-epanet',
+        simulatorVersion: '1.2.0',
+        stateHash: 'b1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f9',
+        consequences: consequenceB,
+        worstCaseConsequences: null,
+        evaluationProvenance: { aggregation_policy: 'posterior_weighted', hypotheses_evaluated: 1 },
+        rejectionCodes: [],
+        abstentionReason: null,
+        verifiedAt: '2026-08-03T08:28:05Z',
+        contextHash: 'ctx-b1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8',
+        verificationStatus: 'CURRENT',
+      },
     },
     {
       id: 'C',
       name: 'Monitor + flush only',
       exposureReduction: 0.33,
-      pressureViolations: 0,
-      serviceAvailability: 1,
-      actions: 1,
-      containmentMinutes: 68,
+      actions: [
+        {
+          actionType: 'MONITOR_NODE',
+          targetId: 'J123',
+          startMinute: 0,
+          durationMinutes: 68,
+          flowRateLps: null,
+        },
+        {
+          actionType: 'FLUSH_NODE',
+          targetId: 'J123',
+          startMinute: 10,
+          durationMinutes: 15,
+          flowRateLps: 3.1,
+        },
+        {
+          actionType: 'END_PLAN',
+          targetId: null,
+          startMinute: 68,
+          durationMinutes: 0,
+          flowRateLps: null,
+        },
+      ],
       status: 'VALID',
+      verification: {
+        decision: 'VERIFIED',
+        simulator: 'wntr-epanet',
+        simulatorVersion: '1.2.0',
+        stateHash: 'c1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f9',
+        consequences: consequenceC,
+        worstCaseConsequences: null,
+        evaluationProvenance: { aggregation_policy: 'posterior_weighted', hypotheses_evaluated: 1 },
+        rejectionCodes: [],
+        abstentionReason: null,
+        verifiedAt: '2026-08-03T08:28:06Z',
+        contextHash: 'ctx-c1b2c3d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8',
+        verificationStatus: 'CURRENT',
+      },
     },
   ],
   selectedPlanId: 'B',
   recommendedPlanId: 'B',
   counterfactuals: {
-    A: {
-      populationImpacted: 210,
-      contaminantMassConsumedMg: 4820,
-      volumeAboveThresholdL: 1860,
-      contaminatedPipeExtentM: 640,
-      minimumPressureM: 9.4,
-      pressureViolationMinutes: 23,
-      unservedDemandL: 3100,
-      serviceAvailability: 0.918,
-      operationCount: 5,
-      containmentTimeMinutes: 31,
-    },
-    B: {
-      populationImpacted: 140,
-      contaminantMassConsumedMg: 2510,
-      volumeAboveThresholdL: 980,
-      contaminatedPipeExtentM: 310,
-      minimumPressureM: 24.1,
-      pressureViolationMinutes: 0,
-      unservedDemandL: 420,
-      serviceAvailability: 0.987,
-      operationCount: 3,
-      containmentTimeMinutes: 44,
-    },
-    C: {
-      populationImpacted: 190,
-      contaminantMassConsumedMg: 3340,
-      volumeAboveThresholdL: 1420,
-      contaminatedPipeExtentM: 480,
-      minimumPressureM: 27.8,
-      pressureViolationMinutes: 0,
-      unservedDemandL: 0,
-      serviceAvailability: 1,
-      operationCount: 1,
-      containmentTimeMinutes: 68,
-    },
+    A: consequenceA,
+    B: consequenceB,
+    C: consequenceC,
   },
   audit: [
     {

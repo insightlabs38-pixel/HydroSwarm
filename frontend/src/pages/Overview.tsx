@@ -98,15 +98,19 @@ export function Overview({ incident }: { incident: IncidentView }) {
           >
             <div className="sample-metrics">
               <span>
-                <strong>{incident.recommendedSample.informationGain.toFixed(2)}</strong>{' '}
-                information gain
+                <strong>{incident.recommendedSample.informationGain.toFixed(2)}</strong> information
+                gain
               </span>
-              <span>
-                <strong>{incident.recommendedSample.delayMinutes}m</strong> delay
-              </span>
-              <span>
-                <strong>{incident.recommendedSample.cost.toFixed(1)}</strong> cost
-              </span>
+              {incident.recommendedSample.delayMinutes !== null && (
+                <span>
+                  <strong>{incident.recommendedSample.delayMinutes}m</strong> delay
+                </span>
+              )}
+              {incident.recommendedSample.cost !== null && (
+                <span>
+                  <strong>{incident.recommendedSample.cost.toFixed(1)}</strong> cost
+                </span>
+              )}
             </div>
             <p>{incident.recommendedSample.rationale}</p>
             <button
@@ -156,15 +160,15 @@ export function Overview({ incident }: { incident: IncidentView }) {
             </div>
           }
         >
-          <HydraulicChart />
+          <HydraulicChart incident={incident} />
         </Suspense>
       </Panel>
       <Panel title="Incident replay" eyebrow="AUDITABLE SEQUENCE" className="timeline-panel">
         <Timeline events={incident.audit} />
       </Panel>
       <Panel
-        title="What changed after the sample?"
-        eyebrow="EVIDENCE CONTRACTION"
+        title="Evidence rounds and candidate set"
+        eyebrow="OBSERVED EVIDENCE HISTORY"
         className="wide-panel"
       >
         <EvidencePanel incident={incident} />
@@ -193,18 +197,34 @@ export function Overview({ incident }: { incident: IncidentView }) {
           {/* Not yet wired to the explanation API (overnight-plan.txt Task
               3.4): disabled with an explicit reason rather than appearing
               functional while doing nothing on click. */}
-          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+          <button
+            type="button"
+            disabled
+            title="Explanation Q&A is not yet connected to the live API"
+          >
             Why this source?
           </button>
-          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+          <button
+            type="button"
+            disabled
+            title="Explanation Q&A is not yet connected to the live API"
+          >
             Why this sample?
           </button>
           {rejectedPlan && (
-            <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+            <button
+              type="button"
+              disabled
+              title="Explanation Q&A is not yet connected to the live API"
+            >
               Why was {rejectedPlan.name} rejected?
             </button>
           )}
-          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
+          <button
+            type="button"
+            disabled
+            title="Explanation Q&A is not yet connected to the live API"
+          >
             What uncertainty remains?
           </button>
         </div>

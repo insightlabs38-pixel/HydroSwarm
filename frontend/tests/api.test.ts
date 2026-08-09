@@ -16,10 +16,7 @@ beforeEach(() => {
 
 describe('fetchIncident (no VITE_INCIDENT_ID configured, matching this test env)', () => {
   test('throws IncidentUnavailableError when the API is reachable but no incident is configured', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })),
-    );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
     const { fetchIncident, IncidentUnavailableError } = await import('../src/api');
     await expect(fetchIncident()).rejects.toBeInstanceOf(IncidentUnavailableError);
   });
@@ -35,10 +32,7 @@ describe('fetchIncidentWithFallback', () => {
   });
 
   test('returns ERROR mode (not DEMO_FALLBACK) when the API is reachable but the incident cannot be resolved', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })),
-    );
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
     const { fetchIncidentWithFallback } = await import('../src/api');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('ERROR');
@@ -85,18 +79,92 @@ function apiIncidentViewFixture(): unknown {
     ood_level: 'NORMAL',
     calibration_alpha: 0.1,
     nodes: [
-      { node_id: 'J1', node_type: 'junction', elevation_m: 10, coordinates: [1, 2], probability: 0.7, concentration_mg_l: 0.3, candidate: true },
-      { node_id: 'J2', node_type: 'junction', elevation_m: 12, coordinates: [3, 4], probability: 0.3, concentration_mg_l: 0.1, candidate: true },
+      {
+        node_id: 'J1',
+        node_type: 'junction',
+        elevation_m: 10,
+        coordinates: [1, 2],
+        probability: 0.7,
+        concentration_mg_l: 0.3,
+        candidate: true,
+      },
+      {
+        node_id: 'J2',
+        node_type: 'junction',
+        elevation_m: 12,
+        coordinates: [3, 4],
+        probability: 0.3,
+        concentration_mg_l: 0.1,
+        candidate: true,
+      },
     ],
     links: [{ link_id: 'P1', link_type: 'pipe', start_node: 'J1', end_node: 'J2' }],
     sensor_health: [
-      { sensor_id: 'S1', node_id: 'J1', health: 'HEALTHY', quality: 0.98, observed_at: new Date().toISOString(), received_at: new Date().toISOString(), pressure_m: 28, concentration_mg_l: 0.3 },
+      {
+        sensor_id: 'S1',
+        node_id: 'J1',
+        health: 'HEALTHY',
+        quality: 0.98,
+        observed_at: new Date().toISOString(),
+        received_at: new Date().toISOString(),
+        pressure_m: 28,
+        concentration_mg_l: 0.3,
+      },
     ],
     sample_recommendation: { node_id: 'J2', expected_information_gain: 0.4, alternatives: [] },
+    evidence_history: [
+      {
+        round_index: 0,
+        observation_count: 3,
+        valid_concentration_count: 2,
+        sensor_nodes: ['S1'],
+        evidence_hash: 'e'.repeat(64),
+      },
+    ],
     plans: [
       {
-        plan: { plan_id: 'plan-a', name: 'Isolate J2', actions: [{ action_type: 'CLOSE_PIPE', target_id: 'P1' }] },
-        verification: { decision: 'VERIFIED', rejection_codes: [], abstention_reason: null },
+        plan: {
+          plan_id: 'plan-a',
+          name: 'Isolate J2',
+          actions: [
+            {
+              action_type: 'CLOSE_PIPE',
+              target_id: 'P1',
+              start_minute: 0,
+              duration_minutes: 30,
+              flow_rate_lps: null,
+            },
+          ],
+        },
+        verification: {
+          decision: 'VERIFIED',
+          simulator: 'wntr',
+          simulator_version: '1.2.0',
+          state_hash: 's'.repeat(64),
+          consequences: {
+            population_impacted: 10,
+            contaminant_mass_consumed_mg: 5,
+            volume_above_threshold_l: 2,
+            contaminated_pipe_extent_m: 100,
+            minimum_pressure_m: 20,
+            pressure_violation_minutes: 0,
+            unserved_demand_l: 0,
+            service_availability: 0.99,
+            operation_count: 1,
+            containment_time_minutes: 12,
+            exposure_evaluated: true,
+            pressure_margin_m: 5,
+            service_availability_margin: 0.04,
+            numerically_sensitive: false,
+          },
+          worst_case_consequences: null,
+          evaluation_provenance: null,
+          rejection_codes: [],
+          abstention_reason: null,
+          verified_at: '2026-08-03T08:00:00Z',
+          context_hash: 'ctx-plan-a',
+          verification_status: 'CURRENT',
+        },
       },
     ],
     selected_plan_id: null,
@@ -113,11 +181,21 @@ function apiIncidentViewFixture(): unknown {
         service_availability: 0.99,
         operation_count: 1,
         containment_time_minutes: 12,
+        exposure_evaluated: true,
+        pressure_margin_m: 5,
+        service_availability_margin: 0.04,
+        numerically_sensitive: false,
       },
     },
     explanations: [{ intent: 'WHY_SOURCE', text: 'J1 is the leading source.' }],
     audit_events: [
-      { sequence: 1, timestamp: '2026-08-03T08:00:00', event_type: 'INCIDENT_CREATED', actor: 'OPERATOR', payload: {} },
+      {
+        sequence: 1,
+        timestamp: '2026-08-03T08:00:00',
+        event_type: 'INCIDENT_CREATED',
+        actor: 'OPERATOR',
+        payload: {},
+      },
     ],
     runtime_metrics_ms: { hydraulic_simulation: 12.5, neural_inference: 3.2 },
   };
@@ -156,7 +234,7 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
       vi.fn((url: string) => {
         if (String(url).includes('/health')) return Promise.resolve(jsonResponse({ status: 'ok' }));
         return Promise.resolve(
-          jsonResponse({ ...apiIncidentViewFixture() as object, sample_recommendation: null }),
+          jsonResponse({ ...(apiIncidentViewFixture() as object), sample_recommendation: null }),
         );
       }),
     );
@@ -206,21 +284,21 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
     'incomplete_simulator_output',
     'severe_sensor_dropout',
     'no_valid_plan',
-  ] as const)('%s renders ERROR mode with an explicit, distinct reason -- never LIVE', async (category) => {
-    window.history.pushState(null, '', `/?failure=${category}`);
-    // Even an otherwise-healthy API must not override an injected failure.
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
-    const { fetchIncidentWithFallback } = await import('../src/api');
-    const incident = await fetchIncidentWithFallback();
-    expect(incident.mode).toBe('ERROR');
-    expect(incident.mode).not.toBe('LIVE');
-    expect(incident.modeReason).toContain(category);
-  });
-
-  test.each([
-    'missing_checkpoint',
-    'no_valid_plan',
   ] as const)(
+    '%s renders ERROR mode with an explicit, distinct reason -- never LIVE',
+    async (category) => {
+      window.history.pushState(null, '', `/?failure=${category}`);
+      // Even an otherwise-healthy API must not override an injected failure.
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
+      const { fetchIncidentWithFallback } = await import('../src/api');
+      const incident = await fetchIncidentWithFallback();
+      expect(incident.mode).toBe('ERROR');
+      expect(incident.mode).not.toBe('LIVE');
+      expect(incident.modeReason).toContain(category);
+    },
+  );
+
+  test.each(['missing_checkpoint', 'no_valid_plan'] as const)(
     '%s: ERROR mode carries no demo plans, candidates, or sample recommendation',
     async (category) => {
       // core-issues.txt: ERROR mode must not render demo plans, candidates,
