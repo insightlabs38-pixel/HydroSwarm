@@ -61,6 +61,10 @@ interface ConsoleUiState {
   selectedPlanId: string | null;
   selectedAuditSequence: number | null;
   mapLayers: MapLayerState;
+  mapLayerControlVisible: boolean;
+  /** Bumped by WorkspaceToolbar's "Fit network" control; the map watches
+   * this and re-fits its viewport without rebuilding sources/layers. */
+  mapFitRequestedAt: number;
   leftRailCollapsed: boolean;
   inspectorCollapsed: boolean;
   dockCollapsed: boolean;
@@ -77,6 +81,8 @@ interface ConsoleUiState {
   selectPlan: (planId: string | null) => void;
   selectAuditSequence: (sequence: number | null) => void;
   setMapLayer: (layer: keyof MapLayerState, visible: boolean) => void;
+  toggleMapLayerControl: () => void;
+  requestMapFit: () => void;
   toggleLeftRail: () => void;
   toggleInspector: () => void;
   toggleDock: () => void;
@@ -103,6 +109,8 @@ export const useConsoleStore = create<ConsoleUiState>()(
       selectedPlanId: null,
       selectedAuditSequence: null,
       mapLayers: defaultMapLayers,
+      mapLayerControlVisible: true,
+      mapFitRequestedAt: 0,
       leftRailCollapsed: false,
       inspectorCollapsed: false,
       dockCollapsed: false,
@@ -120,6 +128,9 @@ export const useConsoleStore = create<ConsoleUiState>()(
       selectAuditSequence: (selectedAuditSequence) => set({ selectedAuditSequence }),
       setMapLayer: (layer, visible) =>
         set((state) => ({ mapLayers: { ...state.mapLayers, [layer]: visible } })),
+      toggleMapLayerControl: () =>
+        set((state) => ({ mapLayerControlVisible: !state.mapLayerControlVisible })),
+      requestMapFit: () => set({ mapFitRequestedAt: Date.now() }),
       toggleLeftRail: () => set((state) => ({ leftRailCollapsed: !state.leftRailCollapsed })),
       toggleInspector: () => set((state) => ({ inspectorCollapsed: !state.inspectorCollapsed })),
       toggleDock: () => set((state) => ({ dockCollapsed: !state.dockCollapsed })),

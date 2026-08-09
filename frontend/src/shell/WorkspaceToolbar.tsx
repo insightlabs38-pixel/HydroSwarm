@@ -11,6 +11,9 @@ export function WorkspaceToolbar() {
     selectNode,
     selectLink,
     selectPlan,
+    mapLayerControlVisible,
+    toggleMapLayerControl,
+    requestMapFit,
   } = useConsoleStore();
   const hasSelection = selectedNodeId || selectedLinkId || selectedPlanId;
   const showsMap = MAP_WORKSPACES.has(workspace);
@@ -29,17 +32,13 @@ export function WorkspaceToolbar() {
       <div className="workspace-toolbar-controls">
         {showsMap && (
           <>
-            <button
-              type="button"
-              disabled
-              title="Map fit-to-network control is wired in the UI-2 map rebuild"
-            >
+            <button type="button" onClick={requestMapFit}>
               Fit network
             </button>
             <button
               type="button"
-              disabled
-              title="Shared layer control is wired in the UI-2 map rebuild"
+              aria-pressed={mapLayerControlVisible}
+              onClick={toggleMapLayerControl}
             >
               Layers
             </button>

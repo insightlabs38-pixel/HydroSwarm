@@ -31,8 +31,15 @@ vi.mock('maplibre-gl', () => {
       return this.layers.has(id) ? { id } : undefined;
     }
     setLayoutProperty() {}
+    setFilter() {}
     fitBounds() {}
     jumpTo() {}
+    getSource() {
+      return { setData: () => {} };
+    }
+    getCanvas() {
+      return { style: {} };
+    }
   }
   class LngLatBoundsMock {
     constructor(

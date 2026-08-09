@@ -398,6 +398,48 @@ footer {
 .legend-action {
   background: var(--lime);
 }
+.legend-action-swatch {
+  background: transparent !important;
+  border: 2px solid;
+  border-radius: 50%;
+  height: 10px !important;
+  width: 10px !important;
+}
+.map-popup {
+  font-size: 12px;
+}
+.map-popup strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-mono);
+}
+.map-popup dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15rem 0.6rem;
+}
+.map-popup dt {
+  color: var(--text-muted);
+}
+.map-popup dd {
+  margin: 0;
+}
+.maplibregl-popup-content {
+  background: var(--panel-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  padding: 0.6rem 0.7rem;
+  box-shadow: none;
+}
+.maplibregl-popup-tip {
+  border-top-color: var(--panel-raised);
+  border-bottom-color: var(--panel-raised);
+}
+.maplibregl-popup-close-button {
+  color: var(--text-secondary);
+}
 .candidate-hero {
   display: flex;
   justify-content: space-between;

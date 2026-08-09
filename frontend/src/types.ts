@@ -45,7 +45,6 @@ export interface NetworkLink {
    * field today (only node-level concentration_mg_l exists). Never a
    * fabricated 0. */
   concentration: number | null;
-  action?: 'CLOSE' | 'FLUSH';
 }
 
 export interface SensorState {

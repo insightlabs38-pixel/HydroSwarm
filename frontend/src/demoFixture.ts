@@ -175,9 +175,9 @@ export const demoIncident: IncidentView = {
     { id: 'P1', source: 'R1', target: 'J104', flow: 32, concentration: 0 },
     { id: 'P2', source: 'J104', target: 'J109', flow: 27, concentration: 0.1 },
     { id: 'P3', source: 'J109', target: 'J117', flow: 22, concentration: 0.72 },
-    { id: 'P4', source: 'J117', target: 'J121', flow: 19, concentration: 0.61, action: 'CLOSE' },
+    { id: 'P4', source: 'J117', target: 'J121', flow: 19, concentration: 0.61 },
     { id: 'P5', source: 'J121', target: 'J123', flow: 13, concentration: 0.42 },
-    { id: 'P6', source: 'J123', target: 'J131', flow: 9, concentration: 0.2, action: 'FLUSH' },
+    { id: 'P6', source: 'J123', target: 'J131', flow: 9, concentration: 0.2 },
     { id: 'P7', source: 'T1', target: 'J123', flow: -6, concentration: 0.04 },
   ],
   candidates: [
