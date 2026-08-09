@@ -22,6 +22,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   9. `7381d90` — `feat(ui): add deterministic evidence-value sampling workspace` (UI-4)
   10. `15538af` — `docs(handoff): record UI-4 completion`
   11. `bf77697` — `feat(ui): add verified response-plan decision workspace` (UI-5)
+  12. `54a52b3` — `docs(handoff): record UI-5 completion and exact-run-budget scope decision`
+  13. `4d50e37` — `feat(ui): implement guarded human plan-approval workflow` (UI-6)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -234,23 +236,46 @@ backend touch, and would context-switch away from the frontend-focused momentum 
 run. It remains a legitimate, still-open, narrowly-additive candidate for a future
 session — recorded here explicitly rather than silently dropped.
 
-## Remaining phases (UI-6 through UI-11): NOT STARTED
+## UI-6 — guarded human plan-approval workflow: COMPLETE
 
-Tracked as tasks #8–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `4d50e37` message for full detail. Summary: `api/client.ts` gained
+`requestJson()` + a real `ApiError` class carrying the HTTP status and the backend's
+actual `{"detail": "..."}` message (previously discarded — several of this backend's
+error strings, like the stale-verification 409, *are* the exact operator copy
+ui-work.txt specifies). New `api/approval.ts` + `ApprovalWorkspace.tsx`: the required
+SIMULATOR VERIFIED → CURRENT CONTEXT → OPERATOR REVIEW → HUMAN APPROVED ladder, full
+plan/consequences/verification-context display, a form requiring both a non-empty
+operator ID and an explicit review checkbox before Approve enables (no one-click
+approval), a real receipt on success, fail-closed on 409 with the real backend reason
+shown. DEMO_FALLBACK never performs a real mutation (no live UUID to record against) —
+disabled with an explicit reason.
+
+**Found and fixed a real data bug this feature exposed**: `demoFixture.ts`'s
+`selectedPlanId: 'B'` (meaning "already approved") coexisted with `approvalPending:
+true` — contradictory, and something no prior phase's UI surfaced clearly enough to
+notice. Real backend behavior guarantees these two fields can't both be true
+simultaneously (`approve_plan` always sets `approval_pending: False` in the same
+transaction as `selected_plan_id`), so this was a genuine fixture bug, not a design
+choice — fixed to `selectedPlanId: null`. Worth remembering for future demo-fixture
+edits: **cross-check new fixture fields against the invariants implied by real backend
+transactions**, not just against what individually "looks plausible."
+
+## Remaining phases (UI-7 through UI-11): NOT STARTED
+
+Tracked as tasks #9–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-6 (guarded human plan-approval workflow) — the safety-critical approval
-gate. Needs: `POST /incidents/{id}/plans/{plan_id}/approve` (confirmed present, body
-`{approved: true, operator_id}`, fails closed with 409 on stale verification context —
-already exact-matches ui-work.txt 9.7's spec). Required hierarchy per ui-work.txt 13.5:
-SIMULATOR VERIFIED → CURRENT CONTEXT → OPERATOR REVIEW → HUMAN APPROVED. Must require
-operator ID, a "I reviewed the verified actions and consequences" checkbox, disable
-Approve until both are satisfied, re-fetch authoritative state after POST, and show an
-audit receipt. "No one-click approval." This reuses `ResponseWorkspace`'s
-already-selected `activePlan`/verification logic (same fallback pattern) rather than
-duplicating it.
+Next up: UI-7 (technical dock) is mostly already done as a side effect of UI-1
+(Timeline/Evidence/Hydraulics/Verification/Provenance/Audit tabs all exist and are
+wired to real data, with a keyboard-accessible resizable/collapsible splitter). What's
+likely still missing per ui-work.txt §14: deeper cross-panel synchronization polish
+(does selecting a plan in Response/Approval correctly update the dock's Verification
+tab? does selecting an audit event do anything beyond storing selectedAuditSequence?),
+and a fresh accessibility pass now that 6 more workspaces exist since UI-1's original
+axe check. Worth auditing what's *actually* still open here before assuming a full new
+build is needed — this phase may be smaller than its number suggests.
 
 ## Continuation commands
 
