@@ -16,6 +16,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   3. `2868795` — `feat(ui): introduce HydroSwarm mission-control shell` (UI-1)
   4. `37f956e` — `docs(handoff): record UI-1 completion and visual-verification finding`
   5. `3dc2b49` — `feat(ui): rebuild synchronized operational network map` (UI-2)
+  6. `7db5ab2` — `docs(handoff): record UI-2 completion`
+  7. `f173a65` — `feat(ui): add governed source-localization workspace` (UI-3)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -164,20 +166,48 @@ creation time. **This continues to validate the UI-1 handoff note**: any phase t
 map/canvas/layout should get a real Playwright screenshot pass before being called done,
 not just a green `npm test`.
 
-## Remaining phases (UI-3 through UI-11): NOT STARTED
+## UI-3 — Source/Sentinel workspace: COMPLETE
 
-Tracked as tasks #5–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `f173a65` message for full detail. Summary: restructured `src/api.ts` into
+`src/api/{client,incident}.ts` (only now that a second module needs the shared
+`request()` helper — not preemptively) and added `src/api/authority.ts` consuming the
+real `GET /incidents/{id}/authority` endpoint. Confirmed exact certificate names
+(`source_localization`, `scout_recommendation`, `ood_state`,
+`plan_consequence:{plan_id}`) by reading `hydroswarm/inference/authority.py` directly
+rather than guessing. **Important discovery**: the backend's `/view` response already
+computes grounded explanations for *every* `ExplanationIntent` up front (see
+`get_incident_view` in app.py) — the frontend was just discarding all but `WHY_SOURCE`'s
+text into a single string. Wiring "Why this source?" for real needed zero new network
+calls, just keeping `IncidentView.explanations: GroundedExplanation[]` around. The same
+applies to "Why this sample?"/"Why plan rejected?"/"What uncertainty remains?" — those
+questions' data is already sitting in `incident.explanations`, ready for UI-4/UI-5/UI-6
+to wire up without any new backend work.
+
+New `SourceWorkspace.tsx` (real primary workflow-rail content, not a placeholder):
+ranked candidates, calibration/coverage, classical-neural disagreement, OOD, the
+`source_localization` authority certificate (new reusable `AuthorityBadge`/
+`ApplicabilityBadge` components), and the real grounded explanation. `DecisionInspector`'s
+Source case now shows a real query-free summary. DEMO_FALLBACK gets a hand-authored
+`demoAuthorityCertificates` set (since `/authority` only exists for a real LIVE
+incident) — clearly attributable to the existing DEMO_FALLBACK banner, never used in
+LIVE mode. Verified visually via Playwright.
+
+## Remaining phases (UI-4 through UI-11): NOT STARTED
+
+Tracked as tasks #6–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-3 (Source/Sentinel workspace) — candidate inspector, calibration/coverage,
-disagreement, OOD, wiring the already-confirmed-present `GET /api/incidents/{id}/authority`
-endpoint (see "Backend API surface" above — `DecisionCertificate`/`AuthorityLevel`/
-`ApplicabilityStatus`), and a real grounded "Why this source?" via
-`GET /api/incidents/{id}/explanations/WHY_SOURCE`. This is the first phase that needs a
-genuinely new frontend API module (`api/authority.ts` per ui-work.txt §9/§27) rather than
-just consuming fields already on `IncidentView`.
+Next up: UI-4 (Sampling/Scout workspace) — the real `GET /incidents/{id}/evidence-certificate`
+endpoint (confirmed present: `EvidenceCertificate` with status/stop/message/
+posterior_entropy_bits/candidate_set_size/candidate_nodes/candidate_region_calibrated/
+recommended_sample_node/expected_information_gain_bits/expected_candidate_reduction/
+sample_budget_remaining/already_sampled_nodes/recommended_node_accessible — see
+domain/schemas.py:356), the `scout_recommendation` authority certificate (same
+`/authority` endpoint UI-3 already wired), and the "Why this sample?" explanation
+(already available in `incident.explanations`, per the discovery above — no new fetch
+needed for that part).
 
 ## Continuation commands
 
