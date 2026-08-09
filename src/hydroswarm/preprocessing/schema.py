@@ -157,9 +157,19 @@ class NormalizationStats:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         text = json.dumps(self._payload(), indent=2, sort_keys=True) + "\n"
-        path.write_text(text, encoding="utf-8")
+        # newline="" -- Path.write_text's default newline=None translates
+        # every "\n" in `text` to os.linesep (CRLF on Windows) as it
+        # writes, but `digest` below is hashed from the pre-translation
+        # string. Without this, the sidecar records a hash that only ever
+        # matches the file's actual bytes on POSIX; a strict byte-level
+        # verifier (e.g. hydroswarm.runtime.v4_normalization, which
+        # deliberately hashes path.read_bytes() rather than round-tripping
+        # through text mode) fails closed on every native Windows write.
+        path.write_text(text, encoding="utf-8", newline="")
         digest = hashlib.sha256(text.encode()).hexdigest()
-        path.with_suffix(path.suffix + ".sha256").write_text(digest + "\n", encoding="utf-8")
+        path.with_suffix(path.suffix + ".sha256").write_text(
+            digest + "\n", encoding="utf-8", newline=""
+        )
         return digest
 
     @classmethod

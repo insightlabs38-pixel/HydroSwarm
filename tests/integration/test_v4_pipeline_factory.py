@@ -171,6 +171,14 @@ def test_no_calibration_artifact_configured_falls_back_to_uncalibrated(tmp_path:
     assert pipeline.calibration_artifact is None
 
 
+#: Constructs a real HybridInferencePipeline against a real network
+#: (factory(None, network_path)) -- masked locally by a warm
+#: data/generated/signatures cache (gitignored, session-accumulated); a
+#: fresh checkout/CI run hits a real cache miss here (382s on the CI run
+#: that found this). Found by the real_simulation runtime audit in
+#: tests/conftest.py, not the static call-count audit (itself run against
+#: a warm local cache).
+@pytest.mark.real_simulation
 def test_pipeline_from_v4_factory_uses_sentinel_only_trained_tasks_and_declared_runtime_outputs(
     tmp_path: Path,
 ) -> None:

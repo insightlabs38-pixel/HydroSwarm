@@ -131,9 +131,19 @@ def test_rebuild_fails_closed_on_corrupted_shard(tmp_path) -> None:
     edge_stats.save(edge_path)
 
     # Windows refuses to overwrite a file that is still memory-mapped
-    # elsewhere (POSIX tolerates this); train_dataset's own lazy-loaded
-    # safetensors handle for shard-00000 is still open at this point.
+    # elsewhere (POSIX tolerates this). Two distinct references keep
+    # shard-00000's mmap pinned here: train_dataset's own cached safetensors
+    # handle (dropped by close()), AND train_examples' tensors themselves,
+    # which safetensors returns as zero-copy views into that same mmap'd
+    # buffer rather than copies -- closing the handle alone does not release
+    # the mapping while a tensor still holds a live view into it. Drop both;
+    # gc.collect() covers any PyTorch-storage-side reference that plain
+    # CPython refcounting doesn't immediately clear.
+    import gc
+
     train_dataset.close()
+    del train_examples
+    gc.collect()
 
     shard_path = corpus_dir / "tensors" / "train" / "shard-00000.safetensors"
     corrupted = bytearray(shard_path.read_bytes())

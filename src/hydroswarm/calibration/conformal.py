@@ -252,9 +252,14 @@ class SplitConformalCalibrator:
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
         payload = json.dumps(asdict(self.artifact), indent=2, sort_keys=True)
-        target.write_text(payload, encoding="utf-8")
+        # newline="" -- see hydroswarm.preprocessing.schema.NormalizationStats
+        # .save's identical comment: without this, Path.write_text's default
+        # LF->os.linesep translation makes the sidecar's hash (of the
+        # pre-translation string) mismatch the file's real on-disk bytes on
+        # native Windows, failing any strict byte-level verifier.
+        target.write_text(payload, encoding="utf-8", newline="")
         target.with_suffix(target.suffix + ".sha256").write_text(
-            hashlib.sha256(payload.encode()).hexdigest(), encoding="ascii"
+            hashlib.sha256(payload.encode()).hexdigest(), encoding="ascii", newline=""
         )
 
     @classmethod
