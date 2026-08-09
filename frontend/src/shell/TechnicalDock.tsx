@@ -22,7 +22,14 @@ const DOCK_HEIGHT_MAX_VH = 0.45;
 
 function VerificationTab({ incident }: { incident: IncidentView }) {
   const { selectedPlanId } = useConsoleStore();
-  const plan = incident.plans.find((item) => item.id === selectedPlanId);
+  // Matches the same selected-or-recommended fallback the Response/
+  // Approval workspaces use, so the dock agrees with whichever plan
+  // they're actually showing instead of only reacting to an explicit
+  // click (ui-work.txt 22 cross-panel synchronization).
+  const plan =
+    incident.plans.find((item) => item.id === selectedPlanId) ??
+    incident.plans.find((item) => item.id === incident.recommendedPlanId) ??
+    incident.plans[0];
   if (!plan) {
     return (
       <EmptyState
@@ -158,19 +165,24 @@ function ProvenanceTab({ incident }: { incident: IncidentView }) {
 }
 
 function AuditTab({ incident }: { incident: IncidentView }) {
-  const { selectedAuditSequence, selectAuditSequence } = useConsoleStore();
+  const { selectedAuditSequence, selectAuditSequence, setReplayIndex } = useConsoleStore();
   if (incident.audit.length === 0) {
     return <EmptyState title="No audit events recorded for this incident." />;
   }
   return (
     <ol className="audit-list">
-      {incident.audit.map((event) => (
+      {incident.audit.map((event, index) => (
         <li key={event.sequence}>
           <button
             type="button"
             className="audit-list-row"
             aria-pressed={selectedAuditSequence === event.sequence}
-            onClick={() => selectAuditSequence(event.sequence)}
+            onClick={() => {
+              selectAuditSequence(event.sequence);
+              // Keeps the Timeline tab's marker in agreement (ui-work.txt
+              // 22) even before the operator switches to that tab.
+              setReplayIndex(index);
+            }}
           >
             <span className="audit-sequence">{event.sequence.toString().padStart(2, '0')}</span>
             <time>{event.timestamp}</time>

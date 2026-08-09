@@ -11,6 +11,7 @@ export function Timeline({ events }: { events: AuditEvent[] }) {
     setReplayIndex,
     toggleReplayPlaying,
     setReplaySpeed,
+    selectAuditSequence,
   } = useConsoleStore();
   useEffect(() => {
     if (!replayPlaying || reducedMotion) return;
@@ -20,6 +21,15 @@ export function Timeline({ events }: { events: AuditEvent[] }) {
     );
     return () => window.clearInterval(timer);
   }, [events.length, replayPlaying, reducedMotion, setReplayIndex, replaySpeed, replayIndex]);
+  // ui-work.txt 22: "Selecting an event updates: replay inspector;
+  // timeline marker" -- keeps the Audit dock tab's selection and this
+  // timeline's marker position in agreement regardless of which one the
+  // operator drove last (also covers the Audit tab setting replayIndex
+  // directly -- see TechnicalDock.tsx).
+  useEffect(() => {
+    selectAuditSequence(events[replayIndex]?.sequence ?? null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replayIndex, events]);
   return (
     <div className="timeline">
       <div className="playback-controls">

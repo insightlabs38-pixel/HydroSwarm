@@ -147,3 +147,24 @@ test('overview has no automated accessibility violations', async () => {
     expect(results.violations).toHaveLength(0);
   });
 });
+
+// ui-work.txt 24: "Use axe on major workspaces" -- UI-1 only checked the
+// default Incident view; every workspace built since (UI-3..UI-6) needs
+// its own pass, since each renders substantially different real content
+// (tables, forms, charts) that the shared shell chrome alone can't cover.
+test.each([
+  ['Source', 'Ranked source candidates'],
+  ['Sampling', 'Evidence status'],
+  ['Response', 'Action sequence'],
+  ['Approval', 'Operator approval'],
+] as const)('%s workspace has no automated accessibility violations', async (rail, heading) => {
+  const user = userEvent.setup();
+  const { container } = renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: new RegExp(`^${rail}`) }));
+  await screen.findByRole('heading', { name: heading });
+  await waitFor(async () => {
+    const results = await axe(container);
+    expect(results.violations).toHaveLength(0);
+  });
+});
