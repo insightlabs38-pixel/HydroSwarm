@@ -18,6 +18,7 @@ from hydroswarm.simulation.network import build_wntr_network
 from hydroswarm.training.corpus import fit_signature_library, scenario_to_example
 
 
+@pytest.mark.real_simulation
 def test_exact_scenario_generation_governance_and_replay(tmp_path) -> None:
     config = ScenarioGenerationConfig(
         seed=1234, network_id="demo-v1", network_family="Net1", stage=CurriculumStage.DEGRADED,
@@ -50,6 +51,7 @@ def test_leave_one_network_family_out_is_assigned_before_simulation() -> None:
 #: 19 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_deterministic_ids_calibration_split_and_tensor_bridge() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
@@ -94,6 +96,7 @@ def test_deterministic_ids_calibration_split_and_tensor_bridge() -> None:
 #: 11 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_development_holdout_split_is_distinct_from_locked_test() -> None:
     # overnight-plan.txt Phase 5's Cycle A/B "development holdout" is the
     # governed architecture-comparison iteration surface
@@ -137,6 +140,7 @@ def test_development_holdout_split_is_distinct_from_locked_test() -> None:
     assert example.split == "development_holdout"
 
 
+@pytest.mark.real_simulation
 def test_normal_event_type_produces_negligible_concentration() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
@@ -153,6 +157,7 @@ def test_normal_event_type_produces_negligible_concentration() -> None:
     assert not scenario.communication_outage_mask.any()
 
 
+@pytest.mark.real_simulation
 def test_sensor_fault_only_event_type_forces_a_fault_with_negligible_concentration() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
@@ -168,6 +173,7 @@ def test_sensor_fault_only_event_type_forces_a_fault_with_negligible_concentrati
     assert scenario.frozen_mask.any()
 
 
+@pytest.mark.real_simulation
 def test_drift_and_unit_mismatch_faults_are_recorded_in_their_own_masks() -> None:
     """core-issues.txt repair item 3: drift and unit-mismatch faults were
     injected into observed readings but never recorded in any mask, so
@@ -195,6 +201,7 @@ def test_drift_and_unit_mismatch_faults_are_recorded_in_their_own_masks() -> Non
     assert scenario.unit_mismatch_mask.all(axis=0).any()
 
 
+@pytest.mark.real_simulation
 def test_negligible_drift_does_not_falsely_mark_every_sensor_faulty() -> None:
     """A near-zero drift rate must not trip drift_mask at all -- otherwise
     every scenario, including deliberately clean ones, would appear to have
@@ -214,6 +221,7 @@ def test_negligible_drift_does_not_falsely_mark_every_sensor_faulty() -> None:
     assert not scenario.unit_mismatch_mask.any()
 
 
+@pytest.mark.real_simulation
 def test_sensor_fault_only_does_not_smuggle_finite_values_into_missing_slots() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
@@ -257,6 +265,7 @@ def test_observed_concentration_never_contains_signed_negative_zero() -> None:
     assert not zero_with_sign_bit.any(), observed
 
 
+@pytest.mark.real_simulation
 def test_contamination_event_type_is_unaffected_default() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()
@@ -268,6 +277,7 @@ def test_contamination_event_type_is_unaffected_default() -> None:
     assert scenario.truth_concentration.max() > 1.0  # a real, non-negligible injection
 
 
+@pytest.mark.real_simulation
 def test_event_type_is_part_of_the_replay_hash() -> None:
     network = build_wntr_network()
     generator = WNTRScenarioGenerator()

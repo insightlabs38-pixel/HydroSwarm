@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from datetime import UTC, datetime
 import hashlib
 
@@ -18,6 +20,7 @@ def _inp_bytes(tmp_path) -> bytes:
     return path.read_bytes()
 
 
+@pytest.mark.real_simulation
 def test_secure_inp_import_deduplicates_versions_and_returns_geojson(tmp_path) -> None:
     client = TestClient(
         create_app(
@@ -90,6 +93,7 @@ def test_secure_inp_import_deduplicates_versions_and_returns_geojson(tmp_path) -
     assert verification.json()["simulator"] != "deterministic-local-verifier"
 
 
+@pytest.mark.real_simulation
 def test_exact_simulation_budget_is_tracked_per_incident_not_per_request(tmp_path) -> None:
     # core-issues.txt: "Persist the exact-simulation budget per incident
     # rather than per simulator instance." Before this fix, /verify built a

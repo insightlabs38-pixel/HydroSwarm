@@ -62,6 +62,7 @@ def _profile(node: str = "J1", strength: float = 50.0) -> IncidentSourceProfile:
     return IncidentSourceProfile(source_node_id=node, strength_mg_min=strength, start_minute=0, duration_minutes=30)
 
 
+@pytest.mark.real_simulation
 def test_no_action_canonical_evaluator_matches_standalone_incident_simulation() -> None:
     simulator = _simulator()
     profile = _profile()
@@ -87,6 +88,7 @@ def test_no_action_canonical_evaluator_matches_standalone_incident_simulation() 
     assert canonical.minimum_pressure_m == pytest.approx(standalone.minimum_pressure_m, rel=1e-3)
 
 
+@pytest.mark.real_simulation
 def test_known_flush_plan_changes_exposure_relative_to_no_action() -> None:
     simulator = _simulator()
     verifier = PlanVerifier(simulator)
@@ -104,6 +106,7 @@ def test_known_flush_plan_changes_exposure_relative_to_no_action() -> None:
     assert flush_result.consequences.contaminant_mass_consumed_mg < no_action_result.consequences.contaminant_mass_consumed_mg
 
 
+@pytest.mark.real_simulation
 def test_same_plan_under_different_source_profiles_has_distinct_exposure() -> None:
     simulator = _simulator()
     verifier = PlanVerifier(simulator)
@@ -121,6 +124,7 @@ def test_same_plan_under_different_source_profiles_has_distinct_exposure() -> No
     )
 
 
+@pytest.mark.real_simulation
 def test_profile_specific_cache_isolation(tmp_path) -> None:
     cache = SimulationResultCache(tmp_path / "cache")
     simulator = _simulator(cache=cache)
@@ -145,6 +149,7 @@ def test_profile_specific_cache_isolation(tmp_path) -> None:
     )
 
 
+@pytest.mark.real_simulation
 def test_threshold_specific_cache_isolation(tmp_path) -> None:
     cache = SimulationResultCache(tmp_path / "cache")
     simulator = _simulator(cache=cache)
@@ -161,6 +166,7 @@ def test_threshold_specific_cache_isolation(tmp_path) -> None:
     assert low.consequences.volume_above_threshold_l >= high.consequences.volume_above_threshold_l
 
 
+@pytest.mark.real_simulation
 def test_pressure_and_service_rejection_still_derives_from_exact_simulator() -> None:
     simulator = _simulator()
     verifier = PlanVerifier(simulator)
@@ -177,6 +183,7 @@ def test_pressure_and_service_rejection_still_derives_from_exact_simulator() -> 
     assert result.consequences.exposure_evaluated is True
 
 
+@pytest.mark.real_simulation
 def test_simulation_failure_abstains(monkeypatch: pytest.MonkeyPatch) -> None:
     simulator = _simulator()
     verifier = PlanVerifier(simulator)
@@ -193,6 +200,7 @@ def test_simulation_failure_abstains(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.abstention_reason is not None
 
 
+@pytest.mark.real_simulation
 def test_multi_hypothesis_reports_posterior_weighted_and_worst_case() -> None:
     simulator = _simulator()
     verifier = PlanVerifier(simulator)
@@ -216,6 +224,7 @@ def test_multi_hypothesis_reports_posterior_weighted_and_worst_case() -> None:
     assert result.evaluation_provenance["aggregation_policy"] == "posterior_weighted"
 
 
+@pytest.mark.real_simulation
 def test_worst_case_aggregation_policy_reports_the_conservative_number() -> None:
     simulator = _simulator()
     verifier = PlanVerifier(simulator)
@@ -234,6 +243,7 @@ def test_worst_case_aggregation_policy_reports_the_conservative_number() -> None
     )
 
 
+@pytest.mark.real_simulation
 def test_hydraulic_only_legacy_path_marks_exposure_unevaluated_not_zero_measured() -> None:
     """important-issues.txt requirement 12: a plan verified without any
     evaluation context must never present its Pydantic-default exposure

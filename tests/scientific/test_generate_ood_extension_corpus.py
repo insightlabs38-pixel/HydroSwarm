@@ -54,6 +54,7 @@ def test_severe_missingness_recipe_never_selects_clean_stage() -> None:
 #: call count) -- see pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
 @pytest.mark.parametrize("category_name", sorted(category.value for category in OOD_TRIGGERING_CONFIG_OVERRIDES))
+@pytest.mark.real_simulation
 def test_recipe_reliably_triggers_its_category_at_real_scale(category_name: str, tmp_path: Path) -> None:
     overrides = {category.value: overrides for category, overrides in OOD_TRIGGERING_CONFIG_OVERRIDES.items()}[
         category_name

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from uuid import uuid4
 
 import torch
@@ -15,6 +17,9 @@ from hydroswarm.inference import HybridInferencePipeline
 from hydroswarm.inference import ControlAction
 from hydroswarm.preprocessing import DEFAULT_FEATURE_SCHEMA, SensorSeries
 from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
+
+
+pytestmark = pytest.mark.real_simulation
 
 
 def _series(node: str, final: float) -> SensorSeries:

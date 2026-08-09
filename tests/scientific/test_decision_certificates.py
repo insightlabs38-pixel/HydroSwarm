@@ -6,6 +6,8 @@ dataclass."""
 
 from __future__ import annotations
 
+import pytest
+
 from uuid import uuid4
 
 from hydroswarm.domain import ApplicabilityStatus, AuthorityLevel, PlanDecision, PlanVerification
@@ -56,6 +58,7 @@ def test_no_analysis_yet_still_surfaces_existing_plan_verifications() -> None:
     assert certificates[0].name == f"plan_consequence:{verification.plan_id}"
 
 
+@pytest.mark.real_simulation
 def test_source_localization_certificate_reflects_calibration() -> None:
     analysis = _analysis()
     certificates = build_decision_certificates(analysis)
@@ -69,6 +72,7 @@ def test_source_localization_certificate_reflects_calibration() -> None:
     assert localization.provenance.model == analysis.provenance_hashes.get("model")
 
 
+@pytest.mark.real_simulation
 def test_scout_certificate_always_reports_learned_scout_suppressed() -> None:
     analysis = _analysis()
     certificates = build_decision_certificates(analysis)
@@ -78,6 +82,7 @@ def test_scout_certificate_always_reports_learned_scout_suppressed() -> None:
     assert "LEARNED_SCOUT_SUPPRESSED:FAILED_PROMOTION_GATE" in scout.suppression_reasons
 
 
+@pytest.mark.real_simulation
 def test_ood_certificate_always_reports_learned_ood_category_suppressed() -> None:
     analysis = _analysis()
     certificates = build_decision_certificates(analysis)
@@ -123,6 +128,7 @@ def test_stale_verification_certificate_reflects_stale_applicability() -> None:
     assert certificate.authority == AuthorityLevel.SIMULATOR_VERIFIED
 
 
+@pytest.mark.real_simulation
 def test_full_certificate_set_includes_every_plan_verification() -> None:
     analysis = _analysis()
     verified = _verification(decision=PlanDecision.VERIFIED)

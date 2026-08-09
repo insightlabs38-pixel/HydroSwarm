@@ -70,6 +70,7 @@ def test_assign_source_regions_is_deterministic_and_bounded(network) -> None:
 #: 11 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_contamination_example_has_event_presence_true_and_valid_masks(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.CONTAMINATION)
     validate_targets_v2(example.targets, topology=example.topology)
@@ -82,6 +83,7 @@ def test_contamination_example_has_event_presence_true_and_valid_masks(network, 
     assert bool(example.targets["source_region_mask"]) is True
 
 
+@pytest.mark.real_simulation
 def test_normal_example_has_event_presence_false_and_masked_targets(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.NORMAL)
     validate_targets_v2(example.targets, topology=example.topology)
@@ -106,6 +108,7 @@ def test_normal_example_has_event_presence_false_and_masked_targets(network, sig
     assert not bool(mask.all())
 
 
+@pytest.mark.real_simulation
 def test_sensor_fault_only_example_has_correct_cause_and_shows_the_fault(network, signature_library) -> None:
     example = _example(network, signature_library, event_type=EventType.SENSOR_FAULT_ONLY)
     validate_targets_v2(example.targets, topology=example.topology)
@@ -114,18 +117,21 @@ def test_sensor_fault_only_example_has_correct_cause_and_shows_the_fault(network
     assert bool(example.targets["sensor_fault"].any())  # the forced fault is visible
 
 
+@pytest.mark.real_simulation
 def test_normal_operation_is_not_labeled_as_contamination(network, signature_library) -> None:
     # Direct plan requirement (Task 2.2 test list).
     example = _example(network, signature_library, event_type=EventType.NORMAL)
     assert int(example.targets["event_cause"]) != EVENT_CAUSE_INDEX[EventCause.CONTAMINATION]
 
 
+@pytest.mark.real_simulation
 def test_fault_only_scenario_has_correct_event_cause(network, signature_library) -> None:
     # Direct plan requirement (Task 2.2 test list).
     example = _example(network, signature_library, event_type=EventType.SENSOR_FAULT_ONLY)
     assert int(example.targets["event_cause"]) == EVENT_CAUSE_INDEX[EventCause.SENSOR_FAULT]
 
 
+@pytest.mark.real_simulation
 def test_normal_scenario_at_shift_and_adversarial_stage_is_not_labeled_hydraulic_mismatch(
     network, signature_library
 ) -> None:
@@ -155,6 +161,7 @@ def test_normal_scenario_at_shift_and_adversarial_stage_is_not_labeled_hydraulic
 #: 27 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_event_cause_never_assigns_an_unsupported_class(network, signature_library) -> None:
     """corpus._event_cause must only ever return a SUPPORTED_EVENT_CAUSES
     member (HYDRAULIC_MISMATCH and AMBIGUOUS are governed taxonomy members
@@ -176,6 +183,7 @@ def test_event_cause_never_assigns_an_unsupported_class(network, signature_libra
             assert cause in SUPPORTED_EVENT_CAUSES
 
 
+@pytest.mark.real_simulation
 def test_evidence_sufficiency_agrees_with_clean_high_health_scenario(network, signature_library) -> None:
     # A clean, fully-observed scenario should have every sensor at health=1.0
     # for the whole window, well above the sufficiency rule's threshold.
@@ -183,6 +191,7 @@ def test_evidence_sufficiency_agrees_with_clean_high_health_scenario(network, si
     assert bool(example.targets["evidence_sufficiency"]) is True
 
 
+@pytest.mark.real_simulation
 def test_source_node_index_is_within_masked_out_range_but_harmless_when_masked(network, signature_library) -> None:
     # When event_presence is False, source_node's value is a placeholder;
     # confirm it does not crash downstream consumers and the mask correctly
@@ -192,6 +201,7 @@ def test_source_node_index_is_within_masked_out_range_but_harmless_when_masked(n
     assert bool(example.targets["source_node_mask"]) is False
 
 
+@pytest.mark.real_simulation
 def test_scenario_to_example_populates_non_null_topology_metadata(network, signature_library) -> None:
     """core-issues.txt repair item 5: every generated example must carry a
     real, non-null TopologyMetadata, not the None default (previously
@@ -222,6 +232,7 @@ def test_scenario_to_example_populates_non_null_topology_metadata(network, signa
     assert resolved in topology.node_ids
 
 
+@pytest.mark.real_simulation
 def test_two_scenarios_with_different_hydraulic_regimes_get_different_governed_contexts(network) -> None:
     """core-issues.txt repair item 4: each scenario's feature context must
     be built from ITS OWN randomized network (demand regime, roughness,

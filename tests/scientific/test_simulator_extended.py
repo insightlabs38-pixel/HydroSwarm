@@ -41,6 +41,7 @@ def _plan() -> OperationalPlan:
     )
 
 
+@pytest.mark.real_simulation
 def test_structured_hypothesis_sample_diagnostics_and_consequences() -> None:
     simulator = HydraulicSimulator(_network())
     profile = IncidentSourceProfile("J1", duration_minutes=60)
@@ -68,6 +69,7 @@ def test_structured_hypothesis_sample_diagnostics_and_consequences() -> None:
     assert 0.0 <= metrics.service_availability <= 1.0
 
 
+@pytest.mark.real_simulation
 def test_multiple_source_stress_mode_requires_explicit_opt_in() -> None:
     with pytest.raises(ValueError, match="stress_mode"):
         IncidentSourceProfile("J1", additional_sources=(IncidentSource("J3"),))
@@ -81,6 +83,7 @@ def test_multiple_source_stress_mode_requires_explicit_opt_in() -> None:
     assert result.concentration_mg_l.to_numpy().max() > 0
 
 
+@pytest.mark.real_simulation
 def test_incident_and_plan_cache_hits_do_not_consume_budget_and_corruption_invalidates(tmp_path) -> None:
     cache = SimulationResultCache(tmp_path / "cache")
     hooks: list[tuple[str, int, int | None]] = []
@@ -115,6 +118,7 @@ def test_incident_and_plan_cache_hits_do_not_consume_budget_and_corruption_inval
     assert not cache._path(key).exists()
 
 
+@pytest.mark.real_simulation
 def test_run_with_timeout_worker_and_args_survive_a_real_spawn_context() -> None:
     """Windows' multiprocessing start method is mandatorily "spawn" (no
     fork() at all there); unlike "fork" (the POSIX default this module
@@ -161,6 +165,7 @@ def test_run_with_timeout_worker_and_args_survive_a_real_spawn_context() -> None
         process.join()
 
 
+@pytest.mark.real_simulation
 def test_timeout_terminates_the_child_process_rather_than_orphaning_it() -> None:
     # core-issues.txt: a killable subprocess, not an orphanable daemon
     # thread -- verify the process that was still running past the
@@ -175,6 +180,7 @@ def test_timeout_terminates_the_child_process_rather_than_orphaning_it() -> None
     assert multiprocessing.active_children() == []
 
 
+@pytest.mark.real_simulation
 def test_timeout_and_result_completeness_fail_closed() -> None:
     simulator = HydraulicSimulator(_network(1), timeout_seconds=0.01)
     with pytest.raises(SimulationTimeoutError):

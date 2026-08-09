@@ -48,6 +48,7 @@ def _incident() -> IncidentState:
     )
 
 
+@pytest.mark.real_simulation
 def test_complete_swarm_pauses_for_approval_and_replays_deterministically() -> None:
     network = build_wntr_network()
     network.options.time.duration = 2 * 3_600
@@ -79,6 +80,7 @@ def test_complete_swarm_pauses_for_approval_and_replays_deterministically() -> N
     assert replay.trajectory == completed.events
 
 
+@pytest.mark.real_simulation
 def test_controller_pauses_for_real_sample_when_evidence_is_insufficient() -> None:
     network = build_wntr_network()
     network.options.time.duration = 3_600

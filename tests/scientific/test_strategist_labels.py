@@ -16,7 +16,7 @@ from hydroswarm.training.strategist_labels import generate_strategist_labels
 #: Every test in this module runs many real WNTR/EPANET verifications
 #: (audited call count >=10 each) -- see pyproject.toml's full_simulation
 #: marker docstring.
-pytestmark = pytest.mark.full_simulation
+pytestmark = [pytest.mark.full_simulation, pytest.mark.real_simulation]
 
 
 def _context(**overrides) -> PlanGenerationContext:

@@ -16,6 +16,9 @@ from hydroswarm.training.corpus import build_feature_context
 from hydroswarm.training.targets_v2 import validate_targets_v2
 
 
+pytestmark = pytest.mark.real_simulation
+
+
 def _scenario(
     network,
     *,

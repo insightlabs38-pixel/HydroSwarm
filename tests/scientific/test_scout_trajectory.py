@@ -15,6 +15,9 @@ from hydroswarm.training.scout_trajectory import MAXIMUM_SAMPLES_BOUND, build_sc
 from hydroswarm.training.targets_v2 import validate_targets_v2
 
 
+pytestmark = pytest.mark.real_simulation
+
+
 def _no_extra_degradation(stage):
     # Matches _scenario's own never-overridden ScenarioGenerationConfig
     # defaults (missing/frozen/outage/unit-mismatch probabilities).

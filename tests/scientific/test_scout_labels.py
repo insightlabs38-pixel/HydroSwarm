@@ -11,6 +11,9 @@ from hydroswarm.simulation.network import build_wntr_network
 from hydroswarm.training.scout_labels import build_signature_artifact_for_network, generate_scout_label
 
 
+pytestmark = pytest.mark.real_simulation
+
+
 def _fast_artifact(network, cache_dir):
     cache = SignatureCache(cache_dir)
     key = SignatureCacheKey(

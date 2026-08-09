@@ -43,6 +43,7 @@ def trajectory_jsonl(mini_corpus, tmp_path_factory) -> Path:
 #: 822 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_every_example_is_matched_and_enriched(mini_corpus, trajectory_jsonl, tmp_path) -> None:
     output = tmp_path / "merged"
     result = merge_trajectory_targets.merge(
@@ -52,6 +53,14 @@ def test_every_example_is_matched_and_enriched(mini_corpus, trajectory_jsonl, tm
     assert result["examples_enriched"] == result["examples_total"] > 0
 
 
+#: Shares the module-scoped mini_corpus/trajectory_jsonl fixtures with
+#: test_every_example_is_matched_and_enriched -- whichever test runs first
+#: in a given selection triggers their one-time real-simulation-backed
+#: build, so every consumer must be marked (found by the real_simulation
+#: runtime audit in tests/conftest.py, not by the static call-count audit
+#: alone, since the static audit attributes fixture setup cost to
+#: whichever single test happened to trigger it first).
+@pytest.mark.real_simulation
 def test_merged_shards_contain_both_old_and_new_targets(mini_corpus, trajectory_jsonl, tmp_path) -> None:
     output = tmp_path / "merged"
     merge_trajectory_targets.merge(
@@ -71,6 +80,9 @@ def test_merged_shards_contain_both_old_and_new_targets(mini_corpus, trajectory_
         assert "travel_time" in example.targets
 
 
+#: Shares the module-scoped mini_corpus/trajectory_jsonl fixtures -- see
+#: test_merged_shards_contain_both_old_and_new_targets's comment.
+@pytest.mark.real_simulation
 def test_merged_shards_are_a_valid_reloadable_dataset(mini_corpus, trajectory_jsonl, tmp_path) -> None:
     output = tmp_path / "merged"
     merge_trajectory_targets.merge(
@@ -80,6 +92,9 @@ def test_merged_shards_are_a_valid_reloadable_dataset(mini_corpus, trajectory_js
     dataset.verify_shard_checksums()  # must not raise
 
 
+#: Shares the module-scoped mini_corpus/trajectory_jsonl fixtures -- see
+#: test_merged_shards_contain_both_old_and_new_targets's comment.
+@pytest.mark.real_simulation
 def test_source_shard_directory_is_never_modified(mini_corpus, trajectory_jsonl, tmp_path) -> None:
     source = mini_corpus / "tensors" / "train"
     before = sorted(p.name for p in source.iterdir())

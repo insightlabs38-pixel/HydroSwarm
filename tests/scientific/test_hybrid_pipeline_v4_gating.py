@@ -7,6 +7,8 @@ fixtures."""
 
 from __future__ import annotations
 
+import pytest
+
 from uuid import uuid4
 
 import torch
@@ -48,6 +50,7 @@ def _analyze(model, *, runtime_enabled_outputs):
     return pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
 
 
+@pytest.mark.real_simulation
 def test_runtime_enabled_outputs_none_preserves_legacy_behavior() -> None:
     """The default (no v4 checkpoint identity) must behave exactly as
     before this pass -- every existing caller/test that never sets
@@ -64,6 +67,7 @@ def test_runtime_enabled_outputs_none_preserves_legacy_behavior() -> None:
     assert semantics.ood_category == "UNSEEN_TOPOLOGY"
 
 
+@pytest.mark.real_simulation
 def test_output_not_in_runtime_enabled_outputs_is_suppressed_to_none() -> None:
     """A v4 identity that has NOT validated event_cause/next_step/
     evidence_sufficiency/sensor_fault must produce None for every one of
@@ -83,6 +87,7 @@ def test_output_not_in_runtime_enabled_outputs_is_suppressed_to_none() -> None:
     assert semantics.ood_category is None
 
 
+@pytest.mark.real_simulation
 def test_empty_runtime_enabled_outputs_suppresses_everything_gated() -> None:
     result = _analyze(EventAwareModel(), runtime_enabled_outputs=frozenset())
     semantics = result.semantic_predictions
@@ -95,6 +100,7 @@ def test_empty_runtime_enabled_outputs_suppresses_everything_gated() -> None:
     assert semantics.ood_category is None
 
 
+@pytest.mark.real_simulation
 def test_unsupported_ood_category_class_never_surfaces_even_when_enabled() -> None:
     """4 of the 11 governed OOD categories have no real, reproducible
     training examples yet (ood_labels.UNSUPPORTED_OOD_CATEGORIES) -- even a
@@ -119,6 +125,7 @@ def test_unsupported_ood_category_class_never_surfaces_even_when_enabled() -> No
     assert result.ood_level is not None
 
 
+@pytest.mark.real_simulation
 def test_unsupported_event_cause_class_never_surfaces_even_when_enabled() -> None:
     """AMBIGUOUS/HYDRAULIC_MISMATCH have zero real training examples
     (reports/results/v4/phase13-metrics-and-baselines.md) -- even a v4
@@ -138,6 +145,7 @@ def test_unsupported_event_cause_class_never_surfaces_even_when_enabled() -> Non
     assert result.semantic_predictions.event_cause is None
 
 
+@pytest.mark.real_simulation
 def test_inspect_faulty_sensor_next_step_never_surfaces_even_when_enabled() -> None:
     """NextStep.INSPECT_FAULTY_SENSOR is a real, reproducible training
     label but is not runtime-enabled for the agent-FSM controller (no
@@ -157,6 +165,7 @@ def test_inspect_faulty_sensor_next_step_never_surfaces_even_when_enabled() -> N
     assert result.semantic_predictions.next_step is None
 
 
+@pytest.mark.real_simulation
 def test_low_confidence_event_presence_is_false_not_none() -> None:
     """event_presence is a boolean decision (>= 0.5 sigmoid threshold),
     distinct from "no trustworthy value available" -- a validated head
@@ -203,6 +212,7 @@ class ExtremeScoutModel(PriorFollowingModel):
         return output
 
 
+@pytest.mark.real_simulation
 def test_disabled_scout_information_gain_never_reaches_semantic_predictions() -> None:
     moderate = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset())
     extreme = _analyze(ExtremeScoutModel(), runtime_enabled_outputs=frozenset())
@@ -211,6 +221,7 @@ def test_disabled_scout_information_gain_never_reaches_semantic_predictions() ->
     assert extreme.semantic_predictions.expected_information_gain is None
 
 
+@pytest.mark.real_simulation
 def test_enabled_scout_information_gain_does_reach_semantic_predictions() -> None:
     """Sanity check for the test above: when actually governed as
     runtime-enabled, the same field IS populated -- proves the None result
@@ -239,6 +250,7 @@ class ExtremeStrategistModel(PriorFollowingModel):
         return output
 
 
+@pytest.mark.real_simulation
 def test_disabled_strategist_plan_scores_never_reach_semantic_predictions() -> None:
     moderate = _analyze(PriorFollowingModel(), runtime_enabled_outputs=frozenset())
     extreme = _analyze(ExtremeStrategistModel(), runtime_enabled_outputs=frozenset())
@@ -249,6 +261,7 @@ def test_disabled_strategist_plan_scores_never_reach_semantic_predictions() -> N
     assert extreme.semantic_predictions.plan_validity == ()
 
 
+@pytest.mark.real_simulation
 def test_enabled_strategist_plan_scores_do_reach_semantic_predictions() -> None:
     result = _analyze(
         PriorFollowingModel(), runtime_enabled_outputs=frozenset({"plan_value", "plan_validity"})
@@ -257,6 +270,7 @@ def test_enabled_strategist_plan_scores_do_reach_semantic_predictions() -> None:
     assert result.semantic_predictions.plan_validity != ()
 
 
+@pytest.mark.real_simulation
 def test_disabled_source_node_falls_back_to_classical_only_belief() -> None:
     """core-issues5.txt delta item 2: source_node is a normal granular
     output like any other -- excluding it from runtime_enabled_outputs must
@@ -272,6 +286,7 @@ def test_disabled_source_node_falls_back_to_classical_only_belief() -> None:
     assert disabled.runtime_mode == HybridRuntimeMode.FULL_HYBRID
 
 
+@pytest.mark.real_simulation
 def test_enabled_source_node_does_influence_the_fused_result() -> None:
     """The other half of the same invariant: when a v4 identity DOES
     validate/runtime-enable source_node, the neural belief must actually
@@ -284,6 +299,7 @@ def test_enabled_source_node_does_influence_the_fused_result() -> None:
     assert enabled.fusion_diagnostics is not None
 
 
+@pytest.mark.real_simulation
 def test_extreme_source_node_logits_cannot_move_the_result_when_disabled() -> None:
     """core-issues5.txt Section 11's general regression-test pattern
     (mutate a disabled head's logits to extreme values, assert the

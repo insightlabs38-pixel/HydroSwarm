@@ -1,8 +1,13 @@
 
+import pytest
+
 from hydroswarm.classical.state_estimation import HydraulicStateEstimator, OperationalTelemetry
 from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder, SensorSeries
 from hydroswarm.simulation.network import build_wntr_network
 from hydroswarm.simulation.wrapper import HydraulicSimulator
+
+
+pytestmark = pytest.mark.real_simulation
 
 
 def test_feature_builder_aligns_complete_native_schema() -> None:

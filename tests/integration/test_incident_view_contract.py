@@ -8,6 +8,8 @@ against a genuine IncidentAnalysisResult rather than the DEMO_FALLBACK path.
 
 from __future__ import annotations
 
+import pytest
+
 import dataclasses
 from datetime import UTC, datetime, timedelta
 import hashlib
@@ -175,6 +177,7 @@ def _drive_to_planning_allowed(client: TestClient, incident_id: str) -> None:
     assert analysis["runtime_mode"] == "FULL_HYBRID"
 
 
+@pytest.mark.real_simulation
 def test_incident_view_requires_completed_analysis(tmp_path) -> None:
     pipeline, network = _build_pipeline()
     client = TestClient(create_app(pipeline_factory=pipeline, database_path=tmp_path / "runtime.sqlite3"))
@@ -194,6 +197,7 @@ def test_incident_view_requires_completed_analysis(tmp_path) -> None:
     assert response.status_code == 409
 
 
+@pytest.mark.real_simulation
 def test_incident_view_requires_full_topology_metadata(tmp_path) -> None:
     """A network validated through the legacy manual /validate endpoint has no
     node/link topology to render; the live view must fail closed, not guess
@@ -225,6 +229,7 @@ def test_incident_view_requires_full_topology_metadata(tmp_path) -> None:
     assert response.status_code == 503
 
 
+@pytest.mark.real_simulation
 def test_incident_view_fails_closed_on_a_missing_provenance_hash(tmp_path) -> None:
     # core-issues.txt: "fail closed rather than returning empty provenance
     # hashes." A missing/empty required provenance hash must refuse the
@@ -256,6 +261,7 @@ def test_incident_view_fails_closed_on_a_missing_provenance_hash(tmp_path) -> No
     assert "provenance" in response.json()["detail"]
 
 
+@pytest.mark.real_simulation
 def test_incident_view_fails_closed_on_a_dangling_candidate_node_reference(tmp_path) -> None:
     # core-issues.txt: explicit runtime validation for the /view response.
     # A candidate set referencing a node that does not exist in this
@@ -292,6 +298,7 @@ def test_incident_view_fails_closed_on_a_dangling_candidate_node_reference(tmp_p
     assert "unknown nodes" in response.json()["detail"]
 
 
+@pytest.mark.real_simulation
 def test_incident_view_returns_complete_verified_contract(tmp_path) -> None:
     pipeline, network = _build_pipeline()
     client = TestClient(
@@ -406,6 +413,7 @@ def test_incident_view_returns_complete_verified_contract(tmp_path) -> None:
     # with status 200 is itself part of the contract.
 
 
+@pytest.mark.real_simulation
 def test_view_never_recommends_a_plan_whose_verification_has_gone_stale(tmp_path) -> None:
     """core-issues5.txt delta item 6: recommended_plan_id must not point at
     a plan whose own verification is STALE -- the other half of

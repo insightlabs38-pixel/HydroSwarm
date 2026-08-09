@@ -138,6 +138,7 @@ def calibrator(examples):
 #: 17 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_raises_if_model_is_not_frozen(examples, calibrator):
     model = HydroCore.from_variant("small")
     model.train()
@@ -150,6 +151,13 @@ def test_raises_if_model_is_not_frozen(examples, calibrator):
         )
 
 
+#: Shares the module-scoped `examples` fixture with
+#: test_raises_if_model_is_not_frozen and
+#: test_unvalidated_topology_invalidates_calibration_and_forces_zero_candidate_set
+#: -- whichever test runs first in a given selection triggers its one-time
+#: real-simulation-backed build (found by the real_simulation runtime audit
+#: in tests/conftest.py, not the static call-count audit alone).
+@pytest.mark.real_simulation
 def test_generates_one_label_per_example_with_expected_fields(tiny_model, examples, calibrator):
     dataset = _ListDataset(examples)
     validated = frozenset({example.topology.topology_hash for example in examples})
@@ -171,6 +179,9 @@ def test_generates_one_label_per_example_with_expected_fields(tiny_model, exampl
         assert label.candidate_covered in (True, False, None)
 
 
+#: Shares the module-scoped `examples` fixture with the two tests above --
+#: see test_generates_one_label_per_example_with_expected_fields's comment.
+@pytest.mark.real_simulation
 def test_unvalidated_topology_invalidates_calibration_and_forces_zero_candidate_set(tiny_model, examples, calibrator):
     dataset = _ListDataset(examples[:1])
     labels = list(

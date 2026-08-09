@@ -70,6 +70,7 @@ def two_scenarios(pristine_network):
 #: 10 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_different_seeds_produce_different_network_and_hydraulic_state_hashes(
     pristine_network, two_scenarios
 ) -> None:
@@ -89,6 +90,7 @@ def test_different_seeds_produce_different_network_and_hydraulic_state_hashes(
     assert reconstruction_a.hydraulic_state_hash != reconstruction_b.hydraulic_state_hash
 
 
+@pytest.mark.real_simulation
 def test_reconstruction_matches_the_original_scenarios_semantic_replay(pristine_network, two_scenarios) -> None:
     for scenario in two_scenarios:
         reconstruction = reconstruct_scenario_network(
@@ -97,6 +99,12 @@ def test_reconstruction_matches_the_original_scenarios_semantic_replay(pristine_
         assert reconstruction.replay_matched is True
 
 
+#: Shares the two_scenarios fixture with
+#: test_reconstruction_matches_the_original_scenarios_semantic_replay --
+#: whichever test runs first in a given selection triggers its one-time
+#: real-simulation-backed build (found by the real_simulation runtime
+#: audit in tests/conftest.py, not the static call-count audit alone).
+@pytest.mark.real_simulation
 def test_reconstruction_fails_closed_on_a_manifest_that_does_not_match_the_pristine_topology(
     pristine_network, two_scenarios
 ) -> None:
@@ -115,6 +123,7 @@ def test_reconstruction_fails_closed_on_a_manifest_that_does_not_match_the_prist
         )
 
 
+@pytest.mark.real_simulation
 def test_travel_time_labels_change_when_hydraulic_state_changes(pristine_network, two_scenarios) -> None:
     scenario_a, scenario_b = two_scenarios
     reconstruction_a = reconstruct_scenario_network(
@@ -133,6 +142,7 @@ def test_travel_time_labels_change_when_hydraulic_state_changes(pristine_network
     assert not (travel_a["travel_time"] == travel_b["travel_time"]).all()
 
 
+@pytest.mark.real_simulation
 def test_reconstructed_network_is_not_the_pristine_object_and_has_distinct_state(
     pristine_network, two_scenarios
 ) -> None:
@@ -157,6 +167,7 @@ def _state_hash(context) -> str:
     return _hydraulic_state_hash(context.state)
 
 
+@pytest.mark.real_simulation
 def test_old_shared_pristine_context_would_have_produced_identical_travel_time_for_both_scenarios(
     pristine_network, two_scenarios
 ) -> None:
@@ -193,6 +204,7 @@ def test_old_shared_pristine_context_would_have_produced_identical_travel_time_f
     assert travel_a_old_bug is not None and travel_b_old_bug is not None  # sanity: old path still runs, just wrong
 
 
+@pytest.mark.real_simulation
 def test_negligible_magnitude_float_noise_does_not_fail_reconstruction(pristine_network, two_scenarios) -> None:
     """Real case found running this module against data/learning-v2/cycle-b2:
     scenario e5f317e7-8b65-54a3-b898-c553357ea90d (a NORMAL/negligible-
@@ -217,6 +229,7 @@ def test_negligible_magnitude_float_noise_does_not_fail_reconstruction(pristine_
     assert reconstruction.replay_matched is True
 
 
+@pytest.mark.real_simulation
 def test_a_real_magnitude_difference_still_fails_closed(pristine_network, two_scenarios) -> None:
     """The tolerance added for float-rounding noise must not mask an actual
     reconstruction defect: a difference at the scale of a real signal
@@ -234,6 +247,7 @@ def test_a_real_magnitude_difference_still_fails_closed(pristine_network, two_sc
         )
 
 
+@pytest.mark.real_simulation
 def test_simulate_all_node_truth_reproduces_the_scenarios_own_stored_sensor_columns(
     pristine_network, two_scenarios
 ) -> None:
@@ -263,6 +277,7 @@ def test_simulate_all_node_truth_reproduces_the_scenarios_own_stored_sensor_colu
     assert np.allclose(reproduced, scenario_a.truth_concentration, atol=1e-6, rtol=0.0)
 
 
+@pytest.mark.real_simulation
 def test_simulate_all_node_truth_reaches_nodes_outside_the_original_sensor_set(
     pristine_network, two_scenarios
 ) -> None:
@@ -281,6 +296,7 @@ def test_simulate_all_node_truth_reaches_nodes_outside_the_original_sensor_set(
     assert np.isfinite(all_node_truth[target].to_numpy(dtype=np.float64)).all()
 
 
+@pytest.mark.real_simulation
 def test_simulate_all_node_truth_is_deterministic(pristine_network, two_scenarios) -> None:
     scenario_a, _ = two_scenarios
     reconstruction = reconstruct_scenario_network(

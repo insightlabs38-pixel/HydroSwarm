@@ -8,6 +8,7 @@ import pytest
 from hydroswarm import cli
 
 
+@pytest.mark.real_simulation
 def test_self_test_validates_dependencies_network_sqlite_and_model() -> None:
     report = cli.run_self_test()
 

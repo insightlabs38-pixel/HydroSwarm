@@ -30,6 +30,7 @@ def _generate(network, **overrides):
     return generator.generate(network, ScenarioGenerationConfig(**base))
 
 
+@pytest.mark.real_simulation
 def test_ordinary_scenario_is_in_distribution(tmp_path) -> None:
     network = build_wntr_network()
     # The corpus generator's own worst in-distribution degradation knobs
@@ -48,6 +49,7 @@ def test_ordinary_scenario_is_in_distribution(tmp_path) -> None:
     assert category == OODCategory.NONE
 
 
+@pytest.mark.real_simulation
 def test_unseen_topology_hash_is_flagged() -> None:
     network = build_wntr_network()
     scenario = _generate(network)
@@ -57,6 +59,7 @@ def test_unseen_topology_hash_is_flagged() -> None:
     assert category == OODCategory.UNSEEN_TOPOLOGY
 
 
+@pytest.mark.real_simulation
 def test_unseen_topology_is_not_flagged_when_a_broader_artifact_covers_it() -> None:
     network = build_wntr_network()
     scenario = _generate(network)
@@ -67,6 +70,7 @@ def test_unseen_topology_is_not_flagged_when_a_broader_artifact_covers_it() -> N
     assert category != OODCategory.UNSEEN_TOPOLOGY
 
 
+@pytest.mark.real_simulation
 def test_extreme_demand_is_flagged() -> None:
     network = build_wntr_network()
     scenario = _generate(network, demand_regimes=(2.5,))
@@ -76,6 +80,7 @@ def test_extreme_demand_is_flagged() -> None:
     assert category == OODCategory.EXTREME_DEMAND
 
 
+@pytest.mark.real_simulation
 def test_tank_state_shift_is_flagged() -> None:
     network = build_wntr_network()
     scenario = _generate(network, tank_level_variation_fraction=0.6)
@@ -85,6 +90,7 @@ def test_tank_state_shift_is_flagged() -> None:
     assert category == OODCategory.TANK_STATE_SHIFT
 
 
+@pytest.mark.real_simulation
 def test_roughness_mismatch_is_flagged() -> None:
     network = build_wntr_network()
     scenario = _generate(network, roughness_variation_fraction=0.4)
@@ -94,6 +100,7 @@ def test_roughness_mismatch_is_flagged() -> None:
     assert category == OODCategory.ROUGHNESS_MISMATCH
 
 
+@pytest.mark.real_simulation
 def test_severe_missingness_is_flagged() -> None:
     network = build_wntr_network()
     scenario = _generate(network, missing_probability=0.6)
@@ -103,6 +110,7 @@ def test_severe_missingness_is_flagged() -> None:
     assert category == OODCategory.SEVERE_MISSINGNESS
 
 
+@pytest.mark.real_simulation
 def test_frozen_drifting_sensor_is_flagged() -> None:
     network = build_wntr_network()
     scenario = _generate(network, frozen_probability=1.0, sensor_count=6)
@@ -112,6 +120,7 @@ def test_frozen_drifting_sensor_is_flagged() -> None:
     assert category == OODCategory.FROZEN_DRIFTING_SENSOR
 
 
+@pytest.mark.real_simulation
 def test_priority_order_prefers_the_most_structural_category() -> None:
     # A scenario that is BOTH on an unseen topology AND has extreme demand
     # must be labeled by the higher-priority (more structural) category.
@@ -143,6 +152,7 @@ def test_supported_and_unsupported_ood_categories_partition_the_full_taxonomy() 
 #: 28 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_classify_ood_category_never_returns_an_unsupported_category(tmp_path) -> None:
     """core-issues3.txt Phase 6.2: the SUPPORTED_OOD_CATEGORIES registry
     must match classify_ood_category's real behavior, not silently drift
@@ -172,6 +182,7 @@ def test_classify_ood_category_never_returns_an_unsupported_category(tmp_path) -
 #: 30 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
 @pytest.mark.full_simulation
+@pytest.mark.real_simulation
 def test_every_recipe_override_reliably_triggers_its_category(tmp_path) -> None:
     """core-issues3.txt Phase 6.3: OOD_TRIGGERING_CONFIG_OVERRIDES is the
     reusable recipe a future balanced-OOD corpus-generation pass would use

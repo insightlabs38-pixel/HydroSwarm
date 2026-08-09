@@ -11,6 +11,8 @@ experiments/runs/ tree.
 
 from __future__ import annotations
 
+import pytest
+
 import hashlib
 import json
 import shutil
@@ -248,6 +250,7 @@ def test_refuses_to_overwrite_a_nonempty_output_directory(tmp_path: Path) -> Non
     assert raised
 
 
+@pytest.mark.real_simulation
 def test_clean_runtime_loads_and_analyzes_from_the_bundle_alone(tmp_path: Path) -> None:
     """core-issues5.txt delta item 3 (P0 blocker): end-to-end clean-runtime
     proof -- build inference bundle -> load ONLY from that bundle ->

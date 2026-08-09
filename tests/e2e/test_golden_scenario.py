@@ -7,6 +7,9 @@ from hydroswarm.evaluation import GoldenScenarioRunner
 
 #: 13 real WNTR/EPANET verifications (audited call count) -- see
 #: pyproject.toml's full_simulation marker docstring.
+pytestmark = pytest.mark.real_simulation
+
+
 @pytest.mark.full_simulation
 def test_golden_scenario_executes_complete_human_gated_workflow(tmp_path) -> None:
     result = GoldenScenarioRunner(tmp_path, seed=2026, cache_directory=tmp_path / "cache").run()

@@ -16,7 +16,7 @@ from hydroswarm.training.targets_v2 import validate_targets_v2
 #: Every test in this module runs many real WNTR/EPANET verifications
 #: (audited call count >=10 each) -- see pyproject.toml's full_simulation
 #: marker docstring.
-pytestmark = pytest.mark.full_simulation
+pytestmark = [pytest.mark.full_simulation, pytest.mark.real_simulation]
 
 _VALIDATED = frozenset({"reference-topology-hash"})
 

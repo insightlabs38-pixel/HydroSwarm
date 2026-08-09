@@ -23,6 +23,9 @@ pytest.importorskip("wntr")
 NOW = datetime(2026, 8, 3, tzinfo=UTC)
 
 
+pytestmark = pytest.mark.real_simulation
+
+
 def _import_network(client: TestClient, tmp_path) -> str:
     model = build_wntr_network()
     model.options.time.duration = 2 * 3_600

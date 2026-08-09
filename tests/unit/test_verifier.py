@@ -41,6 +41,7 @@ def verifier() -> PlanVerifier:
     )
 
 
+@pytest.mark.real_simulation
 def test_safe_monitor_and_sample_plan_is_verified(verifier: PlanVerifier) -> None:
     plan = _plan(
         OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J2"),
@@ -65,6 +66,7 @@ def test_unknown_target_is_rejected_before_simulation(verifier: PlanVerifier) ->
     assert result.rejection_codes == ("UNKNOWN_TARGET:NOT_A_PIPE",)
 
 
+@pytest.mark.real_simulation
 def test_unsafe_supply_isolation_is_rejected_by_exact_simulation(verifier: PlanVerifier) -> None:
     plan = _plan(OperationalAction(action_type=ActionType.CLOSE_PIPE, target_id="P_R1_J1"))
     result = verifier.verify(plan)
@@ -75,6 +77,7 @@ def test_unsafe_supply_isolation_is_rejected_by_exact_simulation(verifier: PlanV
     assert result.consequences.minimum_pressure_m < 10.0
 
 
+@pytest.mark.real_simulation
 def test_state_and_dynamic_graph_are_hydraulically_derived(verifier: PlanVerifier) -> None:
     state = verifier.simulator.calculate_state(at_time=0)
     graph = verifier.simulator.build_dynamic_graph(state)
@@ -85,6 +88,7 @@ def test_state_and_dynamic_graph_are_hydraulically_derived(verifier: PlanVerifie
     assert graph.nodes["J1"]["reservoir_reachable"] is True
 
 
+@pytest.mark.real_simulation
 def test_incident_uses_epanet_quality_without_cwd_artifacts(
     verifier: PlanVerifier, tmp_path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -202,6 +206,7 @@ def test_budget_exceeded_mid_loop_is_categorized_distinctly(
 # safety contract for a value this close to a boundary.
 
 
+@pytest.mark.real_simulation
 def test_verified_plan_reports_real_margins(verifier: PlanVerifier) -> None:
     plan = _plan(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J2"))
     result = verifier.verify(plan)
@@ -215,6 +220,7 @@ def test_verified_plan_reports_real_margins(verifier: PlanVerifier) -> None:
     )
 
 
+@pytest.mark.real_simulation
 def test_rejected_plan_also_reports_real_margins(verifier: PlanVerifier) -> None:
     """A REJECTED decision is exact simulator output too -- margins must
     not be silently omitted just because the plan failed."""

@@ -5,6 +5,8 @@ status branch against otherwise-realistic data."""
 
 from __future__ import annotations
 
+import pytest
+
 from dataclasses import replace
 from uuid import uuid4
 
@@ -13,6 +15,9 @@ from hydroswarm.inference.evidence_certificate import build_evidence_certificate
 from hydroswarm.inference.fusion import ControlAction
 
 from test_hybrid_pipeline import PriorFollowingModel, _pipeline, _series
+
+
+pytestmark = pytest.mark.real_simulation
 
 
 def _analysis():

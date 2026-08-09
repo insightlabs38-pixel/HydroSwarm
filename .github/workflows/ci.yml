@@ -103,18 +103,22 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: uv run pytest --cov=hydroswarm --cov-report=term-missing --cov-report=xml --durations=30
 
-      # Windows: broad portability/correctness suite, excluding only the
-      # audited full_simulation set (tests making >=10 real simulator
-      # calls each -- pathologically expensive under Windows' mandatory
-      # multiprocessing "spawn" start method, which pays a fresh
-      # interpreter startup importing numpy/pandas/wntr/torch per call;
-      # see pyproject.toml's full_simulation marker docstring) and the
-      # dedicated smoke file below (run separately for clear reporting,
-      # not to avoid it -- it would otherwise also match "not
-      # full_simulation" and run twice).
-      - name: Broad test suite, excluding full_simulation (Windows)
+      # Windows: broad portability/correctness suite containing ZERO real
+      # simulator calls -- excludes every test marked real_simulation (any
+      # test that invokes HydraulicSimulator/WNTR/EPANET at least once, not
+      # just the >=10-call full_simulation subset; even a handful of real
+      # calls is expensive here) and the dedicated smoke file below (run
+      # separately for clear reporting, not to avoid it -- it would
+      # otherwise also match "not real_simulation" and run twice). A
+      # tests/conftest.py runtime hook independently fails the run if any
+      # unmarked test is ever found making a real call, so this exclusion
+      # is enforced, not merely asserted by this comment. No coverage here
+      # -- Ubuntu's full run above is the single authoritative coverage
+      # source; a second, partial Windows coverage report would be noise,
+      # not signal.
+      - name: Broad test suite, zero real simulator calls (Windows)
         if: matrix.os == 'windows-latest'
-        run: uv run pytest -m "not full_simulation" --ignore=tests/scientific/test_windows_simulator_smoke.py --cov=hydroswarm --cov-report=term-missing --cov-report=xml --durations=30
+        run: uv run pytest -m "not real_simulation" --ignore=tests/scientific/test_windows_simulator_smoke.py --durations=30
       # Separate, explicitly-reported step: proves native Windows spawn
       # correctness for real WNTR simulation, real EPANET simulation, real
       # timeout/child termination, real exception propagation, one exact
@@ -129,8 +133,9 @@ jobs:
 
       - name: Offline self-test
         run: uv run hydroswarm self-test
+      # Ubuntu is the only leg that produces coverage.xml (see above).
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && matrix.os == 'ubuntu-latest'
         with:
           name: coverage-${{ matrix.os }}
           path: coverage.xml

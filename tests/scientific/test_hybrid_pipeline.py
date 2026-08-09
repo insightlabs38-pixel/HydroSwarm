@@ -25,6 +25,9 @@ from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
 from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS
 
 
+pytestmark = pytest.mark.real_simulation
+
+
 def _artifact() -> SignatureArtifact:
     hypotheses = tuple(
         SourceHypothesis(node, 0, 60, 1.0, "nominal") for node in ("J1", "J2", "J3")
