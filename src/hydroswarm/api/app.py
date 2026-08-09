@@ -63,7 +63,7 @@ from hydroswarm.simulation.wrapper import (
     IncidentSourceProfile,
     wntr,
 )
-from hydroswarm.runtime import DefaultPipelineFactory
+from hydroswarm.runtime import V4PipelineFactory
 
 from .state import (
     AnalysisResponse,
@@ -1563,4 +1563,20 @@ def create_app(
     return app
 
 
-app = create_app(pipeline_factory=DefaultPipelineFactory())
+# UI-11.1: the normal documented production launch (start_hydroswarm.sh/.bat ->
+# hydroswarm.cli start -> this module) now serves the frozen, tagged
+# hydrocore-v4-architecture-freeze candidate by default, composed through the
+# existing V4PipelineFactory (never reimplemented here) against the committed,
+# self-contained release bundle under models/hydrocore-v4-release/ -- see that
+# directory's own README section for the exact frozen identity this resolves
+# to and how it was produced (an unmodified copy of the real build output, not
+# a fresh build). DefaultPipelineFactory (the pre-freeze hydrocore-v3 /
+# adapters=true / feature_and_logit path) is untouched and still importable;
+# it is simply no longer the module-level default this app object is built
+# with.
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_V4_RELEASE_BUNDLE_DIR = _PROJECT_ROOT / "models" / "hydrocore-v4-release"
+
+app = create_app(
+    pipeline_factory=V4PipelineFactory(DEFAULT_V4_RELEASE_BUNDLE_DIR, project_root=_PROJECT_ROOT)
+)

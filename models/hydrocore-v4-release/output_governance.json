@@ -1,0 +1,57 @@
+{
+  "diagnostic_only_outputs": [],
+  "notes": {
+    "ood_category": "excluded from all governance sets: near-chance macro F1 (~1/11 chance), zero real train-split gradient (Phase 13 finding 2) -- physically present in the architecture, not promoted",
+    "sensor_reconstruction": "not trained by the selected run at all (core-issues5.txt delta item 4, Section C): auxiliary_heads=False for this model config, so sensor_reconstruction_head was never even physically constructed, let alone supervised -- absent from every governance set",
+    "travel_time": "not trained by the selected run at all (core-issues5.txt delta item 4, Section C): auxiliary_heads=False for this model config, so travel_time_head was never even physically constructed, let alone supervised -- absent from every governance set"
+  },
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "next_step",
+    "relative_strength",
+    "source_node"
+  ],
+  "schema_version": 1,
+  "trained_outputs": [
+    "candidate_reduction",
+    "containment_time_proxy",
+    "duration",
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "exposure_proxy",
+    "information_gain",
+    "next_step",
+    "plan_regret_proxy",
+    "plan_validity",
+    "plan_value",
+    "pressure_risk_proxy",
+    "relative_strength",
+    "sample_node",
+    "sensor_fault",
+    "service_loss_proxy",
+    "should_continue_sampling",
+    "source_node",
+    "source_region",
+    "start_time"
+  ],
+  "training_only_outputs": [],
+  "validated_outputs": [
+    "containment_time_proxy",
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "exposure_proxy",
+    "next_step",
+    "plan_regret_proxy",
+    "plan_validity",
+    "plan_value",
+    "pressure_risk_proxy",
+    "relative_strength",
+    "service_loss_proxy",
+    "source_node",
+    "start_time"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "demand_regimes": [
+    "nominal"
+  ],
+  "duration_bins": [
+    30,
+    60,
+    120
+  ],
+  "policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811",
+  "policy_version": "hydroswarm-signature-policy-v1",
+  "sample_times_seconds": [
+    0,
+    3600,
+    7200,
+    10800,
+    14400,
+    18000,
+    21600
+  ],
+  "schema_version": 1,
+  "sensor_layout_policy": "all_junctions_as_sensor_candidates",
+  "source_candidate_definition": "all_junctions",
+  "start_time_bins": [
+    0,
+    60,
+    120,
+    240
+  ],
+  "strength_bins": [
+    0.5,
+    1.0,
+    2.0
+  ]
+}

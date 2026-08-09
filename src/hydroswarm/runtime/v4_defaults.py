@@ -136,6 +136,15 @@ class V4PipelineFactory:
         return self._identity
 
     @property
+    def model_hash(self) -> str | None:
+        """The loaded model weights' real SHA-256, for provenance reporting
+        (e.g. cli.py's self-test, so it can confirm it is looking at the
+        same checkpoint the production app actually serves) -- None until
+        assets have loaded successfully."""
+        self._load_assets()
+        return self._model_hash
+
+    @property
     def trained_assets_ready(self) -> bool:
         self._load_assets()
         return self._model is not None and self._identity is not None

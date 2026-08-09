@@ -37,7 +37,7 @@ def run_self_test() -> dict[str, Any]:
             dependencies[name] = "importable"
 
     from hydroswarm.model import HydroCore
-    from hydroswarm.runtime import DefaultPipelineFactory
+    from hydroswarm.runtime import V4PipelineFactory
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
     from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
@@ -110,8 +110,13 @@ def run_self_test() -> dict[str, Any]:
         except OSError:
             port_available = False
     frontend_dist = workspace / "frontend" / "dist" / "index.html"
-    trained_factory = DefaultPipelineFactory(workspace)
+    # UI-11.1: self-test must validate the exact same production runtime
+    # hydroswarm.api.app:app actually launches with -- both resolve
+    # models/hydrocore-v4-release the same way (workspace-relative), through
+    # the same V4PipelineFactory, never a separately-checked runtime.
+    trained_factory = V4PipelineFactory(workspace / "models" / "hydrocore-v4-release", project_root=workspace)
     trained_assets_ready = trained_factory.trained_assets_ready
+    identity = trained_factory.identity
 
     return {
         "ok": True,
@@ -127,6 +132,9 @@ def run_self_test() -> dict[str, Any]:
         "trained_assets": {
             "ready": trained_assets_ready,
             "fallback_reason": trained_factory.fallback_reason,
+            "architecture_version": identity.architecture_version if identity is not None else None,
+            "model_sha256": trained_factory.model_hash,
+            "normalization_hash": identity.normalization_hash if identity is not None else None,
         },
         "inference_run": True,
         "inference_sha256": inference_hash,
