@@ -207,6 +207,12 @@ const alternateIncident: IncidentView = {
     { intent: 'WHY_SOURCE', text: 'test explanation text', facts: {}, limitations: [] },
   ],
   explanation: 'test explanation text',
+  simulatorBudget: {
+    exactSimulationsUsed: 1,
+    plansExactlyVerified: 1,
+    exactSimulationCacheHits: 0,
+    remainingEpanetBudget: 2,
+  },
 };
 
 vi.mock('../src/api/incident', () => ({

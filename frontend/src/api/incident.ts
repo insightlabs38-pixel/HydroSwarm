@@ -188,6 +188,12 @@ interface ApiIncidentView {
   }[];
   audit_events: Record<string, unknown>[];
   runtime_metrics_ms: Record<string, number>;
+  simulator_budget: {
+    exact_simulations_used: number;
+    plans_exactly_verified: number;
+    exact_simulation_cache_hits: number;
+    remaining_epanet_budget: number;
+  };
 }
 
 /** Mirrors hydroswarm.domain.schemas.ConsequenceMetrics field-for-field.
@@ -407,6 +413,12 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     benchmarks: [],
     explanations,
     explanation: whySource?.text ?? '',
+    simulatorBudget: {
+      exactSimulationsUsed: raw.simulator_budget.exact_simulations_used,
+      plansExactlyVerified: raw.simulator_budget.plans_exactly_verified,
+      exactSimulationCacheHits: raw.simulator_budget.exact_simulation_cache_hits,
+      remainingEpanetBudget: raw.simulator_budget.remaining_epanet_budget,
+    },
   };
 }
 
@@ -478,6 +490,7 @@ function errorIncidentView(reason: string): IncidentView {
     benchmarks: [],
     explanations: [],
     explanation: '',
+    simulatorBudget: null,
   };
 }
 

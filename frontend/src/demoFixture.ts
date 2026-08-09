@@ -515,6 +515,17 @@ export const demoIncident: IncidentView = {
   ] satisfies GroundedExplanation[],
   explanation:
     'Plan B is preferred because exact simulation found no pressure violations while reducing estimated exposure by 48% and preserving 98.7% service availability. Plan A was rejected despite higher exposure reduction because four nodes fell below the pressure threshold.',
+  // Consistent with the three plans above (A, B, C), all three of which
+  // carry a real `verification` -- plansExactlyVerified: 3. One of those
+  // three verifications is modeled as satisfied from cache (a real,
+  // legitimate zero-new-simulation outcome), so exactSimulationsUsed is 2
+  // even though plansExactlyVerified is 3.
+  simulatorBudget: {
+    exactSimulationsUsed: 2,
+    plansExactlyVerified: 3,
+    exactSimulationCacheHits: 1,
+    remainingEpanetBudget: 1,
+  },
 };
 
 /**

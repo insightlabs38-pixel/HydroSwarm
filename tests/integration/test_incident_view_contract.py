@@ -407,6 +407,31 @@ def test_incident_view_returns_complete_verified_contract(tmp_path) -> None:
     assert {"INCIDENT_CREATED", "PLANS_GENERATED", "PLAN_VERIFIED", "PLAN_APPROVED"} <= event_types
     assert "hydraulic_simulation" in view["runtime_metrics_ms"]
 
+    # Simulator budget: mirrors IncidentState unmodified (no recomputation
+    # here, no altered semantics) -- both generated plans were verified
+    # above, so plans_exactly_verified must reflect exactly that. This
+    # fixture injects a fake `_authority` verifier callable rather than a
+    # real HydraulicSimulator (see create_app(verifier=_authority) above),
+    # so exact_simulations_used correctly stays 0 -- verify_plan() only
+    # counts real EPANET executions consumed by an actual simulator
+    # instance (app.py's own "0 for ... an injected/non-simulator
+    # verifier" comment), not verification attempts in the abstract.
+    budget = view["simulator_budget"]
+    assert budget["plans_exactly_verified"] == 2
+    assert budget["exact_simulations_used"] == 0
+    assert budget["exact_simulation_cache_hits"] == 0
+    assert budget["remaining_epanet_budget"] == max(0, 3 - budget["exact_simulations_used"])
+
+    # Also directly cross-checks the /view response against the
+    # authoritative IncidentState for this incident (GET
+    # /api/incidents/{id}) -- the same counters, unmodified, not a
+    # frontend-only or /view-only recomputation.
+    state = client.get(f"/api/incidents/{incident_id}").json()
+    assert budget["exact_simulations_used"] == state["exact_simulations_used"]
+    assert budget["plans_exactly_verified"] == state["plans_exactly_verified"]
+    assert budget["exact_simulation_cache_hits"] == state["exact_simulation_cache_hits"]
+    assert budget["remaining_epanet_budget"] == state["remaining_epanet_budget"]
+
     # extra="forbid" on every nested model means an unknown/undeclared field
     # anywhere in this response would already have failed FastAPI's
     # response_model validation before we got here -- this call succeeding

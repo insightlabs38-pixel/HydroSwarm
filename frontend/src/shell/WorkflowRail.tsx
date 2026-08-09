@@ -1,7 +1,6 @@
 import type { IncidentView } from '../types';
 import { useConsoleStore, type Workspace } from '../store';
-
-type StageStatus = 'complete' | 'current' | 'waiting' | 'blocked' | 'caution' | 'unavailable';
+import { deriveWorkflowProgression, type StageStatus } from '../workflow';
 
 const STAGE_STATUS_META: Record<StageStatus, { glyph: string; word: string }> = {
   complete: { glyph: '✓', word: 'complete' },
@@ -31,10 +30,16 @@ const SECONDARY_UTILITIES: { id: Workspace; label: string }[] = [
 /**
  * Every status here is derived from real IncidentView fields, never
  * hard-coded (ui-work.txt 4: "Derive state from backend truth rather than
- * hard-coding it"). Workspaces without a real implementation yet
- * (network/authority, and source/sampling/response/approval until their
- * own UI-3..UI-6 phases land) are honestly `unavailable` rather than
- * faking readiness.
+ * hard-coding it"). Source/Sampling/Response/Approval come from the
+ * single shared `deriveWorkflowProgression` helper (workflow.ts), whose
+ * authority is `incident.status` -- the real controller stage -- rather
+ * than incidental artifacts like `recommendedSample`/`plans`, so this
+ * rail cannot disagree with Overview/DecisionInspector about what stage
+ * the incident is actually in. Note this means the "current" glyph marks
+ * the stage the controller considers active right now, which is
+ * independent of which page the operator happens to be viewing (that is
+ * `aria-current="page"` / the `.rail-item[aria-current='page']` border
+ * highlight, rendered separately below).
  */
 function deriveStageStatus(
   incident: IncidentView,
@@ -60,37 +65,13 @@ function deriveStageStatus(
       benchmarks: isCurrent('benchmarks') ? 'current' : 'complete',
     };
   }
-  const sourceCaution = !incident.calibrationValid || incident.ood !== 'NORMAL';
-  const hasValidPlan = incident.plans.some(
-    (plan) => plan.status === 'VALID' || plan.status === 'RECOMMENDED',
-  );
-  const noValidPlan = incident.plans.length > 0 && !hasValidPlan;
+  const progression = deriveWorkflowProgression(incident);
   return {
     incident: isCurrent('incident') ? 'current' : 'complete',
-    source: sourceCaution ? 'caution' : isCurrent('source') ? 'current' : 'complete',
-    sampling: incident.recommendedSample
-      ? isCurrent('sampling')
-        ? 'current'
-        : 'waiting'
-      : isCurrent('sampling')
-        ? 'current'
-        : 'complete',
-    response: noValidPlan
-      ? 'blocked'
-      : incident.plans.length === 0
-        ? 'waiting'
-        : isCurrent('response')
-          ? 'current'
-          : incident.selectedPlanId
-            ? 'complete'
-            : 'waiting',
-    approval: incident.selectedPlanId
-      ? 'complete'
-      : incident.approvalPending
-        ? isCurrent('approval')
-          ? 'current'
-          : 'waiting'
-        : 'blocked',
+    source: progression.source,
+    sampling: progression.sampling,
+    response: progression.response,
+    approval: progression.approval,
     replay: isCurrent('replay') ? 'current' : incident.audit.length > 0 ? 'waiting' : 'unavailable',
     network: isCurrent('network') ? 'current' : 'complete',
     validation: isCurrent('validation') ? 'current' : 'complete',

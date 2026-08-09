@@ -4,17 +4,11 @@ import { Panel } from '../components/Panel';
 import { StatusBadge } from '../components/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
 import { useConsoleStore } from '../store';
+import { deriveWorkflowProgression } from '../workflow';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
 );
-
-function nextWorkflowStep(incident: IncidentView): string {
-  if (incident.recommendedSample) return 'Collect recommended sample';
-  if (incident.plans.length > 0 && !incident.selectedPlanId) return 'Review response plan';
-  if (incident.approvalPending) return 'Approve verified plan';
-  return 'Monitor';
-}
 
 /**
  * ui-work.txt "UI-10.5" 3: the Incident workspace is a concise mission
@@ -40,6 +34,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
     incident.plans.find((plan) => plan.id === incident.recommendedPlanId) ??
     incident.plans[0] ??
     null;
+  const { nextStep } = deriveWorkflowProgression(incident);
 
   return (
     <div className="overview-grid">
@@ -66,7 +61,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
               'No source candidates for this incident.'
             )}
             {' · next: '}
-            <strong>{nextWorkflowStep(incident)}</strong>
+            <strong>{nextStep}</strong>
           </p>
         </div>
         <div className="decision-badges">

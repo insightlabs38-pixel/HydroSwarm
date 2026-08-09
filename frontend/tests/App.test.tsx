@@ -52,10 +52,28 @@ test('passes the 30-second comprehension test in fallback mode', async () => {
   expect(screen.getByRole('heading', { name: 'Evidence / sampling' })).toBeVisible();
   expect(screen.getByText('0.37 bits')).toBeVisible();
 
+  // The demo fixture is status=APPROVAL/approvalPending=true with a
+  // still-populated (stale) recommendedSample -- exactly the scenario
+  // that used to make the Incident strip and DecisionInspector say
+  // "Collect recommended sample" while a plan was actually awaiting
+  // human approval. Both surfaces must now agree with the authoritative
+  // controller stage instead (workflow.ts's shared helper).
+  expect(screen.getAllByText('Approve verified plan').length).toBeGreaterThan(0);
+  expect(screen.queryByText(/collect recommended sample/i)).toBeNull();
+
+  // "pre-UI-11" fix B: the exact-simulation budget the backend already
+  // tracks (previously only reachable via /replay) is now visible on the
+  // normal live view too, starting with a compact figure on Incident.
+  expect(screen.getByText('Remaining exact simulation budget')).toBeVisible();
+  expect(screen.getAllByText('1').length).toBeGreaterThan(0);
+
   await user.click(screen.getByRole('button', { name: /^Response/ }));
   expect(await screen.findByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
   expect(screen.getByText('RECOMMENDED')).toBeVisible();
   expect(screen.getByText('REJECTED')).toBeVisible();
+  expect(screen.getByText('Exact simulations used')).toBeVisible();
+  expect(screen.getByText('Plans exactly verified')).toBeVisible();
+  expect(screen.getByText('Exact simulation cache hits')).toBeVisible();
 
   // Select the rejected plan to see its real grounded rejection reason
   // (ui-work.txt 22 cross-panel synchronization).

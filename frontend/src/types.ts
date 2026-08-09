@@ -143,11 +143,12 @@ export interface ApprovalReceipt {
  * "no fake historical state": the real /replay endpoint returns the
  * incident's *current* raw state, not a historical snapshot, so this
  * type must never be presented as a point-in-time replay frame). This
- * happens to be the only place `exact_simulations_used`/
- * `plans_exactly_verified`/`exact_simulation_cache_hits`/
- * `remaining_epanet_budget` are exposed to the console today -- a known
- * gap on IncidentView (see UI-3/UI-5 handoff notes), closed here at zero
- * backend cost since /replay already returns them. */
+ * was, until the "pre-UI-11" fix that added IncidentView.simulatorBudget
+ * below, the only place `exact_simulations_used`/`plans_exactly_verified`/
+ * `exact_simulation_cache_hits`/`remaining_epanet_budget` were exposed to
+ * the console -- kept as its own type since /replay's `state` still
+ * carries several fields (sampleCount, approvalPending, oodLevel) that
+ * SimulatorBudget does not. */
 export interface ReplayIncidentState {
   incidentId: string;
   networkId: string;
@@ -166,6 +167,19 @@ export interface ReplayResult {
   state: ReplayIncidentState;
   events: AuditEvent[];
   chainValid: boolean;
+}
+
+/** Mirrors hydroswarm.api.state.SimulatorBudgetView field-for-field --
+ * exact-simulation budget/usage counters mirrored unmodified from the
+ * backend's IncidentState (core-issues5.txt Section 8), now exposed
+ * through the normal live /view response ("pre-UI-11" fix B) rather than
+ * only through /replay. No recomputation and no altered semantics happen
+ * on the frontend; every field here is exactly what the backend reports. */
+export interface SimulatorBudget {
+  exactSimulationsUsed: number;
+  plansExactlyVerified: number;
+  exactSimulationCacheHits: number;
+  remainingEpanetBudget: number;
 }
 
 export interface NetworkTopologyNode {
@@ -471,4 +485,9 @@ export interface IncidentView {
    * explanation panel -- equivalent to
    * explanations.find(e => e.intent === 'WHY_SOURCE')?.text. */
   explanation: string;
+  /** Exact-simulation budget/usage counters ("pre-UI-11" fix B). Null only
+   * when genuinely unavailable -- ERROR mode has no incident to report
+   * counters for. DEMO_FALLBACK carries a labeled fixture value like
+   * every other field on that fixture, never a fabricated LIVE value. */
+  simulatorBudget: SimulatorBudget | null;
 }

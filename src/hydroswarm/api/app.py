@@ -89,6 +89,7 @@ from .state import (
     SampleRecommendationView,
     SensorHealthView,
     ServiceStatus,
+    SimulatorBudgetView,
     Verifier,
     demo_candidates,
     utc_now,
@@ -1381,6 +1382,12 @@ def create_app(
             explanations=explanations,
             audit_events=audit_events,
             runtime_metrics_ms=dict(analysis.latencies_ms),
+            simulator_budget=SimulatorBudgetView(
+                exact_simulations_used=record.state.exact_simulations_used,
+                plans_exactly_verified=record.state.plans_exactly_verified,
+                exact_simulation_cache_hits=record.state.exact_simulation_cache_hits,
+                remaining_epanet_budget=record.state.remaining_epanet_budget,
+            ),
         )
         _validate_incident_view(view)
         return view

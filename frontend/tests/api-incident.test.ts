@@ -201,6 +201,12 @@ function apiIncidentViewFixture(): unknown {
       },
     ],
     runtime_metrics_ms: { hydraulic_simulation: 12.5, neural_inference: 3.2 },
+    simulator_budget: {
+      exact_simulations_used: 1,
+      plans_exactly_verified: 1,
+      exact_simulation_cache_hits: 0,
+      remaining_epanet_budget: 2,
+    },
   };
 }
 
@@ -224,6 +230,14 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
     expect(incident.recommendedPlanId).toBe('plan-a');
     expect(incident.counterfactuals['plan-a'].serviceAvailability).toBe(0.99);
     expect(incident.provenance.calibrationHash).toBe('c'.repeat(64));
+    // "pre-UI-11" fix B: the exact-simulation budget the /view response
+    // reports is passed through unmodified, never recomputed or defaulted.
+    expect(incident.simulatorBudget).toEqual({
+      exactSimulationsUsed: 1,
+      plansExactlyVerified: 1,
+      exactSimulationCacheHits: 0,
+      remainingEpanetBudget: 2,
+    });
   });
 
   test('maps a null sample_recommendation to null, not a zero-filled placeholder', async () => {
@@ -322,6 +336,7 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
       expect(incident.recommendedPlanId).toBeNull();
       expect(incident.benchmarks).toEqual([]);
       expect(incident.audit).toEqual([]);
+      expect(incident.simulatorBudget).toBeNull();
     },
   );
 

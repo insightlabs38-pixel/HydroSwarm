@@ -4,6 +4,7 @@ import type { IncidentView } from '../types';
 import { useConsoleStore } from '../store';
 import { fetchAuthorityCertificates } from '../api/authority';
 import { demoAuthorityCertificates } from '../demoFixture';
+import { deriveWorkflowProgression } from '../workflow';
 import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 import { AuthorityBadge } from '../components/status/AuthorityBadge';
@@ -25,13 +26,7 @@ const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {};
  */
 function IncidentSummary({ incident }: { incident: IncidentView }) {
   const leading = incident.candidates[0];
-  const nextStep = incident.recommendedSample
-    ? 'Collect recommended sample'
-    : incident.plans.length > 0 && !incident.selectedPlanId
-      ? 'Review response plan'
-      : incident.approvalPending
-        ? 'Approve verified plan'
-        : 'Monitor';
+  const { nextStep } = deriveWorkflowProgression(incident);
   return (
     <div className="inspector-stack">
       <dl className="key-value-grid">
@@ -61,6 +56,14 @@ function IncidentSummary({ incident }: { incident: IncidentView }) {
                 : 'none pending'}
           </dd>
         </div>
+        <div>
+          <dt>Remaining exact simulation budget</dt>
+          <dd>
+            {incident.simulatorBudget
+              ? incident.simulatorBudget.remainingEpanetBudget
+              : 'not measured'}
+          </dd>
+        </div>
       </dl>
       {leading ? (
         <div className="candidate-hero">
@@ -71,12 +74,8 @@ function IncidentSummary({ incident }: { incident: IncidentView }) {
         <EmptyState title="No source candidates for this incident." />
       )}
       <p className="supporting">
-        Suggested next step (derived from current state, not an authoritative controller output):{' '}
+        Next step (derived from the controller's real stage, <code>{incident.status}</code>):{' '}
         <strong>{nextStep}</strong>.
-      </p>
-      <p className="supporting">
-        Simulator budget: not yet exposed to the console (a known gap -- IncidentState carries
-        remaining_epanet_budget, but the /view response does not yet include it).
       </p>
     </div>
   );
@@ -270,6 +269,32 @@ function ResponseSummary({ incident }: { incident: IncidentView }) {
         <p className="supporting">Abstention reason: {verification.abstentionReason}</p>
       )}
       <p className="supporting">{plan.actions.length} action(s) in this plan.</p>
+      {incident.simulatorBudget && (
+        <KeyValueGrid
+          entries={[
+            {
+              key: 'remaining-budget',
+              label: 'Remaining exact simulation budget',
+              value: String(incident.simulatorBudget.remainingEpanetBudget),
+            },
+            {
+              key: 'exact-sims-used',
+              label: 'Exact simulations used',
+              value: String(incident.simulatorBudget.exactSimulationsUsed),
+            },
+            {
+              key: 'plans-verified',
+              label: 'Plans exactly verified',
+              value: String(incident.simulatorBudget.plansExactlyVerified),
+            },
+            {
+              key: 'cache-hits',
+              label: 'Exact simulation cache hits',
+              value: String(incident.simulatorBudget.exactSimulationCacheHits),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }
