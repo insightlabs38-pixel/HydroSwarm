@@ -4817,5 +4817,31 @@ only -- no architecture change, no locked-test access, no
    trained-but-gated heads) into a new `present_but_untrained_outputs`
    field. No runtime behavior changed.
 
-4. Git SHA pin and final integrity regression: recorded below once
-   complete.
+4. **Git SHA pin** -- `reports/results/v4/pretest-architecture-selection.{md,json}`
+   now record the full current HEAD SHA
+   (`e532d41facbaed15418d2cb7d00e4a5259598603`, commit `0573e4e`'s parent)
+   alongside the existing Section-19 calibration/bundle-build-time SHA
+   (`c5d2dd5`), so the report reflects this session's changes.
+
+5. **Final integrity regression, re-run after all of the above**:
+
+   | Gate | Result |
+   |---|---|
+   | Full `pytest` | **859 passed**, 0 failed (unchanged from Section 19's count -- this pass touched no source/test code, only reports/docs and one new training run) |
+   | Ruff (`src tests scripts`) | clean |
+   | Pyright | 0 errors, 0 warnings |
+   | Train/serve parity (`scripts/run_train_serve_parity_gate.py`) | **passed** -- 3 topologies x 2 conditions, identical result to Section 19 (only the `generated_at` timestamp changed) |
+   | Inference-bundle load/self-test (`load_v4_inference_bundle` against `experiments/runs/v4-release-bundle/no_adapters-seed20260810`) | **passed** -- `calibration_status="FITTED"`, calibration artifact present, every internal-consistency check the loader performs (SHA256SUMS, `artifact-manifest.json`, `checkpoint_identity.json` self-consistency, `runtime_manifest.json` fingerprint/model-hash match, `output_governance.json` agreement, normalization-hash reproduction, signature-policy-hash match) passed with no exception |
+   | Calibration identity validation | **passed** -- `load_v4_inference_bundle`'s own contract validates the calibration artifact against the model/feature-schema/normalization identity as a precondition of returning `calibration_status="FITTED"` (see its docstring); the successful load above is this validation succeeding, not a separate step |
+
+   No source or runtime code changed in this pass -- only report wording,
+   one new training-evidence file, and a Git SHA pin -- so this regression
+   re-run is a confirmation that nothing was disturbed, not a check
+   against new risk.
+
+**READY FOR ARCHITECTURE FREEZE AND FINAL SELECTION.**
+
+`final-selection.json` still does not exist. The locked final test still
+has not been opened. Per this pass's explicit instructions: stopping
+here. Do not open the locked test and do not create `final-selection.json`
+without a separate explicit instruction.
