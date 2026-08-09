@@ -214,6 +214,31 @@ def test_dataset_is_picklable_without_open_shard_handles_for_worker_processes(tm
         assert pickled[index].scenario_id == examples[index].scenario_id
 
 
+def test_close_releases_cached_shard_handles_and_dataset_remains_usable(tmp_path) -> None:
+    """Windows refuses to overwrite/replace a file with an open mmap held
+    elsewhere (POSIX tolerates it) -- close() exists so a caller that needs
+    to do that (e.g. a corruption-detection test) can reliably free the
+    handle first, cross-platform. Also proves the dataset stays usable
+    afterward -- close() only drops cached handles, it doesn't tear down
+    the dataset (matches the lazy-reopen behavior __setstate__ already
+    relies on)."""
+
+    examples = _examples(4)
+    write_shards(examples, tmp_path / "shards", shard_size=2)
+    dataset = ShardedScenarioDataset(tmp_path / "shards", expected_split="train")
+
+    for index in range(len(dataset)):
+        dataset[index]
+    assert dataset._shard_handles  # sanity: handles were actually opened
+
+    dataset.close()
+    assert dataset._shard_handles == {}
+
+    # Lazily reopens shards on demand rather than staying permanently closed.
+    for index in range(len(dataset)):
+        assert dataset[index].scenario_id == examples[index].scenario_id
+
+
 def test_deepcopy_also_drops_open_shard_handles(tmp_path) -> None:
     examples = _examples(2)
     write_shards(examples, tmp_path / "shards", shard_size=2)

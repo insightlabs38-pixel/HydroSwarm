@@ -283,6 +283,25 @@ class ShardedScenarioDataset(Dataset[ScenarioExample]):
             self._shard_handles[shard_file] = handle
         return handle
 
+    def close(self) -> None:
+        """Release every cached shard mmap handle this dataset has opened.
+
+        Not required on POSIX -- overwriting/replacing a file with an open
+        mmap held elsewhere is harmless there, the old mapping just keeps
+        pointing at the original inode data. Windows enforces sharing-mode
+        locks instead: it refuses to overwrite/replace a file while any
+        handle, including a memory-mapped one, is still open on it. A
+        caller that needs to overwrite/replace a shard file this dataset
+        has already read (e.g. a corruption-detection test) must call this
+        first for that to work cross-platform. safetensors' handle objects
+        have no explicit close of their own; dropping the last Python
+        reference is what releases the underlying mmap (CPython's
+        reference counting makes this deterministic, not GC-timing
+        dependent, since _handle_for is the only place a handle is ever
+        stored)."""
+
+        self._shard_handles.clear()
+
     def __getitem__(self, position: int) -> ScenarioExample:
         entry = self._entries[self._indices[position]]
         handle = self._handle_for(entry.shard_file)

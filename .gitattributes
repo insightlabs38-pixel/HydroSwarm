@@ -1,3 +1,17 @@
+# backend-ci-portability fix: force LF line endings for every text file on
+# every platform, unconditionally overriding a Windows git client's default
+# core.autocrlf=true checkout-time LF->CRLF conversion. Without this, a
+# native Windows checkout (including windows-latest CI) silently corrupts
+# committed text files this project verifies with a SHA-256 sidecar --
+# e.g. node-normalization.json/edge-normalization.json (loaded by the real
+# runtime, not just tests) and index.jsonl (verified against manifest.json
+# by ShardedScenarioDataset) -- every checksum then fails to match,
+# regardless of the file's actual (unchanged, LF) committed content. Must
+# be the FIRST rule in this file: git uses the LAST matching pattern, so
+# the more specific `binary`/LFS `-text` rules below correctly continue to
+# override this blanket default for genuinely binary content.
+* text=auto eol=lf
+
 output/releases/ export-ignore
 tmp/ export-ignore
 build/ export-ignore

@@ -16,6 +16,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 import torch
 
 from hydroswarm.model.core import HydroCore
@@ -147,6 +148,10 @@ def test_corrupted_artifact_manifest_fingerprint_fails_closed(tmp_path: Path) ->
     assert factory.trained_assets_ready is False
 
 
+#: Masked locally by a warm data/generated/signatures cache (gitignored,
+#: session-accumulated); found by the real_simulation runtime audit in
+#: tests/conftest.py on a clean-cache CI run.
+@pytest.mark.real_simulation
 def test_no_calibration_artifact_configured_falls_back_to_uncalibrated(tmp_path: Path) -> None:
     """V4PipelineFactory never sets a calibration_path by default (no v4
     checkpoint has passed Phase 19 selection/calibration fitting yet) --
@@ -259,6 +264,10 @@ def test_normalization_hash_mismatch_fails_closed(tmp_path: Path) -> None:
 # fix closes).
 
 
+#: Masked locally by a warm data/generated/signatures cache (gitignored,
+#: session-accumulated); found by the real_simulation runtime audit in
+#: tests/conftest.py on a clean-cache CI run.
+@pytest.mark.real_simulation
 def test_committed_training_topology_file_resolves_to_governed_mode(tmp_path: Path) -> None:
     """`data/topology-transfer/branched-loop.inp`, loaded directly (no
     write/re-read round trip), is one of the exact committed .inp files

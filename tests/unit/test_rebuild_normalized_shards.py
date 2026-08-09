@@ -130,6 +130,11 @@ def test_rebuild_fails_closed_on_corrupted_shard(tmp_path) -> None:
     node_stats.save(node_path)
     edge_stats.save(edge_path)
 
+    # Windows refuses to overwrite a file that is still memory-mapped
+    # elsewhere (POSIX tolerates this); train_dataset's own lazy-loaded
+    # safetensors handle for shard-00000 is still open at this point.
+    train_dataset.close()
+
     shard_path = corpus_dir / "tensors" / "train" / "shard-00000.safetensors"
     corrupted = bytearray(shard_path.read_bytes())
     corrupted[-1] ^= 0xFF

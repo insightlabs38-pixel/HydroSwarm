@@ -11,6 +11,8 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
+
 from hydroswarm.runtime.defaults import DefaultPipelineFactory
 from hydroswarm.simulation.wrapper import wntr
 
@@ -78,6 +80,13 @@ def test_promoted_checkpoint_calibration_still_validates_with_no_normalization()
     assert factory._feature_builder.normalization_fingerprint == NO_NORMALIZATION_SENTINEL
 
 
+#: Constructs a real HybridInferencePipeline against a real network and
+#: calls it -- masked locally by a warm data/generated/signatures cache
+#: (gitignored, session-accumulated); a fresh checkout/CI run hits a real
+#: cache miss here. Found by the real_simulation runtime audit in
+#: tests/conftest.py on a clean-cache CI run, not the static call-count
+#: audit (which was itself run against a warm local cache).
+@pytest.mark.real_simulation
 def test_promoted_checkpoint_declares_only_sentinel_as_a_trained_task() -> None:
     """core-issues.txt repair item 8: the real promoted checkpoint's own
     metadata.json now declares trained_tasks, and the real hybrid pipeline
