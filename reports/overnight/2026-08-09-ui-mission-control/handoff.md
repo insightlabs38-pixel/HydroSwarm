@@ -18,6 +18,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   5. `3dc2b49` — `feat(ui): rebuild synchronized operational network map` (UI-2)
   6. `7db5ab2` — `docs(handoff): record UI-2 completion`
   7. `f173a65` — `feat(ui): add governed source-localization workspace` (UI-3)
+  8. `83c72d2` — `docs(handoff): record UI-3 completion`
+  9. `7381d90` — `feat(ui): add deterministic evidence-value sampling workspace` (UI-4)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -192,22 +194,40 @@ Source case now shows a real query-free summary. DEMO_FALLBACK gets a hand-autho
 incident) — clearly attributable to the existing DEMO_FALLBACK banner, never used in
 LIVE mode. Verified visually via Playwright.
 
-## Remaining phases (UI-4 through UI-11): NOT STARTED
+## UI-4 — Sampling/Scout workspace: COMPLETE
 
-Tracked as tasks #6–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `7381d90` message for full detail. Summary: `src/api/sampling.ts` +
+`fetchEvidenceCertificate()` against the real `GET /incidents/{id}/evidence-certificate`
+endpoint; new `SamplingWorkspace.tsx` showing evidence status (with the deterministic
+`scout_recommendation` authority badge, reusing UI-3's `fetchAuthorityCertificates`),
+sample-budget state, the next-sample recommendation with real EIG/candidate-reduction/
+accessibility/alternatives, and the real grounded "Why this sample?" explanation.
+"No further sampling recommended" is an explicit labeled empty state, never a blank
+card. `demoEvidenceCertificate` added for DEMO_FALLBACK, consistent with the rest of the
+fixture. Verified visually via Playwright.
+
+## Remaining phases (UI-5 through UI-11): NOT STARTED
+
+Tracked as tasks #7–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-4 (Sampling/Scout workspace) — the real `GET /incidents/{id}/evidence-certificate`
-endpoint (confirmed present: `EvidenceCertificate` with status/stop/message/
-posterior_entropy_bits/candidate_set_size/candidate_nodes/candidate_region_calibrated/
-recommended_sample_node/expected_information_gain_bits/expected_candidate_reduction/
-sample_budget_remaining/already_sampled_nodes/recommended_node_accessible — see
-domain/schemas.py:356), the `scout_recommendation` authority certificate (same
-`/authority` endpoint UI-3 already wired), and the "Why this sample?" explanation
-(already available in `incident.explanations`, per the discovery above — no new fetch
-needed for that part).
+Next up: UI-5 (Response/Strategist workspace) — the largest remaining single phase.
+Needs: full plan/action display (already have `Plan.actions`/`Plan.verification` typed
+since UI-0), CURRENT/STALE (already on `PlanVerificationView.verificationStatus`),
+expected/worst-case consequences (already typed), exact-run budget (a **known gap**:
+`IncidentState.remaining_epanet_budget`/`plans_exactly_verified`/
+`exact_simulation_cache_hits` exist on the backend but are not yet on `IncidentView` --
+recorded as a gap in UI-3's DecisionInspector too), numerical sensitivity (already on
+`ConsequenceView`), the Pareto frontier (`GET /incidents/{id}/frontier`, confirmed
+present, returns `ParetoFrontierEntryView[]` with an `EXPOSURE_AWARE`/`HYDRAULIC_ONLY`
+`group` field that ui-work.txt 15 says must stay visually separate, never merged), the
+`plan_consequence:{plan_id}` authority certificates (same `/authority` endpoint, already
+wired), and the "Why plan rejected?"/"Compare plans?" explanations (already in
+`incident.explanations`). The exact-run-budget gap should probably get a narrowly-additive
+backend exposure in this phase rather than staying a permanent "not yet exposed" note --
+worth deciding explicitly rather than deferring again.
 
 ## Continuation commands
 
