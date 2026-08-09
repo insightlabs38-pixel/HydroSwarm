@@ -317,6 +317,10 @@ def test_committed_training_topology_file_resolves_to_governed_mode(tmp_path: Pa
     assert factory.signature_policy_hash == GOVERNED_TRAINING_SIGNATURE_POLICY.policy_hash
 
 
+#: Masked locally by a warm data/generated/signatures cache (gitignored,
+#: session-accumulated); found by the real_simulation runtime audit in
+#: tests/conftest.py on a clean-cache CI run.
+@pytest.mark.real_simulation
 def test_golden_fixture_snapshot_resolves_to_runtime_generated_mode(tmp_path: Path) -> None:
     """data/frozen/golden_network.inp is a single frozen RANDOMIZED
     scenario snapshot (see data/frozen/manifest.json's
@@ -336,6 +340,10 @@ def test_golden_fixture_snapshot_resolves_to_runtime_generated_mode(tmp_path: Pa
     assert factory.signature_mode == "RUNTIME_GENERATED_IMPORTED_NETWORK"
 
 
+#: Masked locally by a warm data/generated/signatures cache (gitignored,
+#: session-accumulated); found by the real_simulation runtime audit in
+#: tests/conftest.py on a clean-cache CI run.
+@pytest.mark.real_simulation
 def test_governed_policy_produces_the_full_training_hypothesis_grid(tmp_path: Path) -> None:
     """The runtime-generated SignatureArtifact's own recorded hypotheses
     must reflect the REAL governed training policy's bins
