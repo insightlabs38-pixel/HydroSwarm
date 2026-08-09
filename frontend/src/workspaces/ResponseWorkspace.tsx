@@ -38,8 +38,27 @@ const OperationalMap = lazy(() =>
  * and the grounded comparison/rejection explanations as its own PRIMARY
  * content, per "UI-10.5" 2's RESPONSE ordering.
  */
+// UI-11.1 §3: when the incident genuinely has no response plans (planning
+// suppressed -- e.g. invalid calibration or an out-of-validated-range
+// reading), every panel below must say so honestly instead of drawing
+// content that only makes sense once plans exist (a Pareto frontier or a
+// "compare plans" explanation authored for a *different*, populated,
+// scenario). This is the single source of truth for that state, and for
+// the reason shown alongside it, reusing the same calibration/OOD signals
+// ModeBanner already surfaces -- never a new suppression concept.
+function planningSuppressionDetail(incident: IncidentView): string {
+  if (!incident.calibrationValid) {
+    return 'Calibration is invalid for this network. Planning is suppressed until a valid calibration artifact is available.';
+  }
+  if (incident.ood === 'OUTSIDE_VALIDATED_RANGE') {
+    return "This incident is outside the model's validated operating range. Planning is suppressed pending additional evidence or operator review.";
+  }
+  return 'No response plans have been generated for this incident yet.';
+}
+
 export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
   const { selectedPlanId, selectPlan, frontierMode } = useConsoleStore();
+  const planningSuppressed = incident.plans.length === 0;
   const activePlan =
     incident.plans.find((plan) => plan.id === selectedPlanId) ??
     incident.plans.find((plan) => plan.id === incident.recommendedPlanId) ??
@@ -49,12 +68,12 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
   const frontierQuery = useQuery({
     queryKey: ['frontier', incident.id, frontierMode],
     queryFn: ({ signal }) => fetchParetoFrontier(incident.id, frontierMode, signal),
-    enabled: incident.mode === 'LIVE',
+    enabled: incident.mode === 'LIVE' && !planningSuppressed,
   });
   const frontier =
     incident.mode === 'LIVE'
       ? (frontierQuery.data ?? [])
-      : incident.mode === 'DEMO_FALLBACK'
+      : incident.mode === 'DEMO_FALLBACK' && !planningSuppressed
         ? demoParetoFrontier
         : [];
   const whyRejected = useMemo(
@@ -80,14 +99,26 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
         </Suspense>
       </Panel>
       <Panel title="Verified plan comparison" eyebrow="WNTR CONSEQUENCES" className="wide-panel">
-        <PlanTable plans={incident.plans} />
+        {planningSuppressed ? (
+          <EmptyState
+            title="Planning suppressed -- no response plans to compare."
+            detail={planningSuppressionDetail(incident)}
+          />
+        ) : (
+          <PlanTable plans={incident.plans} />
+        )}
       </Panel>
       <Panel
         title="Verified response Pareto frontier"
         eyebrow={`${frontierMode === 'posterior_weighted' ? 'POSTERIOR-WEIGHTED' : 'WORST-CASE'} CONTEXT`}
         className="wide-panel"
       >
-        {incident.mode === 'LIVE' && frontierQuery.isLoading ? (
+        {planningSuppressed ? (
+          <EmptyState
+            title="Planning suppressed -- no Pareto frontier to display."
+            detail={planningSuppressionDetail(incident)}
+          />
+        ) : incident.mode === 'LIVE' && frontierQuery.isLoading ? (
           <p role="status">Loading Pareto frontier…</p>
         ) : incident.mode === 'LIVE' && frontierQuery.isError ? (
           <EmptyState
@@ -125,7 +156,12 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
         </Panel>
       )}
       <Panel title="Compare plans" eyebrow="GROUNDED EXPLANATION" className="wide-panel">
-        {comparePlans ? (
+        {planningSuppressed ? (
+          <EmptyState
+            title="Planning suppressed -- no plan comparison available."
+            detail={planningSuppressionDetail(incident)}
+          />
+        ) : comparePlans ? (
           <p>{comparePlans.text}</p>
         ) : (
           <EmptyState title="No grounded plan comparison available for this incident." />

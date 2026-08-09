@@ -104,12 +104,37 @@ test('OOD / suppressed planning shows the governed caution state, not a fabricat
   await expect(page.getByText('DEGRADED')).toBeVisible();
 
   await page.getByRole('button', { name: /^Response/ }).click();
+  // UI-11.1 §3: while planning is suppressed, no panel may draw content
+  // that only makes sense once plans exist -- neither the plan comparison
+  // table (previously correct) nor the Pareto frontier panel below it
+  // (previously a bug: it kept showing demoParetoFrontier, an illustrative
+  // dataset authored for a populated scenario, even though this incident's
+  // real plans are empty). Both must show the same governed suppressed
+  // state instead.
   await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
-  // No fabricated plan may appear in the real plan-comparison table while
-  // planning is suppressed (scoped to .plan-table: the Pareto frontier
-  // panel below it renders its own separate, mode-keyed illustrative demo
-  // dataset, unrelated to this incident's real -- here, empty -- plans).
+  await expect(page.locator('.plan-table')).toHaveCount(0);
   await expect(page.locator('.plan-table .table-plan-button')).toHaveCount(0);
+  await expect(
+    page.getByText('Planning suppressed -- no response plans to compare.'),
+  ).toBeVisible();
+
+  await expect(
+    page.getByRole('heading', { name: 'Verified response Pareto frontier' }),
+  ).toBeVisible();
+  await expect(
+    page.getByText('Planning suppressed -- no Pareto frontier to display.'),
+  ).toBeVisible();
+  // Neither the exposure-aware scatter chart nor either frontier table --
+  // which would carry the illustrative demoParetoFrontier plan labels
+  // ("Aggressive isolation", "Isolate + controlled flush", etc.) -- may
+  // render while planning is suppressed.
+  await expect(page.locator('.frontier-chart')).toHaveCount(0);
+  await expect(page.getByText('Aggressive isolation')).toHaveCount(0);
+
+  await expect(page.getByRole('heading', { name: 'Compare plans' })).toBeVisible();
+  await expect(
+    page.getByText('Planning suppressed -- no plan comparison available.'),
+  ).toBeVisible();
 });
 
 // UI-11 required scenario: stale verification disables approval. Uses
