@@ -768,22 +768,125 @@ backend diff in this commit.
   response field, populated from already-computed state) and fully gated (874/874
   pytest).
 
+## UI-11.1 — final bounded submission-integrity pass: COMPLETE
+
+A separate, later session. The visual architecture was frozen going in (no redesign);
+this pass fixed remaining runtime/data-integrity/demo/CI issues only.
+
+- **§1 — frozen V4 wired into production**: `hydroswarm.api.app`'s module-level `app`
+  and `hydroswarm.cli.run_self_test` composed `DefaultPipelineFactory` (legacy
+  `hydrocore-v3`/`models/hydrocore-s-learning-v1.safetensors`) instead of the frozen
+  `hydrocore-v4` candidate, despite `V4PipelineFactory` already existing. Fixed by
+  copying the already-built, hash-verified release bundle from
+  `experiments/runs/v4-release-bundle/no_adapters-seed20260810/` into a git-tracked
+  `models/hydrocore-v4-release/` and switching exactly the two call sites
+  (`app.py`, `cli.py`) to `V4PipelineFactory(...)` — no V4 loading logic reimplemented.
+  New `tests/integration/test_production_runtime_wiring.py` (7 tests) locks the frozen
+  identity, output governance, fail-closed behavior, and exact-WNTR-verification
+  decoupling down; a real end-to-end incident analysis and a real
+  `./start_hydroswarm.sh` + live-Chromium smoke both confirmed the production app
+  actually serves `model_sha256 a501ad87bc...16c7` / `calibration_hash 829c167b26...68fa`.
+- **§2 — null-vs-0 in the frontend**: sensor pressure/concentration, node concentration,
+  and fusion disagreement were still `?? 0`-coerced (unmeasured silently became a
+  scientifically meaningful 0). Made `number | null` end-to-end, rendered as "not
+  measured", with regression coverage distinguishing null from genuine 0 at both the
+  mapping and rendered-DOM layers.
+- **§3 — suppressed-planning Pareto/plan-comparison leak**: `?demo=ood_suppressed`
+  correctly set `plans: []`, but the Pareto frontier and "compare plans" panels still
+  drew `demoParetoFrontier`/a stale explanation authored for the populated base
+  scenario. All three panels now key off `plans.length === 0` and show one governed
+  suppressed state; Playwright asserts both an empty plan table and an empty frontier.
+- **§4 — demo fixture provenance honesty**: `demoFixture.ts` carried a fabricated model
+  name (`HydroSwarm-M 0.9.2`) and hand-authored 64-hex-character strings shaped like
+  real SHA-256 hashes. Replaced with honest empty/unavailable values; the one
+  genuinely real value (`calibrationVersion: hydroswarm-calibration-v1`, the real
+  `CALIBRATION_SCHEMA_VERSION` constant) was kept, not removed.
+- **§5 — Playwright in CI**: added a dedicated `frontend-e2e` ubuntu-latest job
+  (Chromium install, build, `npm run test:e2e`), separate from `frontend-quality`. The
+  Linux Chromium visual baselines had never actually run in CI before this.
+- **§6 — final regression gates**: backend ruff/pyright clean, full pytest 881/881;
+  frontend lint/typecheck/format/build clean, 107/107 unit tests, 26/26 Playwright;
+  real documented-launch smoke test (network import, incident create/analyze, real
+  EPANET map coordinates, simulator-budget fields, zero console errors, zero external
+  network calls, genuine unforced planning-suppression governance observed twice).
+- **§7 — real PR + CI**: opened PR #2 (`feature/ui-mission-control-v1` → `main`, not
+  merged). First real CI run caught a genuine environment-fidelity issue in the new
+  `frontend-e2e` job: baselines regenerated in this session's local sandbox did not
+  pixel-match GitHub Actions' actual Ubuntu/Chromium font rendering (a whole-page
+  sub-pixel "ghosting" diff, not a content regression). Fixed by regenerating the 9
+  affected baselines from inside the real CI environment itself (a throwaway
+  push-triggered workflow ran `playwright test --update-snapshots` on `ubuntu-latest`
+  and uploaded the result; downloaded, committed, workflow deleted) — never by loosening
+  the pixel tolerance. All 4 required checks (`frontend-quality`, `frontend-e2e`,
+  `python-quality` Ubuntu + Windows) passed on the next real run.
+- **§8 — governance invariants re-confirmed**: `hydrocore-v4-architecture-freeze` tag
+  unmoved and still an ancestor of HEAD; `architecture-freeze.json`'s
+  `locked_test_opened: false`, `final_selection_json_exists: false`,
+  `locked_evaluation_status: "NOT PERFORMED"` all unchanged (file untouched by this
+  branch); no `final-selection.json` anywhere in the tree.
+
+Commits (`792afac`..`e1e9d78`): `792afac` feat(runtime) wire V4 · `099ce06` §2 null-vs-0
+· `a4cf0ce` §3 suppressed-Pareto fix · `e4b662d` §4 demo provenance honesty · `937b555`
+§5 CI Playwright job · `877f312`/`23c020c` temp baseline-regen tooling (deleted) ·
+`e1e9d78` real-CI baseline fix.
+
+## Pre-merge polish pass: COMPLETE
+
+A final bounded pass requested ahead of merge — no redesign, no backend/model/scientific
+behavior change:
+
+1. **README screenshot**: `docs/screenshots/operator-overview.png` was from a pre-
+   "UI-10.5" layout (old right rail, `HydroSwarm-M 0.9.2` header text). Replaced with a
+   real 1920×1080 Incident-workspace capture from this branch's current build; caption
+   wording updated to match.
+2. **DEMO_FALLBACK semantics**: `ModeBanner`'s label changed from "DETERMINISTIC DEMO
+   FALLBACK" to "ILLUSTRATIVE DEMO / DEMO_FALLBACK"; `demoFixture.ts`'s
+   `runtimeAnalysisMode` (`'FULL_HYBRID'` → `null`) and `runtimeMs` (`438` → `0`) no
+   longer imply a real inference run occurred or a real latency was measured — both
+   reuse this codebase's existing "0/null means don't render the badge" convention
+   (`MissionHeader`), not a new one; `modeReason` now says "hand-authored", not
+   "simulator-derived". All 14 test references to the old banner string updated.
+3. **Stale docs**: `hydroswarm.runtime.v4_defaults`'s module docstring said "nothing in
+   this module is wired into the live production entry point" — written before UI-11.1
+   §1 wired it in. Updated to state current reality while preserving the still-true
+   distinction from the separate, still-unopened locked test. This handoff doc and PR
+   #2's description updated to the current final SHA/CI-green state (this section).
+
+9 Playwright baselines affected by the visible banner/badge text changes regenerated
+from real CI again, same throwaway-workflow method as UI-11.1 §7. Final local gates:
+frontend lint/typecheck/format/build clean, 107/107 unit tests; backend ruff/pyright
+clean, the 14 tests touching `v4_defaults`/production wiring re-run and green. Real PR
+CI (`frontend-quality`, `frontend-e2e`, `python-quality` Ubuntu + Windows) green again
+on the final pushed SHA.
+
 ## Final summary
 
 - **Branch**: `feature/ui-mission-control-v1`
-- **Final SHA**: `dab17d0a61b2edeaeab536ac9b1a8bb7f430b826`
+- **Final SHA**: `a5c7cbcb50fd7edb0070b1a1290f0bbd00d5a096`
+- **PR**: [#2](https://github.com/insightlabs38-pixel/HydroSwarm/pull/2)
+  (`feature/ui-mission-control-v1` → `main`), open, mergeable, all 4 required GitHub
+  Actions checks passing on the final SHA above. **Not merged** (never attempted, per
+  every phase's own instruction not to merge automatically).
 - **This session's commits** (chronological, all pushed to `origin`):
   1. `a73d034` — `fix(ui): consolidate mission-control visual hierarchy before final qa` (UI-10.5)
   2. `ed942d9` — `docs(handoff): record UI-10.5 completion and stashed UI-11 work-in-progress`
   3. `63eba84` — `docs(handoff): record successful GitHub push for UI-10.5`
   4. `2e299ea` — `fix(ui): align workflow progression and expose simulator budget` (pre-UI-11 fixes A+B)
   5. `dab17d0` — `test(ui): lock mission-control demo and interaction regression suite` (UI-11)
-- Not merged to `main` (never attempted).
+  6. `792afac` — `feat(runtime): serve the frozen HydroCore-v4 architecture by default` (UI-11.1 §1)
+  7. `099ce06` — `UI-11.1 §2: stop fabricating 0 for unmeasured sensor/node/disagreement data`
+  8. `a4cf0ce` — `UI-11.1 §3: stop showing an illustrative Pareto frontier when planning is suppressed`
+  9. `e4b662d` — `UI-11.1 §4: stop the demo fixture's provenance from looking like a real identity`
+  10. `937b555` — `UI-11.1 §5: add a dedicated Playwright/E2E job to CI`
+  11. `e1e9d78` — `fix(ci): regenerate visual baselines from the real GitHub Actions environment`
+  12. `4cdd6b0` — `chore(polish): pre-merge README screenshot, DEMO_FALLBACK semantics, and stale docs`
+  13. `a5c7cbc` — `fix(ci): regenerate Playwright baselines for the DEMO_FALLBACK polish pass`
 
-UI phase is now complete per ui-work.txt §31's own ordering (UI-0 through UI-11) plus
-the operator-inserted UI-10.5 and pre-UI-11 fixes. Recommend the next step be human
-review of this branch and, if approved, a PR against `main` — not something this session
-should do unprompted.
+UI phase (UI-0 through UI-11.1, plus this pre-merge polish pass) is complete per
+ui-work.txt §31's own ordering, the operator-inserted UI-10.5/pre-UI-11 fixes, and the
+two later bounded integrity/polish passes. PR #2 is open with real, currently-green
+GitHub Actions CI. Recommend the next step be human review of the PR and, if approved,
+merging it — not something any session should do unprompted.
 
 ## Continuation commands
 
