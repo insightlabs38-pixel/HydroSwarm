@@ -9,8 +9,16 @@ report.**
 
 - Branch: `agent/gcp-multitopology-v3`
 - HEAD at calibration/bundle build time: `c5d2dd5` (Delta 10's commit)
+- HEAD after the final pre-freeze evidence-cleanup pass (Stage-F
+  third-seed repeatability check + Strategist/OOD wording corrections,
+  this session): `e532d41facbaed15418d2cb7d00e4a5259598603` (full SHA;
+  this pin commit's own SHA necessarily post-dates this value by one
+  commit, matching this report's own established convention of recording
+  the state as of the last substantive change rather than its own commit)
 - Full pytest/Ruff/Pyright re-verified after all Section 19 changes (see
-  "Final reproducibility check" below)
+  "Final reproducibility check" below); re-verified again after this
+  session's changes (see "Final integrity regression (evidence-cleanup
+  pass)" below)
 
 ## Selected HydroCore variant
 

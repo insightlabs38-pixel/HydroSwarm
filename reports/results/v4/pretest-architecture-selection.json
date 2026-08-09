@@ -2,6 +2,8 @@
   "schema_version": 1,
   "branch": "agent/gcp-multitopology-v3",
   "head_commit": "c5d2dd5",
+  "head_commit_note": "c5d2dd5 is HEAD at calibration/bundle build time (Section 19); see head_commit_after_evidence_cleanup for the state after this session's Stage-F third-seed check + wording corrections",
+  "head_commit_after_evidence_cleanup": "e532d41facbaed15418d2cb7d00e4a5259598603",
   "selected_variant": "small",
   "use_adapters": false,
   "strategist_mode": "candidate_conditioned",
