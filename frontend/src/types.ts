@@ -204,6 +204,15 @@ export interface IncidentView {
   offline: boolean;
   runtimeMs: number;
   modelVersion: string;
+  /** ISO timestamp this view was generated, or null when unknown (ERROR
+   * mode). Mirrors hydroswarm.api.state.IncidentView.generated_at. */
+  generatedAt: string | null;
+  /** Whether the hybrid neural pipeline ran (FULL_HYBRID) or the
+   * deterministic classical-safe fallback ran instead (CLASSICAL_SAFE).
+   * Null when unknown (non-LIVE modes carry no analysis-mode signal of
+   * their own). Distinct from `mode` (LIVE/REPLAY/DEMO_FALLBACK/ERROR),
+   * which is data provenance, not analysis-pipeline identity. */
+  runtimeAnalysisMode: 'FULL_HYBRID' | 'CLASSICAL_SAFE' | null;
   provenance: Provenance;
   ood: OodLevel;
   approvalPending: boolean;

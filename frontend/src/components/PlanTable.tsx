@@ -14,7 +14,7 @@ function rejectionText(plan: Plan): string | undefined {
 }
 
 export function PlanTable({ plans }: { plans: Plan[] }) {
-  const { selectedPlan, selectPlan } = useConsoleStore();
+  const { selectedPlanId, selectPlan } = useConsoleStore();
   return (
     <div className="table-scroll">
       <table className="plan-table">
@@ -33,13 +33,13 @@ export function PlanTable({ plans }: { plans: Plan[] }) {
           {plans.map((plan) => {
             const consequences = plan.verification?.consequences ?? null;
             return (
-              <tr key={plan.id} className={selectedPlan === plan.id ? 'selected-row' : ''}>
+              <tr key={plan.id} className={selectedPlanId === plan.id ? 'selected-row' : ''}>
                 <th scope="row">
                   <button
                     type="button"
                     className="table-plan-button"
                     onClick={() => selectPlan(plan.id)}
-                    aria-pressed={selectedPlan === plan.id}
+                    aria-pressed={selectedPlanId === plan.id}
                   >
                     {plan.id} · {plan.name}
                   </button>

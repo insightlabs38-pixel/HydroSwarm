@@ -104,6 +104,7 @@ interface ApiIncidentView {
   runtime_mode: 'FULL_HYBRID' | 'CLASSICAL_SAFE';
   data_mode: 'LIVE';
   controller_state: 'DETECTED' | 'ANALYZING' | 'SAMPLING' | 'PLANNING' | 'APPROVAL' | 'CLOSED';
+  generated_at: string;
   provenance: {
     network_hash: string;
     feature_schema_hash: string;
@@ -354,6 +355,8 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     offline: true,
     runtimeMs: Object.values(raw.runtime_metrics_ms).reduce((total, value) => total + value, 0),
     modelVersion: raw.provenance.model_version,
+    generatedAt: raw.generated_at,
+    runtimeAnalysisMode: raw.runtime_mode,
     provenance: {
       networkHash: raw.provenance.network_hash,
       featureSchemaHash: raw.provenance.feature_schema_hash,
@@ -440,6 +443,8 @@ function errorIncidentView(reason: string): IncidentView {
     offline: true,
     runtimeMs: 0,
     modelVersion: '',
+    generatedAt: null,
+    runtimeAnalysisMode: null,
     provenance: {
       networkHash: '',
       featureSchemaHash: '',

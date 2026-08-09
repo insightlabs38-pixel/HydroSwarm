@@ -1,0 +1,71 @@
+import type { IncidentView } from '../types';
+
+/**
+ * Persistent narrow banner shown only when relevant (ui-work.txt 6): never
+ * shown in ordinary LIVE/NORMAL state. REPLAY/DEMO_FALLBACK/ERROR take
+ * priority (they describe where the data came from); CALIBRATION
+ * INVALID / OUTSIDE VALIDATED RANGE can additionally surface for an
+ * otherwise-LIVE incident whose planning is suppressed.
+ */
+export function ModeBanner({
+  incident,
+  onRetry,
+}: {
+  incident: IncidentView;
+  onRetry?: () => void;
+}) {
+  if (incident.mode === 'DEMO_FALLBACK') {
+    return (
+      <div className="mode-banner mode-banner-warn" role="status">
+        <strong>DETERMINISTIC DEMO FALLBACK</strong>
+        <span>{incident.modeReason}</span>
+      </div>
+    );
+  }
+  if (incident.mode === 'REPLAY') {
+    return (
+      <div className="mode-banner mode-banner-info" role="status">
+        <strong>REPLAY</strong>
+        <span>
+          {incident.modeReason ?? 'Showing a selected stored trajectory, not live telemetry.'}
+        </span>
+      </div>
+    );
+  }
+  if (incident.mode === 'ERROR') {
+    return (
+      <div className="mode-banner mode-banner-danger" role="alert">
+        <strong>INCIDENT UNAVAILABLE</strong>
+        <span>{incident.modeReason ?? 'The configured incident could not be loaded.'}</span>
+        {onRetry && (
+          <button type="button" onClick={onRetry}>
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
+  if (!incident.calibrationValid) {
+    return (
+      <div className="mode-banner mode-banner-warn" role="status">
+        <strong>CALIBRATION INVALID</strong>
+        <span>
+          The calibration artifact backing this incident&apos;s candidate set did not validate.
+          Candidate-set sizing is not trustworthy.
+        </span>
+      </div>
+    );
+  }
+  if (incident.ood === 'OUTSIDE_VALIDATED_RANGE') {
+    return (
+      <div className="mode-banner mode-banner-danger" role="alert">
+        <strong>OUTSIDE VALIDATED RANGE</strong>
+        <span>
+          This incident is outside the model&apos;s validated operating range. Planning may be
+          suppressed.
+        </span>
+      </div>
+    );
+  }
+  return null;
+}

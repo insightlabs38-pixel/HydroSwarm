@@ -1,17 +1,12 @@
 import { lazy, Suspense } from 'react';
 import type { IncidentView } from '../types';
 import { Counterfactuals } from '../components/Counterfactuals';
-import { EvidencePanel } from '../components/EvidencePanel';
 import { Panel } from '../components/Panel';
 import { PlanTable } from '../components/PlanTable';
 import { StatusBadge } from '../components/StatusBadge';
-import { Timeline } from '../components/Timeline';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
-);
-const HydraulicChart = lazy(() =>
-  import('../components/HydraulicChart').then((module) => ({ default: module.HydraulicChart })),
 );
 
 export function Overview({ incident }: { incident: IncidentView }) {
@@ -148,31 +143,6 @@ export function Overview({ incident }: { incident: IncidentView }) {
           ))}
         </Panel>
       </aside>
-      <Panel
-        title="Sensor and hydraulic profile"
-        eyebrow="OBSERVED EVIDENCE"
-        className="hydraulic-panel"
-      >
-        <Suspense
-          fallback={
-            <div className="chart visual-loading" role="status">
-              Loading hydraulic chart…
-            </div>
-          }
-        >
-          <HydraulicChart incident={incident} />
-        </Suspense>
-      </Panel>
-      <Panel title="Incident replay" eyebrow="AUDITABLE SEQUENCE" className="timeline-panel">
-        <Timeline events={incident.audit} />
-      </Panel>
-      <Panel
-        title="Evidence rounds and candidate set"
-        eyebrow="OBSERVED EVIDENCE HISTORY"
-        className="wide-panel"
-      >
-        <EvidencePanel incident={incident} />
-      </Panel>
       <Panel
         title="Counterfactual consequence branches"
         eyebrow="SYNCHRONIZED AT 08:40"

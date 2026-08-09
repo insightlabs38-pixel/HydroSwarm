@@ -58,6 +58,7 @@ function apiIncidentViewFixture(): unknown {
     runtime_mode: 'FULL_HYBRID',
     data_mode: 'LIVE',
     controller_state: 'PLANNING',
+    generated_at: '2026-08-03T08:40:00Z',
     provenance: {
       network_hash: 'n'.repeat(64),
       feature_schema_hash: 'f'.repeat(64),

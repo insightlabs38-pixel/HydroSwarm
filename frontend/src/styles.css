@@ -11,15 +11,13 @@
   color: #d8e7eb;
   background: #07151d;
   font-synthesis: none;
-  --ink: #d8e7eb;
-  --muted: #8da9b4;
-  --panel: #0c202a;
-  --panel-2: #102832;
-  --line: #1d3a46;
-  --cyan: #6bd6dd;
-  --amber: #f4b45f;
-  --red: #f16c62;
-  --lime: #cadd73;
+  /* Legacy aliases for pages not yet migrated to the mission-control shell
+   * (UI-1: tokens now live in styles/tokens.css; these keep pre-existing
+   * component CSS working unchanged until each page's own phase lands). */
+  --ink: var(--text-primary);
+  --muted: var(--text-muted);
+  --panel-2: var(--panel-raised);
+  --line: var(--border);
 }
 
 * {

@@ -76,9 +76,7 @@ export function ModelGovernanceTable() {
   }, []);
 
   if (error) {
-    return (
-      <p role="alert">Model governance data unavailable: {error}</p>
-    );
+    return <p role="alert">Model governance data unavailable: {error}</p>;
   }
   if (!doc) {
     return <p role="status">Loading governed model evaluation…</p>;

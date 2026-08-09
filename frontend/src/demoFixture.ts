@@ -72,6 +72,8 @@ export const demoIncident: IncidentView = {
   offline: true,
   runtimeMs: 438,
   modelVersion: 'HydroSwarm-M 0.9.2',
+  generatedAt: '2026-08-03T08:40:05Z',
+  runtimeAnalysisMode: 'FULL_HYBRID',
   provenance: {
     networkHash: '3f9a1c7e8b2d4560a9f1e3c7b5d8024f6a1c9e3b7d5f0824a6c1e9b3d7f50281',
     featureSchemaHash: '8b2d4560a9f1e3c73f9a1c7eb5d8024f6a1c9e3b7d5f0824a6c1e9b3d7f5081c',

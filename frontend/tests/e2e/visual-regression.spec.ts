@@ -47,7 +47,9 @@ test.describe('keyboard-only navigation', () => {
     const validationButton = page.getByRole('button', { name: 'Validation' });
     await validationButton.focus();
     await page.keyboard.press('Enter');
-    await expect(page.getByRole('heading', { name: 'Benchmarks and operating range' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Benchmarks and operating range' }),
+    ).toBeVisible();
 
     const benchmarksButton = page.getByRole('button', { name: 'Benchmarks' });
     await benchmarksButton.focus();
@@ -79,13 +81,17 @@ test.describe('reduced-motion mode', () => {
 });
 
 test.describe('data-mode banners', () => {
-  test('DEMO_FALLBACK banner is visible with no backend reachable (default test condition)', async ({ page }) => {
+  test('DEMO_FALLBACK banner is visible with no backend reachable (default test condition)', async ({
+    page,
+  }) => {
     await page.goto('/');
     await expect(page.getByText('DETERMINISTIC DEMO FALLBACK')).toBeVisible();
     await expect(page.getByText('DEMO_FALLBACK', { exact: false })).toBeVisible();
   });
 
-  test('failure injection (Task 3.8) renders ERROR mode with a Retry action, never a false LIVE state', async ({ page }) => {
+  test('failure injection (Task 3.8) renders ERROR mode with a Retry action, never a false LIVE state', async ({
+    page,
+  }) => {
     await page.goto('/?failure=no_valid_plan');
     await expect(page.getByText('INCIDENT UNAVAILABLE')).toBeVisible();
     await expect(page.getByText(/no_valid_plan/)).toBeVisible();
@@ -110,10 +116,14 @@ test.describe('selected-plan synchronization', () => {
 });
 
 test.describe('long identifiers do not break layout', () => {
-  test('overview renders without horizontal overflow when node/plan names are unusually long', async ({ page }) => {
+  test('overview renders without horizontal overflow when node/plan names are unusually long', async ({
+    page,
+  }) => {
     await page.goto('/');
     await waitForOverviewLoaded(page);
-    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+    );
     expect(overflow).toBe(false);
   });
 });

@@ -17,6 +17,8 @@ const alternateIncident: IncidentView = {
   offline: true,
   runtimeMs: 100,
   modelVersion: 'test-model',
+  generatedAt: '2026-08-03T08:00:00Z',
+  runtimeAnalysisMode: 'FULL_HYBRID',
   provenance: {
     networkHash: 'n'.repeat(64),
     featureSchemaHash: 'f'.repeat(64),
