@@ -3,6 +3,80 @@ export type OodLevel = 'NORMAL' | 'CAUTION' | 'OUTSIDE_VALIDATED_RANGE';
 export type PlanStatus = 'PENDING' | 'REJECTED' | 'RECOMMENDED' | 'VALID';
 
 /**
+ * Mirrors hydroswarm.domain.schemas.AuthorityLevel exactly (core-issues5.txt
+ * Section 13). Ordered from least to most operationally binding -- a UI
+ * must never let a lower authority result visually outrank a higher one
+ * (ui-work.txt 7's "Authority labels").
+ */
+export type AuthorityLevel =
+  | 'UNAVAILABLE'
+  | 'SUPPRESSED'
+  | 'ADVISORY'
+  | 'CALIBRATED_ADVISORY'
+  | 'DETERMINISTIC'
+  | 'SIMULATOR_VERIFIED'
+  | 'HUMAN_APPROVED';
+
+/** Mirrors hydroswarm.domain.schemas.ApplicabilityStatus exactly -- why a
+ * result's authority is what it is, not just the resulting level. */
+export type ApplicabilityStatus =
+  | 'VALIDATED'
+  | 'UNVALIDATED'
+  | 'OOD'
+  | 'CALIBRATION_UNAVAILABLE'
+  | 'STALE'
+  | 'SIMULATOR_SENSITIVE'
+  | 'INSUFFICIENT_EVIDENCE'
+  | 'DISABLED_BY_GOVERNANCE'
+  | 'FAILED_PROMOTION_GATE';
+
+export interface DecisionProvenance {
+  model: string | null;
+  calibration: string | null;
+  network: string | null;
+  evidence: string | null;
+}
+
+/** Mirrors hydroswarm.explanation.grounded.ExplanationIntent exactly. */
+export type ExplanationIntent =
+  | 'WHY_SOURCE'
+  | 'WHY_SAMPLE'
+  | 'WHAT_CHANGED'
+  | 'WHY_PLAN_REJECTED'
+  | 'COMPARE_PLANS'
+  | 'UNCERTAINTY_REMAINS'
+  | 'WHICH_SENSOR_MATTERED';
+
+/** Mirrors hydroswarm.api.state.ExplanationPayload field-for-field -- a
+ * real grounded explanation, not a generative chat response (ui-work.txt
+ * 9.5). The backend computes every intent up front as part of /view, so
+ * the frontend never needs a separate round trip per question. */
+export interface GroundedExplanation {
+  intent: ExplanationIntent;
+  text: string;
+  facts: Record<string, unknown>;
+  limitations: string[];
+}
+
+/** Mirrors hydroswarm.domain.schemas.DecisionCertificate field-for-field.
+ * `name` is a stable backend identifier, not a display label -- known
+ * values today are "source_localization", "scout_recommendation",
+ * "ood_state", and "plan_consequence:{plan_id}" (one per verified plan);
+ * treat any other name as a certificate this build doesn't know how to
+ * render specially, not an error. `value`'s shape depends on `name`. */
+export interface DecisionCertificate {
+  name: string;
+  value: unknown;
+  source: string;
+  authority: AuthorityLevel;
+  applicability: ApplicabilityStatus;
+  enabled: boolean;
+  calibrated: boolean;
+  suppressionReasons: string[];
+  provenance: DecisionProvenance;
+}
+
+/**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *
  * LIVE: every field was derived from the live API for this exact incident.
@@ -266,5 +340,11 @@ export interface IncidentView {
   counterfactuals: Record<string, ConsequenceView>;
   audit: AuditEvent[];
   benchmarks: Benchmark[];
+  /** All grounded explanations the backend computed for this incident,
+   * one per ExplanationIntent (ui-work.txt 9.5). */
+  explanations: GroundedExplanation[];
+  /** WHY_SOURCE's text, kept as a convenience for the existing Overview
+   * explanation panel -- equivalent to
+   * explanations.find(e => e.intent === 'WHY_SOURCE')?.text. */
   explanation: string;
 }

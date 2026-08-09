@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchIncidentWithFallback } from './api';
+import { fetchIncidentWithFallback } from './api/incident';
 import { useConsoleStore, WORKSPACE_LABELS } from './store';
 import { MissionHeader } from './shell/MissionHeader';
 import { ModeBanner } from './shell/ModeBanner';
@@ -13,6 +13,9 @@ import { EmptyState } from './components/common/EmptyState';
 const Overview = lazy(() =>
   import('./pages/Overview').then((module) => ({ default: module.Overview })),
 );
+const SourceWorkspace = lazy(() =>
+  import('./workspaces/SourceWorkspace').then((module) => ({ default: module.SourceWorkspace })),
+);
 const ValidationPage = lazy(() =>
   import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
 );
@@ -21,7 +24,6 @@ const BenchmarkPage = lazy(() =>
 );
 
 const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {
-  source: 'Planned for UI-3 (governed source-localization workspace).',
   sampling: 'Planned for UI-4 (deterministic evidence-value sampling workspace).',
   response: 'Planned for UI-5 (verified response-plan decision workspace).',
   approval: 'Planned for UI-6 (guarded human plan-approval workflow).',
@@ -48,6 +50,8 @@ export default function App() {
   let workspaceBody;
   if (workspace === 'incident') {
     workspaceBody = <Overview incident={incident} />;
+  } else if (workspace === 'source') {
+    workspaceBody = <SourceWorkspace incident={incident} />;
   } else if (workspace === 'validation') {
     workspaceBody = <ValidationPage incident={incident} />;
   } else if (workspace === 'benchmarks') {

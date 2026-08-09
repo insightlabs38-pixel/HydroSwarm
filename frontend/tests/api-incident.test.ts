@@ -17,7 +17,7 @@ beforeEach(() => {
 describe('fetchIncident (no VITE_INCIDENT_ID configured, matching this test env)', () => {
   test('throws IncidentUnavailableError when the API is reachable but no incident is configured', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
-    const { fetchIncident, IncidentUnavailableError } = await import('../src/api');
+    const { fetchIncident, IncidentUnavailableError } = await import('../src/api/incident');
     await expect(fetchIncident()).rejects.toBeInstanceOf(IncidentUnavailableError);
   });
 });
@@ -25,7 +25,7 @@ describe('fetchIncident (no VITE_INCIDENT_ID configured, matching this test env)
 describe('fetchIncidentWithFallback', () => {
   test('falls back to DEMO_FALLBACK when the API is entirely unreachable', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('DEMO_FALLBACK');
     expect(incident.modeReason).toBeTruthy();
@@ -33,7 +33,7 @@ describe('fetchIncidentWithFallback', () => {
 
   test('returns ERROR mode (not DEMO_FALLBACK) when the API is reachable but the incident cannot be resolved', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('ERROR');
     expect(incident.modeReason).toMatch(/No active incident configured/);
@@ -41,7 +41,7 @@ describe('fetchIncidentWithFallback', () => {
 
   test('never labels any fallback result as LIVE', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).not.toBe('LIVE');
   });
@@ -188,7 +188,9 @@ function apiIncidentViewFixture(): unknown {
         numerically_sensitive: false,
       },
     },
-    explanations: [{ intent: 'WHY_SOURCE', text: 'J1 is the leading source.' }],
+    explanations: [
+      { intent: 'WHY_SOURCE', text: 'J1 is the leading source.', facts: {}, limitations: [] },
+    ],
     audit_events: [
       {
         sequence: 1,
@@ -212,7 +214,7 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
         return Promise.resolve(jsonResponse(apiIncidentViewFixture()));
       }),
     );
-    const { fetchIncident } = await import('../src/api');
+    const { fetchIncident } = await import('../src/api/incident');
     const incident = await fetchIncident();
     expect(incident.mode).toBe('LIVE');
     expect(incident.id).toBe('test-incident-id');
@@ -239,7 +241,7 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
         );
       }),
     );
-    const { fetchIncident } = await import('../src/api');
+    const { fetchIncident } = await import('../src/api/incident');
     const incident = await fetchIncident();
     expect(incident.recommendedSample).toBeNull();
   });
@@ -253,7 +255,7 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
         return Promise.resolve(jsonResponse(apiIncidentViewFixture()));
       }),
     );
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('LIVE');
     expect(incident.id).toBe('test-incident-id');
@@ -268,7 +270,7 @@ describe('fetchIncident with an incident configured (VITE_INCIDENT_ID stubbed)',
         return Promise.resolve(jsonResponse({ not: 'a valid incident view' }));
       }),
     );
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('DEMO_FALLBACK');
   });
@@ -291,7 +293,7 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
       window.history.pushState(null, '', `/?failure=${category}`);
       // Even an otherwise-healthy API must not override an injected failure.
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
-      const { fetchIncidentWithFallback } = await import('../src/api');
+      const { fetchIncidentWithFallback } = await import('../src/api/incident');
       const incident = await fetchIncidentWithFallback();
       expect(incident.mode).toBe('ERROR');
       expect(incident.mode).not.toBe('LIVE');
@@ -309,7 +311,7 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
       // alongside the error banner.
       window.history.pushState(null, '', `/?failure=${category}`);
       vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
-      const { fetchIncidentWithFallback } = await import('../src/api');
+      const { fetchIncidentWithFallback } = await import('../src/api/incident');
       const incident = await fetchIncidentWithFallback();
       expect(incident.mode).toBe('ERROR');
       expect(incident.plans).toEqual([]);
@@ -326,7 +328,7 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
   test('ERROR mode from an unresolvable incident also carries no demo content', async () => {
     vi.unstubAllEnvs(); // a prior test in this file may have stubbed VITE_INCIDENT_ID
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ status: 'ok' })));
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('ERROR');
     expect(incident.plans).toEqual([]);
@@ -337,20 +339,20 @@ describe('failure injection (overnight-plan.txt Task 3.8)', () => {
   test('an unrecognized failure category is ignored, not silently accepted', async () => {
     window.history.pushState(null, '', '/?failure=not_a_real_category');
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
-    const { fetchIncidentWithFallback } = await import('../src/api');
+    const { fetchIncidentWithFallback } = await import('../src/api/incident');
     const incident = await fetchIncidentWithFallback();
     expect(incident.mode).toBe('DEMO_FALLBACK');
   });
 
   test('every failure category has a distinct reason string', async () => {
-    const { FAILURE_INJECTION_CATEGORIES } = await import('../src/api');
+    const { FAILURE_INJECTION_CATEGORIES } = await import('../src/api/incident');
     window.history.pushState(null, '', '/');
     const reasons = new Set<string>();
     for (const category of FAILURE_INJECTION_CATEGORIES) {
       window.history.pushState(null, '', `/?failure=${category}`);
       vi.resetModules();
       vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
-      const { fetchIncidentWithFallback } = await import('../src/api');
+      const { fetchIncidentWithFallback } = await import('../src/api/incident');
       const incident = await fetchIncidentWithFallback();
       reasons.add(incident.modeReason ?? '');
     }

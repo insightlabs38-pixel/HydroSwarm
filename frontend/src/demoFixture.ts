@@ -1,4 +1,9 @@
-import type { ConsequenceView, IncidentView } from './types';
+import type {
+  ConsequenceView,
+  DecisionCertificate,
+  GroundedExplanation,
+  IncidentView,
+} from './types';
 
 // Illustrative required safety thresholds used only to compute the demo
 // fixture's pressure/service-availability margins below (matches the
@@ -455,6 +460,136 @@ export const demoIncident: IncidentView = {
       status: 'PASS',
     },
   ],
+  explanations: [
+    {
+      intent: 'WHY_SOURCE',
+      text: 'J117 is the leading candidate because its observed concentration rise preceded downstream nodes by the travel time expected from a source at that location, and classical and neural signatures agree (8.0% disagreement).',
+      facts: { top_node: 'J117', top_probability: 0.76, disagreement_js: 0.08 },
+      limitations: ['Single-species simulated incident only.'],
+    },
+    {
+      intent: 'WHY_SAMPLE',
+      text: 'J123 was recommended because it best separates the two remaining upstream hypotheses (J117 vs. J121), with an expected information gain of 0.37 bits.',
+      facts: { recommended_node: 'J123', expected_information_gain_bits: 0.37 },
+      limitations: ['Alternatives J121 and J109 have lower expected gain, not zero.'],
+    },
+    {
+      intent: 'WHAT_CHANGED',
+      text: 'After the J123 sample, the candidate region contracted from 11 nodes to 3, and posterior mass concentrated on J117.',
+      facts: { nodes_before: 11, nodes_after: 3 },
+      limitations: [],
+    },
+    {
+      intent: 'WHY_PLAN_REJECTED',
+      text: 'Plan A (Aggressive isolation) was rejected because exact WNTR/EPANET simulation found 4 nodes with pressure below the 15 m minimum for a combined 23 minutes.',
+      facts: { plan_id: 'A', rejection_codes: ['PRESSURE_BELOW_MINIMUM'] },
+      limitations: [
+        'Rejection is based on the posterior-weighted evaluation, not every possible hydraulic state.',
+      ],
+    },
+    {
+      intent: 'COMPARE_PLANS',
+      text: 'Plan B reduces estimated exposure by 48% with zero pressure violations and 98.7% service availability; Plan C reduces exposure less (33%) but preserves slightly more service (100%); Plan A would reduce exposure most (61%) but is unsafe.',
+      facts: { plan_ids: ['A', 'B', 'C'] },
+      limitations: [],
+    },
+    {
+      intent: 'UNCERTAINTY_REMAINS',
+      text: 'Start time, duration, and relative strength estimates remain exploratory (a known governed limitation) and are not shown as calibrated quantities.',
+      facts: {},
+      limitations: ['Unseen-topology transfer is measured but weak for this checkpoint.'],
+    },
+    {
+      intent: 'WHICH_SENSOR_MATTERED',
+      text: 'Sensor S4 at J109 (healthy, 98% quality) triggered detection; sensor S7 at J123 (drift flagged, 72% quality) contributed lower-weight evidence.',
+      facts: { sensors: ['S4', 'S7'] },
+      limitations: [],
+    },
+  ] satisfies GroundedExplanation[],
   explanation:
     'Plan B is preferred because exact simulation found no pressure violations while reducing estimated exposure by 48% and preserving 98.7% service availability. Plan A was rejected despite higher exposure reduction because four nodes fell below the pressure threshold.',
 };
+
+/**
+ * Illustrative Decision Authority / Applicability Certificates for the
+ * DEMO_FALLBACK fixture (core-issues5.txt Section 13). GET
+ * /incidents/{id}/authority only exists for a real LIVE incident; this
+ * hand-authored set mirrors the real certificate shapes
+ * (hydroswarm.inference.authority.build_decision_certificates) so the
+ * Source workspace and Model & Authority workspace have something
+ * genuine to render in the deterministic demo, clearly attributable to
+ * DEMO_FALLBACK like the rest of this fixture -- never used for a LIVE
+ * incident.
+ */
+export const demoAuthorityCertificates: DecisionCertificate[] = [
+  {
+    name: 'source_localization',
+    value: { top_node: 'J117', belief: { J117: 0.76, J121: 0.11, J109: 0.05 } },
+    source: 'FUSED_CLASSICAL_NEURAL',
+    authority: 'CALIBRATED_ADVISORY',
+    applicability: 'VALIDATED',
+    enabled: true,
+    calibrated: true,
+    suppressionReasons: [],
+    provenance: {
+      model: demoIncident.provenance.modelCheckpointHash,
+      calibration: demoIncident.provenance.calibrationHash,
+      network: demoIncident.provenance.networkHash,
+      evidence: null,
+    },
+  },
+  {
+    name: 'scout_recommendation',
+    value: 'J123',
+    source: 'CLASSICAL_EIG',
+    authority: 'DETERMINISTIC',
+    applicability: 'VALIDATED',
+    enabled: true,
+    calibrated: false,
+    suppressionReasons: ['LEARNED_SCOUT_SUPPRESSED:FAILED_PROMOTION_GATE'],
+    provenance: {
+      model: demoIncident.provenance.modelCheckpointHash,
+      calibration: null,
+      network: demoIncident.provenance.networkHash,
+      evidence: null,
+    },
+  },
+  {
+    name: 'ood_state',
+    value: 'NORMAL',
+    source: 'DETERMINISTIC_CONTROLLER',
+    authority: 'DETERMINISTIC',
+    applicability: 'VALIDATED',
+    enabled: true,
+    calibrated: false,
+    suppressionReasons: ['LEARNED_OOD_CATEGORY_SUPPRESSED:NOT_PROMOTED'],
+    provenance: {
+      model: demoIncident.provenance.modelCheckpointHash,
+      calibration: null,
+      network: demoIncident.provenance.networkHash,
+      evidence: null,
+    },
+  },
+  {
+    name: 'plan_consequence:A',
+    value: null,
+    source: 'WNTR_EPANET',
+    authority: 'SIMULATOR_VERIFIED',
+    applicability: 'VALIDATED',
+    enabled: true,
+    calibrated: false,
+    suppressionReasons: ['PRESSURE_BELOW_MINIMUM'],
+    provenance: { model: null, calibration: null, network: null, evidence: null },
+  },
+  {
+    name: 'plan_consequence:B',
+    value: null,
+    source: 'WNTR_EPANET',
+    authority: 'SIMULATOR_VERIFIED',
+    applicability: 'VALIDATED',
+    enabled: true,
+    calibrated: false,
+    suppressionReasons: [],
+    provenance: { model: null, calibration: null, network: null, evidence: null },
+  },
+];

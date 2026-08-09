@@ -203,10 +203,13 @@ const alternateIncident: IncidentView = {
   counterfactuals: {},
   audit: [],
   benchmarks: [],
+  explanations: [
+    { intent: 'WHY_SOURCE', text: 'test explanation text', facts: {}, limitations: [] },
+  ],
   explanation: 'test explanation text',
 };
 
-vi.mock('../src/api', () => ({
+vi.mock('../src/api/incident', () => ({
   fetchIncidentWithFallback: async () => alternateIncident,
 }));
 

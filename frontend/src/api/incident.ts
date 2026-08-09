@@ -1,17 +1,19 @@
-import { demoIncident } from './demoFixture';
+import { demoIncident } from '../demoFixture';
 import type {
   AuditEvent,
   Candidate,
   ConsequenceView,
+  ExplanationIntent,
+  GroundedExplanation,
   IncidentView,
   NetworkLink,
   NetworkNode,
   Plan,
   PlanStatus,
   SensorState,
-} from './types';
+} from '../types';
+import { request } from './client';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? '/api';
 const INCIDENT_ID = import.meta.env.VITE_INCIDENT_ID as string | undefined;
 
 /**
@@ -72,15 +74,6 @@ export class IncidentUnavailableError extends Error {
     super(message);
     this.name = 'IncidentUnavailableError';
   }
-}
-
-async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: { Accept: 'application/json' },
-    signal,
-  });
-  if (!response.ok) throw new Error(`HydroSwarm API ${response.status}: ${response.statusText}`);
-  return (await response.json()) as T;
 }
 
 function eventFromApi(event: Record<string, unknown>): AuditEvent {
@@ -187,7 +180,12 @@ interface ApiIncidentView {
   selected_plan_id: string | null;
   recommended_plan_id: string | null;
   counterfactual_consequences: Record<string, ApiConsequenceMetrics>;
-  explanations: { intent: string; text: string }[];
+  explanations: {
+    intent: string;
+    text: string;
+    facts: Record<string, unknown>;
+    limitations: string[];
+  }[];
   audit_events: Record<string, unknown>[];
   runtime_metrics_ms: Record<string, number>;
 }
@@ -345,7 +343,13 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
       }
     : null;
 
-  const whySource = raw.explanations.find((item) => item.intent === 'WHY_SOURCE');
+  const explanations: GroundedExplanation[] = raw.explanations.map((item) => ({
+    intent: item.intent as ExplanationIntent,
+    text: item.text,
+    facts: item.facts,
+    limitations: [...item.limitations],
+  }));
+  const whySource = explanations.find((item) => item.intent === 'WHY_SOURCE');
 
   return {
     id: raw.incident_id,
@@ -401,6 +405,7 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     // IncidentView at all) -- genuinely out of scope for Task 3.2's field
     // list. An empty array is the honest "not available live" state.
     benchmarks: [],
+    explanations,
     explanation: whySource?.text ?? '',
   };
 }
@@ -471,6 +476,7 @@ function errorIncidentView(reason: string): IncidentView {
     counterfactuals: {},
     audit: [],
     benchmarks: [],
+    explanations: [],
     explanation: '',
   };
 }

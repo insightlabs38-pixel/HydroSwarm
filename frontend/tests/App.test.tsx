@@ -65,10 +65,24 @@ test('a workspace with no implementation yet shows an honest placeholder, never 
   const user = userEvent.setup();
   renderApp();
   await screen.findByText('Verified response awaiting approval');
-  await user.click(screen.getByRole('button', { name: /^Source/ }));
+  await user.click(screen.getByRole('button', { name: /^Sampling/ }));
   expect(
-    await screen.findByText('Source has not been implemented in the mission-control shell yet.'),
+    await screen.findByText('Sampling has not been implemented in the mission-control shell yet.'),
   ).toBeVisible();
+});
+
+test('Source workspace renders real candidate ranking and the DEMO_FALLBACK authority certificate, never a placeholder', async () => {
+  const user = userEvent.setup();
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: /^Source/ }));
+  expect(await screen.findByRole('heading', { name: 'Ranked source candidates' })).toBeVisible();
+  expect(screen.getAllByText('1. J117').length).toBeGreaterThan(0);
+  expect(screen.getByRole('heading', { name: 'Why this source?' })).toBeVisible();
+  expect(
+    screen.getByText(/J117 is the leading candidate because its observed concentration/),
+  ).toBeVisible();
+  expect(screen.getByText('CALIBRATED ADVISORY')).toBeVisible();
 });
 
 test('technical dock audit tab shows real audit events, and reduced-motion toggle still works', async () => {

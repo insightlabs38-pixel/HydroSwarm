@@ -5,7 +5,6 @@ import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 
 const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {
-  source: 'UI-3 (governed source-localization workspace) adds the ranked candidate inspector here.',
   sampling: 'UI-4 (evidence-value sampling workspace) adds the evidence/stop certificate here.',
   response: 'UI-5 (response-plan decision workspace) adds full plan/verification detail here.',
   approval: 'UI-6 (guarded approval workflow) adds the approval flow here.',
@@ -80,6 +79,49 @@ function IncidentSummary({ incident }: { incident: IncidentView }) {
   );
 }
 
+/** ui-work.txt 13.2: real-time summary only -- the full authority
+ * certificate and grounded explanation live in the Source workspace
+ * body (a separate query), not duplicated here. */
+function SourceSummary({ incident }: { incident: IncidentView }) {
+  if (incident.candidates.length === 0) {
+    return <EmptyState title="No source candidates for this incident." />;
+  }
+  return (
+    <div className="inspector-stack">
+      {incident.candidates.slice(0, 3).map((candidate, index) => (
+        <div className="compact-row" key={candidate.nodeId}>
+          <span>
+            {index + 1}. {candidate.nodeId}
+          </span>
+          <strong>{Math.round(candidate.probability * 100)}%</strong>
+        </div>
+      ))}
+      <dl className="key-value-grid">
+        <div>
+          <dt>Candidate-set size</dt>
+          <dd>{incident.candidates.length}</dd>
+        </div>
+        <div>
+          <dt>Conformal target</dt>
+          <dd>{Math.round(incident.candidateCoverage * 100)}%</dd>
+        </div>
+        <div>
+          <dt>Calibration</dt>
+          <dd>{incident.calibrationValid ? 'valid' : 'invalid'}</dd>
+        </div>
+        <div>
+          <dt>Disagreement</dt>
+          <dd>{(incident.disagreement * 100).toFixed(1)}%</dd>
+        </div>
+        <div>
+          <dt>OOD</dt>
+          <dd>{incident.ood}</dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
 export function DecisionInspector({ incident }: { incident: IncidentView }) {
   const { workspace, inspectorCollapsed, toggleInspector } = useConsoleStore();
 
@@ -99,6 +141,8 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
   let body: ReactNode;
   if (workspace === 'incident') {
     body = <IncidentSummary incident={incident} />;
+  } else if (workspace === 'source') {
+    body = <SourceSummary incident={incident} />;
   } else if (workspace === 'validation') {
     body = (
       <p className="supporting">
