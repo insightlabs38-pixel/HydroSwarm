@@ -565,35 +565,247 @@ not moved.
 carrying both the UI-10.5 commit (`a73d034`) and this handoff-report commit (`ed942d9`) to
 `origin`.
 
-## Remaining phases (UI-11): NOT STARTED
+## Pre-UI-11 fixes (workflow progression + simulator budget): COMPLETE
 
-Tracked in ui-work.txt §31 order (UI-10.5 above was inserted ahead of it by ui-work2.txt,
-not part of that original ordering).
+Two operator-requested fixes, landed before UI-11 as instructed.
 
-Next up: UI-11 (demo hardening / final QA). **Start with `git stash pop`** to recover the
-in-progress Playwright E2E work described above. Per ui-work.txt's own UI-11 scope: lock
-down the deterministic demo flow, finish turning the ad-hoc screenshot scripts used
-throughout this session into a real committed Playwright E2E suite, confirm zero console
-errors and zero external runtime calls in the production build (ui-work.txt §26's "no
-Google Fonts / Mapbox cloud styles / CDNs / remote icon packs / OpenAI / Anthropic /
-internet-hosted scripts" — worth an explicit grep-based check of `dist/` and `index.html`,
-not just an assumption), regenerate/approve the Playwright visual-regression baselines now
-that UI-10.5 has stabilized the layout (ui-work2.txt §14 deferred this here explicitly), do
-an integrated backend smoke test if a real backend can be started in this environment
-(confirm first whether WNTR/EPANET and the Python venv are available here before assuming —
-note a `uvicorn hydroswarm.api.app:app` process was observed already running on
-127.0.0.1:8765 in this sandbox during UI-10.5, left untouched), and finalize docs. This is
-the last phase per ui-work.txt §31's own ordering.
+Commit: `2e299ea` — `fix(ui): align workflow progression and expose simulator budget`
+(14 files: `frontend/src/workflow.ts` new, `frontend/tests/workflow.test.ts` new, plus
+`Overview.tsx`/`DecisionInspector.tsx`/`WorkflowRail.tsx`/`types.ts`/`demoFixture.ts`/
+`api/incident.ts` on the frontend and `api/app.py`/`api/state.py` +
+`tests/integration/test_incident_view_contract.py` on the backend). Pushed.
+
+**A. Workflow progression.** `Overview.tsx` and `DecisionInspector.tsx` each
+independently derived "next step" from retained artifacts (`recommendedSample`,
+`plans`, `selectedPlanId`) instead of the authoritative `incident.status`, and
+`WorkflowRail` derived rail-item status the same way — these could disagree, and the
+shipped demo fixture is exactly the reported contradiction (status=APPROVAL,
+approvalPending=true, a still-populated `recommendedSample` left over from the earlier
+SAMPLING stage): both surfaces said "Collect recommended sample" while a plan was
+actually awaiting human approval. Added `frontend/src/workflow.ts`
+(`deriveWorkflowProgression`), the one shared authority on `incident.status` for
+Source/Sampling/Response/Approval rail status and next-step text, per the operator's
+exact SAMPLING/PLANNING/APPROVAL/CLOSED table. All three call sites now use it. 9 new
+unit tests cover all four controller states, ERROR mode, the `noValidPlan`-blocks-
+response case, and the exact reported contradiction scenario.
+
+**B. Simulator budget.** `IncidentState` already tracked `exact_simulations_used`,
+`plans_exactly_verified`, `exact_simulation_cache_hits`, `remaining_epanet_budget`;
+`/replay` already exposed them (embeds the full `IncidentState`), but the normal live
+`/view` response did not. Added `SimulatorBudgetView` (`src/hydroswarm/api/state.py`) as
+a new required field on `IncidentView`, populated in `get_incident_view()` directly from
+`record.state` — no recomputation, no altered budget semantics, purely additive
+passthrough. Extended the existing `/view` contract test with budget assertions
+cross-checked directly against `GET /api/incidents/{id}`'s authoritative `IncidentState`.
+Frontend: matching `SimulatorBudget` type + `simulatorBudget` field on `IncidentView`
+(null only in ERROR mode; DEMO_FALLBACK carries a labeled fixture value like every other
+field on that fixture), a typed adapter, and compact (not KPI-card) rendering — one
+"Remaining exact simulation budget" line on the Incident inspector, the full four-field
+breakdown on the Response inspector.
+
+Gates at this commit: frontend eslint/tsc/prettier clean, 93/93 vitest (up from 84);
+backend ruff/pyright clean on touched files, **full pytest suite 874/874 passing**
+(unchanged count from the pre-existing baseline — zero regressions), full-tree pyright
+clean.
+
+## UI-11 — final demo hardening / QA: COMPLETE
+
+Commit: `dab17d0` — `test(ui): lock mission-control demo and interaction regression
+suite` (18 files: `operator.spec.ts`, `visual-regression.spec.ts`, 9 new baseline PNGs
++ 2 stale ones removed, `api/incident.ts`, `geometry.ts` new, `geometry.test.ts` new,
+`api-incident.test.ts`, `index.html`). Pushed.
+
+### Recovering the stash
+
+`git stash show -p stash@{0}` (from the UI-10.5 handoff above) was inspected before
+writing anything new. Its test *logic* was real, valuable UI-11 work-in-progress
+(a genuine Playwright rewrite of the ui-work.txt §32 demo flow); its *screenshots* were
+explicitly not reused (`git stash pop` brought them back, but they were immediately
+superseded by fresh baselines — see below). Two assertions in the recovered
+`operator.spec.ts` were stale against the current UI and fixed:
+
+- `getByRole('heading', { name: 'Source candidates' })` — Overview's panel is now
+  titled "Source" ("UI-10.5" 3.C condensed it).
+- `getByLabel('Calibrated candidate set')` — that panel no longer exists in the Source
+  workspace body; its content moved into the global Decision Inspector ("UI-10.5" 2).
+  Rewritten to query `getByRole('complementary', { name: 'Decision inspector' })`.
+
+`visual-regression.spec.ts`'s `waitForOverviewLoaded()` helper waited for
+`.table-plan-button`, which no longer exists on Overview (the plan table moved to
+Response in "UI-10.5") — fixed to wait for the map canvas instead. The
+"selected-plan synchronization" test moved from Overview to Response for the same
+reason, and was extended to prove the toolbar breadcrumb, Decision Inspector, and
+Verification dock tab all update together on plan selection (ui-work.txt §22), not just
+the table's own highlighted row.
+
+### New E2E scenarios
+
+Two new deterministic DEMO_FALLBACK variants added to `api/incident.ts`
+(`?demo=ood_suppressed`, `?demo=stale_verification`, mirroring the existing
+`?failure=<category>` mechanism) so these real, already-wired governed states are
+reachable end-to-end without a live backend — every field they set is a real,
+already-typed `IncidentView` field, no new fabricated shape:
+
+- **OOD / suppressed planning**: `MissionHeader`'s "OOD OUTSIDE_VALIDATED_RANGE" badge
+  and "DEGRADED" readiness render; the real plan-comparison table shows zero rows while
+  planning is suppressed (found and had to explicitly scope around: the Pareto frontier
+  panel below it renders its own separate, mode-keyed illustrative dataset unrelated to
+  this incident's real plans — a pre-existing, deliberate demo-fixture design, not a bug
+  introduced here).
+- **Stale verification blocks approval**: the "Verification is stale." empty-state
+  renders, and the approval hierarchy ladder never advances past "Simulator verified" —
+  proves `ApprovalWorkspace`'s existing `canReview = isVerified && isCurrent` gate
+  actually holds against a real STALE plan, without touching that gate.
+
+### Fresh visual baselines (all 9 required views)
+
+`incident-1920x1080`, `source-1920x1080`, `sampling-1920x1080`, `response-1920x1080`,
+`approval-1920x1080`, `replay-1920x1080`, `incident-1440x900`, `response-1440x900`,
+`incident-1366x768` — all regenerated from the current UI (`--update-snapshots`), not
+carried over from the stash. The two stale `overview-*` baselines from before the
+Overview→Incident naming were deleted.
+
+### Offline audit
+
+Grepped the production `dist/` bundle (`assets/*.js`, `assets/*.css`, `index.html`) for
+Google Fonts, Mapbox cloud styles, any CDN host, remote icon packs, OpenAI/Anthropic,
+analytics/telemetry SDKs — zero matches except three inert strings inside vendored
+library code (a MapLibre error message referencing a GitHub issue URL, MapLibre's
+default attribution HTML — dead code since `attributionControl: false` is set, and
+React's own production-error-decoder URL — never auto-fetched, only ever a clickable
+link if a React invariant fails). Then, not trusting a static grep alone, ran a real
+Playwright pass against a built `vite preview` server capturing every actual network
+`request` event while visiting every workspace: the only non-origin URL seen was a
+`blob:` object URL (MapLibre's own in-browser worker script — not a network call).
+Clean.
+
+### Skip-link duplicate (found during hardening, fixed)
+
+`index.html` carried a static `<a class="skip-link" href="#main-content">Skip to
+incident workspace</a>`, outside React's `#root`, left over from the pre-mission-control
+dashboard. `App.tsx` grew its own real, tested skip-link ("Skip to main content") in
+UI-1 and nothing ever removed the old one — both existed simultaneously in the live DOM
+the whole time since UI-1, with the stale static one first in tab order and no working
+focus target of its own. Removed; added a regression test asserting exactly one
+`.skip-link` element exists.
+
+### Integrated backend/frontend smoke test
+
+A real `uvicorn hydroswarm.api.app:app` instance was started against the actual
+promoted checkpoint (`models/hydrocore-s-learning-v1.safetensors`,
+sha256 `85715fbe061a30131b39b717137d2522c3870d674d262f4717ef7541731d5423` — unchanged
+from before this session). Imported `data/frozen/golden_network.inp`, created and
+`/analyze`d a real incident (id `a553054d-963a-4f81-843a-361384fc08e2`), confirmed:
+
+- `GET /view` returns `data_mode: LIVE`, a real `controller_state`, and the new
+  `simulator_budget` field populated with real (all-zero, honestly — this network's
+  calibration doesn't validate, so `/plans/generate` correctly 409s
+  `PLANNING_SUPPRESSED`/`CALIBRATION_INVALID_OR_MISSING` before any simulation runs)
+  values, not fabricated ones.
+- `GET /authority` (3 certificates), `GET /evidence-certificate`, and
+  `GET /frontier` all respond 200 with real content.
+- The locked final evaluation was never opened.
+
+Then pointed a real production build at this live incident (`VITE_INCIDENT_ID` set,
+default `VITE_API_BASE` relative to the `vite preview` proxy) and loaded it in real
+Chromium: header shows a real "LIVE" badge (no DEMO_FALLBACK banner), the Decision
+Inspector echoes `LIVE`, the workflow-progression fix renders correctly on genuinely
+live data ("next: Continue evidence collection" while `status: SAMPLING`, matching Part
+A's table), and the simulator-budget fix renders correctly on genuinely live data
+("Remaining exact simulation budget: 3").
+
+**This smoke test found a real, previously-unknown bug**: the page threw
+`pageerror: Invalid LngLat latitude value: must be between -90 and 90` on load.
+`golden_network.inp`'s raw EPANET coordinates (arbitrary engineering units, Y up to
+1450 — typical for a hand-designed test network with no real-world georeference) were
+being passed straight through to MapLibre as `[lng, lat]`, which requires latitude in
+`[-90, 90]` and throws synchronously otherwise. Any real backend incident built on a
+network like that would have crashed the map. Added `frontend/src/geometry.ts`
+(`normalizeMapCoordinates`): coordinates already within a safe geographic range pass
+through unchanged (never distorts genuinely georeferenced data — confirmed against the
+demoFixture's real `-80.xx, 35.xx` North Carolina coordinates); out-of-range local
+coordinates are rescaled together across the whole network with one uniform scale
+factor for both axes, so real relative shape/angles are preserved, into a small
+MapLibre-safe window. Frontend-only rendering-geometry fix — no backend, model, or
+scientific-authority code touched. Rebuilt and reloaded against the same live incident
+afterward: zero console/page errors, map renders the real (now-valid-range) network
+topology correctly. 6 new unit tests lock the fix down (real vs. out-of-range input,
+shape-preservation via uniform scale, single-node/empty-input edge cases).
+
+Backend and preview processes were stopped after the smoke test completed.
+
+### Final gates
+
+Frontend: `npm run lint`, `npm run typecheck`, `npm run format:check` all clean;
+`npm test -- --run` → **102/102** (up from 84 at session start: +9 workflow, +6
+geometry, +3 demo-variant, +4 assorted assertions across existing files); `npm run
+build` succeeds; **Playwright E2E → 26/26** (`npx playwright test tests/e2e/`), zero
+unexpected console errors anywhere in this session's real-browser runs (informational
+`net::ERR_UNSAFE_PORT`/`ECONNREFUSED` lines from the deliberately-unreachable API used
+to force DEMO_FALLBACK for screenshotting are expected, not unexpected).
+
+Backend: ruff and full-tree pyright re-confirmed clean at the end of this session; the
+**full pytest suite (874/874)** was run once, at the Part A/B commit, since Part A/B was
+the only backend-touching change this session (Part C/UI-11 touched zero backend files
+— confirmed via `git status` before committing) and nothing backend-side changed after
+that run. Did not attempt to replicate CI-only jobs unrelated to this change (Windows
+portability, Git-LFS hydration) — out of scope for a frontend-focused change with zero
+backend diff in this commit.
+
+### Safety/governance invariants (re-verified at session end)
+
+- `git tag -l | grep freeze` → `hydrocore-v4-architecture-freeze`, still pointing at
+  `fcd2011...` (last moved 2026-08-09 01:04:28, before this session started) — untouched.
+- `models/hydrocore-s-learning-v1.safetensors` sha256 unchanged (`85715fbe...`, verified
+  both via `git status`/`git diff --stat` showing no changes and by direct `sha256sum`,
+  and cross-checked against the live `/view` response's `provenance.model_checkpoint_hash`
+  during the smoke test).
+- `find . -iname "final-selection.json"` → no matches. Still absent.
+- Locked final evaluation: not opened this session (confirmed no relevant script/command
+  was ever run against it).
+- No `src/hydroswarm/**` files changed in the UI-11 commit; the two backend files changed
+  in the pre-UI-11 commit (`api/app.py`, `api/state.py`) are additive-only (one new typed
+  response field, populated from already-computed state) and fully gated (874/874
+  pytest).
+
+## Final summary
+
+- **Branch**: `feature/ui-mission-control-v1`
+- **Final SHA**: `dab17d0a61b2edeaeab536ac9b1a8bb7f430b826`
+- **This session's commits** (chronological, all pushed to `origin`):
+  1. `a73d034` — `fix(ui): consolidate mission-control visual hierarchy before final qa` (UI-10.5)
+  2. `ed942d9` — `docs(handoff): record UI-10.5 completion and stashed UI-11 work-in-progress`
+  3. `63eba84` — `docs(handoff): record successful GitHub push for UI-10.5`
+  4. `2e299ea` — `fix(ui): align workflow progression and expose simulator budget` (pre-UI-11 fixes A+B)
+  5. `dab17d0` — `test(ui): lock mission-control demo and interaction regression suite` (UI-11)
+- Not merged to `main` (never attempted).
+
+UI phase is now complete per ui-work.txt §31's own ordering (UI-0 through UI-11) plus
+the operator-inserted UI-10.5 and pre-UI-11 fixes. Recommend the next step be human
+review of this branch and, if approved, a PR against `main` — not something this session
+should do unprompted.
 
 ## Continuation commands
 
 ```
 cd /workspace/HydroSwarm
 git checkout feature/ui-mission-control-v1
-git stash pop   # recovers in-progress UI-11 Playwright work found before UI-10.5
+git pull
 cd frontend
 npm install   # if node_modules is missing (ephemeral sandbox)
 npm run lint && npm run typecheck && npm run format:check && npm test -- --run && npm run build
+npx playwright install --with-deps chromium   # if not already installed
+npx playwright test tests/e2e/
+```
+
+To re-run the integrated backend smoke test:
+
+```
+cd /workspace/HydroSwarm
+source .venv/bin/activate
+uvicorn hydroswarm.api.app:app --host 127.0.0.1 --port 8765 &
+# then POST /api/networks/import (data/frozen/golden_network.inp), POST /api/incidents,
+# POST /api/incidents/{id}/analyze, GET /api/incidents/{id}/view
 ```
 
 No long-running/background jobs are active from this session as of this report.
