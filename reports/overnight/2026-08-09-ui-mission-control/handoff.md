@@ -31,9 +31,12 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   18. `f218379` — `UI-9: Network and Model & Authority utility workspaces`
   19. `bcf398a` — `docs(handoff): record UI-9 completion and UI-10 scoping note`
   20. `0ccdaf3` — `UI-10: harden accessibility, responsive layout, and reduced-motion`
+  21. `20ae245` — `docs(handoff): record UI-10 completion and UI-11 scoping note`
+  22. `a73d034` — `fix(ui): consolidate mission-control visual hierarchy before final qa` (UI-10.5)
 
-Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
-working this session).
+Commits 1-20 were pushed to `origin/feature/ui-mission-control-v1` in the session that
+produced them. Commit 22 (this session, UI-10.5) has **not** been pushed — see "GitHub
+push" note in the UI-10.5 section below.
 
 ## Environment
 
@@ -407,19 +410,183 @@ needed), and the `.status-icon` shapes (audited and found already shape-distinct
 initially looked like from the token list alone; a proposed "fix" here was written, found
 to be a no-op against the real CSS, and reverted rather than left in as dead code).
 
+## UI-10.5 — visual consolidation before final QA: COMPLETE
+
+Spec: `/workspace/ui-work2.txt`. This phase was inserted between UI-10 and UI-11 by a
+newer session prompt; it does not appear in ui-work.txt §31's own phase list.
+
+Commit: `a73d034` — `fix(ui): consolidate mission-control visual hierarchy before final qa`
+(6 files changed, 356 insertions / 361 deletions: `frontend/src/pages/Overview.tsx`,
+`frontend/src/shell/DecisionInspector.tsx`, `frontend/src/styles.css`,
+`frontend/src/workspaces/ResponseWorkspace.tsx`, `frontend/src/workspaces/SourceWorkspace.tsx`,
+`frontend/tests/App.test.tsx`). Not yet pushed to `origin` — see "GitHub push" note below.
+
+### Pre-existing uncommitted work found at session start
+
+Before touching anything, `git status` showed uncommitted changes to
+`frontend/tests/e2e/operator.spec.ts`, `frontend/tests/e2e/visual-regression.spec.ts`, and
+two of that spec's PNG snapshots, plus two untracked ad-hoc smoke scripts
+(`scripts_scratch_smoke.py`, `frontend/screenshot_live_smoke.mjs`). These were real UI-11
+work-in-progress (a genuine Playwright rewrite of the "normal demo flow" from ui-work.txt
+§32, predating ui-work2.txt's insertion of this UI-10.5 phase) — not something to discard.
+Since ui-work2.txt §14 explicitly forbids touching visual-regression baselines in this
+phase ("Do NOT yet regenerate/approve the final Playwright visual regression baselines"),
+and this phase's CSS/layout changes would have made those in-progress baselines stale
+immediately anyway, it was stashed rather than committed or discarded:
+
+```
+git stash list
+# stash@{0}: On feature/ui-mission-control-v1: pre-existing uncommitted UI-11 work
+#   (operator.spec.ts, visual-regression.spec.ts, snapshots) found at UI-10.5 session start
+```
+
+**Before starting UI-11, run `git stash pop` first** — that work is a real head start on
+UI-11's own scope (turning ad-hoc screenshot scripts into a committed E2E suite) and should
+be reviewed/continued, not redone from scratch. The two ad-hoc scratch scripts were moved to
+this session's scratchpad directory (outside the repo) rather than committed or deleted.
+
+### Real visual inspection (before editing anything)
+
+Built the frontend and ran it under real Chromium via `vite preview` (not `vite build`
+alone) with `VITE_API_BASE` pointed at a deliberately-unreachable port so the app takes its
+real network-failure→DEMO_FALLBACK code path deterministically, independent of whatever
+backend process happens to be running in this shared sandbox (one was: a leftover `uvicorn
+hydroswarm.api.app:app` on 127.0.0.1:8765 from an earlier session, still running throughout
+this one — left untouched). This surfaced two real, previously-undetected findings no CSS
+reading or jsdom test could have caught:
+
+1. **A real crash**: `Overview.tsx` (the Incident workspace) unconditionally read
+   `incident.candidates[0].nodeId`. With a real backend reachable but no `VITE_INCIDENT_ID`
+   configured, the app correctly enters ERROR mode with genuinely empty `candidates: []`
+   (per `errorIncidentView`'s "never a fabricated value" contract) — and Overview crashed
+   on that combination, producing a blank page instead of the intended ERROR UI. Fixed by
+   guarding on `leading` throughout (see commit).
+2. **The visual problems ui-work2.txt predicted**: at 1366x768 with the dock at its 240px
+   default, the map was clipped to a small sliver; Source and Response each stacked a local
+   `.right-rail` beside the map that duplicated fields already in the global
+   `DecisionInspector` at equal prominence (e.g. Source's "Calibrated candidate set" panel
+   vs. the inspector's identical candidate-set-size/conformal-target/calibration block).
+
+### What changed (ui-work2.txt §2–§8)
+
+- **Source / Response local `.right-rail` removed.** Both workspaces now stack the map
+  (full-width, `wide-panel`) above their full-detail panels instead of a 2-column
+  map+sidebar grid. `DecisionInspector.tsx`'s `SourceSummary` gained a compact
+  authority/applicability badge pair (queries the same `['authority', incident.id]`
+  TanStack Query key the workspace already populates — confirmed no double-fetch, this
+  dedup pattern was already used between Source/Response before this phase) and the
+  previously-missing "held-out measured coverage" field (ui-work.txt §13.2 requires it;
+  the old local rail had it, the inspector never did — this phase's rail removal would
+  have silently dropped it from the Source workspace entirely had it not been added here).
+  `ResponseSummary` gained the selected plan's decision/CURRENT-STALE badges, simulator
+  identity, pressure/service margins, numerical sensitivity, and rejection/abstention
+  reason. Full hash-level provenance and worst-case consequences stay PRIMARY in
+  `TechnicalDock > Verification`, which already covered every one of those fields.
+- **Incident workspace (`Overview.tsx`) simplified.** Removed: the full `PlanTable`, the
+  full `Counterfactuals` grid, the long "Verified explanation" section with 4
+  always-disabled "not yet connected to the live API" buttons (stale — Approval (UI-6) and
+  real grounded explanations (UI-3/UI-5) already exist; these were never updated), and the
+  per-sensor health list (already color/shape-coded on the map, per ui-work.txt §11).
+  Replaced with: a trimmed compact strip, a full-width dominant map, and three small
+  Source/Sampling/Response panels that navigate to their dedicated workspace via real
+  `setWorkspace()` calls (Zustand) instead of repeating that workspace's content. The two
+  disabled fake buttons ("Review sample request", "Review … approval") are now real
+  navigation to Sampling/Approval respectively — the first genuine fix of the "wire or
+  remove nonfunctional controls" gap ui-work.txt §3.4 named, which had survived UI-1..UI-10
+  untouched because Overview.tsx was never revisited after UI-0.
+- **`Counterfactuals` moved from Overview to `ResponseWorkspace`** (its natural home — a
+  no-response plan-comparison view, not incident-overview content) rather than deleted.
+  Its eyebrow was `"SYNCHRONIZED AT 08:40"`, a literal hard-coded string with no data
+  binding — found while moving it; replaced with `"NO-RESPONSE COMPARATOR"`.
+- **Map sizing.** `.map-shell` was `height: 530px` unconditionally. Now
+  `clamp(420px, 62vh, 720px)` — substantially larger at 1920x1080 (the phase's explicit
+  hard acceptance target per ui-work2.txt §4) with the dock open at its 240px default,
+  confirmed via real screenshots, not computed. At 1366x768 the map still requires scrolling
+  to see in full — this is arithmetic, not a missed optimization: header(52) + mode
+  banner(~34) + toolbar(38) + dock(240, must not shrink below default per explicit
+  instruction) + footer(~30) already consumes 394px of 768 before any workspace content, and
+  ui-work2.txt §4's hard acceptance bar is stated only for 1920x1080. Not a regression
+  either way — the old fixed 530px map didn't fit at 768px height any better.
+- **Legacy gradient/radius flattening.** `.panel` (was a 145° diagonal gradient, 7px
+  radius) and `.decision-banner` (was a 100° gradient) now use flat
+  `var(--panel)`/`var(--panel-raised)` and the `--shell-panel-radius` token (5px). The
+  decision-banner's `<h1>` (global scale up to 2.15rem/34px, sized for a full-page
+  document title, shared with Validation/Benchmark page headings) was oversized for a
+  "compact incident strip" and caused 2-line wrapping at 1440px width; scoped to
+  `.decision-banner h1 { font-size: 1.2rem }` rather than changing the shared global rule.
+
+### Explicitly NOT changed (per ui-work2.txt §9 and general scope discipline)
+
+- No change to `OperationalMap.tsx`'s per-workspace mount architecture (each of
+  Incident/Source/Response still mounts its own `<OperationalMap>` instance). Verified via
+  real navigation clicks between workspaces that this doesn't produce visible flashing or
+  lost selection state beyond what already existed pre-phase; ui-work2.txt §9 explicitly
+  forbids the larger single-persistent-map refactor unless real testing shows a problem,
+  and none was found.
+- Sampling, Approval, and Replay workspaces' local `.right-rail` usage — ui-work2.txt §2
+  names Source and Response specifically ("especially Source and Response"); Sampling's
+  local rail content (Stop Certificate, Sample budget) doesn't duplicate the global
+  inspector's sparser summary at equal prominence, and Approval has no map to free space
+  beside.
+- No backend files touched (0 files under `src/hydroswarm/**` this phase, as in every
+  phase this session).
+
+### Verification
+
+`npm run lint && npm run typecheck && npm run format:check && npm test -- --run && npm run build`
+all pass (84/84 tests — 3 assertions in `App.test.tsx` updated because they depended on
+content intentionally relocated to a different workspace, or now legitimately duplicated
+by design between the compact inspector and the full workspace panel; see the commit body
+for the exact list). Then real Chromium/Vite-preview screenshots (DEMO_FALLBACK, forced via
+an unreachable `VITE_API_BASE` as described above) across:
+
+- Incident/Source/Sampling/Response/Approval @ 1920×1080
+- Incident/Response @ 1440×900, Source @ 1440×900
+- Incident @ 1366×768
+- Rail + inspector + dock all collapsed simultaneously (Response)
+- Selecting a second plan in the plan table (confirms toolbar breadcrumb / inspector /
+  Pareto-frontier highlight all stay synchronized — ui-work.txt §22, unaffected by this
+  phase's refactor)
+- The ERROR-mode crash fix (`?failure=no_valid_plan` with no real backend reachable)
+
+Zero console/page errors beyond the deliberately-unreachable API port's network failure in
+every case. No horizontal overflow observed at any tested width. No panel overlap, no
+duplicated second right sidebar, no unusable map height at 1920×1080.
+
+**Confirmed**: no backend files changed; frozen model/calibration identities untouched (no
+model/calibration/checkpoint files or config touched); locked final test remains unopened;
+`reports/results/v3/final-selection.json` was not created; the architecture-freeze tag was
+not moved.
+
+### GitHub push
+
+This session did not have working GitHub authentication (unlike the session that produced
+the earlier UI-0..UI-10 commits, which explicitly notes "GitHub auth is working this
+session" above) — push was not attempted since no push command exists yet in this
+transcript to report success or failure against; the commit exists locally on
+`feature/ui-mission-control-v1` at `a73d034`. **Next session: attempt
+`git push origin feature/ui-mission-control-v1` and update this section with the result;
+if it fails, continue locally per the standing instruction to not block on GitHub auth
+errors.**
+
 ## Remaining phases (UI-11): NOT STARTED
 
-Tracked as task #13 in this session's task list, in ui-work.txt §31 order.
+Tracked in ui-work.txt §31 order (UI-10.5 above was inserted ahead of it by ui-work2.txt,
+not part of that original ordering).
 
-Next up: UI-11 (demo hardening / final QA). Per ui-work.txt's own UI-11 scope: lock down
-the deterministic demo flow, turn the manual Playwright screenshot scripts used ad hoc in
-every phase this session (UI-1 through UI-10, never committed) into a real committed
-Playwright E2E suite, confirm zero console errors and zero external runtime calls in the
-production build (ui-work.txt §26's "no Google Fonts / Mapbox cloud styles / CDNs / remote
-icon packs / OpenAI / Anthropic / internet-hosted scripts" — worth an explicit grep-based
-check of `dist/` and `index.html`, not just an assumption), do an integrated backend smoke
-test if a real backend can be started in this environment (confirm first whether WNTR/
-EPANET and the Python venv are available here before assuming), and finalize docs. This is
+Next up: UI-11 (demo hardening / final QA). **Start with `git stash pop`** to recover the
+in-progress Playwright E2E work described above. Per ui-work.txt's own UI-11 scope: lock
+down the deterministic demo flow, finish turning the ad-hoc screenshot scripts used
+throughout this session into a real committed Playwright E2E suite, confirm zero console
+errors and zero external runtime calls in the production build (ui-work.txt §26's "no
+Google Fonts / Mapbox cloud styles / CDNs / remote icon packs / OpenAI / Anthropic /
+internet-hosted scripts" — worth an explicit grep-based check of `dist/` and `index.html`,
+not just an assumption), regenerate/approve the Playwright visual-regression baselines now
+that UI-10.5 has stabilized the layout (ui-work2.txt §14 deferred this here explicitly), do
+an integrated backend smoke test if a real backend can be started in this environment
+(confirm first whether WNTR/EPANET and the Python venv are available here before assuming —
+note a `uvicorn hydroswarm.api.app:app` process was observed already running on
+127.0.0.1:8765 in this sandbox during UI-10.5, left untouched), and finalize docs. This is
 the last phase per ui-work.txt §31's own ordering.
 
 ## Continuation commands
@@ -427,9 +594,10 @@ the last phase per ui-work.txt §31's own ordering.
 ```
 cd /workspace/HydroSwarm
 git checkout feature/ui-mission-control-v1
+git stash pop   # recovers in-progress UI-11 Playwright work found before UI-10.5
 cd frontend
 npm install   # if node_modules is missing (ephemeral sandbox)
-npm run lint && npm run typecheck && npm test -- --run && npm run build
+npm run lint && npm run typecheck && npm run format:check && npm test -- --run && npm run build
 ```
 
 No long-running/background jobs are active from this session as of this report.
