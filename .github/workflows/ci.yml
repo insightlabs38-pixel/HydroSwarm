@@ -23,9 +23,26 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      # Targeted Git-LFS hydration, not `actions/checkout`'s `lfs: true`:
+      # this repo carries substantially more LFS data (full training
+      # corpora, preserved checkpoints) than the test suite needs, and
+      # `lfs: true` would download all of it on both matrix runners for
+      # every run. Pull only the committed tensor directories the real
+      # (non-locked-test) Python test suite actually reads -- audited by
+      # grepping tests/ for every data/learning-v2/**/*.safetensors path a
+      # test references; see scripts/verify_lfs_test_fixtures.py's
+      # REQUIRED_TENSOR_DIRS for the exact, single source of truth for
+      # this list (kept identical to the --include patterns below by
+      # construction, not by convention alone).
+      - name: Git LFS -- hydrate required test fixture paths only
+        run: |
+          git lfs install --local
+          git lfs pull --include="data/learning-v2/cycle-b2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/train/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-ood-extension/tensors-normalized/**"
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+      - name: Git LFS -- verify hydration (fails closed with a clear message)
+        run: uv run --no-project python scripts/verify_lfs_test_fixtures.py
       - name: Install locked environment
         run: uv sync --all-extras --dev
       - name: Package build and editable installation

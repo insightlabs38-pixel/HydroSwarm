@@ -12,21 +12,23 @@ or interleave partial lines.
 
 from __future__ import annotations
 
-import fcntl
 import json
 import os
 import platform
-import resource
 import subprocess
 from collections.abc import Mapping, Sequence
-from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 from uuid import uuid4
 
 import psutil
+
+from ._cross_platform import IS_WINDOWS, file_lock
+
+if not IS_WINDOWS:
+    import resource
 
 SCHEMA_VERSION = 1
 
@@ -84,9 +86,26 @@ def _thread_settings() -> dict[str, str | int | None]:
     return settings
 
 
+#: A documented, explicitly-positive fallback for the rare case a Windows
+#: psutil build lacks the ``peak_wset`` field -- never silently 0, since
+#: callers (e.g. ClosedRunRecord.peak_rss_bytes) treat this as a real
+#: measurement, not an "unknown" sentinel.
+_WINDOWS_PEAK_RSS_FALLBACK_FIELD = "rss"
+
+
 def _peak_rss_bytes() -> int:
-    # ru_maxrss is KiB on Linux, bytes on macOS; this project's execution
-    # environment is Linux-only (see plan section 10), so we assume KiB.
+    if IS_WINDOWS:
+        memory_info = psutil.Process().memory_info()
+        # ``peak_wset`` (peak working-set size, in bytes) is Windows-only,
+        # part of psutil's extended Windows `pmem` fields -- the direct
+        # analog of POSIX ru_maxrss, already in bytes (no KiB conversion).
+        peak = getattr(memory_info, "peak_wset", None)
+        if peak is not None:
+            return int(peak)
+        return int(getattr(memory_info, _WINDOWS_PEAK_RSS_FALLBACK_FIELD))
+    # ru_maxrss is KiB on Linux, bytes on macOS; this project's CI/production
+    # execution environment is Linux, so we assume KiB here (matching the
+    # pre-existing behavior this fix preserves for POSIX).
     return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024
 
 
@@ -174,17 +193,6 @@ class ClosedRunRecord:
             "locked_test_opened": self.locked_test_opened,
             "notes": self.notes,
         }
-
-
-@contextmanager
-def _locked(lock_path: Path) -> Iterator[None]:
-    lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with lock_path.open("a+") as handle:
-        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-        try:
-            yield
-        finally:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
 class RunHandle:
@@ -282,7 +290,7 @@ class ExperimentRegistry:
         started_at = datetime.now(UTC)
         candidate_id = run_id or f"{started_at:%Y%m%dT%H%M%SZ}-{uuid4().hex[:8]}"
 
-        with _locked(self.lock_path):
+        with file_lock(self.lock_path):
             existing = self._existing_run_ids()
             if candidate_id in existing:
                 raise RegistryError(f"duplicate run_id {candidate_id!r} already exists in registry")
@@ -315,7 +323,7 @@ class ExperimentRegistry:
         return RunHandle(self, record)
 
     def _append_closed(self, closed: ClosedRunRecord) -> None:
-        with _locked(self.lock_path):
+        with file_lock(self.lock_path):
             existing = self._existing_run_ids()
             if closed.run_id not in existing:
                 raise RegistryError(

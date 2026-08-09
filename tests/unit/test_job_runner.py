@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import sys
-import time
 
 import pytest
 
@@ -33,15 +32,17 @@ def test_launch_writes_running_status_and_log(tmp_path) -> None:
 
 
 def _wait_for_exit(pid: int, timeout: float = 5.0) -> int:
-    import os
+    # os.waitpid's os.WNOHANG flag is POSIX-only (not defined on Windows),
+    # so a manual non-blocking poll loop around it isn't cross-platform.
+    # psutil.Process.wait() is: it uses the real OS reap primitive on POSIX
+    # and WaitForSingleObject on Windows, and returns the exit code either
+    # way.
+    import psutil
 
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        finished_pid, status = os.waitpid(pid, os.WNOHANG)
-        if finished_pid == pid:
-            return os.waitstatus_to_exitcode(status)
-        time.sleep(0.02)
-    raise TimeoutError("job did not exit in time")
+    try:
+        return psutil.Process(pid).wait(timeout=timeout)
+    except psutil.TimeoutExpired:
+        raise TimeoutError("job did not exit in time") from None
 
 
 def test_overlapping_launch_in_same_run_dir_is_rejected(tmp_path) -> None:

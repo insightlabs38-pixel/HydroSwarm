@@ -6,6 +6,7 @@ import json
 import math
 import os
 import signal
+import sys
 from pathlib import Path
 
 import pytest
@@ -302,6 +303,23 @@ def test_runtime_budget_exports_best_completed_epoch(tmp_path: Path, monkeypatch
     assert status["stop_reason"] == "runtime_budget"
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason=(
+        "this test simulates an external SIGTERM by signaling its own "
+        "process (os.kill(os.getpid(), signal.SIGTERM)) to exercise "
+        "Trainer.install_signal_handlers' graceful-shutdown path. On "
+        "Windows, os.kill() with any non-CTRL_* signal value -- including "
+        "SIGTERM -- calls TerminateProcess() directly rather than "
+        "delivering a catchable signal, which would hard-kill the pytest "
+        "worker itself instead of invoking the registered handler. There "
+        "is no Windows equivalent of a catchable self-delivered SIGTERM; "
+        "this is a real platform difference, not a portability gap to "
+        "paper over. install_signal_handlers()/_handle_signal() themselves "
+        "remain unconditionally available on Windows -- only this "
+        "self-signal test technique cannot run there."
+    ),
+)
 def test_sigterm_stops_cleanly_and_saves_a_resumable_checkpoint(tmp_path: Path) -> None:
     trainer = Trainer(
         _tiny_model(),
