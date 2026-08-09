@@ -24,6 +24,8 @@ distinct from `reports/overnight/2026-08-03/` (the backend/model overnight plan)
   11. `bf77697` — `feat(ui): add verified response-plan decision workspace` (UI-5)
   12. `54a52b3` — `docs(handoff): record UI-5 completion and exact-run-budget scope decision`
   13. `4d50e37` — `feat(ui): implement guarded human plan-approval workflow` (UI-6)
+  14. `ab347f5` — `docs(handoff): record UI-6 completion and demo-fixture invariant lesson`
+  15. `8c4f38b` — `feat(ui): add synchronized technical evidence dock` (UI-7)
 
 Pushed to `origin/feature/ui-mission-control-v1` after each commit (GitHub auth is
 working this session).
@@ -260,22 +262,38 @@ choice — fixed to `selectedPlanId: null`. Worth remembering for future demo-fi
 edits: **cross-check new fixture fields against the invariants implied by real backend
 transactions**, not just against what individually "looks plausible."
 
-## Remaining phases (UI-7 through UI-11): NOT STARTED
+## UI-7 — technical dock: COMPLETE
 
-Tracked as tasks #9–#13 in this session's task list, in ui-work.txt §31 order. Each
+See commit `8c4f38b` message for full detail. As predicted in the UI-6 handoff note,
+this phase was smaller than its number suggests: the dock frame/tabs/resize/collapse
+and all six tabs' content already existed from UI-1. The real remaining work was
+cross-panel synchronization (ui-work.txt §22) that nothing had audited yet: the Audit
+tab and Timeline tab were entirely independent of each other (fixed bidirectionally),
+and the Verification tab only reacted to an explicit plan click instead of falling back
+to the recommended plan the way every workspace since UI-3 does (fixed to match). Also
+added axe coverage for the Source/Sampling/Response/Approval workspace bodies (UI-1 only
+ever checked the default Incident view) — all pass with zero violations.
+
+## Remaining phases (UI-8 through UI-11): NOT STARTED
+
+Tracked as tasks #10–#13 in this session's task list, in ui-work.txt §31 order. Each
 phase's own gate must pass and get its own commit before moving to the next, per
 ui-work.txt §36 ("Do not implement all phases in one mega-change"). No shortcuts,
 placeholders, or "TODO" UI states are to be committed as if finished.
 
-Next up: UI-7 (technical dock) is mostly already done as a side effect of UI-1
-(Timeline/Evidence/Hydraulics/Verification/Provenance/Audit tabs all exist and are
-wired to real data, with a keyboard-accessible resizable/collapsible splitter). What's
-likely still missing per ui-work.txt §14: deeper cross-panel synchronization polish
-(does selecting a plan in Response/Approval correctly update the dock's Verification
-tab? does selecting an audit event do anything beyond storing selectedAuditSequence?),
-and a fresh accessibility pass now that 6 more workspaces exist since UI-1's original
-axe check. Worth auditing what's *actually* still open here before assuming a full new
-build is needed — this phase may be smaller than its number suggests.
+Next up: UI-8 (replay/failure/demo). Some of this already exists from before this
+session (the `?failure=<category>` query-param failure-injection mechanism in
+api/incident.ts, covered by tests/api-incident.test.ts). What's likely still needed:
+an actual Replay workspace (currently still a NOT_YET_MIGRATED placeholder — check
+`POST /incidents/{id}/replay`, confirmed present, returns `ReplayResponse{state, events,
+chain_valid}`), replay controls using the existing `replayIndex`/`replayPlaying`/
+`replaySpeed` store fields (already built for the dock's Timeline tab — likely
+reusable/shared rather than rebuilt), mode-banner labeling for REPLAY (ModeBanner
+already handles this mode from UI-1, just unexercised by any real code path yet since
+nothing ever sets `mode: 'REPLAY'`), and verifying "no fake historical state" (the map/
+charts must only animate real historical frames if the replay endpoint actually
+provides them — check what `ReplayResponse` actually contains before building anything
+that assumes more than that).
 
 ## Continuation commands
 
