@@ -95,9 +95,9 @@ compatibility; learned results are reported in the separate governed benchmark a
 [measured summary](reports/results/summary.md), and
 [technical report](output/pdf/HydroSwarm_Technical_Report.pdf).
 
-The operator screenshot below uses the console's visibly labeled deterministic fallback to
-demonstrate the interface when no active API incident is configured; it is not presented as
-live telemetry or benchmark evidence.
+The operator screenshot below uses the console's visibly labeled illustrative demo fallback
+(`ILLUSTRATIVE DEMO / DEMO_FALLBACK`) to demonstrate the interface when no active API incident
+is configured; it is not presented as live telemetry or benchmark evidence.
 
 ![HydroSwarm incident operator workspace](docs/screenshots/operator-overview.png)
 

@@ -3,6 +3,218 @@ export type OodLevel = 'NORMAL' | 'CAUTION' | 'OUTSIDE_VALIDATED_RANGE';
 export type PlanStatus = 'PENDING' | 'REJECTED' | 'RECOMMENDED' | 'VALID';
 
 /**
+ * Mirrors hydroswarm.domain.schemas.AuthorityLevel exactly (core-issues5.txt
+ * Section 13). Ordered from least to most operationally binding -- a UI
+ * must never let a lower authority result visually outrank a higher one
+ * (ui-work.txt 7's "Authority labels").
+ */
+export type AuthorityLevel =
+  | 'UNAVAILABLE'
+  | 'SUPPRESSED'
+  | 'ADVISORY'
+  | 'CALIBRATED_ADVISORY'
+  | 'DETERMINISTIC'
+  | 'SIMULATOR_VERIFIED'
+  | 'HUMAN_APPROVED';
+
+/** Mirrors hydroswarm.domain.schemas.ApplicabilityStatus exactly -- why a
+ * result's authority is what it is, not just the resulting level. */
+export type ApplicabilityStatus =
+  | 'VALIDATED'
+  | 'UNVALIDATED'
+  | 'OOD'
+  | 'CALIBRATION_UNAVAILABLE'
+  | 'STALE'
+  | 'SIMULATOR_SENSITIVE'
+  | 'INSUFFICIENT_EVIDENCE'
+  | 'DISABLED_BY_GOVERNANCE'
+  | 'FAILED_PROMOTION_GATE';
+
+export interface DecisionProvenance {
+  model: string | null;
+  calibration: string | null;
+  network: string | null;
+  evidence: string | null;
+}
+
+/** Mirrors hydroswarm.explanation.grounded.ExplanationIntent exactly. */
+export type ExplanationIntent =
+  | 'WHY_SOURCE'
+  | 'WHY_SAMPLE'
+  | 'WHAT_CHANGED'
+  | 'WHY_PLAN_REJECTED'
+  | 'COMPARE_PLANS'
+  | 'UNCERTAINTY_REMAINS'
+  | 'WHICH_SENSOR_MATTERED';
+
+/** Mirrors hydroswarm.api.state.ExplanationPayload field-for-field -- a
+ * real grounded explanation, not a generative chat response (ui-work.txt
+ * 9.5). The backend computes every intent up front as part of /view, so
+ * the frontend never needs a separate round trip per question. */
+export interface GroundedExplanation {
+  intent: ExplanationIntent;
+  text: string;
+  facts: Record<string, unknown>;
+  limitations: string[];
+}
+
+/** Mirrors hydroswarm.domain.schemas.DecisionCertificate field-for-field.
+ * `name` is a stable backend identifier, not a display label -- known
+ * values today are "source_localization", "scout_recommendation",
+ * "ood_state", and "plan_consequence:{plan_id}" (one per verified plan);
+ * treat any other name as a certificate this build doesn't know how to
+ * render specially, not an error. `value`'s shape depends on `name`. */
+export interface DecisionCertificate {
+  name: string;
+  value: unknown;
+  source: string;
+  authority: AuthorityLevel;
+  applicability: ApplicabilityStatus;
+  enabled: boolean;
+  calibrated: boolean;
+  suppressionReasons: string[];
+  provenance: DecisionProvenance;
+}
+
+/** Mirrors hydroswarm.domain.schemas.EvidenceCertificateStatus exactly. */
+export type EvidenceCertificateStatus =
+  | 'EVIDENCE_SUFFICIENT'
+  | 'CONTINUE_SAMPLING'
+  | 'STOP_BUDGET_EXHAUSTED'
+  | 'STOP_NO_USEFUL_CANDIDATE'
+  | 'STOP_ABSTAIN';
+
+/** Mirrors hydroswarm.domain.schemas.EvidenceCertificate field-for-field
+ * (core-issues5.txt Section 15, ui-work.txt 9.3/13.3: "Evidence Value /
+ * Stop Certificate"). Converts the incident's current sampling state
+ * into a legible EVIDENCE SUFFICIENT / CONTINUE SAMPLING / STOP
+ * decision -- "no-sample is a real decision state, not an empty card." */
+export interface EvidenceCertificate {
+  status: EvidenceCertificateStatus;
+  stop: boolean;
+  message: string;
+  posteriorEntropyBits: number;
+  candidateSetSize: number;
+  candidateNodes: string[];
+  /** True only when candidateNodes/candidateSetSize is a real calibrated
+   * conformal set; false for the uncalibrated credible-region fallback.
+   * Never present the false case as carrying the same guarantee. */
+  candidateRegionCalibrated: boolean;
+  recommendedSampleNode: string | null;
+  expectedInformationGainBits: number | null;
+  expectedCandidateReduction: number | null;
+  sampleBudgetRemaining: number;
+  alreadySampledNodes: string[];
+  recommendedNodeAccessible: boolean | null;
+}
+
+/** Mirrors hydroswarm.planning.pareto.FrontierMode exactly. */
+export type FrontierMode = 'posterior_weighted' | 'worst_case';
+
+/** Mirrors hydroswarm.api.state.ParetoFrontierEntryView field-for-field
+ * (core-issues5.txt Section 14, ui-work.txt 9.4/15). `group` is the P0
+ * safety-relevant field: EXPOSURE_AWARE (consequences.exposureEvaluated
+ * === true) and HYDRAULIC_ONLY (=== false) must never be visually merged
+ * into one comparable frontier. `dominated` is only ever computed
+ * against other entries in the same group. */
+export interface ParetoFrontierEntry {
+  planId: string;
+  label: string;
+  consequences: ConsequenceView;
+  mode: FrontierMode;
+  dominated: boolean;
+  isNoActionComparator: boolean;
+  group: 'EXPOSURE_AWARE' | 'HYDRAULIC_ONLY';
+}
+
+/** Mirrors hydroswarm.api.state.ApprovalReceipt field-for-field -- the
+ * durable record that a human, not HydroSwarm, decided to proceed with
+ * a plan (ui-work.txt 13.5). */
+export interface ApprovalReceipt {
+  incidentId: string;
+  planId: string;
+  approved: true;
+  operatorId: string;
+  approvedAt: string;
+}
+
+/** A minimal, honest slice of hydroswarm.domain.schemas.IncidentState --
+ * only the fields this console actually renders (ui-work.txt UI-8's
+ * "no fake historical state": the real /replay endpoint returns the
+ * incident's *current* raw state, not a historical snapshot, so this
+ * type must never be presented as a point-in-time replay frame). This
+ * was, until the "pre-UI-11" fix that added IncidentView.simulatorBudget
+ * below, the only place `exact_simulations_used`/`plans_exactly_verified`/
+ * `exact_simulation_cache_hits`/`remaining_epanet_budget` were exposed to
+ * the console -- kept as its own type since /replay's `state` still
+ * carries several fields (sampleCount, approvalPending, oodLevel) that
+ * SimulatorBudget does not. */
+export interface ReplayIncidentState {
+  incidentId: string;
+  networkId: string;
+  status: string;
+  sampleCount: number;
+  approvalPending: boolean;
+  oodLevel: string;
+  exactSimulationsUsed: number;
+  plansExactlyVerified: number;
+  exactSimulationCacheHits: number;
+  remainingEpanetBudget: number;
+}
+
+/** Mirrors hydroswarm.api.state.ReplayResponse field-for-field. */
+export interface ReplayResult {
+  state: ReplayIncidentState;
+  events: AuditEvent[];
+  chainValid: boolean;
+}
+
+/** Mirrors hydroswarm.api.state.SimulatorBudgetView field-for-field --
+ * exact-simulation budget/usage counters mirrored unmodified from the
+ * backend's IncidentState (core-issues5.txt Section 8), now exposed
+ * through the normal live /view response ("pre-UI-11" fix B) rather than
+ * only through /replay. No recomputation and no altered semantics happen
+ * on the frontend; every field here is exactly what the backend reports. */
+export interface SimulatorBudget {
+  exactSimulationsUsed: number;
+  plansExactlyVerified: number;
+  exactSimulationCacheHits: number;
+  remainingEpanetBudget: number;
+}
+
+export interface NetworkTopologyNode {
+  nodeId: string;
+  nodeType: string;
+  elevationM: number;
+  coordinates: [number, number];
+}
+
+export interface NetworkTopologyLink {
+  linkId: string;
+  linkType: string;
+  startNode: string;
+  endNode: string;
+}
+
+/** Mirrors hydroswarm.api.state.NetworkRecord field-for-field
+ * (ui-work.txt 17). `nodes`/`links` come from the record's `metadata`
+ * dict (only populated by a real .inp import) -- empty when genuinely
+ * absent, never fabricated. */
+export interface NetworkRecord {
+  networkId: string;
+  name: string;
+  version: number;
+  sha256: string;
+  nodeCount: number;
+  linkCount: number;
+  valid: boolean;
+  validatedAt: string;
+  nodes: NetworkTopologyNode[];
+  links: NetworkTopologyLink[];
+  validationErrors: string[];
+}
+
+/**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *
  * LIVE: every field was derived from the live API for this exact incident.
@@ -26,7 +238,11 @@ export interface NetworkNode {
   kind: 'junction' | 'reservoir' | 'tank';
   coordinates: [number, number];
   probability: number;
-  concentration: number;
+  /** Null when this node's concentration has not been observed/measured
+   * (NetworkNodeView.concentration_mg_l is nullable) -- never a fabricated
+   * 0 (UI-11.1 §2; matches NetworkLink.concentration's established
+   * convention below). */
+  concentration: number | null;
   candidate: boolean;
   sensor?: SensorState;
 }
@@ -35,9 +251,16 @@ export interface NetworkLink {
   id: string;
   source: string;
   target: string;
-  flow: number;
-  concentration: number;
-  action?: 'CLOSE' | 'FLUSH';
+  /** Null when this link's directed flow has not been made available to
+   * the console. Currently always null when mode is LIVE:
+   * HydraulicSimulator computes per-link flow, but it is not yet threaded
+   * onto IncidentAnalysisResult / NetworkLinkView (a known, additive
+   * backend gap -- see api.ts). Never a fabricated 0 (ui-work.txt 8.1). */
+  flow: number | null;
+  /** Null in LIVE mode: NetworkLinkView carries no per-link concentration
+   * field today (only node-level concentration_mg_l exists). Never a
+   * fabricated 0. */
+  concentration: number | null;
 }
 
 export interface SensorState {
@@ -45,8 +268,15 @@ export interface SensorState {
   health: 'HEALTHY' | 'DRIFT' | 'MISSING';
   quality: number;
   ageMinutes: number;
-  pressure: number;
-  concentration: number;
+  /** Null when this reading was not supplied (SensorHealthView.pressure_m
+   * is nullable) -- never a fabricated 0 (UI-11.1 §2). A genuine 0 m
+   * reading and "not measured" must remain visually and numerically
+   * distinct: 0 is a real pressure at that node, null means no reading. */
+  pressure: number | null;
+  /** Null when this reading was not supplied
+   * (SensorHealthView.concentration_mg_l is nullable) -- never a
+   * fabricated 0 (UI-11.1 §2). */
+  concentration: number | null;
 }
 
 export interface Candidate {
@@ -54,16 +284,86 @@ export interface Candidate {
   probability: number;
 }
 
+/** Mirrors hydroswarm.domain.schemas.OperationalAction (Pydantic)
+ * field-for-field, camelCased -- ui-work.txt 9.1 "plan action typing". */
+export interface PlanAction {
+  actionType: string;
+  targetId: string | null;
+  startMinute: number;
+  durationMinutes: number;
+  flowRateLps: number | null;
+}
+
+export type PlanDecision = 'VERIFIED' | 'REJECTED' | 'ABSTAINED' | 'PENDING_APPROVAL';
+export type VerificationStatus = 'CURRENT' | 'STALE';
+
+/** Mirrors the backend's ConsequenceMetrics (Pydantic) field-for-field,
+ * camelCased -- the exact simulated outcome of running one specific plan
+ * (overnight-plan.txt Task 3.2's "counterfactual consequences"). */
+export interface ConsequenceView {
+  populationImpacted: number;
+  contaminantMassConsumedMg: number;
+  volumeAboveThresholdL: number;
+  contaminatedPipeExtentM: number;
+  minimumPressureM: number;
+  pressureViolationMinutes: number;
+  unservedDemandL: number;
+  serviceAvailability: number;
+  operationCount: number;
+  containmentTimeMinutes: number | null;
+  /** False whenever the contamination-exposure fields above are Pydantic
+   * defaults rather than measured from a real chemical-transport
+   * simulation (e.g. the legacy hydraulic-only evaluation path). Callers
+   * must never present exposure fields as measured when this is false. */
+  exposureEvaluated: boolean;
+  /** Signed margin to the configured safety threshold (measured -
+   * required; positive means the plan passed with room to spare). Null
+   * only for a verification predating this field. */
+  pressureMarginM: number | null;
+  serviceAvailabilityMargin: number | null;
+  /** True when either margin above falls inside the conservative
+   * sensitivity epsilon band -- a real VERIFIED/REJECTED decision this
+   * close to the threshold could plausibly flip under a different (still
+   * correct) EPANET build. Must never be hidden behind a plain VERIFIED
+   * badge (ui-work.txt 9.1 "numerical sensitivity"). */
+  numericallySensitive: boolean;
+}
+
+/** Mirrors hydroswarm.domain.schemas.PlanVerification field-for-field,
+ * camelCased -- ui-work.txt 9.1 "full plan verification". Null when this
+ * plan has not yet undergone WNTR/EPANET verification (PENDING). */
+export interface PlanVerificationView {
+  decision: PlanDecision;
+  simulator: string;
+  simulatorVersion: string;
+  stateHash: string;
+  consequences: ConsequenceView | null;
+  worstCaseConsequences: ConsequenceView | null;
+  evaluationProvenance: Record<string, unknown> | null;
+  rejectionCodes: string[];
+  abstentionReason: string | null;
+  verifiedAt: string;
+  /** One canonical hash over every behavior-critical piece of context this
+   * verification was computed against. Null only for verifications
+   * predating this field. */
+  contextHash: string | null;
+  /** CURRENT until a behavior-critical context component changes, at
+   * which point this plan's prior verification becomes STALE and is no
+   * longer approvable. ui-work.txt: "Stale verification unmistakable." */
+  verificationStatus: VerificationStatus;
+}
+
 export interface Plan {
   id: string;
   name: string;
-  exposureReduction: number;
-  pressureViolations: number;
-  serviceAvailability: number;
-  actions: number;
-  containmentMinutes: number;
+  actions: PlanAction[];
   status: PlanStatus;
-  rejectionReason?: string;
+  verification: PlanVerificationView | null;
+  /** Modeled exposure reduction versus a no-response baseline. Null until
+   * a backend endpoint computes a genuine no-response WNTR comparator (a
+   * known gap -- see api.ts viewFromApi comment). Never a fabricated 0
+   * (ui-work.txt 8.2: render "-- / Not evaluated" when absent). */
+  exposureReduction: number | null;
 }
 
 export interface AuditEvent {
@@ -81,22 +381,6 @@ export interface Benchmark {
   status: 'PASS' | 'WATCH' | 'NOT RUN';
 }
 
-/** Mirrors the backend's ConsequenceMetrics (Pydantic) field-for-field,
- * camelCased -- the exact simulated outcome of running one specific plan
- * (overnight-plan.txt Task 3.2's "counterfactual consequences"). */
-export interface ConsequenceView {
-  populationImpacted: number;
-  contaminantMassConsumedMg: number;
-  volumeAboveThresholdL: number;
-  contaminatedPipeExtentM: number;
-  minimumPressureM: number;
-  pressureViolationMinutes: number;
-  unservedDemandL: number;
-  serviceAvailability: number;
-  operationCount: number;
-  containmentTimeMinutes: number | null;
-}
-
 /** Mirrors the backend's ProvenanceView -- every hash/version an operator
  * needs to trust an IncidentView response (overnight-plan.txt Task 3.2). */
 export interface Provenance {
@@ -107,6 +391,27 @@ export interface Provenance {
   calibrationHash: string;
   simulator: string | null;
   simulatorVersion: string | null;
+}
+
+/** Mirrors one EvidenceHistoryEntryView -- a real observed-evidence round,
+ * not a fabricated before/after candidate-probability comparison
+ * (ui-work.txt 8.4: "If only counts/hashes are available, show those"). */
+export interface EvidenceHistoryEntry {
+  roundIndex: number;
+  observationCount: number;
+  validConcentrationCount: number;
+  sensorNodes: string[];
+  evidenceHash: string;
+}
+
+/** A real recorded hydraulic time series. Only ever populated for
+ * DEMO_FALLBACK/REPLAY content -- no backend endpoint exposes a live
+ * per-incident hydraulic time series yet, so LIVE/ERROR must always carry
+ * `null` here rather than a fabricated series (ui-work.txt 8.5). */
+export interface HydraulicSeriesPoint {
+  time: string;
+  pressureM: number;
+  concentrationMgL: number;
 }
 
 export interface IncidentView {
@@ -121,6 +426,15 @@ export interface IncidentView {
   offline: boolean;
   runtimeMs: number;
   modelVersion: string;
+  /** ISO timestamp this view was generated, or null when unknown (ERROR
+   * mode). Mirrors hydroswarm.api.state.IncidentView.generated_at. */
+  generatedAt: string | null;
+  /** Whether the hybrid neural pipeline ran (FULL_HYBRID) or the
+   * deterministic classical-safe fallback ran instead (CLASSICAL_SAFE).
+   * Null when unknown (non-LIVE modes carry no analysis-mode signal of
+   * their own). Distinct from `mode` (LIVE/REPLAY/DEMO_FALLBACK/ERROR),
+   * which is data provenance, not analysis-pipeline identity. */
+  runtimeAnalysisMode: 'FULL_HYBRID' | 'CLASSICAL_SAFE' | null;
   provenance: Provenance;
   ood: OodLevel;
   approvalPending: boolean;
@@ -137,7 +451,12 @@ export interface IncidentView {
    * artifact in use, if known -- distinct from the per-incident
    * candidateCoverage target. */
   measuredCoverage?: number;
-  disagreement: number;
+  /** Null when no classical/neural fusion diagnostics exist for this
+   * incident (e.g. CLASSICAL_SAFE mode, where the neural pipeline never
+   * ran) -- never a fabricated 0, which would falsely read as "the two
+   * systems perfectly agree" rather than the true "not applicable /
+   * unmeasured" state (UI-11.1 §2). */
+  disagreement: number | null;
   nodes: NetworkNode[];
   links: NetworkLink[];
   candidates: Candidate[];
@@ -149,16 +468,17 @@ export interface IncidentView {
   recommendedSample: {
     nodeId: string;
     informationGain: number;
-    delayMinutes: number;
-    cost: number;
+    /** Null in LIVE mode: SampleRecommendationView carries no delay/cost
+     * fields today. Never a fabricated 0 (ui-work.txt 8.3). */
+    delayMinutes: number | null;
+    cost: number | null;
     rationale: string;
   } | null;
-  evidence: {
-    before: Candidate[];
-    after: Candidate[];
-    uncertaintyReduction: number;
-    nodesRemoved: number;
-  };
+  /** Real observed-evidence rounds, in order. Empty when no sampling has
+   * occurred yet -- never a fabricated before/after probability delta. */
+  evidenceHistory: EvidenceHistoryEntry[];
+  /** See HydraulicSeriesPoint: non-null only for DEMO_FALLBACK/REPLAY. */
+  hydraulicSeries: HydraulicSeriesPoint[] | null;
   plans: Plan[];
   /** Operator-approved plan id, sourced from the audit ledger's
    * PLAN_APPROVED event -- null until a human has actually approved one. */
@@ -168,9 +488,22 @@ export interface IncidentView {
    * verification -- see Plan.status, not this field, for that outcome. */
   recommendedPlanId: string | null;
   /** Simulated outcome of every plan that underwent WNTR/EPANET
-   * verification, keyed by plan id (overnight-plan.txt Task 3.2). */
+   * verification, keyed by plan id (overnight-plan.txt Task 3.2). Equal to
+   * each plan's own verification.consequences -- kept as a separate field
+   * because that is the shape the backend /view response actually returns. */
   counterfactuals: Record<string, ConsequenceView>;
   audit: AuditEvent[];
   benchmarks: Benchmark[];
+  /** All grounded explanations the backend computed for this incident,
+   * one per ExplanationIntent (ui-work.txt 9.5). */
+  explanations: GroundedExplanation[];
+  /** WHY_SOURCE's text, kept as a convenience for the existing Overview
+   * explanation panel -- equivalent to
+   * explanations.find(e => e.intent === 'WHY_SOURCE')?.text. */
   explanation: string;
+  /** Exact-simulation budget/usage counters ("pre-UI-11" fix B). Null only
+   * when genuinely unavailable -- ERROR mode has no incident to report
+   * counters for. DEMO_FALLBACK carries a labeled fixture value like
+   * every other field on that fixture, never a fabricated LIVE value. */
+  simulatorBudget: SimulatorBudget | null;
 }

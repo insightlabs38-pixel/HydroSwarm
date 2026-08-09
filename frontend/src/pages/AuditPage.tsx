@@ -32,10 +32,19 @@ export function AuditPage({ incident }: { incident: IncidentView }) {
             verify the hash chain client-side -- asserting VALID
             unconditionally would be exactly the false-VERIFIED-state
             problem the plan prohibits. */}
-        <button type="button" className="primary-action" disabled title="Export is not yet connected to the live API">
+        <button
+          type="button"
+          className="primary-action"
+          disabled
+          title="Export is not yet connected to the live API"
+        >
           Export incident JSON
         </button>
-        <button type="button" disabled title="Hash-chain verification is not yet connected to the live API">
+        <button
+          type="button"
+          disabled
+          title="Hash-chain verification is not yet connected to the live API"
+        >
           Verify hash chain
         </button>
         <span>Chain status: not independently verified by this console yet</span>

@@ -1,17 +1,20 @@
-import { demoIncident } from './demoFixture';
+import { demoIncident } from '../demoFixture';
+import { normalizeMapCoordinates } from '../geometry';
 import type {
   AuditEvent,
   Candidate,
   ConsequenceView,
+  ExplanationIntent,
+  GroundedExplanation,
   IncidentView,
   NetworkLink,
   NetworkNode,
   Plan,
   PlanStatus,
   SensorState,
-} from './types';
+} from '../types';
+import { request } from './client';
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? '/api';
 const INCIDENT_ID = import.meta.env.VITE_INCIDENT_ID as string | undefined;
 
 /**
@@ -36,7 +39,7 @@ export const FAILURE_INJECTION_CATEGORIES = [
 
 export type FailureInjectionCategory = (typeof FAILURE_INJECTION_CATEGORIES)[number];
 
-const FAILURE_INJECTION_REASONS: Record<FailureInjectionCategory, string> = {
+export const FAILURE_INJECTION_REASONS: Record<FailureInjectionCategory, string> = {
   missing_checkpoint:
     'No trained checkpoint is present at the configured path. Falling back to classical-only mode is not simulated here; this demonstration shows the fail-closed ERROR state instead of a false LIVE result.',
   corrupt_checkpoint_hash:
@@ -65,6 +68,62 @@ function injectedFailure(): FailureInjectionCategory | null {
     : null;
 }
 
+/**
+ * Deterministic DEMO_FALLBACK variants, selected via `?demo=<category>`
+ * (mirrors the existing `?failure=<category>` mechanism for the ERROR
+ * categories above). These exist so UI-11's Playwright suite can exercise
+ * real, non-error governed states -- OOD/suppressed planning and a stale
+ * verification blocking approval -- deterministically, without a live
+ * backend and without altering any scientific/authority semantics: every
+ * field below is a real, already-typed IncidentView field, never a new
+ * fabricated shape, and the base values still come from `demoIncident`.
+ */
+export const DEMO_VARIANT_CATEGORIES = ['ood_suppressed', 'stale_verification'] as const;
+export type DemoVariant = (typeof DEMO_VARIANT_CATEGORIES)[number];
+
+function requestedDemoVariant(): DemoVariant | null {
+  if (typeof window === 'undefined') return null;
+  const requested = new URLSearchParams(window.location.search).get('demo');
+  return (DEMO_VARIANT_CATEGORIES as readonly string[]).includes(requested ?? '')
+    ? (requested as DemoVariant)
+    : null;
+}
+
+function demoFallbackView(variant: DemoVariant | null): IncidentView {
+  if (variant === 'ood_suppressed') {
+    // The incident is outside the model's validated operating range with
+    // invalid calibration: the real, already-wired ModeBanner/WorkflowRail
+    // suppression path (ui-work.txt 7, 13) shows this correctly with no
+    // new UI code -- no plans exist yet because planning is suppressed,
+    // not because none were generated.
+    return {
+      ...demoIncident,
+      ood: 'OUTSIDE_VALIDATED_RANGE',
+      calibrationValid: false,
+      plans: [],
+      selectedPlanId: null,
+      recommendedPlanId: null,
+      approvalPending: false,
+      counterfactuals: {},
+    };
+  }
+  if (variant === 'stale_verification') {
+    // Every plan's verification is marked STALE, as if incident evidence
+    // changed after verification ran -- ApprovalWorkspace's existing
+    // isCurrent = verificationStatus === 'CURRENT' gate (never altered
+    // here) must keep the approval flow from reaching "Current context".
+    return {
+      ...demoIncident,
+      plans: demoIncident.plans.map((plan) =>
+        plan.verification
+          ? { ...plan, verification: { ...plan.verification, verificationStatus: 'STALE' } }
+          : plan,
+      ),
+    };
+  }
+  return { ...demoIncident };
+}
+
 /** Raised when the API is reachable but this specific incident cannot be
  * safely rendered (e.g. a configured incident ID that does not exist). */
 export class IncidentUnavailableError extends Error {
@@ -72,15 +131,6 @@ export class IncidentUnavailableError extends Error {
     super(message);
     this.name = 'IncidentUnavailableError';
   }
-}
-
-async function request<T>(path: string, signal?: AbortSignal): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: { Accept: 'application/json' },
-    signal,
-  });
-  if (!response.ok) throw new Error(`HydroSwarm API ${response.status}: ${response.statusText}`);
-  return (await response.json()) as T;
 }
 
 function eventFromApi(event: Record<string, unknown>): AuditEvent {
@@ -104,6 +154,7 @@ interface ApiIncidentView {
   runtime_mode: 'FULL_HYBRID' | 'CLASSICAL_SAFE';
   data_mode: 'LIVE';
   controller_state: 'DETECTED' | 'ANALYZING' | 'SAMPLING' | 'PLANNING' | 'APPROVAL' | 'CLOSED';
+  generated_at: string;
   provenance: {
     network_hash: string;
     feature_schema_hash: string;
@@ -149,38 +200,78 @@ interface ApiIncidentView {
     expected_information_gain: number;
     alternatives: string[];
   } | null;
+  evidence_history: {
+    round_index: number;
+    observation_count: number;
+    valid_concentration_count: number;
+    sensor_nodes: string[];
+    evidence_hash: string;
+  }[];
   plans: {
     plan: {
       plan_id: string;
       name: string;
-      actions: { action_type: string; target_id: string | null }[];
+      actions: {
+        action_type: string;
+        target_id: string | null;
+        start_minute: number;
+        duration_minutes: number;
+        flow_rate_lps: number | null;
+      }[];
     };
     verification: {
       decision: 'VERIFIED' | 'REJECTED' | 'ABSTAINED' | 'PENDING_APPROVAL';
+      simulator: string;
+      simulator_version: string;
+      state_hash: string;
+      consequences: ApiConsequenceMetrics | null;
+      worst_case_consequences: ApiConsequenceMetrics | null;
+      evaluation_provenance: Record<string, unknown> | null;
       rejection_codes: string[];
       abstention_reason: string | null;
+      verified_at: string;
+      context_hash: string | null;
+      verification_status: 'CURRENT' | 'STALE';
     } | null;
   }[];
   selected_plan_id: string | null;
   recommended_plan_id: string | null;
-  counterfactual_consequences: Record<
-    string,
-    {
-      population_impacted: number;
-      contaminant_mass_consumed_mg: number;
-      volume_above_threshold_l: number;
-      contaminated_pipe_extent_m: number;
-      minimum_pressure_m: number;
-      pressure_violation_minutes: number;
-      unserved_demand_l: number;
-      service_availability: number;
-      operation_count: number;
-      containment_time_minutes: number | null;
-    }
-  >;
-  explanations: { intent: string; text: string }[];
+  counterfactual_consequences: Record<string, ApiConsequenceMetrics>;
+  explanations: {
+    intent: string;
+    text: string;
+    facts: Record<string, unknown>;
+    limitations: string[];
+  }[];
   audit_events: Record<string, unknown>[];
   runtime_metrics_ms: Record<string, number>;
+  simulator_budget: {
+    exact_simulations_used: number;
+    plans_exactly_verified: number;
+    exact_simulation_cache_hits: number;
+    remaining_epanet_budget: number;
+  };
+}
+
+/** Mirrors hydroswarm.domain.schemas.ConsequenceMetrics field-for-field.
+ * Shared by both counterfactual_consequences and plans[].verification,
+ * since the backend populates the former directly from the latter's
+ * `consequences` (overnight-plan.txt Task 3.2). */
+interface ApiConsequenceMetrics {
+  population_impacted: number;
+  contaminant_mass_consumed_mg: number;
+  volume_above_threshold_l: number;
+  contaminated_pipe_extent_m: number;
+  minimum_pressure_m: number;
+  pressure_violation_minutes: number;
+  unserved_demand_l: number;
+  service_availability: number;
+  operation_count: number;
+  containment_time_minutes: number | null;
+  exposure_evaluated: boolean;
+  pressure_margin_m: number | null;
+  service_availability_margin: number | null;
+  numerically_sensitive: boolean;
 }
 
 function planStatusFromApi(
@@ -193,9 +284,7 @@ function planStatusFromApi(
   return planId === recommendedPlanId ? 'RECOMMENDED' : 'VALID';
 }
 
-function consequenceFromApi(
-  raw: ApiIncidentView['counterfactual_consequences'][string],
-): ConsequenceView {
+function consequenceFromApi(raw: ApiConsequenceMetrics): ConsequenceView {
   return {
     populationImpacted: raw.population_impacted,
     contaminantMassConsumedMg: raw.contaminant_mass_consumed_mg,
@@ -207,6 +296,10 @@ function consequenceFromApi(
     serviceAvailability: raw.service_availability,
     operationCount: raw.operation_count,
     containmentTimeMinutes: raw.containment_time_minutes,
+    exposureEvaluated: raw.exposure_evaluated,
+    pressureMarginM: raw.pressure_margin_m,
+    serviceAvailabilityMargin: raw.service_availability_margin,
+    numericallySensitive: raw.numerically_sensitive,
   };
 }
 
@@ -216,7 +309,11 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
   const sensorByNode = new Map(raw.sensor_health.map((entry) => [entry.node_id, entry]));
   const nowMs = Date.now();
 
-  const nodes: NetworkNode[] = raw.nodes.map((node) => {
+  // Normalized together, across the whole network, so real relative
+  // shape/angles are preserved -- see geometry.ts.
+  const normalizedCoordinates = normalizeMapCoordinates(raw.nodes.map((node) => node.coordinates));
+
+  const nodes: NetworkNode[] = raw.nodes.map((node, index) => {
     const sensor = sensorByNode.get(node.node_id);
     const sensorState: SensorState | undefined = sensor
       ? {
@@ -224,17 +321,17 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
           health: sensor.health,
           quality: sensor.quality,
           ageMinutes: Math.max(0, (nowMs - new Date(sensor.observed_at).getTime()) / 60_000),
-          pressure: sensor.pressure_m ?? 0,
-          concentration: sensor.concentration_mg_l ?? 0,
+          pressure: sensor.pressure_m,
+          concentration: sensor.concentration_mg_l,
         }
       : undefined;
     return {
       id: node.node_id,
       // EPANET networks only ever have these three node types.
       kind: node.node_type as NetworkNode['kind'],
-      coordinates: node.coordinates,
+      coordinates: normalizedCoordinates[index],
       probability: node.probability,
-      concentration: node.concentration_mg_l ?? 0,
+      concentration: node.concentration_mg_l,
       candidate: node.candidate,
       sensor: sensorState,
     };
@@ -246,9 +343,11 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     target: link.end_node,
     // Per-link flow is not yet threaded through IncidentAnalysisResult
     // (HydraulicSimulator computes it, but it isn't carried onto the
-    // result today); 0 is an honest "not measured", not a fabricated flow.
-    flow: 0,
-    concentration: 0,
+    // result today); null is honest "not measured" (ui-work.txt 8.1),
+    // never a fabricated 0 that a map layer could draw as if measured.
+    flow: null,
+    // NetworkLinkView carries no per-link concentration field today.
+    concentration: null,
   }));
 
   const candidates: Candidate[] = raw.candidates.node_ids
@@ -258,23 +357,39 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
   const plans: Plan[] = raw.plans.map(({ plan, verification }) => ({
     id: plan.plan_id,
     name: plan.name,
+    actions: plan.actions.map((action) => ({
+      actionType: action.action_type,
+      targetId: action.target_id,
+      startMinute: action.start_minute,
+      durationMinutes: action.duration_minutes,
+      flowRateLps: action.flow_rate_lps,
+    })),
+    status: planStatusFromApi(plan.plan_id, verification, raw.recommended_plan_id),
+    verification: verification
+      ? {
+          decision: verification.decision,
+          simulator: verification.simulator,
+          simulatorVersion: verification.simulator_version,
+          stateHash: verification.state_hash,
+          consequences: verification.consequences
+            ? consequenceFromApi(verification.consequences)
+            : null,
+          worstCaseConsequences: verification.worst_case_consequences
+            ? consequenceFromApi(verification.worst_case_consequences)
+            : null,
+          evaluationProvenance: verification.evaluation_provenance,
+          rejectionCodes: [...verification.rejection_codes],
+          abstentionReason: verification.abstention_reason,
+          verifiedAt: verification.verified_at,
+          contextHash: verification.context_hash,
+          verificationStatus: verification.verification_status,
+        }
+      : null,
     // Not yet computed server-side against a no-response baseline (see
     // hydroswarm.explanation.EvidenceBundle.exposure_reduction_mg, also
-    // always None today) -- 0 here means "not measured", not "no benefit".
-    exposureReduction: 0,
-    pressureViolations:
-      raw.counterfactual_consequences[plan.plan_id]?.pressure_violation_minutes ?? 0,
-    serviceAvailability: raw.counterfactual_consequences[plan.plan_id]?.service_availability ?? 0,
-    actions: plan.actions.length,
-    containmentMinutes:
-      raw.counterfactual_consequences[plan.plan_id]?.containment_time_minutes ?? 0,
-    status: planStatusFromApi(plan.plan_id, verification, raw.recommended_plan_id),
-    rejectionReason:
-      verification?.decision === 'REJECTED'
-        ? verification.rejection_codes.join(', ') || 'rejected by exact simulation'
-        : verification?.decision === 'ABSTAINED'
-          ? (verification.abstention_reason ?? undefined)
-          : undefined,
+    // always None today) -- null means "not measured", not "no benefit"
+    // (ui-work.txt 8.2: render "-- / Not evaluated").
+    exposureReduction: null,
   }));
 
   const sample = raw.sample_recommendation;
@@ -287,13 +402,21 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     ? {
         nodeId: sample.node_id,
         informationGain: sample.expected_information_gain,
-        delayMinutes: 0,
-        cost: 0,
+        // SampleRecommendationView carries no delay/cost fields today --
+        // null, never a fabricated 0 (ui-work.txt 8.3).
+        delayMinutes: null,
+        cost: null,
         rationale: `Expected information gain ${sample.expected_information_gain.toFixed(2)} bits; alternatives: ${sample.alternatives.join(', ') || 'none'}.`,
       }
     : null;
 
-  const whySource = raw.explanations.find((item) => item.intent === 'WHY_SOURCE');
+  const explanations: GroundedExplanation[] = raw.explanations.map((item) => ({
+    intent: item.intent as ExplanationIntent,
+    text: item.text,
+    facts: item.facts,
+    limitations: [...item.limitations],
+  }));
+  const whySource = explanations.find((item) => item.intent === 'WHY_SOURCE');
 
   return {
     id: raw.incident_id,
@@ -303,6 +426,8 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     offline: true,
     runtimeMs: Object.values(raw.runtime_metrics_ms).reduce((total, value) => total + value, 0),
     modelVersion: raw.provenance.model_version,
+    generatedAt: raw.generated_at,
+    runtimeAnalysisMode: raw.runtime_mode,
     provenance: {
       networkHash: raw.provenance.network_hash,
       featureSchemaHash: raw.provenance.feature_schema_hash,
@@ -317,17 +442,21 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     candidateCoverage: raw.candidates.coverage_target,
     calibrationValid: raw.candidates.calibrated,
     measuredCoverage: raw.candidates.measured_coverage ?? undefined,
-    disagreement: raw.disagreement_js ?? 0,
+    disagreement: raw.disagreement_js,
     nodes,
     links,
     candidates,
     recommendedSample,
-    evidence: {
-      before: [],
-      after: candidates,
-      uncertaintyReduction: 0,
-      nodesRemoved: 0,
-    },
+    evidenceHistory: raw.evidence_history.map((entry) => ({
+      roundIndex: entry.round_index,
+      observationCount: entry.observation_count,
+      validConcentrationCount: entry.valid_concentration_count,
+      sensorNodes: [...entry.sensor_nodes],
+      evidenceHash: entry.evidence_hash,
+    })),
+    // No backend endpoint exposes a live per-incident hydraulic time
+    // series yet -- null here, never a fabricated series (ui-work.txt 8.5).
+    hydraulicSeries: null,
     plans,
     selectedPlanId: raw.selected_plan_id,
     recommendedPlanId: raw.recommended_plan_id,
@@ -343,7 +472,14 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
     // IncidentView at all) -- genuinely out of scope for Task 3.2's field
     // list. An empty array is the honest "not available live" state.
     benchmarks: [],
+    explanations,
     explanation: whySource?.text ?? '',
+    simulatorBudget: {
+      exactSimulationsUsed: raw.simulator_budget.exact_simulations_used,
+      plansExactlyVerified: raw.simulator_budget.plans_exactly_verified,
+      exactSimulationCacheHits: raw.simulator_budget.exact_simulation_cache_hits,
+      remainingEpanetBudget: raw.simulator_budget.remaining_epanet_budget,
+    },
   };
 }
 
@@ -385,6 +521,8 @@ function errorIncidentView(reason: string): IncidentView {
     offline: true,
     runtimeMs: 0,
     modelVersion: '',
+    generatedAt: null,
+    runtimeAnalysisMode: null,
     provenance: {
       networkHash: '',
       featureSchemaHash: '',
@@ -398,19 +536,22 @@ function errorIncidentView(reason: string): IncidentView {
     approvalPending: false,
     candidateCoverage: 0,
     calibrationValid: false,
-    disagreement: 0,
+    disagreement: null,
     nodes: [],
     links: [],
     candidates: [],
     recommendedSample: null,
-    evidence: { before: [], after: [], uncertaintyReduction: 0, nodesRemoved: 0 },
+    evidenceHistory: [],
+    hydraulicSeries: null,
     plans: [],
     selectedPlanId: null,
     recommendedPlanId: null,
     counterfactuals: {},
     audit: [],
     benchmarks: [],
+    explanations: [],
     explanation: '',
+    simulatorBudget: null,
   };
 }
 
@@ -432,6 +573,8 @@ export async function fetchIncidentWithFallback(signal?: AbortSignal): Promise<I
     // rather than a blank screen. This mirrors the plan's product
     // requirement that HydroSwarm remain usable offline; it must never be
     // confused with LIVE, and demoIncident.mode is already DEMO_FALLBACK.
-    return { ...demoIncident };
+    // `?demo=<category>` optionally swaps in a governed non-error variant
+    // (see demoFallbackView above) for deterministic E2E coverage.
+    return demoFallbackView(requestedDemoVariant());
   }
 }

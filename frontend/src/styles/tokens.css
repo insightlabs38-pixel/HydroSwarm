@@ -1,0 +1,48 @@
+/**
+ * HydroSwarm mission-control design tokens (ui-work.txt 7).
+ *
+ * These are the authoritative token names for all new shell/workspace
+ * work. `styles.css` still defines legacy aliases (--ink, --muted,
+ * --panel-2, --line) mapped onto these tokens so pre-existing component
+ * CSS keeps working unchanged until each page is migrated in its own
+ * phase (UI-2..UI-9) -- this file does not itself remove anything.
+ */
+:root {
+  --bg-root: #07151d;
+  --bg-workspace: #091922;
+  --panel: #0c202a;
+  --panel-raised: #102832;
+  --panel-hover: #15313c;
+
+  --border: #1d3a46;
+  --border-strong: #31545f;
+
+  --text-primary: #d8e7eb;
+  --text-secondary: #a9bec6;
+  --text-muted: #8da9b4;
+  --text-disabled: #607985;
+
+  --cyan: #6bd6dd;
+  --amber: #f4b45f;
+  --red: #f16c62;
+  --lime: #cadd73;
+  --green: #b6df83;
+
+  --font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  /* Shell geometry (ui-work.txt 5) */
+  --shell-header-h: 52px;
+  --shell-toolbar-h: 38px;
+  --shell-rail-w: 216px;
+  --shell-rail-w-collapsed: 52px;
+  --shell-inspector-w: 360px;
+  --shell-inspector-w-min: 320px;
+  --shell-dock-h-default: 240px;
+  --shell-dock-h-min: 160px;
+  --shell-dock-h-max: 45vh;
+  --shell-gap: 8px;
+  --shell-panel-padding: 11px;
+  --shell-panel-radius: 5px;
+}

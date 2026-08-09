@@ -2,18 +2,28 @@
 checkpoint directory (core-issues3.txt Phase 15).
 
 This is deliberately separate from `DefaultPipelineFactory`
-(`hydroswarm.runtime.defaults`), which still serves the currently promoted
-`models/hydrocore-s-learning-v1.safetensors` checkpoint and MUST NOT be
-touched by this pre-architecture-freeze pass (restriction: do not overwrite
-`data/learning-v1`/current checkpoints/historical results). No v4
-architecture has passed Phase 19 selection or the locked test yet, so
-nothing in this module is wired into the live production entry point --
-it exists so the granular output-governance machinery
-(`hydroswarm.training.output_governance`/`checkpoint_identity`) has a real,
-testable runtime consumer ahead of that selection, per Phase 15's own
+(`hydroswarm.runtime.defaults`), which still serves the legacy, no-longer-
+default `models/hydrocore-s-learning-v1.safetensors` checkpoint and MUST
+NOT be touched by this pre-architecture-freeze pass (restriction: do not
+overwrite `data/learning-v1`/current checkpoints/historical results). This
+module originally existed so the granular output-governance machinery
+(`hydroswarm.training.output_governance`/`checkpoint_identity`) had a real,
+testable runtime consumer ahead of Phase 19 selection, per Phase 15's own
 "update the runtime loader to reconstruct architecture v4 from checkpoint
 metadata" and "replace broad trained_tasks behavior with granular output
 gating" requirements.
+
+As of UI-11.1 §1, `V4PipelineFactory` is what the live production entry
+point actually uses: `hydroswarm.api.app`'s module-level `app` and
+`hydroswarm.cli.run_self_test` both compose it against the frozen
+candidate's release bundle (`models/hydrocore-v4-release/`, an exact copy
+of the frozen `hydrocore-v4` identity recorded in
+`reports/results/v4/architecture-freeze.json`), replacing the previous
+`DefaultPipelineFactory` default. This is still distinct from "passing the
+locked test": the architecture freeze is a candidate selection, not the
+separate, still-not-yet-authorized locked evaluation
+(`architecture-freeze.json`'s `locked_test_opened`/
+`locked_evaluation_status` remain `false`/"NOT PERFORMED").
 
 Fails closed (`fallback_reason` set, `trained_assets_ready=False`,
 `self.identity`/`self.model` stay `None`) on: missing checkpoint directory,
@@ -134,6 +144,15 @@ class V4PipelineFactory:
     def identity(self) -> CheckpointIdentity | None:
         self._load_assets()
         return self._identity
+
+    @property
+    def model_hash(self) -> str | None:
+        """The loaded model weights' real SHA-256, for provenance reporting
+        (e.g. cli.py's self-test, so it can confirm it is looking at the
+        same checkpoint the production app actually serves) -- None until
+        assets have loaded successfully."""
+        self._load_assets()
+        return self._model_hash
 
     @property
     def trained_assets_ready(self) -> bool:

@@ -1,26 +1,41 @@
 import { lazy, Suspense } from 'react';
 import type { IncidentView } from '../types';
-import { Counterfactuals } from '../components/Counterfactuals';
-import { EvidencePanel } from '../components/EvidencePanel';
 import { Panel } from '../components/Panel';
-import { PlanTable } from '../components/PlanTable';
 import { StatusBadge } from '../components/StatusBadge';
-import { Timeline } from '../components/Timeline';
+import { EmptyState } from '../components/common/EmptyState';
+import { useConsoleStore } from '../store';
+import { deriveWorkflowProgression } from '../workflow';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
 );
-const HydraulicChart = lazy(() =>
-  import('../components/HydraulicChart').then((module) => ({ default: module.HydraulicChart })),
-);
 
+/**
+ * ui-work.txt "UI-10.5" 3: the Incident workspace is a concise mission
+ * overview, not the old "everything dashboard" embedded inside the new
+ * shell. It answers "what incident, what state, where's the suspected
+ * problem, what's next, is anything blocked, is approval pending" via a
+ * compact strip + a dominant map + three small at-a-glance panels that
+ * link to their dedicated workspace rather than repeating its full
+ * content. The full plan comparison table, the counterfactual comparator,
+ * the long explanation section, and the per-sensor health list all moved
+ * to (or already existed in) their dedicated workspaces -- see
+ * ResponseWorkspace (plan table, counterfactuals), SourceWorkspace
+ * (ranked candidates, grounded explanation), SamplingWorkspace (evidence
+ * certificate), and the map itself / TechnicalDock > Evidence (per-sensor
+ * health, already color/shape-coded on the map per ui-work.txt 11).
+ */
 export function Overview({ incident }: { incident: IncidentView }) {
-  const leading = incident.candidates[0];
-  const sensors = incident.nodes.flatMap((node) =>
-    node.sensor ? [{ ...node.sensor, nodeId: node.id }] : [],
-  );
+  const { setWorkspace } = useConsoleStore();
+  const leading = incident.candidates[0] ?? null;
   const pendingPlan = incident.plans.find((plan) => plan.status === 'RECOMMENDED');
-  const rejectedPlan = incident.plans.find((plan) => plan.status === 'REJECTED');
+  const activePlan =
+    incident.plans.find((plan) => plan.id === incident.selectedPlanId) ??
+    incident.plans.find((plan) => plan.id === incident.recommendedPlanId) ??
+    incident.plans[0] ??
+    null;
+  const { nextStep } = deriveWorkflowProgression(incident);
+
   return (
     <div className="overview-grid">
       <section className="decision-banner" aria-labelledby="incident-heading">
@@ -32,13 +47,21 @@ export function Overview({ incident }: { incident: IncidentView }) {
               : incident.status}
           </h1>
           <p>
-            Leading source region <strong>{leading.nodeId}</strong> · candidate set size{' '}
-            <strong>{incident.candidates.length}</strong> · conformal target{' '}
-            {Math.round(incident.candidateCoverage * 100)}%
-            {incident.calibrationValid ? '' : ' (calibration invalid for this network)'}
-            {typeof incident.measuredCoverage === 'number' && (
-              <> · held-out measured coverage {Math.round(incident.measuredCoverage * 100)}%</>
+            {leading ? (
+              <>
+                Leading source region <strong>{leading.nodeId}</strong> · candidate set size{' '}
+                <strong>{incident.candidates.length}</strong> · conformal target{' '}
+                {Math.round(incident.candidateCoverage * 100)}%
+                {incident.calibrationValid ? '' : ' (calibration invalid for this network)'}
+                {typeof incident.measuredCoverage === 'number' && (
+                  <> · held-out measured coverage {Math.round(incident.measuredCoverage * 100)}%</>
+                )}
+              </>
+            ) : (
+              'No source candidates for this incident.'
             )}
+            {' · next: '}
+            <strong>{nextStep}</strong>
           </p>
         </div>
         <div className="decision-badges">
@@ -48,6 +71,9 @@ export function Overview({ incident }: { incident: IncidentView }) {
           >
             OOD {incident.ood}
           </StatusBadge>
+          <StatusBadge tone={incident.calibrationValid ? 'good' : 'warn'}>
+            CALIBRATION {incident.calibrationValid ? 'VALID' : 'INVALID'}
+          </StatusBadge>
           <StatusBadge tone={incident.approvalPending ? 'warn' : 'good'}>
             {incident.approvalPending ? 'HUMAN APPROVAL PENDING' : 'NO APPROVAL PENDING'}
           </StatusBadge>
@@ -55,8 +81,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
             <button
               type="button"
               className="primary-action"
-              disabled
-              title="Plan approval is not yet connected to the live API"
+              onClick={() => setWorkspace('approval')}
             >
               Review {pendingPlan.name} approval
             </button>
@@ -64,7 +89,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
         </div>
       </section>
 
-      <Panel title="Live network" eyebrow="2D HYDRAULIC STATE" className="map-panel">
+      <Panel title="Live network" eyebrow="2D HYDRAULIC STATE" className="map-panel wide-panel">
         <Suspense
           fallback={
             <div className="visual-loading" role="status">
@@ -75,140 +100,78 @@ export function Overview({ incident }: { incident: IncidentView }) {
           <OperationalMap incident={incident} />
         </Suspense>
       </Panel>
-      <aside className="right-rail" aria-label="Incident evidence and actions">
-        <Panel title="Source candidates" eyebrow="SENTINEL">
-          <div className="candidate-hero">
-            <strong>{leading.nodeId}</strong>
-            <span>{Math.round(leading.probability * 100)}%</span>
-          </div>
-          {incident.candidates.slice(1).map((candidate) => (
-            <div className="compact-row" key={candidate.nodeId}>
-              <span>{candidate.nodeId}</span>
-              <strong>{Math.round(candidate.probability * 100)}%</strong>
-            </div>
-          ))}
-          <p className="supporting">
-            Classical ↔ neural disagreement: {(incident.disagreement * 100).toFixed(1)}% · low
-          </p>
-        </Panel>
-        {incident.recommendedSample ? (
-          <Panel
-            title={`Collect sample at ${incident.recommendedSample.nodeId}`}
-            eyebrow="RECOMMENDED NEXT ACTION"
-          >
-            <div className="sample-metrics">
-              <span>
-                <strong>{incident.recommendedSample.informationGain.toFixed(2)}</strong>{' '}
-                information gain
-              </span>
-              <span>
-                <strong>{incident.recommendedSample.delayMinutes}m</strong> delay
-              </span>
-              <span>
-                <strong>{incident.recommendedSample.cost.toFixed(1)}</strong> cost
-              </span>
-            </div>
-            <p>{incident.recommendedSample.rationale}</p>
-            <button
-              type="button"
-              className="primary-action"
-              disabled
-              title="Sample-request review is not yet connected to the live API"
-            >
-              Review sample request
-            </button>
-          </Panel>
-        ) : (
-          <Panel title="No further sampling recommended" eyebrow="RECOMMENDED NEXT ACTION">
-            <p className="supporting">
-              The sampling budget is exhausted, or active sampling found no further useful
-              measurement for this incident.
-            </p>
-          </Panel>
-        )}
-        <Panel title="Sensor health" eyebrow="DATA QUALITY">
-          {sensors.map((sensor) => (
-            <div className="sensor-row" key={sensor.id}>
-              <div>
-                <strong>
-                  {sensor.id} · {sensor.nodeId}
-                </strong>
-                <small>
-                  {sensor.ageMinutes} min old · quality {Math.round(sensor.quality * 100)}%
-                </small>
+
+      <div className="incident-summary-row wide-panel">
+        <Panel title="Source" eyebrow="SENTINEL">
+          {leading ? (
+            <>
+              <div className="candidate-hero">
+                <strong>{leading.nodeId}</strong>
+                <span>{Math.round(leading.probability * 100)}%</span>
               </div>
-              <StatusBadge tone={sensor.health === 'HEALTHY' ? 'good' : 'warn'}>
-                {sensor.health}
-              </StatusBadge>
-            </div>
-          ))}
-        </Panel>
-      </aside>
-      <Panel
-        title="Sensor and hydraulic profile"
-        eyebrow="OBSERVED EVIDENCE"
-        className="hydraulic-panel"
-      >
-        <Suspense
-          fallback={
-            <div className="chart visual-loading" role="status">
-              Loading hydraulic chart…
-            </div>
-          }
-        >
-          <HydraulicChart />
-        </Suspense>
-      </Panel>
-      <Panel title="Incident replay" eyebrow="AUDITABLE SEQUENCE" className="timeline-panel">
-        <Timeline events={incident.audit} />
-      </Panel>
-      <Panel
-        title="What changed after the sample?"
-        eyebrow="EVIDENCE CONTRACTION"
-        className="wide-panel"
-      >
-        <EvidencePanel incident={incident} />
-      </Panel>
-      <Panel
-        title="Counterfactual consequence branches"
-        eyebrow="SYNCHRONIZED AT 08:40"
-        className="wide-panel"
-      >
-        <Counterfactuals plans={incident.plans} />
-      </Panel>
-      <Panel title="Verified plan comparison" eyebrow="WNTR CONSEQUENCES" className="wide-panel">
-        <PlanTable plans={incident.plans} />
-      </Panel>
-      <Panel
-        title={pendingPlan ? `Why ${pendingPlan.name}?` : 'Verified explanation'}
-        eyebrow="VERIFIED EXPLANATION"
-        className="wide-panel explanation-panel"
-      >
-        <p>{incident.explanation}</p>
-        <div
-          className="explanation-actions"
-          role="group"
-          aria-label="Available explanation questions"
-        >
-          {/* Not yet wired to the explanation API (overnight-plan.txt Task
-              3.4): disabled with an explicit reason rather than appearing
-              functional while doing nothing on click. */}
-          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
-            Why this source?
-          </button>
-          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
-            Why this sample?
-          </button>
-          {rejectedPlan && (
-            <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
-              Why was {rejectedPlan.name} rejected?
-            </button>
+              <p className="supporting">
+                {incident.candidates.length} candidate(s) · disagreement{' '}
+                {typeof incident.disagreement === 'number'
+                  ? `${(incident.disagreement * 100).toFixed(1)}%`
+                  : 'not measured'}
+              </p>
+            </>
+          ) : (
+            <EmptyState title="No source candidates for this incident." />
           )}
-          <button type="button" disabled title="Explanation Q&A is not yet connected to the live API">
-            What uncertainty remains?
+          <button type="button" className="panel-nav-link" onClick={() => setWorkspace('source')}>
+            Open Source workspace →
           </button>
-        </div>
-      </Panel>
+        </Panel>
+
+        <Panel title="Evidence / sampling" eyebrow="SCOUT">
+          {incident.recommendedSample ? (
+            <>
+              <div className="candidate-hero">
+                <strong>{incident.recommendedSample.nodeId}</strong>
+                <span>{incident.recommendedSample.informationGain.toFixed(2)} bits</span>
+              </div>
+              <p className="supporting">{incident.recommendedSample.rationale}</p>
+            </>
+          ) : (
+            <EmptyState
+              title="No further sampling recommended."
+              detail="Sampling budget exhausted, or active sampling found no further useful measurement."
+            />
+          )}
+          <button type="button" className="panel-nav-link" onClick={() => setWorkspace('sampling')}>
+            Open Sampling workspace →
+          </button>
+        </Panel>
+
+        <Panel title="Response" eyebrow="STRATEGIST">
+          {activePlan ? (
+            <>
+              <p className="supporting">
+                {activePlan.id} · {activePlan.name}
+              </p>
+              <StatusBadge
+                tone={
+                  activePlan.verification
+                    ? activePlan.verification.decision === 'VERIFIED'
+                      ? 'good'
+                      : activePlan.verification.decision === 'REJECTED'
+                        ? 'danger'
+                        : 'warn'
+                    : 'info'
+                }
+              >
+                {activePlan.verification ? activePlan.verification.decision : activePlan.status}
+              </StatusBadge>
+            </>
+          ) : (
+            <EmptyState title="No response plans available for this incident." />
+          )}
+          <button type="button" className="panel-nav-link" onClick={() => setWorkspace('response')}>
+            Open Response workspace →
+          </button>
+        </Panel>
+      </div>
     </div>
   );
 }

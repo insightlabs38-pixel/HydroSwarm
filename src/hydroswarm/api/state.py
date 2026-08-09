@@ -218,6 +218,22 @@ class ProvenanceView(ApiModel):
     simulator_version: str | None = None
 
 
+class SimulatorBudgetView(ApiModel):
+    """Exact-simulation budget/usage counters, mirrored unmodified from
+    ``IncidentState`` (core-issues5.txt Section 8) -- no recomputation and
+    no altered budget semantics here. ``/replay`` already exposes these
+    four counters by embedding the full ``IncidentState``; this surfaces
+    the same values through the normal live ``/view`` response so the
+    operator console does not need a replay round-trip just to show the
+    exact-simulation budget for an incident it is actively viewing.
+    """
+
+    exact_simulations_used: int = Field(ge=0)
+    plans_exactly_verified: int = Field(ge=0)
+    exact_simulation_cache_hits: int = Field(ge=0)
+    remaining_epanet_budget: int = Field(ge=0)
+
+
 class IncidentView(ApiModel):
     """A complete, versioned, live-only snapshot of one incident (overnight-plan.txt
     Task 3.2). Every field here is sourced from live backend state produced by
@@ -251,6 +267,7 @@ class IncidentView(ApiModel):
     explanations: tuple[ExplanationPayload, ...]
     audit_events: tuple[AuditEvent, ...]
     runtime_metrics_ms: dict[str, float]
+    simulator_budget: SimulatorBudgetView
 
 
 Verifier = Callable[[OperationalPlan, IncidentState], PlanVerification]

@@ -5,7 +5,15 @@ import { ModelGovernanceTable } from '../src/components/ModelGovernanceTable';
 const SAMPLE_DOCUMENT = {
   schemaVersion: 'hydroswarm-model-governance-v1',
   models: [
-    { id: 'classical', name: 'Classical', parameters: null, top1: 0.915, ece: null, latencyMs: null, decision: 'fallback' },
+    {
+      id: 'classical',
+      name: 'Classical',
+      parameters: null,
+      top1: 0.915,
+      ece: null,
+      latencyMs: null,
+      decision: 'fallback',
+    },
     {
       id: 'hydrocore-s-hybrid',
       name: 'HydroCore-S hybrid',

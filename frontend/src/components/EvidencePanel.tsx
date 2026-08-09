@@ -1,46 +1,66 @@
 import type { IncidentView } from '../types';
 
-function CandidateBars({ title, values }: { title: string; values: IncidentView['candidates'] }) {
-  return (
-    <div className="evidence-column">
-      <h3>{title}</h3>
-      {values.map((candidate) => (
-        <div className="probability-row" key={candidate.nodeId}>
-          <span>{candidate.nodeId}</span>
-          <div className="probability-track">
-            <i style={{ width: `${candidate.probability * 100}%` }} />
-          </div>
-          <strong>{Math.round(candidate.probability * 100)}%</strong>
-        </div>
-      ))}
-    </div>
-  );
+function shortHash(hash: string): string {
+  return hash.length > 12 ? `${hash.slice(0, 8)}…` : hash;
 }
 
+/**
+ * Renders real observed-evidence rounds and the current calibrated
+ * candidate set. Previously this rendered a "before/after" candidate
+ * probability comparison seeded from an always-empty `before` array and a
+ * hard-coded-zero uncertainty-reduction metric -- fabricated-looking
+ * content built from real (but absent) data. ui-work.txt 8.4: "Do not
+ * render fake before/after candidate probabilities from empty arrays. Use
+ * actual evidence history / posterior history. If only counts/hashes are
+ * available, show those."
+ */
 export function EvidencePanel({ incident }: { incident: IncidentView }) {
-  const sampleNodeId = incident.recommendedSample?.nodeId ?? 'the recommended location';
   return (
     <div>
-      <div className="evidence-grid">
-        <CandidateBars title={`Before ${sampleNodeId}`} values={incident.evidence.before} />
-        <div className="evidence-arrow" aria-hidden="true">
-          →
-        </div>
-        <CandidateBars title={`After ${sampleNodeId}`} values={incident.evidence.after} />
+      <div className="table-scroll">
+        <table className="benchmark-table">
+          <caption>Observed evidence rounds</caption>
+          <thead>
+            <tr>
+              <th scope="col">Round</th>
+              <th scope="col">Observations</th>
+              <th scope="col">Valid concentration readings</th>
+              <th scope="col">Sensor nodes</th>
+              <th scope="col">Evidence hash</th>
+            </tr>
+          </thead>
+          <tbody>
+            {incident.evidenceHistory.length === 0 ? (
+              <tr>
+                <td colSpan={5}>No sampling rounds recorded for this incident yet.</td>
+              </tr>
+            ) : (
+              incident.evidenceHistory.map((round) => (
+                <tr key={round.roundIndex}>
+                  <td>{round.roundIndex}</td>
+                  <td>{round.observationCount}</td>
+                  <td>{round.validConcentrationCount}</td>
+                  <td>{round.sensorNodes.join(', ') || '—'}</td>
+                  <td>
+                    <code title={round.evidenceHash}>{shortHash(round.evidenceHash)}</code>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
-      <div className="metric-strip" aria-label="Evidence change summary">
-        <span>
-          <strong>{Math.round(incident.evidence.uncertaintyReduction * 100)}%</strong> uncertainty
-          reduction
-        </span>
-        <span>
-          <strong>{incident.evidence.nodesRemoved}</strong> candidate nodes removed
-        </span>
-        {incident.recommendedSample && (
-          <span>
-            <strong>{incident.recommendedSample.delayMinutes} min</strong> sample delay
-          </span>
-        )}
+      <div className="evidence-column">
+        <h3>Current calibrated candidate set</h3>
+        {incident.candidates.map((candidate) => (
+          <div className="probability-row" key={candidate.nodeId}>
+            <span>{candidate.nodeId}</span>
+            <div className="probability-track">
+              <i style={{ width: `${candidate.probability * 100}%` }} />
+            </div>
+            <strong>{Math.round(candidate.probability * 100)}%</strong>
+          </div>
+        ))}
       </div>
     </div>
   );

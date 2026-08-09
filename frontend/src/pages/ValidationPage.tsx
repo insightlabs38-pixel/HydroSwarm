@@ -79,9 +79,9 @@ export function ValidationPage({ incident }: { incident: IncidentView }) {
           <ul className="warning-list">
             <li>Single-species simulated incidents only</li>
             <li>
-              Unseen-topology transfer is measured but weak (a genuinely different network
-              correctly triggers CAUTION and suppresses planning rather than demonstrating
-              strong transfer accuracy)
+              Unseen-topology transfer is measured but weak (a genuinely different network correctly
+              triggers CAUTION and suppresses planning rather than demonstrating strong transfer
+              accuracy)
             </li>
             <li>Frozen proof uses one compact reference network</li>
             <li>No autonomous actuator control</li>

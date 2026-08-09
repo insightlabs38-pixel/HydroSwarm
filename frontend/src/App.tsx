@@ -1,28 +1,48 @@
 import { lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchIncidentWithFallback } from './api';
-import { useConsoleStore, type Page } from './store';
-import { StatusBadge } from './components/StatusBadge';
-import type { RuntimeMode } from './types';
-
-function modeTone(mode: RuntimeMode): 'good' | 'warn' | 'danger' | 'info' {
-  switch (mode) {
-    case 'LIVE':
-      return 'good';
-    case 'REPLAY':
-      return 'info';
-    case 'DEMO_FALLBACK':
-      return 'warn';
-    case 'ERROR':
-      return 'danger';
-  }
-}
+import { fetchIncidentWithFallback } from './api/incident';
+import { useConsoleStore, WORKSPACE_LABELS } from './store';
+import { MissionHeader } from './shell/MissionHeader';
+import { ModeBanner } from './shell/ModeBanner';
+import { WorkflowRail } from './shell/WorkflowRail';
+import { WorkspaceToolbar } from './shell/WorkspaceToolbar';
+import { DecisionInspector } from './shell/DecisionInspector';
+import { TechnicalDock } from './shell/TechnicalDock';
+import { EmptyState } from './components/common/EmptyState';
 
 const Overview = lazy(() =>
   import('./pages/Overview').then((module) => ({ default: module.Overview })),
 );
-const AuditPage = lazy(() =>
-  import('./pages/AuditPage').then((module) => ({ default: module.AuditPage })),
+const SourceWorkspace = lazy(() =>
+  import('./workspaces/SourceWorkspace').then((module) => ({ default: module.SourceWorkspace })),
+);
+const SamplingWorkspace = lazy(() =>
+  import('./workspaces/SamplingWorkspace').then((module) => ({
+    default: module.SamplingWorkspace,
+  })),
+);
+const ResponseWorkspace = lazy(() =>
+  import('./workspaces/ResponseWorkspace').then((module) => ({
+    default: module.ResponseWorkspace,
+  })),
+);
+const ApprovalWorkspace = lazy(() =>
+  import('./workspaces/ApprovalWorkspace').then((module) => ({
+    default: module.ApprovalWorkspace,
+  })),
+);
+const ReplayWorkspace = lazy(() =>
+  import('./workspaces/ReplayWorkspace').then((module) => ({ default: module.ReplayWorkspace })),
+);
+const NetworkWorkspace = lazy(() =>
+  import('./workspaces/NetworkWorkspace').then((module) => ({
+    default: module.NetworkWorkspace,
+  })),
+);
+const AuthorityWorkspace = lazy(() =>
+  import('./workspaces/AuthorityWorkspace').then((module) => ({
+    default: module.AuthorityWorkspace,
+  })),
 );
 const ValidationPage = lazy(() =>
   import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
@@ -30,20 +50,11 @@ const ValidationPage = lazy(() =>
 const BenchmarkPage = lazy(() =>
   import('./pages/BenchmarkPage').then((module) => ({ default: module.BenchmarkPage })),
 );
-const TopologyPage = lazy(() =>
-  import('./pages/TopologyPage').then((module) => ({ default: module.TopologyPage })),
-);
 
-const pages: { id: Page; label: string }[] = [
-  { id: 'overview', label: 'Incident' },
-  { id: 'audit', label: 'Audit' },
-  { id: 'validation', label: 'Validation' },
-  { id: 'benchmarks', label: 'Benchmarks' },
-  { id: 'topology', label: 'Topology' },
-];
+const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {};
 
 export default function App() {
-  const { page, setPage, reducedMotion, toggleReducedMotion } = useConsoleStore();
+  const { workspace, reducedMotion, toggleReducedMotion } = useConsoleStore();
   const query = useQuery({
     queryKey: ['active-incident'],
     queryFn: ({ signal }) => fetchIncidentWithFallback(signal),
@@ -56,70 +67,72 @@ export default function App() {
       </main>
     );
   const incident = query.data;
+
+  let workspaceBody;
+  if (workspace === 'incident') {
+    workspaceBody = <Overview incident={incident} />;
+  } else if (workspace === 'source') {
+    workspaceBody = <SourceWorkspace incident={incident} />;
+  } else if (workspace === 'sampling') {
+    workspaceBody = <SamplingWorkspace incident={incident} />;
+  } else if (workspace === 'response') {
+    workspaceBody = <ResponseWorkspace incident={incident} />;
+  } else if (workspace === 'approval') {
+    workspaceBody = <ApprovalWorkspace incident={incident} />;
+  } else if (workspace === 'replay') {
+    workspaceBody = <ReplayWorkspace incident={incident} />;
+  } else if (workspace === 'network') {
+    workspaceBody = <NetworkWorkspace />;
+  } else if (workspace === 'authority') {
+    workspaceBody = <AuthorityWorkspace incident={incident} />;
+  } else if (workspace === 'validation') {
+    workspaceBody = <ValidationPage incident={incident} />;
+  } else if (workspace === 'benchmarks') {
+    workspaceBody = <BenchmarkPage incident={incident} />;
+  } else {
+    workspaceBody = (
+      <div className="workspace-placeholder">
+        <EmptyState
+          title={`${WORKSPACE_LABELS[workspace]} has not been implemented in the mission-control shell yet.`}
+          detail={NOT_YET_MIGRATED_DETAIL[workspace]}
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className={reducedMotion ? 'app reduced-motion' : 'app'}>
-      <header className="app-header">
-        <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            H
-          </span>
-          <div>
-            <strong>HydroSwarm</strong>
-            <small>Offline Neuro-Hydraulic Incident Intelligence</small>
-          </div>
+    <div className={reducedMotion ? 'mission-shell reduced-motion' : 'mission-shell'}>
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
+      <MissionHeader incident={incident} />
+      <ModeBanner
+        incident={incident}
+        onRetry={incident.mode === 'ERROR' ? () => query.refetch() : undefined}
+      />
+      <div className="mission-shell-body">
+        <WorkflowRail incident={incident} />
+        <div className="mission-shell-main">
+          <WorkspaceToolbar />
+          <main id="main-content" className="workspace-content" tabIndex={-1}>
+            <Suspense
+              fallback={
+                <div className="page-loading" role="status">
+                  Loading local console view…
+                </div>
+              }
+            >
+              {workspaceBody}
+            </Suspense>
+          </main>
         </div>
-        <div className="header-context">
-          <span>
-            Incident <strong>{incident.id}</strong>
-          </span>
-          <span>{incident.networkId}</span>
-          <span>{incident.modelVersion}</span>
-        </div>
-        <div className="header-status">
-          <StatusBadge tone="good">OFFLINE · LOCAL</StatusBadge>
-          <StatusBadge tone={modeTone(incident.mode)}>
-            <span aria-label={`Data mode ${incident.mode}`}>{incident.mode}</span>
-          </StatusBadge>
-          <span
-            className="runtime"
-            aria-label={`Inference runtime ${incident.runtimeMs} milliseconds`}
-          >
-            {incident.runtimeMs} ms
-          </span>
-        </div>
-      </header>
-      {incident.mode === 'DEMO_FALLBACK' && (
-        <div className="fallback-banner" role="status">
-          <strong>DETERMINISTIC DEMO FALLBACK</strong>
-          <span>{incident.modeReason}</span>
-        </div>
-      )}
-      {incident.mode === 'REPLAY' && (
-        <div className="fallback-banner" role="status">
-          <strong>REPLAY</strong>
-          <span>{incident.modeReason ?? 'Showing a selected stored trajectory, not live telemetry.'}</span>
-        </div>
-      )}
-      {incident.mode === 'ERROR' && (
-        <div className="error-banner" role="alert">
-          <strong>INCIDENT UNAVAILABLE</strong>
-          <span>{incident.modeReason ?? 'The configured incident could not be loaded.'}</span>
-          <button type="button" onClick={() => query.refetch()}>
-            Retry
-          </button>
-        </div>
-      )}
-      <nav className="app-nav" aria-label="Operator console pages">
-        {pages.map((item) => (
-          <button
-            type="button"
-            key={item.id}
-            onClick={() => setPage(item.id)}
-            aria-current={page === item.id ? 'page' : undefined}
-          >
-            {item.label}
-          </button>
-        ))}
+        <DecisionInspector incident={incident} />
+      </div>
+      <TechnicalDock incident={incident} />
+      <footer className="mission-footer">
+        <span>Decision support only · No autonomous control</span>
+        <span>Exact verifier: WNTR / EPANET</span>
+        <span>Operator approval required</span>
         <button
           type="button"
           className="motion-toggle"
@@ -128,26 +141,6 @@ export default function App() {
         >
           Reduced motion {reducedMotion ? 'on' : 'off'}
         </button>
-      </nav>
-      <main id="main-content">
-        <Suspense
-          fallback={
-            <div className="page-loading" role="status">
-              Loading local console view…
-            </div>
-          }
-        >
-          {page === 'overview' && <Overview incident={incident} />}
-          {page === 'audit' && <AuditPage incident={incident} />}
-          {page === 'validation' && <ValidationPage incident={incident} />}
-          {page === 'benchmarks' && <BenchmarkPage incident={incident} />}
-          {page === 'topology' && <TopologyPage incident={incident} />}
-        </Suspense>
-      </main>
-      <footer>
-        <span>Decision support only · No autonomous control</span>
-        <span>Exact verifier: WNTR / EPANET</span>
-        <span>Operator approval required</span>
       </footer>
     </div>
   );
