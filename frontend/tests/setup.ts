@@ -57,7 +57,7 @@ vi.mock('maplibre-gl', () => {
 
 vi.mock('echarts/core', () => ({
   use: vi.fn(),
-  init: () => ({ setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), on: vi.fn() }),
+  init: vi.fn(() => ({ setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), on: vi.fn() })),
 }));
 vi.mock('echarts/charts', () => ({ LineChart: {}, BarChart: {}, ScatterChart: {} }));
 vi.mock('echarts/components', () => ({

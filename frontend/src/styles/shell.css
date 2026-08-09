@@ -15,6 +15,7 @@
 }
 
 .mission-shell-body {
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -92,8 +93,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  max-width: 55vw;
+  overflow-x: auto;
+  scrollbar-width: none;
   font-size: 11px;
+}
+.mission-header-status::-webkit-scrollbar {
+  display: none;
 }
 
 /* ---------- Mode banner ---------- */
@@ -549,16 +556,13 @@
   color: var(--text-muted);
 }
 
-/* ---------- Responsive (baseline; hardened further in UI-10) ---------- */
+/* ---------- Responsive (ui-work.txt 25) ---------- */
 
+/* 1100-1439px: rail starts collapsed (icon-only); inspector narrows to
+   ~320px; the plan table's redundant "Actions" count column (the full
+   action list already has its own dedicated view) is dropped rather
+   than any safety-relevant column. */
 @media (max-width: 1439px) {
-  .decision-inspector {
-    flex-basis: 320px;
-    width: 320px;
-  }
-}
-
-@media (max-width: 1099px) {
   .workflow-rail {
     flex-basis: var(--shell-rail-w-collapsed);
     width: var(--shell-rail-w-collapsed);
@@ -567,11 +571,39 @@
     display: none;
   }
   .decision-inspector {
-    flex-basis: 280px;
-    width: 280px;
+    flex-basis: 320px;
+    width: 320px;
+  }
+  .plan-table .col-actions {
+    display: none;
   }
 }
 
+/* 768-1099px: rail stays collapsed; the inspector becomes an overlay
+   drawer (absolutely positioned within the already-`position: relative`
+   .mission-shell-body, so it floats over the map/workspace instead of
+   squeezing it) rather than a permanently docked narrow column; the
+   technical dock is already a tabbed, collapsible bottom panel outside
+   this row (see .mission-shell layout in App.tsx), so it already behaves
+   as the required "tabbed bottom drawer" with no extra rule needed. */
+@media (max-width: 1099px) {
+  .decision-inspector {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    flex-basis: auto;
+    width: min(320px, 85vw);
+    z-index: 20;
+    box-shadow: -12px 0 28px rgba(0, 0, 0, 0.45);
+  }
+}
+
+/* <768px: limited/stacked mode (ui-work.txt 25 explicitly allows this) --
+   rail becomes a horizontal strip, inspector returns to normal document
+   flow stacked below the map/workspace instead of floating as a drawer
+   (a fixed overlay is unnecessary once everything is already vertically
+   stacked and scrollable). */
 @media (max-width: 767px) {
   .mission-shell-body {
     flex-direction: column;
@@ -590,8 +622,10 @@
     display: none;
   }
   .decision-inspector {
+    position: static;
     flex-basis: auto;
     width: 100%;
+    box-shadow: none;
     border-left: none;
     border-top: 1px solid var(--border);
   }

@@ -4,6 +4,7 @@ import { ScatterChart } from 'echarts/charts';
 import { GridComponent, TooltipComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import type { ParetoFrontierEntry } from '../../types';
+import { useConsoleStore } from '../../store';
 import { EmptyState } from '../common/EmptyState';
 
 echarts.use([ScatterChart, GridComponent, TooltipComponent, CanvasRenderer]);
@@ -26,12 +27,14 @@ function ExposureAwareFrontier({
   onSelectPlan: (planId: string) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { reducedMotion } = useConsoleStore();
 
   useEffect(() => {
     if (!ref.current || entries.length === 0) return;
     const chart = echarts.init(ref.current, undefined, { renderer: 'canvas' });
     chart.setOption({
       backgroundColor: 'transparent',
+      animation: !reducedMotion,
       textStyle: { color: '#b8ccd4' },
       tooltip: {
         trigger: 'item',
@@ -83,7 +86,7 @@ function ExposureAwareFrontier({
       observer.disconnect();
       chart.dispose();
     };
-  }, [entries, selectedPlanId, onSelectPlan]);
+  }, [entries, selectedPlanId, onSelectPlan, reducedMotion]);
 
   return (
     <>

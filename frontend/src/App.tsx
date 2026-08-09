@@ -114,7 +114,7 @@ export default function App() {
         <WorkflowRail incident={incident} />
         <div className="mission-shell-main">
           <WorkspaceToolbar />
-          <main id="main-content" className="workspace-content">
+          <main id="main-content" className="workspace-content" tabIndex={-1}>
             <Suspense
               fallback={
                 <div className="page-loading" role="status">

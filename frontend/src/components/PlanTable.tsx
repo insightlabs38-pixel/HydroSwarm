@@ -25,7 +25,9 @@ export function PlanTable({ plans }: { plans: Plan[] }) {
             <th scope="col">Exposure reduction</th>
             <th scope="col">Pressure violations</th>
             <th scope="col">Service availability</th>
-            <th scope="col">Actions</th>
+            <th scope="col" className="col-actions">
+              Actions
+            </th>
             <th scope="col">Status</th>
           </tr>
         </thead>
@@ -61,7 +63,7 @@ export function PlanTable({ plans }: { plans: Plan[] }) {
                     ? '—'
                     : `${(consequences.serviceAvailability * 100).toFixed(1)}%`}
                 </td>
-                <td>{plan.actions.length}</td>
+                <td className="col-actions">{plan.actions.length}</td>
                 <td>
                   <StatusBadge tone={tone[plan.status]}>{plan.status}</StatusBadge>
                   {rejectionText(plan) && <small>{rejectionText(plan)}</small>}

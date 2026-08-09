@@ -163,6 +163,21 @@ test('technical dock audit tab shows real audit events, and reduced-motion toggl
   );
 });
 
+// jsdom does not implement a real browser's native behavior of moving
+// keyboard focus to a URL fragment's target on navigation, so this can
+// only assert the fix's precondition here (a real browser only shifts
+// focus to a skip-link target if it's programmatically focusable);
+// the actual focus-after-activation behavior was confirmed with a real
+// Playwright/Chromium run during UI-10 verification.
+test('skip link target is focusable so a real browser moves keyboard focus there, not just scroll position', async () => {
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  const skipLink = screen.getByRole('link', { name: 'Skip to main content' });
+  expect(skipLink).toHaveAttribute('href', '#main-content');
+  const target = document.getElementById('main-content');
+  expect(target).toHaveAttribute('tabindex', '-1');
+});
+
 test('overview has no automated accessibility violations', async () => {
   const { container } = renderApp();
   await screen.findByText('Verified response awaiting approval');

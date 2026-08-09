@@ -4,6 +4,7 @@ import { BarChart, LineChart } from 'echarts/charts';
 import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import type { IncidentView } from '../types';
+import { useConsoleStore } from '../store';
 
 echarts.use([
   LineChart,
@@ -19,6 +20,7 @@ echarts.use([
  * exist, an honest current-value snapshot instead of an invented series. */
 export function HydraulicChart({ incident }: { incident: IncidentView }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { reducedMotion } = useConsoleStore();
   const series = incident.hydraulicSeries;
   const sensors = incident.nodes.flatMap((node) =>
     node.sensor ? [{ node, sensor: node.sensor }] : [],
@@ -30,6 +32,7 @@ export function HydraulicChart({ incident }: { incident: IncidentView }) {
     if (series && series.length > 0) {
       chart.setOption({
         backgroundColor: 'transparent',
+        animation: !reducedMotion,
         textStyle: { color: '#b8ccd4' },
         tooltip: { trigger: 'axis' },
         legend: {
@@ -67,6 +70,7 @@ export function HydraulicChart({ incident }: { incident: IncidentView }) {
     } else if (sensors.length > 0) {
       chart.setOption({
         backgroundColor: 'transparent',
+        animation: !reducedMotion,
         textStyle: { color: '#b8ccd4' },
         tooltip: { trigger: 'axis' },
         legend: {
@@ -106,7 +110,7 @@ export function HydraulicChart({ incident }: { incident: IncidentView }) {
       observer.disconnect();
       chart.dispose();
     };
-  }, [series, sensors]);
+  }, [series, sensors, reducedMotion]);
 
   if (!series && sensors.length === 0) {
     return (
