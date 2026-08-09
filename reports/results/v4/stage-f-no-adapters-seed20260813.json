@@ -1,0 +1,64 @@
+{
+  "arms": [
+    "no_adapters"
+  ],
+  "corpus": "data/learning-v2/cycle-b2-joint-v4",
+  "results": {
+    "no_adapters-seed20260813": {
+      "arm": "no_adapters",
+      "best_validation_loss": 5.434922960069445,
+      "checkpoint": "experiments/runs/stage-f/no_adapters-seed20260813/20260808T234644Z-7d902580/model-export.safetensors",
+      "checkpoint_sha256": "e63c836a35982647abc244fc1e25395fb1daa57ed3bce97864889272fa890ea1",
+      "development_holdout": {
+        "examples": 1750,
+        "mean_loss": 8.902053986896169,
+        "per_task_mean_loss": {
+          "containment_time_proxy": 0.048191116908459335,
+          "duration": 0.7908683449029923,
+          "event_cause": 0.8967060841619968,
+          "event_presence": 0.3050408484752883,
+          "evidence_sufficiency": 4.185743160681291,
+          "exposure_proxy": 0.10254652273460206,
+          "plan_regret_proxy": 0.012868731820807708,
+          "plan_validity": 0.023754790578492578,
+          "plan_value": 0.004466367651846006,
+          "pressure_risk_proxy": 5.5141519727509476e-06,
+          "relative_strength": 0.6081769327548417,
+          "sensor_fault": 3.2957357519659456e-05,
+          "service_loss_proxy": 4.323956227381132e-06,
+          "source_node": 0.7376511629108625,
+          "source_region": 0.3706523809074001,
+          "start_time": 0.8153447023846886
+        }
+      },
+      "epochs_completed": 16,
+      "model_hash": "d825400bd85f056eafc9ddcc57f2c71d37794242237da835a58fd1c83050a468",
+      "run_id": "20260808T234644Z-94471243",
+      "seed": 20260813,
+      "stop_reason": "maximum_epochs",
+      "stopped_early": false,
+      "use_adapters": false,
+      "wall_seconds": 2852.2697855860024
+    }
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260813
+  ],
+  "shared_model_config": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned"
+  },
+  "training_budget": {
+    "batch_size": 16,
+    "early_stopping_patience": 3,
+    "max_epochs": 16,
+    "maximum_runtime_seconds": 7200.0
+  },
+  "wall_seconds": 2852.2741198079893
+}

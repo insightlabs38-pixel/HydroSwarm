@@ -4779,3 +4779,43 @@ reproduction commands for the gitignored `experiments/runs/` artifacts).
 does not exist. The locked final test has not been opened. Per this pass's
 explicit instructions: stopping here, at the authorized pre-test
 architecture-freeze boundary, with every mandatory gate green.
+
+## Post-freeze evidence-cleanup pass (final pre-freeze cleanup, this session)
+
+Started from HEAD `0136de0` (wording-correction commit, itself on top of
+Section 19-21's `b1f9387`). Scope: final pre-freeze evidence cleanup
+only -- no architecture change, no locked-test access, no
+`final-selection.json`.
+
+1. **Stage-F third-seed repeatability check (seed 20260813, `no_adapters`)**
+   -- ran to completion (16/16 epochs, no early stop, no NaNs, 2852.3s),
+   identical corpus/config/protocol to seeds 20260810/20260811. Reasonably
+   consistent with both prior seeds on every headline and per-task metric
+   (largest substantive per-task spread ~4-8% on already-small values,
+   no outlier task, no runtime/RSS anomaly). Per the governing instruction,
+   this is a stability check only -- **seed 20260810 remains the selected
+   checkpoint**; no calibration re-fit, no release-bundle rebuild (nothing
+   downstream of checkpoint selection changed). See
+   `reports/results/v4/stage-f-no-adapters-seed20260813-repeatability.md`.
+
+2. **Strategist wording correction**
+   (`reports/results/v4/pretest-architecture-selection.{md,json}`) -- the
+   prior text claimed the two corrected Strategist seeds "do not agree
+   closely enough to promote," which contradicted
+   `strategist-second-seed-promotion-decision.md`'s own analysis (every
+   metric agrees within ~2-3% relative; gate 7's repeatability requirement
+   is satisfied). Corrected: the seeds agree closely; `do_not_promote` is
+   because `learned_prescreen` does not beat `deterministic_heuristic`
+   ordering at the same 3-call exact-simulator budget, not a
+   seed-disagreement failure.
+
+3. **OOD provenance wording correction** (same two files) -- `ood_category`
+   was described as "trained (architecturally present)" while the adjacent
+   sentence in the same row said it received zero real training gradient.
+   Reworded to "present, untrained this run" and moved out of the JSON's
+   `not_promoted_outputs` list (which otherwise only contains genuinely
+   trained-but-gated heads) into a new `present_but_untrained_outputs`
+   field. No runtime behavior changed.
+
+4. Git SHA pin and final integrity regression: recorded below once
+   complete.

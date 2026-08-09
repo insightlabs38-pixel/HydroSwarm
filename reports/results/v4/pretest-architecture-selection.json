@@ -5,6 +5,14 @@
   "selected_variant": "small",
   "use_adapters": false,
   "strategist_mode": "candidate_conditioned",
+  "stage_f_third_seed_repeatability_check": {
+    "seed": 20260813,
+    "purpose": "stability/repeatability check only, not a checkpoint-selection sweep",
+    "result": "reasonably consistent with seeds 20260810/20260811 on every headline and per-task metric; no NaNs; no runtime/RSS anomaly",
+    "selected_checkpoint_changed": false,
+    "report": "reports/results/v4/stage-f-no-adapters-seed20260813-repeatability.md",
+    "raw_results": "reports/results/v4/stage-f-no-adapters-seed20260813.json"
+  },
   "checkpoint_identity_dir": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810",
   "checkpoint_identity_fingerprint": "a94069adba25230f58f24f57901b855fab3a702aabd5e30cf0bc105e002e90a1",
   "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",

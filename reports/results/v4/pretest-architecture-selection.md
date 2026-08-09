@@ -20,6 +20,15 @@ winner (`experiments/registry/stage-f.jsonl`; direction-consistent across
 2 seeds on both validation loss and development-holdout loss, per
 `reports/results/v4/stage-f-adapters-comparison.json`).
 
+A third `no_adapters` seed (`20260813`) was run post-freeze as a pure
+stability/repeatability check (not a selection sweep) — see
+`reports/results/v4/stage-f-no-adapters-seed20260813-repeatability.md`.
+It is reasonably consistent with seeds `20260810`/`20260811` on every
+headline and per-task metric (no NaNs, no runtime/RSS anomaly, no
+outlier task). **Seed 20260810 remains the selected checkpoint** — this
+check did not replace it, and no calibration/release-bundle rebuild was
+triggered since the selected checkpoint did not change.
+
 ## Adapter decision
 
 **No adapters** (`use_adapters=false`). Stage F's real 4-run comparison
