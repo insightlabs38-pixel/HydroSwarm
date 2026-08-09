@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "status": "FROZEN",
+  "declaration": "reports/results/v4/architecture-freeze-declaration.md",
+  "branch": "agent/gcp-multitopology-v3",
+  "frozen_git_commit": "e598a4e5b2f3c01259118f1186c369ee0360ca6a",
+  "frozen_git_commit_short": "e598a4e",
+  "freeze_commit_note": "This manifest's own commit necessarily post-dates frozen_git_commit by one commit (the commit that adds this file), matching this project's established convention (pretest-architecture-selection.json's head_commit fields) of recording the state as of the last substantive change rather than a self-referential hash.",
+  "candidate": {
+    "architecture_version": "hydrocore-v4",
+    "variant": "small",
+    "variant_label": "HydroCore-S",
+    "use_adapters": false,
+    "d_model": 192,
+    "nhead": 6,
+    "num_layers": 4,
+    "dim_feedforward": 576,
+    "latent_tokens": 64,
+    "incident_pooling": "mean",
+    "message_direction": "forward_only",
+    "normalization_layer": "rmsnorm",
+    "activation": "silu",
+    "dropout": 0.1,
+    "prior_mode": "feature_only",
+    "strategist_mode": "candidate_conditioned",
+    "event_control_heads": true,
+    "scout_control_heads": true,
+    "consequence_prescreening_heads": true,
+    "ood_category_head": true,
+    "auxiliary_heads": false,
+    "action_vocabulary_size": 9,
+    "action_template_names": [
+      "NO_ACTION",
+      "ISOLATE_SOURCE",
+      "FLUSH_DOWNSTREAM",
+      "ISOLATE_AND_FLUSH",
+      "PROTECT_CRITICAL",
+      "INCREASE_MONITORING",
+      "REQUEST_SAMPLE",
+      "WAIT_OBSERVE",
+      "ALTERNATE_VALVE_CUT"
+    ],
+    "seed": 20260810
+  },
+  "selected_checkpoint": {
+    "checkpoint_identity_dir": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810",
+    "checkpoint_identity_fingerprint": "a94069adba25230f58f24f57901b855fab3a702aabd5e30cf0bc105e002e90a1",
+    "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+    "source_stage_f_run": "experiments/runs/stage-f/no_adapters-seed20260810/20260808T041727Z-de5f4b0e",
+    "note": "experiments/runs/ is gitignored/ephemeral per this project's established convention (hydroswarm_checkpoint_persistence memory record); reproduce via scripts/build_phase15_v4_checkpoint.py per the exact reproduction commands in pretest-architecture-selection.md"
+  },
+  "schema_hashes": {
+    "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "feature_schema_version": "hydroswarm-features-v2",
+    "target_schema_hash": "2f00d174369d48e09c413c76da0c97fddf78630e8e1260d16cf07c43b9034cb1",
+    "target_schema_version": "targets_v2",
+    "action_template_schema_hash": "3a447a74bd2254c109364fcf5434b06bd49ba9d7ed537dac91098b1e4e98116d",
+    "ood_category_schema_hash": "b0be7c960784dce70c00bc3ffc8f0560da01ac9f8463e7485e775d03fb7ed4f4",
+    "next_step_schema_hash": "d808002c32920183bd33980a012c45e16e499dcf18d4ae13066c8bc809fcb682"
+  },
+  "normalization": {
+    "normalization_hash": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+    "node_normalization_sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
+    "edge_normalization_sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
+    "source": "data/learning-v2/cycle-b2/normalization (train-split-fit, committed, not \"none\")"
+  },
+  "fusion_and_signature_policy": {
+    "fusion_policy_hash": "fuse_source_probabilities-v1",
+    "fusion_policy_name": "DYNAMIC_TRUST_FUSION_CONFIG (real dynamic-trust fusion, not a fixed-weight approximation)",
+    "signature_policy_version": "hydroswarm-signature-policy-v1",
+    "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811",
+    "signature_artifact_policy_version": "topology-wide-v1",
+    "modes": ["GOVERNED_KNOWN_NETWORK (3 known topologies)", "RUNTIME_GENERATED_IMPORTED_NETWORK (clearly labeled, never conflated)"]
+  },
+  "calibration": {
+    "artifact_path": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810/calibration.json",
+    "artifact_hash": "829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa",
+    "status": "FITTED",
+    "alpha": 0.1,
+    "coverage_target": 0.9,
+    "empirical_coverage": 0.9143258426966292,
+    "mean_candidate_set_size": 2.800561797752809,
+    "expected_calibration_error": 0.0878951730544455,
+    "examples_used": 712,
+    "examples_skipped_non_contamination": 288,
+    "validated_topology_hashes": [
+      "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+      "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+      "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88"
+    ],
+    "data_provenance_note": "fit against reconstructed (seeded WNTRScenarioGenerator replay), not disk-verified, scenario data due to a sandbox environment limitation -- see pretest-architecture-selection.md's calibration section for the full honest disclosure; this is real EPANET physics, not fabricated data",
+    "not_recalibrated_this_pass": true
+  },
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "next_step",
+    "relative_strength",
+    "source_node"
+  ],
+  "not_promoted_outputs": [
+    "source_region",
+    "start_time",
+    "duration",
+    "sensor_fault",
+    "sample_node",
+    "information_gain",
+    "candidate_reduction",
+    "should_continue_sampling",
+    "plan_value",
+    "plan_validity",
+    "exposure_proxy",
+    "pressure_risk_proxy",
+    "service_loss_proxy",
+    "containment_time_proxy",
+    "plan_regret_proxy"
+  ],
+  "present_but_untrained_outputs": {
+    "ood_category": "head physically constructed and forward-passes cleanly, but the governed train split has zero ood_class coverage by design; zero real training gradient this run (near-chance macro F1 0.095). Not trained; excluded from every governance set."
+  },
+  "never_trained_outputs": ["sensor_reconstruction", "travel_time", "future_concentration"],
+  "orphaned_outputs": ["action_logits", "action_pointer_logits", "ood_logits", "uncertainty"],
+  "deterministic_authorities": {
+    "source_localization": "classical/neural fusion is CALIBRATED_ADVISORY at best; conformal calibration + deterministic disagreement/OOD gating control whether planning may proceed at all",
+    "sampling": "classical expected-information-gain / fixed-order sampling; learned Scout fully disabled (negative realized entropy reduction vs. random/fixed-order -- a direct measured fail of its own promotion requirement)",
+    "planning": "deterministic bounded candidate generation is authoritative for which candidates exist; learned Strategist prescreen/ordering is disabled (deterministic heuristic ordering is the deployed policy -- see strategist_second_seed below)",
+    "verification": "WNTR/EPANET is the sole authority for VERIFIED; no learned score can mark a plan verified; exact-simulation budgets tracked separately from plan-verification counts; verification context invalidated by evidence/threshold/policy changes",
+    "ood": "deterministic 3-level severity (NORMAL/CAUTION/OUTSIDE_VALIDATED_RANGE) is sole authority; learned ood_category is fully disabled (present-but-untrained, see above)",
+    "approval": "human approval is mandatory for every operational plan; no code path bypasses it"
+  },
+  "strategist_second_seed": {
+    "run": "v4-strategist-heads-v4corpus-corrected-seed2",
+    "seed": 20260812,
+    "seed_agreement": "close (every metric within ~2-3% relative); gate 7's repeatability requirement is satisfied",
+    "decision": "do_not_promote",
+    "decision_reason": "learned_prescreen does not beat deterministic_heuristic ordering at the same 3-call exact-simulator budget -- not a seed-disagreement failure"
+  },
+  "stage_f_no_adapters_3_seed_repeatability": {
+    "selected_seed": 20260810,
+    "seeds_compared": [20260810, 20260811, 20260813],
+    "seed_20260813_purpose": "stability/repeatability check only, not a selection sweep -- run after the candidate was already selected",
+    "best_validation_loss": {"20260810": 5.35117224663023, "20260811": 5.42401319079929, "20260813": 5.434922960069445},
+    "development_holdout_mean_loss": {"20260810": 8.791133440624584, "20260811": 8.873860411210494, "20260813": 8.902053986896169},
+    "wall_seconds": {"20260810": 2812.544256135003, "20260811": 2884.460777774999, "20260813": 2852.2697855860024},
+    "nan_or_non_finite_found": false,
+    "outlier_task_found": false,
+    "result": "reasonably consistent -- seed 20260810 retained as selected checkpoint, no replacement",
+    "report": "reports/results/v4/stage-f-no-adapters-seed20260813-repeatability.md"
+  },
+  "release_bundle": {
+    "dir": "experiments/runs/v4-release-bundle/no_adapters-seed20260810",
+    "not_rebuilt_this_pass": true,
+    "checkpoint_identity_fingerprint": "a94069adba25230f58f24f57901b855fab3a702aabd5e30cf0bc105e002e90a1",
+    "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+    "calibration_status": "FITTED",
+    "internal_source_git_sha_at_build_time": "c5d2dd563746105de05ec355e675e7d38ccefdeb",
+    "internal_source_git_sha_note": "the bundle's own runtime_manifest.json records the commit at which it was built (c5d2dd5, Section 19); it was NOT rebuilt for this freeze declaration, so this value intentionally differs from frozen_git_commit above -- the bundle's content/hashes are the frozen artifact, not its embedded build-time commit label",
+    "load_self_test_result": "passed this session -- calibration_status=FITTED, calibration artifact present, every internal-consistency check the loader performs (SHA256SUMS, artifact-manifest.json, checkpoint_identity.json self-consistency, runtime_manifest.json fingerprint/model-hash match, output_governance.json agreement, normalization-hash reproduction, signature-policy-hash match) passed with no exception"
+  },
+  "final_pre_freeze_gate_results": {
+    "pytest": {"passed": 859, "failed": 0},
+    "ruff": "clean",
+    "pyright": "0 errors, 0 warnings",
+    "train_serve_parity_gate": {"passed": true, "topologies": 3, "conditions": 2},
+    "inference_bundle_load_self_test": "passed",
+    "calibration_identity_validation": "passed (validated as part of load_v4_inference_bundle's own contract)"
+  },
+  "known_deferred_limitations": [
+    "sensor_fault evaluation population is degenerate (zero true negatives) -- learned sensor-fault head remains disabled; deterministic sensor-health logic stays authoritative; needs a data-generation audit, out of scope for this freeze",
+    "model_input_signature_mode (GOVERNED_KNOWN_NETWORK vs. RUNTIME_GENERATED_IMPORTED_NETWORK) is computed at analyze() time but not yet threaded into the Decision Authority certificate's DecisionProvenance",
+    "frontend TypeScript ApiIncidentView type does not yet declare verification_status/context_hash on plans[].verification -- backend correctness does not depend on this, but a frontend pass should close it",
+    "calibration was fit against reconstructed (not disk-verified) scenario data per this sandbox's own environment limitation; re-fitting against disk-verified data in an environment with the raw .npz archives present is a reasonable, low-effort follow-up, not required for correctness",
+    "learned Scout and learned Strategist prescreening remain disabled by measured evidence (not omission); both have a documented one-retrain path (Section 18) that would NOT reopen this frozen architecture, only optionally retrain within it"
+  ],
+  "no_further_architecture_tuning_commitment": "The architecture, selected checkpoint (no_adapters-seed20260810), calibration artifact, output-governance configuration, and V4 inference release bundle described in this manifest are FROZEN as of frozen_git_commit. No further architecture redesign, retraining, recalibration, promotion-decision change, or release-bundle rebuild will occur against this candidate except: (a) a bug fix that provably preserves every frozen contract/hash above, or (b) an explicitly optional, separately authorized one-retrain improvement using an already-scaffolded head/mechanism (OOD category, Scout, PCGrad, class balancing -- Section 18), which would produce a NEW candidate for separate evaluation, not a silent mutation of this one.",
+  "locked_test_opened": false,
+  "final_selection_json_exists": false,
+  "locked_evaluation_status": "NOT PERFORMED -- awaiting separate explicit authorization"
+}

@@ -4845,3 +4845,35 @@ only -- no architecture change, no locked-test access, no
 has not been opened. Per this pass's explicit instructions: stopping
 here. Do not open the locked test and do not create `final-selection.json`
 without a separate explicit instruction.
+
+## Architecture freeze declaration (formal, this session)
+
+**Status: FROZEN**, commit `e598a4e5b2f3c01259118f1186c369ee0360ca6a`
+(`e598a4e`) on `agent/gcp-multitopology-v3`.
+
+Per explicit instruction, formally froze the current validated release
+candidate (`HydroCore-S` / `no_adapters` / `no_adapters`-seed`20260810`,
+its existing fitted calibration artifact, its output-governance
+configuration, and its V4 inference release bundle) as the frozen
+architecture candidate. This was a metadata-recording pass only -- no
+retraining, no recalibration, no architecture/runtime change, no
+promotion-decision change, and no release-bundle rebuild. Wrote:
+
+- `reports/results/v4/architecture-freeze.json` -- machine-readable
+  frozen manifest (architecture/config, selected checkpoint + model
+  SHA-256, calibration artifact/hash, normalization hash, feature-schema
+  hash, fusion/signature-policy identities, runtime-enabled outputs,
+  deterministic authorities/fallbacks, release-bundle identity, exact Git
+  commit, known deferred limitations, 3-seed repeatability evidence,
+  final pre-freeze gate results).
+- `reports/results/v4/architecture-freeze-declaration.md` -- the
+  narrative declaration, including an explicit no-further-
+  architecture-tuning commitment (only bug fixes that preserve every
+  frozen hash/contract, or explicitly optional, separately authorized
+  one-retrain improvements producing a **new** candidate, are permitted
+  going forward).
+
+**The locked final test has not been opened. The one-time locked
+evaluation has not been performed. `final-selection.json` does not
+exist.** The frozen candidate is preserved unchanged for that separately
+authorized step.
