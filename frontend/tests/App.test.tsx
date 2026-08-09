@@ -61,14 +61,26 @@ test('workflow rail navigates to Validation and Benchmarks, and derives stage st
   expect(await screen.findByRole('heading', { name: 'Operational benchmarks' })).toBeVisible();
 });
 
-test('a workspace with no implementation yet shows an honest placeholder, never fabricated content', async () => {
+test('Network workspace honestly reports the network list as unavailable when the backend is unreachable, never a fabricated empty success', async () => {
   const user = userEvent.setup();
   renderApp();
   await screen.findByText('Verified response awaiting approval');
   await user.click(screen.getByRole('button', { name: /^Network/ }));
-  expect(
-    await screen.findByText('Network has not been implemented in the mission-control shell yet.'),
-  ).toBeVisible();
+  expect(await screen.findByRole('heading', { name: 'Import network' })).toBeVisible();
+  expect(await screen.findByText('Networks unavailable.')).toBeVisible();
+});
+
+test('Model & Authority workspace renders the real DEMO_FALLBACK decision certificates as a governance table, including plan-specific certificates', async () => {
+  const user = userEvent.setup();
+  renderApp();
+  await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: /^Model/ }));
+  expect(await screen.findByRole('heading', { name: 'Authority ladder' })).toBeVisible();
+  expect(screen.getByText('Source localization')).toBeVisible();
+  expect(screen.getByText('Sample recommendation')).toBeVisible();
+  expect(screen.getByText('OOD decision')).toBeVisible();
+  expect(screen.getByText('Plan verification: B')).toBeVisible();
+  expect(screen.getAllByText('CALIBRATED ADVISORY').length).toBeGreaterThan(0);
 });
 
 test('Replay workspace renders the real event ledger, disables hash-chain verification in DEMO_FALLBACK, and lists every failure-injection category as a real link', async () => {
@@ -170,6 +182,8 @@ test.each([
   ['Response', 'Action sequence'],
   ['Approval', 'Operator approval'],
   ['Replay', 'Event ledger'],
+  ['Network', 'Import network'],
+  ['Model', 'Authority ladder'],
 ] as const)('%s workspace has no automated accessibility violations', async (rail, heading) => {
   const user = userEvent.setup();
   const { container } = renderApp();

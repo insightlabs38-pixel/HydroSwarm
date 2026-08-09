@@ -4,10 +4,11 @@ import { useConsoleStore } from '../store';
 import { EmptyState } from '../components/common/EmptyState';
 import { StatusBadge } from '../components/StatusBadge';
 
-const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {
-  network: 'UI-9 (utilities) adds network import/validation detail here.',
-  authority: 'UI-9 (utilities) adds the Decision Certificate authority table here.',
-};
+// Defensive fallback only -- every Workspace value is handled explicitly
+// below; this stays empty and exists so an unhandled future workspace
+// value fails honestly (an EmptyState with no detail) instead of
+// crashing on an undefined lookup.
+const NOT_YET_IMPLEMENTED: Partial<Record<string, string>> = {};
 
 /**
  * ui-work.txt 13: "This pane must always answer: What does HydroSwarm
@@ -272,6 +273,21 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
     body = <ApprovalSummary incident={incident} />;
   } else if (workspace === 'replay') {
     body = <ReplaySummary incident={incident} />;
+  } else if (workspace === 'network') {
+    body = (
+      <p className="supporting">
+        Local .inp import and validation only -- no cloud upload. See the Network workspace to
+        import or inspect a network.
+      </p>
+    );
+  } else if (workspace === 'authority') {
+    body = (
+      <p className="supporting">
+        Governance table of which subsystem is authoritative for source localization, sample
+        recommendation, OOD, and plan verification. See the Model &amp; Authority workspace for the
+        full table.
+      </p>
+    );
   } else if (workspace === 'validation') {
     body = (
       <p className="supporting">

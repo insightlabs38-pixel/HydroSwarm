@@ -50,8 +50,12 @@ function deriveStageStatus(
       approval: 'unavailable',
       replay:
         incident.audit.length > 0 ? (isCurrent('replay') ? 'current' : 'waiting') : 'unavailable',
-      network: 'unavailable',
+      // Network import/management does not depend on this incident's
+      // analysis succeeding.
+      network: isCurrent('network') ? 'current' : 'complete',
       validation: isCurrent('validation') ? 'current' : 'complete',
+      // Authority certificates are scoped to this incident's analysis,
+      // which failed -- honestly unavailable rather than an empty table.
       authority: 'unavailable',
       benchmarks: isCurrent('benchmarks') ? 'current' : 'complete',
     };
@@ -88,11 +92,9 @@ function deriveStageStatus(
           : 'waiting'
         : 'blocked',
     replay: isCurrent('replay') ? 'current' : incident.audit.length > 0 ? 'waiting' : 'unavailable',
-    // UI-9 (utilities) has not landed yet -- honestly unavailable rather
-    // than a placeholder page pretending to be a real feature.
-    network: 'unavailable',
+    network: isCurrent('network') ? 'current' : 'complete',
     validation: isCurrent('validation') ? 'current' : 'complete',
-    authority: 'unavailable',
+    authority: isCurrent('authority') ? 'current' : 'complete',
     benchmarks: isCurrent('benchmarks') ? 'current' : 'complete',
   };
 }

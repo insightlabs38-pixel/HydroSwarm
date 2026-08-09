@@ -34,6 +34,16 @@ const ApprovalWorkspace = lazy(() =>
 const ReplayWorkspace = lazy(() =>
   import('./workspaces/ReplayWorkspace').then((module) => ({ default: module.ReplayWorkspace })),
 );
+const NetworkWorkspace = lazy(() =>
+  import('./workspaces/NetworkWorkspace').then((module) => ({
+    default: module.NetworkWorkspace,
+  })),
+);
+const AuthorityWorkspace = lazy(() =>
+  import('./workspaces/AuthorityWorkspace').then((module) => ({
+    default: module.AuthorityWorkspace,
+  })),
+);
 const ValidationPage = lazy(() =>
   import('./pages/ValidationPage').then((module) => ({ default: module.ValidationPage })),
 );
@@ -41,10 +51,7 @@ const BenchmarkPage = lazy(() =>
   import('./pages/BenchmarkPage').then((module) => ({ default: module.BenchmarkPage })),
 );
 
-const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {
-  network: 'Planned for UI-9 (network governance and benchmark utilities).',
-  authority: 'Planned for UI-9 (network governance and benchmark utilities).',
-};
+const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {};
 
 export default function App() {
   const { workspace, reducedMotion, toggleReducedMotion } = useConsoleStore();
@@ -74,6 +81,10 @@ export default function App() {
     workspaceBody = <ApprovalWorkspace incident={incident} />;
   } else if (workspace === 'replay') {
     workspaceBody = <ReplayWorkspace incident={incident} />;
+  } else if (workspace === 'network') {
+    workspaceBody = <NetworkWorkspace />;
+  } else if (workspace === 'authority') {
+    workspaceBody = <AuthorityWorkspace incident={incident} />;
   } else if (workspace === 'validation') {
     workspaceBody = <ValidationPage incident={incident} />;
   } else if (workspace === 'benchmarks') {

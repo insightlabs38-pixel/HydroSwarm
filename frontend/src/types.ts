@@ -168,6 +168,38 @@ export interface ReplayResult {
   chainValid: boolean;
 }
 
+export interface NetworkTopologyNode {
+  nodeId: string;
+  nodeType: string;
+  elevationM: number;
+  coordinates: [number, number];
+}
+
+export interface NetworkTopologyLink {
+  linkId: string;
+  linkType: string;
+  startNode: string;
+  endNode: string;
+}
+
+/** Mirrors hydroswarm.api.state.NetworkRecord field-for-field
+ * (ui-work.txt 17). `nodes`/`links` come from the record's `metadata`
+ * dict (only populated by a real .inp import) -- empty when genuinely
+ * absent, never fabricated. */
+export interface NetworkRecord {
+  networkId: string;
+  name: string;
+  version: number;
+  sha256: string;
+  nodeCount: number;
+  linkCount: number;
+  valid: boolean;
+  validatedAt: string;
+  nodes: NetworkTopologyNode[];
+  links: NetworkTopologyLink[];
+  validationErrors: string[];
+}
+
 /**
  * Explicit runtime data provenance (overnight-plan.txt Task 3.1).
  *
