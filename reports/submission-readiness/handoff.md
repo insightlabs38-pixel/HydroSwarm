@@ -276,6 +276,43 @@ sandbox. SUB-3 (multiarch Docker/release packaging) is next and will include a r
 `docker build`/`docker run` verification this time, not just the static Dockerfile
 assertions SUB-1 was limited to.
 
+### SUB-3 — multiarch Docker/release packaging (commit `c1664b6`) — NOT marked complete
+
+Implemented per submission.txt §18–22: `.github/workflows/release.yml` (tag-triggered
+only; verify-frozen-bundle → buildx amd64+arm64 GHCR push → per-platform
+pull-and-self-test matrix → RELEASE_MANIFEST.json + runtime zip attached to the GitHub
+Release), `docker-compose.release.yml` (pinned GHCR tag, no local build), and two
+generator scripts (`scripts/build_release_manifest.py`,
+`scripts/build_release_bundle.py`) — both real-tested locally against the actual repo
+state, hashes sourced from `models/hydrocore-v4-release/runtime_manifest.json` (never
+hand-typed).
+
+**This session could not execute an actual `docker build`/`docker run` at all**,
+neither amd64 nor arm64 (this host is aarch64, so arm64 would have been native).
+Root-caused, not just observed: this sandbox's own container has `CAP_SYS_ADMIN`
+stripped and blocks `unshare` even for an *unprivileged* user namespace
+(`unshare --user --map-root-user --mount` → `Operation not permitted`, despite
+`/proc/sys/kernel/unprivileged_userns_clone` = `1`) — a seccomp/LSM-level restriction
+on this sandbox, not a fixable Docker/kernel config gap. Full diagnostic trail:
+`reports/submission-readiness/sub3-docker-sandbox-limitation.md`.
+
+**Per this session's explicit gate ("do not mark Docker/release packaging complete
+until a real amd64 build/run and an arm64 build/smoke have executed successfully"),
+SUB-3 is NOT being marked done.** What remains, for whoever picks this up next:
+
+1. Push a `v*` tag (or run `workflow_dispatch`) so `release.yml` runs on a real GitHub
+   Actions runner (has the privileges this sandbox withholds), **or**
+2. On any machine with normal (non-sandboxed) Docker privileges:
+   ```bash
+   docker build -t hydroswarm:smoke .
+   docker run --rm hydroswarm:smoke hydroswarm self-test --human
+   docker buildx build --platform linux/amd64,linux/arm64 -t hydroswarm:multiarch-smoke .
+   ```
+3. Only after (1) or (2) produces a real green result should Docker be described as
+   "Tested"/"Recommended judge path" anywhere in README/docs (SUB-7 onward) — do not
+   let later phases quietly promote Docker to "verified" on the strength of this
+   session's static-only verification.
+
 ## Exact continuation commands
 
 ```bash
@@ -293,22 +330,20 @@ cd frontend && npm run lint && npm run typecheck && npm run format:check && npx 
 # check the post-sync full-suite background run this session started:
 cat reports/submission-readiness/sub2-post-merge-pytest.log
 
-# next phase per submission.txt SS3.4/SS18-23 (task list §SUB-3):
-# SUB-3 -- multiarch Docker/release packaging. docker is now available in this
-# sandbox (29.7.2) -- do a REAL docker build/run for amd64, and a real arm64
-# build+smoke (this host is aarch64, so arm64 is native; amd64 needs
-# buildx+qemu emulation), before marking SUB-3 acceptance criteria met.
+# SUB-3 status: implemented but Docker execution UNVERIFIED -- this sandbox
+# cannot run any container at all (CAP_SYS_ADMIN stripped; see
+# reports/submission-readiness/sub3-docker-sandbox-limitation.md). Verify on
+# a real GitHub Actions runner or unsandboxed machine before treating SUB-3
+# as done -- see the SUB-3 section above for exact commands.
+
+# next phase per submission.txt SS4-14 (task list SUB-4):
+# SUB-4 -- reference-incident artifact schema + scripts/build_reference_demo.py generator
 ```
 
 ## Next phase (not started as of end of 2026-08-10 session)
 
-SUB-3 — multiarch container publishing and release packaging, per
-submission.txt §18–22: release compose (`docker-compose.release.yml`),
-`.github/workflows/release.yml` (buildx amd64+arm64, GHCR publish), runtime
-zip (`HydroSwarm-v0.1.0-hackathon-runtime.zip`), `RELEASE_MANIFEST.json`.
-**Do not mark Docker/release packaging complete until a real amd64
-build/run and a real arm64 build/smoke have both actually executed
-successfully in this sandbox** (docker is installed; SUB-1's Dockerfile
-already has the bundle-copy + build-time self-test gate in place from the
-prior session, so `docker build` should be attempted directly rather than
-re-implemented).
+SUB-4 — governed reference-incident trace format and generator, per
+submission.txt §4–14: `artifacts/reference-demo/reference-incident-v1.json` schema,
+`scripts/build_reference_demo.py`, milestone snapshots with no future-data leakage,
+`artifacts/reference-demo/manifest.json`, validation tests tying the artifact to the
+golden workflow's final event hash.
