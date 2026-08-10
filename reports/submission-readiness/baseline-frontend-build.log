@@ -1,0 +1,28 @@
+
+> hydroswarm-operator-console@0.1.0 build
+> tsc -b && vite build
+
+vite v7.3.6 building client environment for production...
+transforming...
+✓ 717 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                   0.46 kB │ gzip:   0.30 kB
+dist/assets/index-DIufE0r8.css                   93.80 kB │ gzip:  15.62 kB
+dist/assets/Panel-C-od2d36.js                     0.44 kB │ gzip:   0.27 kB
+dist/assets/PlanActionSequence-Crwsu8ib.js        0.84 kB │ gzip:   0.51 kB
+dist/assets/ModelGovernanceTable-1iBQ3fKD.js      1.67 kB │ gzip:   0.75 kB
+dist/assets/BenchmarkPage-DEIUB1lX.js             1.93 kB │ gzip:   0.79 kB
+dist/assets/useMutation-BblCtmug.js               2.20 kB │ gzip:   0.91 kB
+dist/assets/AuthorityWorkspace-DXGO7XUg.js        2.82 kB │ gzip:   1.23 kB
+dist/assets/ValidationPage-BYYI_fdM.js            3.21 kB │ gzip:   1.25 kB
+dist/assets/ReplayWorkspace-DrTMngEe.js           3.30 kB │ gzip:   1.48 kB
+dist/assets/SourceWorkspace-Dw0FotJZ.js           3.42 kB │ gzip:   1.47 kB
+dist/assets/Overview-BKvsOjBY.js                  4.29 kB │ gzip:   1.60 kB
+dist/assets/SamplingWorkspace-CE2RRBoI.js         5.29 kB │ gzip:   1.93 kB
+dist/assets/ApprovalWorkspace-BJU8vp_L.js         5.54 kB │ gzip:   2.21 kB
+dist/assets/ResponseWorkspace-CcZMU9_K.js        17.48 kB │ gzip:   6.13 kB
+dist/assets/NetworkWorkspace-C32sLu5M.js        448.63 kB │ gzip: 143.56 kB
+dist/assets/index-BBX1MIrd.js                   823.18 kB │ gzip: 271.44 kB
+dist/assets/OperationalMap-B5pL3pKw.js        1,064.07 kB │ gzip: 286.77 kB
+✓ built in 7.86s

@@ -1,0 +1,40 @@
+
+ RUN  v3.2.7 /workspace/HydroSwarm/frontend
+
+ ✓ tests/api-replay.test.ts (3 tests) 59ms
+ ✓ tests/api-sampling.test.ts (3 tests) 67ms
+ ✓ tests/api-networks.test.ts (4 tests) 79ms
+ ✓ tests/api-planning.test.ts (4 tests) 76ms
+ ✓ tests/api-authority.test.ts (3 tests) 120ms
+ ✓ tests/api-approval.test.ts (3 tests) 45ms
+ ✓ tests/Counterfactuals.test.tsx (5 tests) 76ms
+ ✓ tests/ModelGovernanceTable.test.tsx (2 tests) 98ms
+ ✓ tests/ReducedMotionCharts.test.tsx (2 tests) 46ms
+ ✓ tests/api-incident.test.ts (27 tests) 374ms
+ ✓ tests/OperationalMap.test.tsx (4 tests) 178ms
+ ✓ tests/workflow.test.ts (9 tests) 4ms
+ ✓ tests/geometry.test.ts (6 tests) 5ms
+ ✓ tests/ApprovalWorkspace.test.tsx (6 tests) 462ms
+ ✓ tests/store.test.ts (3 tests) 4ms
+ ✓ tests/IdentifierIndependence.test.tsx (1 test) 412ms
+   ✓ no hard-coded incident identifiers leak through when the underlying data uses different IDs  411ms
+ ✓ tests/NullVsZeroTruthfulness.test.tsx (3 tests) 560ms
+   ✓ a null disagreement renders "not measured", never a fabricated 0.0%  393ms
+ ✓ tests/App.test.tsx (19 tests) 6861ms
+   ✓ passes the 30-second comprehension test in fallback mode  963ms
+   ✓ workflow rail navigates to Validation and Benchmarks, and derives stage state from real data (no OOD/CAUTION for this fixture)  739ms
+   ✓ Network workspace honestly reports the network list as unavailable when the backend is unreachable, never a fabricated empty success  402ms
+   ✓ Model & Authority workspace renders the real DEMO_FALLBACK decision certificates as a governance table, including plan-specific certificates  407ms
+   ✓ Replay workspace renders the real event ledger, disables hash-chain verification in DEMO_FALLBACK, and lists every failure-injection category as a real link  424ms
+   ✓ Approval workspace never performs a real approval mutation in DEMO_FALLBACK mode  397ms
+   ✓ Sampling workspace renders the real evidence certificate, never an empty card, for the DEMO_FALLBACK fixture  393ms
+   ✓ Source workspace renders real candidate ranking and the DEMO_FALLBACK authority certificate, never a placeholder  393ms
+   ✓ overview has no automated accessibility violations  360ms
+   ✓ Source workspace has no automated accessibility violations  331ms
+   ✓ Response workspace has no automated accessibility violations  414ms
+
+ Test Files  18 passed (18)
+      Tests  107 passed (107)
+   Start at  00:22:45
+   Duration  8.17s (transform 1.32s, setup 1.63s, collect 3.27s, tests 9.53s, environment 7.26s, prepare 1.29s)
+
