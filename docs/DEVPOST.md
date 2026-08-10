@@ -82,8 +82,12 @@ React · TypeScript · Vite · TanStack Query · Zustand · MapLibre GL JS · EC
 Cytoscape · Vitest · Playwright · pytest · Ruff · Pyright · safetensors · Docker Buildx ·
 GitHub Actions
 
-## Links to complete before submission
+## Release and submission links
 
 - Repository: https://github.com/insightlabs38-pixel/HydroSwarm
+- GitHub Release: https://github.com/insightlabs38-pixel/HydroSwarm/releases/tag/v0.1.0-hackathon
+- Runtime ZIP: https://github.com/insightlabs38-pixel/HydroSwarm/releases/download/v0.1.0-hackathon/HydroSwarm-v0.1.0-hackathon-runtime.zip
+- Release manifest: https://github.com/insightlabs38-pixel/HydroSwarm/releases/download/v0.1.0-hackathon/RELEASE_MANIFEST.json
+- Published multiarch image: `ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon`
+- Technical report: https://github.com/insightlabs38-pixel/HydroSwarm/blob/v0.1.0-hackathon/docs/FINAL_SYSTEM.md
 - Demo video: **pending final recording**
-- Technical report: **pending generated release URL**

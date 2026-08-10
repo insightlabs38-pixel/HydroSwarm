@@ -43,8 +43,10 @@
       section). **Not yet visible in a video** -- no video exists yet (see above).
 - [x] A local `v0.1.0-hackathon` runtime ZIP was built, extracted into a clean Linux
       ARM64 directory, and passed setup → strict self-test → loopback launch. It includes
-      checksums, the frozen V4 bundle, built frontend, and reference artifact. This is
-      local release-path evidence only; no tag or GitHub Release has been published.
+      checksums, the frozen V4 bundle, built frontend, and reference artifact. The
+      `v0.1.0-hackathon` GitHub Release now publishes this runtime ZIP and
+      `RELEASE_MANIFEST.json`; its GHCR multiarch image passed strict self-tests for both
+      published architectures.
 - [x] Hardened Docker verification (`--read-only`, non-root, dropped capabilities,
       no-new-privileges, `/data` persistence, `/tmp` tmpfs) passed on hosted native
       AMD64 and ARM64. This is not a Docker Desktop host-integration claim.
@@ -54,5 +56,3 @@
 
 1. Record the demo video, showing the REFERENCE
    INCIDENT as the primary walkthrough.
-2. Cut an actual version tag once ready, and let `.github/workflows/release.yml` produce
-   the real multiarch image, `RELEASE_MANIFEST.json`, and runtime zip.
