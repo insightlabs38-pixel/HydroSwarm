@@ -482,6 +482,47 @@ cd /workspace/HydroSwarm
 gh pr checks 3 --watch --interval 600
 ```
 
+### 2026-08-10 CI stabilization closure — current head `221ba6b`
+
+The stale section above is superseded by this result.  These current-head hosted
+gates all completed successfully:
+
+- [HydroSwarm CI](https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/31434504711):
+  Ubuntu scientific/backend suite, Windows broad suite, Windows real-simulator
+  smoke, Windows strict self-test, frontend quality, and Playwright (functional
+  plus all 15 visual baselines).
+- [Native cross-platform verification](https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/31434504706):
+  Linux x86-64, Linux ARM64, Windows x86-64, macOS ARM64, and macOS Intel
+  (`macos-15`) all passed.
+- [Docker build and runtime gate](https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/31434504717):
+  native Linux AMD64 and native Linux ARM64 builds, hardened boot, health,
+  readiness, frontend, strict frozen identity, explicit real EPANET quality
+  smoke, full LIVE workflow, exact WNTR/EPANET verification, mandatory human
+  approval, restart persistence/re-analysis recovery, and offline workflow all
+  passed.
+
+Root-cause corrections included an import-safe bounded subprocess for the Windows
+self-test; temporary-directory CWD isolation for EPANET; native ARM64 EPANET 2.2
+build from pinned official OWA source commit `4d8d82d`; and a physically coherent
+common LIVE observation timestamp (14,400 seconds).  Docker remains non-root,
+read-only-root compatible, capability-dropped, no-new-privileges, with only `/data`
+and `/tmp` writable.  No frozen V4 model, normalization, calibration, feature schema,
+fusion policy, authority boundary, locked evaluation, or `data/learning-v1` content
+was changed; `final-selection.json` remains absent.
+
+The visual baselines were replaced only after inspection of the actual/expected/diff
+artifacts emitted by the GitHub Linux Chromium job; no visual tolerance was loosened.
+The Docker PR matrix now uses direct native Docker builds on `ubuntu-24.04` and
+`ubuntu-24.04-arm`, without QEMU or a buildx-container bootstrap.
+
+No active job remains.  If a future run must be checked, preserve the required
+ten-minute polling interval:
+
+```bash
+cd /workspace/HydroSwarm
+gh pr checks 3 --watch --interval 600
+```
+
 ### Active local job
 
 The standard backend suite was launched as a resumable background job. Do not poll it
