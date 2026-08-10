@@ -8,26 +8,33 @@ overrides it.
 ## For judges
 
 1. [Top-level README](../README.md) -- 60-second overview, screenshot, try-it.
-2. [Final system](FINAL_SYSTEM.md) -- exact frozen identity, hashes, measured results.
-3. Run the **REFERENCE INCIDENT** from the first-launch screen after `docker compose -f
+2. [Quickstart](QUICKSTART.md) -- the fastest path to a running instance.
+3. [Final system](FINAL_SYSTEM.md) -- exact frozen identity, hashes, measured results.
+4. Run the **REFERENCE INCIDENT** from the first-launch screen after `docker compose -f
    docker-compose.release.yml up` or a native setup script -- a real, checksummed replay
-   of the frozen golden scenario, no live backend required.
-4. [Judging evidence map](JUDGING.md).
+   of the frozen golden scenario, no live backend required. See [Reference demo](REFERENCE_DEMO.md).
+5. [Judging evidence map](JUDGING.md).
 
 ## For users
 
-1. [Installation](INSTALLATION.md) -- native and container setup, troubleshooting.
+1. [Quickstart](QUICKSTART.md) / [Installation](INSTALLATION.md) -- native and container
+   setup, troubleshooting.
 2. [Operator guide](USER_GUIDE.md) -- the console workflow end to end.
-3. [Limitations and failure cases](LIMITATIONS.md).
+3. [Glossary](GLOSSARY.md) -- unfamiliar term? Look here first.
+4. [Limitations and failure cases](LIMITATIONS.md).
 
 ## Technical reference
 
+- [Technical brief](TECHNICAL_BRIEF.md) -- one-page summary, links to full depth
 - [Final system authority](FINAL_SYSTEM.md)
 - [Full architecture](ARCHITECTURE.md)
 - [Model card](MODEL_CARD.md)
 - [Evaluation protocol](EVALUATION.md)
 - [Dataset card](DATASET_CARD.md)
 - [Data generation and governance](DATA_GENERATION.md)
+- [Reference demo](REFERENCE_DEMO.md)
+- [Architecture diagrams](diagrams/README.md)
+- [Glossary](GLOSSARY.md)
 - [Security policy](SECURITY.md)
 
 ## Research / historical work

@@ -138,6 +138,7 @@ re-verified by exact WNTR/EPANET simulation before it can be approved. See
 
 ## Technical depth
 
+- [Technical brief](docs/TECHNICAL_BRIEF.md) -- one-page summary, links to full depth
 - [Final system authority](docs/FINAL_SYSTEM.md) -- the one canonical "what actually ships" page
 - [Full architecture](docs/ARCHITECTURE.md)
 - [Model card](docs/MODEL_CARD.md)
@@ -145,6 +146,7 @@ re-verified by exact WNTR/EPANET simulation before it can be approved. See
 - [Dataset card](docs/DATASET_CARD.md)
 - [Operator guide](docs/USER_GUIDE.md)
 - [Judging evidence map](docs/JUDGING.md)
+- [Glossary](docs/GLOSSARY.md)
 
 ## Limitations
 
