@@ -33,6 +33,47 @@ def test_main_self_test_prints_machine_readable_result(monkeypatch: pytest.Monke
     assert json.loads(capsys.readouterr().out) == {"model_parameters": 42, "ok": True}
 
 
+def test_main_self_test_human_prints_checklist_not_json(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setattr(
+        cli,
+        "run_self_test",
+        lambda: {
+            "ok": True,
+            "trained_assets": {"ready": True, "model_sha256": "abc", "normalization_hash": "def", "fallback_reason": None},
+            "simulation_run": True,
+            "sqlite": "ok",
+            "frontend_assets": "built",
+            "resources": {"port_8765_available": True},
+        },
+    )
+
+    assert cli.main(["self-test", "--human"]) == 0
+    out = capsys.readouterr().out
+    assert "HydroSwarm readiness" in out
+    assert "READY" in out
+    assert "✓ Frozen HydroCore-v4 bundle verified" in out
+    with pytest.raises(json.JSONDecodeError):
+        json.loads(out)
+
+
+def test_render_self_test_report_flags_not_ready_reasons() -> None:
+    report = {
+        "ok": True,
+        "trained_assets": {"ready": False, "model_sha256": None, "normalization_hash": None, "fallback_reason": "classical-safe fallback"},
+        "simulation_run": True,
+        "sqlite": "ok",
+        "frontend_assets": "source-only",
+        "resources": {"port_8765_available": True},
+    }
+    rendered = cli.render_self_test_report(report)
+    assert "NOT READY" in rendered
+    assert "✗ Frozen HydroCore-v4 bundle verified" in rendered
+    assert "reason: classical-safe fallback" in rendered
+    assert "reason: frontend not built" in rendered
+
+
 def test_start_uses_localhost_and_default_port(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:
     captured: list[str] = []
 

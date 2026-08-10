@@ -1,7 +1,8 @@
 @echo off
+rem Compatibility wrapper. Prefer the explicit PowerShell launcher, which
+rem uses the project-local .venv interpreter and never an ambient system
+rem Python:
+rem   .\start_hydroswarm_windows.ps1
 setlocal
-set "PROJECT_ROOT=%~dp0"
-set "PYTHONPATH=%PROJECT_ROOT%src;%PYTHONPATH%"
-python -m hydroswarm.cli self-test || exit /b 1
-python -m hydroswarm.cli start --host 127.0.0.1 --port 8765
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0start_hydroswarm_windows.ps1" %*
 exit /b %ERRORLEVEL%

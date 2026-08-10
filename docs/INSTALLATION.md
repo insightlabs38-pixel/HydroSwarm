@@ -7,7 +7,47 @@
 - Approximately 4 GiB RAM for the small/default demonstration; more for large models
 - WNTR's EPANET runtime, installed as a Python dependency
 
-## Native install
+## Native install (recommended: platform setup script)
+
+The setup scripts create a project-local `.venv`, install CPU-only dependencies into it
+(never globally, never via `sudo`/system package managers), verify the frozen
+HydroCore-v4 release bundle, build the frontend if no prebuilt `frontend/dist` exists,
+and run the readiness self-test. They are safe to re-run.
+
+```bash
+git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
+cd HydroSwarm
+
+./setup_hydroswarm_linux.sh   # Linux (x86-64 or ARM64)
+./setup_hydroswarm_macos.sh   # macOS (Apple Silicon or Intel)
+```
+
+```powershell
+.\setup_hydroswarm_windows.ps1   # Windows (PowerShell)
+```
+
+Then launch with the matching platform launcher -- each fails closed (rather than
+silently falling back to an ambient system Python) if `.venv` does not exist, and each
+runs a readiness check before binding to loopback:
+
+```bash
+./start_hydroswarm_linux.sh
+./start_hydroswarm_macos.sh
+```
+
+```powershell
+.\start_hydroswarm_windows.ps1
+```
+
+`start_hydroswarm.sh` / `start_hydroswarm.bat` remain as thin compatibility wrappers
+that delegate to the platform-specific launcher above.
+
+The app opens at `http://127.0.0.1:8765`. Dependency downloads are required only during
+installation; runtime operation is offline.
+
+## Manual native install
+
+The setup scripts above are equivalent to, and preferred over, the manual steps:
 
 ```powershell
 git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
@@ -24,8 +64,7 @@ cd ..
 ```
 
 Linux/macOS equivalents use `.venv/bin/python`, `npm ci && npm run build`, and
-`./start_hydroswarm.sh`. The app opens at `http://127.0.0.1:8765`. Dependency downloads
-are required only during installation; runtime operation is offline.
+`./start_hydroswarm.sh`.
 
 ## Container
 

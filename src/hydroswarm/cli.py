@@ -158,6 +158,35 @@ def run_self_test() -> dict[str, Any]:
     }
 
 
+def render_self_test_report(report: dict[str, Any]) -> str:
+    """Render `run_self_test()`'s machine-readable result as the human-facing
+    readiness checklist from submission.txt SS17, for setup scripts and
+    interactive `hydroswarm self-test --human` use. Does not replace the
+    default JSON output (still required by CI and other machine callers)."""
+    trained_assets = report.get("trained_assets", {})
+    resources = report.get("resources", {})
+    checks: list[tuple[bool, str]] = [
+        (report.get("ok", False), "Python runtime"),
+        (bool(trained_assets.get("ready")), "Frozen HydroCore-v4 bundle verified"),
+        (bool(trained_assets.get("model_sha256")), "Model SHA-256 verified"),
+        (bool(trained_assets.get("normalization_hash")), "Normalization verified"),
+        (bool(report.get("simulation_run")), "WNTR/EPANET available"),
+        (report.get("sqlite") == "ok", "SQLite writable"),
+        (report.get("frontend_assets") == "built", "Frontend assets available"),
+        (bool(resources.get("port_8765_available")), "Port 8765 available"),
+        (True, "No required external runtime service"),
+    ]
+    lines = ["HydroSwarm readiness", ""]
+    lines.extend(f"{'✓' if ok else '✗'} {label}" for ok, label in checks)
+    lines.append("")
+    lines.append("READY" if all(ok for ok, _ in checks) else "NOT READY")
+    if not trained_assets.get("ready"):
+        lines.append(f"  reason: {trained_assets.get('fallback_reason')}")
+    if report.get("frontend_assets") != "built":
+        lines.append("  reason: frontend not built (source-only) -- run the frontend build before a demo")
+    return "\n".join(lines)
+
+
 def _start_console(host: str, port: int, *, runner: Any | None = None) -> int:
     command = [
         sys.executable,
@@ -195,13 +224,25 @@ def start_command(
 
 
 @app.command("self-test")
-def self_test_command() -> None:
-    """Run machine-readable offline readiness checks."""
+def self_test_command(
+    human: bool = typer.Option(
+        False, "--human", help="Print a human-readable readiness checklist instead of JSON."
+    ),
+) -> None:
+    """Run offline readiness checks. Defaults to machine-readable JSON; pass
+    --human for the operator-facing checklist used by the setup scripts."""
     try:
-        typer.echo(json.dumps(run_self_test(), indent=2, sort_keys=True))
+        report = run_self_test()
     except Exception as exc:
-        typer.echo(json.dumps({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), err=True)
+        if human:
+            typer.echo(f"HydroSwarm readiness\n\nFAILED: {type(exc).__name__}: {exc}", err=True)
+        else:
+            typer.echo(json.dumps({"ok": False, "error": f"{type(exc).__name__}: {exc}"}), err=True)
         raise typer.Exit(1) from exc
+    if human:
+        typer.echo(render_self_test_report(report))
+    else:
+        typer.echo(json.dumps(report, indent=2, sort_keys=True))
 
 
 def main(argv: Sequence[str] | None = None) -> int:
