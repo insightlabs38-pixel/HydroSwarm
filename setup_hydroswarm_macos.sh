@@ -68,7 +68,7 @@ fi
 log "Installing dependencies into .venv (CPU wheels; never global) ..."
 "$VENV_PYTHON" -m pip install --upgrade pip --quiet
 "$VENV_PYTHON" -m pip install "torch>=2.5" --quiet
-"$VENV_PYTHON" -m pip install -e ".[dev]" --quiet
+"$VENV_PYTHON" -m pip install -e "." --quiet
 log "✓ Runtime dependencies installed"
 
 # --- 4. Verify WNTR/EPANET import + the frozen V4 release bundle -----------

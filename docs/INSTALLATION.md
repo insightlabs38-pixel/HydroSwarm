@@ -70,7 +70,7 @@ git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
 cd HydroSwarm
 python -m venv .venv
 .venv\Scripts\python -m pip install --upgrade pip
-.venv\Scripts\python -m pip install -e ".[dev]"
+.venv\Scripts\python -m pip install -e "."
 cd frontend
 npm.cmd ci
 npm.cmd run build

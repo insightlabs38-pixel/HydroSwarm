@@ -128,6 +128,20 @@ def test_setup_script_creates_venv_and_installs_only_into_it(name: str) -> None:
 
 
 @pytest.mark.parametrize("name", SETUP_SCRIPTS)
+def test_setup_script_installs_runtime_dependencies_only_not_dev_extras(name: str) -> None:
+    """SUB-12.1 #8: a judge/end-user running the native setup script never
+    needs pytest, ruff, pyright, hypothesis, or any other dev-only tool --
+    those come from `.[dev]`, which pulls in strictly more than the
+    running application (`hydroswarm.api.app`, `hydroswarm.cli`) actually
+    imports. `.[dev]` remains correct in dev-facing docs (CONTRIBUTING.md's
+    `uv sync --all-extras --dev`), just not in what an end user's own
+    machine installs."""
+    text = (PROJECT_ROOT / name).read_text()
+    assert "pip install -e \".\"" in text or "pip install -e '.'" in text
+    assert ".[dev]" not in text
+
+
+@pytest.mark.parametrize("name", SETUP_SCRIPTS)
 def test_setup_script_verifies_frozen_bundle_and_runs_self_test(name: str) -> None:
     text = (PROJECT_ROOT / name).read_text()
     assert "verify-bundle" in text

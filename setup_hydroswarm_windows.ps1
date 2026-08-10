@@ -72,7 +72,7 @@ if (-not (Test-Path $VenvPython)) {
 Write-Info "Installing dependencies into .venv (CPU wheels; never global) ..."
 & $VenvPython -m pip install --upgrade pip --quiet
 & $VenvPython -m pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.5" --quiet
-& $VenvPython -m pip install -e ".[dev]" --quiet
+& $VenvPython -m pip install -e "." --quiet
 Write-Info "✓ Runtime dependencies installed"
 
 # --- 4. Verify the frozen V4 release bundle ---------------------------------
