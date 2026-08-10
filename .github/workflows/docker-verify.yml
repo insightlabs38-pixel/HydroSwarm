@@ -61,7 +61,7 @@ jobs:
           docker run -d --name hydroswarm-pr-verify \
             --platform ${{ matrix.platform }} \
             --read-only \
-            --tmpfs /tmp \
+            --tmpfs /tmp:rw,exec,mode=1777 \
             --cap-drop ALL \
             --security-opt no-new-privileges \
             -v hydroswarm-pr-verify-data:/data \
@@ -119,7 +119,7 @@ jobs:
             --platform ${{ matrix.platform }} \
             --dns 0.0.0.0 \
             --read-only \
-            --tmpfs /tmp \
+            --tmpfs /tmp:rw,exec,mode=1777 \
             --cap-drop ALL \
             --security-opt no-new-privileges \
             -v hydroswarm-pr-verify-offline-data:/data \

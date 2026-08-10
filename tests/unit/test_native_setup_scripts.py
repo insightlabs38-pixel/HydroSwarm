@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import re
 import stat
+import sys
 from pathlib import Path
 
 import pytest
@@ -52,6 +53,14 @@ def test_script_exists(name: str) -> None:
     assert (PROJECT_ROOT / name).is_file(), f"missing native script: {name}"
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason=(
+        "the POSIX executable bit is not a meaningful NTFS concept -- a real "
+        "windows-latest CI checkout reports these as non-executable regardless "
+        "of the git-tracked mode, since Windows never runs .sh scripts directly"
+    ),
+)
 @pytest.mark.parametrize("name", POSIX_SCRIPTS)
 def test_posix_script_is_executable(name: str) -> None:
     mode = (PROJECT_ROOT / name).stat().st_mode

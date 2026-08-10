@@ -11,7 +11,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     HYDROSWARM_DATA_DIR=/data \
     HYDROSWARM_V4_BUNDLE_DIR=/app/models/hydrocore-v4-release \
     HYDROSWARM_REFERENCE_DEMO_PATH=/app/artifacts/reference-demo/reference-incident-v1.json \
-    HYDROSWARM_FROZEN_SCENARIO_DIR=/app/data/frozen
+    HYDROSWARM_FROZEN_SCENARIO_DIR=/app/data/frozen \
+    TMPDIR=/tmp
 WORKDIR /app
 RUN useradd --create-home --uid 10001 hydroswarm
 COPY pyproject.toml README.md LICENSE ./

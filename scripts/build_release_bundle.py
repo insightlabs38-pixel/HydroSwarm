@@ -139,7 +139,14 @@ def build_bundle(output_path: Path, *, release_version: str) -> Path:
     for relative_dir in INCLUDED_DIRS:
         source_dir = PROJECT_ROOT / relative_dir
         for file_path in _iter_files(source_dir):
-            entries.append((file_path, str(file_path.relative_to(PROJECT_ROOT))))
+            # .as_posix(), not str(): on Windows, str(WindowsPath) uses
+            # backslashes, which would both violate the ZIP spec's
+            # mandatory forward-slash archive-member names and produce a
+            # SHA256SUMS file whose paths don't match the real
+            # (forward-slash) paths `sha256sum --check` sees after
+            # extraction -- a real Windows CI run caught this exact bug
+            # ("FAILED open or read" for every entry).
+            entries.append((file_path, file_path.relative_to(PROJECT_ROOT).as_posix()))
 
     if not entries:
         raise RuntimeError("no files resolved for the release bundle -- refusing to write an empty archive")

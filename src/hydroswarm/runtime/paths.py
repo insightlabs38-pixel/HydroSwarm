@@ -147,10 +147,12 @@ def resolve_reference_demo_path(project_root: str | Path | None = None) -> Path:
 
 
 def resolve_frozen_scenario_dir(project_root: str | Path | None = None) -> Path:
-    """Resolve the frozen golden network/scenario fixture directory
-    (`golden_network.inp`, `golden_scenario.json`) the LIVE example's real
-    reference inputs are computed from. Same three-tier priority as the
-    other resolvers in this module."""
+    """Resolve the frozen network/scenario fixture directory
+    (`live_example_network.inp`, `live_example_scenario.json`) the LIVE
+    example's real reference inputs are computed from -- a calibration-
+    validated topology, deliberately distinct from the REFERENCE demo's
+    own `golden_network.inp`/`golden_scenario.json` in the same directory.
+    Same three-tier priority as the other resolvers in this module."""
     override = os.environ.get(FROZEN_SCENARIO_DIR_ENV_VAR, "").strip()
     if override:
         return Path(override).expanduser().resolve()
