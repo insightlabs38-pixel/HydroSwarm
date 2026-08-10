@@ -11,9 +11,11 @@ from pathlib import Path
 
 from hydroswarm.runtime.paths import (
     DATA_DIR_ENV_VAR,
+    FROZEN_SCENARIO_DIR_ENV_VAR,
     REFERENCE_DEMO_PATH_ENV_VAR,
     V4_BUNDLE_DIR_ENV_VAR,
     resolve_data_dir,
+    resolve_frozen_scenario_dir,
     resolve_reference_demo_path,
     resolve_v4_bundle_dir,
 )
@@ -132,3 +134,22 @@ def test_reference_demo_falls_back_to_cwd_relative_when_project_root_candidate_m
     resolved = resolve_reference_demo_path(project_root=fake_project_root)
 
     assert resolved == artifact.resolve()
+
+
+def test_frozen_scenario_dir_env_var_override_takes_priority(tmp_path: Path, monkeypatch) -> None:
+    override = tmp_path / "custom-frozen-scenario"
+    monkeypatch.setenv(FROZEN_SCENARIO_DIR_ENV_VAR, str(override))
+
+    resolved = resolve_frozen_scenario_dir(project_root=tmp_path / "unrelated-project-root")
+
+    assert resolved == override.resolve()
+
+
+def test_frozen_scenario_dir_project_root_relative_default(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv(FROZEN_SCENARIO_DIR_ENV_VAR, raising=False)
+    frozen = tmp_path / "data" / "frozen"
+    frozen.mkdir(parents=True)
+
+    resolved = resolve_frozen_scenario_dir(project_root=tmp_path)
+
+    assert resolved == frozen.resolve()

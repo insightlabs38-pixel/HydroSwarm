@@ -46,8 +46,14 @@ DATA_DIR_ENV_VAR = "HYDROSWARM_DATA_DIR"
 #: fail closed with a clear reason, not silently serve nothing.
 REFERENCE_DEMO_PATH_ENV_VAR = "HYDROSWARM_REFERENCE_DEMO_PATH"
 
+#: Explicit override for the frozen golden network/scenario fixture
+#: directory (SUB-12.1 P1 #4: the LIVE example's real reference inputs --
+#: `hydroswarm.evaluation.live_example`). Same rationale as the two above.
+FROZEN_SCENARIO_DIR_ENV_VAR = "HYDROSWARM_FROZEN_SCENARIO_DIR"
+
 _BUNDLE_RELATIVE_PATH = ("models", "hydrocore-v4-release")
 _REFERENCE_DEMO_RELATIVE_PATH = ("artifacts", "reference-demo", "reference-incident-v1.json")
+_FROZEN_SCENARIO_RELATIVE_PATH = ("data", "frozen")
 
 
 def _source_tree_project_root() -> Path:
@@ -135,6 +141,27 @@ def resolve_reference_demo_path(project_root: str | Path | None = None) -> Path:
 
     cwd_candidate = Path.cwd().joinpath(*_REFERENCE_DEMO_RELATIVE_PATH)
     if cwd_candidate.is_file():
+        return cwd_candidate.resolve()
+
+    return source_tree_candidate.resolve()
+
+
+def resolve_frozen_scenario_dir(project_root: str | Path | None = None) -> Path:
+    """Resolve the frozen golden network/scenario fixture directory
+    (`golden_network.inp`, `golden_scenario.json`) the LIVE example's real
+    reference inputs are computed from. Same three-tier priority as the
+    other resolvers in this module."""
+    override = os.environ.get(FROZEN_SCENARIO_DIR_ENV_VAR, "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+
+    root = Path(project_root).resolve() if project_root is not None else _source_tree_project_root()
+    source_tree_candidate = root.joinpath(*_FROZEN_SCENARIO_RELATIVE_PATH)
+    if source_tree_candidate.is_dir():
+        return source_tree_candidate.resolve()
+
+    cwd_candidate = Path.cwd().joinpath(*_FROZEN_SCENARIO_RELATIVE_PATH)
+    if cwd_candidate.is_dir():
         return cwd_candidate.resolve()
 
     return source_tree_candidate.resolve()

@@ -61,6 +61,11 @@ INCLUDED_DIRS = [
     "configs",
     "examples",
     "artifacts/reference-demo",
+    # SUB-12.1 P1 #4: the frozen golden network/scenario fixture the LIVE
+    # example's real reference inputs (GET /api/live-example-inputs) need
+    # -- without it, the extracted release zip's LIVE example judge path
+    # 404s even though the REFERENCE INCIDENT path works fine.
+    "data/frozen",
 ]
 
 

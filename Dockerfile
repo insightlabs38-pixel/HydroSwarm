@@ -10,7 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HYDROSWARM_DATA_DIR=/data \
     HYDROSWARM_V4_BUNDLE_DIR=/app/models/hydrocore-v4-release \
-    HYDROSWARM_REFERENCE_DEMO_PATH=/app/artifacts/reference-demo/reference-incident-v1.json
+    HYDROSWARM_REFERENCE_DEMO_PATH=/app/artifacts/reference-demo/reference-incident-v1.json \
+    HYDROSWARM_FROZEN_SCENARIO_DIR=/app/data/frozen
 WORKDIR /app
 RUN useradd --create-home --uid 10001 hydroswarm
 COPY pyproject.toml README.md LICENSE ./
@@ -33,6 +34,11 @@ COPY models/hydrocore-v4-release/ models/hydrocore-v4-release/
 # judge demo path works fully offline in the container, served at
 # HYDROSWARM_REFERENCE_DEMO_PATH above via GET /api/reference-demo.
 COPY artifacts/reference-demo/ artifacts/reference-demo/
+# SUB-12.1 P1 #4: the frozen golden network/scenario fixture the LIVE
+# example's real reference inputs (GET /api/live-example-inputs) are
+# computed from -- without this the LIVE example judge path 404s inside
+# the container even though it works from a source checkout.
+COPY data/frozen/ data/frozen/
 RUN mkdir -p /data && chown -R hydroswarm:hydroswarm /app /data
 USER hydroswarm
 # Container self-test gate: fails the build (not just a post-hoc CI check)

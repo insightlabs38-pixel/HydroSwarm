@@ -64,7 +64,11 @@ from hydroswarm.simulation.wrapper import (
     wntr,
 )
 from hydroswarm.runtime import V4PipelineFactory
-from hydroswarm.runtime.paths import resolve_reference_demo_path, resolve_v4_bundle_dir
+from hydroswarm.runtime.paths import (
+    resolve_frozen_scenario_dir,
+    resolve_reference_demo_path,
+    resolve_v4_bundle_dir,
+)
 
 from .state import (
     AnalysisResponse,
@@ -108,10 +112,20 @@ def create_app(
     settings: ApiSettings | None = None,
     max_request_bytes: int = MAX_INP_BYTES + 256 * 1024,
     reference_demo_path: str | Path | None = None,
+    frozen_scenario_dir: str | Path | None = None,
 ) -> FastAPI:
     """Create a fully local app; deployment must bind it to ``127.0.0.1``."""
 
     reference_demo_file = Path(reference_demo_path) if reference_demo_path is not None else resolve_reference_demo_path()
+    live_example_scenario_dir = (
+        Path(frozen_scenario_dir) if frozen_scenario_dir is not None else resolve_frozen_scenario_dir()
+    )
+    # SUB-12.1 P1 #4: the LIVE example's reference inputs are a real,
+    # bounded WNTR simulation of the frozen scenario -- deterministic and
+    # identical on every call, so it is computed once (lazily, on first
+    # request) and cached for this app instance's lifetime rather than
+    # re-simulated on every GET.
+    live_example_inputs_cache: dict[str, Any] = {}
 
     settings = settings or ApiSettings(maximum_request_bytes=max_request_bytes)
     max_request_bytes = settings.maximum_request_bytes
@@ -358,6 +372,30 @@ def create_app(
                 status_code=500, detail=f"reference-demo artifact at {reference_demo_file} is not valid JSON: {exc}"
             ) from exc
         return JSONResponse(content=payload)
+
+    @app.get("/api/live-example-inputs")
+    def live_example_inputs() -> JSONResponse:
+        """SUB-12.1 P1 #4: real, WNTR-simulated reference inputs for the
+        'Run Live Example' judge path -- the frozen golden network's own
+        .inp text plus a real simulated concentration at every candidate
+        node, so the frontend can drive the REAL production API
+        (import/create/sample/analyze/verify/approve) using known
+        reference inputs, computing real current results rather than
+        replaying a fixture. Computed once (bounded WNTR simulation,
+        deterministic) and cached for this app instance's lifetime."""
+        if not live_example_inputs_cache:
+            from hydroswarm.evaluation import build_live_example_inputs
+
+            try:
+                live_example_inputs_cache.update(
+                    build_live_example_inputs(live_example_scenario_dir)
+                )
+            except FileNotFoundError as exc:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"frozen scenario fixtures not found at {live_example_scenario_dir}: {exc}",
+                ) from exc
+        return JSONResponse(content=live_example_inputs_cache)
 
     @app.get("/api/readiness", response_model=ServiceStatus)
     def readiness() -> ServiceStatus | JSONResponse:
