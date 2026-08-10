@@ -2,19 +2,17 @@
 
 - [ ] Public repository is accessible and license is correct. (LICENSE present and
       Apache-2.0; GitHub visibility/access settings not verifiable from this session.)
-- [x] Clean Linux ARM64 native installation commands pass (`./setup_hydroswarm_linux.sh` +
-      `./start_hydroswarm_linux.sh` live-smoke-tested end to end: bundle verified,
-      self-test READY, `/api/health` responded). Windows/macOS and Linux x86-64 have not
-      run here; their scripts are statically/structurally tested only
-      (`tests/unit/test_native_setup_scripts.py`).
+- [x] Native verification passed on hosted Linux x86-64, Linux ARM64, Windows x86-64,
+      macOS ARM64, and macOS Intel (`macos-15`). Linux ARM64 additionally completed the
+      clean runtime-ZIP setup → strict self-test → loopback-health release-path check.
 
 | Release-path platform | Actually verified status |
 |---|---|
-| Linux ARM64 native | Verified: clean runtime ZIP extraction → setup → strict self-test → loopback `/api/health` |
-| Linux x86-64 native | Not verified in this environment; hosted CI is billing-blocked before runner allocation |
-| Windows x86-64 native | Not verified; hosted CI is billing-blocked before runner allocation |
-| macOS ARM64 / Intel native | Not verified; hosted CI is billing-blocked before runner allocation |
-| Docker linux/amd64 and linux/arm64 | Not verified; hosted CI is billing-blocked and this sandbox cannot run privileged Docker builds |
+| Linux ARM64 native | Verified: clean runtime ZIP extraction → setup → strict self-test → loopback `/api/health`; hosted native CI also passed |
+| Linux x86-64 native | Verified: hosted native CI passed |
+| Windows x86-64 native | Verified: hosted native CI passed, including strict self-test and real simulator smoke |
+| macOS ARM64 / Intel native | Verified: hosted native CI passed on both architectures (`macos-15` Intel) |
+| Docker linux/amd64 and linux/arm64 | Verified: hosted hardened-runtime gate passed natively on both architectures, including EPANET smoke, LIVE workflow, exact verification, approval, persistence, and offline checks |
 - [x] `hydroswarm self-test` and the golden scenario pass with networking disabled
       (`tests/integration/test_offline_runtime_audit.py`, this session -- mechanically
       blocks every outbound socket connect() and re-runs both).
@@ -47,23 +45,14 @@
       ARM64 directory, and passed setup → strict self-test → loopback launch. It includes
       checksums, the frozen V4 bundle, built frontend, and reference artifact. This is
       local release-path evidence only; no tag or GitHub Release has been published.
-- [ ] Docker recommended judge path (`docker compose -f docker-compose.release.yml up`)
-      actually builds/runs. **Blocked in this sandbox**: confirmed root cause is
-      `CAP_SYS_ADMIN` stripped and `unshare` blocked even for an unprivileged user
-      namespace -- see `reports/submission-readiness/sub3-docker-sandbox-limitation.md`.
-      `.github/workflows/release.yml` is written and ready to verify this for real on a
-      GitHub Actions runner or an unsandboxed machine; that execution has not happened.
+- [x] Hardened Docker verification (`--read-only`, non-root, dropped capabilities,
+      no-new-privileges, `/data` persistence, `/tmp` tmpfs) passed on hosted native
+      AMD64 and ARM64. This is not a Docker Desktop host-integration claim.
 - [x] Final claims are limited to measured synthetic/reference-network results.
 
 ## What a human needs to do before this submission is truly ready
 
-1. Verify Docker on a real machine or GitHub Actions (`docker build`/`docker run`, then
-   `docker buildx build --platform linux/amd64,linux/arm64`) -- see the two unchecked
-   Docker/release items above and `reports/submission-readiness/sub3-docker-sandbox-limitation.md`.
-2. Verify the native setup/launch scripts on real Linux x86-64, Windows, and macOS
-   machines (only Linux ARM64 was live-tested here).
-3. Record the demo video once the above are confirmed working, showing the REFERENCE
+1. Record the demo video, showing the REFERENCE
    INCIDENT as the primary walkthrough.
-4. Cut an actual version tag once ready, and let `.github/workflows/release.yml` produce
-   the real multiarch image, `RELEASE_MANIFEST.json`, and runtime zip on real
-   infrastructure.
+2. Cut an actual version tag once ready, and let `.github/workflows/release.yml` produce
+   the real multiarch image, `RELEASE_MANIFEST.json`, and runtime zip.
