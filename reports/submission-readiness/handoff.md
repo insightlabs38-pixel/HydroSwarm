@@ -313,6 +313,26 @@ SUB-3 is NOT being marked done.** What remains, for whoever picks this up next:
    let later phases quietly promote Docker to "verified" on the strength of this
    session's static-only verification.
 
+### SUB-5/SUB-6 — progressive reference UI + experience-state separation (commit `952815d`)
+
+Backend (`e542739`) + frontend (`952815d`). New `REFERENCE` runtime mode,
+`reference/` module (types/mapMilestone/useReferenceIncident), first-launch
+gateway, `?experience=reference|live|fallback` routing, ModeBanner controls.
+See that commit message for full detail. Frontend gates green (lint,
+typecheck, format:check, 125 vitest, `npm run build`). Live end-to-end
+smoke test: real server + curl of `/api/health` and `/api/reference-demo`.
+
+**Not done / left for a later pass:** no visual/screenshot verification was
+possible in this sandbox (no browser). Playwright visual-regression
+baselines (`frontend/tests/e2e/visual-regression.spec.ts`) were **not**
+updated or re-run for the new gateway/REFERENCE banner -- do this before
+claiming the reference experience is visually correct, not just
+type-correct and unit-tested. `evidenceHistory`/`audit`/`benchmarks` are
+left empty (`[]`) in the REFERENCE IncidentView mapping -- real data exists
+in the golden result (explanations, event ledger) but wasn't threaded
+through the SUB-4 artifact schema; empty is honest (not fabricated) but is
+a known richness gap, not a bug, if a future pass wants a fuller experience.
+
 ## Exact continuation commands
 
 ```bash
@@ -336,14 +356,16 @@ cat reports/submission-readiness/sub2-post-merge-pytest.log
 # a real GitHub Actions runner or unsandboxed machine before treating SUB-3
 # as done -- see the SUB-3 section above for exact commands.
 
-# next phase per submission.txt SS4-14 (task list SUB-4):
-# SUB-4 -- reference-incident artifact schema + scripts/build_reference_demo.py generator
+# next phase per submission.txt task list SUB-7:
+# SUB-7 -- README judge-first restructure
 ```
 
 ## Next phase (not started as of end of 2026-08-10 session)
 
-SUB-4 — governed reference-incident trace format and generator, per
-submission.txt §4–14: `artifacts/reference-demo/reference-incident-v1.json` schema,
-`scripts/build_reference_demo.py`, milestone snapshots with no future-data leakage,
-`artifacts/reference-demo/manifest.json`, validation tests tying the artifact to the
-golden workflow's final event hash.
+SUB-7 — judge-first README rebuild (submission.txt §3.1 / task list SUB-7):
+one-line value prop, product screenshot, problem, operator workflow, why
+different, strongest measured results, try-it, final-system architecture,
+technical depth links, limitations, research/evaluation details pushed
+deeper. Five-minute judge test must pass. Then SUB-8 (docs IA), SUB-9
+(technical docs/diagrams), SUB-10 (Devpost), SUB-11 (release tests),
+SUB-12 (release candidate).
