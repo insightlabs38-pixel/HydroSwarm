@@ -66,7 +66,10 @@ def test_readme_opening_sections_are_judge_first_ordered() -> None:
 
 def test_readme_screenshot_appears_before_the_problem_section() -> None:
     text = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
-    screenshot_index = text.index("docs/screenshots/operator-overview.png")
+    match = re.search(r"!\[HydroSwarm first-launch gateway\]\((docs/screenshots/[^)]+)\)", text)
+    assert match, "README must retain a canonical hero screenshot"
+    assert (PROJECT_ROOT / match.group(1)).is_file(), "README hero screenshot is missing"
+    screenshot_index = match.start()
     problem_index = text.index("## The problem")
     assert screenshot_index < problem_index
 

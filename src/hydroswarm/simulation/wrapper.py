@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import multiprocessing
+import os
 import queue
 import sys
 import tempfile
@@ -481,7 +482,17 @@ def _invoke_epanet_simulator(model: Any, operation: str) -> Any:
     _invoke_wntr_simulator above."""
     with tempfile.TemporaryDirectory(prefix="hydroswarm-epanet-") as directory:
         prefix = str(Path(directory) / operation)
-        return wntr.sim.EpanetSimulator(model).run_sim(file_prefix=prefix)
+        # EPANET's hydraulic scratch file is resolved from its process cwd
+        # in addition to WNTR's explicit file prefix.  This worker is
+        # isolated by _run_with_timeout, so changing cwd here cannot affect
+        # the long-lived API process; it keeps all EPANET artefacts in the
+        # writable temporary directory when /app is read-only in Docker.
+        previous_cwd = Path.cwd()
+        try:
+            os.chdir(directory)
+            return wntr.sim.EpanetSimulator(model).run_sim(file_prefix=prefix)
+        finally:
+            os.chdir(previous_cwd)
 
 
 class HydraulicSimulator:
