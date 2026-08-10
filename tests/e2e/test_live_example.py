@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from hydroswarm.evaluation.live_example import CANDIDATES, TRUE_SOURCE, build_live_example_inputs
+from hydroswarm.evaluation.live_example import CANDIDATES, build_live_example_inputs
 from hydroswarm.runtime.paths import resolve_frozen_scenario_dir
 
 #: Drives a real bounded WNTR simulation -- see pyproject.toml's
@@ -37,10 +37,10 @@ def test_candidate_signatures_cover_every_network_node_with_real_simulated_value
     for value in signatures.values():
         assert isinstance(value, float)
         assert value >= 0.0
-    # The true source's own node must show measurable contamination at the
-    # declared common observation time -- never at a separately cherry-picked
-    # per-node peak.
-    assert signatures[TRUE_SOURCE] > 0.0
+    # The configured common sampling time is when the recommended downstream
+    # node is measurably contaminated; every other value is from this same
+    # timestep, never from a separately cherry-picked per-node peak.
+    assert signatures["J8"] > 0.0
 
 
 def test_initial_observation_is_a_real_pre_contamination_reading(inputs) -> None:

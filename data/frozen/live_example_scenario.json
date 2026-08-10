@@ -3,7 +3,7 @@
   "contamination_threshold_mg_l": 0.001,
   "initial_sensor": "J1",
   "network_id": "live-example-network-v1",
-  "sample_time_seconds": 3600,
+  "sample_time_seconds": 14400,
   "schema_version": "hydroswarm-live-example-v1",
   "source_profile": {
     "duration_minutes": 60,

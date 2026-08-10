@@ -5,6 +5,20 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
+FROM debian:bookworm-slim AS epanet-builder
+# WNTR 1.5 ships its EPANET 2.2 shared library only for linux-x64. Build the
+# official OWA EPANET 2.2 engine for the image's native CPU so ARM64 retains
+# exact EpanetSimulator verification. Compilers and source remain in this
+# throw-away stage; the runtime receives one shared object only.
+ARG EPANET_COMMIT=4d8d82ddc260fce216af9321fc3d9a4646ac6827
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential ca-certificates cmake git \
+ && git clone --depth 1 https://github.com/OpenWaterAnalytics/EPANET.git /opt/epanet \
+ && git -C /opt/epanet fetch --depth 1 origin "$EPANET_COMMIT" \
+ && git -C /opt/epanet checkout --detach "$EPANET_COMMIT" \
+ && cmake -S /opt/epanet -B /opt/epanet/build \
+ && cmake --build /opt/epanet/build --parallel 2
+
 FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -38,6 +52,19 @@ RUN apt-get update \
  && python -m pip install --no-cache-dir . \
  && apt-get purge -y --auto-remove g++ \
  && rm -rf /var/lib/apt/lists/*
+COPY --from=epanet-builder /opt/epanet/build/lib/libepanet2.so /opt/hydroswarm/epanet/libepanet22.so
+# WNTR 1.5's Linux loader path is named linux-x64 even on ARM, although it
+# does not bundle an ARM binary. Install the native official EPANET 2.2
+# library at that loader path only on ARM; no Python authority code is patched
+# and x86_64 continues to use WNTR's bundled library.
+RUN python -c "\
+import platform, shutil; \
+from importlib.resources import files; \
+target = files('wntr.epanet').joinpath('libepanet/linux-x64/libepanet22.so'); \
+machine = platform.machine().lower(); \
+(shutil.copyfile('/opt/hydroswarm/epanet/libepanet22.so', target) if machine in {'aarch64', 'arm64'} else None)\
+" \
+ && rm -rf /opt/hydroswarm
 COPY --from=frontend /build/frontend/dist frontend/dist
 COPY configs/ configs/
 # Submission-readiness SUB-1 (P0): the frozen, self-contained V4 inference

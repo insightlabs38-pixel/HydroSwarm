@@ -79,6 +79,19 @@ jobs:
           print('container strict self-test OK for ${{ matrix.platform }}:', report['trained_assets']['model_sha256'])
           "
 
+      # WNTR's basic hydraulic self-test does not exercise EpanetSimulator's
+      # water-quality shared-library path. Prove it explicitly before the
+      # larger API workflow so an architecture packaging failure is clear.
+      - name: Verify real EPANET quality smoke inside hardened container
+        run: |
+          docker exec hydroswarm-pr-verify python -c "
+          from hydroswarm.evaluation.live_example import build_live_example_inputs
+          from hydroswarm.runtime.paths import resolve_frozen_scenario_dir
+          inputs = build_live_example_inputs(resolve_frozen_scenario_dir())
+          assert any(value > 0.0 for value in inputs['candidate_signatures_mg_l'].values())
+          print('container real EPANET quality smoke OK')
+          "
+
       # Real network import, real DB write (a new incident + evidence),
       # real re-analysis, real bounded WNTR/EPANET exact verification, and
       # a real human-approval event -- all through the real production

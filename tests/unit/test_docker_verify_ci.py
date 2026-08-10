@@ -83,6 +83,7 @@ def test_wires_every_required_runtime_check() -> None:
     text = WORKFLOW_PATH.read_text()
     assert "docker_ci_verify.py health" in text
     assert "self-test --strict" in text
+    assert "real EPANET quality smoke" in text
     assert "docker_ci_verify.py live-workflow" in text
     assert "docker restart" in text
     assert "docker_ci_verify.py verify-persistence" in text
