@@ -1,5 +1,5 @@
 import type { NetworkRecord } from '../types';
-import { API_BASE, ApiError, request } from './client';
+import { API_BASE, ApiError, request, requestJson, requestPost } from './client';
 
 interface ApiNetworkTopologyNode {
   node_id: string;
@@ -94,4 +94,50 @@ export async function importNetwork(file: File, signal?: AbortSignal): Promise<N
     throw new ApiError(response.status, `HydroSwarm API ${response.status}: ${detail}`);
   }
   return recordFromApi((await response.json()) as ApiNetworkRecord);
+}
+
+interface ApiIncidentStateSummary {
+  incident_id: string;
+}
+
+/**
+ * SUB-12.1 P1 #6: the compact, API-assisted incident-creation form on the
+ * "Import Your Own Network" advanced path -- deliberately minimal (one
+ * initial observation, not a multi-step wizard), through the same real
+ * POST /api/incidents endpoint the LIVE example uses. Never fabricates a
+ * network node or observation: the caller supplies a real node id the
+ * imported network actually has and a real reading for it. Also triggers
+ * the incident's first real analysis before returning -- otherwise the
+ * mission-control shell this hands off to has no way to get a freshly
+ * created, still-DETECTED incident out of `/view`'s 409 ("requires a
+ * completed hybrid analysis"): there is no separate "run analysis" control
+ * anywhere else in the UI, so this compact API-assisted flow has to be the
+ * one to trigger it.
+ */
+export async function createIncidentForNetwork(
+  networkId: string,
+  observation: { nodeId: string; concentrationMgL: number; pressureM: number | null },
+  signal?: AbortSignal,
+): Promise<string> {
+  const now = new Date().toISOString();
+  const state = await requestJson<ApiIncidentStateSummary>(
+    '/incidents',
+    {
+      network_id: networkId,
+      detected_at: now,
+      observations: [
+        {
+          sensor_id: `S-${observation.nodeId}`,
+          node_id: observation.nodeId,
+          observed_at: now,
+          received_at: now,
+          concentration_mg_l: observation.concentrationMgL,
+          pressure_m: observation.pressureM,
+        },
+      ],
+    },
+    signal,
+  );
+  await requestPost<ApiIncidentStateSummary>(`/incidents/${state.incident_id}/analyze`, signal);
+  return state.incident_id;
 }
