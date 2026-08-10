@@ -1,0 +1,12 @@
+{
+  "artifact_file": "reference-incident-v1.json",
+  "artifact_sha256": "f499a57eff7432afbd3ca51a20fe87d1a9cf698937aea4b8ee66c65b58fc0982",
+  "event_count": 21,
+  "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
+  "generated_at": "2026-08-10T04:19:38.579409+00:00",
+  "golden_result_hash": "d91cb7202cb8133ee0b8b656395d95d9fcddf10ba75e3de2f73acdf86f7da817",
+  "milestone_count": 11,
+  "reference_id": "reference-incident-v1",
+  "schema_version": 1,
+  "source_commit": "2bff781c5062795447952584ee718bfc997b4293"
+}

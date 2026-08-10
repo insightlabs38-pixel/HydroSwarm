@@ -13,7 +13,7 @@ test('operator can follow the full normal demo flow (ui-work.txt §32) using onl
   page,
 }) => {
   // 1. Open HydroSwarm; 2. see local/offline/readiness status.
-  await page.goto('/');
+  await page.goto('/?experience=fallback');
   await expect(page.getByText('OFFLINE · LOCAL')).toBeVisible();
   await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   await expect(page.getByText('READY')).toBeVisible();

@@ -1,7 +1,14 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchIncidentWithFallback } from './api/incident';
+import type { Experience } from './api/incident';
+import {
+  fetchIncidentWithFallback,
+  hasConfiguredLiveIncident,
+  requestedExperience,
+} from './api/incident';
 import { useConsoleStore, WORKSPACE_LABELS } from './store';
+import { useReferenceIncident } from './reference/useReferenceIncident';
+import { useLiveExampleFlow } from './liveExample/useLiveExampleFlow';
 import { MissionHeader } from './shell/MissionHeader';
 import { ModeBanner } from './shell/ModeBanner';
 import { WorkflowRail } from './shell/WorkflowRail';
@@ -9,6 +16,8 @@ import { WorkspaceToolbar } from './shell/WorkspaceToolbar';
 import { DecisionInspector } from './shell/DecisionInspector';
 import { TechnicalDock } from './shell/TechnicalDock';
 import { EmptyState } from './components/common/EmptyState';
+import { FirstLaunchGateway } from './shell/FirstLaunchGateway';
+import { LiveExampleProgress } from './shell/LiveExampleProgress';
 
 const Overview = lazy(() =>
   import('./pages/Overview').then((module) => ({ default: module.Overview })),
@@ -53,20 +62,99 @@ const BenchmarkPage = lazy(() =>
 
 const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {};
 
+/** Sets `?experience=<value>` in the URL (so a refresh/copied link
+ * preserves the judge's choice -- submission.txt SS5.3) and forces a
+ * re-render by also returning it for local state. */
+function setExperienceParam(value: Experience): void {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  url.searchParams.set('experience', value);
+  window.history.replaceState(null, '', url);
+}
+
+function hasRoutingOverride(): boolean {
+  if (typeof window === 'undefined') return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.has('failure') || params.has('demo');
+}
+
 export default function App() {
-  const { workspace, reducedMotion, toggleReducedMotion } = useConsoleStore();
-  const query = useQuery({
-    queryKey: ['active-incident'],
+  const { workspace, setWorkspace, reducedMotion, toggleReducedMotion } = useConsoleStore();
+  const [manualExperience, setManualExperience] = useState<Experience | null>(null);
+  const experience = manualExperience ?? requestedExperience();
+  const isReference = experience === 'reference';
+  // "live" (automated Run Live Example) only runs the flow while no
+  // incident is selected yet; once useLiveExampleFlow's approve() calls
+  // selectIncident(), hasConfiguredLiveIncident() flips true and this
+  // becomes false on the next render, falling through to the ordinary
+  // LIVE liveQuery path below -- no separate "done" branch needed.
+  // "import" (advanced manual network import, SUB-12.1 P1 #6) never runs
+  // the automated flow at all, even though it is also headed for LIVE.
+  const isLiveExampleFlow = experience === 'live' && !hasConfiguredLiveIncident();
+
+  // First-launch gateway (submission.txt SS5): only for a genuinely
+  // unconfigured, unrouted fresh install -- never overrides an explicit
+  // ?experience=/?demo=/?failure= request or an already-configured LIVE
+  // deployment.
+  const showGateway = experience === null && !hasConfiguredLiveIncident() && !hasRoutingOverride();
+
+  function chooseExperience(value: Experience) {
+    setExperienceParam(value);
+    setManualExperience(value);
+  }
+
+  const referenceController = useReferenceIncident(reducedMotion, isReference && !showGateway);
+  const liveExampleController = useLiveExampleFlow(isLiveExampleFlow && !showGateway);
+  const liveQuery = useQuery({
+    queryKey: ['active-incident', experience],
     queryFn: ({ signal }) => fetchIncidentWithFallback(signal),
     staleTime: 5_000,
+    enabled: !isReference && !isLiveExampleFlow && !showGateway,
   });
-  if (!query.data)
+
+  if (showGateway) {
+    return (
+      <FirstLaunchGateway
+        onRunReference={() => chooseExperience('reference')}
+        onRunLive={() => chooseExperience('live')}
+        onImportNetwork={() => {
+          chooseExperience('import');
+          setWorkspace('network');
+        }}
+        onExploreFallback={() => chooseExperience('fallback')}
+      />
+    );
+  }
+
+  if (isLiveExampleFlow) {
+    return (
+      <LiveExampleProgress
+        controller={liveExampleController}
+        onExploreFallback={() => chooseExperience('fallback')}
+      />
+    );
+  }
+
+  if (isReference && referenceController.isError) {
+    return (
+      <main className="loading-state" role="alert">
+        <div>
+          <p>Reference incident unavailable.</p>
+          <p className="supporting">
+            {referenceController.errorMessage ?? 'The reference-demo artifact could not be loaded.'}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  const incident = isReference ? referenceController.incident : (liveQuery.data ?? null);
+  if (!incident)
     return (
       <main className="loading-state" aria-live="polite">
         Loading local incident state…
       </main>
     );
-  const incident = query.data;
 
   let workspaceBody;
   if (workspace === 'incident') {
@@ -108,7 +196,9 @@ export default function App() {
       <MissionHeader incident={incident} />
       <ModeBanner
         incident={incident}
-        onRetry={incident.mode === 'ERROR' ? () => query.refetch() : undefined}
+        onRetry={incident.mode === 'ERROR' ? () => liveQuery.refetch() : undefined}
+        reference={isReference ? referenceController : undefined}
+        onExploreReplay={() => setWorkspace('replay')}
       />
       <div className="mission-shell-body">
         <WorkflowRail incident={incident} />

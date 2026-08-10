@@ -15,6 +15,8 @@ let currentIncident: IncidentView = demoIncident;
 
 vi.mock('../src/api/incident', () => ({
   fetchIncidentWithFallback: async () => currentIncident,
+  hasConfiguredLiveIncident: () => true,
+  requestedExperience: () => null,
 }));
 
 function renderApp() {

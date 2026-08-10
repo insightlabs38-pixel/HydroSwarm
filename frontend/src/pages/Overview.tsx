@@ -1,5 +1,11 @@
 import { lazy, Suspense } from 'react';
 import type { IncidentView } from '../types';
+import {
+  candidateCoverageLabel,
+  candidateCoverageValueText,
+  isCalibrationApplicable,
+  measuredCoverageValueText,
+} from '../calibrationDisplay';
 import { Panel } from '../components/Panel';
 import { StatusBadge } from '../components/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
@@ -50,12 +56,16 @@ export function Overview({ incident }: { incident: IncidentView }) {
             {leading ? (
               <>
                 Leading source region <strong>{leading.nodeId}</strong> · candidate set size{' '}
-                <strong>{incident.candidates.length}</strong> · conformal target{' '}
-                {Math.round(incident.candidateCoverage * 100)}%
-                {incident.calibrationValid ? '' : ' (calibration invalid for this network)'}
-                {typeof incident.measuredCoverage === 'number' && (
-                  <> · held-out measured coverage {Math.round(incident.measuredCoverage * 100)}%</>
-                )}
+                <strong>{incident.candidates.length}</strong> ·{' '}
+                {candidateCoverageLabel(incident).toLowerCase()}{' '}
+                {candidateCoverageValueText(incident)}
+                {isCalibrationApplicable(incident) && !incident.calibrationValid
+                  ? ' (calibration invalid for this network)'
+                  : ''}
+                {isCalibrationApplicable(incident) &&
+                  typeof incident.measuredCoverage === 'number' && (
+                    <> · held-out measured coverage {measuredCoverageValueText(incident)}</>
+                  )}
               </>
             ) : (
               'No source candidates for this incident.'
@@ -71,8 +81,18 @@ export function Overview({ incident }: { incident: IncidentView }) {
           >
             OOD {incident.ood}
           </StatusBadge>
-          <StatusBadge tone={incident.calibrationValid ? 'good' : 'warn'}>
-            CALIBRATION {incident.calibrationValid ? 'VALID' : 'INVALID'}
+          <StatusBadge
+            tone={
+              !isCalibrationApplicable(incident)
+                ? 'info'
+                : incident.calibrationValid
+                  ? 'good'
+                  : 'warn'
+            }
+          >
+            {isCalibrationApplicable(incident)
+              ? `CALIBRATION ${incident.calibrationValid ? 'VALID' : 'INVALID'}`
+              : 'CALIBRATION N/A'}
           </StatusBadge>
           <StatusBadge tone={incident.approvalPending ? 'warn' : 'good'}>
             {incident.approvalPending ? 'HUMAN APPROVAL PENDING' : 'NO APPROVAL PENDING'}

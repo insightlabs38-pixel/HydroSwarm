@@ -1,0 +1,31 @@
+services:
+  hydroswarm:
+    # Judge/release path (submission.txt SS20.1): pulls the published
+    # multiarch image -- no local build, no Dockerfile/build-context
+    # dependency. Pin the versioned tag rather than `:latest` so a judge's
+    # run is reproducible. See docker-compose.yml for the developer,
+    # build-from-source compose file.
+    image: ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - hydroswarm-data:/data
+    environment:
+      HYDROSWARM_DATA_DIR: /data
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+volumes:
+  hydroswarm-data:

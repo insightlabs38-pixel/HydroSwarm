@@ -27,6 +27,15 @@ def _slug(value: str) -> str:
     return cleaned[:48] or "network"
 
 
+def network_topology_metadata(model: Any) -> dict[str, Any]:
+    """Public entry point for the node/link/coordinate extraction a real
+    network import computes (`NetworkImporter._metadata`). Reused by
+    `hydroswarm.evaluation.reference_demo` so the REFERENCE INCIDENT
+    artifact's network topology is computed identically to a live imported
+    network's -- not a second, independently-drifting copy."""
+    return NetworkImporter._metadata(model)
+
+
 class NetworkImporter:
     def __init__(
         self,

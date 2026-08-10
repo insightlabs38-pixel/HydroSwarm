@@ -217,6 +217,8 @@ const alternateIncident: IncidentView = {
 
 vi.mock('../src/api/incident', () => ({
   fetchIncidentWithFallback: async () => alternateIncident,
+  hasConfiguredLiveIncident: () => true,
+  requestedExperience: () => null,
 }));
 
 function renderApp() {

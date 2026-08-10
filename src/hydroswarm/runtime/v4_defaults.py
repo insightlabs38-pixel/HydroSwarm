@@ -50,6 +50,7 @@ from hydroswarm.classical import (
 from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
 from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
+from hydroswarm.runtime.paths import resolve_data_dir
 from hydroswarm.runtime.v4_inference_bundle import (
     InferenceBundleError,
     load_v4_inference_bundle,
@@ -114,7 +115,11 @@ class V4PipelineFactory:
             Path(project_root).resolve() if project_root is not None else Path(__file__).resolve().parents[3]
         )
         self.calibration_path: Path | None = None
-        self.signature_cache = self.project_root / "data" / "generated" / "signatures"
+        # Submission-readiness SUB-1: honor HYDROSWARM_DATA_DIR (the
+        # container image's writable volume mount) for the signature cache
+        # so a read-only application root does not silently fail the first
+        # cache write. See hydroswarm.runtime.paths.resolve_data_dir.
+        self.signature_cache = resolve_data_dir(self.project_root) / "signatures"
         # core-issues5.txt Section 3: where to load the governed train-owned
         # node/edge normalization artifact from, keyed off
         # identity.normalization_hash at load time (NO_NORMALIZATION_SENTINEL

@@ -1,5 +1,6 @@
 import { demoIncident } from '../demoFixture';
 import { normalizeMapCoordinates } from '../geometry';
+import { requestedIncidentId } from '../incidentSelection';
 import type {
   AuditEvent,
   Candidate,
@@ -15,7 +16,34 @@ import type {
 } from '../types';
 import { request } from './client';
 
-const INCIDENT_ID = import.meta.env.VITE_INCIDENT_ID as string | undefined;
+/** Whether a LIVE incident is selectable at all right now (URL, session
+ * selection, or the VITE_INCIDENT_ID dev fallback) -- exported for the
+ * first-launch gateway (submission.txt SS5), which must not silently
+ * default a fresh, un-configured install into DEMO_FALLBACK, but also
+ * must not show for a deep link or a returning session that already has
+ * one selected. Re-exported from incidentSelection.ts's
+ * hasSelectableIncident() under its original name for callers already
+ * importing it from here. */
+export { hasSelectableIncident as hasConfiguredLiveIncident } from '../incidentSelection';
+
+/** Preferred routing per submission.txt SS5.3: `/?experience=reference|
+ * live|fallback|import` rather than only a build-time VITE_INCIDENT_ID.
+ * `import` is the advanced "Import Your Own Network" path (SUB-12.1 P1
+ * #6) -- distinct from `live` (the automated "Run Live Example" flow, see
+ * liveExample/useLiveExampleFlow.ts) so the two never trigger each
+ * other's behavior just because both are ultimately headed for LIVE
+ * mode. */
+export type Experience = 'reference' | 'live' | 'fallback' | 'import';
+
+const EXPERIENCE_VALUES: readonly Experience[] = ['reference', 'live', 'fallback', 'import'];
+
+export function requestedExperience(): Experience | null {
+  if (typeof window === 'undefined') return null;
+  const requested = new URLSearchParams(window.location.search).get('experience');
+  return (EXPERIENCE_VALUES as readonly string[]).includes(requested ?? '')
+    ? (requested as Experience)
+    : null;
+}
 
 /**
  * Controlled failure-injection demonstration (overnight-plan.txt Task 3.8).
@@ -257,7 +285,7 @@ interface ApiIncidentView {
  * Shared by both counterfactual_consequences and plans[].verification,
  * since the backend populates the former directly from the latter's
  * `consequences` (overnight-plan.txt Task 3.2). */
-interface ApiConsequenceMetrics {
+export interface ApiConsequenceMetrics {
   population_impacted: number;
   contaminant_mass_consumed_mg: number;
   volume_above_threshold_l: number;
@@ -274,9 +302,13 @@ interface ApiConsequenceMetrics {
   numerically_sensitive: boolean;
 }
 
-function planStatusFromApi(
+/** Exported for reuse by the SUB-5 reference-incident mapper (`../reference/
+ * mapMilestone`), which needs the identical PENDING/REJECTED/RECOMMENDED/
+ * VALID derivation the live view uses -- not a second copy that could
+ * silently drift. */
+export function planStatusFromApi(
   planId: string,
-  verification: ApiIncidentView['plans'][number]['verification'],
+  verification: { decision: string } | null,
   recommendedPlanId: string | null,
 ): PlanStatus {
   if (verification?.decision === 'REJECTED') return 'REJECTED';
@@ -284,7 +316,9 @@ function planStatusFromApi(
   return planId === recommendedPlanId ? 'RECOMMENDED' : 'VALID';
 }
 
-function consequenceFromApi(raw: ApiConsequenceMetrics): ConsequenceView {
+/** Exported for reuse by the SUB-5 reference-incident mapper -- see
+ * planStatusFromApi above. */
+export function consequenceFromApi(raw: ApiConsequenceMetrics): ConsequenceView {
   return {
     populationImpacted: raw.population_impacted,
     contaminantMassConsumedMg: raw.contaminant_mass_consumed_mg,
@@ -485,18 +519,25 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
 
 /**
  * Fetch the live, complete incident view (overnight-plan.txt Task 3.2).
+ * The incident id is resolved at call time via `requestedIncidentId()`
+ * (submission.txt SUB-12.1 P1 #5: URL `?incident=`, then the session-
+ * selected incident, then the optional VITE_INCIDENT_ID dev fallback --
+ * never only a build-time constant).
  */
 export async function fetchIncident(signal?: AbortSignal): Promise<IncidentView> {
   await request<{ status: string }>('/health', signal);
-  if (!INCIDENT_ID) {
-    throw new IncidentUnavailableError('No active incident configured (VITE_INCIDENT_ID unset)');
+  const incidentId = requestedIncidentId();
+  if (!incidentId) {
+    throw new IncidentUnavailableError(
+      'No active incident configured (no ?incident=, session selection, or VITE_INCIDENT_ID)',
+    );
   }
   let raw: ApiIncidentView;
   try {
-    raw = await request<ApiIncidentView>(`/incidents/${INCIDENT_ID}/view`, signal);
+    raw = await request<ApiIncidentView>(`/incidents/${incidentId}/view`, signal);
   } catch (error) {
     throw new IncidentUnavailableError(
-      `configured incident ${INCIDENT_ID} could not be loaded: ${(error as Error).message}`,
+      `configured incident ${incidentId} could not be loaded: ${(error as Error).message}`,
     );
   }
   return viewFromApi(raw);
@@ -561,6 +602,13 @@ export async function fetchIncidentWithFallback(signal?: AbortSignal): Promise<I
     return errorIncidentView(
       `[Failure injection: ${failure}] ${FAILURE_INJECTION_REASONS[failure]}`,
     );
+  }
+  // `?experience=fallback` (submission.txt SS5.3): the gateway's secondary
+  // "Explore illustrative fallback" action must reliably show the
+  // hand-authored fixture even when a LIVE incident happens to be
+  // configured -- never silently prefer LIVE over an explicit request.
+  if (requestedExperience() === 'fallback') {
+    return demoFallbackView(requestedDemoVariant());
   }
   try {
     return await fetchIncident(signal);

@@ -1,0 +1,23 @@
+%% Diagram E -- event/replay/demo lifecycle (submission.txt SS14.5)
+%% Mirrors the real milestone_id sequence in
+%% artifacts/reference-demo/reference-incident-v1.json (SUB-4 generator);
+%% do not let this diagram drift from that artifact's actual milestone ids.
+%% Alt text: the reference incident's 11 real milestones, from alert through
+%% a sample-collection pause, posterior contraction, plan verification, a
+%% human-approval pause, to a completed, replayable record.
+flowchart TD
+  M0["alert"] --> M1["initial_uncertainty"]
+  M1 --> M2["evidence_insufficient"]
+  M2 --> M3["sample_recommended\n(PAUSE -- Collect reference sample)"]
+  M3 --> M4["sample_received"]
+  M4 --> M5["posterior_contracted"]
+  M5 --> M6["plans_generated"]
+  M6 --> M7["unsafe_plan_rejected"]
+  M7 --> M8["safe_plan_verified"]
+  M8 --> M9["human_approval_boundary\n(PAUSE -- Approve plan)"]
+  M9 --> M10["completed\n(replayable event ledger)"]
+
+  classDef pause fill:#f4b45f,stroke:#7a5a20,color:#1a1206,font-weight:bold;
+  classDef done fill:#b6df83,stroke:#324a1a,color:#0c1806,font-weight:bold;
+  class M3,M9 pause;
+  class M10 done;

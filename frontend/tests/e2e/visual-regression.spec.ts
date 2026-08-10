@@ -1,6 +1,34 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+const REFERENCE_ARTIFACT_PATH = new URL(
+  '../../../artifacts/reference-demo/reference-incident-v1.json',
+  import.meta.url,
+).pathname;
+
+/**
+ * Reference replay is an offline, checksummed artifact.  Route its one API
+ * request here so these browser tests exercise the production mapper and UI
+ * without requiring a separately-running API server.  This is deliberately
+ * not used for LIVE: LIVE visual proof is captured against the real backend.
+ */
+async function mockReferenceArtifact(page: Page) {
+  await page.route('**/api/reference-demo', (route) =>
+    route.fulfill({ contentType: 'application/json', path: REFERENCE_ARTIFACT_PATH }),
+  );
+}
+
+async function openReferenceAtMilestone(page: Page, milestone: number) {
+  await mockReferenceArtifact(page);
+  await page.goto('/?experience=reference');
+  await expect(page.getByText('REFERENCE INCIDENT · VERIFIED REPLAY')).toBeVisible();
+  // Freeze auto-advance before moving to an exact authored milestone.
+  await page.getByRole('button', { name: 'Pause' }).click();
+  for (let index = 0; index < milestone; index += 1) {
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+  }
+}
+
 // overnight-plan.txt Task 3.7: visual and interaction regression gates.
 // Screenshots are stored as real baseline artifacts (Playwright's
 // toHaveScreenshot snapshot mechanism), not approved without evidence.
@@ -39,7 +67,7 @@ async function gotoWorkspace(
   target: { rail: RegExp | null; heading: string | null },
 ) {
   await page.setViewportSize({ width, height });
-  await page.goto('/');
+  await page.goto('/?experience=fallback');
   await waitForOverviewLoaded(page);
   if (target.rail) {
     await page.getByRole('button', { name: target.rail }).click();
@@ -78,6 +106,67 @@ test.describe('viewport regression', () => {
   });
 });
 
+// The primary judge flow is intentionally covered independently from the
+// illustrative fallback baselines above.  Each snapshot is pinned to an
+// authored milestone in the checksummed reference artifact, so a visual
+// change cannot accidentally hide a safety boundary or make the progressive
+// narrative look like a completed incident on first load.
+test.describe('reference incident visual regression', () => {
+  test('first-launch gateway @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'HydroSwarm is ready' })).toBeVisible();
+    await expect(page).toHaveScreenshot('gateway-1920x1080.png', { fullPage: true });
+  });
+
+  test('sampling pause @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 3);
+    await expect(page.getByRole('button', { name: 'Collect reference sample' })).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-sampling-pause-1920x1080.png', {
+      fullPage: true,
+    });
+  });
+
+  test('posterior contraction @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 5);
+    await expect(page.getByText('Posterior contracts')).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-posterior-1920x1080.png', { fullPage: true });
+  });
+
+  test('verification @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 8);
+    await page.getByRole('button', { name: /^Response/ }).click();
+    await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-verification-1920x1080.png', { fullPage: true });
+  });
+
+  test('approval boundary @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 9);
+    await page.getByRole('button', { name: /^Approval/ }).click();
+    await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Approve plan' })).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-approval-1920x1080.png', { fullPage: true });
+  });
+
+  test('LIVE V4 flow starts in an explicitly live-computation state @ 1920x1080', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    // Keep the real API request pending only long enough to snapshot the
+    // first truthful LIVE state.  The full LIVE workflow is exercised against
+    // the production backend in Docker/native checks; this baseline prevents
+    // a visual regression from relabeling this state as a replay or fallback.
+    await page.route('**/api/**', () => new Promise(() => undefined));
+    await page.goto('/?experience=live');
+    await expect(page.getByText('LIVE COMPUTATION · REFERENCE INPUTS')).toBeVisible();
+    await expect(page).toHaveScreenshot('live-v4-proof-start-1920x1080.png', { fullPage: true });
+  });
+});
+
 test.describe('keyboard-only navigation', () => {
   // Every rail stage the mission-control shell ships (ui-work.txt §31
   // UI-0..UI-9), reachable purely via Tab-to-focus + Enter-to-activate,
@@ -98,7 +187,7 @@ test.describe('keyboard-only navigation', () => {
   test('every workflow-rail stage is reachable and focus is visible without a mouse', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
 
     for (const { rail, heading } of stages) {
@@ -117,7 +206,7 @@ test.describe('keyboard-only navigation', () => {
   // exercise a real browser's native fragment-focus behavior, so this
   // is only verifiable end-to-end.
   test('skip link moves real keyboard focus to main content', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await skipLink.focus();
@@ -133,7 +222,7 @@ test.describe('keyboard-only navigation', () => {
   // React's #root, was first in DOM/tab order and had no working focus
   // target of its own. Locks down there is exactly one skip link now.
   test('exactly one skip link exists (no stale static duplicate)', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await expect(page.locator('.skip-link')).toHaveCount(1);
   });
@@ -141,7 +230,7 @@ test.describe('keyboard-only navigation', () => {
 
 test.describe('reduced-motion mode', () => {
   test('toggle is reachable, persists, and is announced via aria-pressed', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     const toggle = page.getByRole('button', { name: /Reduced motion/ });
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await toggle.click();
@@ -151,7 +240,7 @@ test.describe('reduced-motion mode', () => {
 
   test('emulated prefers-reduced-motion still renders a usable page', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   });
 });
@@ -160,7 +249,7 @@ test.describe('data-mode banners', () => {
   test('DEMO_FALLBACK banner is visible with no backend reachable (default test condition)', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     // Both the header's mode badge and the decision inspector's own
     // status badge render the real DEMO_FALLBACK mode -- intentional
@@ -188,7 +277,7 @@ test.describe('selected-plan synchronization', () => {
   // Pareto frontier and full action sequence it was previously
   // duplicated against).
   test('selecting a different plan in the table updates the highlighted row', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
@@ -210,7 +299,7 @@ test.describe('selected-plan synchronization', () => {
   test('selecting plan C updates the toolbar breadcrumb, inspector, and verification dock together', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
@@ -232,7 +321,7 @@ test.describe('long identifiers do not break layout', () => {
   test('overview renders without horizontal overflow when node/plan names are unusually long', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await waitForOverviewLoaded(page);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -250,7 +339,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
   for (const width of [1300, 900, 600]) {
     test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
-      await page.goto('/');
+      await page.goto('/?experience=fallback');
       await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
       const overflow = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
@@ -264,7 +353,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 900, height: 900 });
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     const inspector = page.locator('.decision-inspector');
     await expect(inspector).toBeVisible();

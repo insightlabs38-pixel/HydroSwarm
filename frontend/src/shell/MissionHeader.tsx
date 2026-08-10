@@ -1,10 +1,13 @@
 import type { IncidentView } from '../types';
+import { isCalibrationApplicable } from '../calibrationDisplay';
 import { StatusBadge } from '../components/StatusBadge';
 
 function modeTone(mode: IncidentView['mode']): 'good' | 'warn' | 'danger' | 'info' {
   switch (mode) {
     case 'LIVE':
       return 'good';
+    case 'REFERENCE':
+      return 'info';
     case 'REPLAY':
       return 'info';
     case 'DEMO_FALLBACK':
@@ -34,7 +37,10 @@ function readinessLabel(incident: IncidentView): {
   tone: 'good' | 'warn' | 'danger';
 } {
   if (incident.mode === 'ERROR') return { label: 'NOT READY', tone: 'danger' };
-  if (!incident.calibrationValid || incident.ood !== 'NORMAL')
+  if (
+    (isCalibrationApplicable(incident) && !incident.calibrationValid) ||
+    incident.ood !== 'NORMAL'
+  )
     return { label: 'DEGRADED', tone: 'warn' };
   return { label: 'READY', tone: 'good' };
 }

@@ -1,0 +1,59 @@
+........................................................................ [  8%]
+........................................................................ [ 16%]
+........................................................................ [ 24%]
+........................................................................ [ 32%]
+........................................................................ [ 40%]
+........................................................................ [ 48%]
+........................................................................ [ 56%]
+........................................................................ [ 64%]
+........................................................................ [ 72%]
+........................................................................ [ 80%]
+........................................................................ [ 88%]
+........................................................................ [ 96%]
+...............................                                          [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /workspace/HydroSwarm/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/e2e/test_golden_scenario.py: 4 warnings
+tests/e2e/test_swarm_controller.py: 4 warnings
+tests/integration/test_incident_view_contract.py: 17 warnings
+tests/integration/test_live_exposure_verification.py: 11 warnings
+tests/integration/test_network_import.py: 7 warnings
+tests/integration/test_production_runtime_wiring.py: 6 warnings
+tests/integration/test_v4_release_bundle.py: 6 warnings
+tests/scientific/test_auxiliary_labels.py: 29 warnings
+tests/scientific/test_bundle_f_topologies.py: 32 warnings
+tests/scientific/test_corpus_sentinel_labels.py: 74 warnings
+tests/scientific/test_decision_certificates.py: 4 warnings
+tests/scientific/test_evidence_certificate.py: 9 warnings
+tests/scientific/test_exposure_aware_plan_evaluation.py: 28 warnings
+tests/scientific/test_feature_builder.py: 1 warning
+tests/scientific/test_fit_dynamic_fusion_calibration.py: 1836 warnings
+tests/scientific/test_full_trajectory.py: 165 warnings
+tests/scientific/test_generate_ood_extension_corpus.py: 135 warnings
+tests/scientific/test_generate_trajectory_corpus.py: 2724 warnings
+tests/scientific/test_hybrid_pipeline.py: 14 warnings
+tests/scientific/test_hybrid_pipeline_v4_gating.py: 17 warnings
+tests/scientific/test_merge_trajectory_targets.py: 822 warnings
+tests/scientific/test_ood_labels.py: 76 warnings
+tests/scientific/test_run_corpus_gates.py: 341 warnings
+tests/scientific/test_scenario_generation.py: 50 warnings
+tests/scientific/test_scenario_reconstruction.py: 48 warnings
+tests/scientific/test_scout_labels.py: 58 warnings
+tests/scientific/test_scout_trajectory.py: 107 warnings
+tests/scientific/test_second_pass_control_labels.py: 17 warnings
+tests/scientific/test_simulator_extended.py: 11 warnings
+tests/scientific/test_strategist_labels.py: 222 warnings
+tests/scientific/test_strategist_trajectory.py: 279 warnings
+tests/scientific/test_train_serve_parity_gate.py: 109 warnings
+tests/scientific/test_windows_simulator_smoke.py: 13 warnings
+tests/unit/test_cli.py: 1 warning
+tests/unit/test_sharded_data.py: 2 warnings
+tests/unit/test_verifier.py: 10 warnings
+  /usr/local/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=846057) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    self.pid = os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+895 passed, 7290 warnings in 618.63s (0:10:18)

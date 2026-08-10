@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import cytoscape from 'cytoscape';
 import type { NetworkRecord } from '../types';
-import { fetchNetworks, importNetwork } from '../api/networks';
+import { createIncidentForNetwork, fetchNetworks, importNetwork } from '../api/networks';
 import { ApiError } from '../api/client';
+import { selectIncident } from '../incidentSelection';
+import { useConsoleStore } from '../store';
 import { Panel } from '../components/Panel';
 import { StatusBadge } from '../components/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
@@ -110,6 +112,107 @@ function NetworkDetail({ network }: { network: NetworkRecord }) {
       )}
       <TopologyPreview network={network} />
     </>
+  );
+}
+
+/**
+ * SUB-12.1 P1 #6: the compact, API-assisted incident-creation form for the
+ * "Import Your Own Network" advanced path. Deliberately minimal -- one
+ * initial observation at a real node from the imported network, not a
+ * multi-step wizard -- through the real POST /api/incidents endpoint.
+ * Only rendered once a network has actually validated.
+ */
+function CreateIncidentPanel({ network }: { network: NetworkRecord }) {
+  const queryClient = useQueryClient();
+  const setWorkspace = useConsoleStore((state) => state.setWorkspace);
+  // Real production signature-localization policy
+  // (models/hydrocore-v4-release/signature-policy-manifest.json:
+  // sensor_layout_policy = "all_junctions_as_sensor_candidates") only
+  // recognizes junctions as valid sensor nodes -- see
+  // hydroswarm.evaluation.live_example's own INITIAL_SENSOR comment for the
+  // live smoke run that surfaced this. Defaults this compact form to a
+  // node id that will actually work with real analysis.
+  const junctionNodes = network.nodes.filter((node) => node.nodeType === 'junction');
+  const candidateNodes = junctionNodes.length > 0 ? junctionNodes : network.nodes;
+  const [nodeId, setNodeId] = useState(candidateNodes[0]?.nodeId ?? '');
+  const [concentration, setConcentration] = useState('0');
+  const [pressure, setPressure] = useState('');
+
+  const createMutation = useMutation({
+    mutationFn: () =>
+      createIncidentForNetwork(network.networkId, {
+        nodeId,
+        concentrationMgL: Number(concentration),
+        pressureM: pressure.trim() === '' ? null : Number(pressure),
+      }),
+    onSuccess: (incidentId) => {
+      selectIncident(incidentId);
+      void queryClient.invalidateQueries({ queryKey: ['active-incident'] });
+      setWorkspace('incident');
+    },
+  });
+
+  if (candidateNodes.length === 0) {
+    return (
+      <Panel title="Create incident" eyebrow="API-ASSISTED" className="wide-panel">
+        <EmptyState title="This network has no topology metadata to seed an initial observation from." />
+      </Panel>
+    );
+  }
+
+  return (
+    <Panel title="Create incident" eyebrow="API-ASSISTED" className="wide-panel">
+      <p className="supporting">
+        One initial observation is enough to start an incident against this network -- through the
+        real production API, exactly like every other incident here.
+      </p>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          createMutation.mutate();
+        }}
+      >
+        <label>
+          Sensor node
+          <select value={nodeId} onChange={(event) => setNodeId(event.target.value)}>
+            {candidateNodes.map((node) => (
+              <option key={node.nodeId} value={node.nodeId}>
+                {node.nodeId}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Concentration (mg/L)
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={concentration}
+            onChange={(event) => setConcentration(event.target.value)}
+          />
+        </label>
+        <label>
+          Pressure (m, optional)
+          <input
+            type="number"
+            step="0.01"
+            value={pressure}
+            onChange={(event) => setPressure(event.target.value)}
+          />
+        </label>
+        <button type="submit" disabled={createMutation.isPending}>
+          {createMutation.isPending ? 'Creating…' : 'Create incident'}
+        </button>
+      </form>
+      {createMutation.isError && (
+        <p className="supporting" role="alert">
+          {createMutation.error instanceof ApiError
+            ? createMutation.error.message
+            : 'Incident creation failed.'}
+        </p>
+      )}
+    </Panel>
   );
 }
 
@@ -250,6 +353,7 @@ export function NetworkWorkspace() {
           <EmptyState title="Select a network above to see its validation detail." />
         )}
       </Panel>
+      {selected && selected.valid && <CreateIncidentPanel network={selected} />}
     </div>
   );
 }

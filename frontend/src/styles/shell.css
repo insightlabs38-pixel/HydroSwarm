@@ -129,6 +129,18 @@
 .mode-banner button {
   margin-left: auto;
 }
+.mode-banner-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+.mode-banner-controls button {
+  margin-left: 0;
+}
+.mode-banner-pause-reason {
+  font-style: italic;
+}
 
 /* ---------- Workflow rail ---------- */
 
@@ -505,6 +517,74 @@
 .audit-list-row[aria-pressed='true'] {
   border-color: var(--border-strong);
   background: var(--panel-raised);
+}
+
+/* ---------- First-launch gateway ---------- */
+
+.first-launch-gateway {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: var(--bg-root);
+  padding: 1.5rem;
+}
+.first-launch-panel {
+  width: min(420px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.first-launch-panel h1 {
+  font-size: 18px;
+  margin: 0;
+  color: var(--text-primary);
+}
+.first-launch-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.first-launch-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+}
+.first-launch-primary {
+  border-color: var(--cyan);
+}
+.first-launch-recommended {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cyan);
+}
+.first-launch-secondary-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.live-example-pause {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--panel-raised);
+}
+.first-launch-secondary {
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  text-decoration: underline;
+  font-size: 12px;
 }
 
 /* ---------- Shared small components ---------- */

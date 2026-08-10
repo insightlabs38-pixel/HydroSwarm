@@ -1,5 +1,14 @@
 # Operator guide
 
+## 0. Start
+
+On first launch with no incident configured, choose **Run Reference Incident** to see the
+full workflow below play out against a real, checksummed replay with no setup required, or
+proceed to step 1 to work with a real network. See [Installation](INSTALLATION.md) for
+setup and [Final system](FINAL_SYSTEM.md) for the experience-state labels (`LIVE`,
+`REFERENCE INCIDENT`, `ILLUSTRATIVE DEMO`, `INCIDENT UNAVAILABLE`) you may see in the mode
+banner.
+
 ## 1. Prepare a network
 
 Import a local EPANET `.inp` file from the Network view. Review validation errors,
@@ -22,18 +31,24 @@ outcome—not an error to hide.
 
 ## 4. Collect the recommended sample
 
-Scout reports the expected information gain, likely candidate reduction, detection
-probability, travel/delay cost, redundancy, and access constraints for each recommendation.
-Record an arriving sample against its request. Reanalysis must create a new posterior
-revision; the timeline and Evidence Changed panel show contraction or expansion and why.
+The Evidence Value / Stop Certificate reports the recommended node, expected information
+gain, expected candidate reduction, remaining sample budget, and whether the recommended
+node is currently accessible. (The deterministic ranking underneath also weighs
+detectability, delay, cost, and redundancy -- but only the fields above are surfaced to the
+operator per recommendation.) Record an arriving sample against its request. Reanalysis
+must create a new posterior revision; the timeline and Evidence Changed panel show
+contraction or expansion and why.
 
 ## 5. Compare response plans
 
 Compare no response, Plan A, Plan B, and rejected candidates side by side. Check exposure
-mass/volume/population proxies, minimum pressure, service/unserved demand, pump energy,
-action count, verification completeness, and regret/Pareto status. `VERIFIED` means a
-completed WNTR run passed every configured hard constraint. It does not mean a plan is
-approved or safe in the real utility.
+mass/volume/population proxies, minimum pressure, service/unserved demand, action count,
+verification completeness, and Pareto-dominance status. `VERIFIED` means a completed WNTR
+run passed every configured hard constraint. It does not mean a plan is approved or safe in
+the real utility. (A trained plan-regret head exists but is not runtime-enabled -- see
+[Final system](FINAL_SYSTEM.md#what-is-and-is-not-runtime-enabled) -- so no numeric regret
+score is shown; pump energy is computed by the simulator internally but is not currently
+surfaced to the operator either.)
 
 ## 6. Approve or reject
 

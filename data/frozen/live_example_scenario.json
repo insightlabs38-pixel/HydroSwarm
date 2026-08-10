@@ -1,0 +1,14 @@
+{
+  "candidate_sources": ["J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8"],
+  "contamination_threshold_mg_l": 0.001,
+  "initial_sensor": "J1",
+  "network_id": "live-example-network-v1",
+  "sample_time_seconds": 14400,
+  "schema_version": "hydroswarm-live-example-v1",
+  "source_profile": {
+    "duration_minutes": 60,
+    "start_minute": 0,
+    "strength_mg_min": 10.0
+  },
+  "true_source": "J6"
+}

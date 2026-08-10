@@ -1,0 +1,6 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            BuildKit is currently disabled; enable it by removing the DOCKER_BUILDKIT=0
+            environment-variable.
+
+time="2026-08-10T02:04:58Z" level=error msg="Can't add file /workspace/HydroSwarm/artifacts/migration/cycle-b2-scenarios-calibration.tar.zst to tar: io: read/write on closed pipe"
+Error response from daemon: unshare: operation not permitted

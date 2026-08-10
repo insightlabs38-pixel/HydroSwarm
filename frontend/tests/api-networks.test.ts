@@ -86,3 +86,44 @@ test('sends a real multipart/form-data import request, not JSON, and surfaces a 
   expect(init.body).toBeInstanceOf(FormData);
   expect(init.headers?.['Content-Type']).toBeUndefined();
 });
+
+test('createIncidentForNetwork posts a real single-observation incident, triggers real analysis, and returns the real incident id', async () => {
+  const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ incident_id: 'incident-abc' }));
+  vi.stubGlobal('fetch', fetchMock);
+  const { createIncidentForNetwork } = await import('../src/api/networks');
+
+  const incidentId = await createIncidentForNetwork('net-1', {
+    nodeId: 'J1',
+    concentrationMgL: 0,
+    pressureM: 30,
+  });
+
+  expect(incidentId).toBe('incident-abc');
+  expect(fetchMock).toHaveBeenCalledTimes(2);
+  const [createUrl, createInit] = fetchMock.mock.calls[0];
+  expect(String(createUrl)).toContain('/incidents');
+  const body = JSON.parse(createInit.body as string);
+  expect(body.network_id).toBe('net-1');
+  expect(body.observations).toHaveLength(1);
+  expect(body.observations[0]).toMatchObject({
+    sensor_id: 'S-J1',
+    node_id: 'J1',
+    concentration_mg_l: 0,
+    pressure_m: 30,
+  });
+  const [analyzeUrl, analyzeInit] = fetchMock.mock.calls[1];
+  expect(String(analyzeUrl)).toContain('/incidents/incident-abc/analyze');
+  expect(analyzeInit.method).toBe('POST');
+});
+
+test('createIncidentForNetwork sends a null pressure when the optional field is left blank', async () => {
+  const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ incident_id: 'incident-abc' }));
+  vi.stubGlobal('fetch', fetchMock);
+  const { createIncidentForNetwork } = await import('../src/api/networks');
+
+  await createIncidentForNetwork('net-1', { nodeId: 'J1', concentrationMgL: 0, pressureM: null });
+
+  const [, init] = fetchMock.mock.calls[0];
+  const body = JSON.parse(init.body as string);
+  expect(body.observations[0].pressure_m).toBeNull();
+});

@@ -1,0 +1,152 @@
+name: HydroSwarm Docker Build & Runtime Gate (PR)
+
+# SUB-12.1 #23: a real amd64 + arm64 Docker build and a real, hardened,
+# running container for every pull request -- deliberately NEVER pushes
+# to GHCR (no `docker/login-action`, no `push: true` anywhere in this
+# file). This is the PR-time proof that release.yml's actual published
+# image build will work and pass the same runtime gates before any image
+# is ever pushed; release.yml's own container-self-test job re-runs the
+# authoritative check against the real published image afterward.
+#
+# Only once both this workflow and release.yml's container-self-test have
+# actually run green may documentation claim the Docker image is
+# "TESTED" for a given platform -- neither this file nor any doc should
+# ever claim a platform passed without a real run backing it.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker-verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      # This is a native single-platform PR gate: no QEMU and no
+      # docker-container BuildKit bootstrap are necessary.  In particular,
+      # it avoids turning a Docker Hub pull of moby/buildkit into an
+      # application CI failure before the image is even built.
+      - name: Build image (${{ matrix.platform }}, no push)
+        run: docker build --tag hydroswarm:pr-verify .
+
+      # Release-like hardening (matches the production posture this image
+      # is meant to run under, not a looser CI-only configuration):
+      # read-only root filesystem, a tmpfs /tmp for whatever scratch
+      # space the runtime needs, every Linux capability dropped, no
+      # privilege escalation, a writable named volume at /data (the only
+      # path HYDROSWARM_DATA_DIR ever writes to), and the published port
+      # bound to loopback only.
+      - name: Run hardened container (${{ matrix.platform }})
+        run: |
+          docker run -d --name hydroswarm-pr-verify \
+            --read-only \
+            --tmpfs /tmp:rw,exec,mode=1777 \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            -v hydroswarm-pr-verify-data:/data \
+            -p 127.0.0.1:8765:8765 \
+            hydroswarm:pr-verify
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify health, readiness, reference-demo, and built frontend
+        run: python3 scripts/docker_ci_verify.py health
+
+      # The exact frozen identity, inside the actual running container --
+      # not a rebuilt copy, not the source checkout's own bundle.
+      - name: Verify exact frozen hashes via strict self-test inside the container
+        run: |
+          docker exec hydroswarm-pr-verify hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
+          python3 -c "
+          import json
+          report = json.load(open('self-test-${{ strategy.job-index }}.json'))
+          assert report['ok'] is True, report.get('strict_failures', report)
+          assert report['trained_assets']['model_sha256'], 'missing model hash'
+          print('container strict self-test OK for ${{ matrix.platform }}:', report['trained_assets']['model_sha256'])
+          "
+
+      # WNTR's basic hydraulic self-test does not exercise EpanetSimulator's
+      # water-quality shared-library path. Prove it explicitly before the
+      # larger API workflow so an architecture packaging failure is clear.
+      - name: Verify real EPANET quality smoke inside hardened container
+        run: |
+          docker exec hydroswarm-pr-verify python -c "
+          from hydroswarm.evaluation.live_example import build_live_example_inputs
+          from hydroswarm.runtime.paths import resolve_frozen_scenario_dir
+          inputs = build_live_example_inputs(resolve_frozen_scenario_dir())
+          assert any(value > 0.0 for value in inputs['candidate_signatures_mg_l'].values())
+          print('container real EPANET quality smoke OK')
+          "
+
+      # Real network import, real DB write (a new incident + evidence),
+      # real re-analysis, real bounded WNTR/EPANET exact verification, and
+      # a real human-approval event -- all through the real production
+      # API, against the real running (hardened) container. Writes the
+      # created incident id to a state file for the persistence check below.
+      - name: Verify real LIVE example workflow (network import, DB write, real WNTR verification, approval)
+        run: python3 scripts/docker_ci_verify.py live-workflow --state-file docker-ci-state.json
+
+      - name: Restart the container
+        run: docker restart hydroswarm-pr-verify
+
+      - name: Verify persistence after restart
+        run: python3 scripts/docker_ci_verify.py verify-persistence --state-file docker-ci-state.json
+
+      # The running container's own outbound network posture: with no
+      # working DNS resolver configured, any code path that depended on
+      # reaching an external host would fail immediately -- the fact that
+      # every real API call above (including a real WNTR/EPANET
+      # verification and the full incident lifecycle) already succeeded
+      # confirms none of it needed external resolution. This step re-runs
+      # the same real workflow once more under that condition as an
+      # explicit, dedicated check, not just an inference from the
+      # earlier steps.
+      - name: Verify no external network dependency (no working DNS resolver)
+        run: |
+          docker stop hydroswarm-pr-verify
+          docker rm hydroswarm-pr-verify
+          docker run -d --name hydroswarm-pr-verify-offline \
+            --dns 0.0.0.0 \
+            --read-only \
+            --tmpfs /tmp:rw,exec,mode=1777 \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            -v hydroswarm-pr-verify-offline-data:/data \
+            -p 127.0.0.1:8765:8765 \
+            hydroswarm:pr-verify
+          python3 scripts/docker_ci_verify.py health
+          python3 scripts/docker_ci_verify.py live-workflow --state-file /dev/null
+
+      - name: Container logs (always, for diagnosis)
+        if: always()
+        # `cmd 2>&1 | tail` masks `cmd`'s own exit code with `tail`'s (which
+        # always succeeds), so `A | tail || B | tail` never actually falls
+        # through to B -- each container is checked and printed
+        # independently instead.
+        run: |
+          for name in hydroswarm-pr-verify hydroswarm-pr-verify-offline; do
+            if docker inspect "$name" >/dev/null 2>&1; then
+              echo "=== docker logs $name ==="
+              docker logs "$name" 2>&1 | tail -200
+            fi
+          done
+
+      - name: Clean up
+        if: always()
+        run: |
+          docker rm -f hydroswarm-pr-verify hydroswarm-pr-verify-offline 2>/dev/null || true
+          docker volume rm hydroswarm-pr-verify-data hydroswarm-pr-verify-offline-data 2>/dev/null || true
