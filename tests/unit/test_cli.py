@@ -134,7 +134,7 @@ def test_main_self_test_human_prints_checklist_not_json(
     out = capsys.readouterr().out
     assert "HydroSwarm readiness" in out
     assert "READY" in out
-    assert "✓ Frozen HydroCore-v4 bundle verified" in out
+    assert "OK Frozen HydroCore-v4 bundle verified" in out
     with pytest.raises(json.JSONDecodeError):
         json.loads(out)
 
@@ -150,7 +150,7 @@ def test_render_self_test_report_flags_not_ready_reasons() -> None:
     }
     rendered = cli.render_self_test_report(report)
     assert "NOT READY" in rendered
-    assert "✗ Frozen HydroCore-v4 bundle verified" in rendered
+    assert "FAIL Frozen HydroCore-v4 bundle verified" in rendered
     assert "reason: classical-safe fallback" in rendered
     assert "reason: frontend not built" in rendered
 

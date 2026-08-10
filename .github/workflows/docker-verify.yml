@@ -24,30 +24,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [linux/amd64, linux/arm64]
-    runs-on: ubuntu-latest
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-24.04
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up QEMU (cross-arch emulation for linux/arm64)
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # push:false, load:true -- builds a real image for this one
-      # platform and loads it into the local Docker daemon so it can
-      # actually be run and tested below. No registry credentials are
-      # configured anywhere in this job.
+      # This is a native single-platform PR gate: no QEMU and no
+      # docker-container BuildKit bootstrap are necessary.  In particular,
+      # it avoids turning a Docker Hub pull of moby/buildkit into an
+      # application CI failure before the image is even built.
       - name: Build image (${{ matrix.platform }}, no push)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: ${{ matrix.platform }}
-          push: false
-          load: true
-          tags: hydroswarm:pr-verify
+        run: docker build --tag hydroswarm:pr-verify .
 
       # Release-like hardening (matches the production posture this image
       # is meant to run under, not a looser CI-only configuration):
@@ -59,7 +51,6 @@ jobs:
       - name: Run hardened container (${{ matrix.platform }})
         run: |
           docker run -d --name hydroswarm-pr-verify \
-            --platform ${{ matrix.platform }} \
             --read-only \
             --tmpfs /tmp:rw,exec,mode=1777 \
             --cap-drop ALL \
@@ -116,7 +107,6 @@ jobs:
           docker stop hydroswarm-pr-verify
           docker rm hydroswarm-pr-verify
           docker run -d --name hydroswarm-pr-verify-offline \
-            --platform ${{ matrix.platform }} \
             --dns 0.0.0.0 \
             --read-only \
             --tmpfs /tmp:rw,exec,mode=1777 \

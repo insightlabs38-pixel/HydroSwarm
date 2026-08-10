@@ -6,6 +6,7 @@ import hashlib
 import importlib
 import importlib.metadata
 import json
+import os
 import sqlite3
 import socket
 import subprocess
@@ -101,25 +102,19 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
         raise RuntimeError("fixed HydroCore inference is invalid")
     inference_hash = hashlib.sha256(source_probabilities.numpy().tobytes()).hexdigest()
 
-    # SUB-12.1 #22: a real windows-latest CI run surfaced
-    # SimulationTimeoutError here at 20s, then again at 60s (~64s actual),
-    # then again at 150s (~155s actual) -- on Windows, HydraulicSimulator.
-    # _run_with_timeout must use multiprocessing's "spawn" start method
-    # (no fork() on Windows). Under spawn, locating the picklable-by-
-    # reference worker function requires re-executing enough of the
-    # parent's import graph to reach it, which can transitively reimport
-    # torch/numpy/pandas/wntr from scratch even though this specific
-    # worker only needs wntr -- compounded by real-world GitHub-hosted
-    # Windows runners' well-documented slow process-creation overhead
-    # (antivirus/Defender scanning each new process). self-test runs once
-    # at startup, not on a hot path, so a generous bound here costs
-    # nothing real while still being a real, bounded timeout -- not
-    # unbounded. If this still is not enough on some future run, that is
-    # itself evidence of a genuine hang, not just slowness, and needs
-    # separate investigation rather than another blind increase.
+    # Keep this tiny WNTR smoke outside the heavy CLI process.  On Windows,
+    # the regular production simulator correctly uses spawn, but spawning it
+    # from the fully-imported CLI self-test recursively bootstrapped the
+    # large import graph and exceeded its bound.  The dedicated module builds
+    # its own small network and has a separate, bounded process lifetime.
+    worker_env = os.environ.copy()
+    source_root = str(Path(__file__).resolve().parents[1])
+    worker_env["PYTHONPATH"] = os.pathsep.join(
+        value for value in (source_root, worker_env.get("PYTHONPATH")) if value
+    )
     worker = subprocess.run(
         [sys.executable, "-m", "hydroswarm.simulation.self_test_worker"],
-        capture_output=True, text=True, timeout=60, check=False,
+        capture_output=True, text=True, timeout=60, check=False, env=worker_env,
     )
     if worker.returncode:
         raise RuntimeError(f"bounded WNTR self-test worker failed: {worker.stderr.strip()}")

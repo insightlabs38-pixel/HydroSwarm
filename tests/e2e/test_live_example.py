@@ -37,9 +37,9 @@ def test_candidate_signatures_cover_every_network_node_with_real_simulated_value
     for value in signatures.values():
         assert isinstance(value, float)
         assert value >= 0.0
-    # The true source's own node must show measurable contamination at its
-    # own peak -- a real physical consequence of simulating a real source
-    # profile there, not an arbitrary placeholder.
+    # The true source's own node must show measurable contamination at the
+    # declared common observation time -- never at a separately cherry-picked
+    # per-node peak.
     assert signatures[TRUE_SOURCE] > 0.0
 
 

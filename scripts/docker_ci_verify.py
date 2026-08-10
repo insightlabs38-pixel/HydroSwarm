@@ -260,6 +260,15 @@ def cmd_verify_persistence(args: argparse.Namespace) -> int:
     state = json.loads(Path(args.state_file).read_text())
     incident_id = state["incident_id"]
 
+    # Incident evidence, plans, verifications, and approvals are durable;
+    # the hybrid analysis object is deliberately in-memory because it holds
+    # non-serializable pipeline state.  Rebuild that projection through the
+    # real API after restart before requesting its derived IncidentView.
+    # This proves both that the volume retained the incident and that the
+    # runtime can recover it without treating cached analysis as evidence.
+    status, body = _request(base_url, "POST", f"/api/incidents/{incident_id}/analyze")
+    assert status == 200, f"persisted incident {incident_id} could not be re-analyzed after restart: {status}: {body}"
+
     status, view = _request(base_url, "GET", f"/api/incidents/{incident_id}/view")
     assert status == 200, (
         f"incident {incident_id} not found after restart (status {status}) -- "

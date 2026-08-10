@@ -86,18 +86,13 @@ def build_live_example_inputs(frozen_scenario_dir: str | Path) -> dict[str, Any]
     )
     sample_time = scenario["sample_time_seconds"]
     all_nodes = list(simulation.concentration_mg_l.columns)
-    # The contamination plume here is advective, not diffusive: at any
-    # single simulated instant, only whichever node the plume front
-    # currently occupies reads nonzero (confirmed by inspecting the full
-    # series -- J6 peaks at t=3600, J7 at t=7200, J8 at t=14400, never more
-    # than one node at once). Reporting each node's own PEAK concentration
-    # across the full incident window (rather than one shared instant) is
-    # what a real sensor at that node would have captured had the plume
-    # passed through it during the incident -- real physics, just not
-    # collapsed onto one universal timestamp the way the golden network's
-    # (tank-buffered, more diffusive) transport allows.
+    if sample_time not in simulation.concentration_mg_l.index:
+        raise RuntimeError(f"frozen LIVE sample time {sample_time!r} is not a simulated timestep")
+    # Every value is an observation from the same declared instant.  Do not
+    # combine each node's peak from a different timestep with one shared
+    # sample timestamp: that would be physically impossible evidence.
     node_signatures = {
-        node: float(simulation.concentration_mg_l[node].max()) for node in all_nodes
+        node: float(simulation.concentration_mg_l.loc[sample_time, node]) for node in all_nodes
     }
     # A real, WNTR-computed hydraulic state (pre-incident, time zero) for
     # the initial observation's pressure reading -- not a guessed constant.

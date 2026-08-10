@@ -41,23 +41,35 @@ def test_triggers_are_pull_request_and_dispatch_only() -> None:
 
 def test_builds_both_amd64_and_arm64() -> None:
     workflow = _load_workflow()
-    platforms = workflow["jobs"]["docker-verify"]["strategy"]["matrix"]["platform"]
+    platforms = [
+        entry["platform"]
+        for entry in workflow["jobs"]["docker-verify"]["strategy"]["matrix"]["include"]
+    ]
     assert set(platforms) == {"linux/amd64", "linux/arm64"}
 
 
 def test_never_pushes_or_logs_in_to_a_registry() -> None:
     workflow = _load_workflow()
     steps = workflow["jobs"]["docker-verify"]["steps"]
-    build_steps = [step for step in steps if step.get("uses", "").startswith("docker/build-push-action")]
-    assert build_steps, "expected a docker/build-push-action step"
-    for step in build_steps:
-        assert step["with"]["push"] is False
-        assert step["with"]["load"] is True
-
     assert not any(step.get("uses", "").startswith("docker/login-action") for step in steps)
     assert "env" not in workflow["jobs"]["docker-verify"] or "ghcr.io" not in str(
         workflow["jobs"]["docker-verify"].get("env", {})
     )
+    build_steps = [step for step in steps if step.get("name", "").startswith("Build image")]
+    assert build_steps and "docker build" in build_steps[0]["run"]
+
+
+def test_pr_docker_verification_uses_native_runners_without_qemu_or_buildx() -> None:
+    workflow = _load_workflow()
+    assert workflow["jobs"]["docker-verify"]["runs-on"] == "${{ matrix.runner }}"
+    runners = {
+        entry["platform"]: entry["runner"]
+        for entry in workflow["jobs"]["docker-verify"]["strategy"]["matrix"]["include"]
+    }
+    assert runners == {"linux/amd64": "ubuntu-24.04", "linux/arm64": "ubuntu-24.04-arm"}
+    uses = "\n".join(step.get("uses", "") for step in workflow["jobs"]["docker-verify"]["steps"])
+    assert "setup-qemu" not in uses
+    assert "setup-buildx" not in uses
 
 
 def test_runs_with_release_like_hardening() -> None:
