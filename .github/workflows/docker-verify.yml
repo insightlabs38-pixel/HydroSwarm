@@ -1,0 +1,139 @@
+name: HydroSwarm Docker Build & Runtime Gate (PR)
+
+# SUB-12.1 #23: a real amd64 + arm64 Docker build and a real, hardened,
+# running container for every pull request -- deliberately NEVER pushes
+# to GHCR (no `docker/login-action`, no `push: true` anywhere in this
+# file). This is the PR-time proof that release.yml's actual published
+# image build will work and pass the same runtime gates before any image
+# is ever pushed; release.yml's own container-self-test job re-runs the
+# authoritative check against the real published image afterward.
+#
+# Only once both this workflow and release.yml's container-self-test have
+# actually run green may documentation claim the Docker image is
+# "TESTED" for a given platform -- neither this file nor any doc should
+# ever claim a platform passed without a real run backing it.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docker-verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux/amd64, linux/arm64]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (cross-arch emulation for linux/arm64)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # push:false, load:true -- builds a real image for this one
+      # platform and loads it into the local Docker daemon so it can
+      # actually be run and tested below. No registry credentials are
+      # configured anywhere in this job.
+      - name: Build image (${{ matrix.platform }}, no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          push: false
+          load: true
+          tags: hydroswarm:pr-verify
+
+      # Release-like hardening (matches the production posture this image
+      # is meant to run under, not a looser CI-only configuration):
+      # read-only root filesystem, a tmpfs /tmp for whatever scratch
+      # space the runtime needs, every Linux capability dropped, no
+      # privilege escalation, a writable named volume at /data (the only
+      # path HYDROSWARM_DATA_DIR ever writes to), and the published port
+      # bound to loopback only.
+      - name: Run hardened container (${{ matrix.platform }})
+        run: |
+          docker run -d --name hydroswarm-pr-verify \
+            --platform ${{ matrix.platform }} \
+            --read-only \
+            --tmpfs /tmp \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            -v hydroswarm-pr-verify-data:/data \
+            -p 127.0.0.1:8765:8765 \
+            hydroswarm:pr-verify
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Verify health, readiness, reference-demo, and built frontend
+        run: python3 scripts/docker_ci_verify.py health
+
+      # The exact frozen identity, inside the actual running container --
+      # not a rebuilt copy, not the source checkout's own bundle.
+      - name: Verify exact frozen hashes via strict self-test inside the container
+        run: |
+          docker exec hydroswarm-pr-verify hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
+          python3 -c "
+          import json
+          report = json.load(open('self-test-${{ strategy.job-index }}.json'))
+          assert report['ok'] is True, report.get('strict_failures', report)
+          assert report['trained_assets']['model_sha256'], 'missing model hash'
+          print('container strict self-test OK for ${{ matrix.platform }}:', report['trained_assets']['model_sha256'])
+          "
+
+      # Real network import, real DB write (a new incident + evidence),
+      # real re-analysis, real bounded WNTR/EPANET exact verification, and
+      # a real human-approval event -- all through the real production
+      # API, against the real running (hardened) container. Writes the
+      # created incident id to a state file for the persistence check below.
+      - name: Verify real LIVE example workflow (network import, DB write, real WNTR verification, approval)
+        run: python3 scripts/docker_ci_verify.py live-workflow --state-file docker-ci-state.json
+
+      - name: Restart the container
+        run: docker restart hydroswarm-pr-verify
+
+      - name: Verify persistence after restart
+        run: python3 scripts/docker_ci_verify.py verify-persistence --state-file docker-ci-state.json
+
+      # The running container's own outbound network posture: with no
+      # working DNS resolver configured, any code path that depended on
+      # reaching an external host would fail immediately -- the fact that
+      # every real API call above (including a real WNTR/EPANET
+      # verification and the full incident lifecycle) already succeeded
+      # confirms none of it needed external resolution. This step re-runs
+      # the same real workflow once more under that condition as an
+      # explicit, dedicated check, not just an inference from the
+      # earlier steps.
+      - name: Verify no external network dependency (no working DNS resolver)
+        run: |
+          docker stop hydroswarm-pr-verify
+          docker rm hydroswarm-pr-verify
+          docker run -d --name hydroswarm-pr-verify-offline \
+            --platform ${{ matrix.platform }} \
+            --dns 0.0.0.0 \
+            --read-only \
+            --tmpfs /tmp \
+            --cap-drop ALL \
+            --security-opt no-new-privileges \
+            -v hydroswarm-pr-verify-offline-data:/data \
+            -p 127.0.0.1:8765:8765 \
+            hydroswarm:pr-verify
+          python3 scripts/docker_ci_verify.py health
+          python3 scripts/docker_ci_verify.py live-workflow --state-file /dev/null
+
+      - name: Container logs (always, for diagnosis)
+        if: always()
+        run: docker logs hydroswarm-pr-verify-offline 2>&1 | tail -200 || docker logs hydroswarm-pr-verify 2>&1 | tail -200 || true
+
+      - name: Clean up
+        if: always()
+        run: |
+          docker rm -f hydroswarm-pr-verify hydroswarm-pr-verify-offline 2>/dev/null || true
+          docker volume rm hydroswarm-pr-verify-data hydroswarm-pr-verify-offline-data 2>/dev/null || true
