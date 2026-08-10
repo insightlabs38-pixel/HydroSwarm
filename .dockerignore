@@ -14,6 +14,8 @@ coverage.xml
 data/*
 !data/frozen
 !data/frozen/**
+!data/topologies
+!data/topologies/**
 # Submission-readiness SUB-1 (P0): the frozen V4 release bundle is the one
 # models/ subtree the runtime image actually needs (Dockerfile COPYs it in
 # and serves it via HYDROSWARM_V4_BUNDLE_DIR) -- everything else under

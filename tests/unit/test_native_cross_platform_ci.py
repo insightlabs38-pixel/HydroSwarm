@@ -19,7 +19,7 @@ REQUIRED_PLATFORMS = {
     "linux-arm64": "ubuntu-24.04-arm",
     "windows-x86_64": "windows-latest",
     "macos-arm64": "macos-14",
-    "macos-x86_64": "macos-13",
+    "macos-x86_64": "macos-15",
 }
 
 
