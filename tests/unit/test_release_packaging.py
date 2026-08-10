@@ -212,3 +212,83 @@ def test_release_bundle_sha256sums_matches_every_entry(tmp_path: Path) -> None:
             assert name in expected, f"{name} missing from SHA256SUMS"
             actual = hashlib.sha256(archive.read(name)).hexdigest()
             assert actual == expected[name], f"checksum mismatch for {name}"
+
+
+def test_release_bundle_includes_every_helper_script_the_setup_scripts_reference(
+    tmp_path: Path,
+) -> None:
+    """SUB-12.1 P0: scripts/setup_common.py was missing from the release
+    zip even though every setup_hydroswarm_*.{sh,ps1} script requires it
+    to run at all -- a judge extracting the archive would have hit an
+    immediate "file not found" the moment they ran setup. This test scans
+    the real setup scripts for scripts/*.py references (the same audit
+    build_bundle() itself now runs) rather than special-casing
+    setup_common.py by name, so a *future* new helper-script dependency
+    fails this test too, not just the one already found."""
+    referenced = build_release_bundle.referenced_helper_scripts()
+    assert referenced, "sanity check: expected at least one scripts/*.py reference"
+
+    output = tmp_path / "test-runtime.zip"
+    build_release_bundle.build_bundle(output, release_version="v-test")
+
+    with zipfile.ZipFile(output) as archive:
+        names = set(archive.namelist())
+
+    missing = referenced - names
+    assert not missing, f"release zip is missing helper script(s) its own setup scripts require: {missing}"
+
+
+def test_build_bundle_fails_loudly_if_a_setup_script_references_an_unlisted_helper(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Proves the audit in build_bundle() is load-bearing, not dead code:
+    if REQUIRED_HELPER_SCRIPTS ever falls out of sync with what the setup
+    scripts actually reference, the build must fail, not silently ship a
+    broken zip again."""
+    monkeypatch.setattr(build_release_bundle, "REQUIRED_HELPER_SCRIPTS", [])
+    with pytest.raises(RuntimeError, match="not listed in REQUIRED_HELPER_SCRIPTS"):
+        build_release_bundle.build_bundle(tmp_path / "test-runtime.zip", release_version="v-test")
+
+
+def test_extracted_release_bundle_has_every_file_its_own_setup_scripts_need(tmp_path: Path) -> None:
+    """Structural extract-and-run check (fast tier -- no venv/network):
+    extracts the real built zip to a clean directory and verifies every
+    file `scripts/setup_common.py`'s own consumers, and pip's own editable
+    install, actually need is present at the paths the setup scripts
+    expect them at. The full setup-script-execution smoke (creates a real
+    venv, installs dependencies, launches the server) is a separate,
+    slower CI job -- see .github/workflows for the release-zip-smoke job
+    -- deliberately not run in the default fast unit-test tier."""
+    output = tmp_path / "test-runtime.zip"
+    build_release_bundle.build_bundle(output, release_version="v-test")
+
+    extract_dir = tmp_path / "extracted"
+    with zipfile.ZipFile(output) as archive:
+        archive.extractall(extract_dir)
+
+    for relative in build_release_bundle.SETUP_SCRIPTS:
+        assert (extract_dir / relative).is_file(), f"missing setup/start script: {relative}"
+    for relative in build_release_bundle.REQUIRED_HELPER_SCRIPTS:
+        assert (extract_dir / relative).is_file(), f"missing helper script: {relative}"
+
+    assert (extract_dir / "pyproject.toml").is_file()
+    assert (extract_dir / "LICENSE").is_file()
+    assert (extract_dir / "README.md").is_file()
+    assert (extract_dir / "src" / "hydroswarm" / "__init__.py").is_file()
+    assert (extract_dir / "models" / "hydrocore-v4-release" / "model.safetensors").is_file()
+
+    import shutil
+    import subprocess
+
+    if shutil.which("sha256sum") is None:
+        pytest.skip("sha256sum binary not available on this platform")
+
+    sha256sums = (extract_dir / "SHA256SUMS").read_text()
+    verify = subprocess.run(
+        ["sha256sum", "--check", "--strict"],
+        input=sha256sums,
+        cwd=extract_dir,
+        capture_output=True,
+        text=True,
+    )
+    assert verify.returncode == 0, f"sha256sum --check failed on the extracted tree:\n{verify.stdout}\n{verify.stderr}"

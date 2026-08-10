@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import zipfile
 from pathlib import Path
 
@@ -30,6 +31,20 @@ SETUP_SCRIPTS = [
     "start_hydroswarm_windows.ps1",
     "start_hydroswarm.sh",
     "start_hydroswarm.bat",
+]
+
+#: SUB-12.1 P0 fix: every setup script above invokes
+#: `scripts/setup_common.py` (check-python / verify-bundle /
+#: frontend-status / self-test subcommands) -- a runtime dependency of the
+#: setup path itself, not just a repo-dev convenience script. Omitting it
+#: from the release zip broke every included setup script the moment a
+#: judge actually ran one from the extracted archive. Audited against
+#: every `scripts/*` reference in SETUP_SCRIPTS' own files (see
+#: tests/unit/test_release_packaging.py's audit test, which fails loudly
+#: if a setup script starts referencing a scripts/*.py file not listed
+#: here) -- this is the complete set, not a guess.
+REQUIRED_HELPER_SCRIPTS = [
+    "scripts/setup_common.py",
 ]
 
 TOP_LEVEL_FILES = [
@@ -47,6 +62,33 @@ INCLUDED_DIRS = [
     "examples",
     "artifacts/reference-demo",
 ]
+
+
+#: Matches a `scripts/<name>.py` or `scripts\<name>.py` reference inside a
+#: setup/start script's own source text (bash and PowerShell both write it
+#: this way -- see e.g. setup_hydroswarm_windows.ps1's
+#: `"$ProjectRoot\scripts\setup_common.py"`).
+_SCRIPT_REFERENCE = re.compile(r"scripts[/\\]([A-Za-z0-9_]+\.py)")
+
+
+def referenced_helper_scripts() -> set[str]:
+    """Every `scripts/*.py` file the committed setup/start scripts
+    actually reference, found by scanning their own source text -- not a
+    hand-maintained guess. `REQUIRED_HELPER_SCRIPTS` must be a superset of
+    this (checked in `build_bundle` and in
+    tests/unit/test_release_packaging.py) so a future setup script that
+    starts calling a new helper script cannot silently ship a release zip
+    missing it, the same way `scripts/setup_common.py` was missing before
+    this fix."""
+    found: set[str] = set()
+    for relative in SETUP_SCRIPTS:
+        source = PROJECT_ROOT / relative
+        if not source.is_file():
+            continue
+        text = source.read_text(encoding="utf-8")
+        for match in _SCRIPT_REFERENCE.finditer(text):
+            found.add(f"scripts/{match.group(1)}")
+    return found
 
 
 def _iter_files(directory: Path) -> list[Path]:
@@ -71,6 +113,23 @@ def build_bundle(output_path: Path, *, release_version: str) -> Path:
         source = PROJECT_ROOT / relative
         if source.is_file():
             entries.append((source, relative))
+
+    missing_from_manifest = referenced_helper_scripts() - set(REQUIRED_HELPER_SCRIPTS)
+    if missing_from_manifest:
+        raise RuntimeError(
+            "setup/start scripts reference helper script(s) not listed in "
+            f"REQUIRED_HELPER_SCRIPTS: {sorted(missing_from_manifest)} -- add them there "
+            "before building the release bundle, or it will ship a broken setup path"
+        )
+
+    for relative in REQUIRED_HELPER_SCRIPTS:
+        source = PROJECT_ROOT / relative
+        if not source.is_file():
+            raise RuntimeError(
+                f"required helper script missing from the repository: {relative} -- "
+                "the release bundle would ship a setup script that cannot run"
+            )
+        entries.append((source, relative))
 
     for relative_dir in INCLUDED_DIRS:
         source_dir = PROJECT_ROOT / relative_dir
