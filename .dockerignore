@@ -7,7 +7,15 @@ __pycache__
 .coverage
 coverage.xml
 data
-models
+# Submission-readiness SUB-1 (P0): the frozen V4 release bundle is the one
+# models/ subtree the runtime image actually needs (Dockerfile COPYs it in
+# and serves it via HYDROSWARM_V4_BUNDLE_DIR) -- everything else under
+# models/ (training checkpoints, cycle-b2 candidates/controls) stays out of
+# the build context, both to keep it small and so the image never bundles
+# unpromoted/non-frozen weights.
+models/*
+!models/hydrocore-v4-release
+!models/hydrocore-v4-release/**
 experiments
 reports
 frontend/node_modules

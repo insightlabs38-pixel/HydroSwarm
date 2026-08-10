@@ -38,6 +38,7 @@ def run_self_test() -> dict[str, Any]:
 
     from hydroswarm.model import HydroCore
     from hydroswarm.runtime import V4PipelineFactory
+    from hydroswarm.runtime.paths import resolve_v4_bundle_dir
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
     from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
@@ -110,11 +111,15 @@ def run_self_test() -> dict[str, Any]:
         except OSError:
             port_available = False
     frontend_dist = workspace / "frontend" / "dist" / "index.html"
-    # UI-11.1: self-test must validate the exact same production runtime
-    # hydroswarm.api.app:app actually launches with -- both resolve
-    # models/hydrocore-v4-release the same way (workspace-relative), through
-    # the same V4PipelineFactory, never a separately-checked runtime.
-    trained_factory = V4PipelineFactory(workspace / "models" / "hydrocore-v4-release", project_root=workspace)
+    # UI-11.1 / submission-readiness SUB-1: self-test must validate the
+    # exact same production runtime hydroswarm.api.app:app actually
+    # launches with. Both now resolve the bundle directory through the
+    # single shared hydroswarm.runtime.paths.resolve_v4_bundle_dir
+    # function (HYDROSWARM_V4_BUNDLE_DIR override, else the source-tree
+    # default) instead of two independently-computed, workspace-relative
+    # paths that could silently diverge for a non-editable install or a
+    # non-repository-root working directory.
+    trained_factory = V4PipelineFactory(resolve_v4_bundle_dir())
     trained_assets_ready = trained_factory.trained_assets_ready
     identity = trained_factory.identity
 
@@ -135,6 +140,7 @@ def run_self_test() -> dict[str, Any]:
             "architecture_version": identity.architecture_version if identity is not None else None,
             "model_sha256": trained_factory.model_hash,
             "normalization_hash": identity.normalization_hash if identity is not None else None,
+            "bundle_dir": str(trained_factory.checkpoint_dir),
         },
         "inference_run": True,
         "inference_sha256": inference_hash,

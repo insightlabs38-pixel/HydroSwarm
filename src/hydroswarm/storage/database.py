@@ -13,6 +13,14 @@ def default_database_path() -> Path:
     configured = os.environ.get("HYDROSWARM_DB_PATH")
     if configured:
         return Path(configured).expanduser().resolve()
+    # Submission-readiness SUB-1: HYDROSWARM_DATA_DIR is the container
+    # image's writable volume mount (declared by the Dockerfile/
+    # docker-compose.yml since before this fix, but never previously read
+    # by any application code -- the database would otherwise default
+    # under the process cwd, which is the container's read-only root).
+    data_dir = os.environ.get("HYDROSWARM_DATA_DIR")
+    if data_dir:
+        return (Path(data_dir).expanduser() / "hydroswarm.db").resolve()
     return (Path.cwd() / "data" / "generated" / "hydroswarm.db").resolve()
 
 

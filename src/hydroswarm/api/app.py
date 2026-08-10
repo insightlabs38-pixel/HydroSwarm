@@ -64,6 +64,7 @@ from hydroswarm.simulation.wrapper import (
     wntr,
 )
 from hydroswarm.runtime import V4PipelineFactory
+from hydroswarm.runtime.paths import resolve_v4_bundle_dir
 
 from .state import (
     AnalysisResponse,
@@ -1574,8 +1575,14 @@ def create_app(
 # adapters=true / feature_and_logit path) is untouched and still importable;
 # it is simply no longer the module-level default this app object is built
 # with.
+#
+# Submission-readiness SUB-1: the bundle directory is resolved through
+# hydroswarm.runtime.paths.resolve_v4_bundle_dir, the same function
+# hydroswarm.cli.run_self_test uses, so a container/packaged deployment
+# (HYDROSWARM_V4_BUNDLE_DIR set) and a source checkout (unset) can never
+# silently disagree about which directory is actually being served.
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_V4_RELEASE_BUNDLE_DIR = _PROJECT_ROOT / "models" / "hydrocore-v4-release"
+DEFAULT_V4_RELEASE_BUNDLE_DIR = resolve_v4_bundle_dir(_PROJECT_ROOT)
 
 app = create_app(
     pipeline_factory=V4PipelineFactory(DEFAULT_V4_RELEASE_BUNDLE_DIR, project_root=_PROJECT_ROOT)

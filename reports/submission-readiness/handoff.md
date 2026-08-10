@@ -173,10 +173,10 @@ touched (matches SUB-0's "no source file has been changed before baseline record
   (`model_sha256 = a501ad87...`).
 - `tests/integration/test_v4_pipeline_factory.py`, `test_v4_release_bundle.py`: pass.
 - New unit tests: pass (see file list above).
-- `ruff check` + `pyright` on every touched file: clean.
-- Full repository `pytest -q` re-run after all SUB-1 changes: **see below** (was
-  in-flight in the background at report-drafting time; final tally recorded once
-  finished — check `reports/submission-readiness/sub1-pytest.log`).
+- `ruff check` + `pyright` on every touched file: clean (`sub1-ruff.log`, `sub1-pyright.log`).
+- Full repository `pytest -q` re-run after all SUB-1 changes:
+  **895 passed, 0 failed** (881 baseline + 14 new tests added this phase), 618.63s
+  wall time — zero regressions. See `reports/submission-readiness/sub1-pytest.log`.
 
 ### Known limitations / not verified this session
 
