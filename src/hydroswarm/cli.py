@@ -103,18 +103,22 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     inference_hash = hashlib.sha256(source_probabilities.numpy().tobytes()).hexdigest()
 
     # SUB-12.1 #22: a real windows-latest CI run surfaced
-    # SimulationTimeoutError here at 20s, then again at 60s (actual
-    # observed duration ~64s) -- on Windows, HydraulicSimulator.
+    # SimulationTimeoutError here at 20s, then again at 60s (~64s actual),
+    # then again at 150s (~155s actual) -- on Windows, HydraulicSimulator.
     # _run_with_timeout must use multiprocessing's "spawn" start method
-    # (no fork() on Windows), which reimports numpy/pandas/wntr/torch in
-    # the child interpreter for every call; that reimport cost, compounded
-    # by real-world GitHub-hosted Windows runners' well-documented slow
-    # process-creation overhead (antivirus/Defender scanning each new
-    # process), not the EPANET run itself, is what a cold/loaded CI runner
-    # blows through a tight timeout on. self-test runs once at startup,
-    # not on a hot path, so a generous bound here costs nothing real while
-    # still being a real, bounded timeout -- not unbounded.
-    simulator = HydraulicSimulator(hydraulic_model, timeout_seconds=150.0)
+    # (no fork() on Windows). Under spawn, locating the picklable-by-
+    # reference worker function requires re-executing enough of the
+    # parent's import graph to reach it, which can transitively reimport
+    # torch/numpy/pandas/wntr from scratch even though this specific
+    # worker only needs wntr -- compounded by real-world GitHub-hosted
+    # Windows runners' well-documented slow process-creation overhead
+    # (antivirus/Defender scanning each new process). self-test runs once
+    # at startup, not on a hot path, so a generous bound here costs
+    # nothing real while still being a real, bounded timeout -- not
+    # unbounded. If this still is not enough on some future run, that is
+    # itself evidence of a genuine hang, not just slowness, and needs
+    # separate investigation rather than another blind increase.
+    simulator = HydraulicSimulator(hydraulic_model, timeout_seconds=300.0)
     state = simulator.calculate_state(FEATURE_SNAPSHOT_TIME_SECONDS)
     if not state.pressure_m or not all(map(lambda value: value == value, state.pressure_m.values())):
         raise RuntimeError("fixed WNTR reference simulation is invalid")
