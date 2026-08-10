@@ -1,9 +1,9 @@
 {
-  "artifact_sha256": "62f54c505c51133bb856118b9ad48c4788b4adc5f3c14818b36448cc03eabc61",
+  "artifact_sha256": "f499a57eff7432afbd3ca51a20fe87d1a9cf698937aea4b8ee66c65b58fc0982",
   "description": "A checksummed replay of HydroSwarm's frozen, WNTR-backed golden incident workflow -- source localization, active sampling, plan verification, and human approval, end to end.",
   "event_count": 21,
   "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
-  "generated_at": "2026-08-10T04:14:16.982865+00:00",
+  "generated_at": "2026-08-10T04:19:38.579409+00:00",
   "generator": "scripts/build_reference_demo.py",
   "golden_result_hash": "d91cb7202cb8133ee0b8b656395d95d9fcddf10ba75e3de2f73acdf86f7da817",
   "milestones": [
@@ -33,6 +33,8 @@
       "label": "Incident detected",
       "milestone_id": "alert",
       "narrative": "A contamination alert opens the incident. The network model and incident record load and validate before any analysis runs.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -71,6 +73,8 @@
       "label": "Initial source uncertainty",
       "milestone_id": "initial_uncertainty",
       "narrative": "Data quality passes and the hydraulic state is estimated. With only the initial sensor reading, every candidate source is equally likely.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -109,10 +113,12 @@
       "label": "Evidence insufficient to plan",
       "milestone_id": "evidence_insufficient",
       "narrative": "The current evidence cannot narrow the candidate set enough to safely plan a response. Active sampling is required before proceeding.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
-      "auto_advance": true,
+      "auto_advance": false,
       "controller_state": "SAMPLE_SELECTION",
       "event_sequence_end": 8,
       "event_sequence_start": 8,
@@ -150,7 +156,9 @@
       "label": "Next sample selected",
       "milestone_id": "sample_recommended",
       "narrative": "Deterministic active sampling selects J2 -- the measured signature split with the largest expected information gain.",
-      "pause_reason": null
+      "pause_action": "COLLECT_REFERENCE_SAMPLE",
+      "pause_action_label": "Collect reference sample",
+      "pause_reason": "HydroSwarm pauses here rather than assuming a sample was taken -- evidence collection is a real, deliberate step, not a foregone conclusion."
     },
     {
       "auto_advance": true,
@@ -194,6 +202,8 @@
       "label": "Sample arrives",
       "milestone_id": "sample_received",
       "narrative": "A real measurement arrives from J2. The posterior has not been recomputed yet -- candidate probabilities are still the pre-sample values.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -232,6 +242,8 @@
       "label": "Posterior contracts",
       "milestone_id": "posterior_contracted",
       "narrative": "The measurement updates the posterior. The candidate region contracts from 4 nodes to 1, and evidence is now sufficient to plan.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -308,6 +320,8 @@
       "label": "Response plans generated",
       "milestone_id": "plans_generated",
       "narrative": "Two candidate response plans are generated. Neither has undergone exact WNTR/EPANET verification yet.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -436,6 +450,8 @@
       "label": "Unsafe plan rejected on verification",
       "milestone_id": "unsafe_plan_rejected",
       "narrative": "Exact WNTR/EPANET verification rejects the feeder-closure plan for violating a hard constraint (PRESSURE_BELOW_MINIMUM). The alternative plan has not been verified yet.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -614,6 +630,8 @@
       "label": "Safe plan verified",
       "milestone_id": "safe_plan_verified",
       "narrative": "Exact verification confirms the flush plan is safe: no constraint violations, and it is now eligible for human approval.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     },
     {
@@ -792,6 +810,8 @@
       "label": "Awaiting human approval",
       "milestone_id": "human_approval_boundary",
       "narrative": "The verified flush plan is selected and presented for approval. No action has been taken.",
+      "pause_action": "APPROVE_REFERENCE_PLAN",
+      "pause_action_label": "Approve plan",
       "pause_reason": "HydroSwarm never executes a response autonomously -- a verified plan pauses here until a human operator approves it."
     },
     {
@@ -970,6 +990,8 @@
       "label": "Response approved and simulated",
       "milestone_id": "completed",
       "narrative": "A human operator approves the verified plan. The approved response is simulated end to end, and the full, hash-chained event ledger is available for replay.",
+      "pause_action": null,
+      "pause_action_label": null,
       "pause_reason": null
     }
   ],
@@ -1115,6 +1137,6 @@
     "golden_network.inp",
     "golden_scenario.json"
   ],
-  "source_commit": "3eb7f846a8240cb3a79bc59c684686901d97d7d8",
+  "source_commit": "2bff781c5062795447952584ee718bfc997b4293",
   "title": "HydroSwarm reference incident"
 }

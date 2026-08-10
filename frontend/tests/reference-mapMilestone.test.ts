@@ -13,6 +13,8 @@ function baseMilestone(
     event_sequence_end: 2,
     auto_advance: true,
     pause_reason: null,
+    pause_action: null,
+    pause_action_label: null,
     highlight: 'incident_opened',
     narrative: 'An incident opens.',
     incident_view: {

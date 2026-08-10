@@ -23,11 +23,24 @@ export interface ReferenceController {
   narrative: string;
   isPaused: boolean;
   pauseReason: string | null;
+  /** Machine-readable identifier for what the pause action does (e.g.
+   * "COLLECT_REFERENCE_SAMPLE", "APPROVE_REFERENCE_PLAN"). Null when not
+   * paused. Not every pause is an approval -- see pauseActionLabel for
+   * what to actually put on the button. */
+  pauseAction: string | null;
+  /** Human-readable button label for the current pause, straight from the
+   * artifact (e.g. "Collect reference sample", "Approve plan"). Null when
+   * not paused. */
+  pauseActionLabel: string | null;
   isPlaying: boolean;
   isAtEnd: boolean;
   next: () => void;
   previous: () => void;
-  approve: () => void;
+  /** Advances past the current pause, whatever it is -- collecting a
+   * sample, approving a plan, or any future pause type. The milestone
+   * artifact (not this function) decides what each pause means; this
+   * never assumes "paused" implies "awaiting approval". */
+  performPauseAction: () => void;
   togglePlay: () => void;
   reset: () => void;
 }
@@ -49,8 +62,11 @@ export function useReferenceIncident(reducedMotion: boolean, enabled = true): Re
   const milestoneCount = artifact?.milestones.length ?? 0;
   const isAtEnd = milestoneCount > 0 && milestoneIndex >= milestoneCount - 1;
   // A milestone with auto_advance === false is a deliberate narrative
-  // pause (currently only the human-approval boundary) -- distinct from
-  // simply being paused via the play/pause control.
+  // pause -- distinct from simply being paused via the play/pause
+  // control. The reference narrative currently has two: collecting the
+  // next evidence sample (sample_recommended) and approving the verified
+  // plan (human_approval_boundary) -- see milestone.pause_action for
+  // which one this is; never assume a pause means approval specifically.
   const isPaused = milestone !== null && !milestone.auto_advance;
 
   function next() {
@@ -61,7 +77,7 @@ export function useReferenceIncident(reducedMotion: boolean, enabled = true): Re
   function previous() {
     setMilestoneIndex((index) => Math.max(index - 1, 0));
   }
-  function approve() {
+  function performPauseAction() {
     if (isPaused) next();
   }
   function togglePlay() {
@@ -105,11 +121,13 @@ export function useReferenceIncident(reducedMotion: boolean, enabled = true): Re
     narrative: milestone?.narrative ?? '',
     isPaused,
     pauseReason: milestone?.pause_reason ?? null,
+    pauseAction: milestone?.pause_action ?? null,
+    pauseActionLabel: milestone?.pause_action_label ?? null,
     isPlaying,
     isAtEnd,
     next,
     previous,
-    approve,
+    performPauseAction,
     togglePlay,
     reset,
   };

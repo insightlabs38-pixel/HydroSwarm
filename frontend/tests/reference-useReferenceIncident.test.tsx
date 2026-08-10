@@ -8,6 +8,8 @@ function milestone(
   id: string,
   autoAdvance: boolean,
   pauseReason: string | null = null,
+  pauseAction: string | null = null,
+  pauseActionLabel: string | null = null,
 ): ApiReferenceMilestone {
   return {
     index: 0,
@@ -18,6 +20,8 @@ function milestone(
     event_sequence_end: 0,
     auto_advance: autoAdvance,
     pause_reason: pauseReason,
+    pause_action: pauseAction,
+    pause_action_label: pauseActionLabel,
     highlight: 'x',
     narrative: `narrative for ${id}`,
     incident_view: {
@@ -54,14 +58,14 @@ const fakeArtifact: ApiReferenceArtifact = {
   network_topology: null,
   milestones: [
     milestone('alert', true),
-    milestone('boundary', false, 'awaiting approval'),
+    milestone('boundary', false, 'awaiting approval', 'APPROVE_REFERENCE_PLAN', 'Approve plan'),
     milestone('completed', true),
   ],
   artifact_sha256: 'artifact-hash',
 };
 
 vi.mock('../src/api/referenceDemo', () => ({
-  fetchReferenceArtifact: async () => fakeArtifact,
+  fetchReferenceArtifact: vi.fn(async () => fakeArtifact),
 }));
 
 function wrapper({ children }: { children: ReactNode }) {
@@ -106,16 +110,18 @@ test('pauses at a non-auto_advance milestone and does not advance on its own', a
   expect(result.current.milestoneIndex).toBe(1);
 });
 
-test('approve() advances past a paused milestone', async () => {
+test('performPauseAction() advances past a paused milestone, exposing the artifact-driven action/label', async () => {
   const { result } = renderHook(() => useReferenceIncident(false), { wrapper });
   await waitFor(() => expect(result.current.incident).not.toBeNull());
   await act(async () => {
     await vi.advanceTimersByTimeAsync(3300);
   });
   expect(result.current.isPaused).toBe(true);
+  expect(result.current.pauseAction).toBe('APPROVE_REFERENCE_PLAN');
+  expect(result.current.pauseActionLabel).toBe('Approve plan');
 
   act(() => {
-    result.current.approve();
+    result.current.performPauseAction();
   });
 
   expect(result.current.milestoneIndex).toBe(2);
@@ -161,4 +167,49 @@ test('togglePlay pauses auto-advance without discarding state, reset returns to 
   });
   expect(result.current.milestoneIndex).toBe(0);
   expect(result.current.isPlaying).toBe(true);
+});
+
+test('two distinct pause types are both handled generically, not hard-coded to "approval"', async () => {
+  const twoPauseArtifact: ApiReferenceArtifact = {
+    ...fakeArtifact,
+    milestones: [
+      milestone('alert', true),
+      milestone(
+        'sample_recommended',
+        false,
+        'awaiting sample collection',
+        'COLLECT_REFERENCE_SAMPLE',
+        'Collect reference sample',
+      ),
+      milestone('boundary', false, 'awaiting approval', 'APPROVE_REFERENCE_PLAN', 'Approve plan'),
+      milestone('completed', true),
+    ],
+  };
+  vi.mocked(
+    (await import('../src/api/referenceDemo')).fetchReferenceArtifact,
+  ).mockResolvedValueOnce(twoPauseArtifact);
+
+  const { result } = renderHook(() => useReferenceIncident(false), { wrapper });
+  await waitFor(() => expect(result.current.incident).not.toBeNull());
+
+  await act(async () => {
+    await vi.advanceTimersByTimeAsync(3300);
+  });
+  expect(result.current.isPaused).toBe(true);
+  expect(result.current.pauseAction).toBe('COLLECT_REFERENCE_SAMPLE');
+  expect(result.current.pauseActionLabel).toBe('Collect reference sample');
+
+  act(() => {
+    result.current.performPauseAction();
+  });
+  expect(result.current.milestoneIndex).toBe(2);
+  expect(result.current.isPaused).toBe(true);
+  expect(result.current.pauseAction).toBe('APPROVE_REFERENCE_PLAN');
+  expect(result.current.pauseActionLabel).toBe('Approve plan');
+
+  act(() => {
+    result.current.performPauseAction();
+  });
+  expect(result.current.milestoneIndex).toBe(3);
+  expect(result.current.isPaused).toBe(false);
 });

@@ -106,6 +106,12 @@ export interface ApiReferenceMilestone {
   event_sequence_end: number;
   auto_advance: boolean;
   pause_reason: string | null;
+  /** Machine-readable pause type (e.g. "COLLECT_REFERENCE_SAMPLE",
+   * "APPROVE_REFERENCE_PLAN"). Null when auto_advance is true. */
+  pause_action: string | null;
+  /** Human-readable button label for pause_action, straight from the
+   * artifact -- never hard-coded per pause type in the frontend. */
+  pause_action_label: string | null;
   incident_view: ApiReferenceIncidentView;
   highlight: string;
   narrative: string;

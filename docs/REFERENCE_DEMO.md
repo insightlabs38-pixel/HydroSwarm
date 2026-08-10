@@ -28,28 +28,37 @@ telemetry."*
 flowchart TD
   M0["alert"] --> M1["initial_uncertainty"]
   M1 --> M2["evidence_insufficient"]
-  M2 --> M3["sample_recommended"]
+  M2 --> M3["sample_recommended\n(PAUSE -- Collect reference sample)"]
   M3 --> M4["sample_received"]
   M4 --> M5["posterior_contracted"]
   M5 --> M6["plans_generated"]
   M6 --> M7["unsafe_plan_rejected"]
   M7 --> M8["safe_plan_verified"]
-  M8 --> M9["human_approval_boundary\n(PAUSE -- awaiting operator)"]
+  M8 --> M9["human_approval_boundary\n(PAUSE -- Approve plan)"]
   M9 --> M10["completed\n(replayable event ledger)"]
 
   classDef pause fill:#f4b45f,stroke:#7a5a20,color:#1a1206,font-weight:bold;
   classDef done fill:#b6df83,stroke:#324a1a,color:#0c1806,font-weight:bold;
-  class M9 pause;
+  class M3,M9 pause;
   class M10 done;
 ```
 
 (Source: [docs/diagrams/reference-incident-flow.mmd](diagrams/reference-incident-flow.mmd).)
 
-Each milestone advances automatically after a few seconds (or manually, with the Next
-control) except `human_approval_boundary`, which pauses until the operator explicitly
-approves -- HydroSwarm never advances past that boundary on its own, even in a replay.
-Reduced motion disables automatic advancing entirely; every milestone becomes a manual
-step, never a fake wait.
+There are two real, meaningful pauses -- not one. Each milestone advances automatically
+after a few seconds (or manually, with the Next control) *except*:
+
+- `sample_recommended`, which pauses for **Collect reference sample** -- HydroSwarm never
+  assumes a sample was taken; an operator/judge explicitly triggers evidence collection.
+- `human_approval_boundary`, which pauses for **Approve plan** -- HydroSwarm never
+  executes a response autonomously, even in a replay.
+
+Both pauses are declared in the artifact itself (`pause_action` /
+`pause_action_label` on the milestone), not hard-coded in the frontend as "the only pause
+must mean approval" -- see `EXPECTED_PAUSE_ACTIONS` in
+`hydroswarm.evaluation.reference_demo` and `ReferenceController.performPauseAction` in
+`frontend/src/reference/useReferenceIncident.ts`. Reduced motion disables automatic
+advancing entirely; every milestone becomes a manual step, never a fake wait.
 
 ## What each milestone reveals -- and does not
 

@@ -37,6 +37,14 @@ class Milestone:
     event_sequence_end: int
     auto_advance: bool
     pause_reason: str | None
+    #: SUB-12.1 P1: generalizes "what happens when a judge/operator acts on
+    #: this pause" beyond the single hard-coded "it must be approval"
+    #: assumption -- there are two distinct pauses in the real reference
+    #: narrative (collecting the next evidence sample, then approving the
+    #: verified plan), and a future pass may add more. None for every
+    #: auto_advance milestone; always paired with pause_action_label.
+    pause_action: str | None
+    pause_action_label: str | None
     narrative: str
     highlight: str
     incident_view: dict[str, Any] = field(default_factory=dict)
@@ -123,7 +131,16 @@ def build_reference_incident_artifact(
         narrative: str,
         highlight: str,
         incident_view: dict[str, Any],
+        pause_action: str | None = None,
+        pause_action_label: str | None = None,
     ) -> None:
+        assert (pause_action is None) == (pause_action_label is None), (
+            "pause_action and pause_action_label must be set together"
+        )
+        assert auto_advance or pause_action is not None, (
+            f"milestone {milestone_id!r} pauses (auto_advance=False) but declares no "
+            "pause_action -- the frontend would have nothing to tell the operator to do"
+        )
         milestones.append(
             Milestone(
                 index=len(milestones),
@@ -133,6 +150,8 @@ def build_reference_incident_artifact(
                 event_sequence_end=end,
                 auto_advance=auto_advance,
                 pause_reason=pause_reason,
+                pause_action=pause_action,
+                pause_action_label=pause_action_label,
                 narrative=narrative,
                 highlight=highlight,
                 incident_view=dict(
@@ -190,8 +209,11 @@ def build_reference_incident_artifact(
         "Next sample selected",
         8,
         8,
-        auto_advance=True,
-        pause_reason=None,
+        auto_advance=False,
+        pause_reason="HydroSwarm pauses here rather than assuming a sample was taken -- "
+        "evidence collection is a real, deliberate step, not a foregone conclusion.",
+        pause_action="COLLECT_REFERENCE_SAMPLE",
+        pause_action_label="Collect reference sample",
         narrative=f"Deterministic active sampling selects {localization['sample_node']} -- the "
         "measured signature split with the largest expected information gain.",
         highlight="sample_recommendation",
@@ -324,6 +346,8 @@ def build_reference_incident_artifact(
         auto_advance=False,
         pause_reason="HydroSwarm never executes a response autonomously -- a verified "
         "plan pauses here until a human operator approves it.",
+        pause_action="APPROVE_REFERENCE_PLAN",
+        pause_action_label="Approve plan",
         narrative="The verified flush plan is selected and presented for approval. "
         "No action has been taken.",
         highlight="human_approval_required",
@@ -371,6 +395,7 @@ def build_reference_incident_artifact(
     )
     _assert_contiguous_coverage(milestones, golden_result["workflow"]["event_count"])
     _assert_no_future_leakage(milestones, safe_plan_id=safe_plan_id, unsafe_plan_id=unsafe_plan_id)
+    _assert_pauses_are_well_formed(milestones)
 
     artifact = {
         "schema_version": SCHEMA_VERSION,
@@ -407,6 +432,8 @@ def build_reference_incident_artifact(
                 "event_sequence_end": milestone.event_sequence_end,
                 "auto_advance": milestone.auto_advance,
                 "pause_reason": milestone.pause_reason,
+                "pause_action": milestone.pause_action,
+                "pause_action_label": milestone.pause_action_label,
                 "incident_view": milestone.incident_view,
                 "highlight": milestone.highlight,
                 "narrative": milestone.narrative,
@@ -440,6 +467,47 @@ def _assert_contiguous_coverage(milestones: list[Milestone], event_count: int) -
     )
 
 
+#: submission.txt SUB-12.1 P1: the two real, meaningful human interactions
+#: in the reference narrative -- collecting the next evidence sample, then
+#: approving the verified plan. A milestone pauses if and only if it is
+#: one of these two; every other milestone auto-advances. Declared once
+#: here (not re-derived from auto_advance flags scattered across the
+#: add() calls above) so _assert_pauses_are_well_formed can catch a
+#: future milestone that pauses without a registered, intentional reason.
+EXPECTED_PAUSE_ACTIONS = {
+    "sample_recommended": "COLLECT_REFERENCE_SAMPLE",
+    "human_approval_boundary": "APPROVE_REFERENCE_PLAN",
+}
+
+
+def _assert_pauses_are_well_formed(milestones: list[Milestone]) -> None:
+    """Every milestone that pauses (auto_advance=False) must declare the
+    exact pause_action EXPECTED_PAUSE_ACTIONS says it should, and no
+    milestone outside that set may pause unannounced. Prevents both
+    directions of drift: a future milestone silently gaining a pause the
+    frontend has no button for, and a milestone silently losing the pause
+    a judge/operator interaction depends on."""
+    for milestone in milestones:
+        expected_action = EXPECTED_PAUSE_ACTIONS.get(milestone.milestone_id)
+        if expected_action is None:
+            assert milestone.auto_advance, (
+                f"milestone {milestone.milestone_id!r} pauses but is not in "
+                "EXPECTED_PAUSE_ACTIONS -- add it there if this pause is intentional"
+            )
+            assert milestone.pause_action is None
+            assert milestone.pause_action_label is None
+        else:
+            assert not milestone.auto_advance, (
+                f"milestone {milestone.milestone_id!r} is expected to pause "
+                f"(pause_action={expected_action!r}) but auto_advance is True"
+            )
+            assert milestone.pause_action == expected_action
+            assert milestone.pause_action_label, (
+                f"milestone {milestone.milestone_id!r} has a pause_action but no "
+                "human-readable pause_action_label for the frontend to render"
+            )
+
+
 def _assert_no_future_leakage(milestones: list[Milestone], *, safe_plan_id: str, unsafe_plan_id: str) -> None:
     """Fail loudly rather than silently shipping a narrative that reveals
     a plan's verification outcome, the recommended sample, or the
@@ -454,6 +522,10 @@ def _assert_no_future_leakage(milestones: list[Milestone], *, safe_plan_id: str,
     assert by_id["sample_recommended"].incident_view["recommended_sample"] is not None
     assert by_id["evidence_insufficient"].incident_view["recommended_sample"] is None, (
         "sample recommendation must not appear before the sample_recommended milestone"
+    )
+    assert by_id["sample_recommended"].incident_view["sample_observation"] is None, (
+        "the sample value must not appear until the operator actually collects it "
+        "(sample_received) -- sample_recommended is a real pause, not a formality"
     )
 
     # The raw sample must arrive before the posterior visibly contracts --

@@ -36,8 +36,8 @@ export function ModeBanner({
         )}
         <div className="mode-banner-controls">
           {reference.isPaused ? (
-            <button type="button" onClick={reference.approve}>
-              Approve plan
+            <button type="button" onClick={reference.performPauseAction}>
+              {reference.pauseActionLabel ?? 'Continue'}
             </button>
           ) : (
             <button type="button" onClick={reference.togglePlay} aria-pressed={reference.isPlaying}>

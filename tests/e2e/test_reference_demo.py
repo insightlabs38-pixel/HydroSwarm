@@ -149,14 +149,27 @@ def test_final_completion_occurs_only_after_human_approval(artifact) -> None:
     assert completed["final_event_hash"] == artifact["final_event_hash"]
 
 
-def test_human_approval_boundary_pauses_and_others_auto_advance(artifact) -> None:
+def test_exactly_the_two_real_pauses_stop_auto_advance_everything_else_continues(artifact) -> None:
+    """submission.txt SUB-12.1 P1: the reference narrative has two real,
+    meaningful human interactions -- collecting the next evidence sample
+    (sample_recommended) and approving the verified plan
+    (human_approval_boundary). Every other milestone auto-advances."""
+    expected_pauses = {
+        "sample_recommended": "COLLECT_REFERENCE_SAMPLE",
+        "human_approval_boundary": "APPROVE_REFERENCE_PLAN",
+    }
     for milestone in artifact["milestones"]:
-        if milestone["milestone_id"] == "human_approval_boundary":
+        expected_action = expected_pauses.get(milestone["milestone_id"])
+        if expected_action is not None:
             assert milestone["auto_advance"] is False
             assert milestone["pause_reason"]
+            assert milestone["pause_action"] == expected_action
+            assert milestone["pause_action_label"]
         else:
             assert milestone["auto_advance"] is True
             assert milestone["pause_reason"] is None
+            assert milestone["pause_action"] is None
+            assert milestone["pause_action_label"] is None
 
 
 def test_artifact_carries_the_real_frozen_network_topology_not_a_fixture(artifact) -> None:

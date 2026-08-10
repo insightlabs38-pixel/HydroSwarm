@@ -27,6 +27,8 @@ function alertMilestone(): ApiReferenceMilestone {
     event_sequence_end: 2,
     auto_advance: true,
     pause_reason: null,
+    pause_action: null,
+    pause_action_label: null,
     highlight: 'incident_opened',
     narrative: 'A contamination alert opens the incident.',
     incident_view: {
