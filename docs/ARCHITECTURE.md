@@ -1,5 +1,9 @@
 # Architecture
 
+> This page describes the system's architecture generically. For the exact frozen model
+> identity, hashes, runtime-enabled outputs, and measured evaluation actually shipped by
+> default, see [Final system](FINAL_SYSTEM.md).
+
 HydroSwarm is an offline, event-sourced hybrid inference system. The scientific path is
 deliberately separate from the presentation path: the React interface renders typed API
 contracts, while WNTR and deterministic constraints remain authoritative.

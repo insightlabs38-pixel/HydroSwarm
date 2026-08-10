@@ -1,5 +1,15 @@
 # Evaluation Protocol
 
+> **HydroCore-v4's own measured evaluation** is in
+> [Final system](FINAL_SYSTEM.md) and
+> [reports/results/v4/phase13-metrics-and-baselines.md](../reports/results/v4/phase13-metrics-and-baselines.md).
+> HydroCore-v4's own locked final evaluation has **not** been opened
+> (`locked_test_opened: false` in
+> [architecture-freeze.json](../reports/results/v4/architecture-freeze.json)). The
+> "Executed learned matrix" section below documents the prior (S/M/L generation)
+> architecture's own, already-completed locked test -- a real, historical result for that
+> superseded generation, not a description of v4's (still-unopened) locked evaluation.
+
 Report distributions and failure cases, not only averages.
 
 | Capability | Required measurements |

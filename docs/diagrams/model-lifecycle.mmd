@@ -1,0 +1,24 @@
+%% Diagram D -- training/calibration/release lifecycle (submission.txt SS14.4)
+%% Alt text: a simulation corpus splits into train, validation, and
+%% calibration; a checkpoint is trained, validated, and calibrated; promotion
+%% gates decide the frozen HydroCore-v4 selection, which is packaged into a
+%% self-contained inference bundle and served in production. The locked
+%% final evaluation is visually isolated as not opened.
+flowchart TD
+  SC["Simulation corpus\n(governed WNTR-generated)"] --> TS["Train split"]
+  SC --> VS["Validation split"]
+  SC --> CAL["Calibration split"]
+  TS --> CK["Checkpoint"]
+  CK --> VAL["Validation\n(Phase 13 metrics)"]
+  VS --> VAL
+  CAL --> CA["Calibration artifact\n(split-conformal, alpha=0.1)"]
+  VAL --> PG["Promotion gates\n(Phase 14)"]
+  CA --> PG
+  PG --> FZ["Frozen HydroCore-v4 selection\n(architecture-freeze.json)"]
+  FZ --> IB["Self-contained inference bundle\n(models/hydrocore-v4-release)"]
+  IB --> PS["Production serving\n(hydroswarm.api.app)"]
+
+  SC -.excluded from all of the above.-> LK["LOCKED FINAL EVALUATION\nNOT OPENED"]
+
+  classDef locked fill:#f16c62,stroke:#7a221c,color:#1a0503,font-weight:bold;
+  class LK locked;

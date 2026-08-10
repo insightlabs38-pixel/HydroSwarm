@@ -1,5 +1,49 @@
 # HydroCore Model Card
 
+> **The frozen, shipped default is HydroCore-v4** (4.18M parameters, `small` variant),
+> not the S/M/L generation this card describes below. See
+> [Final system](FINAL_SYSTEM.md) for HydroCore-v4's exact identity, hashes,
+> runtime-enabled outputs, and measured evaluation. The content below documents the prior
+> architecture generation and remains accurate for that generation -- kept for research
+> transparency, not as a description of the current default runtime.
+
+```mermaid
+flowchart TD
+  NF["Node features"] --> SE["Structural encoders"]
+  EF["Edge features"] --> SE
+  TF["Temporal features"] --> SE
+  QF["Sensor-quality features"] --> SE
+  SE --> PR["Feature-only classical prior\n(residual correction, not a learned override)"]
+  SE --> LB["Local edge-aware blocks\n(4 layers, forward-only message direction, RMSNorm/SiLU)"]
+  LB --> GA["Bounded global latent attention\n(64 latent tokens, d_model=192, 6 heads)"]
+  GA --> PO["Pooling"]
+  PR --> PO
+
+  PO --> H1["source_node"]
+  PO --> H2["event_presence"]
+  PO --> H3["event_cause"]
+  PO --> H4["evidence_sufficiency"]
+  PO --> H5["next_step"]
+  PO --> H6["relative_strength"]
+  PO --> HX["15 other trained heads\n(plan_value, sample_node, start_time, ...)"]
+  PO --> HD["ood_category, sensor_reconstruction, travel_time\n(excluded -- see notes)"]
+
+  H1 & H2 & H3 & H4 & H5 & H6 --> OG["Output governance\nruntime_enabled_outputs"]
+  HX -.trained, not promoted.-> OG
+  HD -.excluded: near-chance / never trained.-> OG
+
+  classDef served fill:#b6df83,stroke:#324a1a,color:#0c1806,font-weight:bold;
+  classDef unpromoted fill:#a9bec6,stroke:#31545f,color:#0c202a;
+  classDef excluded fill:#f16c62,stroke:#7a221c,color:#1a0503;
+  class H1,H2,H3,H4,H5,H6 served;
+  class HX unpromoted;
+  class HD excluded;
+```
+
+(Source: [docs/diagrams/hydrocore-v4.mmd](diagrams/hydrocore-v4.mmd). Source of truth for
+every label: `models/hydrocore-v4-release/checkpoint_identity.json` and
+`output_governance.json`.)
+
 ## Intended use
 
 HydroCore ranks possible contamination sources, estimates evidence sufficiency and sensor

@@ -1,5 +1,14 @@
 # Operator guide
 
+## 0. Start
+
+On first launch with no incident configured, choose **Run Reference Incident** to see the
+full workflow below play out against a real, checksummed replay with no setup required, or
+proceed to step 1 to work with a real network. See [Installation](INSTALLATION.md) for
+setup and [Final system](FINAL_SYSTEM.md) for the experience-state labels (`LIVE`,
+`REFERENCE INCIDENT`, `ILLUSTRATIVE DEMO`, `INCIDENT UNAVAILABLE`) you may see in the mode
+banner.
+
 ## 1. Prepare a network
 
 Import a local EPANET `.inp` file from the Network view. Review validation errors,

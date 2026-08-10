@@ -77,6 +77,38 @@ def test_readme_historical_benchmark_is_collapsed_and_labeled_superseded() -> No
     assert "superseded by the frozen HydroCore-v4" in text
 
 
+DIAGRAM_FILES = [
+    "judge-product-flow.mmd",
+    "authority-architecture.mmd",
+    "hydrocore-v4.mmd",
+    "model-lifecycle.mmd",
+    "reference-incident-flow.mmd",
+    "offline-deployment.mmd",
+]
+
+
+@pytest.mark.parametrize("name", DIAGRAM_FILES)
+def test_diagram_source_exists_and_is_a_real_flowchart(name: str) -> None:
+    """submission.txt SS14's diagram-source existence check (SS2062):
+    every named .mmd source must exist and contain real flowchart content,
+    not an empty placeholder."""
+    path = PROJECT_ROOT / "docs" / "diagrams" / name
+    text = path.read_text(encoding="utf-8")
+    assert "flowchart" in text
+    assert len(text.strip().splitlines()) > 5
+
+
+def test_each_diagram_is_embedded_in_at_least_one_doc() -> None:
+    """A diagram source with no embedding anywhere is dead weight -- verify
+    each one is actually rendered somewhere a reader would see it."""
+    docs_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in (PROJECT_ROOT / "docs").rglob("*.md")
+    )
+    docs_text += (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+    for name in DIAGRAM_FILES:
+        assert name in docs_text, f"{name} is not referenced/embedded in any doc"
+
+
 def test_final_system_doc_states_the_real_frozen_model_hash() -> None:
     import json
 

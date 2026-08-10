@@ -1,5 +1,21 @@
 # Installation and offline launch
 
+```mermaid
+flowchart TD
+  B["Browser"] <-->|"localhost:8765 only"| F["FastAPI"]
+  F <--> S["SQLite / local files"]
+  F <--> H["HydroCore-v4 + WNTR"]
+
+  N1["NO CLOUD RUNTIME DEPENDENCY"]
+  N2["NO REMOTE MAP TILES"]
+  N3["NO HOSTED MODEL API"]
+
+  classDef boundary fill:#f16c62,stroke:#7a221c,color:#1a0503,font-weight:bold;
+  class N1,N2,N3 boundary;
+```
+
+(Source: [docs/diagrams/offline-deployment.mmd](diagrams/offline-deployment.mmd).)
+
 ## Requirements
 
 - Python 3.12 (64-bit)

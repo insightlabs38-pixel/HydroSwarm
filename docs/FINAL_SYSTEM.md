@@ -19,6 +19,33 @@ page is authoritative -- report the discrepancy rather than trusting the other d
 | Freeze declaration | [architecture-freeze-declaration.md](../reports/results/v4/architecture-freeze-declaration.md) |
 | Freeze manifest | [architecture-freeze.json](../reports/results/v4/architecture-freeze.json) |
 
+```mermaid
+flowchart TD
+  T["Telemetry / samples"] --> R["Reconciliation"]
+  R --> CS["Classical signatures\n[ADVISORY]"]
+  R --> HC["HydroCore-v4\n[ADVISORY]"]
+  CS --> FU["Fusion -> calibration/OOD gate\n[CALIBRATED ADVISORY]"]
+  HC --> FU
+  FU --> SA["Calibrated source advisory\n[CALIBRATED ADVISORY]"]
+  SA --> ED["Deterministic evidence decision\n[DETERMINISTIC]"]
+  ED --> RC["Deterministic response candidates\n[DETERMINISTIC]"]
+  RC --> WV["WNTR exact verifier\n[SIMULATOR_VERIFIED]"]
+  WV --> HA["Human approval boundary\n[HUMAN_APPROVED]"]
+
+  classDef advisory fill:#6bd6dd,stroke:#0d4a4e,color:#04191b;
+  classDef calibrated fill:#cadd73,stroke:#4a5420,color:#141a06;
+  classDef deterministic fill:#a9bec6,stroke:#31545f,color:#0c202a;
+  classDef verified fill:#f4b45f,stroke:#7a5a20,color:#1a1206,font-weight:bold;
+  classDef approved fill:#f16c62,stroke:#7a221c,color:#1a0503,font-weight:bold;
+  class CS,HC advisory;
+  class FU,SA calibrated;
+  class ED,RC deterministic;
+  class WV verified;
+  class HA approved;
+```
+
+(Source: [docs/diagrams/authority-architecture.mmd](diagrams/authority-architecture.mmd).)
+
 This is the exact identity `hydroswarm self-test` and `hydroswarm.api.app:app` resolve to
 by default (source checkout, native install, or the published Docker image). Any
 divergence between what a running instance reports and the hashes above is a real defect,
@@ -62,6 +89,29 @@ front (not hidden): [Phase 13 metrics and baselines](../reports/results/v4/phase
 `locked_evaluation_status: NOT PERFORMED -- awaiting separate explicit authorization`
 (from the freeze manifest above). No number on this page or anywhere else in this
 repository is drawn from the locked final evaluation.
+
+```mermaid
+flowchart TD
+  SC["Simulation corpus\n(governed WNTR-generated)"] --> TS["Train split"]
+  SC --> VS["Validation split"]
+  SC --> CAL["Calibration split"]
+  TS --> CK["Checkpoint"]
+  CK --> VAL["Validation\n(Phase 13 metrics)"]
+  VS --> VAL
+  CAL --> CA["Calibration artifact\n(split-conformal, alpha=0.1)"]
+  VAL --> PG["Promotion gates\n(Phase 14)"]
+  CA --> PG
+  PG --> FZ["Frozen HydroCore-v4 selection\n(architecture-freeze.json)"]
+  FZ --> IB["Self-contained inference bundle\n(models/hydrocore-v4-release)"]
+  IB --> PS["Production serving\n(hydroswarm.api.app)"]
+
+  SC -.excluded from all of the above.-> LK["LOCKED FINAL EVALUATION\nNOT OPENED"]
+
+  classDef locked fill:#f16c62,stroke:#7a221c,color:#1a0503,font-weight:bold;
+  class LK locked;
+```
+
+(Source: [docs/diagrams/model-lifecycle.mmd](diagrams/model-lifecycle.mmd).)
 
 ## Authority boundaries (never weakened)
 

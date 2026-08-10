@@ -4,7 +4,7 @@
 |---|---|
 | Innovation | Time-directed hydraulic graph, classical/neural disagreement-aware fusion, expected-information-gain sampling, conformal/OOD abstention, specialist heads, and exact WNTR verification |
 | Problem solving | A complete incident loop from imperfect observations through source region, evidence collection, realistic plan alternatives, consequences, rejection, and approval checkpoint |
-| Feasibility | CPU-capable S/M/L models, standard EPANET imports, bounded workers, durable local state, classical fallback, one-command and container launch |
+| Feasibility | CPU-capable frozen HydroCore-v4 checkpoint, standard EPANET imports, bounded workers, durable local state, classical fallback, one-command native setup and multiarch Docker launch |
 | Sustainability | Offline runtime, no per-query cloud cost, reusable network/signature cache, exposure/service tradeoffs, and no infrastructure-control coupling |
 | Scalability | Canonical structural features, network-disjoint evaluation, configurable model sizes, sparse topology, cache/profiling reports, and standard formats |
 | UX and design | Accessible operator dashboard, map and time replay, evidence-change view, calibrated uncertainty, plan table, counterfactual comparison, and explicit status language |
@@ -12,8 +12,12 @@
 
 ## Proof sequence
 
+The fastest path is the **REFERENCE INCIDENT** (`docker compose -f
+docker-compose.release.yml up`, then "Run Reference Incident" on first launch) -- a real,
+checksummed, progressive replay of the exact frozen golden scenario, not a scripted mockup.
+
 Within one minute: state the real problem, show local/offline operation, display an initial
 candidate region produced by the backend, and distinguish probability from calibration.
 Then show the recommended sample and actual posterior revision. Finish with three-way
-consequence comparison, an unsafe rejection, the approval boundary, measured results,
-failure cases, and reproducibility hashes.
+consequence comparison, an unsafe rejection, the approval boundary, measured results
+([Final system](FINAL_SYSTEM.md)), failure cases, and reproducibility hashes.

@@ -1,0 +1,28 @@
+%% Diagram B -- final authority architecture (submission.txt SS14.2)
+%% Alt text: telemetry and samples reconcile into a hydraulic state; classical
+%% signatures and HydroCore-v4 fuse under a calibration/OOD gate into a
+%% calibrated source advisory; deterministic evidence and response decisions
+%% follow; WNTR exact verification and a human approval boundary gate any
+%% response before it could ever be considered actionable.
+flowchart TD
+  T["Telemetry / samples"] --> R["Reconciliation"]
+  R --> CS["Classical signatures\n[ADVISORY]"]
+  R --> HC["HydroCore-v4\n[ADVISORY]"]
+  CS --> FU["Fusion -> calibration/OOD gate\n[CALIBRATED ADVISORY]"]
+  HC --> FU
+  FU --> SA["Calibrated source advisory\n[CALIBRATED ADVISORY]"]
+  SA --> ED["Deterministic evidence decision\n[DETERMINISTIC]"]
+  ED --> RC["Deterministic response candidates\n[DETERMINISTIC]"]
+  RC --> WV["WNTR exact verifier\n[SIMULATOR_VERIFIED]"]
+  WV --> HA["Human approval boundary\n[HUMAN_APPROVED]"]
+
+  classDef advisory fill:#6bd6dd,stroke:#0d4a4e,color:#04191b;
+  classDef calibrated fill:#cadd73,stroke:#4a5420,color:#141a06;
+  classDef deterministic fill:#a9bec6,stroke:#31545f,color:#0c202a;
+  classDef verified fill:#f4b45f,stroke:#7a5a20,color:#1a1206,font-weight:bold;
+  classDef approved fill:#f16c62,stroke:#7a221c,color:#1a0503,font-weight:bold;
+  class CS,HC advisory;
+  class FU,SA calibrated;
+  class ED,RC deterministic;
+  class WV verified;
+  class HA approved;

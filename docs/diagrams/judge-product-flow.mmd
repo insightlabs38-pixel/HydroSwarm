@@ -1,0 +1,18 @@
+%% Diagram A -- judge-facing product flow (submission.txt SS14.1)
+%% 6-7 nodes, minimal jargon, authority boundary visually obvious.
+%% Alt text: A water-quality alert flows through source localization,
+%% evidence selection, belief update, response comparison, exact WNTR
+%% verification, and a human decision -- no autonomous control at any step.
+flowchart TD
+  A["Water-quality alert"]
+  B["LOCALIZE SOURCE\nPhysics + calibrated HydroCore evidence"]
+  C["CHOOSE NEXT EVIDENCE\nExpected information gain"]
+  D["UPDATE INCIDENT BELIEF\nCandidate region contracts / abstains"]
+  E["COMPARE RESPONSES\nBounded deterministic alternatives"]
+  F["EXACTLY VERIFY\nWNTR / EPANET"]
+  G["HUMAN DECISION\nNo autonomous control"]
+
+  A --> B --> C --> D --> E --> F --> G
+
+  classDef authority fill:#f4b45f,stroke:#7a5a20,color:#1a1206,font-weight:bold;
+  class F,G authority;
