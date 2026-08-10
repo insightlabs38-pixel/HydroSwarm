@@ -1,0 +1,988 @@
+{
+  "artifact_sha256": "62624e57ed7bad0db23c967f97bde60c4fc677c6433f762411224aa7bb2a845d",
+  "description": "A checksummed replay of HydroSwarm's frozen, WNTR-backed golden incident workflow -- source localization, active sampling, plan verification, and human approval, end to end.",
+  "event_count": 21,
+  "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
+  "generated_at": "2026-08-10T02:15:39.938750+00:00",
+  "generator": "scripts/build_reference_demo.py",
+  "golden_result_hash": "d91cb7202cb8133ee0b8b656395d95d9fcddf10ba75e3de2f73acdf86f7da817",
+  "milestones": [
+    {
+      "auto_advance": true,
+      "controller_state": "NETWORK_VALIDATED",
+      "event_sequence_end": 2,
+      "event_sequence_start": 0,
+      "highlight": "incident_opened",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": null,
+        "candidates": null,
+        "controller_state": "NETWORK_VALIDATED",
+        "evidence_sufficient": null,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": null,
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 0,
+      "label": "Incident detected",
+      "milestone_id": "alert",
+      "narrative": "A contamination alert opens the incident. The network model and incident record load and validate before any analysis runs.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "SOURCE_LOCALIZATION",
+      "event_sequence_end": 6,
+      "event_sequence_start": 3,
+      "highlight": "broad_candidate_set",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J1",
+          "J2",
+          "J3",
+          "J4"
+        ],
+        "candidates": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "controller_state": "SOURCE_LOCALIZATION",
+        "evidence_sufficient": false,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": null,
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 1,
+      "label": "Initial source uncertainty",
+      "milestone_id": "initial_uncertainty",
+      "narrative": "Data quality passes and the hydraulic state is estimated. With only the initial sensor reading, every candidate source is equally likely.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "EVIDENCE_CHECK",
+      "event_sequence_end": 7,
+      "event_sequence_start": 7,
+      "highlight": "evidence_gate_blocks_planning",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J1",
+          "J2",
+          "J3",
+          "J4"
+        ],
+        "candidates": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "controller_state": "EVIDENCE_CHECK",
+        "evidence_sufficient": false,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": null,
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 2,
+      "label": "Evidence insufficient to plan",
+      "milestone_id": "evidence_insufficient",
+      "narrative": "The current evidence cannot narrow the candidate set enough to safely plan a response. Active sampling is required before proceeding.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "SAMPLE_SELECTION",
+      "event_sequence_end": 8,
+      "event_sequence_start": 8,
+      "highlight": "sample_recommendation",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J1",
+          "J2",
+          "J3",
+          "J4"
+        ],
+        "candidates": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "controller_state": "SAMPLE_SELECTION",
+        "evidence_sufficient": false,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": null,
+        "recommended_sample": {
+          "expected_information_gain_bits": 1.0,
+          "node_id": "J2"
+        },
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 3,
+      "label": "Next sample selected",
+      "milestone_id": "sample_recommended",
+      "narrative": "Deterministic active sampling selects J2 -- the measured signature split with the largest expected information gain.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "SAMPLE_SELECTION",
+      "event_sequence_end": 9,
+      "event_sequence_start": 9,
+      "highlight": "raw_sample_received",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J1",
+          "J2",
+          "J3",
+          "J4"
+        ],
+        "candidates": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "controller_state": "SAMPLE_SELECTION",
+        "evidence_sufficient": false,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": null,
+        "recommended_sample": {
+          "expected_information_gain_bits": 1.0,
+          "node_id": "J2"
+        },
+        "sample_observation": {
+          "concentration_mg_l": 125.86401338755819,
+          "node_id": "J2"
+        },
+        "selected_plan_id": null
+      },
+      "index": 4,
+      "label": "Sample arrives",
+      "milestone_id": "sample_received",
+      "narrative": "A real measurement arrives from J2. The posterior has not been recomputed yet -- candidate probabilities are still the pre-sample values.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "EVIDENCE_CHECK",
+      "event_sequence_end": 12,
+      "event_sequence_start": 10,
+      "highlight": "posterior_contraction",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J2"
+        ],
+        "candidates": {
+          "J1": 0.0059801813911791474,
+          "J2": 0.9940198136146235,
+          "J3": 2.4970986279891085e-09,
+          "J4": 2.4970986279891085e-09
+        },
+        "controller_state": "EVIDENCE_CHECK",
+        "evidence_sufficient": true,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": null,
+        "recommended_sample": null,
+        "sample_observation": {
+          "concentration_mg_l": 125.86401338755819,
+          "node_id": "J2"
+        },
+        "selected_plan_id": null
+      },
+      "index": 5,
+      "label": "Posterior contracts",
+      "milestone_id": "posterior_contracted",
+      "narrative": "The measurement updates the posterior. The candidate region contracts from 4 nodes to 1, and evidence is now sufficient to plan.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "PLAN_GENERATION",
+      "event_sequence_end": 13,
+      "event_sequence_start": 13,
+      "highlight": "unverified_plan_candidates",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J2"
+        ],
+        "candidates": {
+          "J1": 0.0059801813911791474,
+          "J2": 0.9940198136146235,
+          "J3": 2.4970986279891085e-09,
+          "J4": 2.4970986279891085e-09
+        },
+        "controller_state": "PLAN_GENERATION",
+        "evidence_sufficient": true,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": [
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "CLOSE_PIPE",
+                  "duration_minutes": 60,
+                  "flow_rate_lps": null,
+                  "start_minute": 0,
+                  "target_id": "P_R1_J1"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Close sole reservoir feeder",
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "requires_operator_approval": true
+            },
+            "verification": null
+          },
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "FLUSH_NODE",
+                  "duration_minutes": 45,
+                  "flow_rate_lps": 3.0,
+                  "start_minute": 0,
+                  "target_id": "J4"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Flush downstream J4",
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "requires_operator_approval": true
+            },
+            "verification": null
+          }
+        ],
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 6,
+      "label": "Response plans generated",
+      "milestone_id": "plans_generated",
+      "narrative": "Two candidate response plans are generated. Neither has undergone exact WNTR/EPANET verification yet.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "WNTR_VERIFY",
+      "event_sequence_end": 15,
+      "event_sequence_start": 14,
+      "highlight": "unsafe_plan_rejected",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J2"
+        ],
+        "candidates": {
+          "J1": 0.0059801813911791474,
+          "J2": 0.9940198136146235,
+          "J3": 2.4970986279891085e-09,
+          "J4": 2.4970986279891085e-09
+        },
+        "controller_state": "WNTR_VERIFY",
+        "evidence_sufficient": true,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": [
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "CLOSE_PIPE",
+                  "duration_minutes": 60,
+                  "flow_rate_lps": null,
+                  "start_minute": 0,
+                  "target_id": "P_R1_J1"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Close sole reservoir feeder",
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 24021985.707782302,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 1.8282688856124878,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": -8.171731114387512,
+                "pressure_violation_minutes": 60.0,
+                "service_availability": 0.9528918669318404,
+                "service_availability_margin": 0.05289186693184034,
+                "unserved_demand_l": 15623.412333851045,
+                "volume_above_threshold_l": 20160.0244268775
+              },
+              "context_hash": null,
+              "decision": "REJECTED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "rejection_codes": [
+                "PRESSURE_BELOW_MINIMUM"
+              ],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "9cb1a9182467d6331c82121b026104ab70718ee1e3b00f08d8ff49e9ffba87e7",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          },
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "FLUSH_NODE",
+                  "duration_minutes": 45,
+                  "flow_rate_lps": 3.0,
+                  "start_minute": 0,
+                  "target_id": "J4"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Flush downstream J4",
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "requires_operator_approval": true
+            },
+            "verification": null
+          }
+        ],
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 7,
+      "label": "Unsafe plan rejected on verification",
+      "milestone_id": "unsafe_plan_rejected",
+      "narrative": "Exact WNTR/EPANET verification rejects the feeder-closure plan for violating a hard constraint (PRESSURE_BELOW_MINIMUM). The alternative plan has not been verified yet.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "WNTR_VERIFY",
+      "event_sequence_end": 17,
+      "event_sequence_start": 16,
+      "highlight": "safe_plan_verified",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J2"
+        ],
+        "candidates": {
+          "J1": 0.0059801813911791474,
+          "J2": 0.9940198136146235,
+          "J3": 2.4970986279891085e-09,
+          "J4": 2.4970986279891085e-09
+        },
+        "controller_state": "WNTR_VERIFY",
+        "evidence_sufficient": true,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": [
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "CLOSE_PIPE",
+                  "duration_minutes": 60,
+                  "flow_rate_lps": null,
+                  "start_minute": 0,
+                  "target_id": "P_R1_J1"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Close sole reservoir feeder",
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 24021985.707782302,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 1.8282688856124878,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": -8.171731114387512,
+                "pressure_violation_minutes": 60.0,
+                "service_availability": 0.9528918669318404,
+                "service_availability_margin": 0.05289186693184034,
+                "unserved_demand_l": 15623.412333851045,
+                "volume_above_threshold_l": 20160.0244268775
+              },
+              "context_hash": null,
+              "decision": "REJECTED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "rejection_codes": [
+                "PRESSURE_BELOW_MINIMUM"
+              ],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "9cb1a9182467d6331c82121b026104ab70718ee1e3b00f08d8ff49e9ffba87e7",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          },
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "FLUSH_NODE",
+                  "duration_minutes": 45,
+                  "flow_rate_lps": 3.0,
+                  "start_minute": 0,
+                  "target_id": "J4"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Flush downstream J4",
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 2526696.365121015,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 10.716442108154297,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": 0.7164421081542969,
+                "pressure_violation_minutes": 0.0,
+                "service_availability": 1.0,
+                "service_availability_margin": 0.09999999999999998,
+                "unserved_demand_l": 0.0,
+                "volume_above_threshold_l": 20160.0294560194
+              },
+              "context_hash": null,
+              "decision": "VERIFIED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "rejection_codes": [],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "146b122c260eda6824b097de7a54d80a291e2a0f3962f973d15db34ea6b4c2aa",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          }
+        ],
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": null
+      },
+      "index": 8,
+      "label": "Safe plan verified",
+      "milestone_id": "safe_plan_verified",
+      "narrative": "Exact verification confirms the flush plan is safe: no constraint violations, and it is now eligible for human approval.",
+      "pause_reason": null
+    },
+    {
+      "auto_advance": false,
+      "controller_state": "PLAN_COMPARISON",
+      "event_sequence_end": 18,
+      "event_sequence_start": 18,
+      "highlight": "human_approval_required",
+      "incident_view": {
+        "approval_pending": true,
+        "approved_plan_id": null,
+        "candidate_region": [
+          "J2"
+        ],
+        "candidates": {
+          "J1": 0.0059801813911791474,
+          "J2": 0.9940198136146235,
+          "J3": 2.4970986279891085e-09,
+          "J4": 2.4970986279891085e-09
+        },
+        "controller_state": "PLAN_COMPARISON",
+        "evidence_sufficient": true,
+        "final_event_hash": null,
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": [
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "CLOSE_PIPE",
+                  "duration_minutes": 60,
+                  "flow_rate_lps": null,
+                  "start_minute": 0,
+                  "target_id": "P_R1_J1"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Close sole reservoir feeder",
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 24021985.707782302,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 1.8282688856124878,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": -8.171731114387512,
+                "pressure_violation_minutes": 60.0,
+                "service_availability": 0.9528918669318404,
+                "service_availability_margin": 0.05289186693184034,
+                "unserved_demand_l": 15623.412333851045,
+                "volume_above_threshold_l": 20160.0244268775
+              },
+              "context_hash": null,
+              "decision": "REJECTED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "rejection_codes": [
+                "PRESSURE_BELOW_MINIMUM"
+              ],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "9cb1a9182467d6331c82121b026104ab70718ee1e3b00f08d8ff49e9ffba87e7",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          },
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "FLUSH_NODE",
+                  "duration_minutes": 45,
+                  "flow_rate_lps": 3.0,
+                  "start_minute": 0,
+                  "target_id": "J4"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Flush downstream J4",
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 2526696.365121015,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 10.716442108154297,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": 0.7164421081542969,
+                "pressure_violation_minutes": 0.0,
+                "service_availability": 1.0,
+                "service_availability_margin": 0.09999999999999998,
+                "unserved_demand_l": 0.0,
+                "volume_above_threshold_l": 20160.0294560194
+              },
+              "context_hash": null,
+              "decision": "VERIFIED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "rejection_codes": [],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "146b122c260eda6824b097de7a54d80a291e2a0f3962f973d15db34ea6b4c2aa",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          }
+        ],
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd"
+      },
+      "index": 9,
+      "label": "Awaiting human approval",
+      "milestone_id": "human_approval_boundary",
+      "narrative": "The verified flush plan is selected and presented for approval. No action has been taken.",
+      "pause_reason": "HydroSwarm never executes a response autonomously -- a verified plan pauses here until a human operator approves it."
+    },
+    {
+      "auto_advance": true,
+      "controller_state": "SIMULATE_RESPONSE",
+      "event_sequence_end": 20,
+      "event_sequence_start": 19,
+      "highlight": "incident_closed",
+      "incident_view": {
+        "approval_pending": false,
+        "approved_plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+        "candidate_region": [
+          "J2"
+        ],
+        "candidates": {
+          "J1": 0.0059801813911791474,
+          "J2": 0.9940198136146235,
+          "J3": 2.4970986279891085e-09,
+          "J4": 2.4970986279891085e-09
+        },
+        "controller_state": "SIMULATE_RESPONSE",
+        "evidence_sufficient": true,
+        "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
+        "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+        "network_id": "golden-network-v1",
+        "ood_level": "NORMAL",
+        "plans": [
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "CLOSE_PIPE",
+                  "duration_minutes": 60,
+                  "flow_rate_lps": null,
+                  "start_minute": 0,
+                  "target_id": "P_R1_J1"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Close sole reservoir feeder",
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 24021985.707782302,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 1.8282688856124878,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": -8.171731114387512,
+                "pressure_violation_minutes": 60.0,
+                "service_availability": 0.9528918669318404,
+                "service_availability_margin": 0.05289186693184034,
+                "unserved_demand_l": 15623.412333851045,
+                "volume_above_threshold_l": 20160.0244268775
+              },
+              "context_hash": null,
+              "decision": "REJECTED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "83d765fa-e650-5ea2-b56e-6688c4263142",
+              "rejection_codes": [
+                "PRESSURE_BELOW_MINIMUM"
+              ],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "9cb1a9182467d6331c82121b026104ab70718ee1e3b00f08d8ff49e9ffba87e7",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          },
+          {
+            "plan": {
+              "actions": [
+                {
+                  "action_type": "FLUSH_NODE",
+                  "duration_minutes": 45,
+                  "flow_rate_lps": 3.0,
+                  "start_minute": 0,
+                  "target_id": "J4"
+                }
+              ],
+              "created_at": "2026-08-03T00:00:00Z",
+              "incident_id": "5bf2cfe9-66cc-5364-b779-976e612a02aa",
+              "model_version": "golden-deterministic-v1",
+              "name": "Flush downstream J4",
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "requires_operator_approval": true
+            },
+            "verification": {
+              "abstention_reason": null,
+              "consequences": {
+                "containment_time_minutes": 120.0,
+                "contaminant_mass_consumed_mg": 2526696.365121015,
+                "contaminated_pipe_extent_m": 2250.00000000624,
+                "exposure_evaluated": true,
+                "minimum_pressure_m": 10.716442108154297,
+                "numerically_sensitive": false,
+                "operation_count": 1,
+                "population_impacted": 1.0,
+                "pressure_margin_m": 0.7164421081542969,
+                "pressure_violation_minutes": 0.0,
+                "service_availability": 1.0,
+                "service_availability_margin": 0.09999999999999998,
+                "unserved_demand_l": 0.0,
+                "volume_above_threshold_l": 20160.0294560194
+              },
+              "context_hash": null,
+              "decision": "VERIFIED",
+              "evaluation_provenance": {
+                "aggregation_policy": "posterior_weighted",
+                "cache_hit": true,
+                "consequence_policy_version": "exposure-consequences-v1",
+                "contamination_threshold_mg_l": 0.001,
+                "exact_simulation_count": 0,
+                "hypotheses": {
+                  "mode": "single",
+                  "profile": {
+                    "additional_sources": [],
+                    "duration_minutes": 60,
+                    "label": "incident-hypothesis",
+                    "source_node_id": "J2",
+                    "start_minute": 0,
+                    "strength_mg_min": 10.0,
+                    "stress_mode": false
+                  }
+                },
+                "hypotheses_per_plan": 1,
+                "population_map_identity": "none",
+                "simulator_version": "1.5.0"
+              },
+              "plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd",
+              "rejection_codes": [],
+              "simulator": "WNTRSimulator",
+              "simulator_version": "1.5.0",
+              "state_hash": "146b122c260eda6824b097de7a54d80a291e2a0f3962f973d15db34ea6b4c2aa",
+              "verification_status": "CURRENT",
+              "verified_at": "2026-08-03T00:00:00Z",
+              "worst_case_consequences": null
+            }
+          }
+        ],
+        "recommended_sample": null,
+        "sample_observation": null,
+        "selected_plan_id": "efbee2e9-2b93-55e2-bf01-17270d4b88bd"
+      },
+      "index": 10,
+      "label": "Response approved and simulated",
+      "milestone_id": "completed",
+      "narrative": "A human operator approves the verified plan. The approved response is simulated end to end, and the full, hash-chained event ledger is available for replay.",
+      "pause_reason": null
+    }
+  ],
+  "reference_id": "reference-incident-v1",
+  "schema_version": "hydroswarm-reference-incident-v1",
+  "source_artifact_hashes": {
+    "golden_network.inp": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
+    "golden_scenario.json": "ad7a80496f3501d0e53b0a6aac80cad349b73b7c97b9ae7698a28e57a8c76a06"
+  },
+  "source_artifacts": [
+    "golden_network.inp",
+    "golden_scenario.json"
+  ],
+  "source_commit": "9efec90ed168628ec3870913593cfb51f194a40f",
+  "title": "HydroSwarm reference incident"
+}

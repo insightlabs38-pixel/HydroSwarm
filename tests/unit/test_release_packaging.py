@@ -135,13 +135,32 @@ def test_release_manifest_accepts_container_identity_overrides() -> None:
     assert manifest["container_digest"] == "sha256:deadbeef"
 
 
-def test_release_manifest_reference_demo_hash_is_null_when_artifact_absent() -> None:
-    # SUB-4 (the reference-demo artifact) has not landed yet as of SUB-3;
-    # the manifest must degrade to null, not fabricate/guess a hash.
-    if (PROJECT_ROOT / "artifacts" / "reference-demo" / "manifest.json").exists():
-        pytest.skip("reference-demo artifact already exists in this checkout")
+def test_release_manifest_reference_demo_hash_is_null_when_artifact_absent(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The manifest must degrade to null rather than fabricate/guess a hash
+    # when no reference-demo artifact exists yet. Verified against a real
+    # absent-manifest path, independent of whether SUB-4's artifact
+    # currently exists in this checkout.
+    monkeypatch.setattr(
+        build_release_manifest,
+        "REFERENCE_DEMO_MANIFEST_PATH",
+        PROJECT_ROOT / "artifacts" / "reference-demo" / "does-not-exist.json",
+    )
+    result = build_release_manifest.build_manifest()
+    assert result["reference_demo_hash"] is None
+
+
+def test_release_manifest_reference_demo_hash_matches_the_real_artifact_when_present() -> None:
+    if not (PROJECT_ROOT / "artifacts" / "reference-demo" / "manifest.json").exists():
+        pytest.skip("reference-demo artifact not generated in this checkout")
+    import json
+
+    reference_manifest = json.loads(
+        (PROJECT_ROOT / "artifacts" / "reference-demo" / "manifest.json").read_text()
+    )
     manifest = build_release_manifest.build_manifest()
-    assert manifest["reference_demo_hash"] is None
+    assert manifest["reference_demo_hash"] == reference_manifest["artifact_sha256"]
 
 
 # --- scripts/build_release_bundle.py ----------------------------------------
