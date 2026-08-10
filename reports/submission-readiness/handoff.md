@@ -549,3 +549,28 @@ At commit `2890a3e`, `npx playwright test tests/e2e/visual-regression.spec.ts` p
 all existing keyboard, accessibility-oriented, state-separation, and responsive checks.
 The complete recorded output is `/tmp/hydroswarm-final-head-playwright.log` for this
 session; browser baselines are committed in the repository.
+
+### Hosted CI re-run after `e2b4402` (active investigation)
+
+The earlier billing block cleared and the hosted jobs began executing. Current observed
+results from run `31418378356` / `31418378402`:
+
+- Native Linux x86-64, Linux ARM64, and macOS ARM64: passed.
+- Windows x86-64: setup reached the strict self-test, but its real spawned WNTR hydraulic
+  simulation exceeded the existing **300-second** bound. Do not increase it again; inspect
+  the Windows spawn/worker import path (`HydraulicSimulator._run_with_timeout`) first.
+- Docker linux/amd64: build, hardened startup, health/readiness/reference/frontend, and
+  strict in-container frozen-hash self-test passed. The real LIVE workflow then failed at
+  `/api/live-example-inputs`: EPANET Error 305 (cannot open hydraulics file) from the
+  hardened read-only container. Persistence and offline checks were consequently skipped.
+  Investigate the EpanetSimulator scratch/hydraulics path under the hardened mount layout;
+  do not mark Docker green yet.
+
+Exact inspection commands:
+
+```bash
+cd /workspace/HydroSwarm
+gh api repos/insightlabs38-pixel/HydroSwarm/actions/jobs/93552816310/logs > /tmp/docker-amd64-job.log
+gh api repos/insightlabs38-pixel/HydroSwarm/actions/jobs/93552816273/logs > /tmp/windows-job.log
+gh pr checks 3 --watch --interval 600
+```
