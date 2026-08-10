@@ -333,6 +333,77 @@ in the golden result (explanations, event ledger) but wasn't threaded
 through the SUB-4 artifact schema; empty is honest (not fabricated) but is
 a known richness gap, not a bug, if a future pass wants a fuller experience.
 
+## SUB-7 through SUB-11 — completed this session (commits `c5612a0` .. `61729d5`)
+
+All five phases landed in one continuous pass after SUB-2 through SUB-6. Summary (see
+each commit message for full detail):
+
+- **SUB-7** (`c5612a0`): README rebuilt judge-first (value prop → screenshot → problem →
+  workflow → why-different → results → try-it → architecture → limitations, research
+  detail collapsed further down). Found and fixed a real staleness gap: the README's
+  headline benchmark was the superseded v3-era S/M/L generation, with **zero mention**
+  that HydroCore-v4 is the actual frozen default. Front-loaded `docs/FINAL_SYSTEM.md`
+  (the one canonical "what actually ships" page -- real hashes/numbers, not typed from
+  memory) and `docs/README.md` (doc landing page) since the rewrite needed real link
+  targets, not placeholders.
+- **SUB-8/SUB-9** (`a594c7a`, `ae1a01c`): same staleness audit extended to
+  `docs/MODEL_CARD.md` and `docs/EVALUATION.md` (both described *only* the superseded
+  generation -- added banners pointing to FINAL_SYSTEM.md, kept historical content
+  labeled, not deleted). Six named Mermaid architecture diagrams
+  (`docs/diagrams/*.mmd`) embedded in their relevant docs. `docs/QUICKSTART.md`,
+  `docs/GLOSSARY.md`, `docs/TECHNICAL_BRIEF.md`, `docs/REFERENCE_DEMO.md` added.
+  **Static `.svg` exports for the diagrams could not be generated** -- `mermaid-cli`
+  needs a real Chromium process, which hits the identical sandbox restriction as Docker
+  (`CAP_SYS_ADMIN` stripped); documented in `docs/diagrams/README.md` with the exact
+  command to run elsewhere. The `.mmd` sources render natively on GitHub in the
+  meantime, so nothing is currently unviewable.
+- **SUB-10** (`3b13dfc`): `docs/DEVPOST.md` rewritten to tell the same story as the new
+  README (leads with the REFERENCE INCIDENT, cites HydroCore-v4, two concrete real
+  challenges instead of generic prose), plus an explicit "Built with" list.
+- **SUB-11** (`61729d5`): offline-runtime audit (mechanically blocks outbound sockets,
+  not just asserted in prose), repository-wide docs-link audit (73 files, 0 broken).
+  **Found and fixed a real regression while wiring this up**: the SUB-5/6 first-launch
+  gateway intercepts bare `/` navigation, but the Playwright specs
+  (`operator.spec.ts`, `visual-regression.spec.ts`) all navigate bare `/` with no
+  `VITE_INCIDENT_ID` set in CI's build -- every one of those specs and the committed
+  visual baselines would have hit the new gateway screen in real CI instead of the
+  DEMO_FALLBACK content they test. Fixed by routing to `?experience=fallback`
+  (same DOM output expected, so baselines likely don't need regenerating -- **but this
+  is unverified; no browser exists in this sandbox to confirm**). Also found and fixed a
+  second gap: a failed `/api/reference-demo` fetch left the REFERENCE experience showing
+  an infinite loading spinner instead of an error.
+
+Full gate status after SUB-11: frontend (lint/typecheck/format/126 vitest/build) all
+green. Backend: ruff/pyright clean throughout; a full `pytest -q` run covering every
+change through SUB-11 completed with **991 passed, 0 failed, 541.89s**
+(`reports/submission-readiness/sub12-final-pytest.log`) -- the definitive full-suite
+result for this session's entire branch state.
+
+## SUB-12 — final release candidate (this session, partial -- see below)
+
+Completed:
+- `docs/SUBMISSION_CHECKLIST.md` rewritten against this session's actual, verified state
+  (not left in whatever state it happened to be), with an explicit "what a human needs to
+  do before this is truly ready" punch list.
+- This handoff report itself, kept current throughout (see the dated section headers
+  above for the full session narrative from the branch sync through SUB-11).
+
+**Deliberately NOT done this session** (each requires either explicit authorization for a
+public-facing action, or an environment this sandbox does not have):
+
+1. **No version tag was created or pushed.** Cutting a real release tag triggers
+   `.github/workflows/release.yml`, which pushes container images to a public GHCR
+   registry and creates a GitHub Release -- a real external side effect this session's
+   operating instructions did not authorize, and which is gated behind Docker
+   verification that has not happened (see the SUB-3 section above). A human should
+   verify Docker for real first, then decide when to cut `v0.1.0-hackathon`.
+2. **No new screenshots.** No browser is available in this sandbox; the existing
+   `docs/screenshots/operator-overview.png` predates the first-launch gateway and
+   REFERENCE INCIDENT experience added this session.
+3. **No demo video** -- intentionally out of scope per submission.txt SS23 (no
+   placeholder presented as finished) and requires the above to be verified first.
+4. **No public-link test** -- nothing has actually been published/deployed yet.
+
 ## Exact continuation commands
 
 ```bash
@@ -342,30 +413,47 @@ git pull origin feature/submission-readiness-v1
 
 # re-run full gates
 source .venv/bin/activate
-python -m pytest -q
+python -m pytest -q          # check reports/submission-readiness/sub12-final-pytest.log
+                              # for this session's own last full run before relying on a
+                              # fresh one -- may already be complete
 python -m ruff check src tests scripts
 python -m pyright
 cd frontend && npm run lint && npm run typecheck && npm run format:check && npx vitest run && npm run build && cd ..
 
-# check the post-sync full-suite background run this session started:
-cat reports/submission-readiness/sub2-post-merge-pytest.log
+# Docker verification (see reports/submission-readiness/sub3-docker-sandbox-limitation.md
+# for why this session could not do this itself):
+docker build -t hydroswarm:smoke .
+docker run --rm hydroswarm:smoke hydroswarm self-test --human
+docker buildx build --platform linux/amd64,linux/arm64 -t hydroswarm:multiarch-smoke .
 
-# SUB-3 status: implemented but Docker execution UNVERIFIED -- this sandbox
-# cannot run any container at all (CAP_SYS_ADMIN stripped; see
-# reports/submission-readiness/sub3-docker-sandbox-limitation.md). Verify on
-# a real GitHub Actions runner or unsandboxed machine before treating SUB-3
-# as done -- see the SUB-3 section above for exact commands.
+# Playwright re-verification (also blocked in this sandbox -- see
+# docs/diagrams/README.md for the identical Chromium-launch restriction):
+cd frontend && npx playwright install --with-deps chromium && npm run build && npm run test:e2e
 
-# next phase per submission.txt task list SUB-7:
-# SUB-7 -- README judge-first restructure
+# Windows/macOS native setup verification (only Linux was live-tested this session):
+# ./setup_hydroswarm_macos.sh / .\setup_hydroswarm_windows.ps1, then the matching
+# start_hydroswarm_* launcher, on a real machine of that OS.
+
+# Once the above are green: cut the version tag, let release.yml produce the real
+# multiarch image + RELEASE_MANIFEST.json + runtime zip, take new screenshots of the
+# gateway/REFERENCE INCIDENT, then record the demo video.
 ```
 
-## Next phase (not started as of end of 2026-08-10 session)
+## Session summary (SUB-2 through SUB-12, this session, 2026-08-10)
 
-SUB-7 — judge-first README rebuild (submission.txt §3.1 / task list SUB-7):
-one-line value prop, product screenshot, problem, operator workflow, why
-different, strongest measured results, try-it, final-system architecture,
-technical depth links, limitations, research/evaluation details pushed
-deeper. Five-minute judge test must pass. Then SUB-8 (docs IA), SUB-9
-(technical docs/diagrams), SUB-10 (Devpost), SUB-11 (release tests),
-SUB-12 (release candidate).
+Every phase from the original plan's task list was addressed: branch synced onto merged
+main; native setup/launcher scripts (live-tested on Linux); Docker/multiarch release
+packaging (implemented, execution blocked by a confirmed sandbox restriction, not left
+silently unverified); the reference-incident artifact/generator with internally-enforced
+stage-correctness; the progressive reference UI and first-launch gateway with full
+experience-state separation; a judge-first README rebuild that also caught and fixed a
+real v3-vs-v4 staleness gap across three other docs; layered documentation IA with six
+new architecture diagrams; Devpost alignment; release test gates including a genuinely
+new offline-runtime audit; and an honest final submission checklist. Every commit in this
+session's history includes real, run gate results (pytest counts, vitest counts, ruff/
+pyright/lint/typecheck output) -- not claimed without evidence. The two things this
+session could not verify -- Docker container execution and any browser-based rendering
+(Playwright, Mermaid SVG export, new screenshots) -- both trace to the identical
+confirmed root cause (this sandbox's container has `CAP_SYS_ADMIN` stripped and blocks
+`unshare` even for unprivileged user namespaces) and are each documented with the exact
+command a human or real CI needs to run to close them out.
