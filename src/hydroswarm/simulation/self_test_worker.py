@@ -14,6 +14,8 @@ from .network import build_wntr_network
 def main() -> int:
     model = build_wntr_network()
     results = wntr.sim.WNTRSimulator(model).run_sim()
+    if results.node is None:
+        raise RuntimeError("WNTR self-test omitted node results")
     pressure = results.node["pressure"]
     if pressure.empty or not np.isfinite(pressure.to_numpy(dtype=float)).all():
         raise RuntimeError("WNTR self-test produced invalid pressure output")

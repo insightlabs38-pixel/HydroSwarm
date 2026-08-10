@@ -254,7 +254,8 @@ def render_self_test_report(report: dict[str, Any]) -> str:
         (True, "No required external runtime service"),
     ]
     lines = ["HydroSwarm readiness", ""]
-    lines.extend(f"{'✓' if ok else '✗'} {label}" for ok, label in checks)
+    # Keep setup output readable on Windows' legacy console code pages.
+    lines.extend(f"{'OK' if ok else 'FAIL'} {label}" for ok, label in checks)
     lines.append("")
     lines.append("READY" if all(ok for ok, _ in checks) else "NOT READY")
     if not trained_assets.get("ready"):

@@ -61,6 +61,9 @@ COPY data/frozen/ data/frozen/
 # without them a hardened container reaches the live analysis path and then
 # fails closed with a missing relative topology file.
 COPY data/topologies/ data/topologies/
+# Governed classical signature input required by the real frozen LIVE
+# pipeline; copy this one manifest, never the learning corpus/checkpoints.
+COPY data/learning-v2/cycle-b2/signatures/loop-grid.json data/learning-v2/cycle-b2/signatures/loop-grid.json
 RUN mkdir -p /data && chown -R hydroswarm:hydroswarm /app /data
 USER hydroswarm
 # Container self-test gate: fails the build (not just a post-hoc CI check)
