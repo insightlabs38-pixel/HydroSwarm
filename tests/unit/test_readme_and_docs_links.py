@@ -109,6 +109,18 @@ def test_each_diagram_is_embedded_in_at_least_one_doc() -> None:
         assert name in docs_text, f"{name} is not referenced/embedded in any doc"
 
 
+def test_readme_and_devpost_tell_the_same_story() -> None:
+    """submission.txt SUB-10 acceptance criterion: "README and Devpost tell
+    the same story." Checked by requiring both to name the same headline
+    product concepts, not by comparing prose verbatim."""
+    readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
+    devpost = (PROJECT_ROOT / "docs" / "DEVPOST.md").read_text(encoding="utf-8")
+    for phrase in ["HydroCore-v4", "REFERENCE INCIDENT", "WNTR", r"human[ -]approval"]:
+        pattern = re.compile(phrase, re.IGNORECASE)
+        assert pattern.search(readme), f"README missing shared concept: {phrase}"
+        assert pattern.search(devpost), f"DEVPOST missing shared concept: {phrase}"
+
+
 def test_final_system_doc_states_the_real_frozen_model_hash() -> None:
     import json
 
