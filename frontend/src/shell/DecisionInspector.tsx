@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { IncidentView } from '../types';
+import {
+  calibrationStatusText,
+  candidateCoverageLabel,
+  candidateCoverageValueText,
+  measuredCoverageValueText,
+} from '../calibrationDisplay';
 import { useConsoleStore } from '../store';
 import { fetchAuthorityCertificates } from '../api/authority';
 import { demoAuthorityCertificates } from '../demoFixture';
@@ -44,7 +50,7 @@ function IncidentSummary({ incident }: { incident: IncidentView }) {
         </div>
         <div>
           <dt>Calibration</dt>
-          <dd>{incident.calibrationValid ? 'valid' : 'invalid'}</dd>
+          <dd>{calibrationStatusText(incident)}</dd>
         </div>
         <div>
           <dt>Approval</dt>
@@ -121,20 +127,16 @@ function SourceSummary({ incident }: { incident: IncidentView }) {
           <dd>{incident.candidates.length}</dd>
         </div>
         <div>
-          <dt>Conformal target</dt>
-          <dd>{Math.round(incident.candidateCoverage * 100)}%</dd>
+          <dt>{candidateCoverageLabel(incident)}</dt>
+          <dd>{candidateCoverageValueText(incident)}</dd>
         </div>
         <div>
           <dt>Held-out measured coverage</dt>
-          <dd>
-            {typeof incident.measuredCoverage === 'number'
-              ? `${Math.round(incident.measuredCoverage * 100)}%`
-              : 'not measured'}
-          </dd>
+          <dd>{measuredCoverageValueText(incident)}</dd>
         </div>
         <div>
           <dt>Calibration</dt>
-          <dd>{incident.calibrationValid ? 'valid' : 'invalid'}</dd>
+          <dd>{calibrationStatusText(incident)}</dd>
         </div>
         <div>
           <dt>Disagreement</dt>

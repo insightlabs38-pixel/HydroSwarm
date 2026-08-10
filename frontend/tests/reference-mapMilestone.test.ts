@@ -44,6 +44,7 @@ function baseArtifact(milestones: ApiReferenceMilestone[]): ApiReferenceArtifact
     generator: 'test',
     generated_at: '2026-08-10T00:00:00+00:00',
     source_commit: 'deadbeef',
+    network_sha256: 'network-hash',
     golden_result_hash: 'golden-hash',
     final_event_hash: 'final-hash',
     event_count: 21,
@@ -167,4 +168,21 @@ test('status is derived from milestone id, not the raw FSM controller_state stri
   expect(milestoneToIncidentView(artifact, artifact.milestones[0]).status).toBe('PLANNING');
   expect(milestoneToIncidentView(artifact, artifact.milestones[1]).status).toBe('APPROVAL');
   expect(milestoneToIncidentView(artifact, artifact.milestones[2]).status).toBe('CLOSED');
+});
+
+test('provenance.networkHash uses the real network hash, never the golden-result hash', () => {
+  const artifact = baseArtifact([baseMilestone()]);
+  artifact.network_sha256 = 'real-network-hash';
+  artifact.golden_result_hash = 'real-golden-result-hash';
+  const view = milestoneToIncidentView(artifact, artifact.milestones[0]);
+
+  expect(view.provenance.networkHash).toBe('real-network-hash');
+  expect(view.provenance.networkHash).not.toBe('real-golden-result-hash');
+});
+
+test('REFERENCE mode marks calibration as not applicable, never a fabricated production result', () => {
+  const artifact = baseArtifact([baseMilestone()]);
+  const view = milestoneToIncidentView(artifact, artifact.milestones[0]);
+
+  expect(view.calibrationApplicable).toBe(false);
 });

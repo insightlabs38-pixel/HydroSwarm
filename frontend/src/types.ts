@@ -446,13 +446,32 @@ export interface IncidentView {
   approvalPending: boolean;
   /** Conformal target used to size the calibrated candidate set (e.g. 0.9
    * for a 90% target). This is NOT measured per-incident coverage -- see
-   * calibrationValid/measuredCoverage for that. Task 3.5. */
+   * calibrationValid/measuredCoverage for that. Task 3.5.
+   *
+   * When calibrationApplicable is false, this is NOT a production
+   * conformal target -- it is REFERENCE mode's own deterministic
+   * credible-region criterion (GoldenScenarioRunner's fixed 0.90 mass
+   * threshold), reused here only because the number happens to coincide;
+   * render it as "reference criterion", never as "Conformal target". */
   candidateCoverage: number;
   /** Whether the calibration artifact backing this incident's candidate
    * set validated (matching checkpoint/feature-schema hashes) for the
    * current network/topology. When false, candidateCoverage is a stale
-   * target, not a trustworthy one. */
+   * target, not a trustworthy one. Meaningless when calibrationApplicable
+   * is false -- check that field first. */
   calibrationValid: boolean;
+  /** False only for a source that never exercises the production
+   * conformal-calibration artifact at all -- currently just REFERENCE
+   * mode, which replays GoldenScenarioRunner's deterministic classical
+   * workflow, not the neural pipeline's calibration. Undefined/true (the
+   * default) means "this field means what it always meant" for LIVE/
+   * DEMO_FALLBACK/ERROR -- existing callers that never check this field
+   * keep their current behavior unchanged. When false, calibrationValid/
+   * candidateCoverage/measuredCoverage must never be rendered as if they
+   * came from a real conformal calibration run (submission.txt SUB-12.1
+   * P0 #2B: REFERENCE is the deterministic golden workflow, not a
+   * production calibrated-neural-inference run). */
+  calibrationApplicable?: boolean;
   /** Held-out marginal coverage actually measured for the calibration
    * artifact in use, if known -- distinct from the per-incident
    * candidateCoverage target. */

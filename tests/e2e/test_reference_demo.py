@@ -46,6 +46,20 @@ def test_artifact_is_tied_to_the_golden_result_by_hash(artifact, golden_result) 
         assert artifact["source_artifact_hashes"][name] == entry["sha256"]
 
 
+def test_network_sha256_is_the_real_network_hash_not_the_golden_result_hash(
+    artifact, golden_result
+) -> None:
+    """submission.txt SUB-12.1 P0 #2A: the frontend's provenance.networkHash
+    must be the frozen network file's own hash, never golden_result_hash
+    (a hash of the entire golden result payload -- localization, plans,
+    consequences, events -- not the network). Confirms the two are
+    genuinely different values here, so a future regression that
+    accidentally reintroduces the mislabeling can't hide behind a
+    coincidental equality."""
+    assert artifact["network_sha256"] == golden_result["fixture_manifest"]["artifacts"]["golden_network.inp"]["sha256"]
+    assert artifact["network_sha256"] != artifact["golden_result_hash"]
+
+
 def test_generator_is_deterministic_across_repeated_builds(golden_result) -> None:
     first = build_reference_incident_artifact(golden_result, generator="test", source_commit="deadbeef")
     second = build_reference_incident_artifact(golden_result, generator="test", source_commit="deadbeef")

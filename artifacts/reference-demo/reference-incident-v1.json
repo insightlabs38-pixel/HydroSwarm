@@ -1,9 +1,9 @@
 {
-  "artifact_sha256": "5c5ce7f830da55ac50b908c58d8fe16e57e7f43ada4cc260b7b5da1a9c1e38f1",
+  "artifact_sha256": "62f54c505c51133bb856118b9ad48c4788b4adc5f3c14818b36448cc03eabc61",
   "description": "A checksummed replay of HydroSwarm's frozen, WNTR-backed golden incident workflow -- source localization, active sampling, plan verification, and human approval, end to end.",
   "event_count": 21,
   "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
-  "generated_at": "2026-08-10T02:24:25.546340+00:00",
+  "generated_at": "2026-08-10T04:14:16.982865+00:00",
   "generator": "scripts/build_reference_demo.py",
   "golden_result_hash": "d91cb7202cb8133ee0b8b656395d95d9fcddf10ba75e3de2f73acdf86f7da817",
   "milestones": [
@@ -973,6 +973,7 @@
       "pause_reason": null
     }
   ],
+  "network_sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
   "network_topology": {
     "junction_ids": [
       "J1",
@@ -1114,6 +1115,6 @@
     "golden_network.inp",
     "golden_scenario.json"
   ],
-  "source_commit": "d61f6d3f28dd4076bebcae92664b2f889ca57d26",
+  "source_commit": "3eb7f846a8240cb3a79bc59c684686901d97d7d8",
   "title": "HydroSwarm reference incident"
 }

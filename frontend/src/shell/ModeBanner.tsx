@@ -1,4 +1,5 @@
 import type { IncidentView } from '../types';
+import { isCalibrationApplicable } from '../calibrationDisplay';
 import type { ReferenceController } from '../reference/useReferenceIncident';
 
 /**
@@ -96,7 +97,7 @@ export function ModeBanner({
       </div>
     );
   }
-  if (!incident.calibrationValid) {
+  if (isCalibrationApplicable(incident) && !incident.calibrationValid) {
     return (
       <div className="mode-banner mode-banner-warn" role="status">
         <strong>CALIBRATION INVALID</strong>

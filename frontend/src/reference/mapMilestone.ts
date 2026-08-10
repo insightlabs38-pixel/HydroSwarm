@@ -145,7 +145,12 @@ export function milestoneToIncidentView(
     // report for it (see GoldenScenarioRunner).
     runtimeAnalysisMode: null,
     provenance: {
-      networkHash: artifact.golden_result_hash,
+      // The real frozen network file's own hash (submission.txt SUB-12.1
+      // P0 #2A) -- NOT artifact.golden_result_hash, which hashes the
+      // entire golden result payload (localization/plans/consequences/
+      // events), not the network specifically. Relabeling one artifact's
+      // hash as another's is exactly the truthfulness bug this fixes.
+      networkHash: artifact.network_sha256,
       // Feature-schema/model/calibration provenance is a neural-pipeline
       // concept the deterministic golden workflow never exercises --
       // empty string is this codebase's established "not applicable"
@@ -161,10 +166,17 @@ export function milestoneToIncidentView(
     },
     ood: (view.ood_level as IncidentView['ood']) ?? 'NORMAL',
     approvalPending: view.approval_pending,
-    // The golden workflow's own credible-region target (GoldenScenarioRunner
-    // uses target=0.90) -- a real value, not fabricated.
+    // submission.txt SUB-12.1 P0 #2B: REFERENCE mode replays the
+    // deterministic golden workflow (GoldenScenarioRunner's own fixed 0.90
+    // credible-region mass threshold), not a production conformal-
+    // calibrated neural inference run. candidateCoverage is real (it is
+    // GoldenScenarioRunner's actual threshold), but calibrationApplicable
+    // tells every render site not to present it as "Conformal target: 90%"
+    // or claim "Calibration: valid" the way a real calibration run would --
+    // see calibrationDisplay.ts for the shared rendering rules this drives.
     candidateCoverage: 0.9,
     calibrationValid: true,
+    calibrationApplicable: false,
     disagreement: null,
     nodes,
     links,

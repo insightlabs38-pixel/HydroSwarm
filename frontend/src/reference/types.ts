@@ -119,6 +119,11 @@ export interface ApiReferenceArtifact {
   generator: string;
   generated_at: string;
   source_commit: string;
+  /** The real frozen network file's own SHA-256 -- distinct from
+   * golden_result_hash below (a hash of the entire golden result payload,
+   * not the network specifically). Use this for provenance.networkHash;
+   * never golden_result_hash (submission.txt SUB-12.1 P0 #2A). */
+  network_sha256: string;
   golden_result_hash: string;
   final_event_hash: string;
   event_count: number;

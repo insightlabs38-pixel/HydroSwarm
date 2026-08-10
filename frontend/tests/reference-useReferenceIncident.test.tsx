@@ -47,6 +47,7 @@ const fakeArtifact: ApiReferenceArtifact = {
   generator: 'test',
   generated_at: '2026-08-10T00:00:00+00:00',
   source_commit: 'deadbeef',
+  network_sha256: 'network-hash',
   golden_result_hash: 'golden-hash',
   final_event_hash: 'final-hash',
   event_count: 3,

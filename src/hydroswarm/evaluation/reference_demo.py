@@ -386,6 +386,13 @@ def build_reference_incident_artifact(
         "source_artifact_hashes": {
             name: entry["sha256"] for name, entry in golden_result["fixture_manifest"]["artifacts"].items()
         },
+        # SUB-12.1 P0 #2A: the real frozen network file's own hash, distinct
+        # from golden_result_hash below (a hash of the *entire* golden
+        # result payload -- localization, plans, consequences, events --
+        # not the network specifically). The frontend's provenance.networkHash
+        # must use this field, never golden_result_hash, or it mislabels one
+        # artifact's hash as another's.
+        "network_sha256": golden_result["fixture_manifest"]["artifacts"]["golden_network.inp"]["sha256"],
         "golden_result_hash": golden_result["result_sha256"],
         "final_event_hash": golden_result["workflow"]["final_event_hash"],
         "event_count": golden_result["workflow"]["event_count"],
