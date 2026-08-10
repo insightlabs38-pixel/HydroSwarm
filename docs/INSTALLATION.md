@@ -68,14 +68,26 @@ Linux/macOS equivalents use `.venv/bin/python`, `npm ci && npm run build`, and
 
 ## Container
 
+**Judge/release path (recommended, no build required):** pulls the published multiarch
+(amd64 + arm64) image from GHCR.
+
+```text
+docker compose -f docker-compose.release.yml up
+```
+
+**Developer path (builds from source):**
+
 ```text
 docker compose build
 docker compose up
 ```
 
-Compose publishes only `127.0.0.1:8765`, removes Linux capabilities, prevents privilege
-escalation, uses a read-only root filesystem, and persists application state in the
-`hydroswarm-data` volume.
+Both compose files publish only `127.0.0.1:8765`, remove Linux capabilities, prevent
+privilege escalation, use a read-only root filesystem, and persist application state in
+the `hydroswarm-data` volume. The release image is built and pushed by
+`.github/workflows/release.yml` on a version tag (`v*`); see `RELEASE_MANIFEST.json` in
+each release for the exact model/calibration/normalization hashes and container digest
+that image was built from.
 
 ## Performance: native Windows vs. Linux/Docker
 

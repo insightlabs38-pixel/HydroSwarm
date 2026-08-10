@@ -1,0 +1,6 @@
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.40kB done
+#1 DONE 0.0s
+ERROR: failed to build: failed to solve: failed to read dockerfile: failed to mount /var/lib/docker/tmp/buildkit-mount2461733022: [{Type:bind Source:/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs Target: Options:[rbind ro]}]: mount source: "/var/lib/docker/containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/1/fs", target: "/var/lib/docker/tmp/buildkit-mount2461733022", fstype: bind, flags: 20481, data: "", err: operation not permitted
