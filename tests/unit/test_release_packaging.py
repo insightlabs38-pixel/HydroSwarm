@@ -287,12 +287,17 @@ def test_extracted_release_bundle_has_every_file_its_own_setup_scripts_need(tmp_
     if shutil.which("sha256sum") is None:
         pytest.skip("sha256sum binary not available on this platform")
 
-    sha256sums = (extract_dir / "SHA256SUMS").read_text()
+    # Feed the manifest bytes directly.  With text=True, Windows converts
+    # LF to CRLF when writing subprocess stdin and GNU sha256sum then treats
+    # the trailing CR as part of every archive member path.
+    sha256sums = (extract_dir / "SHA256SUMS").read_bytes()
     verify = subprocess.run(
         ["sha256sum", "--check", "--strict"],
         input=sha256sums,
         cwd=extract_dir,
         capture_output=True,
-        text=True,
     )
-    assert verify.returncode == 0, f"sha256sum --check failed on the extracted tree:\n{verify.stdout}\n{verify.stderr}"
+    assert verify.returncode == 0, (
+        "sha256sum --check failed on the extracted tree:\n"
+        f"{verify.stdout.decode(errors='replace')}\n{verify.stderr.decode(errors='replace')}"
+    )

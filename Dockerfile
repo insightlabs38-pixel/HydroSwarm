@@ -56,6 +56,11 @@ COPY artifacts/reference-demo/ artifacts/reference-demo/
 # computed from -- without this the LIVE example judge path 404s inside
 # the container even though it works from a source checkout.
 COPY data/frozen/ data/frozen/
+# The real LIVE pipeline resolves pristine topology fixtures while building
+# classical signature priors.  These are runtime inputs, not training data;
+# without them a hardened container reaches the live analysis path and then
+# fails closed with a missing relative topology file.
+COPY data/topologies/ data/topologies/
 RUN mkdir -p /data && chown -R hydroswarm:hydroswarm /app /data
 USER hydroswarm
 # Container self-test gate: fails the build (not just a post-hoc CI check)
