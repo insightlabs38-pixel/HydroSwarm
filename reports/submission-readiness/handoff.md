@@ -5,8 +5,11 @@ Submission Readiness Implementation Plan"). Background context (already-complete
 prior passes, not this plan's own scope): `overnight-plan.txt`, `core-issues.txt`,
 `core-issues2.txt`, `core-issues3.txt`, `core-issues5.txt`.
 
-Per operating instructions for this session: **stop after SUB-0/SUB-1**. This report
-covers those two phases only; SUB-2 onward have not been started.
+This report originally covered SUB-0/SUB-1 only (that session's operating instructions
+were to stop there). It is now continued by a later autonomous session (2026-08-10)
+that synced this branch onto merged `main` and completed SUB-2; see the dated sections
+below. Earlier sections are left as originally written except where explicitly marked
+RESOLVED/updated.
 
 ## Branch / baseline
 
@@ -15,26 +18,26 @@ covers those two phases only; SUB-2 onward have not been started.
   ("docs(handoff): record UI-11.1 and pre-merge polish pass completion"), **not** from
   `origin/main`.
 
-### Baseline discrepancy — recorded per SUB-0's "record any pre-existing gap" requirement
+### Baseline discrepancy — RESOLVED 2026-08-10
 
 submission.txt §"Recommended branch / delivery strategy" states the baseline is
-"main after merge of the mission-control UI PR". At session start, `origin/main` was
-**40 commits behind** `feature/ui-mission-control-v1`
-(`git merge-base --is-ancestor origin/main feature/ui-mission-control-v1` → true;
-`git rev-list --left-right --count origin/main...feature/ui-mission-control-v1` → `0	40`).
-The mission-control UI PR has not actually been merged to `main` yet. Since the entire
-submission-readiness plan assumes the mission-control shell, `DEMO_FALLBACK` semantics,
-and the frozen-`hydrocore-v4`-by-default runtime already exist (all present only on
-`feature/ui-mission-control-v1`, confirmed by inspecting its commit log and current
-source), branching from stale `main` would silently discard that work and contradict
-the plan's own premise. I branched from `feature/ui-mission-control-v1` instead and am
-recording this explicitly rather than guessing silently.
+"main after merge of the mission-control UI PR". At the *original* SUB-0/SUB-1 session
+start, `origin/main` was 40 commits behind `feature/ui-mission-control-v1` and the PR
+had not been merged; branching from `feature/ui-mission-control-v1` directly (as
+recorded further down, still historically accurate) was the correct call at that time.
 
-**Decision for a human to confirm:** either (a) merge `feature/ui-mission-control-v1`
-into `main` via PR before or alongside this branch's own PR, or (b) treat
-`feature/ui-mission-control-v1` as the de facto integration branch for this phase of
-work. This session did not merge anything to `main` (per the "do not work on or push to
-main" restriction) and took no action beyond recording the discrepancy.
+**Update (this session, 2026-08-10):** `git fetch origin` picked up
+`561a442 Merge pull request #2 from insightlabs38-pixel/feature/ui-mission-control-v1`
+— the mission-control UI PR is now merged into `origin/main`. `origin/main`'s tip
+(`c1fc9cc`, the prior research/training-track head) was already an ancestor of
+`feature/ui-mission-control-v1` at merge time, so PR #2 was a fast-forward-shaped merge
+that introduced no new tree conflicts. This branch (`feature/submission-readiness-v1`)
+was synced onto that new `origin/main` via `git merge --no-ff origin/main` (not rebase,
+to avoid force-pushing the two commits — `ce992e4`, `22fadad` — already pushed to
+`origin/feature/submission-readiness-v1`). The merge was content-empty (this branch's
+tree was already a superset of `origin/main`'s, since it descended from the same UI-branch
+tip origin/main just merged) and is recorded as commit `33bb332`. Gates re-verified green
+after the sync (see below). No human decision is outstanding on this point anymore.
 
 ## Environment (SUB-0 baseline record)
 
@@ -212,11 +215,73 @@ touched (matches SUB-0's "no source file has been changed before baseline record
  reports/submission-readiness/                        | new (this report + gate logs)
 ```
 
+## 2026-08-10 session — branch sync + SUB-2
+
+### Sync onto merged main
+
+- `git fetch origin` revealed `origin/main` had advanced to `561a442` (PR #2, merging
+  `feature/ui-mission-control-v1`). See "Baseline discrepancy — RESOLVED" above.
+- `git merge --no-ff origin/main` into `feature/submission-readiness-v1` → commit
+  `33bb332`, zero content diff, pushed.
+- Post-sync gate re-check: `ruff check src tests scripts` clean, `pyright` 0/0/0. Full
+  `pytest -q` re-run (`reports/submission-readiness/sub2-post-merge-pytest.log`,
+  pre-SUB-2 tree): **895 passed, 0 failed, 546.75s** — identical to the SUB-1 baseline
+  count, confirming the merge was content-empty as expected and introduced zero
+  regressions. A second full run including the SUB-2 test additions is captured in
+  `reports/submission-readiness/sub2-full-pytest.log`.
+
+### SUB-2 — native setup/launcher scripts (commit `388384d`)
+
+Implements submission.txt §15–17.
+
+- `scripts/setup_common.py`: shared Python helper (`check-python`, `verify-bundle`,
+  `frontend-status`, `self-test` subcommands) used by all three platform scripts so
+  the verification logic can't drift between them the way the pre-SUB-1 bundle-path
+  resolution did.
+- `setup_hydroswarm_linux.sh` / `_macos.sh` / `_windows.ps1`: create `.venv`, install
+  CPU-only deps into it exclusively (never global, never `sudo`/apt/yum/pacman/brew
+  invocation — only printed instructions), verify the frozen V4 bundle via the SUB-1
+  resolver, build the frontend only if no prebuilt `frontend/dist` exists (detects
+  Node 22+), and gate "setup complete" on a green self-test. macOS additionally
+  verifies the WNTR/EPANET import and does not assume Rosetta. Windows uses
+  PowerShell (not batch), does not run the full real-simulator suite, and explains
+  the Docker/WSL2 production-latency path per §15.4.
+- `start_hydroswarm_linux.sh` / `_macos.sh` / `_windows.ps1`: explicit `.venv`
+  interpreter (never ambient `python`), fail closed with a clear message if `.venv`
+  is missing, run a readiness check before binding, bind loopback by default, print
+  the URL.
+- `start_hydroswarm.sh` / `.bat`: converted to thin OS-detecting compatibility
+  wrappers delegating to the new platform launchers (previously invoked ambient
+  `python` directly — exactly the gap submission.txt §3.3 called out).
+- `cli.py`: added `hydroswarm self-test --human` rendering the §17 readiness
+  checklist (`render_self_test_report`). Purely additive — default `hydroswarm
+  self-test` JSON output (relied on by CI/tests/Dockerfile build gate) is unchanged.
+- Tests: `tests/unit/test_native_setup_scripts.py` (46 cases, structural/static —
+  venv-only install, fail-closed launchers, no system-package-manager mutation,
+  readiness gating present) + new `test_cli.py` cases for `--human`.
+
+**Live-verified in this sandbox** (not just statically): ran
+`./setup_hydroswarm_linux.sh` end-to-end against the real repo state — bundle
+verified, self-test printed `READY`. Then ran `./start_hydroswarm_linux.sh` in the
+background and confirmed `curl http://127.0.0.1:8765/api/health` returned
+`{"status":"ok","offline":true,...}` before stopping it. macOS and Windows scripts
+were **not** executable in this Linux sandbox and were only statically/structurally
+verified — flag this if a judge/user reports a macOS- or Windows-specific setup
+failure; that path has real execution risk this session could not retire.
+
+### Docker availability update
+
+Unlike the SUB-0/SUB-1 session, **`docker` (29.7.2) is now available** in this
+sandbox. SUB-3 (multiarch Docker/release packaging) is next and will include a real
+`docker build`/`docker run` verification this time, not just the static Dockerfile
+assertions SUB-1 was limited to.
+
 ## Exact continuation commands
 
 ```bash
 cd /workspace/HydroSwarm
 git checkout feature/submission-readiness-v1
+git pull origin feature/submission-readiness-v1
 
 # re-run full gates
 source .venv/bin/activate
@@ -225,11 +290,25 @@ python -m ruff check src tests scripts
 python -m pyright
 cd frontend && npm run lint && npm run typecheck && npm run format:check && npx vitest run && npm run build && cd ..
 
-# next phase per submission.txt §75 / §81:
-# SUB-2 -- native setup scripts (setup_hydroswarm_linux.sh / _macos.sh / _windows.ps1)
-#          and platform launchers (start_hydroswarm_linux.sh / _macos.sh / _windows.ps1)
+# check the post-sync full-suite background run this session started:
+cat reports/submission-readiness/sub2-post-merge-pytest.log
+
+# next phase per submission.txt SS3.4/SS18-23 (task list §SUB-3):
+# SUB-3 -- multiarch Docker/release packaging. docker is now available in this
+# sandbox (29.7.2) -- do a REAL docker build/run for amd64, and a real arm64
+# build+smoke (this host is aarch64, so arm64 is native; amd64 needs
+# buildx+qemu emulation), before marking SUB-3 acceptance criteria met.
 ```
 
-## Next phase (not started)
+## Next phase (not started as of end of 2026-08-10 session)
 
-SUB-2 — native setup/launcher scripts per platform, as specified in submission.txt §15–17.
+SUB-3 — multiarch container publishing and release packaging, per
+submission.txt §18–22: release compose (`docker-compose.release.yml`),
+`.github/workflows/release.yml` (buildx amd64+arm64, GHCR publish), runtime
+zip (`HydroSwarm-v0.1.0-hackathon-runtime.zip`), `RELEASE_MANIFEST.json`.
+**Do not mark Docker/release packaging complete until a real amd64
+build/run and a real arm64 build/smoke have both actually executed
+successfully in this sandbox** (docker is installed; SUB-1's Dockerfile
+already has the bundle-copy + build-time self-test gate in place from the
+prior session, so `docker build` should be attempted directly rather than
+re-implemented).
