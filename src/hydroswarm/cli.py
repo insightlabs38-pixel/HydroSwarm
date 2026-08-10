@@ -52,7 +52,6 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     from hydroswarm.runtime import V4PipelineFactory
     from hydroswarm.runtime.paths import resolve_reference_demo_path, resolve_v4_bundle_dir
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
-    from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
     graph = build_networkx_network()
     hydraulic_model = build_wntr_network()
@@ -118,11 +117,13 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     # unbounded. If this still is not enough on some future run, that is
     # itself evidence of a genuine hang, not just slowness, and needs
     # separate investigation rather than another blind increase.
-    simulator = HydraulicSimulator(hydraulic_model, timeout_seconds=300.0)
-    state = simulator.calculate_state(FEATURE_SNAPSHOT_TIME_SECONDS)
-    if not state.pressure_m or not all(map(lambda value: value == value, state.pressure_m.values())):
-        raise RuntimeError("fixed WNTR reference simulation is invalid")
-    simulation_hash = simulator.state_hash()
+    worker = subprocess.run(
+        [sys.executable, "-m", "hydroswarm.simulation.self_test_worker"],
+        capture_output=True, text=True, timeout=60, check=False,
+    )
+    if worker.returncode:
+        raise RuntimeError(f"bounded WNTR self-test worker failed: {worker.stderr.strip()}")
+    simulation_hash = json.loads(worker.stdout)["simulation_sha256"]
 
     workspace = Path.cwd()
     free_disk_gb = psutil.disk_usage(str(workspace)).free / (1024**3)
@@ -192,7 +193,7 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
         "inference_sha256": inference_hash,
         "simulation_run": True,
         "simulation_sha256": simulation_hash,
-        "network_sha256": simulator.state_hash(),
+        "network_sha256": hashlib.sha256(repr(hydraulic_model).encode()).hexdigest(),
         "resources": {
             "free_disk_gb": round(free_disk_gb, 2),
             "available_ram_gb": round(available_ram_gb, 2),
