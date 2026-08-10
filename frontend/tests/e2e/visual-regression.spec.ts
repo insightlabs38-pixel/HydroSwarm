@@ -39,7 +39,7 @@ async function gotoWorkspace(
   target: { rail: RegExp | null; heading: string | null },
 ) {
   await page.setViewportSize({ width, height });
-  await page.goto('/');
+  await page.goto('/?experience=fallback');
   await waitForOverviewLoaded(page);
   if (target.rail) {
     await page.getByRole('button', { name: target.rail }).click();
@@ -98,7 +98,7 @@ test.describe('keyboard-only navigation', () => {
   test('every workflow-rail stage is reachable and focus is visible without a mouse', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
 
     for (const { rail, heading } of stages) {
@@ -117,7 +117,7 @@ test.describe('keyboard-only navigation', () => {
   // exercise a real browser's native fragment-focus behavior, so this
   // is only verifiable end-to-end.
   test('skip link moves real keyboard focus to main content', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     const skipLink = page.getByRole('link', { name: 'Skip to main content' });
     await skipLink.focus();
@@ -133,7 +133,7 @@ test.describe('keyboard-only navigation', () => {
   // React's #root, was first in DOM/tab order and had no working focus
   // target of its own. Locks down there is exactly one skip link now.
   test('exactly one skip link exists (no stale static duplicate)', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await expect(page.locator('.skip-link')).toHaveCount(1);
   });
@@ -141,7 +141,7 @@ test.describe('keyboard-only navigation', () => {
 
 test.describe('reduced-motion mode', () => {
   test('toggle is reachable, persists, and is announced via aria-pressed', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     const toggle = page.getByRole('button', { name: /Reduced motion/ });
     await expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await toggle.click();
@@ -151,7 +151,7 @@ test.describe('reduced-motion mode', () => {
 
   test('emulated prefers-reduced-motion still renders a usable page', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   });
 });
@@ -160,7 +160,7 @@ test.describe('data-mode banners', () => {
   test('DEMO_FALLBACK banner is visible with no backend reachable (default test condition)', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     // Both the header's mode badge and the decision inspector's own
     // status badge render the real DEMO_FALLBACK mode -- intentional
@@ -188,7 +188,7 @@ test.describe('selected-plan synchronization', () => {
   // Pareto frontier and full action sequence it was previously
   // duplicated against).
   test('selecting a different plan in the table updates the highlighted row', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
@@ -210,7 +210,7 @@ test.describe('selected-plan synchronization', () => {
   test('selecting plan C updates the toolbar breadcrumb, inspector, and verification dock together', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
@@ -232,7 +232,7 @@ test.describe('long identifiers do not break layout', () => {
   test('overview renders without horizontal overflow when node/plan names are unusually long', async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await waitForOverviewLoaded(page);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
@@ -250,7 +250,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
   for (const width of [1300, 900, 600]) {
     test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
-      await page.goto('/');
+      await page.goto('/?experience=fallback');
       await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
       const overflow = await page.evaluate(() => ({
         scrollWidth: document.documentElement.scrollWidth,
@@ -264,7 +264,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
     page,
   }) => {
     await page.setViewportSize({ width: 900, height: 900 });
-    await page.goto('/');
+    await page.goto('/?experience=fallback');
     await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
     const inspector = page.locator('.decision-inspector');
     await expect(inspector).toBeVisible();

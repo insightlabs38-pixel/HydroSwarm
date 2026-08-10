@@ -119,6 +119,19 @@ export default function App() {
     );
   }
 
+  if (isReference && referenceController.isError) {
+    return (
+      <main className="loading-state" role="alert">
+        <div>
+          <p>Reference incident unavailable.</p>
+          <p className="supporting">
+            {referenceController.errorMessage ?? 'The reference-demo artifact could not be loaded.'}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   const incident = isReference ? referenceController.incident : (liveQuery.data ?? null);
   if (!incident)
     return (

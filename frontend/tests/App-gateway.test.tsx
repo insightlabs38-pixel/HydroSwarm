@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import * as referenceDemoApi from '../src/api/referenceDemo';
 import type { ApiReferenceArtifact, ApiReferenceMilestone } from '../src/reference/types';
 
 // SUB-5/SUB-6: this file specifically exercises the first-launch gateway,
@@ -120,6 +121,19 @@ test('clicking Explore illustrative fallback on the gateway shows DEMO_FALLBACK'
   await user.click(await screen.findByRole('button', { name: 'Explore illustrative fallback' }));
 
   expect(await screen.findByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
+});
+
+test('a failed reference-demo fetch shows an error, not an infinite loading spinner', async () => {
+  vi.stubEnv('VITE_INCIDENT_ID', '');
+  window.history.pushState(null, '', '/?experience=reference');
+  vi.spyOn(referenceDemoApi, 'fetchReferenceArtifact').mockRejectedValueOnce(
+    new Error('reference-demo artifact not found'),
+  );
+  await renderFreshApp();
+
+  expect(await screen.findByText('Reference incident unavailable.')).toBeVisible();
+  expect(screen.getByText('reference-demo artifact not found')).toBeVisible();
+  expect(screen.queryByText('Loading local incident state…')).not.toBeInTheDocument();
 });
 
 test('?failure= bypasses the gateway and still shows the ERROR state', async () => {
