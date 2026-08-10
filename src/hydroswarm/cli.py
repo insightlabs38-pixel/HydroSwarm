@@ -24,8 +24,20 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
 
 
-def run_self_test() -> dict[str, Any]:
-    """Run bounded startup checks with fixed model and WNTR reference execution."""
+def run_self_test(*, strict: bool = False) -> dict[str, Any]:
+    """Run bounded startup checks with fixed model and WNTR reference execution.
+
+    `strict=True` (SUB-12.1 #21) additionally requires the frozen V4 bundle
+    to be ready with a genuinely FITTED calibration artifact (not merely
+    loadable), the reference-demo artifact to be present, the frontend to
+    be built, and resource checks to have produced zero warnings -- used by
+    the native setup scripts, the Docker build gate, CI, and the release
+    workflow so none of them can silently ship a degraded runtime. Failures
+    are reported (`ok: False`, `strict_failures: [...]`), not raised -- a
+    non-strict call keeps reporting the same facts but never fails on them
+    (used for local iteration where a source-only frontend or an
+    unconfigured calibration is an expected, informative state, not a
+    blocker)."""
 
     dependency_names = ("fastapi", "networkx", "numpy", "pydantic", "torch", "wntr")
     dependencies: dict[str, str] = {}
@@ -38,7 +50,7 @@ def run_self_test() -> dict[str, Any]:
 
     from hydroswarm.model import HydroCore
     from hydroswarm.runtime import V4PipelineFactory
-    from hydroswarm.runtime.paths import resolve_v4_bundle_dir
+    from hydroswarm.runtime.paths import resolve_reference_demo_path, resolve_v4_bundle_dir
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
     from hydroswarm.simulation.wrapper import FEATURE_SNAPSHOT_TIME_SECONDS, HydraulicSimulator
 
@@ -123,7 +135,24 @@ def run_self_test() -> dict[str, Any]:
     trained_assets_ready = trained_factory.trained_assets_ready
     identity = trained_factory.identity
 
-    return {
+    # SUB-12.1 #21: read the bundle's own calibration-status.json directly
+    # (the same file V4PipelineFactory's internal loader already validated
+    # a real calibration.json against, or explicitly recorded the reason
+    # one isn't present) rather than adding a new public property to the
+    # runtime factory just for this report -- self-test already resolves
+    # the same bundle directory the factory loaded from.
+    calibration_status_path = trained_factory.checkpoint_dir / "calibration-status.json"
+    calibration_status = "MISSING"
+    if calibration_status_path.exists():
+        try:
+            calibration_status = json.loads(calibration_status_path.read_text()).get("status", "MISSING")
+        except (OSError, ValueError):
+            calibration_status = "UNREADABLE"
+
+    reference_artifact_path = resolve_reference_demo_path()
+    reference_artifact_present = reference_artifact_path.exists()
+
+    report = {
         "ok": True,
         "dependencies": dependencies,
         "network": {
@@ -141,6 +170,7 @@ def run_self_test() -> dict[str, Any]:
             "model_sha256": trained_factory.model_hash,
             "normalization_hash": identity.normalization_hash if identity is not None else None,
             "bundle_dir": str(trained_factory.checkpoint_dir),
+            "calibration_status": calibration_status,
         },
         "inference_run": True,
         "inference_sha256": inference_hash,
@@ -154,8 +184,35 @@ def run_self_test() -> dict[str, Any]:
             "warnings": resource_warnings,
         },
         "frontend_assets": "built" if frontend_dist.exists() else "source-only",
+        "reference_artifact": {
+            "present": reference_artifact_present,
+            "path": str(reference_artifact_path),
+        },
         "offline_ready": True,
     }
+
+    # `strict` never raises for these -- they are real, checked facts about
+    # release readiness, not a crash. `ok`/`strict_failures` carries the
+    # verdict so both JSON and --human callers (and the CLI's exit code)
+    # can act on the same report a non-strict caller would also have
+    # received, just with strict's stricter pass/fail line drawn over it.
+    if strict:
+        failures: list[str] = []
+        if not trained_assets_ready:
+            failures.append(f"frozen V4 bundle not ready: {trained_factory.fallback_reason}")
+        if calibration_status != "FITTED":
+            failures.append(f"calibration status is {calibration_status!r}, not FITTED")
+        if report["frontend_assets"] != "built":
+            failures.append("frontend is not built (frontend/dist/index.html missing)")
+        if not reference_artifact_present:
+            failures.append(f"reference-demo artifact missing at {reference_artifact_path}")
+        if resource_warnings:
+            failures.append(f"resource warnings present: {', '.join(resource_warnings)}")
+        if failures:
+            report["ok"] = False
+            report["strict_failures"] = failures
+
+    return report
 
 
 def render_self_test_report(report: dict[str, Any]) -> str:
@@ -165,14 +222,17 @@ def render_self_test_report(report: dict[str, Any]) -> str:
     default JSON output (still required by CI and other machine callers)."""
     trained_assets = report.get("trained_assets", {})
     resources = report.get("resources", {})
+    reference_artifact = report.get("reference_artifact", {})
     checks: list[tuple[bool, str]] = [
         (report.get("ok", False), "Python runtime"),
         (bool(trained_assets.get("ready")), "Frozen HydroCore-v4 bundle verified"),
         (bool(trained_assets.get("model_sha256")), "Model SHA-256 verified"),
         (bool(trained_assets.get("normalization_hash")), "Normalization verified"),
+        (trained_assets.get("calibration_status") == "FITTED", "Calibration FITTED"),
         (bool(report.get("simulation_run")), "WNTR/EPANET available"),
         (report.get("sqlite") == "ok", "SQLite writable"),
         (report.get("frontend_assets") == "built", "Frontend assets available"),
+        (bool(reference_artifact.get("present")), "Reference-demo artifact present"),
         (bool(resources.get("port_8765_available")), "Port 8765 available"),
         (True, "No required external runtime service"),
     ]
@@ -184,6 +244,8 @@ def render_self_test_report(report: dict[str, Any]) -> str:
         lines.append(f"  reason: {trained_assets.get('fallback_reason')}")
     if report.get("frontend_assets") != "built":
         lines.append("  reason: frontend not built (source-only) -- run the frontend build before a demo")
+    for failure in report.get("strict_failures", []):
+        lines.append(f"  strict failure: {failure}")
     return "\n".join(lines)
 
 
@@ -228,11 +290,23 @@ def self_test_command(
     human: bool = typer.Option(
         False, "--human", help="Print a human-readable readiness checklist instead of JSON."
     ),
+    strict: bool = typer.Option(
+        False,
+        "--strict",
+        help=(
+            "Also require the frozen V4 bundle to be ready with a FITTED "
+            "calibration, the reference-demo artifact to be present, the "
+            "frontend to be built, and zero resource warnings -- exits "
+            "nonzero if any of those fail, not just on a crash. Used by "
+            "the native setup scripts, Docker build gate, CI, and release "
+            "workflow."
+        ),
+    ),
 ) -> None:
     """Run offline readiness checks. Defaults to machine-readable JSON; pass
     --human for the operator-facing checklist used by the setup scripts."""
     try:
-        report = run_self_test()
+        report = run_self_test(strict=strict)
     except Exception as exc:
         if human:
             typer.echo(f"HydroSwarm readiness\n\nFAILED: {type(exc).__name__}: {exc}", err=True)
@@ -243,12 +317,22 @@ def self_test_command(
         typer.echo(render_self_test_report(report))
     else:
         typer.echo(json.dumps(report, indent=2, sort_keys=True))
+    if report.get("ok") is False:
+        raise typer.Exit(1)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     try:
-        app(args=list(argv) if argv is not None else None, standalone_mode=False)
-        return 0
+        # Click's own `main(standalone_mode=False)` -- what Typer's `app()`
+        # delegates to -- catches `typer.Exit` internally and returns its
+        # `exit_code` as this call's return value rather than re-raising
+        # it; only `ClickException`/`UsageError` subclasses (e.g.
+        # `typer.BadParameter`) still propagate as real exceptions. A
+        # non-zero `typer.Exit` (e.g. self-test --strict failing) would
+        # otherwise be silently discarded here and this function would
+        # always return 0.
+        result = app(args=list(argv) if argv is not None else None, standalone_mode=False)
+        return int(result) if isinstance(result, int) else 0
     except typer.Exit as exc:
         return int(exc.exit_code)
     except Exception as exc:

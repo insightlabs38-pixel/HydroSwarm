@@ -114,7 +114,7 @@ fi
 # --- 6. Run the readiness self-test -----------------------------------------
 log ""
 log "Running readiness self-test ..."
-if ! PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$VENV_PYTHON" "$PROJECT_ROOT/scripts/setup_common.py" self-test; then
+if ! PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}" "$VENV_PYTHON" "$PROJECT_ROOT/scripts/setup_common.py" self-test --strict; then
   log ""
   fail "readiness self-test failed (see checklist above). Fix the flagged item and re-run this script."
 fi

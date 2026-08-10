@@ -111,24 +111,23 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       # SUB-3 acceptance criterion: "amd64 image boots; arm64 image
-      # builds/smokes; one tag resolves both architectures." This asserts
-      # ok == true, the frozen V4 model/calibration identity, trained
-      # assets ready, and frontend assets built -- inside the actual
-      # pushed image, not a rebuilt copy -- for both platforms.
+      # builds/smokes; one tag resolves both architectures." SUB-12.1 #21:
+      # --strict requires trained assets ready, a genuinely FITTED
+      # calibration (not merely loadable), the reference-demo artifact
+      # present, the frontend built, and zero resource warnings -- inside
+      # the actual pushed image, not a rebuilt copy -- for both platforms.
       - name: Pull and self-test (${{ matrix.platform }})
         run: |
           docker pull --platform ${{ matrix.platform }} "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}"
           docker run --rm --platform ${{ matrix.platform }} \
             "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}" \
-            hydroswarm self-test > self-test-${{ strategy.job-index }}.json
+            hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
           python3 -c "
           import json, sys
           report = json.load(open('self-test-${{ strategy.job-index }}.json'))
-          assert report['ok'] is True, report
-          assert report['trained_assets']['ready'] is True, report['trained_assets']
+          assert report['ok'] is True, report.get('strict_failures', report)
           assert report['trained_assets']['model_sha256'], 'missing model hash'
-          assert report['frontend_assets'] == 'built', report['frontend_assets']
-          print('container self-test OK for ${{ matrix.platform }}')
+          print('container strict self-test OK for ${{ matrix.platform }}')
           "
 
   release-artifacts:

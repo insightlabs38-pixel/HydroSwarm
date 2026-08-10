@@ -88,15 +88,17 @@ def cmd_frontend_status(_args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_self_test(_args: argparse.Namespace) -> int:
+def cmd_self_test(args: argparse.Namespace) -> int:
     """Run the real application self-test using the current interpreter
     (expected to be the freshly created `.venv` interpreter) and print its
-    human-readable readiness summary."""
+    human-readable readiness summary. `--strict` (SUB-12.1 #21) also
+    requires a FITTED calibration, the reference-demo artifact, and a
+    built frontend -- not just that the interpreter/model/WNTR run at all."""
     sys.path.insert(0, str(_project_root() / "src"))
     from hydroswarm.cli import render_self_test_report, run_self_test
 
     try:
-        report = run_self_test()
+        report = run_self_test(strict=args.strict)
     except Exception as exc:  # noqa: BLE001 -- setup must report, not crash, on any failure
         print(f"HydroSwarm readiness\n\nFAILED: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 1
@@ -110,7 +112,14 @@ def main(argv: list[str] | None = None) -> int:
     subparsers.add_parser("check-python", help="Verify interpreter is 64-bit Python >= 3.12.")
     subparsers.add_parser("verify-bundle", help="Verify the frozen V4 release bundle.")
     subparsers.add_parser("frontend-status", help="Report whether frontend/dist is already built.")
-    subparsers.add_parser("self-test", help="Run and render the application readiness self-test.")
+    self_test_parser = subparsers.add_parser(
+        "self-test", help="Run and render the application readiness self-test."
+    )
+    self_test_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Also require a FITTED calibration, the reference-demo artifact, and a built frontend.",
+    )
 
     args = parser.parse_args(argv)
     handlers = {

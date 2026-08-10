@@ -89,8 +89,12 @@ def test_release_workflow_has_a_container_self_test_gate_for_each_platform() -> 
     job = workflow["jobs"]["container-self-test"]
     assert job["strategy"]["matrix"]["platform"] == ["linux/amd64", "linux/arm64"]
     text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
-    assert "trained_assets']['ready'] is True" in text
-    assert "frontend_assets'] == 'built'" in text
+    # SUB-12.1 #21: the release gate uses `--strict`, which already
+    # requires trained_assets.ready, a FITTED calibration, the
+    # reference-demo artifact, and a built frontend -- report['ok'] is the
+    # single real verdict, not a hand-picked subset of fields re-checked here.
+    assert "self-test --strict" in text
+    assert "report['ok'] is True" in text
 
 
 def test_release_workflow_verifies_frozen_bundle_hashes_before_building() -> None:

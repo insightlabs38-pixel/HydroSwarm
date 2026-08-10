@@ -52,4 +52,7 @@ hydroswarm self-test --human
 
 It prints a checklist (Python runtime, frozen bundle, model hash, calibration,
 normalization, WNTR/EPANET, SQLite, frontend assets, port availability) and says exactly
-which check failed.
+which check failed. Add `--strict` to additionally require a genuinely FITTED calibration
+(not merely loadable), the reference-demo artifact, a built frontend, and zero resource
+warnings, exiting nonzero if any of those fail -- the same gate the native setup scripts,
+Docker build, CI, and the release workflow all run.

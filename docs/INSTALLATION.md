@@ -163,7 +163,11 @@ npm.cmd run build
 
 `self-test` executes real model inference and a bounded WNTR simulation, checks SQLite,
 resource availability, bind-port status, dependency versions, and frontend assets, and
-emits machine-readable hashes. A failure exits nonzero.
+emits machine-readable hashes. A failure exits nonzero. `self-test --strict` additionally
+requires a genuinely FITTED calibration artifact, the reference-demo artifact, a built
+frontend, and zero resource warnings -- the release-readiness gate the native setup
+scripts, Docker build, CI, and the release workflow all run; plain `self-test` reports the
+same facts without failing on them, for local iteration.
 
 ## Troubleshooting
 

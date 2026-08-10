@@ -116,7 +116,7 @@ if ($FrontendStatus -match '"built":\s*true') {
 Write-Info ""
 Write-Info "Running readiness self-test ..."
 $env:PYTHONPATH = "$ProjectRoot\src;$env:PYTHONPATH"
-& $VenvPython "$ProjectRoot\scripts\setup_common.py" self-test
+& $VenvPython "$ProjectRoot\scripts\setup_common.py" self-test --strict
 $selfTestExit = $LASTEXITCODE
 Write-Info ""
 if ($selfTestExit -ne 0) {

@@ -70,9 +70,13 @@ def test_dockerfile_copies_the_reference_demo_artifact_to_the_env_var_it_sets() 
 def test_dockerfile_runs_a_build_time_self_test_gate() -> None:
     dockerfile = (PROJECT_ROOT / "Dockerfile").read_text()
 
+    # SUB-12.1 #21: the build-time gate uses strict=True, which already
+    # requires trained_assets.ready, a FITTED calibration, the
+    # reference-demo artifact, and a built frontend -- result['ok'] is the
+    # single real verdict, not a hand-picked subset of fields re-checked here.
     assert "run_self_test" in dockerfile
-    assert "trained_assets']['ready']" in dockerfile
-    assert "frontend_assets'] == 'built'" in dockerfile
+    assert "strict=True" in dockerfile
+    assert "result['ok']" in dockerfile
 
 
 def test_committed_release_bundle_has_every_file_the_loader_requires() -> None:

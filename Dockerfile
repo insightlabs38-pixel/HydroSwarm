@@ -43,14 +43,17 @@ RUN mkdir -p /data && chown -R hydroswarm:hydroswarm /app /data
 USER hydroswarm
 # Container self-test gate: fails the build (not just a post-hoc CI check)
 # if the frozen bundle baked in above does not actually load, hash-verify,
-# and report ready inside this exact image, or if the frontend was not
-# built in -- catching a broken release image before it is ever pushed.
+# and report ready inside this exact image; if calibration is not FITTED;
+# if the frontend was not built in; or if the reference-demo artifact is
+# missing (SUB-12.1 #21: the same --strict gate the native setup scripts,
+# CI, and the release workflow use) -- catching a broken release image
+# before it is ever pushed.
 RUN python -c "\
 import json, sys; \
 from hydroswarm.cli import run_self_test; \
-result = run_self_test(); \
+result = run_self_test(strict=True); \
 print(json.dumps(result, indent=2, sort_keys=True)); \
-sys.exit(0 if result['trained_assets']['ready'] and result['frontend_assets'] == 'built' else 1)"
+sys.exit(0 if result['ok'] else 1)"
 EXPOSE 8765
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/api/health', timeout=3)"
