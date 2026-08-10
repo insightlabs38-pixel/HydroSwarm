@@ -29,10 +29,12 @@ export function FirstLaunchGateway({
             <span className="first-launch-recommended">Recommended</span>
           </button>
           <button type="button" onClick={onRunLive}>
-            Start / Run Live Analysis
+            Run Live Example
+            <span className="first-launch-secondary-label">Real computation, reference inputs</span>
           </button>
           <button type="button" onClick={onImportNetwork}>
-            Import Network
+            Import Your Own Network
+            <span className="first-launch-secondary-label">Advanced</span>
           </button>
         </div>
         <button type="button" className="first-launch-secondary" onClick={onExploreFallback}>

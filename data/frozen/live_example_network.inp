@@ -1,0 +1,67 @@
+; Independent eight-junction two-row grid topology (Bundle F Cycle B training topology).
+; Genuinely different graph structure from golden-reference (single loop, 4 junctions,
+; has a tank) and branched-loop (single loop, 7 junctions, mostly branched, no tank):
+; this is a 2x4 grid with three rectangular loop faces and a reservoir feed corner.
+[TITLE]
+HydroSwarm independent loop-grid topology for Cycle B training
+
+[JUNCTIONS]
+;ID  Elevation  Demand  Pattern
+ J1   305        60      diurnal
+ J2   308        75      diurnal
+ J3   311        70      diurnal
+ J4   314        65      diurnal
+ J5   309        55      diurnal
+ J6   312        80      diurnal
+ J7   315        72      diurnal
+ J8   318        58      diurnal
+
+[RESERVOIRS]
+;ID  Head
+ R3   428
+
+[PIPES]
+;ID       Node1 Node2 Length Diameter Roughness MinorLoss Status
+ P_R3_J1   R3    J1    2000   14       120       0         Open
+ P_J1_J2   J1    J2    1600   10       115       0         Open
+ P_J2_J3   J2    J3    1600   10       115       0         Open
+ P_J3_J4   J3    J4    1600   9        112       0         Open
+ P_J5_J6   J5    J6    1500   9        112       0         Open
+ P_J6_J7   J6    J7    1500   9        112       0         Open
+ P_J7_J8   J7    J8    1500   8        110       0         Open
+ P_J1_J5   J1    J5    1200   10       115       0         Open
+ P_J2_J6   J2    J6    1200   9        112       0         Open
+ P_J3_J7   J3    J7    1200   9        112       0         Open
+ P_J4_J8   J4    J8    1200   8        110       0         Open
+
+[PATTERNS]
+diurnal 0.68 0.62 0.58 0.64 0.80 1.08
+diurnal 1.22 1.16 1.02 0.94 0.86 0.78
+diurnal 0.76 0.74 0.70 0.74 0.84 1.02
+diurnal 1.32 1.20 1.06 0.92 0.82 0.72
+
+[TIMES]
+DURATION             04:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+REPORT TIMESTEP      01:00:00
+
+[OPTIONS]
+UNITS                GPM
+HEADLOSS             H-W
+QUALITY              NONE
+ACCURACY             0.001
+
+[COORDINATES]
+R3   0     500
+J1   900   500
+J2   1800  500
+J3   2700  500
+J4   3600  500
+J5   900   1400
+J6   1800  1400
+J7   2700  1400
+J8   3600  1400
+
+[END]

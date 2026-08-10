@@ -45,6 +45,27 @@ export async function request<T>(path: string, signal?: AbortSignal): Promise<T>
   return (await response.json()) as T;
 }
 
+/** Same contract as request(), for a POST with no request body at all
+ * (e.g. triggering analysis, requesting a sample recommendation, exact
+ * plan verification -- endpoints whose handler takes only path
+ * parameters). Distinct from requestJson() below, which sends a JSON
+ * body; sending an unexpected body to a body-less endpoint is needless
+ * even if FastAPI would silently ignore it. */
+export async function requestPost<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: { Accept: 'application/json' },
+    signal,
+  });
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      `HydroSwarm API ${response.status}: ${await detailFromResponse(response)}`,
+    );
+  }
+  return (await response.json()) as T;
+}
+
 /** Same contract as request(), for a POST with a JSON body (e.g. exact
  * verification, approval). */
 export async function requestJson<T>(

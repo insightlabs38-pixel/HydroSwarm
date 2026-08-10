@@ -27,14 +27,21 @@ import { request } from './client';
 export { hasSelectableIncident as hasConfiguredLiveIncident } from '../incidentSelection';
 
 /** Preferred routing per submission.txt SS5.3: `/?experience=reference|
- * live|fallback` rather than only a build-time VITE_INCIDENT_ID. */
-export type Experience = 'reference' | 'live' | 'fallback';
+ * live|fallback|import` rather than only a build-time VITE_INCIDENT_ID.
+ * `import` is the advanced "Import Your Own Network" path (SUB-12.1 P1
+ * #6) -- distinct from `live` (the automated "Run Live Example" flow, see
+ * liveExample/useLiveExampleFlow.ts) so the two never trigger each
+ * other's behavior just because both are ultimately headed for LIVE
+ * mode. */
+export type Experience = 'reference' | 'live' | 'fallback' | 'import';
+
+const EXPERIENCE_VALUES: readonly Experience[] = ['reference', 'live', 'fallback', 'import'];
 
 export function requestedExperience(): Experience | null {
   if (typeof window === 'undefined') return null;
   const requested = new URLSearchParams(window.location.search).get('experience');
-  return requested === 'reference' || requested === 'live' || requested === 'fallback'
-    ? requested
+  return (EXPERIENCE_VALUES as readonly string[]).includes(requested ?? '')
+    ? (requested as Experience)
     : null;
 }
 

@@ -22,7 +22,7 @@ def test_live_example_inputs_serves_real_reference_data() -> None:
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["network_filename"] == "golden_network.inp"
+    assert payload["network_filename"] == "live_example_network.inp"
     assert payload["candidate_signatures_mg_l"]
     assert payload["initial_observation"]["node_id"]
 

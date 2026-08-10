@@ -20,8 +20,10 @@ test('renders the SS5 target copy and all four actions', () => {
   ).toBeVisible();
   expect(screen.getByRole('button', { name: /Run Reference Incident/ })).toBeVisible();
   expect(screen.getByText('Recommended')).toBeVisible();
-  expect(screen.getByRole('button', { name: 'Start / Run Live Analysis' })).toBeVisible();
-  expect(screen.getByRole('button', { name: 'Import Network' })).toBeVisible();
+  expect(screen.getByRole('button', { name: /Run Live Example/ })).toBeVisible();
+  expect(screen.getByText('Real computation, reference inputs')).toBeVisible();
+  expect(screen.getByRole('button', { name: /Import Your Own Network/ })).toBeVisible();
+  expect(screen.getByText('Advanced')).toBeVisible();
   expect(screen.getByRole('button', { name: 'Explore illustrative fallback' })).toBeVisible();
 });
 
@@ -44,10 +46,10 @@ test('each action invokes its own handler, not a shared one', async () => {
   expect(onRunReference).toHaveBeenCalledTimes(1);
   expect(onRunLive).not.toHaveBeenCalled();
 
-  await user.click(screen.getByRole('button', { name: 'Start / Run Live Analysis' }));
+  await user.click(screen.getByRole('button', { name: /Run Live Example/ }));
   expect(onRunLive).toHaveBeenCalledTimes(1);
 
-  await user.click(screen.getByRole('button', { name: 'Import Network' }));
+  await user.click(screen.getByRole('button', { name: /Import Your Own Network/ }));
   expect(onImportNetwork).toHaveBeenCalledTimes(1);
 
   await user.click(screen.getByRole('button', { name: 'Explore illustrative fallback' }));

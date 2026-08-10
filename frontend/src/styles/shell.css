@@ -563,6 +563,21 @@
   letter-spacing: 0.04em;
   color: var(--cyan);
 }
+.first-launch-secondary-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+.live-example-pause {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: var(--panel-raised);
+}
 .first-launch-secondary {
   align-self: center;
   background: none;

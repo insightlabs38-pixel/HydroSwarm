@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import type { Experience } from './api/incident';
 import {
   fetchIncidentWithFallback,
   hasConfiguredLiveIncident,
@@ -7,6 +8,7 @@ import {
 } from './api/incident';
 import { useConsoleStore, WORKSPACE_LABELS } from './store';
 import { useReferenceIncident } from './reference/useReferenceIncident';
+import { useLiveExampleFlow } from './liveExample/useLiveExampleFlow';
 import { MissionHeader } from './shell/MissionHeader';
 import { ModeBanner } from './shell/ModeBanner';
 import { WorkflowRail } from './shell/WorkflowRail';
@@ -15,6 +17,7 @@ import { DecisionInspector } from './shell/DecisionInspector';
 import { TechnicalDock } from './shell/TechnicalDock';
 import { EmptyState } from './components/common/EmptyState';
 import { FirstLaunchGateway } from './shell/FirstLaunchGateway';
+import { LiveExampleProgress } from './shell/LiveExampleProgress';
 
 const Overview = lazy(() =>
   import('./pages/Overview').then((module) => ({ default: module.Overview })),
@@ -62,7 +65,7 @@ const NOT_YET_MIGRATED_DETAIL: Partial<Record<string, string>> = {};
 /** Sets `?experience=<value>` in the URL (so a refresh/copied link
  * preserves the judge's choice -- submission.txt SS5.3) and forces a
  * re-render by also returning it for local state. */
-function setExperienceParam(value: 'reference' | 'live' | 'fallback'): void {
+function setExperienceParam(value: Experience): void {
   if (typeof window === 'undefined') return;
   const url = new URL(window.location.href);
   url.searchParams.set('experience', value);
@@ -77,11 +80,17 @@ function hasRoutingOverride(): boolean {
 
 export default function App() {
   const { workspace, setWorkspace, reducedMotion, toggleReducedMotion } = useConsoleStore();
-  const [manualExperience, setManualExperience] = useState<
-    'reference' | 'live' | 'fallback' | null
-  >(null);
+  const [manualExperience, setManualExperience] = useState<Experience | null>(null);
   const experience = manualExperience ?? requestedExperience();
   const isReference = experience === 'reference';
+  // "live" (automated Run Live Example) only runs the flow while no
+  // incident is selected yet; once useLiveExampleFlow's approve() calls
+  // selectIncident(), hasConfiguredLiveIncident() flips true and this
+  // becomes false on the next render, falling through to the ordinary
+  // LIVE liveQuery path below -- no separate "done" branch needed.
+  // "import" (advanced manual network import, SUB-12.1 P1 #6) never runs
+  // the automated flow at all, even though it is also headed for LIVE.
+  const isLiveExampleFlow = experience === 'live' && !hasConfiguredLiveIncident();
 
   // First-launch gateway (submission.txt SS5): only for a genuinely
   // unconfigured, unrouted fresh install -- never overrides an explicit
@@ -89,31 +98,38 @@ export default function App() {
   // deployment.
   const showGateway = experience === null && !hasConfiguredLiveIncident() && !hasRoutingOverride();
 
-  function chooseExperience(value: 'reference' | 'live' | 'fallback') {
+  function chooseExperience(value: Experience) {
     setExperienceParam(value);
     setManualExperience(value);
   }
 
   const referenceController = useReferenceIncident(reducedMotion, isReference && !showGateway);
+  const liveExampleController = useLiveExampleFlow(isLiveExampleFlow && !showGateway);
   const liveQuery = useQuery({
     queryKey: ['active-incident', experience],
     queryFn: ({ signal }) => fetchIncidentWithFallback(signal),
     staleTime: 5_000,
-    enabled: !isReference && !showGateway,
+    enabled: !isReference && !isLiveExampleFlow && !showGateway,
   });
 
   if (showGateway) {
     return (
       <FirstLaunchGateway
         onRunReference={() => chooseExperience('reference')}
-        onRunLive={() => {
-          chooseExperience('live');
-          setWorkspace('network');
-        }}
+        onRunLive={() => chooseExperience('live')}
         onImportNetwork={() => {
-          chooseExperience('live');
+          chooseExperience('import');
           setWorkspace('network');
         }}
+        onExploreFallback={() => chooseExperience('fallback')}
+      />
+    );
+  }
+
+  if (isLiveExampleFlow) {
+    return (
+      <LiveExampleProgress
+        controller={liveExampleController}
         onExploreFallback={() => chooseExperience('fallback')}
       />
     );
