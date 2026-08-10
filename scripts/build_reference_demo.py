@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from hydroswarm.evaluation import GoldenScenarioRunner, build_reference_incident_artifact  # noqa: E402
+from hydroswarm.networks import network_topology_metadata  # noqa: E402
 from hydroswarm.training.artifacts import git_commit_hash  # noqa: E402
 
 
@@ -36,10 +37,22 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     golden_result = GoldenScenarioRunner(ROOT, seed=args.seed).run()
+
+    # The exact frozen network golden.py just ran against (written by
+    # freeze_golden_inputs) -- reused via the same metadata extraction a
+    # real network import computes, so the artifact's topology can never
+    # silently drift from a hand-authored fixture (submission.txt's "do not
+    # mix demo fixture data into live UI state").
+    import wntr
+
+    frozen_network_path = ROOT / "data" / "frozen" / "golden_network.inp"
+    network_topology = network_topology_metadata(wntr.network.WaterNetworkModel(str(frozen_network_path)))
+
     artifact = build_reference_incident_artifact(
         golden_result,
         generator="scripts/build_reference_demo.py",
         source_commit=git_commit_hash(ROOT),
+        network_topology=network_topology,
     )
 
     args.out_dir.mkdir(parents=True, exist_ok=True)

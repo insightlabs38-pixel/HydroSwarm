@@ -51,13 +51,25 @@ def _controller_state_after(events: list[dict[str, Any]], end: int) -> str:
 
 
 def build_reference_incident_artifact(
-    golden_result: dict[str, Any], *, generator: str, source_commit: str
+    golden_result: dict[str, Any],
+    *,
+    generator: str,
+    source_commit: str,
+    network_topology: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the full reference-incident artifact (pre-hash) from a real
     `GoldenScenarioRunner().run()` result. Raises `AssertionError` if a
     constructed milestone would leak data not yet available at that stage
     -- see `_assert_no_future_leakage` -- rather than silently shipping a
-    narrative that lies about when evidence became known."""
+    narrative that lies about when evidence became known.
+
+    `network_topology` is the real frozen golden network's node/link/
+    coordinate metadata (`hydroswarm.networks.network_topology_metadata`),
+    identical in shape to what a live network import computes. Optional
+    only so callers that don't need a renderable map (e.g. hash/consistency
+    checks) can omit it; the frontend REFERENCE INCIDENT experience needs
+    it to draw the operational map without borrowing the hand-authored
+    DEMO_FALLBACK fixture's topology."""
 
     events = golden_result["workflow"]["events"]
     localization = golden_result["localization"]
@@ -377,6 +389,7 @@ def build_reference_incident_artifact(
         "golden_result_hash": golden_result["result_sha256"],
         "final_event_hash": golden_result["workflow"]["final_event_hash"],
         "event_count": golden_result["workflow"]["event_count"],
+        "network_topology": network_topology,
         "milestones": [
             {
                 "index": milestone.index,

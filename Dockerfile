@@ -9,7 +9,8 @@ FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HYDROSWARM_DATA_DIR=/data \
-    HYDROSWARM_V4_BUNDLE_DIR=/app/models/hydrocore-v4-release
+    HYDROSWARM_V4_BUNDLE_DIR=/app/models/hydrocore-v4-release \
+    HYDROSWARM_REFERENCE_DEMO_PATH=/app/artifacts/reference-demo/reference-incident-v1.json
 WORKDIR /app
 RUN useradd --create-home --uid 10001 hydroswarm
 COPY pyproject.toml README.md LICENSE ./
@@ -28,6 +29,10 @@ COPY configs/ configs/
 # site-packages. Without this COPY+ENV pair the container would silently
 # fail closed to the classical-safe fallback while still reporting healthy.
 COPY models/hydrocore-v4-release/ models/hydrocore-v4-release/
+# SUB-4/SUB-3: bake in the governed REFERENCE INCIDENT artifact so the
+# judge demo path works fully offline in the container, served at
+# HYDROSWARM_REFERENCE_DEMO_PATH above via GET /api/reference-demo.
+COPY artifacts/reference-demo/ artifacts/reference-demo/
 RUN mkdir -p /data && chown -R hydroswarm:hydroswarm /app /data
 USER hydroswarm
 # Container self-test gate: fails the build (not just a post-hoc CI check)

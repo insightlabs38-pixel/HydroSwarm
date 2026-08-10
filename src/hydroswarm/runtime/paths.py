@@ -39,7 +39,15 @@ V4_BUNDLE_DIR_ENV_VAR = "HYDROSWARM_V4_BUNDLE_DIR"
 #: Dockerfile and docker-compose.yml.
 DATA_DIR_ENV_VAR = "HYDROSWARM_DATA_DIR"
 
+#: Explicit override for the SUB-4 governed reference-incident artifact.
+#: Same rationale as V4_BUNDLE_DIR_ENV_VAR: a non-editable install/container
+#: must not silently resolve this to a nonexistent source-tree-relative
+#: path -- the REFERENCE INCIDENT experience (submission.txt SS4-6) must
+#: fail closed with a clear reason, not silently serve nothing.
+REFERENCE_DEMO_PATH_ENV_VAR = "HYDROSWARM_REFERENCE_DEMO_PATH"
+
 _BUNDLE_RELATIVE_PATH = ("models", "hydrocore-v4-release")
+_REFERENCE_DEMO_RELATIVE_PATH = ("artifacts", "reference-demo", "reference-incident-v1.json")
 
 
 def _source_tree_project_root() -> Path:
@@ -106,3 +114,27 @@ def resolve_data_dir(project_root: str | Path | None = None) -> Path:
 
     root = Path(project_root).resolve() if project_root is not None else _source_tree_project_root()
     return (root / "data" / "generated").resolve()
+
+
+def resolve_reference_demo_path(project_root: str | Path | None = None) -> Path:
+    """Resolve the SUB-4 governed reference-incident artifact file.
+
+    Same three-tier priority as `resolve_v4_bundle_dir`: explicit env var
+    override, then project-root-relative, then a cwd-relative development
+    fallback. Never raises for a missing file -- the `/api/reference-demo`
+    endpoint fails closed with a clear reason instead.
+    """
+    override = os.environ.get(REFERENCE_DEMO_PATH_ENV_VAR, "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+
+    root = Path(project_root).resolve() if project_root is not None else _source_tree_project_root()
+    source_tree_candidate = root.joinpath(*_REFERENCE_DEMO_RELATIVE_PATH)
+    if source_tree_candidate.is_file():
+        return source_tree_candidate.resolve()
+
+    cwd_candidate = Path.cwd().joinpath(*_REFERENCE_DEMO_RELATIVE_PATH)
+    if cwd_candidate.is_file():
+        return cwd_candidate.resolve()
+
+    return source_tree_candidate.resolve()

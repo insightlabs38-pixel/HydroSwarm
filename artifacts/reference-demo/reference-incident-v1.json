@@ -1,9 +1,9 @@
 {
-  "artifact_sha256": "62624e57ed7bad0db23c967f97bde60c4fc677c6433f762411224aa7bb2a845d",
+  "artifact_sha256": "5c5ce7f830da55ac50b908c58d8fe16e57e7f43ada4cc260b7b5da1a9c1e38f1",
   "description": "A checksummed replay of HydroSwarm's frozen, WNTR-backed golden incident workflow -- source localization, active sampling, plan verification, and human approval, end to end.",
   "event_count": 21,
   "final_event_hash": "b0c9744e209b3d07a9484fe0087676b946562eba33fa130eb0a56116711ee445",
-  "generated_at": "2026-08-10T02:15:39.938750+00:00",
+  "generated_at": "2026-08-10T02:24:25.546340+00:00",
   "generator": "scripts/build_reference_demo.py",
   "golden_result_hash": "d91cb7202cb8133ee0b8b656395d95d9fcddf10ba75e3de2f73acdf86f7da817",
   "milestones": [
@@ -973,6 +973,137 @@
       "pause_reason": null
     }
   ],
+  "network_topology": {
+    "junction_ids": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ],
+    "link_ids": [
+      "P_J1_J2",
+      "P_J2_J3",
+      "P_J2_T1",
+      "P_J3_J4",
+      "P_J4_J1",
+      "P_R1_J1",
+      "P_T1_J4"
+    ],
+    "links": [
+      {
+        "end_node": "J2",
+        "link_id": "P_J1_J2",
+        "link_type": "pipe",
+        "start_node": "J1"
+      },
+      {
+        "end_node": "J3",
+        "link_id": "P_J2_J3",
+        "link_type": "pipe",
+        "start_node": "J2"
+      },
+      {
+        "end_node": "T1",
+        "link_id": "P_J2_T1",
+        "link_type": "pipe",
+        "start_node": "J2"
+      },
+      {
+        "end_node": "J4",
+        "link_id": "P_J3_J4",
+        "link_type": "pipe",
+        "start_node": "J3"
+      },
+      {
+        "end_node": "J1",
+        "link_id": "P_J4_J1",
+        "link_type": "pipe",
+        "start_node": "J4"
+      },
+      {
+        "end_node": "J1",
+        "link_id": "P_R1_J1",
+        "link_type": "pipe",
+        "start_node": "R1"
+      },
+      {
+        "end_node": "J4",
+        "link_id": "P_T1_J4",
+        "link_type": "pipe",
+        "start_node": "T1"
+      }
+    ],
+    "node_ids": [
+      "J1",
+      "J2",
+      "J3",
+      "J4",
+      "R1",
+      "T1"
+    ],
+    "nodes": [
+      {
+        "coordinates": [
+          1000.0,
+          0.0
+        ],
+        "elevation_m": 95.999999999616,
+        "node_id": "J1",
+        "node_type": "junction"
+      },
+      {
+        "coordinates": [
+          2000.0,
+          0.0
+        ],
+        "elevation_m": 101.00000000112001,
+        "node_id": "J2",
+        "node_type": "junction"
+      },
+      {
+        "coordinates": [
+          3000.0,
+          650.0
+        ],
+        "elevation_m": 107.000000001096,
+        "node_id": "J3",
+        "node_type": "junction"
+      },
+      {
+        "coordinates": [
+          1750.0,
+          1250.0
+        ],
+        "elevation_m": 103.000000001112,
+        "node_id": "J4",
+        "node_type": "junction"
+      },
+      {
+        "coordinates": [
+          0.0,
+          0.0
+        ],
+        "elevation_m": 0.0,
+        "node_id": "R1",
+        "node_type": "reservoir"
+      },
+      {
+        "coordinates": [
+          2650.0,
+          1450.0
+        ],
+        "elevation_m": 101.00000000112001,
+        "node_id": "T1",
+        "node_type": "tank"
+      }
+    ],
+    "reservoir_ids": [
+      "R1"
+    ],
+    "tank_ids": [
+      "T1"
+    ]
+  },
   "reference_id": "reference-incident-v1",
   "schema_version": "hydroswarm-reference-incident-v1",
   "source_artifact_hashes": {
@@ -983,6 +1114,6 @@
     "golden_network.inp",
     "golden_scenario.json"
   ],
-  "source_commit": "9efec90ed168628ec3870913593cfb51f194a40f",
+  "source_commit": "d61f6d3f28dd4076bebcae92664b2f889ca57d26",
   "title": "HydroSwarm reference incident"
 }

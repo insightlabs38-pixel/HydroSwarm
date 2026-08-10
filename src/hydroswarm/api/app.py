@@ -64,7 +64,7 @@ from hydroswarm.simulation.wrapper import (
     wntr,
 )
 from hydroswarm.runtime import V4PipelineFactory
-from hydroswarm.runtime.paths import resolve_v4_bundle_dir
+from hydroswarm.runtime.paths import resolve_reference_demo_path, resolve_v4_bundle_dir
 
 from .state import (
     AnalysisResponse,
@@ -107,8 +107,11 @@ def create_app(
     swarm_factory: object | None = None,
     settings: ApiSettings | None = None,
     max_request_bytes: int = MAX_INP_BYTES + 256 * 1024,
+    reference_demo_path: str | Path | None = None,
 ) -> FastAPI:
     """Create a fully local app; deployment must bind it to ``127.0.0.1``."""
+
+    reference_demo_file = Path(reference_demo_path) if reference_demo_path is not None else resolve_reference_demo_path()
 
     settings = settings or ApiSettings(maximum_request_bytes=max_request_bytes)
     max_request_bytes = settings.maximum_request_bytes
@@ -333,6 +336,28 @@ def create_app(
     @app.get("/api/version")
     def version() -> dict[str, str | bool]:
         return {"version": __version__, "offline": True}
+
+    @app.get("/api/reference-demo")
+    def reference_demo() -> JSONResponse:
+        """Serve the SUB-4 governed REFERENCE INCIDENT artifact (submission.txt
+        SS4-6). Resolved through the same env-var-first / project-root-relative
+        / cwd-relative priority as the frozen V4 bundle (SUB-1) -- a packaged
+        deployment (HYDROSWARM_REFERENCE_DEMO_PATH set) and a source checkout
+        can never silently disagree about which file is served. Fails closed
+        (404, not an empty 200) when the artifact has not been generated."""
+        if not reference_demo_file.is_file():
+            raise HTTPException(
+                status_code=404,
+                detail=f"reference-demo artifact not found at {reference_demo_file}. "
+                "Run scripts/build_reference_demo.py to generate it.",
+            )
+        try:
+            payload = json.loads(reference_demo_file.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise HTTPException(
+                status_code=500, detail=f"reference-demo artifact at {reference_demo_file} is not valid JSON: {exc}"
+            ) from exc
+        return JSONResponse(content=payload)
 
     @app.get("/api/readiness", response_model=ServiceStatus)
     def readiness() -> ServiceStatus | JSONResponse:

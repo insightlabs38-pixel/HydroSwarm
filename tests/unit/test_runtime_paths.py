@@ -11,8 +11,10 @@ from pathlib import Path
 
 from hydroswarm.runtime.paths import (
     DATA_DIR_ENV_VAR,
+    REFERENCE_DEMO_PATH_ENV_VAR,
     V4_BUNDLE_DIR_ENV_VAR,
     resolve_data_dir,
+    resolve_reference_demo_path,
     resolve_v4_bundle_dir,
 )
 
@@ -92,3 +94,41 @@ def test_data_dir_falls_back_to_project_root_generated_dir(tmp_path: Path, monke
     resolved = resolve_data_dir(project_root=tmp_path)
 
     assert resolved == (tmp_path / "data" / "generated").resolve()
+
+
+def test_reference_demo_env_var_override_takes_priority(tmp_path: Path, monkeypatch) -> None:
+    override = tmp_path / "custom-reference.json"
+    monkeypatch.setenv(REFERENCE_DEMO_PATH_ENV_VAR, str(override))
+
+    resolved = resolve_reference_demo_path(project_root=tmp_path / "unrelated-project-root")
+
+    assert resolved == override.resolve()
+
+
+def test_reference_demo_project_root_relative_default(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.delenv(REFERENCE_DEMO_PATH_ENV_VAR, raising=False)
+    artifact = tmp_path / "artifacts" / "reference-demo" / "reference-incident-v1.json"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text("{}")
+
+    resolved = resolve_reference_demo_path(project_root=tmp_path)
+
+    assert resolved == artifact.resolve()
+
+
+def test_reference_demo_falls_back_to_cwd_relative_when_project_root_candidate_missing(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.delenv(REFERENCE_DEMO_PATH_ENV_VAR, raising=False)
+    fake_project_root = tmp_path / "project-root-without-artifact"
+    fake_project_root.mkdir()
+
+    cwd = tmp_path / "cwd-with-artifact"
+    artifact = cwd / "artifacts" / "reference-demo" / "reference-incident-v1.json"
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text("{}")
+    monkeypatch.chdir(cwd)
+
+    resolved = resolve_reference_demo_path(project_root=fake_project_root)
+
+    assert resolved == artifact.resolve()

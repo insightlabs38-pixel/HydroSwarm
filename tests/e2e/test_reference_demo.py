@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import wntr
 import pytest
 
 from hydroswarm.evaluation import GoldenScenarioRunner, build_reference_incident_artifact
+from hydroswarm.networks import network_topology_metadata
 
 #: Drives the real WNTR-backed golden scenario -- see
 #: pyproject.toml's real_simulation marker docstring.
@@ -10,15 +12,29 @@ pytestmark = pytest.mark.real_simulation
 
 
 @pytest.fixture(scope="module")
-def golden_result(tmp_path_factory):
-    root = tmp_path_factory.mktemp("reference-demo-golden")
-    return GoldenScenarioRunner(root, seed=2026, cache_directory=root / "cache").run()
+def golden_root(tmp_path_factory):
+    return tmp_path_factory.mktemp("reference-demo-golden")
 
 
 @pytest.fixture(scope="module")
-def artifact(golden_result):
+def golden_result(golden_root):
+    return GoldenScenarioRunner(golden_root, seed=2026, cache_directory=golden_root / "cache").run()
+
+
+@pytest.fixture(scope="module")
+def network_topology(golden_root, golden_result):
+    del golden_result  # ensures the golden run (which writes golden_network.inp) has already happened
+    network_path = golden_root / "data" / "frozen" / "golden_network.inp"
+    return network_topology_metadata(wntr.network.WaterNetworkModel(str(network_path)))
+
+
+@pytest.fixture(scope="module")
+def artifact(golden_result, network_topology):
     return build_reference_incident_artifact(
-        golden_result, generator="test", source_commit="deadbeef"
+        golden_result,
+        generator="test",
+        source_commit="deadbeef",
+        network_topology=network_topology,
     )
 
 
@@ -127,6 +143,13 @@ def test_human_approval_boundary_pauses_and_others_auto_advance(artifact) -> Non
         else:
             assert milestone["auto_advance"] is True
             assert milestone["pause_reason"] is None
+
+
+def test_artifact_carries_the_real_frozen_network_topology_not_a_fixture(artifact) -> None:
+    topology = artifact["network_topology"]
+    node_ids = {node["node_id"] for node in topology["nodes"]}
+    assert node_ids == {"R1", "J1", "J2", "J3", "J4", "T1"}
+    assert len(topology["links"]) == 7
 
 
 def test_artifact_round_trips_through_json_with_no_extra_computation(artifact) -> None:

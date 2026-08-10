@@ -54,6 +54,19 @@ def test_dockerfile_copies_bundle_to_the_env_var_it_sets() -> None:
     assert bundle_env_value == "/app/models/hydrocore-v4-release"
 
 
+def test_dockerfile_copies_the_reference_demo_artifact_to_the_env_var_it_sets() -> None:
+    dockerfile = (PROJECT_ROOT / "Dockerfile").read_text()
+
+    env_match = re.search(r"HYDROSWARM_REFERENCE_DEMO_PATH=(\S+)", dockerfile)
+    assert env_match is not None, "Dockerfile must set HYDROSWARM_REFERENCE_DEMO_PATH"
+
+    assert "COPY artifacts/reference-demo/ artifacts/reference-demo/" in dockerfile
+    assert env_match.group(1) == "/app/artifacts/reference-demo/reference-incident-v1.json"
+
+    artifact = PROJECT_ROOT / "artifacts" / "reference-demo" / "reference-incident-v1.json"
+    assert artifact.is_file(), "COPY has nothing real to copy without the generated artifact"
+
+
 def test_dockerfile_runs_a_build_time_self_test_gate() -> None:
     dockerfile = (PROJECT_ROOT / "Dockerfile").read_text()
 
