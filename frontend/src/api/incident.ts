@@ -1,5 +1,6 @@
 import { demoIncident } from '../demoFixture';
 import { normalizeMapCoordinates } from '../geometry';
+import { requestedIncidentId } from '../incidentSelection';
 import type {
   AuditEvent,
   Candidate,
@@ -15,14 +16,15 @@ import type {
 } from '../types';
 import { request } from './client';
 
-const INCIDENT_ID = import.meta.env.VITE_INCIDENT_ID as string | undefined;
-
-/** Whether a LIVE incident is configured at all -- exported for the
+/** Whether a LIVE incident is selectable at all right now (URL, session
+ * selection, or the VITE_INCIDENT_ID dev fallback) -- exported for the
  * first-launch gateway (submission.txt SS5), which must not silently
- * default a fresh, un-configured install into DEMO_FALLBACK. */
-export function hasConfiguredLiveIncident(): boolean {
-  return Boolean(INCIDENT_ID);
-}
+ * default a fresh, un-configured install into DEMO_FALLBACK, but also
+ * must not show for a deep link or a returning session that already has
+ * one selected. Re-exported from incidentSelection.ts's
+ * hasSelectableIncident() under its original name for callers already
+ * importing it from here. */
+export { hasSelectableIncident as hasConfiguredLiveIncident } from '../incidentSelection';
 
 /** Preferred routing per submission.txt SS5.3: `/?experience=reference|
  * live|fallback` rather than only a build-time VITE_INCIDENT_ID. */
@@ -510,18 +512,25 @@ export function viewFromApi(raw: ApiIncidentView): IncidentView {
 
 /**
  * Fetch the live, complete incident view (overnight-plan.txt Task 3.2).
+ * The incident id is resolved at call time via `requestedIncidentId()`
+ * (submission.txt SUB-12.1 P1 #5: URL `?incident=`, then the session-
+ * selected incident, then the optional VITE_INCIDENT_ID dev fallback --
+ * never only a build-time constant).
  */
 export async function fetchIncident(signal?: AbortSignal): Promise<IncidentView> {
   await request<{ status: string }>('/health', signal);
-  if (!INCIDENT_ID) {
-    throw new IncidentUnavailableError('No active incident configured (VITE_INCIDENT_ID unset)');
+  const incidentId = requestedIncidentId();
+  if (!incidentId) {
+    throw new IncidentUnavailableError(
+      'No active incident configured (no ?incident=, session selection, or VITE_INCIDENT_ID)',
+    );
   }
   let raw: ApiIncidentView;
   try {
-    raw = await request<ApiIncidentView>(`/incidents/${INCIDENT_ID}/view`, signal);
+    raw = await request<ApiIncidentView>(`/incidents/${incidentId}/view`, signal);
   } catch (error) {
     throw new IncidentUnavailableError(
-      `configured incident ${INCIDENT_ID} could not be loaded: ${(error as Error).message}`,
+      `configured incident ${incidentId} could not be loaded: ${(error as Error).message}`,
     );
   }
   return viewFromApi(raw);
