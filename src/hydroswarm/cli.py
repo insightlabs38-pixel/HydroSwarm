@@ -102,7 +102,16 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
         raise RuntimeError("fixed HydroCore inference is invalid")
     inference_hash = hashlib.sha256(source_probabilities.numpy().tobytes()).hexdigest()
 
-    simulator = HydraulicSimulator(hydraulic_model, timeout_seconds=20.0)
+    # SUB-12.1 #22: a real Windows CI run surfaced SimulationTimeoutError
+    # here at 20s -- on Windows, HydraulicSimulator._run_with_timeout must
+    # use multiprocessing's "spawn" start method (no fork() on Windows),
+    # which reimports numpy/pandas/wntr/torch in the child interpreter for
+    # every call, not just once; that reimport cost, not the EPANET run
+    # itself, is what a cold/loaded CI runner can blow through 20s on.
+    # self-test runs once at startup, not on a hot path, so a generous
+    # bound here costs nothing real while still being a real, bounded
+    # timeout -- not unbounded.
+    simulator = HydraulicSimulator(hydraulic_model, timeout_seconds=60.0)
     state = simulator.calculate_state(FEATURE_SNAPSHOT_TIME_SECONDS)
     if not state.pressure_m or not all(map(lambda value: value == value, state.pressure_m.values())):
         raise RuntimeError("fixed WNTR reference simulation is invalid")
