@@ -1,6 +1,15 @@
 import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 
+// Most existing component tests exercise LIVE/DEMO_FALLBACK rendering
+// downstream of a configured incident, not the SUB-5 first-launch gateway
+// itself (see reference/FirstLaunchGateway.test.tsx for that). Stubbing a
+// configured incident id here keeps that large existing suite's implicit
+// assumption ("an incident is configured; the mocked fetch may succeed or
+// fail per test") true globally, matching real deployments that set
+// VITE_INCIDENT_ID at build time.
+vi.stubEnv('VITE_INCIDENT_ID', 'test-configured-incident');
+
 class ResizeObserverMock {
   observe() {}
   unobserve() {}

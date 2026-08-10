@@ -231,7 +231,13 @@ export interface NetworkRecord {
  * content as LIVE, and no API error may silently produce a page that
  * appears LIVE.
  */
-export type RuntimeMode = 'LIVE' | 'REPLAY' | 'DEMO_FALLBACK' | 'ERROR';
+/** REFERENCE (submission.txt SS4.1B): a deterministic, checksummed replay
+ * generated from the frozen WNTR-backed golden scenario -- the primary
+ * judge demo path. Distinct from REPLAY (a workspace/capability for
+ * inspecting a completed LIVE or REFERENCE incident's event ledger, not a
+ * source-of-truth mode of its own) and from DEMO_FALLBACK (hand-authored
+ * illustrative content, no genuine model/checkpoint identity). */
+export type RuntimeMode = 'LIVE' | 'REFERENCE' | 'REPLAY' | 'DEMO_FALLBACK' | 'ERROR';
 
 export interface NetworkNode {
   id: string;

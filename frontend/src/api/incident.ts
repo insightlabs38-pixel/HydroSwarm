@@ -17,6 +17,25 @@ import { request } from './client';
 
 const INCIDENT_ID = import.meta.env.VITE_INCIDENT_ID as string | undefined;
 
+/** Whether a LIVE incident is configured at all -- exported for the
+ * first-launch gateway (submission.txt SS5), which must not silently
+ * default a fresh, un-configured install into DEMO_FALLBACK. */
+export function hasConfiguredLiveIncident(): boolean {
+  return Boolean(INCIDENT_ID);
+}
+
+/** Preferred routing per submission.txt SS5.3: `/?experience=reference|
+ * live|fallback` rather than only a build-time VITE_INCIDENT_ID. */
+export type Experience = 'reference' | 'live' | 'fallback';
+
+export function requestedExperience(): Experience | null {
+  if (typeof window === 'undefined') return null;
+  const requested = new URLSearchParams(window.location.search).get('experience');
+  return requested === 'reference' || requested === 'live' || requested === 'fallback'
+    ? requested
+    : null;
+}
+
 /**
  * Controlled failure-injection demonstration (overnight-plan.txt Task 3.8).
  * Selected via the `?failure=<category>` query parameter so an operator or
@@ -257,7 +276,7 @@ interface ApiIncidentView {
  * Shared by both counterfactual_consequences and plans[].verification,
  * since the backend populates the former directly from the latter's
  * `consequences` (overnight-plan.txt Task 3.2). */
-interface ApiConsequenceMetrics {
+export interface ApiConsequenceMetrics {
   population_impacted: number;
   contaminant_mass_consumed_mg: number;
   volume_above_threshold_l: number;
@@ -274,9 +293,13 @@ interface ApiConsequenceMetrics {
   numerically_sensitive: boolean;
 }
 
-function planStatusFromApi(
+/** Exported for reuse by the SUB-5 reference-incident mapper (`../reference/
+ * mapMilestone`), which needs the identical PENDING/REJECTED/RECOMMENDED/
+ * VALID derivation the live view uses -- not a second copy that could
+ * silently drift. */
+export function planStatusFromApi(
   planId: string,
-  verification: ApiIncidentView['plans'][number]['verification'],
+  verification: { decision: string } | null,
   recommendedPlanId: string | null,
 ): PlanStatus {
   if (verification?.decision === 'REJECTED') return 'REJECTED';
@@ -284,7 +307,9 @@ function planStatusFromApi(
   return planId === recommendedPlanId ? 'RECOMMENDED' : 'VALID';
 }
 
-function consequenceFromApi(raw: ApiConsequenceMetrics): ConsequenceView {
+/** Exported for reuse by the SUB-5 reference-incident mapper -- see
+ * planStatusFromApi above. */
+export function consequenceFromApi(raw: ApiConsequenceMetrics): ConsequenceView {
   return {
     populationImpacted: raw.population_impacted,
     contaminantMassConsumedMg: raw.contaminant_mass_consumed_mg,
@@ -561,6 +586,13 @@ export async function fetchIncidentWithFallback(signal?: AbortSignal): Promise<I
     return errorIncidentView(
       `[Failure injection: ${failure}] ${FAILURE_INJECTION_REASONS[failure]}`,
     );
+  }
+  // `?experience=fallback` (submission.txt SS5.3): the gateway's secondary
+  // "Explore illustrative fallback" action must reliably show the
+  // hand-authored fixture even when a LIVE incident happens to be
+  // configured -- never silently prefer LIVE over an explicit request.
+  if (requestedExperience() === 'fallback') {
+    return demoFallbackView(requestedDemoVariant());
   }
   try {
     return await fetchIncident(signal);

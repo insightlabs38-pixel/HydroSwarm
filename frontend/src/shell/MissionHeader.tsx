@@ -5,6 +5,8 @@ function modeTone(mode: IncidentView['mode']): 'good' | 'warn' | 'danger' | 'inf
   switch (mode) {
     case 'LIVE':
       return 'good';
+    case 'REFERENCE':
+      return 'info';
     case 'REPLAY':
       return 'info';
     case 'DEMO_FALLBACK':

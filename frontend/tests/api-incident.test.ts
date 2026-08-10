@@ -12,6 +12,11 @@ function jsonResponse(body: unknown, ok = true, status = 200): Response {
 beforeEach(() => {
   vi.resetModules();
   window.history.pushState(null, '', '/');
+  // This file specifically tests the "no incident configured" path --
+  // override tests/setup.ts's global VITE_INCIDENT_ID stub (added for the
+  // SUB-5 first-launch gateway; most other test files assume a configured
+  // incident) back to unset here.
+  vi.stubEnv('VITE_INCIDENT_ID', '');
 });
 
 describe('fetchIncident (no VITE_INCIDENT_ID configured, matching this test env)', () => {
