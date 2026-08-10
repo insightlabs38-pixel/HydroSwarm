@@ -522,3 +522,30 @@ Exact continuation command for a browser recheck after the visual/docs commit:
 cd /workspace/HydroSwarm/frontend
 npx playwright test tests/e2e/visual-regression.spec.ts
 ```
+
+### Release-path validation (Linux ARM64)
+
+At commit `2890a3e`, `scripts/build_release_manifest.py` and
+`scripts/build_release_bundle.py` produced
+`output/releases/HydroSwarm-v0.1.0-hackathon-runtime.zip` (15.9 MiB). A clean extraction
+at `/tmp/hydroswarm-zip-inspect.vtjOu4` successfully completed:
+
+```bash
+./setup_hydroswarm_linux.sh
+./.venv/bin/hydroswarm self-test --strict
+./start_hydroswarm_linux.sh  # then GET /api/health -> {"status":"ok",...}
+```
+
+The strict result was `ok: true`, with a ready `hydrocore-v4` bundle, fitted calibration,
+built frontend, and present reference artifact. This is a real **Linux ARM64 native**
+release-path verification only. It does not verify Linux x86-64, Windows, either macOS
+architecture, or Docker. The first temporary extraction from a prior incomplete archive
+was invalid and fail-closed as designed; it was not recorded as a passing result.
+
+### Final visual gate
+
+At commit `2890a3e`, `npx playwright test tests/e2e/visual-regression.spec.ts` passed
+**29/29** in 1.1 minutes. This includes the six new reference/LIVE visual baselines and
+all existing keyboard, accessibility-oriented, state-separation, and responsive checks.
+The complete recorded output is `/tmp/hydroswarm-final-head-playwright.log` for this
+session; browser baselines are committed in the repository.

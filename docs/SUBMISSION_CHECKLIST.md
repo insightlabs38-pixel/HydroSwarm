@@ -2,11 +2,19 @@
 
 - [ ] Public repository is accessible and license is correct. (LICENSE present and
       Apache-2.0; GitHub visibility/access settings not verifiable from this session.)
-- [x] Clean Linux native installation commands pass (`./setup_hydroswarm_linux.sh` +
-      `./start_hydroswarm_linux.sh` live-smoke-tested end to end this session: bundle
-      verified, self-test READY, `/api/health` responded). **Windows/macOS not verified**
-      -- no such environment was available this session; scripts are statically/
-      structurally tested only (`tests/unit/test_native_setup_scripts.py`).
+- [x] Clean Linux ARM64 native installation commands pass (`./setup_hydroswarm_linux.sh` +
+      `./start_hydroswarm_linux.sh` live-smoke-tested end to end: bundle verified,
+      self-test READY, `/api/health` responded). Windows/macOS and Linux x86-64 have not
+      run here; their scripts are statically/structurally tested only
+      (`tests/unit/test_native_setup_scripts.py`).
+
+| Release-path platform | Actually verified status |
+|---|---|
+| Linux ARM64 native | Verified: clean runtime ZIP extraction → setup → strict self-test → loopback `/api/health` |
+| Linux x86-64 native | Not verified in this environment; hosted CI is billing-blocked before runner allocation |
+| Windows x86-64 native | Not verified; hosted CI is billing-blocked before runner allocation |
+| macOS ARM64 / Intel native | Not verified; hosted CI is billing-blocked before runner allocation |
+| Docker linux/amd64 and linux/arm64 | Not verified; hosted CI is billing-blocked and this sandbox cannot run privileged Docker builds |
 - [x] `hydroswarm self-test` and the golden scenario pass with networking disabled
       (`tests/integration/test_offline_runtime_audit.py`, this session -- mechanically
       blocks every outbound socket connect() and re-runs both).
@@ -22,11 +30,10 @@
 - [ ] 3:30-4:30 demo video has captions, clear audio, visible real outputs, and no cuts
       that imply false causality. **Not started** -- intentionally, per SS23: no
       placeholder video URL is presented as finished.
-- [ ] Screenshots show the built application and contain no sensitive paths/data. The
-      existing `docs/screenshots/operator-overview.png` (mission-control shell,
-      DEMO_FALLBACK) is current, but **no new screenshot exists for the first-launch
-      gateway or the REFERENCE INCIDENT experience added this session** -- no browser
-      was available in this sandbox to capture one.
+- [x] Fresh Playwright screenshots show the first-launch gateway, reference sampling,
+      approval boundary, and LIVE V4 proof start without sensitive paths/data; all 29
+      exact-head visual/interaction checks passed. README uses these as its primary
+      visual story rather than the old fallback-only screenshot.
 - [ ] Devpost write-up, built-with list, repository, video, and report links work
       anonymously. Write-up and built-with list updated this session
       (`docs/DEVPOST.md`); video/report links remain intentionally pending.
@@ -36,11 +43,10 @@
 - [x] Safety boundary and absence of autonomous control are visible in README and UI
       (footer, ModeBanner, Approval workspace, docs/FINAL_SYSTEM.md's authority-boundaries
       section). **Not yet visible in a video** -- no video exists yet (see above).
-- [ ] Release archive installs offline after dependencies/assets are included and
-      contains checksums. `scripts/build_release_bundle.py` exists, is unit-tested
-      (correct contents, no `__pycache__`, SHA256SUMS integrity), and was run locally
-      producing a real, correct zip -- **but no actual tagged release archive has been
-      cut and extract-and-run tested end to end.**
+- [x] A local `v0.1.0-hackathon` runtime ZIP was built, extracted into a clean Linux
+      ARM64 directory, and passed setup → strict self-test → loopback launch. It includes
+      checksums, the frozen V4 bundle, built frontend, and reference artifact. This is
+      local release-path evidence only; no tag or GitHub Release has been published.
 - [ ] Docker recommended judge path (`docker compose -f docker-compose.release.yml up`)
       actually builds/runs. **Blocked in this sandbox**: confirmed root cause is
       `CAP_SYS_ADMIN` stripped and `unshare` blocked even for an unprivileged user
@@ -54,15 +60,10 @@
 1. Verify Docker on a real machine or GitHub Actions (`docker build`/`docker run`, then
    `docker buildx build --platform linux/amd64,linux/arm64`) -- see the two unchecked
    Docker/release items above and `reports/submission-readiness/sub3-docker-sandbox-limitation.md`.
-2. Verify the native setup/launch scripts on real Windows and macOS machines (only Linux
-   was live-tested this session).
-3. Run the Playwright visual-regression suite on a real CI runner and confirm the
-   baseline screenshots still match after this session's first-launch-gateway routing
-   fix (`?experience=fallback` instead of bare `/` -- same DOM output expected, but
-   unverified without a real browser).
-4. Take new screenshots of the first-launch gateway and REFERENCE INCIDENT experience.
-5. Record the demo video once the above are confirmed working, showing the REFERENCE
+2. Verify the native setup/launch scripts on real Linux x86-64, Windows, and macOS
+   machines (only Linux ARM64 was live-tested here).
+3. Record the demo video once the above are confirmed working, showing the REFERENCE
    INCIDENT as the primary walkthrough.
-6. Cut an actual version tag once ready, and let `.github/workflows/release.yml` produce
+4. Cut an actual version tag once ready, and let `.github/workflows/release.yml` produce
    the real multiarch image, `RELEASE_MANIFEST.json`, and runtime zip on real
    infrastructure.
