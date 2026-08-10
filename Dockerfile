@@ -16,10 +16,26 @@ WORKDIR /app
 RUN useradd --create-home --uid 10001 hydroswarm
 COPY pyproject.toml README.md LICENSE ./
 COPY src/ src/
+# wntr publishes prebuilt wheels for macOS and Linux x86_64
+# (manylinux2014_x86_64) but NOT Linux ARM64 -- confirmed against PyPI's
+# own file listing for the pinned version, no aarch64 wheel exists for any
+# supported Python version. On linux/arm64 (SUB-12.1 #23's Docker CI gate
+# build target) pip therefore falls back to building wntr from source,
+# which needs a C++ compiler the slim base image does not ship by
+# default (a real linux/arm64 build failed on exactly this: "error:
+# [Errno 2] No such file or directory: 'g++'"). Installed and purged in
+# the same layer so the final image does not carry a compiler toolchain
+# it never needs at runtime; on linux/amd64 this is a harmless no-op
+# since a wheel is already available there and nothing gets compiled.
+#
 # Force the CPU wheel in the local decision-support image; the default Linux PyPI
 # resolution can pull multi-gigabyte CUDA components that this runtime never uses.
-RUN python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu "torch>=2.5" \
- && python -m pip install --no-cache-dir .
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends g++ \
+ && python -m pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu "torch>=2.5" \
+ && python -m pip install --no-cache-dir . \
+ && apt-get purge -y --auto-remove g++ \
+ && rm -rf /var/lib/apt/lists/*
 COPY --from=frontend /build/frontend/dist frontend/dist
 COPY configs/ configs/
 # Submission-readiness SUB-1 (P0): the frozen, self-contained V4 inference

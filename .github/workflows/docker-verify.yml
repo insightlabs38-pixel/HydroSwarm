@@ -130,7 +130,17 @@ jobs:
 
       - name: Container logs (always, for diagnosis)
         if: always()
-        run: docker logs hydroswarm-pr-verify-offline 2>&1 | tail -200 || docker logs hydroswarm-pr-verify 2>&1 | tail -200 || true
+        # `cmd 2>&1 | tail` masks `cmd`'s own exit code with `tail`'s (which
+        # always succeeds), so `A | tail || B | tail` never actually falls
+        # through to B -- each container is checked and printed
+        # independently instead.
+        run: |
+          for name in hydroswarm-pr-verify hydroswarm-pr-verify-offline; do
+            if docker inspect "$name" >/dev/null 2>&1; then
+              echo "=== docker logs $name ==="
+              docker logs "$name" 2>&1 | tail -200
+            fi
+          done
 
       - name: Clean up
         if: always()
