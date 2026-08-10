@@ -142,6 +142,14 @@ another one (submission.txt SS4/SS6):
 | `ERROR` | State cannot be safely rendered -- fails closed, no operational recommendations | `INCIDENT UNAVAILABLE` |
 | Replay (workspace, not a source mode) | Inspects a completed LIVE or REFERENCE incident's real hash-chained event ledger | (contextual) |
 
+"Run Live Example" (from first launch) is not a sixth mode: it drives the real production
+API (network import, incident creation, analysis, sampling, WNTR verification, approval)
+against known reference inputs instead of live utility telemetry, and shows
+`LIVE COMPUTATION · REFERENCE INPUTS` while doing so, resolving into ordinary `LIVE` once
+the incident exists. "Import Your Own Network" is the advanced manual path into the same
+`LIVE` mode -- a compact form creates a real incident from a real imported `.inp` network
+instead of the automated reference-input flow.
+
 ## Runtime paths
 
 - **Docker (recommended judge path):** `docker compose -f docker-compose.release.yml up`

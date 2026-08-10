@@ -118,7 +118,9 @@ cd HydroSwarm
 
 Open `http://127.0.0.1:8765`. On first launch with no incident configured, HydroSwarm
 offers **Run Reference Incident** (recommended -- a real, checksummed, progressive replay
-of the frozen golden scenario), Start/Run Live Analysis, Import Network, or Explore the
+of the frozen golden scenario), **Run Live Example** (the real production pipeline
+computing now against known reference inputs, not a replay), **Import Your Own Network**
+(advanced: import a real `.inp` file and start an incident against it), or Explore the
 illustrative fallback. Runtime operation makes no internet calls.
 
 See [installation and troubleshooting](docs/INSTALLATION.md) for the full clean-machine,

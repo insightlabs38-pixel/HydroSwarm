@@ -30,9 +30,12 @@ On first launch with no incident configured, four choices:
 
 - **Run Reference Incident** (recommended) -- a real, checksummed, progressive replay of
   the frozen golden scenario. No live backend or network import required.
-- **Start / Run Live Analysis** -- import a real EPANET network and run the actual
-  pipeline against it.
-- **Import Network** -- go straight to network import.
+- **Run Live Example** -- the real production pipeline computing now (real network
+  import, real incident creation, real analysis, real WNTR verification, real approval
+  pause), automatically, against known reference inputs instead of your own network or
+  live telemetry. Labeled `LIVE COMPUTATION · REFERENCE INPUTS` while it runs.
+- **Import Your Own Network** (advanced) -- import a real EPANET `.inp` file and start an
+  incident against it yourself, through a compact form.
 - **Explore illustrative fallback** -- the hand-authored, clearly-labeled demo fixture.
 
 See [Reference demo](REFERENCE_DEMO.md) for what the reference incident actually shows,

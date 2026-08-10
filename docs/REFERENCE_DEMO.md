@@ -84,12 +84,26 @@ by that milestone's last event.
 - `completed`: approval and the real final event hash both appear, and "Explore full
   replay" routes into the Replay workspace to inspect the real, hash-chained event ledger.
 
+## Calibration semantics
+
+`GoldenScenarioRunner`'s deterministic-classical demo path never runs the real
+split-conformal calibration pipeline, so the REFERENCE INCIDENT does not show a real
+`Calibration: valid` status or a real `Conformal target: 90%` -- that would misrepresent an
+un-run calibration as a governed one. Instead the console shows `Calibration: Not
+applicable to reference replay`, `Region target: 90% reference criterion` (not "Conformal
+target"), and `Measured coverage: Not applicable`. A genuine `LIVE` incident (including
+**Run Live Example**) retains the real calibration fields throughout. See
+`frontend/src/calibrationDisplay.ts` and `IncidentView.calibrationApplicable`.
+
 ## Schema and validation
 
 Artifact schema: `schema_version`, `reference_id`, `generator`, `generated_at`,
-`source_commit`, `golden_result_hash`, `final_event_hash`, `event_count`,
-`network_topology` (the real frozen network's node/link/coordinate metadata -- never
-borrowed from the hand-authored `DEMO_FALLBACK` fixture), and `milestones[]`.
+`source_commit`, `golden_result_hash` (the golden result's own hash, not the network's --
+the console never presents this as network provenance), `network_sha256` (the real
+frozen network `.inp` file's own SHA-256, what the console actually shows as network
+provenance), `final_event_hash`, `event_count`, `network_topology` (the real frozen
+network's node/link/coordinate metadata -- never borrowed from the hand-authored
+`DEMO_FALLBACK` fixture), and `milestones[]`.
 `artifact_sha256` covers everything except `generated_at` (a wall-clock timestamp), so
 regenerating on unchanged inputs reproduces the same hash.
 
