@@ -457,3 +457,68 @@ session could not verify -- Docker container execution and any browser-based ren
 confirmed root cause (this sandbox's container has `CAP_SYS_ADMIN` stripped and blocks
 `unshare` even for unprivileged user namespaces) and are each documented with the exact
 command a human or real CI needs to run to close them out.
+
+## 2026-08-10 continuation — final CI and visual validation in progress
+
+Current branch: `feature/submission-readiness-v1`, head `612f473` at the time this
+section was opened. No work has been performed on `main`, no frozen learning assets or
+locked test data have been touched, and `final-selection.json` remains absent.
+
+### Hosted CI blocker (external)
+
+PR #3's current GitHub Actions jobs do **not** reach checkout or any repository command.
+Every hosted job is rejected before a runner is assigned with the GitHub annotation:
+
+> The job was not started because recent account payments have failed or your spending
+> limit needs to be increased. Please check the 'Billing & plans' section in your settings.
+
+Affected check runs include Python, frontend, Docker (amd64/arm64), and native Linux,
+Windows, and macOS variants. This is an account-level GitHub Actions billing/spending
+blocker, not a test failure; no source-level timeout or workflow change can make these
+jobs execute until that setting is restored. Exact recheck command after it is resolved:
+
+```bash
+cd /workspace/HydroSwarm
+gh pr checks 3 --watch --interval 600
+```
+
+### Active local job
+
+The standard backend suite was launched as a resumable background job. Do not poll it
+more frequently than every 10 minutes.
+
+```bash
+cd /workspace/HydroSwarm
+tail -n 200 reports/submission-readiness/jobs/final-standard-pytest.log
+# resume if interrupted
+source .venv/bin/activate && python -m pytest -q
+```
+
+Result: **1,025 passed** in 458.02 seconds (warnings only; no failures).
+
+### Visual validation and documentation assets
+
+The focused Playwright suite covers the first-launch gateway, reference sampling pause,
+posterior contraction, verification, approval boundary, and explicitly labelled start of
+the LIVE V4 flow. Reference test data is intercepted only at `/api/reference-demo` from
+the checksummed artifact; the LIVE baseline intentionally does not substitute fixture
+data for a live result.
+
+Visual review caught and corrected a concrete approval-boundary truthfulness defect:
+`mapMilestone` treated `selected_plan_id` (the current verified proposal) as an approved
+plan. It now maps `selectedPlanId` from `approved_plan_id` only, with a regression test
+showing that the reference milestone remains pending until an actual approval record.
+
+Fresh screenshots are committed in `docs/screenshots/` for the gateway, sampling pause,
+approval boundary, and LIVE V4 proof start; README now uses these rather than the old
+illustrative fallback as its primary visual story. The six Mermaid `.mmd` files have also
+been exported as committed SVGs. The default Puppeteer Chromium is broken in this
+environment, but `@mermaid-js/mermaid-cli@10` rendered successfully with the already
+installed Playwright Chromium supplied explicitly.
+
+Exact continuation command for a browser recheck after the visual/docs commit:
+
+```bash
+cd /workspace/HydroSwarm/frontend
+npx playwright test tests/e2e/visual-regression.spec.ts
+```

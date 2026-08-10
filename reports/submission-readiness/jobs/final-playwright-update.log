@@ -1,0 +1,193 @@
+[WebServer] (node:19875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19942) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 32 tests using 2 workers
+
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/incident-1920x1080-chromium-linux.png is re-generated, writing actual.
+(node:19960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › tests/e2e/visual-regression.spec.ts:84:5 › viewport regression › incident @ 1920x1080 (2.7s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/source-1920x1080-chromium-linux.png is re-generated, writing actual.
+  ✓   3 [chromium] › tests/e2e/visual-regression.spec.ts:84:5 › viewport regression › source @ 1920x1080 (3.9s)
+  ✓   1 [chromium] › tests/e2e/operator.spec.ts:12:1 › operator can follow the full normal demo flow (ui-work.txt §32) using only the real UI (7.2s)
+[WebServer] 5:00:36 PM [vite] http proxy error: /api/health
+[WebServer] Error: connect ECONNREFUSED 127.0.0.1:8765
+[WebServer]     at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1605:16)
+  ✓   5 [chromium] › tests/e2e/operator.spec.ts:94:1 › OOD / suppressed planning shows the governed caution state, not a fabricated plan (1.3s)
+[WebServer] 5:00:37 PM [vite] http proxy error: /api/health
+[WebServer] Error: connect ECONNREFUSED 127.0.0.1:8765
+[WebServer]     at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1605:16)
+  ✓   6 [chromium] › tests/e2e/operator.spec.ts:145:1 › stale verification blocks the approval hierarchy from advancing past simulator-verified (583ms)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/sampling-1920x1080-chromium-linux.png is re-generated, writing actual.
+  ✓   4 [chromium] › tests/e2e/visual-regression.spec.ts:84:5 › viewport regression › sampling @ 1920x1080 (3.9s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/response-1920x1080-chromium-linux.png is re-generated, writing actual.
+  ✓   7 [chromium] › tests/e2e/visual-regression.spec.ts:84:5 › viewport regression › response @ 1920x1080 (3.9s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/approval-1920x1080-chromium-linux.png is re-generated, writing actual.
+  ✓   8 [chromium] › tests/e2e/visual-regression.spec.ts:84:5 › viewport regression › approval @ 1920x1080 (3.1s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/replay-1920x1080-chromium-linux.png is re-generated, writing actual.
+  ✓   9 [chromium] › tests/e2e/visual-regression.spec.ts:84:5 › viewport regression › replay @ 1920x1080 (3.1s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/incident-1440x900-chromium-linux.png is re-generated, writing actual.
+  ✓  10 [chromium] › tests/e2e/visual-regression.spec.ts:90:3 › viewport regression › incident @ 1440x900 (2.2s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/response-1440x900-chromium-linux.png is re-generated, writing actual.
+  ✓  11 [chromium] › tests/e2e/visual-regression.spec.ts:95:3 › viewport regression › response @ 1440x900 (3.7s)
+/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/incident-1366x768-chromium-linux.png is re-generated, writing actual.
+  ✓  12 [chromium] › tests/e2e/visual-regression.spec.ts:103:3 › viewport regression › incident @ 1366x768 (compact desktop) (2.1s)
+A snapshot doesn't exist at /workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/gateway-1920x1080-chromium-linux.png, writing actual.
+  ✓  13 [chromium] › tests/e2e/visual-regression.spec.ts:115:3 › reference incident visual regression › first-launch gateway @ 1920x1080 (456ms)
+  ✘  14 [chromium] › tests/e2e/visual-regression.spec.ts:122:3 › reference incident visual regression › sampling pause @ 1920x1080 (329ms)
+  ✘  15 [chromium] › tests/e2e/visual-regression.spec.ts:131:3 › reference incident visual regression › posterior contraction @ 1920x1080 (747ms)
+  ✘  16 [chromium] › tests/e2e/visual-regression.spec.ts:138:3 › reference incident visual regression › verification @ 1920x1080 (782ms)
+  ✘  17 [chromium] › tests/e2e/visual-regression.spec.ts:146:3 › reference incident visual regression › approval boundary @ 1920x1080 (397ms)
+A snapshot doesn't exist at /workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts-snapshots/live-v4-proof-start-1920x1080-chromium-linux.png, writing actual.
+(node:20641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 [chromium] › tests/e2e/visual-regression.spec.ts:155:3 › reference incident visual regression › LIVE V4 flow starts in an explicitly live-computation state @ 1920x1080 (523ms)
+[WebServer] 5:01:08 PM [vite] http proxy error: /api/networks
+[WebServer] Error: connect ECONNREFUSED 127.0.0.1:8765
+[WebServer]     at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1605:16)
+  ✓  19 [chromium] › tests/e2e/visual-regression.spec.ts:187:3 › keyboard-only navigation › every workflow-rail stage is reachable and focus is visible without a mouse (6.5s)
+  ✓  20 [chromium] › tests/e2e/visual-regression.spec.ts:208:3 › keyboard-only navigation › skip link moves real keyboard focus to main content (307ms)
+  ✓  21 [chromium] › tests/e2e/visual-regression.spec.ts:224:3 › keyboard-only navigation › exactly one skip link exists (no stale static duplicate) (236ms)
+  ✓  22 [chromium] › tests/e2e/visual-regression.spec.ts:232:3 › reduced-motion mode › toggle is reachable, persists, and is announced via aria-pressed (550ms)
+  ✓  23 [chromium] › tests/e2e/visual-regression.spec.ts:241:3 › reduced-motion mode › emulated prefers-reduced-motion still renders a usable page (234ms)
+  ✓  24 [chromium] › tests/e2e/visual-regression.spec.ts:249:3 › data-mode banners › DEMO_FALLBACK banner is visible with no backend reachable (default test condition) (237ms)
+  ✓  25 [chromium] › tests/e2e/visual-regression.spec.ts:262:3 › data-mode banners › failure injection (Task 3.8) renders ERROR mode with a Retry action, never a false LIVE state (253ms)
+  ✓  26 [chromium] › tests/e2e/visual-regression.spec.ts:279:3 › selected-plan synchronization › selecting a different plan in the table updates the highlighted row (1.6s)
+  ✓  27 [chromium] › tests/e2e/visual-regression.spec.ts:299:3 › selected-plan synchronization › selecting plan C updates the toolbar breadcrumb, inspector, and verification dock together (1.8s)
+  ✓  28 [chromium] › tests/e2e/visual-regression.spec.ts:321:3 › long identifiers do not break layout › overview renders without horizontal overflow when node/plan names are unusually long (639ms)
+  ✓  29 [chromium] › tests/e2e/visual-regression.spec.ts:340:5 › responsive layout (ui-work.txt §25) › no horizontal page overflow at 1300px (236ms)
+  ✓  30 [chromium] › tests/e2e/visual-regression.spec.ts:340:5 › responsive layout (ui-work.txt §25) › no horizontal page overflow at 900px (238ms)
+  ✓  31 [chromium] › tests/e2e/visual-regression.spec.ts:340:5 › responsive layout (ui-work.txt §25) › no horizontal page overflow at 600px (233ms)
+  ✓  32 [chromium] › tests/e2e/visual-regression.spec.ts:352:3 › responsive layout (ui-work.txt §25) › decision inspector becomes an overlay drawer at the 768-1099px tablet tier (244ms)
+
+
+  1) [chromium] › tests/e2e/visual-regression.spec.ts:122:3 › reference incident visual regression › sampling pause @ 1920x1080 
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Next' }) resolved to 2 elements:
+        1) <button type="button">Next</button> aka getByRole('button', { name: 'Next', exact: true })
+        2) <button type="button" aria-label="Next event">→</button> aka getByRole('button', { name: 'Next event' })
+
+    Call log:
+      - waiting for getByRole('button', { name: 'Next' })
+
+
+      26 |   await page.getByRole('button', { name: 'Pause' }).click();
+      27 |   for (let index = 0; index < milestone; index += 1) {
+    > 28 |     await page.getByRole('button', { name: 'Next' }).click();
+         |                                                      ^
+      29 |   }
+      30 | }
+      31 |
+        at openReferenceAtMilestone (/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:28:54)
+        at /workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:124:5
+
+    Error Context: test-results/visual-regression-referenc-0099f-on-sampling-pause-1920x1080-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/visual-regression-referenc-0099f-on-sampling-pause-1920x1080-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/visual-regression-referenc-0099f-on-sampling-pause-1920x1080-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/e2e/visual-regression.spec.ts:131:3 › reference incident visual regression › posterior contraction @ 1920x1080 
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Next' }) resolved to 2 elements:
+        1) <button type="button">Next</button> aka getByRole('button', { name: 'Next', exact: true })
+        2) <button type="button" aria-label="Next event">→</button> aka getByRole('button', { name: 'Next event' })
+
+    Call log:
+      - waiting for getByRole('button', { name: 'Next' })
+
+
+      26 |   await page.getByRole('button', { name: 'Pause' }).click();
+      27 |   for (let index = 0; index < milestone; index += 1) {
+    > 28 |     await page.getByRole('button', { name: 'Next' }).click();
+         |                                                      ^
+      29 |   }
+      30 | }
+      31 |
+        at openReferenceAtMilestone (/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:28:54)
+        at /workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:133:5
+
+    Error Context: test-results/visual-regression-referenc-e3d8d-erior-contraction-1920x1080-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/visual-regression-referenc-e3d8d-erior-contraction-1920x1080-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/visual-regression-referenc-e3d8d-erior-contraction-1920x1080-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/e2e/visual-regression.spec.ts:138:3 › reference incident visual regression › verification @ 1920x1080 
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Next' }) resolved to 2 elements:
+        1) <button type="button">Next</button> aka getByRole('button', { name: 'Next', exact: true })
+        2) <button type="button" aria-label="Next event">→</button> aka getByRole('button', { name: 'Next event' })
+
+    Call log:
+      - waiting for getByRole('button', { name: 'Next' })
+
+
+      26 |   await page.getByRole('button', { name: 'Pause' }).click();
+      27 |   for (let index = 0; index < milestone; index += 1) {
+    > 28 |     await page.getByRole('button', { name: 'Next' }).click();
+         |                                                      ^
+      29 |   }
+      30 | }
+      31 |
+        at openReferenceAtMilestone (/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:28:54)
+        at /workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:140:5
+
+    Error Context: test-results/visual-regression-referenc-51c32-sion-verification-1920x1080-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/visual-regression-referenc-51c32-sion-verification-1920x1080-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/visual-regression-referenc-51c32-sion-verification-1920x1080-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/e2e/visual-regression.spec.ts:146:3 › reference incident visual regression › approval boundary @ 1920x1080 
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: 'Next' }) resolved to 2 elements:
+        1) <button type="button">Next</button> aka getByRole('button', { name: 'Next', exact: true })
+        2) <button type="button" aria-label="Next event">→</button> aka getByRole('button', { name: 'Next event' })
+
+    Call log:
+      - waiting for getByRole('button', { name: 'Next' })
+
+
+      26 |   await page.getByRole('button', { name: 'Pause' }).click();
+      27 |   for (let index = 0; index < milestone; index += 1) {
+    > 28 |     await page.getByRole('button', { name: 'Next' }).click();
+         |                                                      ^
+      29 |   }
+      30 | }
+      31 |
+        at openReferenceAtMilestone (/workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:28:54)
+        at /workspace/HydroSwarm/frontend/tests/e2e/visual-regression.spec.ts:148:5
+
+    Error Context: test-results/visual-regression-referenc-1ad7b-approval-boundary-1920x1080-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/visual-regression-referenc-1ad7b-approval-boundary-1920x1080-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/visual-regression-referenc-1ad7b-approval-boundary-1920x1080-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium] › tests/e2e/visual-regression.spec.ts:122:3 › reference incident visual regression › sampling pause @ 1920x1080 
+    [chromium] › tests/e2e/visual-regression.spec.ts:131:3 › reference incident visual regression › posterior contraction @ 1920x1080 
+    [chromium] › tests/e2e/visual-regression.spec.ts:138:3 › reference incident visual regression › verification @ 1920x1080 
+    [chromium] › tests/e2e/visual-regression.spec.ts:146:3 › reference incident visual regression › approval boundary @ 1920x1080 
+  28 passed (1.0m)

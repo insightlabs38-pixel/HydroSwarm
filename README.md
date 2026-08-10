@@ -10,11 +10,15 @@ hydraulic solvers, and require a human to approve before anything happens.
 > guarantee safety, replace utility procedures or laboratory analysis, or execute any
 > infrastructure action.
 
-![HydroSwarm incident operator workspace](docs/screenshots/operator-overview.png)
+![HydroSwarm first-launch gateway](docs/screenshots/first-launch-gateway.png)
 
-*Screenshot uses the console's visibly labeled illustrative demo fallback
-(`ILLUSTRATIVE DEMO / DEMO_FALLBACK`) -- not live telemetry or benchmark evidence. Run the
-real **REFERENCE INCIDENT** (see [Try it](#try-it)) for a genuine, checksummed replay.*
+*The first launch makes the provenance choice explicit: start the checksummed
+**REFERENCE INCIDENT**, run a real **LIVE** analysis, or use the visibly labeled
+illustrative fallback. Nothing shown as reference replay is live telemetry.*
+
+| Reference sampling pause | Human-approval boundary | LIVE V4 proof start |
+|---|---|---|
+| ![Reference Incident awaiting a governed sample](docs/screenshots/reference-incident-sampling.png) | ![Reference Incident at the human-approval boundary](docs/screenshots/reference-incident-approval.png) | ![LIVE V4 flow labeled as live computation](docs/screenshots/live-v4-proof-start.png) |
 
 ## The problem
 

@@ -1,6 +1,34 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
+const REFERENCE_ARTIFACT_PATH = new URL(
+  '../../../artifacts/reference-demo/reference-incident-v1.json',
+  import.meta.url,
+).pathname;
+
+/**
+ * Reference replay is an offline, checksummed artifact.  Route its one API
+ * request here so these browser tests exercise the production mapper and UI
+ * without requiring a separately-running API server.  This is deliberately
+ * not used for LIVE: LIVE visual proof is captured against the real backend.
+ */
+async function mockReferenceArtifact(page: Page) {
+  await page.route('**/api/reference-demo', (route) =>
+    route.fulfill({ contentType: 'application/json', path: REFERENCE_ARTIFACT_PATH }),
+  );
+}
+
+async function openReferenceAtMilestone(page: Page, milestone: number) {
+  await mockReferenceArtifact(page);
+  await page.goto('/?experience=reference');
+  await expect(page.getByText('REFERENCE INCIDENT · VERIFIED REPLAY')).toBeVisible();
+  // Freeze auto-advance before moving to an exact authored milestone.
+  await page.getByRole('button', { name: 'Pause' }).click();
+  for (let index = 0; index < milestone; index += 1) {
+    await page.getByRole('button', { name: 'Next', exact: true }).click();
+  }
+}
+
 // overnight-plan.txt Task 3.7: visual and interaction regression gates.
 // Screenshots are stored as real baseline artifacts (Playwright's
 // toHaveScreenshot snapshot mechanism), not approved without evidence.
@@ -75,6 +103,67 @@ test.describe('viewport regression', () => {
   test('incident @ 1366x768 (compact desktop)', async ({ page }) => {
     await gotoWorkspace(page, 1366, 768, { rail: null, heading: null });
     await expect(page).toHaveScreenshot('incident-1366x768.png', { fullPage: true });
+  });
+});
+
+// The primary judge flow is intentionally covered independently from the
+// illustrative fallback baselines above.  Each snapshot is pinned to an
+// authored milestone in the checksummed reference artifact, so a visual
+// change cannot accidentally hide a safety boundary or make the progressive
+// narrative look like a completed incident on first load.
+test.describe('reference incident visual regression', () => {
+  test('first-launch gateway @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'HydroSwarm is ready' })).toBeVisible();
+    await expect(page).toHaveScreenshot('gateway-1920x1080.png', { fullPage: true });
+  });
+
+  test('sampling pause @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 3);
+    await expect(page.getByRole('button', { name: 'Collect reference sample' })).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-sampling-pause-1920x1080.png', {
+      fullPage: true,
+    });
+  });
+
+  test('posterior contraction @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 5);
+    await expect(page.getByText('Posterior contracts')).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-posterior-1920x1080.png', { fullPage: true });
+  });
+
+  test('verification @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 8);
+    await page.getByRole('button', { name: /^Response/ }).click();
+    await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-verification-1920x1080.png', { fullPage: true });
+  });
+
+  test('approval boundary @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await openReferenceAtMilestone(page, 9);
+    await page.getByRole('button', { name: /^Approval/ }).click();
+    await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Approve plan' })).toBeVisible();
+    await expect(page).toHaveScreenshot('reference-approval-1920x1080.png', { fullPage: true });
+  });
+
+  test('LIVE V4 flow starts in an explicitly live-computation state @ 1920x1080', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    // Keep the real API request pending only long enough to snapshot the
+    // first truthful LIVE state.  The full LIVE workflow is exercised against
+    // the production backend in Docker/native checks; this baseline prevents
+    // a visual regression from relabeling this state as a replay or fallback.
+    await page.route('**/api/**', () => new Promise(() => undefined));
+    await page.goto('/?experience=live');
+    await expect(page.getByText('LIVE COMPUTATION · REFERENCE INPUTS')).toBeVisible();
+    await expect(page).toHaveScreenshot('live-v4-proof-start-1920x1080.png', { fullPage: true });
   });
 });
 

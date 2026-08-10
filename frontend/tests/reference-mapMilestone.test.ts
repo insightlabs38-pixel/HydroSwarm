@@ -82,6 +82,29 @@ test('alert milestone has no candidates, plans, or approval state', () => {
   expect(view.approvalPending).toBe(false);
 });
 
+test('a selected verified plan remains pending until the artifact records operator approval', () => {
+  const pendingMilestone = baseMilestone({
+    selected_plan_id: 'plan-under-review',
+    approved_plan_id: null,
+    approval_pending: true,
+  });
+  const approvedMilestone = baseMilestone({
+    selected_plan_id: 'plan-under-review',
+    approved_plan_id: 'plan-under-review',
+    approval_pending: false,
+  });
+  const artifact = baseArtifact([pendingMilestone, approvedMilestone]);
+
+  const pendingView = milestoneToIncidentView(artifact, pendingMilestone);
+  expect(pendingView.recommendedPlanId).toBe('plan-under-review');
+  expect(pendingView.selectedPlanId).toBeNull();
+  expect(pendingView.approvalPending).toBe(true);
+
+  const approvedView = milestoneToIncidentView(artifact, approvedMilestone);
+  expect(approvedView.selectedPlanId).toBe('plan-under-review');
+  expect(approvedView.approvalPending).toBe(false);
+});
+
 test('maps real network topology into nodes/links, marking candidates from candidate_region', () => {
   const milestone = baseMilestone({
     candidates: { R1: 0.1, J2: 0.9 },

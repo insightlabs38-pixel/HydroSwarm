@@ -193,7 +193,11 @@ export function milestoneToIncidentView(
     evidenceHistory: [],
     hydraulicSeries: null,
     plans,
-    selectedPlanId: view.selected_plan_id,
+    // A selected plan is merely the proposal currently under review.  Only
+    // the artifact's durable approved_plan_id represents an operator's
+    // approval; collapsing them would falsely present the approval boundary
+    // as already approved.
+    selectedPlanId: view.approved_plan_id,
     recommendedPlanId: view.selected_plan_id,
     counterfactuals,
     audit: [],
