@@ -112,6 +112,9 @@
 - Pre-existing untracked release outputs remain untouched and intentionally uncommitted.
 - No long-running/background job is active or incomplete from this run; no continuation
   command beyond the normal validation/push sequence is required.
+- Synced cleanly with `origin/main` documentation merge `10a9d94` using a normal merge:
+  `45df432ec42fd02febbe7084dbf19bc8ccf5ffbf`. Post-sync lint, typecheck, format,
+  build, **162 unit tests**, and **46 Playwright tests** all passed.
 
 ## Continuation commands
 
