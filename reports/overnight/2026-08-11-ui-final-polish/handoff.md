@@ -47,6 +47,21 @@
   approval, and bounding-box assertions. Baselines were regenerated only after visual
   review.
 
+## README screenshot refresh
+
+- Replaced the five committed README screenshots from the clean-state browser baselines:
+  gateway, reference sampling pause, reference approval boundary, LIVE pipeline start,
+  and incident overview.
+- Manually inspected the refreshed reference sampling/approval and LIVE captures. The
+  replay wording, disabled-only-forward safety boundary, compact IDs, and LIVE pipeline
+  state are legible and truthful.
+
+## Commit / publication ledger
+
+- `abc1dd3` — `feat(ui): polish final demo decision surfaces`
+- Pushed successfully to `origin/ui/final-demo-polish-20260811`.
+- Current pending commit: refreshed README screenshots and this handoff update.
+
 ## Current work
 
 - Running final build/full-gate confirmation, then committing this independently
