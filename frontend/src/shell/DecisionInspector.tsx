@@ -318,32 +318,77 @@ function ResponseSummary({ incident }: { incident: IncidentView }) {
  * Approval workspace body -- this is the always-available real-time
  * summary of where the incident stands. */
 function ApprovalSummary({ incident }: { incident: IncidentView }) {
-  if (incident.selectedPlanId) {
-    return (
-      <div className="inspector-stack">
-        <StatusBadge tone="good">APPROVED</StatusBadge>
-        <p className="supporting">
-          Plan{' '}
-          <span title={incident.selectedPlanId}>{formatDisplayId(incident.selectedPlanId)}</span>{' '}
-          was approved by an operator.
-        </p>
-      </div>
-    );
+  // Keep the same selected/recommended fallback as ApprovalWorkspace so the
+  // permanent inspector never summarizes a different plan than the decision
+  // boundary it accompanies.
+  const plan =
+    incident.plans.find((item) => item.id === incident.selectedPlanId) ??
+    incident.plans.find((item) => item.id === incident.recommendedPlanId) ??
+    incident.plans[0];
+  if (!plan) {
+    return <EmptyState title="No plan is awaiting approval." />;
   }
-  if (!incident.approvalPending) {
-    return (
-      <EmptyState
-        title="No plan is awaiting approval."
-        detail="A plan must be verified and current before it can be reviewed for approval."
-      />
-    );
-  }
+
+  const verification = plan.verification;
+  const consequences = verification?.consequences;
+  const approved = incident.selectedPlanId === plan.id && !incident.approvalPending;
+
   return (
     <div className="inspector-stack">
-      <StatusBadge tone="warn">PENDING</StatusBadge>
+      <StatusBadge tone={approved ? 'good' : incident.approvalPending ? 'warn' : 'info'}>
+        {approved ? 'APPROVED' : incident.approvalPending ? 'PENDING' : 'NO APPROVAL PENDING'}
+      </StatusBadge>
+      <KeyValueGrid
+        entries={[
+          {
+            key: 'plan',
+            label: 'Plan',
+            value: `${formatDisplayId(plan.id)} · ${plan.name}`,
+          },
+          {
+            key: 'verification',
+            label: 'Exact verification',
+            value: verification?.decision ?? null,
+          },
+          {
+            key: 'verification-context',
+            label: 'Verification context',
+            value: verification?.verificationStatus ?? null,
+          },
+          {
+            key: 'pressure-margin',
+            label: 'Pressure margin',
+            value:
+              consequences?.pressureMarginM === null || consequences?.pressureMarginM === undefined
+                ? null
+                : `${consequences.pressureMarginM >= 0 ? '+' : ''}${consequences.pressureMarginM.toFixed(1)} m`,
+          },
+          {
+            key: 'service-availability',
+            label: 'Service availability',
+            value:
+              consequences?.serviceAvailability === null ||
+              consequences?.serviceAvailability === undefined
+                ? null
+                : `${(consequences.serviceAvailability * 100).toFixed(1)}%`,
+          },
+          {
+            key: 'operator-decision',
+            label: 'Operator decision',
+            value: approved ? 'APPROVED' : incident.approvalPending ? 'PENDING' : 'NOT REQUESTED',
+          },
+          {
+            key: 'infrastructure-actuation',
+            label: 'Infrastructure actuation',
+            value: 'NONE',
+          },
+        ]}
+      />
+      <span className="sr-only">Full plan ID {plan.id}</span>
       <p className="supporting">
-        A verified plan is awaiting operator review. Approval records an operator decision only --
-        HydroSwarm does not actuate infrastructure.
+        {approved
+          ? 'An operator approval is recorded. HydroSwarm still performs no infrastructure actuation.'
+          : 'A human operator decision remains required. HydroSwarm does not actuate infrastructure.'}
       </p>
     </div>
   );

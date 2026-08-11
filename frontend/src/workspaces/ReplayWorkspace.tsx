@@ -30,11 +30,11 @@ export function ReplayWorkspace({ incident }: { incident: IncidentView }) {
   });
 
   return (
-    <div className="workspace-grid">
+    <div className="replay-workspace">
       <Panel
         title="Event ledger"
         eyebrow={`${incident.audit.length} EVENTS`}
-        className="wide-panel"
+        className="replay-event-ledger"
       >
         {incident.audit.length === 0 ? (
           <EmptyState title="No audit events recorded for this incident." />
@@ -42,7 +42,7 @@ export function ReplayWorkspace({ incident }: { incident: IncidentView }) {
           <Timeline events={incident.audit} />
         )}
       </Panel>
-      <aside className="right-rail" aria-label="Hash-chain verification">
+      <aside className="replay-hash-chain" aria-label="Hash-chain verification">
         <Panel title="Verify hash chain" eyebrow="TAMPER-EVIDENT AUDIT">
           {incident.mode !== 'LIVE' ? (
             <EmptyState
@@ -111,7 +111,11 @@ export function ReplayWorkspace({ incident }: { incident: IncidentView }) {
           )}
         </Panel>
       </aside>
-      <Panel title="Failure-injection demonstration" eyebrow="DIAGNOSTICS" className="wide-panel">
+      <Panel
+        title="Failure-injection demonstration"
+        eyebrow="DIAGNOSTICS"
+        className="replay-diagnostics"
+      >
         <p className="supporting">
           Every governed fail-closed category, deterministically reachable without a live backend in
           that state. Selecting one reloads this console in ERROR mode with the exact reason named
