@@ -46,6 +46,10 @@
 - Playwright: **35 browser tests** passed, including new pause, rail, map-control,
   approval, and bounding-box assertions. Baselines were regenerated only after visual
   review.
+- Expanded final matrix: **41 browser tests** passed after adding 1440px Approval and
+  REFERENCE states, 1366px gateway/Approval/Sampling, all four utility workspaces at
+  1440px, and deterministic test-only LIVE sample/approval pauses. The latter mock
+  only browser transport in the test; production LIVE behavior remains unchanged.
 
 ## README screenshot refresh
 
@@ -60,6 +64,7 @@
 
 - `abc1dd3` — `feat(ui): polish final demo decision surfaces`
 - `5733d92` — `docs: refresh final demo screenshots`
+- Pending commit: expanded visual-baseline matrix and this updated handoff.
 - Both commits were pushed successfully to `origin/ui/final-demo-polish-20260811`.
 
 ## Final state
