@@ -64,7 +64,9 @@
 
 - `abc1dd3` — `feat(ui): polish final demo decision surfaces`
 - `5733d92` — `docs: refresh final demo screenshots`
-- Pending commit: expanded visual-baseline matrix and this updated handoff.
+- `da92c0f` — `docs(handoff): record final UI polish state`
+- `f4d282b` — `test(ui): expand final demo visual coverage`
+- All listed commits were pushed successfully to `origin/ui/final-demo-polish-20260811`.
 - Both commits were pushed successfully to `origin/ui/final-demo-polish-20260811`.
 
 ## Final state
