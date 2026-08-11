@@ -45,7 +45,7 @@
 - [x] A local `v0.1.0-hackathon` runtime ZIP was built, extracted into a clean Linux
       ARM64 directory, and passed setup → strict self-test → loopback launch. It includes
       checksums, the frozen V4 bundle, built frontend, and reference artifact. The
-      `v0.1.0-hackathon` GitHub Release now publishes this runtime ZIP and
+      `v0.1.1-hackathon` GitHub Release publishes the current runtime ZIP and
       `RELEASE_MANIFEST.json`; its GHCR multiarch image passed strict self-tests for both
       published architectures.
 - [x] Hardened Docker verification (`--read-only`, non-root, dropped capabilities,
