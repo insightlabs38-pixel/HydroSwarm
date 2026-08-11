@@ -115,6 +115,9 @@
 - Synced cleanly with `origin/main` documentation merge `10a9d94` using a normal merge:
   `45df432ec42fd02febbe7084dbf19bc8ccf5ffbf`. Post-sync lint, typecheck, format,
   build, **162 unit tests**, and **46 Playwright tests** all passed.
+- Published successfully to `origin/ui/final-demo-polish-20260811`; final branch HEAD is
+  recorded by the follow-up handoff commit. `gh run list` found no GitHub Actions run for
+  this branch at handoff time.
 
 ## Continuation commands
 
