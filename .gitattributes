@@ -85,3 +85,5 @@ data/learning-v2/cycle-b2-trajectories-v4/strategist-tensors-normalized-correcte
 # Scout+Strategist merge (scripts/build_stage_f_joint_corpus.py) -- same
 # sharded-safetensors-through-LFS convention as every source corpus above.
 data/learning-v2/cycle-b2-joint-v4/**/*.safetensors filter=lfs diff=lfs merge=lfs -text
+demo-recordings/raw/*.webm filter=lfs diff=lfs merge=lfs -text
+demo-recordings/**/*.webm filter=lfs diff=lfs merge=lfs -text
