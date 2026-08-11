@@ -1,6 +1,7 @@
 import { useConsoleStore, WORKSPACE_LABELS } from '../store';
+import { formatDisplayId } from '../displayId';
 
-const MAP_WORKSPACES = new Set(['incident', 'source', 'sampling', 'response', 'approval']);
+const MAP_WORKSPACES = new Set(['incident', 'source', 'sampling', 'response']);
 
 export function WorkspaceToolbar() {
   const {
@@ -27,7 +28,9 @@ export function WorkspaceToolbar() {
           <span className="breadcrumb mono">
             {selectedNodeId && <>node {selectedNodeId}</>}
             {selectedLinkId && <>link {selectedLinkId}</>}
-            {selectedPlanId && <>plan {selectedPlanId}</>}
+            {selectedPlanId && (
+              <span title={selectedPlanId}>plan {formatDisplayId(selectedPlanId)}</span>
+            )}
           </span>
         )}
       </div>

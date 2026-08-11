@@ -2,6 +2,17 @@ import type { IncidentView } from '../types';
 import { isCalibrationApplicable } from '../calibrationDisplay';
 import type { ReferenceController } from '../reference/useReferenceIncident';
 
+function replayPauseActionLabel(reference: ReferenceController): string {
+  switch (reference.pauseAction) {
+    case 'COLLECT_REFERENCE_SAMPLE':
+      return 'Replay sample collection';
+    case 'APPROVE_REFERENCE_PLAN':
+      return 'Replay operator approval';
+    default:
+      return reference.pauseActionLabel ?? 'Continue replay';
+  }
+}
+
 /**
  * Persistent narrow banner shown only when relevant (ui-work.txt 6): never
  * shown in ordinary LIVE/NORMAL state. REFERENCE/REPLAY/DEMO_FALLBACK/ERROR
@@ -24,20 +35,29 @@ export function ModeBanner({
 }) {
   if (incident.mode === 'REFERENCE' && reference) {
     return (
-      <div className="mode-banner mode-banner-info" role="status">
-        <strong>REFERENCE INCIDENT · VERIFIED REPLAY</strong>
-        <span>{incident.modeReason}</span>
-        <span>
-          Milestone {reference.milestoneIndex + 1} of {reference.milestoneCount}:{' '}
-          {reference.milestoneLabel}
-        </span>
-        {reference.isPaused && reference.pauseReason && (
-          <span className="mode-banner-pause-reason">{reference.pauseReason}</span>
-        )}
+      <div className="mode-banner mode-banner-info mode-banner-reference" role="status">
+        <div className="mode-banner-reference-content">
+          <strong>REFERENCE INCIDENT · VERIFIED REPLAY</strong>
+          <span className="mode-banner-milestone">
+            {reference.milestoneLabel} · {reference.milestoneIndex + 1} / {reference.milestoneCount}
+          </span>
+          <span className="mode-banner-progress" aria-hidden="true">
+            <span
+              style={{
+                width: `${((reference.milestoneIndex + 1) / reference.milestoneCount) * 100}%`,
+              }}
+            />
+          </span>
+          <span className="mode-banner-reference-explanation">
+            {reference.isPaused && reference.pauseReason
+              ? reference.pauseReason
+              : incident.modeReason}
+          </span>
+        </div>
         <div className="mode-banner-controls">
           {reference.isPaused ? (
             <button type="button" onClick={reference.performPauseAction}>
-              {reference.pauseActionLabel ?? 'Continue'}
+              {replayPauseActionLabel(reference)}
             </button>
           ) : (
             <button type="button" onClick={reference.togglePlay} aria-pressed={reference.isPlaying}>
@@ -51,7 +71,11 @@ export function ModeBanner({
           >
             Back
           </button>
-          <button type="button" onClick={reference.next} disabled={reference.isAtEnd}>
+          <button
+            type="button"
+            onClick={reference.next}
+            disabled={reference.isAtEnd || reference.isPaused}
+          >
             Next
           </button>
           <button type="button" onClick={reference.reset}>

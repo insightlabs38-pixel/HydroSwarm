@@ -56,6 +56,7 @@ test('a null sensor pressure/concentration renders as "not measured" text in the
   };
   renderApp();
   await screen.findByText('Verified response awaiting approval');
+  await user.click(screen.getByRole('button', { name: 'Expand technical dock' }));
   await user.click(screen.getByRole('tab', { name: 'Hydraulics' }));
   const dockPanel = document.getElementById('dock-panel-hydraulics');
   expect(dockPanel).not.toBeNull();

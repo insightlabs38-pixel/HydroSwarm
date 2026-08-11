@@ -126,8 +126,36 @@
   background: rgba(107, 214, 221, 0.12);
   color: var(--cyan);
 }
-.mode-banner button {
-  margin-left: auto;
+.mode-banner-reference {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+.mode-banner-reference-content {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto minmax(70px, 150px);
+  gap: 0.35rem 0.65rem;
+  align-items: center;
+}
+.mode-banner-reference-explanation {
+  grid-column: 1 / -1;
+  color: var(--text-secondary);
+}
+.mode-banner-progress {
+  height: 4px;
+  background: rgba(107, 214, 221, 0.24);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.mode-banner-progress > span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+}
+.mode-banner-milestone {
+  font-weight: 600;
+  white-space: nowrap;
 }
 .mode-banner-controls {
   display: flex;
@@ -157,6 +185,17 @@
 .workflow-rail.collapsed {
   flex-basis: var(--shell-rail-w-collapsed);
   width: var(--shell-rail-w-collapsed);
+}
+.workflow-rail.collapsed .rail-item {
+  justify-content: center;
+}
+.workflow-rail.collapsed .rail-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 .rail-group {
   display: flex;
@@ -358,6 +397,90 @@
   margin-bottom: 0.4rem;
   color: var(--green);
 }
+.approval-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.9fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+.approval-plan-summary {
+  grid-column: 1 / -1;
+}
+.approval-decision-boundary {
+  min-width: 0;
+}
+.approval-evidence-stack {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.approval-evidence-stack .panel {
+  padding-bottom: 0.65rem;
+}
+.approval-boundary-statement {
+  font-size: 13px;
+  max-width: 58ch;
+  line-height: 1.55;
+}
+.reference-approval-boundary {
+  border-left: 3px solid var(--cyan);
+  padding: 0.65rem 0.8rem;
+  background: rgba(107, 214, 221, 0.08);
+}
+.reference-approval-boundary p {
+  margin: 0.5rem 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+/* Compact primary verdicts establish plan safety before forensic detail. */
+.plan-verdict-strip {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+  gap: 0.55rem;
+}
+.plan-verdict {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.3rem 0.65rem;
+  padding: 0.6rem 0.7rem;
+  text-align: left;
+  background: var(--panel);
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+.plan-verdict[aria-pressed='true'] {
+  border-color: var(--border-strong);
+  background: var(--panel-raised);
+}
+.plan-verdict-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+.plan-verdict strong {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.plan-verdict-rejected strong {
+  color: var(--red);
+}
+.plan-verdict-verified strong {
+  color: var(--green);
+}
+.plan-verdict-abstained strong,
+.plan-verdict-unverified strong {
+  color: var(--amber);
+}
+.plan-verdict > span:not(.plan-verdict-name) {
+  grid-column: span 1;
+  font-size: 11px;
+  color: var(--text-muted);
+}
 
 /* ---------- Replay / failure injection ---------- */
 
@@ -529,17 +652,24 @@
   padding: 1.5rem;
 }
 .first-launch-panel {
-  width: min(420px, 100%);
+  width: min(720px, 100%);
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2.25rem);
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
 }
+.first-launch-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 700;
+  font-size: 16px;
+}
 .first-launch-panel h1 {
-  font-size: 18px;
+  font-size: clamp(20px, 2.2vw, 26px);
   margin: 0;
   color: var(--text-primary);
 }
@@ -556,6 +686,49 @@
 }
 .first-launch-primary {
   border-color: var(--cyan);
+  background: rgba(107, 214, 221, 0.08);
+}
+.first-launch-trust,
+.live-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.first-launch-trust li,
+.live-trust span {
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 0.28rem 0.45rem;
+  border-radius: 99px;
+}
+.live-pipeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+.live-pipeline li {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.4rem;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 11px;
+}
+.live-pipeline li.complete {
+  color: var(--green);
+}
+.live-pipeline li.current {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: rgba(107, 214, 221, 0.08);
 }
 .first-launch-recommended {
   font-size: 10px;
@@ -638,17 +811,14 @@
 
 /* ---------- Responsive (ui-work.txt 25) ---------- */
 
-/* 1100-1439px: rail starts collapsed (icon-only); inspector narrows to
+/* 1100-1439px: rail remains compact but labeled; inspector narrows to
    ~320px; the plan table's redundant "Actions" count column (the full
    action list already has its own dedicated view) is dropped rather
    than any safety-relevant column. */
 @media (max-width: 1439px) {
   .workflow-rail {
-    flex-basis: var(--shell-rail-w-collapsed);
-    width: var(--shell-rail-w-collapsed);
-  }
-  .workflow-rail .rail-label {
-    display: none;
+    flex-basis: 168px;
+    width: 168px;
   }
   .decision-inspector {
     flex-basis: 320px;
@@ -667,6 +837,18 @@
    this row (see .mission-shell layout in App.tsx), so it already behaves
    as the required "tabbed bottom drawer" with no extra rule needed. */
 @media (max-width: 1099px) {
+  .workflow-rail:not(.collapsed) {
+    flex-basis: var(--shell-rail-w-collapsed);
+    width: var(--shell-rail-w-collapsed);
+  }
+  .workflow-rail:not(.collapsed) .rail-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
   .decision-inspector {
     position: absolute;
     top: 0;
@@ -708,5 +890,23 @@
     box-shadow: none;
     border-left: none;
     border-top: 1px solid var(--border);
+  }
+}
+
+@media (max-width: 800px) {
+  .approval-workspace {
+    grid-template-columns: 1fr;
+  }
+  .approval-plan-summary {
+    grid-column: auto;
+  }
+  .live-pipeline {
+    grid-template-columns: 1fr;
+  }
+  .mode-banner-reference-content {
+    grid-template-columns: 1fr;
+  }
+  .mode-banner-progress {
+    display: none;
   }
 }

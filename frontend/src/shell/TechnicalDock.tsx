@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import type { IncidentView } from '../types';
-import { useConsoleStore, type DockTab } from '../store';
+import { useConsoleStore, type DockTab, type Workspace } from '../store';
 import { Timeline } from '../components/Timeline';
 import { EvidencePanel } from '../components/EvidencePanel';
 import { HydraulicChart } from '../components/HydraulicChart';
@@ -198,10 +198,20 @@ function AuditTab({ incident }: { incident: IncidentView }) {
   );
 }
 
-export function TechnicalDock({ incident }: { incident: IncidentView }) {
+export function TechnicalDock({
+  incident,
+  workspace,
+}: {
+  incident: IncidentView;
+  workspace: Workspace;
+}) {
   const { dockTab, setDockTab, dockCollapsed, toggleDock, dockHeight, setDockHeight } =
     useConsoleStore();
   const dragState = useRef<{ startY: number; startHeight: number } | null>(null);
+  // Replay owns the full timeline. Do not show an identical second timeline
+  // in the dock merely because Timeline was the last selected dock tab.
+  const visibleDockTab: DockTab =
+    workspace === 'replay' && dockTab === 'timeline' ? 'audit' : dockTab;
 
   const clampHeight = useCallback((value: number) => {
     const maxHeight = window.innerHeight * DOCK_HEIGHT_MAX_VH;
@@ -272,9 +282,9 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
               type="button"
               role="tab"
               id={`dock-tab-${tab.id}`}
-              aria-selected={dockTab === tab.id}
+              aria-selected={visibleDockTab === tab.id}
               aria-controls={`dock-panel-${tab.id}`}
-              className={dockTab === tab.id ? 'active' : ''}
+              className={visibleDockTab === tab.id ? 'active' : ''}
               onClick={() => setDockTab(tab.id)}
             >
               {tab.label}
@@ -301,7 +311,7 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         role="tabpanel"
         id="dock-panel-timeline"
         aria-labelledby="dock-tab-timeline"
-        hidden={dockTab !== 'timeline'}
+        hidden={visibleDockTab !== 'timeline'}
       >
         <Timeline events={incident.audit} />
       </div>
@@ -310,7 +320,7 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         role="tabpanel"
         id="dock-panel-evidence"
         aria-labelledby="dock-tab-evidence"
-        hidden={dockTab !== 'evidence'}
+        hidden={visibleDockTab !== 'evidence'}
       >
         <EvidencePanel incident={incident} />
       </div>
@@ -319,7 +329,7 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         role="tabpanel"
         id="dock-panel-hydraulics"
         aria-labelledby="dock-tab-hydraulics"
-        hidden={dockTab !== 'hydraulics'}
+        hidden={visibleDockTab !== 'hydraulics'}
       >
         <HydraulicChart incident={incident} />
       </div>
@@ -328,7 +338,7 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         role="tabpanel"
         id="dock-panel-verification"
         aria-labelledby="dock-tab-verification"
-        hidden={dockTab !== 'verification'}
+        hidden={visibleDockTab !== 'verification'}
       >
         <VerificationTab incident={incident} />
       </div>
@@ -337,7 +347,7 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         role="tabpanel"
         id="dock-panel-provenance"
         aria-labelledby="dock-tab-provenance"
-        hidden={dockTab !== 'provenance'}
+        hidden={visibleDockTab !== 'provenance'}
       >
         <ProvenanceTab incident={incident} />
       </div>
@@ -346,7 +356,7 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         role="tabpanel"
         id="dock-panel-audit"
         aria-labelledby="dock-tab-audit"
-        hidden={dockTab !== 'audit'}
+        hidden={visibleDockTab !== 'audit'}
       >
         <AuditTab incident={incident} />
       </div>

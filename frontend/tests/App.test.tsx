@@ -70,7 +70,7 @@ test('passes the 30-second comprehension test in fallback mode', async () => {
   await user.click(screen.getByRole('button', { name: /^Response/ }));
   expect(await screen.findByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
   expect(screen.getByText('RECOMMENDED')).toBeVisible();
-  expect(screen.getByText('REJECTED')).toBeVisible();
+  expect(screen.getAllByText('REJECTED').length).toBeGreaterThan(0);
   expect(screen.getByText('Exact simulations used')).toBeVisible();
   expect(screen.getByText('Plans exactly verified')).toBeVisible();
   expect(screen.getByText('Exact simulation cache hits')).toBeVisible();
@@ -139,7 +139,7 @@ test('Approval workspace never performs a real approval mutation in DEMO_FALLBAC
   await screen.findByText('Verified response awaiting approval');
   await user.click(screen.getByRole('button', { name: /^Approval/ }));
   expect(await screen.findByRole('heading', { name: 'Operator approval' })).toBeVisible();
-  expect(screen.getByText('Approval is not available in this mode.')).toBeVisible();
+  expect(screen.getByText('Approval is unavailable outside a live incident.')).toBeVisible();
   expect(screen.queryByLabelText('Operator ID')).toBeNull();
 });
 

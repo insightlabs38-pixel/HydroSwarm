@@ -86,7 +86,9 @@ test('a fresh install with no configured incident and no routing param shows the
   vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline test')));
   await renderFreshApp();
 
-  expect(await screen.findByText('HydroSwarm is ready')).toBeVisible();
+  expect(
+    await screen.findByRole('heading', { name: /Local incident decision support/ }),
+  ).toBeVisible();
   expect(screen.queryByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).not.toBeInTheDocument();
 });
 
@@ -98,7 +100,9 @@ test('?experience=reference bypasses the gateway entirely', async () => {
   expect(
     await screen.findByText('REFERENCE INCIDENT · VERIFIED REPLAY', { exact: false }),
   ).toBeVisible();
-  expect(screen.queryByText('HydroSwarm is ready')).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('heading', { name: /Local incident decision support/ }),
+  ).not.toBeInTheDocument();
 });
 
 test('clicking Run Reference Incident on the gateway shows the REFERENCE banner', async () => {
@@ -145,5 +149,7 @@ test('?failure= bypasses the gateway and still shows the ERROR state', async () 
   await renderFreshApp();
 
   expect(await screen.findByText('INCIDENT UNAVAILABLE')).toBeVisible();
-  expect(screen.queryByText('HydroSwarm is ready')).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('heading', { name: /Local incident decision support/ }),
+  ).not.toBeInTheDocument();
 });

@@ -117,8 +117,10 @@ export const useConsoleStore = create<ConsoleUiState>()(
       mapFitRequestedAt: 0,
       leftRailCollapsed: false,
       inspectorCollapsed: false,
-      dockCollapsed: false,
-      dockHeight: 240,
+      // Fresh installs reserve their limited vertical space for the decision
+      // surface. A user's explicit layout preference remains persisted.
+      dockCollapsed: true,
+      dockHeight: 190,
       dockTab: 'timeline',
       replayIndex: 0,
       replayPlaying: false,

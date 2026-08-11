@@ -1,6 +1,7 @@
 import type { IncidentView } from '../types';
 import { isCalibrationApplicable } from '../calibrationDisplay';
 import { StatusBadge } from '../components/StatusBadge';
+import { formatDisplayId } from '../displayId';
 
 function modeTone(mode: IncidentView['mode']): 'good' | 'warn' | 'danger' | 'info' {
   switch (mode) {
@@ -69,8 +70,11 @@ export function MissionHeader({ incident }: { incident: IncidentView }) {
       <div className="mission-header-context">
         {incident.id ? (
           <>
-            <span>
-              Incident <strong>{incident.id}</strong>
+            <span title={incident.id}>
+              Incident{' '}
+              <strong aria-label={`Full incident ID ${incident.id}`}>
+                {formatDisplayId(incident.id)}
+              </strong>
             </span>
             <span>{incident.networkId}</span>
             <span>{controllerStageLabel[incident.status]}</span>

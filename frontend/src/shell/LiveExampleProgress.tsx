@@ -26,6 +26,25 @@ const STAGE_LABELS: Record<string, string> = {
   error: 'Something went wrong',
 };
 
+const PIPELINE_STAGES = [
+  ['importing_network', 'Network import'],
+  ['creating_incident', 'Incident creation'],
+  ['analyzing_initial', 'Initial analysis'],
+  ['awaiting_sample_collection', 'Active sample selection'],
+  ['submitting_sample', 'Sample submission'],
+  ['reanalyzing', 'Reanalysis'],
+  ['generating_plans', 'Plan generation'],
+  ['verifying_plans', 'Exact WNTR verification'],
+  ['awaiting_approval', 'Human approval'],
+] as const;
+
+function stageIndex(stage: string): number {
+  const explicit = PIPELINE_STAGES.findIndex(([id]) => id === stage);
+  if (explicit >= 0) return explicit;
+  if (stage === 'approving' || stage === 'complete') return PIPELINE_STAGES.length;
+  return -1;
+}
+
 export function LiveExampleProgress({
   controller,
   onExploreFallback,
@@ -34,6 +53,7 @@ export function LiveExampleProgress({
   onExploreFallback: () => void;
 }) {
   const { stage } = controller;
+  const currentStage = stageIndex(stage);
 
   return (
     <main className="first-launch-gateway" aria-live="polite">
@@ -44,6 +64,25 @@ export function LiveExampleProgress({
           HydroSwarm is computing this incident now using the frozen runtime. Input observations are
           from the included reference scenario, not live utility telemetry.
         </p>
+        <ol className="live-pipeline" aria-label="Live computation stages">
+          {PIPELINE_STAGES.map(([id, label], index) => (
+            <li
+              key={id}
+              className={
+                index < currentStage ? 'complete' : index === currentStage ? 'current' : ''
+              }
+            >
+              <span aria-hidden="true">
+                {index < currentStage ? '✓' : index === currentStage ? '●' : '○'}
+              </span>
+              {label}
+            </li>
+          ))}
+        </ol>
+        <div className="live-trust">
+          <span>Local / offline</span>
+          <span>Exact verification before approval</span>
+        </div>
 
         {stage === 'awaiting_sample_collection' && controller.recommendedNode && (
           <div className="live-example-pause">
