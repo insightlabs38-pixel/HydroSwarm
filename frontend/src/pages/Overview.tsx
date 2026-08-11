@@ -9,6 +9,7 @@ import {
 import { Panel } from '../components/Panel';
 import { StatusBadge } from '../components/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
+import { formatDisplayId } from '../displayId';
 import { useConsoleStore } from '../store';
 import { deriveWorkflowProgression } from '../workflow';
 
@@ -168,7 +169,8 @@ export function Overview({ incident }: { incident: IncidentView }) {
           {activePlan ? (
             <>
               <p className="supporting">
-                {activePlan.id} · {activePlan.name}
+                <span title={activePlan.id}>{formatDisplayId(activePlan.id)}</span> ·{' '}
+                {activePlan.name}
               </p>
               <StatusBadge
                 tone={

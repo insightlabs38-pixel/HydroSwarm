@@ -218,7 +218,7 @@ export default function App() {
         </div>
         <DecisionInspector incident={incident} />
       </div>
-      <TechnicalDock incident={incident} />
+      <TechnicalDock incident={incident} workspace={workspace} />
       <footer className="mission-footer">
         <span>Decision support only · No autonomous control</span>
         <span>Exact verifier: WNTR / EPANET</span>

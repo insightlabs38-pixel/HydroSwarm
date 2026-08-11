@@ -1,4 +1,10 @@
 import { expect, test } from '@playwright/test';
+import type { Page } from '@playwright/test';
+
+async function expandTechnicalDock(page: Page) {
+  const trigger = page.getByRole('button', { name: 'Expand technical dock' });
+  if (await trigger.isVisible()) await trigger.click();
+}
 
 // ui-work.txt §32 "Normal demo flow" -- the product's own definition of a
 // judge-mode-free walkthrough an operator (or a demo audience) should be
@@ -65,6 +71,7 @@ test('operator can follow the full normal demo flow (ui-work.txt §32) using onl
   await expect(page.getByText(/^plan /)).toBeVisible();
 
   // 12. Show CURRENT verification/context (technical dock).
+  await expandTechnicalDock(page);
   await page.getByRole('tab', { name: 'Verification' }).click();
   await expect(page.getByText('Verification status')).toBeVisible();
 

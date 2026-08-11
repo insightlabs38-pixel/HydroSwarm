@@ -8,6 +8,7 @@ import { StatusBadge } from '../components/StatusBadge';
 import { PlanActionSequence } from '../components/plans/PlanActionSequence';
 import { EmptyState } from '../components/common/EmptyState';
 import { KeyValueGrid } from '../components/common/KeyValueGrid';
+import { formatDisplayId } from '../displayId';
 
 type HierarchyStep =
   'SIMULATOR_VERIFIED' | 'CURRENT_CONTEXT' | 'OPERATOR_REVIEW' | 'HUMAN_APPROVED';
@@ -63,7 +64,7 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
 
   if (!activePlan) {
     return (
-      <div className="workspace-grid">
+      <div className="approval-workspace">
         <Panel title="No plan to approve" eyebrow="APPROVAL" className="wide-panel">
           <EmptyState title="No response plans available for this incident." />
         </Panel>
@@ -92,13 +93,14 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
     !approveMutation.isPending;
 
   return (
-    <div className="workspace-grid">
+    <div className="approval-workspace">
       <Panel
-        title={`${activePlan.id} · ${activePlan.name}`}
+        title={`${formatDisplayId(activePlan.id)} · ${activePlan.name}`}
         eyebrow="PLAN UNDER REVIEW"
-        className="wide-panel"
+        className="approval-plan-summary"
       >
         <HierarchyLadder reached={reachedStep} />
+        <span className="sr-only">Full plan ID {activePlan.id}</span>
         <p className="supporting">
           HydroSwarm does not actuate infrastructure. Approval records an operator decision only.
         </p>
@@ -119,7 +121,104 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
           />
         )}
       </Panel>
-      <aside className="right-rail" aria-label="Verified actions and consequences">
+      <section className="approval-decision-boundary" aria-labelledby="approval-boundary-title">
+        <Panel
+          title="Operator approval"
+          eyebrow="HUMAN DECISION BOUNDARY"
+          className="approval-primary-panel"
+        >
+          <p id="approval-boundary-title" className="approval-boundary-statement">
+            HydroSwarm does not actuate infrastructure. A human operator records the decision only
+            after reviewing a current, exactly verified plan.
+          </p>
+          {alreadyApproved ? (
+            <StatusBadge tone="good">APPROVED</StatusBadge>
+          ) : incident.mode === 'REFERENCE' ? (
+            <div className="reference-approval-boundary">
+              <strong>Reference replay paused at the human decision boundary</strong>
+              <p>
+                This is a checksummed replay of a previously generated workflow. No infrastructure
+                action is executed.
+              </p>
+              <p>
+                Advance the replay from the reference banner to reproduce the recorded
+                operator-approval transition.
+              </p>
+            </div>
+          ) : incident.mode !== 'LIVE' ? (
+            <EmptyState
+              title="Approval is unavailable outside a live incident."
+              detail="Illustrative and replay views never record an infrastructure decision."
+            />
+          ) : !canReview ? (
+            <EmptyState title="Resolve the verification issue above before approval can be reviewed." />
+          ) : (
+            <form
+              className="approval-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (canApprove) approveMutation.mutate();
+              }}
+            >
+              <label className="approval-field">
+                Operator ID
+                <input
+                  type="text"
+                  value={operatorId}
+                  onChange={(event) => setOperatorId(event.target.value)}
+                  required
+                  maxLength={80}
+                  autoComplete="off"
+                />
+              </label>
+              <label className="approval-checkbox">
+                <input
+                  type="checkbox"
+                  checked={reviewed}
+                  onChange={(event) => setReviewed(event.target.checked)}
+                />
+                I reviewed the verified actions and consequences.
+              </label>
+              <button type="submit" className="primary-action" disabled={!canApprove}>
+                {approveMutation.isPending ? 'Recording approval…' : 'Approve verified plan'}
+              </button>
+              {approveMutation.isError && (
+                <p className="supporting" role="alert">
+                  {approveMutation.error instanceof ApiError
+                    ? approveMutation.error.message
+                    : 'Approval failed. Re-fetch and re-verify before trying again.'}
+                </p>
+              )}
+              {approveMutation.isSuccess && (
+                <div className="approval-receipt" role="status">
+                  <strong>Approval receipt</strong>
+                  <KeyValueGrid
+                    entries={[
+                      {
+                        key: 'operator',
+                        label: 'Operator',
+                        value: approveMutation.data.operatorId,
+                      },
+                      {
+                        key: 'approved-at',
+                        label: 'Approved at',
+                        value: approveMutation.data.approvedAt,
+                      },
+                      {
+                        key: 'plan',
+                        label: 'Plan',
+                        value: approveMutation.data.planId,
+                        hash: true,
+                      },
+                    ]}
+                  />
+                </div>
+              )}
+            </form>
+          )}
+        </Panel>
+      </section>
+      <aside className="approval-evidence-stack" aria-label="Verified actions and consequences">
         <Panel title="Every action in this plan" eyebrow="FULL PLAN">
           <PlanActionSequence plan={activePlan} />
         </Panel>
@@ -196,72 +295,6 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
           </Panel>
         )}
       </aside>
-      <Panel title="Operator approval" eyebrow="HUMAN APPROVED" className="wide-panel">
-        {alreadyApproved ? (
-          <StatusBadge tone="good">APPROVED</StatusBadge>
-        ) : incident.mode !== 'LIVE' ? (
-          <EmptyState
-            title="Approval is not available in this mode."
-            detail="Approval requires a live incident with a real backend to record the decision against. This deterministic demo does not perform real approval mutations."
-          />
-        ) : !canReview ? (
-          <EmptyState title="Resolve the verification issue above before approval can be reviewed." />
-        ) : (
-          <form
-            className="approval-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (canApprove) approveMutation.mutate();
-            }}
-          >
-            <label className="approval-field">
-              Operator ID
-              <input
-                type="text"
-                value={operatorId}
-                onChange={(event) => setOperatorId(event.target.value)}
-                required
-                maxLength={80}
-                autoComplete="off"
-              />
-            </label>
-            <label className="approval-checkbox">
-              <input
-                type="checkbox"
-                checked={reviewed}
-                onChange={(event) => setReviewed(event.target.checked)}
-              />
-              I reviewed the verified actions and consequences.
-            </label>
-            <button type="submit" className="primary-action" disabled={!canApprove}>
-              {approveMutation.isPending ? 'Recording approval…' : 'Approve verified plan'}
-            </button>
-            {approveMutation.isError && (
-              <p className="supporting" role="alert">
-                {approveMutation.error instanceof ApiError
-                  ? approveMutation.error.message
-                  : 'Approval failed. Re-fetch and re-verify before trying again.'}
-              </p>
-            )}
-            {approveMutation.isSuccess && (
-              <div className="approval-receipt" role="status">
-                <strong>Approval receipt</strong>
-                <KeyValueGrid
-                  entries={[
-                    { key: 'operator', label: 'Operator', value: approveMutation.data.operatorId },
-                    {
-                      key: 'approved-at',
-                      label: 'Approved at',
-                      value: approveMutation.data.approvedAt,
-                    },
-                    { key: 'plan', label: 'Plan', value: approveMutation.data.planId, hash: true },
-                  ]}
-                />
-              </div>
-            )}
-          </form>
-        )}
-      </Panel>
     </div>
   );
 }

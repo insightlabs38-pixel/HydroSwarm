@@ -19,18 +19,35 @@ export function FirstLaunchGateway({
   return (
     <main className="first-launch-gateway" aria-labelledby="first-launch-title">
       <div className="first-launch-panel">
-        <h1 id="first-launch-title">HydroSwarm is ready</h1>
+        <div className="first-launch-brand">
+          <span className="brand-mark" aria-hidden="true">
+            H
+          </span>
+          <span>HydroSwarm</span>
+        </div>
+        <h1 id="first-launch-title">
+          Local incident decision support, ready when the evidence is.
+        </h1>
         <p className="supporting">
           Offline mission-control decision support for drinking-water contamination incidents.
         </p>
+        <ul className="first-launch-trust" aria-label="System safeguards">
+          <li>Local / offline</li>
+          <li>WNTR / EPANET verification</li>
+          <li>Human approval required</li>
+        </ul>
         <div className="first-launch-actions">
           <button type="button" className="first-launch-primary" onClick={onRunReference}>
             Run Reference Incident
-            <span className="first-launch-recommended">Recommended</span>
+            <span className="first-launch-recommended">
+              Recommended · checksummed verified replay
+            </span>
           </button>
           <button type="button" onClick={onRunLive}>
             Run Live Example
-            <span className="first-launch-secondary-label">Real computation, reference inputs</span>
+            <span className="first-launch-secondary-label">
+              Real production computation · reference inputs
+            </span>
           </button>
           <button type="button" onClick={onImportNetwork}>
             Import Your Own Network

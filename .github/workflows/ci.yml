@@ -162,10 +162,12 @@ jobs:
   # reporting/caching -- a Playwright/visual-regression failure is a
   # different kind of signal than a lint/typecheck/unit-test failure, and
   # mixing them into one job makes both slower to diagnose. Runs on
-  # ubuntu-latest specifically because the committed visual baselines
-  # (tests/e2e/visual-regression.spec.ts-snapshots/*-chromium-linux.png)
-  # are Linux Chromium baselines -- any other OS would fail on font/
-  # rendering differences that have nothing to do with a real regression.
+  # ubuntu-latest specifically because the committed visual baselines include
+  # strict Linux x86_64 Chromium captures
+  # (tests/e2e/visual-regression.spec.ts-snapshots/*-chromium-x64-linux.png).
+  # The pre-existing `*-chromium-linux.png` set is the native ARM64 capture
+  # set. Text/canvas rasterization differs across CPU architectures, so both
+  # remain strict captures rather than a tolerance escape hatch.
   # Never auto-approves/updates screenshots here: no --update-snapshots,
   # so real visual drift fails the job rather than silently passing.
   frontend-e2e:
@@ -193,4 +195,3 @@ jobs:
             frontend/playwright-report/
             frontend/test-results/
           retention-days: 7
-

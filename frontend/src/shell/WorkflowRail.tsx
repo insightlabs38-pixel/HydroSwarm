@@ -107,11 +107,9 @@ function RailButton({
       <span className="rail-status-glyph" aria-hidden="true">
         {meta.glyph}
       </span>
-      {!collapsed && (
-        <span className="rail-label" aria-hidden="true">
-          {label}
-        </span>
-      )}
+      <span className="rail-label" aria-hidden={collapsed}>
+        {label}
+      </span>
     </button>
   );
 }
@@ -157,7 +155,7 @@ export function WorkflowRail({ incident }: { incident: IncidentView }) {
         onClick={toggleLeftRail}
         aria-pressed={leftRailCollapsed}
       >
-        {leftRailCollapsed ? '»' : '« Collapse'}
+        {leftRailCollapsed ? '» Expand workflow' : '« Collapse workflow'}
       </button>
     </nav>
   );

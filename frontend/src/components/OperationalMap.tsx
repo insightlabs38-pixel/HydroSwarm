@@ -215,7 +215,7 @@ export function OperationalMap({ incident }: { incident: IncidentView }) {
       interactive: true,
     });
     mapInstance.current = map;
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
     // Real browsers fire 'load' asynchronously (unlike the synchronous
     // test mock), so the separate activePlan-driven effect below can run
     // and bail out (map not loaded yet) before this callback ever runs,

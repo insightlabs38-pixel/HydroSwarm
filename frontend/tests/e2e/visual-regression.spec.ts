@@ -18,6 +18,62 @@ async function mockReferenceArtifact(page: Page) {
   );
 }
 
+async function mockLiveExampleFlow(page: Page) {
+  await page.route('**/api/**', async (route) => {
+    const url = new URL(route.request().url());
+    const path = url.pathname;
+    const method = route.request().method();
+    const json = (body: unknown) =>
+      route.fulfill({ contentType: 'application/json', body: JSON.stringify(body) });
+    if (path.endsWith('/live-example-inputs'))
+      return json({
+        network_filename: 'reference.inp',
+        network_inp_text: '[TITLE]',
+        true_source: 'J8',
+        candidate_nodes: ['J1', 'J8'],
+        initial_observation: {
+          sensor_id: 'S-J1',
+          node_id: 'J1',
+          concentration_mg_l: 0,
+          pressure_m: 37,
+        },
+        candidate_signatures_mg_l: { J8: 1.2 },
+        sample_time_seconds: 3600,
+        contamination_threshold_mg_l: 0.001,
+      });
+    if (path.endsWith('/networks/import'))
+      return json({
+        network_id: 'network-live-1',
+        name: 'reference',
+        version: 1,
+        sha256: 'network-hash',
+        node_count: 2,
+        link_count: 1,
+        valid: true,
+        validated_at: '2026-08-11T00:00:00Z',
+        metadata: { nodes: [], links: [] },
+        validation_errors: [],
+      });
+    if (path.endsWith('/incidents') && method === 'POST')
+      return json({ incident_id: 'live-incident-12345678', status: 'SAMPLING' });
+    if (path.endsWith('/samples/recommend'))
+      return json({ node_id: 'J8', expected_information_gain: 1.2, alternatives: ['J1'] });
+    if (path.endsWith('/plans/generate'))
+      return json([
+        { plan_id: 'unsafe', name: 'Close sole reservoir feeder' },
+        { plan_id: 'safe', name: 'Flush downstream J8' },
+      ]);
+    if (path.endsWith('/verify'))
+      return json({
+        plan_id: path.includes('/safe/') ? 'safe' : 'unsafe',
+        decision: path.includes('/safe/') ? 'VERIFIED' : 'REJECTED',
+      });
+    if (method === 'POST')
+      return json({ incident_id: 'live-incident-12345678', status: 'SAMPLING' });
+    return route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+  });
+}
+
 async function openReferenceAtMilestone(page: Page, milestone: number) {
   await mockReferenceArtifact(page);
   await page.goto('/?experience=reference');
@@ -25,7 +81,17 @@ async function openReferenceAtMilestone(page: Page, milestone: number) {
   // Freeze auto-advance before moving to an exact authored milestone.
   await page.getByRole('button', { name: 'Pause' }).click();
   for (let index = 0; index < milestone; index += 1) {
-    await page.getByRole('button', { name: 'Next', exact: true }).click();
+    const next = page.getByRole('button', { name: 'Next', exact: true });
+    if (await next.isEnabled()) {
+      await next.click();
+    } else {
+      // Authored pause boundaries are deliberately non-bypassable. The
+      // replay-specific action is the only control allowed to advance.
+      await page
+        .locator('.mode-banner-controls button')
+        .filter({ hasText: /^Replay / })
+        .click();
+    }
   }
 }
 
@@ -45,6 +111,11 @@ async function openReferenceAtMilestone(page: Page, milestone: number) {
 async function waitForOverviewLoaded(page: Page) {
   await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
   await expect(page.locator('.map-canvas[role="img"]')).toBeVisible();
+}
+
+async function expandTechnicalDock(page: Page) {
+  const trigger = page.getByRole('button', { name: 'Expand technical dock' });
+  if (await trigger.isVisible()) await trigger.click();
 }
 
 // One entry per required UI-11 baseline workspace at 1920x1080 (`rail`
@@ -115,14 +186,16 @@ test.describe('reference incident visual regression', () => {
   test('first-launch gateway @ 1920x1080', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'HydroSwarm is ready' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Local incident decision support/ }),
+    ).toBeVisible();
     await expect(page).toHaveScreenshot('gateway-1920x1080.png', { fullPage: true });
   });
 
   test('sampling pause @ 1920x1080', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await openReferenceAtMilestone(page, 3);
-    await expect(page.getByRole('button', { name: 'Collect reference sample' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Replay sample collection' })).toBeVisible();
     await expect(page).toHaveScreenshot('reference-sampling-pause-1920x1080.png', {
       fullPage: true,
     });
@@ -148,8 +221,25 @@ test.describe('reference incident visual regression', () => {
     await openReferenceAtMilestone(page, 9);
     await page.getByRole('button', { name: /^Approval/ }).click();
     await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Approve plan' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Replay operator approval' })).toBeVisible();
     await expect(page).toHaveScreenshot('reference-approval-1920x1080.png', { fullPage: true });
+  });
+
+  test('authored reference pauses cannot be bypassed and replay actions advance one milestone', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openReferenceAtMilestone(page, 3);
+    const sampleMilestone = await page.locator('.mode-banner-milestone').textContent();
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
+    await page.getByRole('button', { name: 'Replay sample collection' }).click();
+    await expect(page.locator('.mode-banner-milestone')).not.toHaveText(sampleMilestone ?? '');
+
+    await openReferenceAtMilestone(page, 9);
+    const approvalMilestone = await page.locator('.mode-banner-milestone').textContent();
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
+    await page.getByRole('button', { name: 'Replay operator approval' }).click();
+    await expect(page.locator('.mode-banner-milestone')).not.toHaveText(approvalMilestone ?? '');
   });
 
   test('LIVE V4 flow starts in an explicitly live-computation state @ 1920x1080', async ({
@@ -164,6 +254,17 @@ test.describe('reference incident visual regression', () => {
     await page.goto('/?experience=live');
     await expect(page.getByText('LIVE COMPUTATION · REFERENCE INPUTS')).toBeVisible();
     await expect(page).toHaveScreenshot('live-v4-proof-start-1920x1080.png', { fullPage: true });
+  });
+
+  test('LIVE sample and approval pauses @ 1920x1080', async ({ page }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await mockLiveExampleFlow(page);
+    await page.goto('/?experience=live');
+    await expect(page.getByRole('button', { name: 'Collect reference sample' })).toBeVisible();
+    await expect(page).toHaveScreenshot('live-sample-pause-1920x1080.png', { fullPage: true });
+    await page.getByRole('button', { name: 'Collect reference sample' }).click();
+    await expect(page.getByRole('button', { name: 'Approve plan' })).toBeVisible();
+    await expect(page).toHaveScreenshot('live-approval-pause-1920x1080.png', { fullPage: true });
   });
 });
 
@@ -304,12 +405,16 @@ test.describe('selected-plan synchronization', () => {
     await page.getByRole('button', { name: /^Response/ }).click();
     await expect(page.getByRole('heading', { name: 'Verified plan comparison' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'C · Monitor + flush only' }).click();
+    await page
+      .locator('.plan-table')
+      .getByRole('button', { name: 'C · Monitor + flush only' })
+      .click();
 
     await expect(page.locator('.breadcrumb')).toHaveText('plan C');
     const inspector = page.getByRole('complementary', { name: 'Decision inspector' });
     await expect(inspector.getByText('C · Monitor + flush only')).toBeVisible();
 
+    await expandTechnicalDock(page);
     await page.getByRole('tab', { name: 'Verification' }).click();
     await expect(
       page.locator('#dock-panel-verification').getByText('C · Monitor + flush only'),
@@ -336,7 +441,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
   // forcing the whole document wider than the viewport. Locks that fix
   // down at each documented breakpoint tier rather than only the
   // default desktop width the other tests use.
-  for (const width of [1300, 900, 600]) {
+  for (const width of [1366, 1100, 1099, 900, 768, 767]) {
     test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/?experience=fallback');
@@ -358,5 +463,150 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
     const inspector = page.locator('.decision-inspector');
     await expect(inspector).toBeVisible();
     await expect(inspector).toHaveCSS('position', 'absolute');
+  });
+
+  test('compact desktop rail remains labeled until its explicit collapse control is used', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto('/?experience=fallback');
+    await waitForOverviewLoaded(page);
+    const rail = page.locator('.workflow-rail');
+    const toggle = page.getByRole('button', { name: /Collapse workflow/ });
+    await expect(rail.getByText('Approval', { exact: true })).toBeVisible();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+    await expect(rail).toHaveClass(/collapsed/);
+    await expect(page.getByRole('button', { name: /Expand workflow/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  test('tablet rail state, control semantics, and layout agree at 900px', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.goto('/?experience=fallback');
+    await waitForOverviewLoaded(page);
+
+    const rail = page.locator('.workflow-rail');
+    const collapse = page.getByRole('button', { name: /Collapse workflow/ });
+    await expect(rail.getByText('Approval', { exact: true })).toBeVisible();
+    await expect(collapse).toHaveAttribute('aria-pressed', 'false');
+
+    await collapse.click();
+    await expect(rail).toHaveClass(/collapsed/);
+    const expand = page.getByRole('button', { name: /Expand workflow/ });
+    await expect(expand).toHaveAttribute('aria-pressed', 'true');
+
+    await expand.click();
+    await expect(rail).not.toHaveClass(/collapsed/);
+    await expect(rail.getByText('Approval', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Collapse workflow/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+  });
+
+  test('approval has no map controls and navigation controls stay inside map bounds', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto('/?experience=fallback');
+    await waitForOverviewLoaded(page);
+    const mapBox = await page.locator('.map-shell').first().boundingBox();
+    const navBox = await page.locator('.maplibregl-ctrl-top-right').boundingBox();
+    expect(mapBox).not.toBeNull();
+    expect(navBox).not.toBeNull();
+    expect(navBox!.x).toBeGreaterThanOrEqual(mapBox!.x);
+    expect(navBox!.y).toBeGreaterThanOrEqual(mapBox!.y);
+    expect(navBox!.x + navBox!.width).toBeLessThanOrEqual(mapBox!.x + mapBox!.width);
+    expect(navBox!.y + navBox!.height).toBeLessThanOrEqual(mapBox!.y + mapBox!.height);
+
+    await page.getByRole('button', { name: /^Approval/ }).click();
+    await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Fit network' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Layers' })).toHaveCount(0);
+  });
+});
+
+test.describe('final visual coverage matrix', () => {
+  test('gateway @ 1440x900 and 1366x768', async ({ page }) => {
+    for (const [width, height] of [
+      [1440, 900],
+      [1366, 768],
+    ] as const) {
+      await page.setViewportSize({ width, height });
+      await page.goto('/');
+      await expect(
+        page.getByRole('heading', { name: /Local incident decision support/ }),
+      ).toBeVisible();
+      await expect(page).toHaveScreenshot(`gateway-${width}x${height}.png`, { fullPage: true });
+    }
+  });
+
+  test('Approval @ 1440x900 and 1366x768', async ({ page }) => {
+    for (const [width, height] of [
+      [1440, 900],
+      [1366, 768],
+    ] as const) {
+      await gotoWorkspace(page, width, height, { rail: /^Approval/, heading: 'Operator approval' });
+      await expect(page).toHaveScreenshot(`approval-${width}x${height}.png`, { fullPage: true });
+    }
+  });
+
+  test('Sampling map workspace @ 1366x768', async ({ page }) => {
+    await gotoWorkspace(page, 1366, 768, { rail: /^Sampling/, heading: 'Evidence status' });
+    await expect(page).toHaveScreenshot('sampling-1366x768.png', { fullPage: true });
+  });
+
+  test('reference decision states @ 1440x900', async ({ page }) => {
+    for (const [milestone, name, rail, heading] of [
+      [3, 'reference-sampling-pause-1440x900.png', null, null],
+      [8, 'reference-verification-1440x900.png', /^Response/, 'Verified plan comparison'],
+      [9, 'reference-approval-1440x900.png', /^Approval/, 'Operator approval'],
+    ] as const) {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await openReferenceAtMilestone(page, milestone);
+      if (rail) await page.getByRole('button', { name: rail }).click();
+      if (heading) await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+      await expect(page).toHaveScreenshot(name, { fullPage: true });
+    }
+  });
+
+  test('reference approval boundary @ 1366x768 remains legible and non-bypassable', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await openReferenceAtMilestone(page, 9);
+    await page.getByRole('button', { name: /^Approval/ }).click();
+    await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Replay operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
+    await expect(
+      page.locator('.workflow-rail').getByText('Approval', { exact: true }),
+    ).toBeVisible();
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+    await expect(page).toHaveScreenshot('reference-approval-1366x768.png', { fullPage: true });
+  });
+
+  test('utility workspaces @ 1440x900', async ({ page }) => {
+    for (const [rail, heading, name] of [
+      [/^Network/, 'Import network', 'network-1440x900.png'],
+      [/^Validation/, 'Benchmarks and operating range', 'validation-1440x900.png'],
+      [/^Model/, 'Authority ladder', 'authority-1440x900.png'],
+      [/^Benchmarks/, 'Operational benchmarks', 'benchmarks-1440x900.png'],
+    ] as const) {
+      await gotoWorkspace(page, 1440, 900, { rail, heading });
+      await expect(page).toHaveScreenshot(name, { fullPage: true });
+    }
   });
 });

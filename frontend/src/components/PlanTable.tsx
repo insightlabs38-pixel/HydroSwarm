@@ -1,6 +1,7 @@
 import { useConsoleStore } from '../store';
 import type { Plan } from '../types';
 import { StatusBadge } from './StatusBadge';
+import { formatDisplayId } from '../displayId';
 
 const tone = { REJECTED: 'danger', RECOMMENDED: 'good', VALID: 'info', PENDING: 'warn' } as const;
 
@@ -42,8 +43,9 @@ export function PlanTable({ plans }: { plans: Plan[] }) {
                     className="table-plan-button"
                     onClick={() => selectPlan(plan.id)}
                     aria-pressed={selectedPlanId === plan.id}
+                    title={plan.id}
                   >
-                    {plan.id} · {plan.name}
+                    {formatDisplayId(plan.id)} · {plan.name}
                   </button>
                 </th>
                 <td>

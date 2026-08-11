@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import type { IncidentView } from '../types';
-import { useConsoleStore, type DockTab } from '../store';
+import { useConsoleStore, type DockTab, type Workspace } from '../store';
 import { Timeline } from '../components/Timeline';
 import { EvidencePanel } from '../components/EvidencePanel';
 import { HydraulicChart } from '../components/HydraulicChart';
@@ -198,10 +198,20 @@ function AuditTab({ incident }: { incident: IncidentView }) {
   );
 }
 
-export function TechnicalDock({ incident }: { incident: IncidentView }) {
+export function TechnicalDock({
+  incident,
+  workspace,
+}: {
+  incident: IncidentView;
+  workspace: Workspace;
+}) {
   const { dockTab, setDockTab, dockCollapsed, toggleDock, dockHeight, setDockHeight } =
     useConsoleStore();
   const dragState = useRef<{ startY: number; startHeight: number } | null>(null);
+  // Replay owns the full timeline. Keeping the Timeline tab selectable lets
+  // its panel truthfully explain that ownership instead of silently
+  // redirecting an operator to Audit.
+  const timelineIsInReplayWorkspace = workspace === 'replay';
 
   const clampHeight = useCallback((value: number) => {
     const maxHeight = window.innerHeight * DOCK_HEIGHT_MAX_VH;
@@ -275,9 +285,16 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
               aria-selected={dockTab === tab.id}
               aria-controls={`dock-panel-${tab.id}`}
               className={dockTab === tab.id ? 'active' : ''}
+              title={
+                tab.id === 'timeline' && timelineIsInReplayWorkspace
+                  ? 'Timeline is displayed in the Replay workspace.'
+                  : undefined
+              }
               onClick={() => setDockTab(tab.id)}
             >
-              {tab.label}
+              {tab.id === 'timeline' && timelineIsInReplayWorkspace
+                ? 'Timeline (Replay workspace)'
+                : tab.label}
             </button>
           ))}
         </div>
@@ -303,7 +320,14 @@ export function TechnicalDock({ incident }: { incident: IncidentView }) {
         aria-labelledby="dock-tab-timeline"
         hidden={dockTab !== 'timeline'}
       >
-        <Timeline events={incident.audit} />
+        {timelineIsInReplayWorkspace ? (
+          <EmptyState
+            title="Timeline is displayed in the Replay workspace."
+            detail="Use the primary Replay timeline to inspect or advance the incident sequence."
+          />
+        ) : (
+          <Timeline events={incident.audit} />
+        )}
       </div>
       <div
         className="dock-panel"

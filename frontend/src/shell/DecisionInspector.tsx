@@ -16,6 +16,7 @@ import { StatusBadge } from '../components/StatusBadge';
 import { AuthorityBadge } from '../components/status/AuthorityBadge';
 import { ApplicabilityBadge } from '../components/status/ApplicabilityBadge';
 import { KeyValueGrid } from '../components/common/KeyValueGrid';
+import { formatDisplayId } from '../displayId';
 
 // Defensive fallback only -- every Workspace value is handled explicitly
 // below; this stays empty and exists so an unhandled future workspace
@@ -55,11 +56,19 @@ function IncidentSummary({ incident }: { incident: IncidentView }) {
         <div>
           <dt>Approval</dt>
           <dd>
-            {incident.selectedPlanId
-              ? `approved (${incident.selectedPlanId})`
-              : incident.approvalPending
-                ? 'pending'
-                : 'none pending'}
+            {incident.selectedPlanId ? (
+              <>
+                approved (
+                <span title={incident.selectedPlanId}>
+                  {formatDisplayId(incident.selectedPlanId)}
+                </span>
+                )
+              </>
+            ) : incident.approvalPending ? (
+              'pending'
+            ) : (
+              'none pending'
+            )}
           </dd>
         </div>
         <div>
@@ -206,7 +215,7 @@ function ResponseSummary({ incident }: { incident: IncidentView }) {
   return (
     <div className="inspector-stack">
       <p className="supporting">
-        {plan.id} · {plan.name}
+        <span title={plan.id}>{formatDisplayId(plan.id)}</span> · {plan.name}
       </p>
       <div className="decision-badges">
         <StatusBadge
@@ -313,7 +322,11 @@ function ApprovalSummary({ incident }: { incident: IncidentView }) {
     return (
       <div className="inspector-stack">
         <StatusBadge tone="good">APPROVED</StatusBadge>
-        <p className="supporting">Plan {incident.selectedPlanId} was approved by an operator.</p>
+        <p className="supporting">
+          Plan{' '}
+          <span title={incident.selectedPlanId}>{formatDisplayId(incident.selectedPlanId)}</span>{' '}
+          was approved by an operator.
+        </p>
       </div>
     );
   }

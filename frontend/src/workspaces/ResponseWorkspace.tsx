@@ -10,6 +10,8 @@ import { Counterfactuals } from '../components/Counterfactuals';
 import { PlanActionSequence } from '../components/plans/PlanActionSequence';
 import { ParetoFrontier } from '../components/plans/ParetoFrontier';
 import { EmptyState } from '../components/common/EmptyState';
+import { PlanVerdictStrip } from '../components/plans/PlanVerdictStrip';
+import { formatDisplayId } from '../displayId';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
@@ -87,6 +89,13 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
 
   return (
     <div className="workspace-grid">
+      {!planningSuppressed && (
+        <PlanVerdictStrip
+          plans={incident.plans}
+          selectedPlanId={activePlan?.id ?? null}
+          onSelect={selectPlan}
+        />
+      )}
       <Panel title="Network" eyebrow="RESPONSE ACTION OVERLAY" className="map-panel wide-panel">
         <Suspense
           fallback={
@@ -143,7 +152,7 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
       {activePlan && (
         <Panel
           title="Action sequence"
-          eyebrow={`FULL PLAN · ${activePlan.id}`}
+          eyebrow={`FULL PLAN · ${formatDisplayId(activePlan.id)}`}
           className="wide-panel"
         >
           {activePlan.verification?.verificationStatus === 'STALE' && (
