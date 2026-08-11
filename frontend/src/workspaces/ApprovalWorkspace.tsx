@@ -33,6 +33,81 @@ function HierarchyLadder({ reached }: { reached: HierarchyStep | null }) {
   );
 }
 
+function ApprovalDecisionGate({
+  incident,
+  verification,
+  alreadyApproved,
+}: {
+  incident: IncidentView;
+  verification: NonNullable<Plan['verification']>;
+  alreadyApproved: boolean;
+}) {
+  const consequences = verification.consequences;
+  const pressureMargin = consequences?.pressureMarginM;
+  const eligibilityEntries = [
+    { key: 'exact-verification', label: 'Exact verification', value: verification.decision },
+    {
+      key: 'verification-context',
+      label: 'Verification context',
+      value: verification.verificationStatus,
+    },
+    ...(pressureMargin === null || pressureMargin === undefined
+      ? []
+      : [
+          {
+            key: 'pressure-margin',
+            label: 'Pressure margin',
+            value: `${pressureMargin > 0 ? '+' : ''}${pressureMargin.toFixed(1)} m`,
+          },
+        ]),
+    ...(consequences
+      ? [
+          {
+            key: 'service-availability',
+            label: 'Service availability',
+            value: `${(consequences.serviceAvailability * 100).toFixed(1)}%`,
+          },
+        ]
+      : []),
+    {
+      key: 'operator-decision',
+      label: 'Operator decision',
+      value: alreadyApproved ? 'APPROVED' : incident.approvalPending ? 'PENDING' : 'NOT REQUESTED',
+    },
+    { key: 'infrastructure-actuation', label: 'Infrastructure actuation', value: 'NONE' },
+  ];
+
+  return (
+    <section className="approval-decision-gate" aria-labelledby="approval-decision-gate-title">
+      <div className="approval-decision-gate-heading">
+        <div>
+          <p className="eyebrow">READY FOR HUMAN REVIEW</p>
+          <h3 id="approval-decision-gate-title">Decision gate</h3>
+        </div>
+        <div className="approval-decision-gate-statuses" aria-label="Review eligibility">
+          <StatusBadge tone="good">VERIFIED</StatusBadge>
+          <StatusBadge tone="good">CURRENT</StatusBadge>
+        </div>
+      </div>
+      <KeyValueGrid entries={eligibilityEntries} />
+      <div className="approval-decision-effect">
+        <p className="eyebrow">WHAT THIS DECISION DOES</p>
+        <KeyValueGrid
+          entries={[
+            { key: 'records', label: 'Records', value: 'Human operator decision' },
+            { key: 'does-not', label: 'Does not', value: 'Execute infrastructure' },
+            {
+              key: 'reference-mode',
+              label: 'Reference mode',
+              value: 'Replays the checksummed recorded approval transition only',
+            },
+          ]}
+        />
+      </div>
+    </section>
+  );
+}
+
 /**
  * ui-work.txt UI-6 / 13.5: guarded human plan-approval workflow. Never
  * enables approval unless the active plan is VERIFIED and CURRENT;
@@ -93,7 +168,11 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
     !approveMutation.isPending;
 
   return (
-    <div className="approval-workspace">
+    <div
+      className={`approval-workspace${
+        incident.mode === 'REFERENCE' ? ' approval-workspace-reference' : ''
+      }`}
+    >
       <Panel
         title={`${formatDisplayId(activePlan.id)} · ${activePlan.name}`}
         eyebrow="PLAN UNDER REVIEW"
@@ -134,17 +213,26 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
           {alreadyApproved ? (
             <StatusBadge tone="good">APPROVED</StatusBadge>
           ) : incident.mode === 'REFERENCE' ? (
-            <div className="reference-approval-boundary">
-              <strong>Reference replay paused at the human decision boundary</strong>
-              <p>
-                This is a checksummed replay of a previously generated workflow. No infrastructure
-                action is executed.
-              </p>
-              <p>
-                Advance the replay from the reference banner to reproduce the recorded
-                operator-approval transition.
-              </p>
-            </div>
+            <>
+              {canReview && verification && (
+                <ApprovalDecisionGate
+                  incident={incident}
+                  verification={verification}
+                  alreadyApproved={alreadyApproved}
+                />
+              )}
+              <div className="reference-approval-boundary">
+                <strong>Reference replay paused at the human decision boundary</strong>
+                <p>
+                  This is a checksummed replay of a previously generated workflow. No infrastructure
+                  action is executed.
+                </p>
+                <p>
+                  Advance the replay from the reference banner to reproduce the recorded
+                  operator-approval transition.
+                </p>
+              </div>
+            </>
           ) : incident.mode !== 'LIVE' ? (
             <EmptyState
               title="Approval is unavailable outside a live incident."

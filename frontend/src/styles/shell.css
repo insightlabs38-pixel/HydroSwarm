@@ -451,35 +451,61 @@
   font-size: 12.5px;
   line-height: 1.45;
 }
+.approval-workspace-reference .approval-decision-gate {
+  margin-top: 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--shell-panel-radius);
+  padding: 0.7rem 0.8rem;
+  background: rgba(107, 214, 221, 0.04);
+}
+.approval-decision-gate-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 0.55rem;
+}
+.approval-decision-gate h3 {
+  margin: 0.15rem 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.approval-decision-gate-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+.approval-decision-effect {
+  margin-top: 0.65rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+.approval-decision-effect .eyebrow {
+  margin-bottom: 0.45rem;
+}
 
-/* The human-decision workspace is deliberately spacious at recording-sized
- * desktops: the second grid row becomes a coherent work area rather than a
- * small intrinsic card cluster pinned to the top of a wide shell. Compact
- * desktops retain their natural document height below this breakpoint. */
+/* LIVE and illustrative Approval still use their existing task-oriented
+ * composition. Reference replay has its own compact decision contract and
+ * must not inherit this viewport-filling treatment. */
 @media (min-width: 1440px) and (min-height: 950px) {
-  .approval-workspace {
+  .approval-workspace:not(.approval-workspace-reference) {
     min-height: clamp(580px, calc(100dvh - 330px), 720px);
     grid-template-rows: auto minmax(0, 1fr);
     align-items: stretch;
   }
-  .approval-decision-boundary,
-  .approval-primary-panel,
-  .approval-evidence-stack {
+  .approval-workspace:not(.approval-workspace-reference) .approval-decision-boundary,
+  .approval-workspace:not(.approval-workspace-reference) .approval-primary-panel,
+  .approval-workspace:not(.approval-workspace-reference) .approval-evidence-stack {
     min-height: 0;
     height: 100%;
   }
-  .approval-evidence-stack {
+  .approval-workspace:not(.approval-workspace-reference) .approval-evidence-stack {
     justify-content: space-between;
   }
-  .approval-primary-panel {
+  .approval-workspace:not(.approval-workspace-reference) .approval-primary-panel {
     display: flex;
     flex-direction: column;
-  }
-  .approval-primary-panel .reference-approval-boundary {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
   }
 }
 

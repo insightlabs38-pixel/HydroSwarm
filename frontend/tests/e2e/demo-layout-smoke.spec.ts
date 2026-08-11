@@ -65,9 +65,20 @@ async function expectApprovalComposition(
   const summary = page.locator('.approval-plan-summary');
   const decision = page.locator('.approval-primary-panel');
   const evidence = page.locator('.approval-evidence-stack');
+  const referenceCallout = page.locator('.reference-approval-boundary');
   await expect(summary).toBeVisible();
   await expect(decision).toBeVisible();
   await expect(evidence).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Decision gate' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Decision gate' })).toContainText(
+    'Exact verification',
+  );
+  await expect(page.getByRole('region', { name: 'Decision gate' })).toContainText(
+    'Verification context',
+  );
+  await expect(page.getByRole('region', { name: 'Decision gate' })).toContainText(
+    'Infrastructure actuation',
+  );
   await expect(page.getByRole('complementary', { name: 'Decision inspector' })).toContainText(
     'Exact verification',
   );
@@ -81,8 +92,23 @@ async function expectApprovalComposition(
   await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
 
   const decisionBox = await decision.boundingBox();
+  const referenceCalloutBox = await referenceCallout.boundingBox();
   expect(decisionBox).not.toBeNull();
+  expect(referenceCalloutBox).not.toBeNull();
   expect(decisionBox!.y).toBeLessThan(height);
+  expect(referenceCalloutBox!.height).toBeLessThanOrEqual(decisionBox!.height * 0.45);
+
+  const evidenceBoxes = await evidence.locator(':scope > .panel').evaluateAll((panels) =>
+    panels.map((panel) => {
+      const { y, height } = panel.getBoundingClientRect();
+      return { y, height };
+    }),
+  );
+  for (let index = 0; index < evidenceBoxes.length - 1; index += 1) {
+    const gap = evidenceBoxes[index + 1].y - (evidenceBoxes[index].y + evidenceBoxes[index].height);
+    expect(gap).toBeLessThanOrEqual(64);
+  }
+
   await expectNoHorizontalOverflow(page);
   await expectWorkspaceUsesShellWidth(page);
   await capture(page, testInfo, `approval-${width}x${height}.png`);
