@@ -49,6 +49,14 @@ button:hover {
   background: #173743;
   border-color: #5b8995;
 }
+button:disabled,
+button:disabled:hover {
+  cursor: not-allowed;
+  color: var(--text-disabled);
+  background: var(--panel);
+  border-color: var(--border);
+  opacity: 0.6;
+}
 button:focus-visible,
 select:focus-visible,
 input:focus-visible,

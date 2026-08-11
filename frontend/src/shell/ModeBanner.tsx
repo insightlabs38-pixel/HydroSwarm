@@ -56,7 +56,11 @@ export function ModeBanner({
         </div>
         <div className="mode-banner-controls">
           {reference.isPaused ? (
-            <button type="button" onClick={reference.performPauseAction}>
+            <button
+              type="button"
+              className="mode-banner-pause-action"
+              onClick={reference.performPauseAction}
+            >
               {replayPauseActionLabel(reference)}
             </button>
           ) : (
@@ -78,7 +82,7 @@ export function ModeBanner({
           >
             Next
           </button>
-          <button type="button" onClick={reference.reset}>
+          <button type="button" className="mode-banner-restart-action" onClick={reference.reset}>
             Restart
           </button>
           {reference.isAtEnd && onExploreReplay && (

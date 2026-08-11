@@ -2,6 +2,7 @@ import { useConsoleStore, WORKSPACE_LABELS } from '../store';
 import { formatDisplayId } from '../displayId';
 
 const MAP_WORKSPACES = new Set(['incident', 'source', 'sampling', 'response']);
+const CLEAR_SELECTION_WORKSPACES = new Set(['incident', 'source', 'sampling', 'response']);
 
 export function WorkspaceToolbar() {
   const {
@@ -20,6 +21,7 @@ export function WorkspaceToolbar() {
   } = useConsoleStore();
   const hasSelection = selectedNodeId || selectedLinkId || selectedPlanId;
   const showsMap = MAP_WORKSPACES.has(workspace);
+  const canClearSelection = hasSelection && CLEAR_SELECTION_WORKSPACES.has(workspace);
   return (
     <div className="workspace-toolbar">
       <div className="workspace-toolbar-title">
@@ -67,17 +69,18 @@ export function WorkspaceToolbar() {
             </button>
           </>
         )}
-        <button
-          type="button"
-          disabled={!hasSelection}
-          onClick={() => {
-            selectNode(null);
-            selectLink(null);
-            selectPlan(null);
-          }}
-        >
-          Clear selection
-        </button>
+        {canClearSelection && (
+          <button
+            type="button"
+            onClick={() => {
+              selectNode(null);
+              selectLink(null);
+              selectPlan(null);
+            }}
+          >
+            Clear selection
+          </button>
+        )}
       </div>
     </div>
   );

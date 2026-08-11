@@ -31,6 +31,10 @@
 .workspace-content {
   flex: 1 1 auto;
   min-height: 0;
+  width: 100%;
+  max-width: none;
+  align-self: stretch;
+  margin: 0;
   overflow: auto;
   padding: var(--shell-gap);
 }
@@ -165,6 +169,20 @@
 }
 .mode-banner-controls button {
   margin-left: 0;
+}
+.mode-banner-pause-action {
+  border-color: var(--cyan);
+  background: rgba(107, 214, 221, 0.16);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.mode-banner-pause-action:hover {
+  border-color: var(--cyan);
+  background: rgba(107, 214, 221, 0.25);
+}
+.mode-banner-restart-action {
+  background: transparent;
+  color: var(--text-muted);
 }
 .mode-banner-pause-reason {
   font-style: italic;
@@ -434,6 +452,37 @@
   line-height: 1.45;
 }
 
+/* The human-decision workspace is deliberately spacious at recording-sized
+ * desktops: the second grid row becomes a coherent work area rather than a
+ * small intrinsic card cluster pinned to the top of a wide shell. Compact
+ * desktops retain their natural document height below this breakpoint. */
+@media (min-width: 1440px) and (min-height: 950px) {
+  .approval-workspace {
+    min-height: clamp(580px, calc(100dvh - 330px), 720px);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .approval-decision-boundary,
+  .approval-primary-panel,
+  .approval-evidence-stack {
+    min-height: 0;
+    height: 100%;
+  }
+  .approval-evidence-stack {
+    justify-content: space-between;
+  }
+  .approval-primary-panel {
+    display: flex;
+    flex-direction: column;
+  }
+  .approval-primary-panel .reference-approval-boundary {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
 /* Compact primary verdicts establish plan safety before forensic detail. */
 .plan-verdict-strip {
   grid-column: 1 / -1;
@@ -483,6 +532,29 @@
 }
 
 /* ---------- Replay / failure injection ---------- */
+
+.replay-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(290px, 0.9fr);
+  grid-template-areas:
+    'ledger ledger'
+    'diagnostics verification';
+  gap: 0.85rem;
+  align-items: start;
+}
+.replay-event-ledger {
+  grid-area: ledger;
+}
+.replay-diagnostics {
+  grid-area: diagnostics;
+}
+.replay-hash-chain {
+  grid-area: verification;
+  min-width: 0;
+}
+.replay-hash-chain .panel {
+  padding-bottom: 0.85rem;
+}
 
 .failure-injection-list {
   list-style: none;
@@ -896,6 +968,13 @@
   }
   .approval-plan-summary {
     grid-column: auto;
+  }
+  .replay-workspace {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'ledger'
+      'diagnostics'
+      'verification';
   }
   .live-pipeline {
     grid-template-columns: 1fr;
