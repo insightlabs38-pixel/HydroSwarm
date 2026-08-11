@@ -441,7 +441,7 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
   // forcing the whole document wider than the viewport. Locks that fix
   // down at each documented breakpoint tier rather than only the
   // default desktop width the other tests use.
-  for (const width of [1300, 900, 600]) {
+  for (const width of [1366, 1100, 1099, 900, 768, 767]) {
     test(`no horizontal page overflow at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 900 });
       await page.goto('/?experience=fallback');
@@ -481,6 +481,35 @@ test.describe('responsive layout (ui-work.txt §25)', () => {
       'aria-pressed',
       'true',
     );
+  });
+
+  test('tablet rail state, control semantics, and layout agree at 900px', async ({ page }) => {
+    await page.setViewportSize({ width: 900, height: 900 });
+    await page.goto('/?experience=fallback');
+    await waitForOverviewLoaded(page);
+
+    const rail = page.locator('.workflow-rail');
+    const collapse = page.getByRole('button', { name: /Collapse workflow/ });
+    await expect(rail.getByText('Approval', { exact: true })).toBeVisible();
+    await expect(collapse).toHaveAttribute('aria-pressed', 'false');
+
+    await collapse.click();
+    await expect(rail).toHaveClass(/collapsed/);
+    const expand = page.getByRole('button', { name: /Expand workflow/ });
+    await expect(expand).toHaveAttribute('aria-pressed', 'true');
+
+    await expand.click();
+    await expect(rail).not.toHaveClass(/collapsed/);
+    await expect(rail.getByText('Approval', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Collapse workflow/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
   });
 
   test('approval has no map controls and navigation controls stay inside map bounds', async ({
@@ -547,6 +576,26 @@ test.describe('final visual coverage matrix', () => {
       if (heading) await expect(page.getByRole('heading', { name: heading })).toBeVisible();
       await expect(page).toHaveScreenshot(name, { fullPage: true });
     }
+  });
+
+  test('reference approval boundary @ 1366x768 remains legible and non-bypassable', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await openReferenceAtMilestone(page, 9);
+    await page.getByRole('button', { name: /^Approval/ }).click();
+    await expect(page.getByRole('heading', { name: 'Operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Replay operator approval' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeDisabled();
+    await expect(
+      page.locator('.workflow-rail').getByText('Approval', { exact: true }),
+    ).toBeVisible();
+    const dimensions = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth);
+    await expect(page).toHaveScreenshot('reference-approval-1366x768.png', { fullPage: true });
   });
 
   test('utility workspaces @ 1440x900', async ({ page }) => {
