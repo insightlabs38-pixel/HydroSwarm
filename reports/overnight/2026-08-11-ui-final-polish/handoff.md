@@ -38,6 +38,29 @@
   Response, and 1366px compact-rail images. No clipping, horizontal overflow, or
   ambiguous mode boundary observed.
 
+## Completed milestone: final cleanup pass (2026-08-11)
+
+- Starting commit for this pass: `110ff25b7d3a94dd0801ea907884a4647900ad74`.
+- Completed the remaining high-level compact-ID audit: Overview, Decision Inspector
+  response/approval summaries, and response-plan rows now display `formatDisplayId()`
+  while retaining the complete identifier in the element title. Selection still stores
+  the complete API identity.
+- At 768–1099px, the non-collapsed workflow rail is now truly compact and labeled
+  (150px), matching its `aria-pressed=false` and “Collapse workflow” control. It becomes
+  icon-only only after the explicit collapse action.
+- Replay no longer maps a dock Timeline click to Audit. The Timeline tab remains a valid
+  selected tab and explains that the full timeline is owned by the Replay workspace;
+  Audit remains directly selectable and normal Timeline behavior returns outside Replay.
+- LIVE computation now shows the real incident ID only after it has been created, in a
+  subordinate `Incident <compact ID> · created locally` line. No controller/backend
+  behavior changed.
+- The compact plan verdict strip now includes one real, conditional service availability
+  metric. It uses the simulator-supplied value only and remains visually subordinate.
+- Added a 1366×768 REFERENCE approval boundary screenshot plus assertions for its
+  non-bypassable Next state, replay operator action, usable rail, and no horizontal
+  overflow. Added 900px rail state/control coverage and no-overflow checks at 1366,
+  1100, 1099, 900, 768, and 767px.
+
 ## Verification
 
 - Baseline before changes: lint, typecheck, format, 155 unit tests, build, and E2E
@@ -50,6 +73,14 @@
   REFERENCE states, 1366px gateway/Approval/Sampling, all four utility workspaces at
   1440px, and deterministic test-only LIVE sample/approval pauses. The latter mock
   only browser transport in the test; production LIVE behavior remains unchanged.
+- Final cleanup pass: lint, typecheck, format, build, and **162 unit tests** passed.
+  **46 Playwright tests** passed. The new unit coverage verifies compact visible IDs,
+  title-based full-ID inspection, full-ID selection, delayed LIVE ID visibility, Replay
+  Timeline disclosure, and conditional service availability.
+- Manually inspected the changed response, reference-verification, LIVE pause, and new
+  1366×768 REFERENCE approval screenshots. No horizontal page overflow, banner clipping,
+  control overlap, provenance ambiguity, or safety-significant color-only state was
+  observed in those judge-facing captures.
 
 ## README screenshot refresh
 
@@ -66,8 +97,12 @@
 - `5733d92` — `docs: refresh final demo screenshots`
 - `da92c0f` — `docs(handoff): record final UI polish state`
 - `f4d282b` — `test(ui): expand final demo visual coverage`
+- `4611ef7` — `fix(ui): close final mission-control consistency gaps`
+- `ead6e6a` — `test(ui): complete final responsive visual coverage`
 - All listed commits were pushed successfully to `origin/ui/final-demo-polish-20260811`.
-- Both commits were pushed successfully to `origin/ui/final-demo-polish-20260811`.
+- The final cleanup commits are locally committed; push follows the normal `main` sync
+  below. If publication fails, retain these local commits and continue from the
+  continuation commands.
 
 ## Final state
 
@@ -75,6 +110,8 @@
   branch. No backend/model/checkpoint/frozen-data/reference-artifact file was changed.
 - No long-running/background job is active from this run.
 - Pre-existing untracked release outputs remain untouched and intentionally uncommitted.
+- No long-running/background job is active or incomplete from this run; no continuation
+  command beyond the normal validation/push sequence is required.
 
 ## Continuation commands
 
