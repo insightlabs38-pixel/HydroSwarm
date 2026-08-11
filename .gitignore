@@ -55,3 +55,13 @@ experiments/jobs/*/job.pid
 /temp.inp
 /temp.bin
 /temp.rpt
+
+# Locally generated release and browser-test artifacts. Historical submission
+# evidence logs remain tracked; only transient final-head logs are ignored.
+/RELEASE_MANIFEST.json
+/frontend/reports/
+/output/releases/
+/reports/submission-readiness/jobs/*.pid
+/reports/submission-readiness/jobs/final-head-playwright.log
+/reports/submission-readiness/jobs/final-head-pytest.log
+/reports/submission-readiness/jobs/release-path-validation.log
