@@ -59,19 +59,22 @@
 ## Commit / publication ledger
 
 - `abc1dd3` — `feat(ui): polish final demo decision surfaces`
-- Pushed successfully to `origin/ui/final-demo-polish-20260811`.
-- Current pending commit: refreshed README screenshots and this handoff update.
+- `5733d92` — `docs: refresh final demo screenshots`
+- Both commits were pushed successfully to `origin/ui/final-demo-polish-20260811`.
 
-## Current work
+## Final state
 
-- Running final build/full-gate confirmation, then committing this independently
-  tested UI-only milestone.
+- All sections of `/workspace/ui-improvements.txt` are implemented in this UI-only
+  branch. No backend/model/checkpoint/frozen-data/reference-artifact file was changed.
+- No long-running/background job is active from this run.
+- Pre-existing untracked release outputs remain untouched and intentionally uncommitted.
 
 ## Continuation commands
 
 ```bash
 cd /workspace/HydroSwarm
 git switch ui/final-demo-polish-20260811
+git pull
 cd frontend
 npm ci
 npm run lint && npm run typecheck && npm run format:check && npm test -- --run && npm run build
