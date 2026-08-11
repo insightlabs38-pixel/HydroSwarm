@@ -208,10 +208,10 @@ export function TechnicalDock({
   const { dockTab, setDockTab, dockCollapsed, toggleDock, dockHeight, setDockHeight } =
     useConsoleStore();
   const dragState = useRef<{ startY: number; startHeight: number } | null>(null);
-  // Replay owns the full timeline. Do not show an identical second timeline
-  // in the dock merely because Timeline was the last selected dock tab.
-  const visibleDockTab: DockTab =
-    workspace === 'replay' && dockTab === 'timeline' ? 'audit' : dockTab;
+  // Replay owns the full timeline. Keeping the Timeline tab selectable lets
+  // its panel truthfully explain that ownership instead of silently
+  // redirecting an operator to Audit.
+  const timelineIsInReplayWorkspace = workspace === 'replay';
 
   const clampHeight = useCallback((value: number) => {
     const maxHeight = window.innerHeight * DOCK_HEIGHT_MAX_VH;
@@ -282,12 +282,19 @@ export function TechnicalDock({
               type="button"
               role="tab"
               id={`dock-tab-${tab.id}`}
-              aria-selected={visibleDockTab === tab.id}
+              aria-selected={dockTab === tab.id}
               aria-controls={`dock-panel-${tab.id}`}
-              className={visibleDockTab === tab.id ? 'active' : ''}
+              className={dockTab === tab.id ? 'active' : ''}
+              title={
+                tab.id === 'timeline' && timelineIsInReplayWorkspace
+                  ? 'Timeline is displayed in the Replay workspace.'
+                  : undefined
+              }
               onClick={() => setDockTab(tab.id)}
             >
-              {tab.label}
+              {tab.id === 'timeline' && timelineIsInReplayWorkspace
+                ? 'Timeline (Replay workspace)'
+                : tab.label}
             </button>
           ))}
         </div>
@@ -311,16 +318,23 @@ export function TechnicalDock({
         role="tabpanel"
         id="dock-panel-timeline"
         aria-labelledby="dock-tab-timeline"
-        hidden={visibleDockTab !== 'timeline'}
+        hidden={dockTab !== 'timeline'}
       >
-        <Timeline events={incident.audit} />
+        {timelineIsInReplayWorkspace ? (
+          <EmptyState
+            title="Timeline is displayed in the Replay workspace."
+            detail="Use the primary Replay timeline to inspect or advance the incident sequence."
+          />
+        ) : (
+          <Timeline events={incident.audit} />
+        )}
       </div>
       <div
         className="dock-panel"
         role="tabpanel"
         id="dock-panel-evidence"
         aria-labelledby="dock-tab-evidence"
-        hidden={visibleDockTab !== 'evidence'}
+        hidden={dockTab !== 'evidence'}
       >
         <EvidencePanel incident={incident} />
       </div>
@@ -329,7 +343,7 @@ export function TechnicalDock({
         role="tabpanel"
         id="dock-panel-hydraulics"
         aria-labelledby="dock-tab-hydraulics"
-        hidden={visibleDockTab !== 'hydraulics'}
+        hidden={dockTab !== 'hydraulics'}
       >
         <HydraulicChart incident={incident} />
       </div>
@@ -338,7 +352,7 @@ export function TechnicalDock({
         role="tabpanel"
         id="dock-panel-verification"
         aria-labelledby="dock-tab-verification"
-        hidden={visibleDockTab !== 'verification'}
+        hidden={dockTab !== 'verification'}
       >
         <VerificationTab incident={incident} />
       </div>
@@ -347,7 +361,7 @@ export function TechnicalDock({
         role="tabpanel"
         id="dock-panel-provenance"
         aria-labelledby="dock-tab-provenance"
-        hidden={visibleDockTab !== 'provenance'}
+        hidden={dockTab !== 'provenance'}
       >
         <ProvenanceTab incident={incident} />
       </div>
@@ -356,7 +370,7 @@ export function TechnicalDock({
         role="tabpanel"
         id="dock-panel-audit"
         aria-labelledby="dock-tab-audit"
-        hidden={visibleDockTab !== 'audit'}
+        hidden={dockTab !== 'audit'}
       >
         <AuditTab incident={incident} />
       </div>

@@ -1,4 +1,5 @@
 import type { LiveExampleController } from '../liveExample/useLiveExampleFlow';
+import { formatDisplayId } from '../displayId';
 
 /** submission.txt SUB-12.1 P1 #4: "LIVE COMPUTATION · REFERENCE INPUTS" --
  * shown while the real production pipeline is actually computing this
@@ -64,6 +65,13 @@ export function LiveExampleProgress({
           HydroSwarm is computing this incident now using the frozen runtime. Input observations are
           from the included reference scenario, not live utility telemetry.
         </p>
+        {controller.incidentId && (
+          <p className="live-incident-id">
+            Incident{' '}
+            <span title={controller.incidentId}>{formatDisplayId(controller.incidentId)}</span> ·{' '}
+            created locally
+          </p>
+        )}
         <ol className="live-pipeline" aria-label="Live computation stages">
           {PIPELINE_STAGES.map(([id, label], index) => (
             <li

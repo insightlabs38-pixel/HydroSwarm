@@ -705,6 +705,11 @@
   padding: 0.28rem 0.45rem;
   border-radius: 99px;
 }
+.live-incident-id {
+  margin: -0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+}
 .live-pipeline {
   list-style: none;
   margin: 0;
@@ -829,8 +834,8 @@
   }
 }
 
-/* 768-1099px: rail stays collapsed; the inspector becomes an overlay
-   drawer (absolutely positioned within the already-`position: relative`
+/* 768-1099px: rail stays compact and labeled until the operator explicitly
+   collapses it; the inspector becomes an overlay drawer (absolutely positioned within the already-`position: relative`
    .mission-shell-body, so it floats over the map/workspace instead of
    squeezing it) rather than a permanently docked narrow column; the
    technical dock is already a tabbed, collapsible bottom panel outside
@@ -838,16 +843,8 @@
    as the required "tabbed bottom drawer" with no extra rule needed. */
 @media (max-width: 1099px) {
   .workflow-rail:not(.collapsed) {
-    flex-basis: var(--shell-rail-w-collapsed);
-    width: var(--shell-rail-w-collapsed);
-  }
-  .workflow-rail:not(.collapsed) .rail-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
+    flex-basis: 150px;
+    width: 150px;
   }
   .decision-inspector {
     position: absolute;

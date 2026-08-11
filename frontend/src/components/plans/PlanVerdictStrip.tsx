@@ -41,6 +41,10 @@ export function PlanVerdictStrip({
                   {consequences.pressureMarginM.toFixed(1)} m
                 </span>
               )}
+            {consequences?.serviceAvailability !== null &&
+              consequences?.serviceAvailability !== undefined && (
+                <span>service {(consequences.serviceAvailability * 100).toFixed(1)}%</span>
+              )}
             {verification?.rejectionCodes[0] && <span>{verification.rejectionCodes[0]}</span>}
           </button>
         );
