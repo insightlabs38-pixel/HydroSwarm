@@ -1,0 +1,98 @@
+[
+  {
+    "mode": "REFERENCE",
+    "start": "1 initial_uncertainty",
+    "end": "2 evidence_insufficient",
+    "purpose": "Long source uncertainty and planning-withheld proof",
+    "name": "01_reference_uncertainty_v2",
+    "file": "demo-recordings/v2/raw/01_reference_uncertainty_v2.webm",
+    "duration": "26.68",
+    "usableIn": "3.82",
+    "usableDuration": "22.86",
+    "resolution": "1920x1080",
+    "fps": 25,
+    "sha256": "a5ec420f820c87174f34a672a4395bc72369a8955e8beb924e2715560cc1e29f",
+    "proof": []
+  },
+  {
+    "mode": "REFERENCE",
+    "start": "6 plans_generated",
+    "end": "7 unsafe_plan_rejected",
+    "purpose": "Long deterministic unsafe-plan rejection proof",
+    "name": "03_reference_unsafe_plan_rejected_v2",
+    "file": "demo-recordings/v2/raw/03_reference_unsafe_plan_rejected_v2.webm",
+    "duration": "37.36",
+    "usableIn": "7.14",
+    "usableDuration": "30.22",
+    "resolution": "1920x1080",
+    "fps": 25,
+    "sha256": "d0ac771ee40d9d3100ed9e2ee4a5942da90b4229888e0828d24e6b5f07b1f88e",
+    "proof": [
+      "rejection-proof"
+    ]
+  },
+  {
+    "mode": "REFERENCE",
+    "start": "8 safe_plan_verified",
+    "end": "8 safe_plan_verified",
+    "purpose": "Verified J4 alternative and consequence proof",
+    "name": "04_reference_verified_alternative_v2",
+    "file": "demo-recordings/v2/raw/04_reference_verified_alternative_v2.webm",
+    "duration": "29.40",
+    "usableIn": "8.51",
+    "usableDuration": "20.89",
+    "resolution": "1920x1080",
+    "fps": 25,
+    "sha256": "3b80d3e4865c145e3e8e06841f805e56fdb86df73916bf773e2e3ca7e2f51af8",
+    "proof": []
+  },
+  {
+    "mode": "REFERENCE",
+    "start": "9 human_approval_boundary",
+    "end": "10 completed",
+    "purpose": "Long human approval boundary and completed-state proof",
+    "name": "05_reference_human_approval_v2",
+    "file": "demo-recordings/v2/raw/05_reference_human_approval_v2.webm",
+    "duration": "32.60",
+    "usableIn": "8.98",
+    "usableDuration": "23.62",
+    "resolution": "1920x1080",
+    "fps": 25,
+    "sha256": "3748d95c91a8b973969444d6e56e5bd6dfbe9b65a2a36f98090647300c1e2cde",
+    "proof": [
+      "approval-boundary-proof"
+    ]
+  },
+  {
+    "mode": "REFERENCE",
+    "start": "Gateway",
+    "end": "10 completed",
+    "purpose": "Long-form presentation-paced authored replay backup",
+    "name": "reference_master_take_v2",
+    "file": "demo-recordings/v2/raw/reference_master_take_v2.webm",
+    "duration": "106.08",
+    "usableIn": "0.15",
+    "usableDuration": "105.93",
+    "resolution": "1920x1080",
+    "fps": 25,
+    "sha256": "1ef283906d37447203263b76813b7e9baaa99a706f5e1ae1bd34f743052cbbe4",
+    "proof": []
+  },
+  {
+    "mode": "REFERENCE",
+    "start": "3 sample_recommended",
+    "end": "5 posterior_contracted",
+    "purpose": "Causal sampling to posterior-contraction proof",
+    "name": "02_reference_sampling_to_posterior_v2",
+    "file": "demo-recordings/v2/raw/02_reference_sampling_to_posterior_v2.webm",
+    "duration": "32.52",
+    "usableIn": "5.20",
+    "usableDuration": "27.32",
+    "resolution": "1920x1080",
+    "fps": 25,
+    "sha256": "f64744265ba52623199bb52b27e3323c2a66e670eb27ef225cbf049f97c69302",
+    "proof": [
+      "posterior-proof"
+    ]
+  }
+]
