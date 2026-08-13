@@ -41,6 +41,8 @@
   ],
   "executed": {
     "adversarial": "36 passed, 3 xfailed",
-    "focused_scientific_api": "94 passed, 3 xfailed"
+    "focused_scientific_api": "94 passed, 3 xfailed",
+    "complete_python_suite": "1062 passed, 3 xfailed",
+    "strict_self_test": "passed"
   }
 }

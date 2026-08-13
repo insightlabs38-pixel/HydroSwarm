@@ -127,8 +127,8 @@ not establish field safety, utility validation, or external validation.
   failures**.
 - Relevant scientific/API/state/persistence suite: **94 passed, 3 expected
   failures**.
+- Complete Python suite: **1,062 passed, 3 expected failures**.
 
 The expected failures are deliberate, strict minimized reproductions of
 ADV-27 through ADV-29; an unexpected pass would fail the suite and require
 review.
-
