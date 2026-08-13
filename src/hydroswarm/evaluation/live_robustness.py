@@ -343,7 +343,12 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
             analyzed = client.post(f"/api/incidents/{incident_id}/analyze")
             baseline["analysis_ms"] = (perf_counter() - analysis_start) * 1000
             if analyzed.status_code != 200:
-                baseline.update({"outcome": "HARNESS_ERROR", "error_class": f"ANALYZE_{analyzed.status_code}", "total_trajectory_ms": (perf_counter() - started) * 1000})
+                # A 409 at the real authority boundary for all-missing
+                # evidence is an intentionally fail-closed product outcome,
+                # not a broken evaluation harness.  Preserve its HTTP class
+                # and leave unavailable model metrics null.
+                outcome = "ABSTAINED" if analyzed.status_code == 409 else "HARNESS_ERROR"
+                baseline.update({"outcome": outcome, "error_class": f"ANALYZE_{analyzed.status_code}", "total_trajectory_ms": (perf_counter() - started) * 1000})
                 return baseline
             analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
             internal = _analysis_internal(app, incident_id)
@@ -387,8 +392,13 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
             plans_status: int | None = None
             approval_status: int | None = None
             stale_approval_status: int | None = None
+            lifecycle_mode = (
+                "approval" if condition.network_id == "loop-grid" and condition.repetition == 0
+                else "stale_verification" if condition.network_id == "loop-grid" and condition.repetition == 1
+                else "measurement"
+            )
             planning_start = perf_counter()
-            generated = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
+            generated = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 1 if lifecycle_mode != "measurement" else 2})
             baseline["planning_ms"] = (perf_counter() - planning_start) * 1000
             plans_status = generated.status_code
             if generated.status_code == 200:
@@ -400,8 +410,25 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
                     baseline["verification_ms"] = (baseline["verification_ms"] or 0.0) + verification_ms
                     baseline["exact_simulator_calls"] += int((verification_json.get("evaluation_provenance") or {}).get("exact_simulation_count") or 0)
                     baseline["plans"].append({"plan_id": plan["plan_id"], "plan_hash": hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest(), "action_types": [item["action_type"] for item in plan.get("actions", [])], "verification": verification_json, "verification_ms": verification_ms})
+                    if verification_json.get("decision") == "VERIFIED" and lifecycle_mode in {"approval", "stale_verification"}:
+                        verified = baseline["plans"][-1]
+                        if lifecycle_mode == "stale_verification":
+                            existing = {item["node_id"] for item in observations}
+                            mutation_node = next(node for node in network.junction_name_list if node not in existing)
+                            mutation = client.post(f"/api/incidents/{incident_id}/samples", json=_sample_observation(mutation_node, scenario, randomized, origin, 99))
+                            verified["controlled_evidence_mutation_status"] = mutation.status_code
+                            stale = client.post(f"/api/incidents/{incident_id}/plans/{verified['plan_id']}/approve", json={"approved": True, "operator_id": "live-study"})
+                            stale_approval_status = stale.status_code
+                            verified["stale_approval_status"] = stale.status_code
+                        else:
+                            approval_start = perf_counter()
+                            approved = client.post(f"/api/incidents/{incident_id}/plans/{verified['plan_id']}/approve", json={"approved": True, "operator_id": "live-study"})
+                            baseline["approval_ms"] = (perf_counter() - approval_start) * 1000
+                            approval_status = approved.status_code
+                            verified["approval_status"] = approved.status_code
+                        break
                 verified = next((item for item in baseline["plans"] if item["verification"].get("decision") == "VERIFIED"), None)
-                if verified is not None:
+                if verified is not None and lifecycle_mode == "measurement":
                     approval_start = perf_counter()
                     approved = client.post(f"/api/incidents/{incident_id}/plans/{verified['plan_id']}/approve", json={"approved": True, "operator_id": "live-study"})
                     baseline["approval_ms"] = (perf_counter() - approval_start) * 1000

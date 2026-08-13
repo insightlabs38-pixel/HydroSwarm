@@ -22,6 +22,7 @@ def main() -> int:
     parser.add_argument("--start", type=int, default=0, help="zero-based deterministic condition offset")
     parser.add_argument("--limit", type=int, default=None, help="number of deterministic conditions to run")
     parser.add_argument("--resume", action="store_true", help="append a disjoint deterministic slice to existing raw rows")
+    parser.add_argument("--replace", action="store_true", help="supersede the same deterministic run IDs after a documented harness correction")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     protocol = load_protocol(root / "reports/evaluation/live-robustness/protocol.json")
@@ -36,11 +37,16 @@ def main() -> int:
     output_dir = root / "reports/evaluation/live-robustness"
     rows = []
     results_path = output_dir / "results.json"
-    if args.resume and results_path.exists():
+    if (args.resume or args.replace) and results_path.exists():
         rows = json.loads(results_path.read_text(encoding="utf-8"))
     new_rows = [run_condition(root, condition, protocol=protocol) for condition in conditions]
     old_ids = {row["run_id"] for row in rows}
-    if old_ids.intersection(row["run_id"] for row in new_rows):
+    new_ids = {row["run_id"] for row in new_rows}
+    if args.replace:
+        if not old_ids.issuperset(new_ids):
+            raise SystemExit("--replace requires existing deterministic run IDs")
+        rows = [row for row in rows if row["run_id"] not in new_ids]
+    elif old_ids.intersection(new_ids):
         raise SystemExit("refusing duplicate run IDs while resuming LIVE study")
     rows.extend(new_rows)
     if locked_test_opened(root):
