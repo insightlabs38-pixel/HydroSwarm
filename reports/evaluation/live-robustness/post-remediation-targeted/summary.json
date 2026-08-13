@@ -1,12 +1,54 @@
 {
   "conditions": {
+    "nominal:clean_operational": {
+      "analysis_ms": {
+        "max": 715.9789350116625,
+        "median": 151.15004498511553,
+        "min": 149.93512799264863,
+        "n": 3,
+        "p95": null
+      },
+      "mrr": 0.25,
+      "n": 3,
+      "planning_eligible_rate": 0.0,
+      "top1": 0.0,
+      "top3": 0.0,
+      "total_trajectory_ms": {
+        "max": 797.8423039894551,
+        "median": 234.19092904077843,
+        "min": 233.71891101123765,
+        "n": 3,
+        "p95": null
+      }
+    },
+    "scale:medium_loop_grid": {
+      "analysis_ms": {
+        "max": 515.4086319962516,
+        "median": 164.42494903458282,
+        "min": 160.01199802849442,
+        "n": 9,
+        "p95": null
+      },
+      "mrr": 0.2777777777777778,
+      "n": 9,
+      "planning_eligible_rate": 0.3333333333333333,
+      "top1": 0.0,
+      "top3": 0.6666666666666666,
+      "total_trajectory_ms": {
+        "max": 817.8061950020492,
+        "median": 560.5046059936285,
+        "min": 254.28040197584778,
+        "n": 9,
+        "p95": null
+      }
+    },
     "topology_familiarity:development_unseen": {
       "analysis_ms": {
-        "max": 841.2937130196951,
-        "median": 168.86245450587012,
-        "min": 158.7401260039769,
+        "max": 816.2734289653599,
+        "median": 171.09561699908227,
+        "min": 157.78310497989878,
         "n": 24,
-        "p95": 375.5528010078706
+        "p95": 331.3897920306772
       },
       "mrr": 0.39999999999999997,
       "n": 24,
@@ -14,11 +56,11 @@
       "top1": 0.0,
       "top3": 0.75,
       "total_trajectory_ms": {
-        "max": 1295.880347955972,
-        "median": 475.69356151507236,
-        "min": 257.90952902752906,
+        "max": 1264.1391290235333,
+        "median": 478.35396250593476,
+        "min": 251.05843995697796,
         "n": 24,
-        "p95": 1089.1440020059235
+        "p95": 664.6486599929631
       }
     }
   },
@@ -26,130 +68,185 @@
     {
       "id": "ROB-LIVE-01",
       "severity": "MEDIUM",
-      "status": "UNRESOLVED",
+      "status": "REMEDIATED",
       "summary": "re-analysis can recommend a node already represented in current evidence"
     },
     {
       "id": "ROB-LIVE-02",
       "severity": "HIGH",
-      "status": "UNRESOLVED",
+      "status": "REMEDIATED",
       "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"
     }
   ],
   "invariant_failures": [],
   "locked_test_opened": false,
   "networks": [
-    "coastal-branch"
+    "coastal-branch",
+    "golden-reference",
+    "loop-grid"
   ],
   "outcomes": {
-    "SUPPRESSED": 24
+    "SUPPRESSED": 33,
+    "VERIFIED": 3
   },
   "performance": {
     "analysis_ms": {
-      "max": 841.2937130196951,
-      "median": 168.86245450587012,
-      "min": 158.7401260039769,
-      "n": 24,
-      "p95": 375.5528010078706
+      "max": 816.2734289653599,
+      "median": 168.25329748098738,
+      "min": 149.93512799264863,
+      "n": 36,
+      "p95": 715.9789350116625
     },
     "approval_ms": {
-      "max": null,
-      "median": null,
-      "min": null,
-      "n": 0,
+      "max": 15.462981013115495,
+      "median": 8.713450020877644,
+      "min": 1.9639190286397934,
+      "n": 2,
       "p95": null
     },
     "import_ms": {
-      "max": 286.1497290432453,
-      "median": 84.63389749522321,
-      "min": 73.23928800178692,
-      "n": 24,
-      "p95": 92.85662497859448
+      "max": 91.93959296680987,
+      "median": 80.1854339952115,
+      "min": 65.66831900272518,
+      "n": 36,
+      "p95": 90.60329396743327
     },
     "incident_creation_ms": {
-      "max": 12.093714030925184,
-      "median": 10.781921504531056,
-      "min": 9.869693021755666,
-      "n": 24,
-      "p95": 11.946715007070452
+      "max": 12.503398989792913,
+      "median": 10.734658979345113,
+      "min": 9.926387981977314,
+      "n": 36,
+      "p95": 11.791678960435092
     },
     "peak_process_rss_mb": {
-      "max": 1468.44140625,
-      "median": 1173.443359375,
-      "min": 799.95703125,
-      "n": 24,
-      "p95": 1426.58203125
+      "max": 1436.53125,
+      "median": 1058.197265625,
+      "min": 798.83203125,
+      "n": 36,
+      "p95": 1410.00390625
     },
     "planning_ms": {
-      "max": 1.504633983131498,
-      "median": 1.2318580120336264,
-      "min": 1.0720979771576822,
-      "n": 24,
-      "p95": 1.3124599936418235
+      "max": 10.662365006282926,
+      "median": 1.2581200280692428,
+      "min": 1.0619789827615023,
+      "n": 36,
+      "p95": 9.900632023345679
     },
     "process_rss_after_mb": {
-      "max": 1457.59375,
-      "median": 1160.0546875,
-      "min": 799.95703125,
-      "n": 24,
-      "p95": 1422.55859375
+      "max": 1423.80078125,
+      "median": 1046.96875,
+      "min": 798.80078125,
+      "n": 36,
+      "p95": 1407.59375
     },
     "process_rss_before_mb": {
-      "max": 1419.7109375,
-      "median": 1128.673828125,
-      "min": 719.58984375,
-      "n": 24,
-      "p95": 1401.609375
+      "max": 1402.4609375,
+      "median": 1008.599609375,
+      "min": 719.671875,
+      "n": 36,
+      "p95": 1385.10546875
     },
     "reanalysis_ms": {
-      "max": 335.66093601984903,
-      "median": 130.8657550252974,
-      "min": 117.70995199913159,
-      "n": 18,
-      "p95": null
+      "max": 358.41581801651046,
+      "median": 130.75475400546566,
+      "min": 117.03463201411068,
+      "n": 21,
+      "p95": 357.8394550131634
     },
     "sampling_ms": {
-      "max": 10.508585954084992,
-      "median": 5.328489001840353,
-      "min": 4.639118968043476,
-      "n": 18,
-      "p95": null
+      "max": 14.708556002005935,
+      "median": 5.316248047165573,
+      "min": 4.581492976285517,
+      "n": 21,
+      "p95": 14.538067975081503
     },
     "total_trajectory_ms": {
-      "max": 1295.880347955972,
-      "median": 475.69356151507236,
-      "min": 257.90952902752906,
-      "n": 24,
-      "p95": 1089.1440020059235
+      "max": 1264.1391290235333,
+      "median": 478.35396250593476,
+      "min": 233.71891101123765,
+      "n": 36,
+      "p95": 817.8061950020492
     },
     "verification_ms": {
-      "max": null,
-      "median": null,
-      "min": null,
-      "n": 0,
+      "max": 214.40636803163216,
+      "median": 134.8550270195119,
+      "min": 130.04658202407882,
+      "n": 3,
       "p95": null
     }
   },
   "planning": {
-    "decisions": {},
-    "exact_simulator_calls": 0,
-    "plans": 0
+    "decisions": {
+      "ABSTAINED": 1,
+      "VERIFIED": 3
+    },
+    "exact_simulator_calls": 4,
+    "plans": 4
   },
-  "runs": 24,
+  "remediation_control_evidence": {
+    "HARNESS-POSTFIX-01": {
+      "criteria": [
+        "rows carry runtime_commit",
+        "rows retain study_baseline_commit",
+        "git_commit equals runtime_commit"
+      ],
+      "evaluated": true,
+      "passed": true,
+      "status": "FIXED"
+    },
+    "HARNESS-POSTFIX-02": {
+      "criteria": [
+        "finding status derives from measured control evidence",
+        "failed evidence reports REGRESSION"
+      ],
+      "evaluated": true,
+      "passed": true,
+      "status": "FIXED"
+    },
+    "ROB-LIVE-01": {
+      "criteria": [
+        "REQUEST_SAMPLE returns 200 only for a real non-stopped unsampled recommendation",
+        "all invalid authority states return 409",
+        "audit event only follows 200"
+      ],
+      "evaluated": true,
+      "passed": true
+    },
+    "ROB-LIVE-02": {
+      "criteria": [
+        "coastal calibration invalid",
+        "coastal topology novelty > 0",
+        "coastal OOD not NORMAL",
+        "coastal planning disabled",
+        "validated loop-grid topology novelty is zero"
+      ],
+      "evaluated": true,
+      "passed": true
+    }
+  },
+  "runs": 36,
+  "runtime_commits": [
+    "8e7415cf3ae904414204e5fb56b6a33e70ef458f"
+  ],
   "sampling": {
-    "acquired": 24,
+    "acquired": 33,
     "realized_entropy_reduction_bits": {
       "max": -0.003153139006317751,
-      "median": -0.5316648701254685,
+      "median": -0.12266641388991872,
       "min": -1.8056506035813324,
-      "n": 24,
+      "n": 33,
       "p95": -0.003153139006317751
     },
     "repeated_observed_recommendations": 0,
-    "rounds": 48,
-    "stopped": 24
+    "rounds": 63,
+    "stopped": 30
   },
+  "study_baseline_commits": [
+    "e45f72cf730d3f12c13dbcb9403c64f185510173"
+  ],
   "topology_classes": [
-    "development_unseen"
+    "development_unseen",
+    "governed_reference",
+    "governed_topology"
   ]
 }

@@ -508,16 +508,17 @@ def summarize(
 
 def write_artifacts(
     output_dir: Path, rows: Sequence[Mapping[str, Any]], *, locked_opened_after: bool,
-    finding_evidence: Mapping[str, Any] | None = None,
+    finding_evidence: Mapping[str, Any] | None = None, artifact_prefix: str = "",
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
+    prefix = f"{artifact_prefix}-" if artifact_prefix else ""
     summary = summarize(rows, finding_evidence=finding_evidence)
     summary["locked_test_opened"] = locked_opened_after
-    (output_dir / "results.json").write_text(json.dumps(list(rows), indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    with (output_dir / "results.csv").open("w", newline="", encoding="utf-8") as stream:
+    (output_dir / f"{prefix}results.json").write_text(json.dumps(list(rows), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    with (output_dir / f"{prefix}results.csv").open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=REQUIRED_ROW_FIELDS)
         writer.writeheader()
         for row in rows:
             writer.writerow({field: json.dumps(row[field], sort_keys=True) if isinstance(row.get(field), (dict, list)) else row.get(field) for field in REQUIRED_ROW_FIELDS})
-    (output_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (output_dir / f"{prefix}summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return summary
