@@ -1,0 +1,578 @@
+{
+  "evidence_sparsity_confirmation": {
+    "full_trajectory_summary": {
+      "n": 20,
+      "n_ok": 20,
+      "top1": 1.0
+    },
+    "gap": 0.95,
+    "latest1_summary": {
+      "n": 20,
+      "n_ok": 20,
+      "top1": 0.05
+    },
+    "n_scenarios": 20,
+    "per_scenario": {
+      "full": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089900,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089901,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089902,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089903,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089904,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089905,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089906,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089907,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089908,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089909,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089910,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089911,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089912,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089913,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089914,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089915,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089916,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089917,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089918,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089919,
+          "top1": 1.0,
+          "top3": 1.0
+        }
+      ],
+      "latest1": [
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089900,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026089901,
+          "top1": 0.0,
+          "top3": 0.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089902,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089903,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089904,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089905,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089906,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089907,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089908,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089909,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089910,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089911,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026089912,
+          "top1": 0.0,
+          "top3": 0.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089913,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089914,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089915,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026089916,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026089917,
+          "top1": 0.0,
+          "top3": 0.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089918,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026089919,
+          "top1": 1.0,
+          "top3": 1.0
+        }
+      ]
+    },
+    "replicates_main_finding": true
+  },
+  "excludes_train_calibration_locked": true,
+  "locked_test_opened_after": false,
+  "network_identity_defect_confirmation": {
+    "hashes_match": false,
+    "n_scenarios": 20,
+    "per_scenario": {
+      "production_hash_arm": [
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089920,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089921,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 0.5,
+          "seed": 2026089922,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089923,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089924,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089925,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089926,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089927,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089928,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089929,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089930,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089931,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089932,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089933,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089934,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089935,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089936,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089937,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089938,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": false,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089939,
+          "top1": 1.0,
+          "top3": 1.0
+        }
+      ],
+      "scenario_hash_arm": [
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089920,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089921,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089922,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089923,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089924,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089925,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089926,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026089927,
+          "top1": 0.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089928,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089929,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089930,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089931,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089932,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089933,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089934,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089935,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089936,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089937,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089938,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        {
+          "calibrated": true,
+          "reciprocal_rank": 1.0,
+          "seed": 2026089939,
+          "top1": 1.0,
+          "top3": 1.0
+        }
+      ]
+    },
+    "production_hash_arm_summary": {
+      "calibrated_rate": 0.0,
+      "n": 20,
+      "n_ok": 20,
+      "top1": 0.85
+    },
+    "production_network_sha256": "decd4ac707a3817115c7307940861dafac6d3fad34a3358179f20c7830a2cc79",
+    "replicates_cap_data_01": true,
+    "scenario_hash_arm_summary": {
+      "calibrated_rate": 1.0,
+      "n": 20,
+      "n_ok": 20,
+      "top1": 0.95
+    },
+    "scenario_network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+  },
+  "overall_verdict": {
+    "evidence_sparsity_finding_replicates": true,
+    "network_identity_defect_replicates": true
+  },
+  "schema_version": 1,
+  "section": "39_confirmation_holdout",
+  "seed_family": "20260899xx -- distinct from every other seed family used elsewhere in this diagnostic (2026081[3-8]xx)",
+  "used_for_optimization": false
+}
