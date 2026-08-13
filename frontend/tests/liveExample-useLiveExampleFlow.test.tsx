@@ -31,6 +31,13 @@ vi.mock('../src/incidentSelection', () => ({
 }));
 
 const FAKE_INPUTS = {
+  executionMode: 'LIVE' as const,
+  inputSource: 'FROZEN_REFERENCE_SCENARIO' as const,
+  cacheStatus: 'MISS' as const,
+  computedAt: '2026-08-10T00:00:00Z',
+  inputSha256: 'input-hash',
+  networkSha256: 'network-hash',
+  scenarioSha256: 'scenario-hash',
   networkFilename: 'live_example_network.inp',
   networkInpText: '[TITLE]\n',
   trueSource: 'J6',

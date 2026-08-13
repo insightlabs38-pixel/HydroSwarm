@@ -1,0 +1,111 @@
+{
+  "scope": "completion-study adversarial remediation",
+  "branch": "fix/adversarial-completion-findings",
+  "base_branch": "test/adversarial-completion",
+  "base_commit": "6937a00",
+  "historical_evidence_modified": false,
+  "scientific_thresholds_modified": false,
+  "model_calibration_identity_changed": false,
+  "findings": [
+    {
+      "id": "ADV-27",
+      "severity": "HIGH",
+      "original_reproducer": "test_adv27_duplicate_initial_observation_is_rejected_atomically",
+      "root_cause": "Incident creation omitted the canonical evidence identity guard used by POST /samples.",
+      "changed_files": ["src/hydroswarm/api/app.py", "tests/adversarial/test_adversarial_completion.py"],
+      "remediation": "Canonical sensor_id+node_id+observed_at identity rejects identical and conflicting initial duplicates atomically before runtime, audit, or SQLite persistence; samples share the helper while preserving idempotent retransmission.",
+      "invariant_restored": "Initial evidence cannot silently multiply authority-bearing evidence.",
+      "regressions": [
+        "test_adv27_duplicate_initial_observation_is_rejected_atomically",
+        "test_adv27_initial_evidence_identity_rejects_all_duplicate_variants",
+        "test_adv27_distinct_sensor_or_node_identity_is_allowed",
+        "test_adv27_samples_keep_shared_identity_idempotency_and_conflict_semantics",
+        "test_adv27_concurrent_duplicate_sample_arrival_has_one_evidence_effect"
+      ],
+      "result": "PASS"
+    },
+    {
+      "id": "ADV-28",
+      "severity": "HIGH",
+      "original_reproducer": "test_adv28_frozen_sensor_cannot_retain_planning_authority",
+      "root_cause": "frozen_flag was omitted during SensorObservation-to-SensorSeries conversion and therefore from evidence hashing and trust authority.",
+      "changed_files": [
+        "src/hydroswarm/api/app.py",
+        "src/hydroswarm/preprocessing/builder.py",
+        "src/hydroswarm/inference/pipeline.py",
+        "src/hydroswarm/api/state.py",
+        "src/hydroswarm/agents/sentinel.py",
+        "frontend/src/types.ts",
+        "frontend/src/api/incident.ts",
+        "tests/adversarial/test_adversarial_completion.py"
+      ],
+      "remediation": "Preserve frozen provenance, hash it, cap the existing health feature at the pre-existing corpus frozen-health value of 0.25, expose FROZEN to operators, and suppress planning when all current sensors are frozen.",
+      "invariant_restored": "Frozen evidence cannot retain healthy planning authority and cannot share a cached evidence identity with healthy evidence.",
+      "regressions": [
+        "test_adv28_frozen_sensor_cannot_retain_planning_authority",
+        "test_adv28_frozen_evidence_never_increases_authority",
+        "test_adv28_multiple_frozen_sensors_are_suppressed_and_distinct_from_healthy",
+        "test_adv28_frozen_sample_reanalyzes_and_stales_a_verified_plan",
+        "test_adv28_freeze_then_unfreeze_reanalyzes_each_new_evidence_context",
+        "test_adv28_frozen_semantics_survive_restart"
+      ],
+      "result": "PASS"
+    },
+    {
+      "id": "ADV-29",
+      "severity": "MEDIUM",
+      "original_reproducer": "test_adv29_received_before_observed_is_controlled_422_without_mutation",
+      "root_cause": "The RequestValidationError response retained non-JSON-serializable validator exception objects in ctx.",
+      "changed_files": ["src/hydroswarm/api/app.py", "tests/adversarial/test_adversarial_completion.py"],
+      "remediation": "Explicitly sanitize type, loc, msg, url, datetime and safe nested context; omit raw input, exception objects, nonfinite values, and unsupported objects.",
+      "invariant_restored": "Malformed contracts produce controlled non-leaking 422 responses before handler-side mutation.",
+      "regressions": [
+        "test_adv29_received_before_observed_is_controlled_422_without_mutation",
+        "test_adv29_all_observation_validation_errors_are_controlled_and_atomic",
+        "test_adv29_bad_approval_literal_is_controlled_before_any_approval_mutation"
+      ],
+      "result": "PASS"
+    }
+  ],
+  "extreme_finite_outlier": {
+    "status": "OBSERVATION",
+    "value_mg_l": 1000000,
+    "existing_governed_runtime_range_found": false,
+    "result": "No API/model/calibration/OOD runtime range policy exists; no arbitrary threshold added and no new finding assigned."
+  },
+  "second_pass_new_findings": [],
+  "hypothesis_examples": 315,
+  "validation": {
+    "completion_adversarial": "43 passed",
+    "existing_adversarial": "24 passed",
+    "focused_api_scientific_persistence": "126 passed",
+    "complete_python_suite": "1097 passed in 682.78 seconds",
+    "strict_self_test": "passed",
+    "frontend_tests": "162 passed",
+    "frontend_build": "passed"
+  },
+  "final_pre_merge_hardening": {
+    "frozen_train_serve_parity": {
+      "result": "PASS",
+      "remediation": "Live drift is derived as drift_flag OR frozen_flag, matching training frozen telemetry while retaining provenance-only frozen metadata."
+    },
+    "planning_control_authority": {
+      "result": "PASS",
+      "invariant": "control_action == GENERATE_PLANS iff planning_allowed == true"
+    },
+    "evidence_certificate_authority": {
+      "result": "PASS",
+      "invariant": "EVIDENCE_SUFFICIENT and Planning gate satisfied require planning_allowed == true"
+    },
+    "adv22_detector": {
+      "result": "PASS",
+      "remediation": "Replaced obsolete negative detector with a positive LIVE provenance and MISS/HIT regression."
+    },
+    "identities_unchanged": {
+      "feature_schema_sha256": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+      "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+      "calibration_sha256": "953d87bcb0784594db75443d31f005dd180847a78a9ec024d95f79b66a43c1c7",
+      "scientific_thresholds_modified": false
+    }
+  }
+}

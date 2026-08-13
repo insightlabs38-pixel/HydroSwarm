@@ -28,6 +28,50 @@ def _canonical(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
 
 
+def validate_reference_incident_artifact(
+    artifact: dict[str, Any], *, companion_manifest: dict[str, Any] | None = None
+) -> None:
+    """Validate the semantic checksum and the minimal replay structure before serving.
+
+    Reference is an auditable replay, not generic display JSON. A caller must
+    never receive a syntactically valid but forged artifact.
+    """
+
+    required = {"reference_id", "artifact_sha256", "event_count", "final_event_hash", "milestones"}
+    missing = sorted(required - set(artifact))
+    if missing:
+        raise ValueError(f"reference artifact missing required fields: {', '.join(missing)}")
+    supplied = artifact["artifact_sha256"]
+    if not isinstance(supplied, str) or len(supplied) != 64:
+        raise ValueError("reference artifact has invalid artifact_sha256")
+    semantic = {key: value for key, value in artifact.items() if key not in {"generated_at", "artifact_sha256"}}
+    actual = hashlib.sha256(_canonical(semantic).encode("utf-8")).hexdigest()
+    if actual != supplied:
+        raise ValueError("reference artifact checksum mismatch")
+    milestones = artifact["milestones"]
+    if not isinstance(milestones, list) or not milestones:
+        raise ValueError("reference artifact has no milestones")
+    expected_start = 0
+    for index, milestone in enumerate(milestones):
+        if milestone.get("index") != index:
+            raise ValueError("reference artifact milestone index mismatch")
+        if milestone.get("event_sequence_start") != expected_start:
+            raise ValueError("reference artifact milestone event coverage is not contiguous")
+        end = milestone.get("event_sequence_end")
+        if not isinstance(end, int) or end < expected_start:
+            raise ValueError("reference artifact milestone range is invalid")
+        expected_start = end + 1
+    if expected_start != artifact["event_count"]:
+        raise ValueError("reference artifact event count does not match milestones")
+    final_view = milestones[-1].get("incident_view", {})
+    if final_view.get("final_event_hash") != artifact["final_event_hash"]:
+        raise ValueError("reference artifact final event hash is inconsistent")
+    if companion_manifest is not None:
+        for key in ("artifact_sha256", "event_count", "final_event_hash", "reference_id"):
+            if companion_manifest.get(key) != artifact.get(key):
+                raise ValueError(f"reference companion manifest mismatch for {key}")
+
+
 @dataclass(frozen=True)
 class Milestone:
     index: int

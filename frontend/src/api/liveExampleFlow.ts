@@ -21,6 +21,13 @@ interface ApiLiveExampleInputs {
   candidate_signatures_mg_l: Record<string, number>;
   sample_time_seconds: number;
   contamination_threshold_mg_l: number;
+  execution_mode: 'LIVE';
+  input_source: 'FROZEN_REFERENCE_SCENARIO';
+  cache_status: 'HIT' | 'MISS';
+  computed_at: string;
+  input_sha256: string;
+  network_sha256: string;
+  scenario_sha256: string;
 }
 
 export interface LiveExampleInputs {
@@ -37,6 +44,13 @@ export interface LiveExampleInputs {
   candidateSignaturesMgL: Record<string, number>;
   sampleTimeSeconds: number;
   contaminationThresholdMgL: number;
+  executionMode: 'LIVE';
+  inputSource: 'FROZEN_REFERENCE_SCENARIO';
+  cacheStatus: 'HIT' | 'MISS';
+  computedAt: string;
+  inputSha256: string;
+  networkSha256: string;
+  scenarioSha256: string;
 }
 
 export async function fetchLiveExampleInputs(signal?: AbortSignal): Promise<LiveExampleInputs> {
@@ -55,6 +69,13 @@ export async function fetchLiveExampleInputs(signal?: AbortSignal): Promise<Live
     candidateSignaturesMgL: raw.candidate_signatures_mg_l,
     sampleTimeSeconds: raw.sample_time_seconds,
     contaminationThresholdMgL: raw.contamination_threshold_mg_l,
+    executionMode: raw.execution_mode,
+    inputSource: raw.input_source,
+    cacheStatus: raw.cache_status,
+    computedAt: raw.computed_at,
+    inputSha256: raw.input_sha256,
+    networkSha256: raw.network_sha256,
+    scenarioSha256: raw.scenario_sha256,
   };
 }
 

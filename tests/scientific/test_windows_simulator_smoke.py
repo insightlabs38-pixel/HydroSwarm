@@ -51,9 +51,14 @@ from hydroswarm.domain import (
     ActionType,
     CandidateSet,
     ConsequenceMetrics,
+    OODLevel,
     OperationalAction,
     OperationalPlan,
 )
+from hydroswarm.inference.fusion import ControlAction
+from hydroswarm.inference.ood import OODComponents
+from hydroswarm.inference.results import HybridRuntimeMode, IncidentAnalysisResult, SemanticPredictions
+from hydroswarm.planning import PlanProposal
 from hydroswarm.simulation import (
     HydraulicSimulator,
     IncidentSourceProfile,
@@ -246,6 +251,33 @@ def test_real_end_to_end_api_incident_workflow_invokes_the_real_simulator(tmp_pa
                 calibrated=True,
             )
         }
+    )
+    # The default local app deliberately produces DEMO_FALLBACK analysis,
+    # which is now correctly barred from planning. Install the real analysis
+    # result type solely as this test's authoritative fixture; the verifier
+    # below remains the live WNTR/EPANET implementation being smoked.
+    plan = OperationalPlan(
+        incident_id=incident_id,
+        name="Monitor J1",
+        actions=(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id="J1"),),
+        created_at=NOW,
+        model_version="windows-smoke",
+    )
+    record.analysis = IncidentAnalysisResult(
+        incident_id=incident_id, node_alignment=("J1", "J3"),
+        classical_belief={"J1": 0.7, "J3": 0.3}, neural_belief=None,
+        fused_belief={"J1": 0.7, "J3": 0.3}, classical_localization=None,
+        estimated_hydraulic_state=None, trust_features=None, fusion_diagnostics=None,
+        trust_rationale="test fixture", conformal_candidate_nodes=("J1", "J3"),
+        calibrated=True, calibration_alpha=0.1,
+        ood_components=OODComponents(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), ood_level=OODLevel.NORMAL,
+        evidence_sufficient=True, planning_allowed=True, planning_suppression_reasons=(),
+        control_action=ControlAction.GENERATE_PLANS, sample_result=None,
+        plan_proposals=(PlanProposal(plan, "TEST", 0.0, 1.0, (("MONITOR_NODE", "J1"),)),),
+        semantic_predictions=SemanticPredictions(), posterior_history=(), evidence_history=(),
+        comparison_history=(), before_after=None, runtime_mode=HybridRuntimeMode.CLASSICAL_SAFE,
+        neural_failure=None, latencies_ms={},
+        provenance_hashes={"network": "test", "feature_schema": "test", "model": "test"}, evidence_hash="test",
     )
 
     plans_response = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 1})

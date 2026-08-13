@@ -98,9 +98,8 @@ def test_default_api_exposes_fallback_reanalysis_worker_and_live_status(tmp_path
         assert explanation.status_code == 200
 
         workflow = client.post(f"/api/incidents/{incident_id}/workflow")
-        assert workflow.status_code == 200
-        assert workflow.json()["state"] == "HUMAN_APPROVAL"
-        assert workflow.json()["verification"]["decision"] == "VERIFIED"
+        assert workflow.status_code == 409
+        assert workflow.json()["detail"]["reason"] == "PLANNING_SUPPRESSED"
 
         with client.websocket_connect(f"/ws/incidents/{incident_id}") as websocket:
             snapshot = websocket.receive_json()

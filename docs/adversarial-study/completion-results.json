@@ -1,0 +1,48 @@
+{
+  "branch": "test/adversarial-completion",
+  "base_commit": "ca938a2",
+  "completion_test_commit": "454610c",
+  "production_code_changed": false,
+  "ADV-05": {
+    "status": "FAIL",
+    "scenarios": [
+      {"name": "contradictory healthy pair", "result": "PASS", "actual": "disagreement 0.472 to 0.755; planning true to false"},
+      {"name": "single extreme finite outlier", "result": "OBSERVATION", "actual": "finite normalized posterior; OOD NORMAL; planning allowed"},
+      {"name": "systematic repeated bias", "result": "OBSERVATION", "actual": "no confidence growth in deterministic fixture"},
+      {"name": "near tie", "result": "PASS", "actual": "top beliefs 0.708/0.292; broad conformal region; planning suppressed"},
+      {"name": "conflict after verified plan", "result": "PASS", "actual": "reanalysis suppresses planning, verification STALE, approval 409"},
+      {"name": "quality/drift/frozen", "result": "FAIL", "actual": "low quality suppresses; frozen flag leaves planning allowed", "finding": "ADV-28"}
+    ],
+    "new_findings": ["ADV-28"]
+  },
+  "ADV-25": {
+    "status": "FAIL",
+    "properties": [
+      "finite domain observations", "atomic malformed samples", "atomic incident creation",
+      "canonical plan serialization/hash mutation", "short state sequences", "reference integrity",
+      "LIVE provenance cache identity"
+    ],
+    "hypothesis_examples": 315,
+    "new_findings": ["ADV-27", "ADV-29"]
+  },
+  "new_findings": [
+    {
+      "id": "ADV-27", "severity": "HIGH", "invariant": "duplicate initial evidence is rejected or idempotent",
+      "actual": "incident creation accepts two identical observations", "reproducer": "test_adv27_duplicate_initial_observation_is_rejected_atomically"
+    },
+    {
+      "id": "ADV-28", "severity": "HIGH", "invariant": "frozen sensor evidence cannot retain healthy planning authority",
+      "actual": "frozen_flag is not represented in SensorSeries/authority gating", "reproducer": "test_adv28_frozen_sensor_cannot_retain_planning_authority"
+    },
+    {
+      "id": "ADV-29", "severity": "MEDIUM", "invariant": "malformed requests return controlled 4xx without mutation",
+      "actual": "received_at before observed_at reaches a nonserializable validation ctx and returns 500", "reproducer": "test_adv29_received_before_observed_is_controlled_422_without_mutation"
+    }
+  ],
+  "executed": {
+    "adversarial": "36 passed, 3 xfailed",
+    "focused_scientific_api": "94 passed, 3 xfailed",
+    "complete_python_suite": "1062 passed, 3 xfailed",
+    "strict_self_test": "passed"
+  }
+}

@@ -28,16 +28,12 @@ class ScenarioStore:
 
     def save_network(self, record: NetworkRecord, *, inp_path: str | None) -> None:
         with self.database.connect(write=True) as connection:
-            connection.execute(
+            cursor = connection.execute(
                 """INSERT INTO networks (
                     network_id, name, version, sha256, inp_path, node_count, link_count,
                     valid, validated_at, metadata_json, geojson_json, validation_errors_json
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(network_id) DO UPDATE SET
-                    node_count=excluded.node_count, link_count=excluded.link_count,
-                    valid=excluded.valid, validated_at=excluded.validated_at,
-                    metadata_json=excluded.metadata_json, geojson_json=excluded.geojson_json,
-                    validation_errors_json=excluded.validation_errors_json""",
+                ON CONFLICT(network_id) DO NOTHING""",
                 (
                     record.network_id,
                     record.name,
@@ -53,6 +49,12 @@ class ScenarioStore:
                     _json(record.validation_errors),
                 ),
             )
+            if cursor.rowcount == 0:
+                existing = connection.execute(
+                    "SELECT sha256 FROM networks WHERE network_id = ?", (record.network_id,)
+                ).fetchone()
+                if existing is None or existing[0] != record.sha256:
+                    raise ValueError("network_id is immutable and already bound to different content")
 
     def network_by_hash(self, sha256: str) -> NetworkRecord | None:
         from hydroswarm.api.state import NetworkRecord
@@ -139,10 +141,11 @@ class ScenarioStore:
                     ),
                 )
 
-    def save_approval(self, receipt: ApprovalReceipt) -> None:
+    def save_approval(self, receipt: ApprovalReceipt) -> bool:
+        """Persist a first approval only; never replace an existing receipt."""
         with self.database.connect(write=True) as connection:
-            connection.execute(
-                """INSERT OR REPLACE INTO approvals(
+            cursor = connection.execute(
+                """INSERT OR IGNORE INTO approvals(
                     incident_id, plan_id, operator_id, approved_at, receipt_json
                 ) VALUES (?, ?, ?, ?, ?)""",
                 (
@@ -153,6 +156,7 @@ class ScenarioStore:
                     _json(receipt),
                 ),
             )
+            return cursor.rowcount == 1
 
     def load_incidents(self) -> dict[UUID, IncidentRuntime]:
         from hydroswarm.api.state import IncidentRuntime
@@ -185,4 +189,3 @@ class ScenarioStore:
         tables = ("networks", "incidents", "observations", "posteriors", "plans", "verifications", "approvals")
         with self.database.connect() as connection:
             return {table: int(connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]) for table in tables}
-

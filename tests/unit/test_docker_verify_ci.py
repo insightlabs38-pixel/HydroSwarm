@@ -11,13 +11,24 @@ application/API surface the script talks to)."""
 
 from __future__ import annotations
 
+import argparse
+import importlib.util
 from pathlib import Path
+from uuid import uuid4
 
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_PATH = PROJECT_ROOT / ".github" / "workflows" / "docker-verify.yml"
 VERIFY_SCRIPT_PATH = PROJECT_ROOT / "scripts" / "docker_ci_verify.py"
+
+
+def _load_verify_script_module():
+    spec = importlib.util.spec_from_file_location("docker_ci_verify_under_test", VERIFY_SCRIPT_PATH)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _load_workflow() -> dict:
@@ -113,3 +124,83 @@ def test_verify_script_covers_the_full_real_production_lifecycle() -> None:
         "/approve",
     ):
         assert endpoint in text
+
+
+def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> None:
+    """A verified plan creates the sole current approval boundary for the CI run."""
+    module = _load_verify_script_module()
+    incident_id = str(uuid4())
+    first_plan_id, second_plan_id = str(uuid4()), str(uuid4())
+    requested_paths: list[str] = []
+
+    def request(_base_url, _method, path, **_kwargs):
+        requested_paths.append(path)
+        if path == "/api/live-example-inputs":
+            return 200, {
+                "network_filename": "network.inp",
+                "network_inp_text": "[TITLE]",
+                "candidate_signatures_mg_l": {"J1": 1.0},
+                "initial_observation": {
+                    "sensor_id": "S-J1",
+                    "node_id": "J1",
+                    "concentration_mg_l": 1.0,
+                    "pressure_m": 25.0,
+                },
+                "contamination_threshold_mg_l": 0.1,
+            }
+        if path == "/api/networks/import":
+            return 201, {"network_id": "network-id"}
+        if path == "/api/incidents":
+            return 201, {"incident_id": incident_id}
+        if path.endswith("/samples/recommend"):
+            return 200, {"node_id": "J1"}
+        if path.endswith("/plans/generate"):
+            return 200, [{"plan_id": first_plan_id}, {"plan_id": second_plan_id}]
+        if path.endswith(f"/plans/{first_plan_id}/verify"):
+            return 200, {"decision": "VERIFIED"}
+        if path.endswith(f"/plans/{first_plan_id}/approve"):
+            return 200, {"receipt_id": str(uuid4())}
+        if path.endswith("/view"):
+            return 200, {"runtime_mode": "LIVE", "status": "CLOSED"}
+        if path == f"/api/incidents/{incident_id}":
+            return 200, {"status": "CLOSED"}
+        if path.endswith("/analyze") or path.endswith("/samples"):
+            return 200, {}
+        raise AssertionError(f"unexpected request: {path}")
+
+    monkeypatch.setattr(module, "_wait_for_health", lambda _base_url: None)
+    monkeypatch.setattr(module, "_request", request)
+    monkeypatch.setattr(module, "_utc_now", lambda: "2026-01-01T00:00:00+00:00")
+
+    assert module.cmd_live_workflow(argparse.Namespace(base_url="http://test", state_file=None)) == 0
+    assert f"/api/incidents/{incident_id}/plans/{first_plan_id}/verify" in requested_paths
+    assert f"/api/incidents/{incident_id}/plans/{second_plan_id}/verify" not in requested_paths
+    assert f"/api/incidents/{incident_id}/plans/{first_plan_id}/approve" in requested_paths
+    assert f"/api/incidents/{incident_id}" in requested_paths
+
+
+def test_persistence_check_does_not_reanalyze_a_closed_incident(monkeypatch, tmp_path) -> None:
+    """CLOSED is terminal, so restart validation reads durable state and audit history."""
+    module = _load_verify_script_module()
+    incident_id = str(uuid4())
+    state_file = tmp_path / "docker-ci-state.json"
+    state_file.write_text(
+        f'{{"incident_id":"{incident_id}","runtime_mode":"LIVE","status":"CLOSED"}}'
+    )
+    requested_paths: list[str] = []
+
+    def request(_base_url, _method, path, **_kwargs):
+        requested_paths.append(path)
+        if path == f"/api/incidents/{incident_id}":
+            return 200, {"status": "CLOSED"}
+        if path == f"/api/incidents/{incident_id}/replay":
+            return 200, {"chain_valid": True, "events": [{"event_type": "PLAN_APPROVED"}]}
+        raise AssertionError(f"unexpected request: {path}")
+
+    monkeypatch.setattr(module, "_wait_for_health", lambda _base_url: None)
+    monkeypatch.setattr(module, "_request", request)
+
+    assert module.cmd_verify_persistence(
+        argparse.Namespace(base_url="http://test", state_file=str(state_file))
+    ) == 0
+    assert not any(path.endswith("/analyze") for path in requested_paths)

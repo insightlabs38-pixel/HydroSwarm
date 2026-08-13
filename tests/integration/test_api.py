@@ -8,9 +8,16 @@ from fastapi.testclient import TestClient
 from hydroswarm.api import create_app
 from hydroswarm.domain import (
     ConsequenceMetrics,
+    OODLevel,
+    OperationalAction,
+    OperationalPlan,
     PlanDecision,
     PlanVerification,
 )
+from hydroswarm.inference.fusion import ControlAction
+from hydroswarm.inference.ood import OODComponents
+from hydroswarm.inference.results import HybridRuntimeMode, IncidentAnalysisResult, SemanticPredictions
+from hydroswarm.planning import PlanProposal
 
 
 NOW = datetime(2026, 8, 3, tzinfo=UTC)
@@ -50,6 +57,42 @@ def _observation(sensor_id: str = "S1", node_id: str = "J1") -> dict[str, object
         "drift_flag": False,
         "frozen_flag": False,
     }
+
+
+def _install_authoritative_test_analysis(
+    client: TestClient, incident_id: str, plans: tuple[OperationalPlan, ...] | None = None
+) -> tuple[OperationalPlan, ...]:
+    """Test seam using the production analysis result type, never DEMO_FALLBACK."""
+    from uuid import UUID
+
+    if plans is None:
+        plans = (
+            OperationalPlan(incident_id=incident_id, name="candidate 1 unsafe", model_version="test",
+                            actions=(OperationalAction(action_type="WAIT", duration_minutes=1),)),
+            OperationalPlan(incident_id=incident_id, name="candidate 2 safe", model_version="test",
+                            actions=(OperationalAction(action_type="WAIT", duration_minutes=2),)),
+        )
+    proposals = tuple(
+        PlanProposal(plan, "TEST", 0.0, 1.0, (("WAIT", None),)) for plan in plans
+    )
+    record = client.app.state.runtime.incidents[UUID(incident_id)]
+    record.analysis = IncidentAnalysisResult(
+        incident_id=UUID(incident_id), node_alignment=("J1", "J2"),
+        classical_belief={"J1": 1.0}, neural_belief=None, fused_belief={"J1": 1.0},
+        classical_localization=None, estimated_hydraulic_state=None, trust_features=None,
+        fusion_diagnostics=None, trust_rationale="test-only authoritative analysis",
+        conformal_candidate_nodes=("J1",), calibrated=True, calibration_alpha=0.1,
+        ood_components=OODComponents(0.0, 0.0, 0.0, 0.0, 0.0, 0.0), ood_level=OODLevel.NORMAL,
+        evidence_sufficient=True, planning_allowed=True, planning_suppression_reasons=(),
+        control_action=ControlAction.GENERATE_PLANS, sample_result=None,
+        plan_proposals=proposals, semantic_predictions=SemanticPredictions(), posterior_history=(),
+        evidence_history=(), comparison_history=(), before_after=None,
+        runtime_mode=HybridRuntimeMode.CLASSICAL_SAFE, neural_failure=None, latencies_ms={},
+        provenance_hashes={"network": "test", "feature_schema": "test", "model": "test"}, evidence_hash="test",
+    )
+    record.runtime_mode = HybridRuntimeMode.CLASSICAL_SAFE.value
+    record.fallback_reasons = ()
+    return plans
 
 
 def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None:
@@ -110,10 +153,12 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
         == 2
     )
 
-    plans_response = client.post(
-        f"/api/incidents/{incident_id}/plans/generate", json={"count": 2}
-    )
-    assert plans_response.status_code == 200
+    # DEMO_FALLBACK is intentionally non-authoritative: neither plan route
+    # nor workflow may turn its suppressed analysis into approval-capable work.
+    plans_response = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
+    assert plans_response.status_code == 409
+    assert client.post(f"/api/incidents/{incident_id}/workflow").status_code == 409
+    return
     unsafe_plan, safe_plan = plans_response.json()
     assert unsafe_plan["model_version"] == "DEMO_FALLBACK_UNVERIFIED"
 
@@ -224,12 +269,11 @@ def test_new_sample_invalidates_prior_verification_and_reverify_restores_approva
     incident_id = created.json()["incident_id"]
     client.post(f"/api/incidents/{incident_id}/analyze")
 
-    plans_response = client.post(
-        f"/api/incidents/{incident_id}/plans/generate", json={"count": 2}
-    )
-    _unsafe_plan, safe_plan = plans_response.json()
+    _unsafe_plan, safe_plan = _install_authoritative_test_analysis(client, incident_id)
+    generated = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
+    assert generated.status_code == 200
 
-    verified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/verify")
+    verified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan.plan_id}/verify")
     assert verified.json()["decision"] == "VERIFIED"
     assert verified.json()["verification_status"] == "CURRENT"
     assert verified.json()["context_hash"]
@@ -239,20 +283,21 @@ def test_new_sample_invalidates_prior_verification_and_reverify_restores_approva
     client.post(f"/api/incidents/{incident_id}/samples", json=_observation("S3", "J2"))
 
     stale_approval = client.post(
-        f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/approve",
+        f"/api/incidents/{incident_id}/plans/{safe_plan.plan_id}/approve",
         json={"approved": True, "operator_id": "operator-1"},
     )
     assert stale_approval.status_code == 409
 
     # Re-verifying under the new evidence produces a fresh CURRENT
     # verification, which is approvable again.
-    reverified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/verify")
+    _install_authoritative_test_analysis(client, incident_id, (safe_plan,))
+    reverified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan.plan_id}/verify")
     assert reverified.json()["decision"] == "VERIFIED"
     assert reverified.json()["verification_status"] == "CURRENT"
     assert reverified.json()["context_hash"] != verified.json()["context_hash"]
 
     approved = client.post(
-        f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/approve",
+        f"/api/incidents/{incident_id}/plans/{safe_plan.plan_id}/approve",
         json={"approved": True, "operator_id": "operator-1"},
     )
     assert approved.status_code == 200
@@ -274,6 +319,7 @@ def _create_incident_with_verified_plan(client: TestClient) -> tuple[str, str, d
     )
     incident_id = created.json()["incident_id"]
     client.post(f"/api/incidents/{incident_id}/analyze")
+    _install_authoritative_test_analysis(client, incident_id)
     plans_response = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
     _unsafe_plan, safe_plan = plans_response.json()
     verified = client.post(f"/api/incidents/{incident_id}/plans/{safe_plan['plan_id']}/verify")

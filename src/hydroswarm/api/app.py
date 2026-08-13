@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections import defaultdict
+from collections.abc import Mapping
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -14,6 +16,7 @@ from uuid import UUID
 import networkx as nx
 
 from fastapi import FastAPI, File, HTTPException, UploadFile, WebSocket, WebSocketDisconnect, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -26,7 +29,6 @@ from hydroswarm.domain import (
     EvidenceCertificate,
     IncidentCreate,
     IncidentState,
-    OperationalAction,
     OperationalPlan,
     PlanDecision,
     PlanVerification,
@@ -154,6 +156,70 @@ def create_app(
     app.state.network_importer = NetworkImporter(
         runtime_state.store, runtime_state.network_directory
     )
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error_response(_request, error: RequestValidationError) -> JSONResponse:
+        # Starlette's default error body includes the raw rejected input. JSON
+        # cannot serialize non-finite floats, turning a correct validation
+        # failure into a 500. Omit raw input so every malformed numeric request
+        # remains an unambiguous 422 before any handler/persistence runs.
+        unsafe = object()
+
+        def sanitize_context(value: object) -> object:
+            """Return only explicit JSON-safe validation context.
+
+            Pydantic's ``ctx`` may retain the original ``ValueError`` from a
+            model validator.  It must never escape into the response: aside
+            from being non-serializable, arbitrary exception reprs may expose
+            implementation details.  Raw ``input`` is intentionally excluded
+            separately below.
+            """
+
+            if value is None or isinstance(value, (str, bool, int)):
+                return value
+            if isinstance(value, float):
+                return value if math.isfinite(value) else unsafe
+            if isinstance(value, datetime):
+                return value.isoformat()
+            if isinstance(value, Mapping):
+                result: dict[str, object] = {}
+                for key, nested in value.items():
+                    # Pydantic uses this key for the original exception
+                    # object. Never serialize it, even if a future validator
+                    # supplies a string under the same key.
+                    if not isinstance(key, str) or key == "error":
+                        continue
+                    sanitized = sanitize_context(nested)
+                    if sanitized is not unsafe:
+                        result[key] = sanitized
+                return result
+            if isinstance(value, (list, tuple)):
+                result = []
+                for nested in value:
+                    sanitized = sanitize_context(nested)
+                    if sanitized is not unsafe:
+                        result.append(sanitized)
+                return result
+            return unsafe
+
+        def sanitize_item(item: Mapping[str, object]) -> dict[str, object]:
+            result: dict[str, object] = {}
+            for key in ("type", "msg", "url"):
+                value = item.get(key)
+                if isinstance(value, str):
+                    result[key] = value
+            location = item.get("loc")
+            if isinstance(location, (list, tuple)):
+                result["loc"] = [
+                    value for value in location if isinstance(value, (str, int)) and not isinstance(value, bool)
+                ]
+            context = sanitize_context(item.get("ctx"))
+            if context is not unsafe and context not in (None, {}, []):
+                result["ctx"] = context
+            return result
+
+        detail = [sanitize_item(item) for item in error.errors()]
+        return JSONResponse(status_code=422, content={"detail": detail})
     app.add_middleware(
         CORSMiddleware,
         allow_origin_regex=r"^https?://(127\.0\.0\.1|localhost|\[::1\])(:\d{1,5})?$",
@@ -189,6 +255,91 @@ def create_app(
         except KeyError as error:
             raise HTTPException(status_code=404, detail="plan not found") from error
 
+    def _require_not_closed(record: IncidentRuntime) -> None:
+        if record.state.status == "CLOSED":
+            raise HTTPException(status_code=409, detail="CLOSED incidents are terminal")
+
+    def _evidence_identity(observation: SensorObservation) -> tuple[str, str, datetime]:
+        """Canonical identity for one sensor reading at one node and time."""
+
+        return (observation.sensor_id, observation.node_id, observation.observed_at)
+
+    def _validate_initial_evidence(observations: tuple[SensorObservation, ...]) -> None:
+        """Reject duplicate initial evidence before any incident state exists."""
+
+        seen: dict[tuple[str, str, datetime], SensorObservation] = {}
+        for observation in observations:
+            identity = _evidence_identity(observation)
+            previous = seen.get(identity)
+            if previous is None:
+                seen[identity] = observation
+                continue
+            reason = (
+                "DUPLICATE_INITIAL_EVIDENCE"
+                if previous == observation
+                else "CONFLICTING_INITIAL_EVIDENCE"
+            )
+            raise HTTPException(status_code=422, detail={"reason": reason})
+
+    def _effective_sensor_health(observation: SensorObservation) -> float:
+        """Map a declared frozen reading onto the existing health channel.
+
+        Frozen corpus telemetry already uses health ``0.25`` (rather than a
+        new model feature).  Capping a declared frozen live reading to the
+        same value preserves that schema and prevents the deterministic trust
+        gates from treating it as fully healthy.  The raw flag remains in
+        ``SensorObservation`` and the operator-facing incident view.
+        """
+
+        return min(observation.quality, 0.25) if observation.frozen_flag else observation.quality
+
+    def _require_planning_authority(record: IncidentRuntime) -> IncidentAnalysisResult:
+        """One authority gate for every route that could create or verify plans."""
+
+        _require_not_closed(record)
+        analysis = record.analysis
+        if not isinstance(analysis, IncidentAnalysisResult) or not analysis.planning_allowed:
+            raise HTTPException(
+                status_code=409,
+                detail={"reason": "PLANNING_SUPPRESSED", "codes": list(record.fallback_reasons)},
+            )
+        return analysis
+
+    def _plan_hash(plan: OperationalPlan) -> str:
+        # Sorted compact JSON is a canonical content identity, independent of
+        # Python mapping insertion order or transport formatting.
+        payload = json.dumps(
+            plan.model_dump(mode="json", exclude_none=False, by_alias=False),
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+    def _authoritative_network_hash(record: IncidentRuntime) -> str:
+        """Return current network content identity or fail closed on tampering."""
+
+        network = runtime().networks.get(record.state.network_id)
+        if network is None:
+            raise HTTPException(status_code=409, detail="incident network is unavailable")
+        path = runtime().store.network_path(record.state.network_id)
+        if path is not None:
+            try:
+                actual = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+            except OSError as error:
+                raise HTTPException(status_code=409, detail="authoritative network bytes are unavailable") from error
+            if actual != network.sha256:
+                raise HTTPException(status_code=409, detail="authoritative network bytes no longer match record")
+            return actual
+        # Manually validated test/injected-verifier networks have no INP file;
+        # their immutable NetworkRecord digest is the authoritative identity.
+        return network.sha256
+
+    def _invalidate_swarm(record: IncidentRuntime) -> None:
+        # A controller captures evidence, plans, simulator state and authority
+        # when started. It is never reusable across a material context change.
+        record.swarm = None
+
     def bind_pipeline(record: IncidentRuntime) -> object | None:
         if record.pipeline is not None:
             return record.pipeline
@@ -215,10 +366,15 @@ def create_app(
                 timestamps_seconds=tuple((item.observed_at - origin).total_seconds() for item in items),
                 concentration_mg_l=tuple(item.concentration_mg_l for item in items),
                 pressure_m=tuple(item.pressure_m for item in items),
-                health=tuple(item.quality for item in items),
+                health=tuple(_effective_sensor_health(item) for item in items),
                 missing=tuple(item.missing for item in items),
-                drift=tuple(item.drift_flag for item in items),
+                # Frozen telemetry was trained as the existing sensor-health
+                # channel at 0.25 *and* drift=True. Preserve its raw frozen
+                # provenance separately below, while matching that established
+                # model-facing convention without adding a feature column.
+                drift=tuple(item.drift_flag or item.frozen_flag for item in items),
                 delayed=tuple(item.received_at > item.observed_at for item in items),
+                frozen=tuple(item.frozen_flag for item in items),
             ))
         return tuple(result)
 
@@ -266,6 +422,8 @@ def create_app(
         raise HTTPException(status_code=409, detail="incident has not been analyzed")
 
     def perform_analysis(record: IncidentRuntime) -> AnalysisResponse:
+        _require_not_closed(record)
+        _invalidate_swarm(record)
         record.progress = {"state": "RUNNING", "progress": 0.1, "message": "hybrid analysis"}
         pipeline = bind_pipeline(record)
         if pipeline is not None:
@@ -327,6 +485,11 @@ def create_app(
                 "provenance_hashes": {"evidence": runtime().state_hash(record.state)},
                 "latencies_ms": {},
             }
+        # Reanalysis can change model/calibration/network provenance even
+        # when the observations did not. Current verification is meaningful
+        # only for this exact analysis context, so eagerly stale any prior
+        # record before exposing the new analysis state.
+        _invalidate_stale_verifications(record)
         record.progress = {"state": "COMPLETE", "progress": 1.0, "message": record.runtime_mode}
         runtime().append_event(
             record, event_type="HYBRID_ANALYSIS_COMPLETED", actor="SWARM_CONTROLLER",
@@ -371,6 +534,14 @@ def create_app(
             raise HTTPException(
                 status_code=500, detail=f"reference-demo artifact at {reference_demo_file} is not valid JSON: {exc}"
             ) from exc
+        try:
+            from hydroswarm.evaluation import validate_reference_incident_artifact
+
+            manifest_path = reference_demo_file.parent / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else None
+            validate_reference_incident_artifact(payload, companion_manifest=manifest)
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
+            raise HTTPException(status_code=503, detail=f"reference-demo integrity validation failed: {exc}") from exc
         return JSONResponse(content=payload)
 
     @app.get("/api/live-example-inputs")
@@ -383,6 +554,7 @@ def create_app(
         reference inputs, computing real current results rather than
         replaying a fixture. Computed once (bounded WNTR simulation,
         deterministic) and cached for this app instance's lifetime."""
+        cache_status = "HIT" if live_example_inputs_cache else "MISS"
         if not live_example_inputs_cache:
             from hydroswarm.evaluation import build_live_example_inputs
 
@@ -395,7 +567,9 @@ def create_app(
                     status_code=404,
                     detail=f"frozen scenario fixtures not found at {live_example_scenario_dir}: {exc}",
                 ) from exc
-        return JSONResponse(content=live_example_inputs_cache)
+        payload = dict(live_example_inputs_cache)
+        payload["cache_status"] = cache_status
+        return JSONResponse(content=payload)
 
     @app.get("/api/readiness", response_model=ServiceStatus)
     def readiness() -> ServiceStatus | JSONResponse:
@@ -478,6 +652,8 @@ def create_app(
             )
         if not network_id.strip():
             raise HTTPException(status_code=422, detail="network_id must not be blank")
+        if network_id in runtime().networks:
+            raise HTTPException(status_code=409, detail="network_id is immutable; import a new network version")
         if len(set(request.node_ids)) != len(request.node_ids):
             raise HTTPException(status_code=422, detail="node_ids must be unique")
         digest = hashlib.sha256(
@@ -503,6 +679,11 @@ def create_app(
     def create_incident(request: IncidentCreate) -> IncidentState:
         if request.network_id not in runtime().networks:
             raise HTTPException(status_code=409, detail="network must be validated first")
+        # This must precede IncidentRuntime creation, audit insertion, and
+        # persistence. Initial observations use the same identity as the
+        # subsequent /samples endpoint; creation rejects malformed duplicate
+        # evidence instead of silently inflating authority.
+        _validate_initial_evidence(request.observations)
         network = runtime().networks[request.network_id]
         known_nodes = set(network.metadata.get("node_ids", ()))
         unknown_nodes = sorted({item.node_id for item in request.observations} - known_nodes)
@@ -536,11 +717,14 @@ def create_app(
     @app.post("/api/incidents/{incident_id}/analyze", response_model=IncidentState)
     def analyze_incident(incident_id: UUID) -> IncidentState:
         record = incident_or_404(incident_id)
-        try:
-            perform_analysis(record)
-        except ValueError as error:
-            raise HTTPException(status_code=409, detail=str(error)) from error
-        return record.state
+        with record.lock:
+            _require_not_closed(record)
+            try:
+                perform_analysis(record)
+            except ValueError as error:
+                raise HTTPException(status_code=409, detail=str(error)) from error
+            _invalidate_swarm(record)
+            return record.state
 
     @app.get("/api/incidents/{incident_id}/analysis", response_model=AnalysisResponse)
     def get_analysis(incident_id: UUID) -> AnalysisResponse:
@@ -636,7 +820,9 @@ def create_app(
             progress(0.15, "loading network and artifacts")
             if cancelled.is_set():
                 return {}
-            response = perform_analysis(record)
+            with record.lock:
+                _require_not_closed(record)
+                response = perform_analysis(record)
             progress(0.95, "persisting analysis")
             return response.model_dump(mode="json")
         return runtime().jobs.submit(incident_id, "HYBRID_ANALYSIS", job)
@@ -661,10 +847,12 @@ def create_app(
     )
     def recommend_sample(incident_id: UUID) -> SampleRecommendation:
         record = incident_or_404(incident_id)
-        if record.state.candidates is None:
-            raise HTTPException(status_code=409, detail="analyze incident first")
-        if record.state.sample_count >= record.create.maximum_samples:
-            raise HTTPException(status_code=409, detail="sampling budget exhausted")
+        with record.lock:
+            _require_not_closed(record)
+            if record.state.candidates is None:
+                raise HTTPException(status_code=409, detail="analyze incident first")
+            if record.state.sample_count >= record.create.maximum_samples:
+                raise HTTPException(status_code=409, detail="sampling budget exhausted")
         # core-issues.txt: record.analysis (the live IncidentAnalysisResult)
         # is never persisted to disk -- only record.state.candidates is. A
         # process restart leaves record.analysis=None while
@@ -673,74 +861,88 @@ def create_app(
         # branch below as if that were still current. Explicitly redo the
         # analysis first rather than serve a recommendation derived from
         # evidence that predates however long ago the restart happened.
-        if record.analysis is None:
-            perform_analysis(record)
-        analysis = record.analysis
-        if isinstance(analysis, IncidentAnalysisResult) and analysis.sample_result:
-            sampled = analysis.sample_result
-            if sampled.stop or sampled.recommended_node is None:
-                raise HTTPException(status_code=409, detail=sampled.stop_reason or "sampling stopped")
-            selected = next(item for item in sampled.ranked if item.node_id == sampled.recommended_node)
-            recommendation = SampleRecommendation(
-                node_id=sampled.recommended_node,
-                expected_information_gain=selected.expected_information_gain_bits,
-                alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
-                runtime_mode=record.runtime_mode,
-                fallback_reasons=record.fallback_reasons,
+            if record.analysis is None:
+                perform_analysis(record)
+            analysis = record.analysis
+            if isinstance(analysis, IncidentAnalysisResult) and analysis.sample_result:
+                sampled = analysis.sample_result
+                if sampled.stop or sampled.recommended_node is None:
+                    raise HTTPException(status_code=409, detail=sampled.stop_reason or "sampling stopped")
+                selected = next(item for item in sampled.ranked if item.node_id == sampled.recommended_node)
+                recommendation = SampleRecommendation(
+                    node_id=sampled.recommended_node,
+                    expected_information_gain=selected.expected_information_gain_bits,
+                    alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
+                    runtime_mode=record.runtime_mode,
+                    fallback_reasons=record.fallback_reasons,
+                )
+            else:
+                nodes = record.state.candidates.node_ids
+                recommendation = SampleRecommendation(
+                    node_id=nodes[0], expected_information_gain=max(record.state.candidates.node_probabilities.values()),
+                    alternatives=nodes[1:3], runtime_mode=record.runtime_mode,
+                    fallback_reasons=record.fallback_reasons,
+                )
+            runtime().append_event(
+                record,
+                event_type="SAMPLE_RECOMMENDED",
+                actor="HYDRO_SCOUT",
+                payload=recommendation.model_dump(mode="json"),
             )
-        else:
-            nodes = record.state.candidates.node_ids
-            recommendation = SampleRecommendation(
-                node_id=nodes[0], expected_information_gain=max(record.state.candidates.node_probabilities.values()),
-                alternatives=nodes[1:3], runtime_mode=record.runtime_mode,
-                fallback_reasons=record.fallback_reasons,
-            )
-        runtime().append_event(
-            record,
-            event_type="SAMPLE_RECOMMENDED",
-            actor="HYDRO_SCOUT",
-            payload=recommendation.model_dump(mode="json"),
-        )
-        return recommendation
+            return recommendation
 
     @app.post("/api/incidents/{incident_id}/samples", response_model=IncidentState)
     def add_sample(incident_id: UUID, observation: SensorObservation) -> IncidentState:
         record = incident_or_404(incident_id)
-        if record.state.sample_count >= record.create.maximum_samples:
-            raise HTTPException(status_code=409, detail="sampling budget exhausted")
-        known_nodes = set(runtime().networks[record.state.network_id].metadata.get("node_ids", ()))
-        if observation.node_id not in known_nodes:
-            raise HTTPException(status_code=422, detail="sample references an unknown network node")
-        runtime().append_event(
-            record,
-            event_type="SAMPLE_RECEIVED",
-            actor="OPERATOR",
-            payload={"sensor_id": observation.sensor_id, "node_id": observation.node_id},
-        )
-        record.state = record.state.model_copy(
-            update={
-                "status": "SAMPLING",
-                "observations": (*record.state.observations, observation),
-                "sample_count": record.state.sample_count + 1,
-            }
-        )
+        with record.lock:
+            _require_not_closed(record)
+            if observation.observed_at < record.create.detected_at:
+                raise HTTPException(status_code=422, detail="sample predates incident detection")
+            identity = _evidence_identity(observation)
+            matches = [
+                item for item in record.state.observations
+                if _evidence_identity(item) == identity
+            ]
+            if matches:
+                if all(item == observation for item in matches):
+                    return record.state
+                raise HTTPException(status_code=409, detail="sample identity conflicts with existing measurement")
+            if record.state.sample_count >= record.create.maximum_samples:
+                raise HTTPException(status_code=409, detail="sampling budget exhausted")
+            known_nodes = set(runtime().networks[record.state.network_id].metadata.get("node_ids", ()))
+            if observation.node_id not in known_nodes:
+                raise HTTPException(status_code=422, detail="sample references an unknown network node")
+            runtime().append_event(
+                record,
+                event_type="SAMPLE_RECEIVED",
+                actor="OPERATOR",
+                payload={"sensor_id": observation.sensor_id, "node_id": observation.node_id},
+            )
+            record.state = record.state.model_copy(
+                update={
+                    "status": "SAMPLING",
+                    "observations": (*record.state.observations, observation),
+                    "sample_count": record.state.sample_count + 1,
+                }
+            )
+            _invalidate_swarm(record)
         # core-issues.txt: record.state.candidates (persisted) is checked
         # here too, not just the in-memory-only record.analysis -- a
         # restored incident that was analyzed before a restart must still
         # reanalyze on a new sample, not silently skip straight to persist
         # as if it had never been analyzed at all.
-        if record.analysis is not None or record.state.candidates is not None:
-            perform_analysis(record)
-        else:
-            runtime().persist(record)
+            if record.analysis is not None or record.state.candidates is not None:
+                perform_analysis(record)
+            else:
+                runtime().persist(record)
         # core-issues5.txt Section 10 (P0 safety fix): a new sample changes
         # the incident's evidence -- any plan verified under the PRIOR
         # evidence state must stop being approvable, not remain valid
         # forever. Runs after perform_analysis/persist above so the
         # comparison uses the fully updated posterior/analysis context.
-        _invalidate_stale_verifications(record)
-        runtime().persist(record)
-        return record.state
+            _invalidate_stale_verifications(record)
+            runtime().persist(record)
+            return record.state
 
     @app.post(
         "/api/incidents/{incident_id}/plans/generate",
@@ -750,28 +952,14 @@ def create_app(
         incident_id: UUID, request: PlanGenerationRequest
     ) -> list[OperationalPlan]:
         record = incident_or_404(incident_id)
-        if record.state.candidates is None:
-            raise HTTPException(status_code=409, detail="analyze incident first")
-        if isinstance(record.analysis, IncidentAnalysisResult):
-            if not record.analysis.planning_allowed:
-                raise HTTPException(
-                    status_code=409,
-                    detail={"reason": "PLANNING_SUPPRESSED", "codes": record.fallback_reasons},
-                )
-            plans = [item.plan for item in record.analysis.plan_proposals[: request.count]]
-        else:
-            # Explicit demo plans are structured but remain unverified until an authority is injected.
-            target_nodes = record.state.candidates.node_ids
-            plans = [OperationalPlan(
-                incident_id=incident_id, name=f"candidate {index + 1} demo fallback",
-                actions=(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id=target_nodes[index % len(target_nodes)]),),
-                model_version="DEMO_FALLBACK_UNVERIFIED",
-            ) for index in range(request.count)]
-        record.plans.update({plan.plan_id: plan for plan in plans})
-        record.state = record.state.model_copy(
-            update={"status": "PLANNING", "approval_pending": False}
-        )
-        runtime().append_event(
+        with record.lock:
+            analysis = _require_planning_authority(record)
+            plans = [item.plan for item in analysis.plan_proposals[: request.count]]
+            record.plans.update({plan.plan_id: plan for plan in plans})
+            record.state = record.state.model_copy(
+                update={"status": "PLANNING", "approval_pending": False}
+            )
+            runtime().append_event(
             record,
             event_type="PLANS_GENERATED",
             actor="HYDRO_STRATEGIST",
@@ -781,8 +969,8 @@ def create_app(
                 "fallback_reasons": list(record.fallback_reasons),
             },
         )
-        runtime().persist(record)
-        return plans
+            runtime().persist(record)
+            return plans
 
     def _runtime_evaluation_context(record: IncidentRuntime) -> PlanEvaluationContext | None:
         """important-issues.txt requirement 7: at runtime there is no true
@@ -883,6 +1071,7 @@ def create_app(
         default_population_by_node = _context_fields["population_by_node"].default
         payload: dict[str, Any] = {
             "network_id": record.state.network_id,
+            "network_hash": _authoritative_network_hash(record),
             "observations": [item.model_dump(mode="json") for item in record.state.observations],
             "candidates": (
                 record.state.candidates.model_dump(mode="json")
@@ -932,17 +1121,64 @@ def create_app(
                 record,
                 event_type="PLAN_VERIFICATION_STALE",
                 actor="SYSTEM",
-                payload={"plan_id": str(plan_id), "reason": "EVIDENCE_CHANGED"},
+                payload={"plan_id": str(plan_id), "reason": "VERIFICATION_CONTEXT_CHANGED"},
                 simulator_version=verification.simulator_version,
             )
 
-    @app.post(
-        "/api/incidents/{incident_id}/plans/{plan_id}/verify",
-        response_model=PlanVerification,
-    )
-    def verify_plan(incident_id: UUID, plan_id: UUID) -> PlanVerification:
+    def _verification_snapshot(record: IncidentRuntime, plan: OperationalPlan) -> tuple[str, str, str]:
+        return (_plan_hash(plan), _authoritative_network_hash(record), _verification_context_hash(record))
+
+    def _record_verification(
+        record: IncidentRuntime,
+        plan: OperationalPlan,
+        verification: PlanVerification,
+        *,
+        exact_runs_consumed: int,
+        snapshot: tuple[str, str, str],
+    ) -> PlanVerification:
+        """Persist only a verification whose exact plan/network/context survived evaluation."""
+        if verification.plan_id != plan.plan_id:
+            raise HTTPException(status_code=500, detail="verifier returned the wrong plan_id")
+        if snapshot != _verification_snapshot(record, plan):
+            raise HTTPException(status_code=409, detail="verification inputs changed during evaluation; retry required")
+        plan_hash, network_hash, context_hash = snapshot
+        verification = verification.model_copy(update={
+            "plan_hash": plan_hash, "network_hash": network_hash,
+            "context_hash": context_hash, "verification_status": "CURRENT",
+        })
+        record.verifications[plan.plan_id] = verification
+        verified = verification.decision == PlanDecision.VERIFIED
+        cache_hit = bool(verification.evaluation_provenance and verification.evaluation_provenance.get("cache_hit"))
+        new_runs = record.state.exact_simulations_used + exact_runs_consumed
+        record.state = record.state.model_copy(update={
+            "status": "APPROVAL" if verified else "PLANNING", "approval_pending": verified,
+            "exact_simulations_used": new_runs,
+            "plans_exactly_verified": record.state.plans_exactly_verified + 1,
+            "exact_simulation_cache_hits": record.state.exact_simulation_cache_hits + int(cache_hit),
+            "remaining_epanet_budget": max(0, settings.exact_plan_simulation_limit - new_runs),
+        })
+        runtime().append_event(
+            record,
+            event_type=("PLAN_VERIFIED" if verified else "PLAN_VERIFICATION_FAILED"
+                        if verification.decision == PlanDecision.ABSTAINED else "PLAN_REJECTED"),
+            actor="HYDRO_VERIFIER",
+            payload={
+                "plan_id": str(plan.plan_id), "decision": verification.decision.value,
+                "rejection_codes": list(verification.rejection_codes),
+                "abstention_reason": verification.abstention_reason.value if verification.abstention_reason else None,
+                "exact_simulation_count": exact_runs_consumed, "runtime_mode": record.runtime_mode,
+                "fallback_reasons": list(record.fallback_reasons),
+            },
+            simulator_version=verification.simulator_version,
+        )
+        runtime().persist(record)
+        return verification
+
+    def _verify_plan_unlocked(incident_id: UUID, plan_id: UUID) -> PlanVerification:
         record = incident_or_404(incident_id)
+        _require_planning_authority(record)
         plan = plan_or_404(record, plan_id)
+        snapshot = _verification_snapshot(record, plan)
         exact_runs_consumed = 0
         if runtime().verifier is not None:
             verification = runtime().verifier(plan, record.state)
@@ -977,73 +1213,18 @@ def create_app(
                 verification = PlanVerifier(simulator).verify(plan, evaluation_context)
             finally:
                 exact_runs_consumed = simulator.exact_runs
-        if verification.plan_id != plan_id:
-            raise HTTPException(status_code=500, detail="verifier returned the wrong plan_id")
-        # core-issues5.txt Section 10: stamp the context this verification
-        # was computed against -- CURRENT now (evidence has not moved since
-        # `record` was read above), but note that approve_plan below always
-        # recomputes and compares the hash fresh rather than trusting this
-        # flag alone, so a change that lands between this write and a later
-        # approval attempt is still caught even if some other evidence-
-        # mutating path failed to eagerly mark it STALE.
-        verification = verification.model_copy(
-            update={"context_hash": _verification_context_hash(record), "verification_status": "CURRENT"}
+        return _record_verification(
+            record, plan, verification, exact_runs_consumed=exact_runs_consumed, snapshot=snapshot
         )
-        record.verifications[plan_id] = verification
-        verified = verification.decision == PlanDecision.VERIFIED
-        # core-issues5.txt Section 8: plans_exactly_verified counts THIS
-        # plan verification attempt (one per /verify call, regardless of
-        # decision) -- distinct from exact_simulations_used, which counts
-        # the underlying EPANET executions it consumed (0 for a cache hit
-        # or an injected/non-simulator verifier, possibly >1 for a
-        # multi-hypothesis exposure-aware evaluation).
-        cache_hit = bool(
-            verification.evaluation_provenance and verification.evaluation_provenance.get("cache_hit")
-        )
-        new_exact_simulations_used = record.state.exact_simulations_used + exact_runs_consumed
-        record.state = record.state.model_copy(
-            update={
-                "status": "APPROVAL" if verified else "PLANNING",
-                "approval_pending": verified,
-                "exact_simulations_used": new_exact_simulations_used,
-                "plans_exactly_verified": record.state.plans_exactly_verified + 1,
-                "exact_simulation_cache_hits": (
-                    record.state.exact_simulation_cache_hits + (1 if cache_hit else 0)
-                ),
-                "remaining_epanet_budget": max(
-                    0, settings.exact_plan_simulation_limit - new_exact_simulations_used
-                ),
-            }
-        )
-        runtime().append_event(
-            record,
-            # core-issues5.txt Section 9: distinguish a real WNTR REJECTED
-            # decision from an ABSTAINED (simulator/governed failure)
-            # decision in the audit trail -- both previously collapsed into
-            # the same "PLAN_REJECTED" event type.
-            event_type=(
-                "PLAN_VERIFIED"
-                if verified
-                else "PLAN_VERIFICATION_FAILED"
-                if verification.decision == PlanDecision.ABSTAINED
-                else "PLAN_REJECTED"
-            ),
-            actor="HYDRO_VERIFIER",
-            payload={
-                "plan_id": str(plan_id),
-                "decision": verification.decision.value,
-                "rejection_codes": list(verification.rejection_codes),
-                "abstention_reason": (
-                    verification.abstention_reason.value if verification.abstention_reason else None
-                ),
-                "exact_simulation_count": exact_runs_consumed,
-                "runtime_mode": record.runtime_mode,
-                "fallback_reasons": list(record.fallback_reasons),
-            },
-            simulator_version=verification.simulator_version,
-        )
-        runtime().persist(record)
-        return verification
+
+    @app.post(
+        "/api/incidents/{incident_id}/plans/{plan_id}/verify",
+        response_model=PlanVerification,
+    )
+    def verify_plan(incident_id: UUID, plan_id: UUID) -> PlanVerification:
+        record = incident_or_404(incident_id)
+        with record.lock:
+            return _verify_plan_unlocked(incident_id, plan_id)
 
     @app.post(
         "/api/incidents/{incident_id}/plans/{plan_id}/approve",
@@ -1053,45 +1234,44 @@ def create_app(
         incident_id: UUID, plan_id: UUID, request: ApprovalRequest
     ) -> ApprovalReceipt:
         record = incident_or_404(incident_id)
-        plan_or_404(record, plan_id)
-        verification = record.verifications.get(plan_id)
-        if verification is None or verification.decision != PlanDecision.VERIFIED:
-            raise HTTPException(
-                status_code=409, detail="only a VERIFIED plan can be approved"
-            )
+        with record.lock:
+            if record.state.status != "APPROVAL" or not record.state.approval_pending:
+                raise HTTPException(status_code=409, detail="approval is allowed only from current APPROVAL state")
+            plan = plan_or_404(record, plan_id)
+            verification = record.verifications.get(plan_id)
+            if verification is None or verification.decision != PlanDecision.VERIFIED:
+                raise HTTPException(status_code=409, detail="only a VERIFIED plan can be approved")
         # core-issues5.txt Section 10 (P0 safety fix): approval requires
         # decision == VERIFIED (checked above) AND status == CURRENT AND
         # context_hash == the incident's CURRENT context hash, recomputed
         # fresh here rather than trusting verification_status alone -- a
         # defensive re-check that catches any evidence-changing path that
         # did not (or could not) eagerly call _invalidate_stale_verifications.
-        current_hash = _verification_context_hash(record)
-        if verification.verification_status != "CURRENT" or verification.context_hash != current_hash:
-            raise HTTPException(
-                status_code=409,
-                detail="verification is stale: incident evidence has changed since this plan was "
-                "verified; re-verify before approval",
+            current_hash = _verification_context_hash(record)
+            if (
+                verification.verification_status != "CURRENT"
+                or verification.context_hash != current_hash
+                or verification.plan_hash != _plan_hash(plan)
+                or verification.network_hash != _authoritative_network_hash(record)
+            ):
+                raise HTTPException(
+                    status_code=409,
+                    detail="verification is stale or lacks exact plan/network bindings; re-verify before approval",
+                )
+            receipt = ApprovalReceipt(
+                incident_id=incident_id, plan_id=plan_id, operator_id=request.operator_id,
+                approved_at=datetime.now(UTC),
             )
-        approved_at = datetime.now(UTC)
-        receipt = ApprovalReceipt(
-            incident_id=incident_id,
-            plan_id=plan_id,
-            operator_id=request.operator_id,
-            approved_at=approved_at,
-        )
-        runtime().append_event(
-            record,
-            event_type="PLAN_APPROVED",
-            actor=f"OPERATOR:{request.operator_id}",
-            payload={"plan_id": str(plan_id)},
-            simulator_version=verification.simulator_version,
-        )
-        record.state = record.state.model_copy(
-            update={"status": "CLOSED", "approval_pending": False}
-        )
-        runtime().persist(record)
-        runtime().store.save_approval(receipt)
-        return receipt
+            if not runtime().store.save_approval(receipt):
+                raise HTTPException(status_code=409, detail="plan has already been approved")
+            runtime().append_event(
+                record, event_type="PLAN_APPROVED", actor=f"OPERATOR:{request.operator_id}",
+                payload={"plan_id": str(plan_id)}, simulator_version=verification.simulator_version,
+            )
+            record.state = record.state.model_copy(update={"status": "CLOSED", "approval_pending": False})
+            _invalidate_swarm(record)
+            runtime().persist(record)
+            return receipt
 
     @app.get(
         "/api/incidents/{incident_id}/events", response_model=list[AuditEvent]
@@ -1308,7 +1488,8 @@ def create_app(
                 node_id=observation.node_id,
                 health=(
                     "MISSING" if observation.missing
-                    else "DRIFT" if (observation.drift_flag or observation.frozen_flag)
+                    else "FROZEN" if observation.frozen_flag
+                    else "DRIFT" if observation.drift_flag
                     else "HEALTHY"
                 ),
                 quality=observation.quality,
@@ -1456,13 +1637,12 @@ def create_app(
         _validate_incident_view(view)
         return view
 
-    @app.post("/api/incidents/{incident_id}/workflow")
-    def run_swarm_workflow(incident_id: UUID):
+    def _run_swarm_workflow_unlocked(incident_id: UUID):
         record = incident_or_404(incident_id)
-        if record.analysis is None:
-            perform_analysis(record)
-        if record.swarm is not None:
-            return record.swarm.run()
+        with record.lock:
+            if record.analysis is None:
+                perform_analysis(record)
+            analysis_result = _require_planning_authority(record)
         analysis = analysis_response(record)
         candidate_region = record.state.candidates.node_ids
 
@@ -1473,7 +1653,7 @@ def create_app(
                 if probability > 0
             ],
             "candidate_region": candidate_region,
-            "evidence_sufficient": analysis.planning_allowed or record.runtime_mode == "DEMO_FALLBACK",
+            "evidence_sufficient": analysis_result.planning_allowed,
             "uncertainty": 1.0 - max(analysis.fused_belief.values()),
             "ood_level": analysis.ood_level,
         })
@@ -1483,19 +1663,9 @@ def create_app(
             "expected_information_gain": 0.01 if analysis.recommended_sample else 0.0,
             "reason": "hybrid pipeline recommendation",
         })
-        proposals = (
-            [item.plan for item in record.analysis.plan_proposals]
-            if isinstance(record.analysis, IncidentAnalysisResult)
-            else list(record.plans.values())
-        )
-        if not proposals and record.runtime_mode == "DEMO_FALLBACK":
-            target = candidate_region[0]
-            proposals = [OperationalPlan(
-                incident_id=incident_id,
-                name="candidate 1 demo fallback",
-                actions=(OperationalAction(action_type=ActionType.MONITOR_NODE, target_id=target),),
-                model_version="DEMO_FALLBACK_UNVERIFIED",
-            )]
+        proposals = [item.plan for item in analysis_result.plan_proposals]
+        if not proposals:
+            raise HTTPException(status_code=409, detail="planning produced no authoritative candidates")
         strategist = HydroStrategist(inference=lambda state: {
             "plans": [{"plan": plan, "estimated_value": 0.5} for plan in proposals],
             "revision_round": int(state.get("planning_round", 0)),
@@ -1539,6 +1709,7 @@ def create_app(
             )
         )
         record.swarm.start(network, record.state)
+        verification_snapshots = {plan.plan_id: _verification_snapshot(record, plan) for plan in proposals}
         try:
             result = record.swarm.run()
         finally:
@@ -1557,10 +1728,6 @@ def create_app(
                 record.state = record.state.model_copy(
                     update={
                         "exact_simulations_used": new_exact_simulations_used,
-                        "plans_exactly_verified": (
-                            record.state.plans_exactly_verified
-                            + record.swarm.result().plans_exactly_verified
-                        ),
                         "remaining_epanet_budget": max(
                             0, settings.exact_plan_simulation_limit - new_exact_simulations_used
                         ),
@@ -1569,7 +1736,13 @@ def create_app(
         if result.selected_plan:
             record.plans[result.selected_plan.plan_id] = result.selected_plan
         if result.verification:
-            record.verifications[result.verification.plan_id] = result.verification
+            selected = result.selected_plan
+            if selected is None:
+                raise HTTPException(status_code=500, detail="workflow returned verification without plan")
+            _record_verification(
+                record, selected, result.verification, exact_runs_consumed=0,
+                snapshot=verification_snapshots[selected.plan_id],
+            )
         runtime().append_event(
             record, event_type="SWARM_WORKFLOW_UPDATED", actor="SWARM_CONTROLLER",
             payload={"fsm_state": result.state.value, "runtime_mode": analysis.runtime_mode,
@@ -1577,6 +1750,13 @@ def create_app(
         )
         runtime().persist(record)
         return result
+
+    @app.post("/api/incidents/{incident_id}/workflow")
+    def run_swarm_workflow(incident_id: UUID):
+        """Serialize the entire workflow against evidence, verification, and approval."""
+        record = incident_or_404(incident_id)
+        with record.lock:
+            return _run_swarm_workflow_unlocked(incident_id)
 
     @app.get("/api/incidents/{incident_id}/summary")
     def incident_summary(incident_id: UUID) -> dict[str, object]:

@@ -28,11 +28,18 @@ class SensorSeries:
     missing: tuple[bool, ...]
     drift: tuple[bool, ...]
     delayed: tuple[bool, ...]
+    #: Operational provenance only: this is deliberately not a new HydroCore
+    #: feature column.  Live API ingestion preserves the raw declared state
+    #: here so evidence hashing and deterministic authority checks cannot
+    #: confuse a frozen sensor with an ordinary low-health reading.
+    frozen: tuple[bool, ...] = ()
 
     def __post_init__(self) -> None:
+        if not self.frozen:
+            object.__setattr__(self, "frozen", (False,) * len(self.timestamps_seconds))
         lengths = {
             len(self.timestamps_seconds), len(self.concentration_mg_l), len(self.pressure_m),
-            len(self.health), len(self.missing), len(self.drift), len(self.delayed),
+            len(self.health), len(self.missing), len(self.drift), len(self.delayed), len(self.frozen),
         }
         if len(lengths) != 1 or not self.timestamps_seconds:
             raise ValueError("sensor series fields must be aligned and non-empty")

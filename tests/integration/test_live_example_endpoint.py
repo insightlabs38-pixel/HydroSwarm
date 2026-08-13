@@ -44,4 +44,7 @@ def test_live_example_inputs_is_cached_across_requests_within_one_app_instance()
     first = client.get("/api/live-example-inputs").json()
     second = client.get("/api/live-example-inputs").json()
 
-    assert first == second
+    assert first["cache_status"] == "MISS"
+    assert second["cache_status"] == "HIT"
+    for key in ("execution_mode", "input_source", "computed_at", "input_sha256", "network_sha256", "scenario_sha256"):
+        assert first[key] == second[key]
