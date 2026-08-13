@@ -48,7 +48,7 @@ from hydroswarm.classical import (
     resolve_signature_mode,
 )
 from hydroswarm.data.scenarios import network_sha256
-from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline
+from hydroswarm.inference import DYNAMIC_TRUST_FUSION_CONFIG, HybridInferencePipeline, OODDetector, OODReference
 from hydroswarm.preprocessing.builder import HydraulicFeatureBuilder
 from hydroswarm.runtime.paths import resolve_data_dir
 from hydroswarm.runtime.v4_inference_bundle import (
@@ -313,6 +313,9 @@ class V4PipelineFactory:
             model=self._model,
             model_hash=self._model_hash,
             calibration_artifact=calibration,
+            ood_detector=OODDetector(OODReference(
+                validated_network_hashes=calibration.validated_topology_hashes if calibration else (),
+            )),
             # core-issues5.txt Section 3: inject the same governed,
             # hash-verified train-owned feature builder _load_assets
             # resolved above -- None only when the model itself is None

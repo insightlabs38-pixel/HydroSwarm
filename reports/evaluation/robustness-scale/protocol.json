@@ -1,0 +1,42 @@
+{
+  "schema_version": "hydroswarm-robustness-scale-protocol-v1",
+  "study": "frozen robustness and scale characterization",
+  "tested_git_commit": "e45f72cf730d3f12c13dbcb9403c64f185510173",
+  "identities": {
+    "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+    "calibration_sha256": "829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa",
+    "feature_schema_sha256": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "normalization_sha256": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114"
+  },
+  "locked_test": {
+    "excluded": true,
+    "required_status_before_and_after": false,
+    "forbidden_split_names": ["test", "locked_final_test", "locked_topology_test"]
+  },
+  "corpus_root": "data/learning-v2/cycle-b2-joint-v4/tensors-normalized",
+  "populations": [
+    "validation",
+    "ood-SEVERE_MISSINGNESS",
+    "ood-FROZEN_DRIFTING_SENSOR",
+    "ood-EXTREME_DEMAND",
+    "ood-ROUGHNESS_MISMATCH",
+    "ood-TANK_STATE_SHIFT",
+    "ood-UNSEEN_TOPOLOGY"
+  ],
+  "random_seed": 20260813,
+  "max_rows_per_population": 24,
+  "timing_repetitions": 5,
+  "warmup_repetitions": 1,
+  "authority_invariant": "planning_allowed == false => control_action != GENERATE_PLANS",
+  "commands": [
+    "python scripts/run_robustness_scale_characterization.py --verify-only",
+    "python scripts/run_robustness_scale_characterization.py"
+  ],
+  "known_exclusions": [
+    "No locked evaluation inputs or commands.",
+    "No new generated corpus or synthetic scale topology.",
+    "No independently labelled 10/25/50/75 percent missingness strata in committed development-holdout tensors.",
+    "No independently labelled isolated/multiple/majority sensor-health strata in committed development-holdout tensors.",
+    "No plan-verification timing when planning is deterministically suppressed or no live WNTR proposal is run."
+  ]
+}

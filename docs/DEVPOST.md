@@ -44,6 +44,12 @@ physics-derived source-signature path under a dynamic, disagreement-aware trust
 coefficient, calibrated with split-conformal prediction and five-component
 out-of-distribution detection.
 
+The completed frozen robustness-scale characterization replayed 168 governed
+validation/development rows: nominal top-1 was 76.2%, the existing unseen-
+topology population was 27.8% top-1, and all 144 sampled OOD rows were
+planning-suppressed with no authority-invariant failure. These are synthetic,
+offline characterization results, not field-performance claims.
+
 ## Challenges and accomplishments
 
 The hardest part was making uncertainty operational end to end: disagreement changes
@@ -84,10 +90,14 @@ GitHub Actions
 
 ## Release and submission links
 
+The links below are historical `v0.1.3-hackathon` release evidence, not a
+claim that this branch is published. The eventual final submission release
+must be cut from its reviewed final commit.
+
 - Repository: https://github.com/insightlabs38-pixel/HydroSwarm
 - GitHub Release: https://github.com/insightlabs38-pixel/HydroSwarm/releases/tag/v0.1.3-hackathon
 - Runtime ZIP: https://github.com/insightlabs38-pixel/HydroSwarm/releases/download/v0.1.3-hackathon/HydroSwarm-v0.1.3-hackathon-runtime.zip
 - Release manifest: https://github.com/insightlabs38-pixel/HydroSwarm/releases/download/v0.1.3-hackathon/RELEASE_MANIFEST.json
 - Published multiarch image: `ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.3-hackathon`
 - Technical report: https://github.com/insightlabs38-pixel/HydroSwarm/blob/v0.1.3-hackathon/docs/FINAL_SYSTEM.md
-- Demo video: **pending final recording**
+- Demo video: [FINAL PUBLIC VIDEO URL TO BE INSERTED AT SUBMISSION]

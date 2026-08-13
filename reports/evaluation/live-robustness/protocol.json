@@ -1,0 +1,23 @@
+{
+  "study_id": "hydroswarm-live-robustness-scale-v1",
+  "title": "HydroSwarm End-to-End LIVE Robustness and Scalability Characterization",
+  "study_type": "frozen end-to-end characterization",
+  "system_under_test_commit": "e45f72cf730d3f12c13dbcb9403c64f185510173",
+  "predecessor": {"study_id": "robustness-scale-v1", "scope": "offline frozen tensor characterization only", "not_measured": ["live API", "real active sampling", "planning", "exact WNTR verification", "workflow latency"]},
+  "network_population": [
+    {"id": "golden-reference", "path": "data/frozen/golden_network.inp", "topology_class": "governed_reference", "role": "in_distribution_control"},
+    {"id": "loop-grid", "path": "data/topologies/loop-grid.inp", "topology_class": "governed_topology", "role": "medium_scale_and_control"},
+    {"id": "branched-loop", "path": "data/topology-transfer/branched-loop.inp", "topology_class": "governed_topology_transfer", "role": "validated_transfer_control"},
+    {"id": "coastal-branch", "path": "data/topologies/coastal-branch.inp", "topology_class": "development_unseen", "role": "unfamiliar_topology"}
+  ],
+  "seeds": {"reference": [7101, 7102, 7103, 7104, 7105, 7106, 7107, 7108, 7109, 7110, 7111, 7112, 7113, 7114, 7115, 7116, 7117, 7118, 7119, 7120, 7121, 7122, 7123, 7124], "unseen_topology": [7201, 7202, 7203, 7204, 7205, 7206, 7207, 7208], "scale": [7301, 7302, 7303, 7304, 7305, 7306]},
+  "timing": {"warmup_per_group": 1, "timed_repetitions": 3, "stage_timeout_seconds": 120, "trajectory_timeout_seconds": 300, "p95_minimum_n": 20},
+  "matrix": {"missingness_percent": [0, 10, 25, 50, 75], "coverage_fraction": [1.0, 0.75, 0.5, 0.25], "health_strata": ["one", "25_percent", "50_percent", "majority", "all_available"], "health_modes": ["quality", "drift", "frozen", "delayed", "communication_missing"], "noise": ["nominal", "moderate", "severe"], "bias": ["positive", "negative"], "hydraulic_mismatch": ["demand", "roughness", "tank_state", "source_strength", "timing"], "ambiguity": ["near_tie", "contradictory", "disagreement"], "topology": ["governed_reference", "development_unseen"], "scale": ["small", "medium", "largest_evaluation_only_if_valid"]},
+  "metrics": {"localization": ["top1_correct", "top3_correct", "reciprocal_rank", "true_source_probability", "conformal_truth_coverage", "candidate_set_size", "posterior_entropy"], "governance": ["classical_belief", "neural_belief", "fused_belief", "fusion_trust", "disagreement_js", "calibrated", "ood_components", "ood_level", "evidence_sufficient", "planning_allowed", "control_action", "suppression_reasons"], "sampling": ["recommended_node", "expected_information_gain", "realized_entropy_change", "candidate_set_change", "samples_to_sufficiency"], "performance": ["import_ms", "incident_creation_ms", "analysis_ms", "sampling_ms", "reanalysis_ms", "planning_ms", "verification_ms", "approval_ms", "total_trajectory_ms", "process_rss_before_mb", "peak_process_rss_mb", "process_rss_after_mb", "exact_simulator_calls"], "planning": ["candidate_plans", "deterministic_rejects", "exact_results", "consequences", "verification_status"]},
+  "invariants": ["INV-1", "INV-2", "INV-3", "INV-4", "INV-5", "INV-6", "INV-7", "INV-8", "INV-9", "INV-10"],
+  "classifications": ["PASS", "FAIL", "OBSERVATION", "LIMITATION", "INCONCLUSIVE", "HARNESS_ERROR"],
+  "locked_test_exclusion": {"assert_before": true, "assert_after": true, "rejected_tokens": ["locked_final_test", "locked_topology_test", "test"], "never_open_or_enumerate_locked_examples": true},
+  "no_post_result_tuning": true,
+  "amendments": [{"id": "HARNESS-CORRECTION-02", "reason": "branched-loop structural hash is calibration validated; use coastal-branch for unfamiliar topology", "effect": "supersede mislabeled fixture rows; no production parameter changed"}],
+  "result_artifacts": ["results.json", "results.csv", "summary.json", "LIVE_ROBUSTNESS_EVALUATION.md"]
+}

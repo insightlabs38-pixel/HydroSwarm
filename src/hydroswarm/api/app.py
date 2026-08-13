@@ -43,6 +43,7 @@ from hydroswarm.explanation import (
 from hydroswarm.agents import HydroScout, HydroSentinel, HydroStrategist, SwarmController
 from hydroswarm.calibration.conformal import CALIBRATION_SCHEMA_VERSION
 from hydroswarm.inference import (
+    ControlAction,
     MODEL_VERSION,
     IncidentAnalysisResult,
     build_decision_certificates,
@@ -864,25 +865,26 @@ def create_app(
             if record.analysis is None:
                 perform_analysis(record)
             analysis = record.analysis
-            if isinstance(analysis, IncidentAnalysisResult) and analysis.sample_result:
-                sampled = analysis.sample_result
-                if sampled.stop or sampled.recommended_node is None:
-                    raise HTTPException(status_code=409, detail=sampled.stop_reason or "sampling stopped")
-                selected = next(item for item in sampled.ranked if item.node_id == sampled.recommended_node)
-                recommendation = SampleRecommendation(
-                    node_id=sampled.recommended_node,
-                    expected_information_gain=selected.expected_information_gain_bits,
-                    alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
-                    runtime_mode=record.runtime_mode,
-                    fallback_reasons=record.fallback_reasons,
-                )
-            else:
-                nodes = record.state.candidates.node_ids
-                recommendation = SampleRecommendation(
-                    node_id=nodes[0], expected_information_gain=max(record.state.candidates.node_probabilities.values()),
-                    alternatives=nodes[1:3], runtime_mode=record.runtime_mode,
-                    fallback_reasons=record.fallback_reasons,
-                )
+            if not isinstance(analysis, IncidentAnalysisResult):
+                raise HTTPException(status_code=409, detail="authoritative live sampling analysis is unavailable")
+            if analysis.control_action is not ControlAction.REQUEST_SAMPLE:
+                raise HTTPException(status_code=409, detail="current analysis does not request sampling")
+            sampled = analysis.sample_result
+            if sampled is None:
+                raise HTTPException(status_code=409, detail="current analysis has no sampling recommendation")
+            if sampled.stop or sampled.recommended_node is None:
+                raise HTTPException(status_code=409, detail=sampled.stop_reason or "sampling stopped")
+            observed_nodes = {item.node_id for item in record.state.observations}
+            if sampled.recommended_node in observed_nodes:
+                raise HTTPException(status_code=409, detail="sampling recommendation is already represented in current evidence")
+            selected = next(item for item in sampled.ranked if item.node_id == sampled.recommended_node)
+            recommendation = SampleRecommendation(
+                node_id=sampled.recommended_node,
+                expected_information_gain=selected.expected_information_gain_bits,
+                alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
+                runtime_mode=record.runtime_mode,
+                fallback_reasons=record.fallback_reasons,
+            )
             runtime().append_event(
                 record,
                 event_type="SAMPLE_RECOMMENDED",

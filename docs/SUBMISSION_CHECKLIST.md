@@ -26,26 +26,25 @@
       is the actual frozen default -- fixed; see docs/FINAL_SYSTEM.md.)
 - [x] Frozen scenario outputs are computed, checksummed, and not embedded UI claims.
 - [x] Technical report PDF visually reviewed; figures, tables, limitations, references present.
-- [ ] 3:30-4:30 demo video has captions, clear audio, visible real outputs, and no cuts
-      that imply false causality. **Not started** -- intentionally, per SS23: no
-      placeholder video URL is presented as finished.
+- [x] Demo video recording exists. Captions, audio, visible real outputs, and no cuts
+      implying false causality remain a final-release review task; its public submission
+      URL must be inserted manually on submission day.
 - [x] Fresh Playwright screenshots show the first-launch gateway, reference sampling,
       approval boundary, and LIVE V4 proof start without sensitive paths/data; all 53
       Playwright tests passed. README uses these as its primary
       visual story rather than the old fallback-only screenshot.
-- [ ] Devpost write-up, built-with list, repository, video, and report links work
-      anonymously. Write-up and built-with list updated this session
-      (`docs/DEVPOST.md`); only the video link remains intentionally pending.
+- [ ] Submission-day/manual task: verify the Devpost write-up, built-with list,
+      repository, report links, and final public video URL anonymously.
 - [x] AI-assistance disclosure uses the approved wording.
 - [x] No secrets, private data, restricted datasets, unreviewed checkpoints, or oversized
       caches are committed.
-- [x] Safety boundary and absence of autonomous control are visible in README and UI
-      (footer, ModeBanner, Approval workspace, docs/FINAL_SYSTEM.md's authority-boundaries
-      section). **Not yet visible in a video** -- no video exists yet (see above).
+- [x] Safety boundary and absence of autonomous control are visible in README, UI, and
+      the recorded demo. Final-release review must confirm the final exported video still
+      shows that boundary.
 - [x] A local `v0.1.0-hackathon` runtime ZIP was built, extracted into a clean Linux
       ARM64 directory, and passed setup → strict self-test → loopback launch. It includes
       checksums, the frozen V4 bundle, built frontend, and reference artifact. The
-      `v0.1.3-hackathon` GitHub Release publishes the current runtime ZIP and
+      Historical `v0.1.3-hackathon` GitHub Release publishes the prior runtime ZIP and
       `RELEASE_MANIFEST.json`; its GHCR multiarch image passed strict self-tests for both
       published architectures.
 - [x] Hardened Docker verification (`--read-only`, non-root, dropped capabilities,
@@ -55,5 +54,6 @@
 
 ## What a human needs to do before this submission is truly ready
 
-1. Record the demo video, showing the REFERENCE
-   INCIDENT as the primary walkthrough.
+1. Submission day: insert the final public video URL and verify playback anonymously.
+2. Final-release task: cut a new reviewed release/tag from the eventual final submission
+   commit; do not relabel the historical `v0.1.3-hackathon` release.
