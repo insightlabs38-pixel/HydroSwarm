@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "status": "PRE_REGISTERED",
+  "pre_registered_before_results": true,
+  "branch": "diag/capability-bottleneck",
+  "base_main_sha": "f06642421f8bbeefe5615812b143d14cf10bcda8",
+  "companion_doc": "docs/evaluation/CAPABILITY_DIAGNOSTIC_PROTOCOL.md",
+  "confirmed_premise": {
+    "controlled_top1": [0.7205, 0.7331],
+    "controlled_top3": [0.8680, 0.8756],
+    "controlled_mrr": [0.8113, 0.8172],
+    "controlled_source": "docs/MODEL_CARD.md; reports/results/v4/phase13-metrics-and-baselines.md",
+    "live_post_remediation_top1": 0.306,
+    "live_post_remediation_top3": 0.847,
+    "live_post_remediation_mrr": 0.571,
+    "live_post_remediation_planning_eligible_rate": 0.012,
+    "live_source": "reports/evaluation/live-robustness/post-remediation-summary.json",
+    "live_runs": 264,
+    "sharp_contrast": "LIVE nominal:clean_operational (n=12) top1=0.000 vs offline SEVERE_MISSINGNESS dev-holdout top1=0.64-0.65"
+  },
+  "hypotheses": [
+    "A_evaluation_mismatch",
+    "B_train_serve_feature_mismatch",
+    "C_temporal_evidence_mismatch",
+    "D_sensor_measurement_representation_mismatch",
+    "E_classical_prior_mismatch",
+    "F_neural_model_capability_limitation",
+    "G_neural_classical_fusion_degradation",
+    "H_calibration_applicability_policy",
+    "I_ood_false_positive_conservatism",
+    "J_evidence_sufficiency_logic",
+    "K_conformal_candidate_region_logic",
+    "L_active_sampling_quality",
+    "M_active_sampling_observation_model_mismatch",
+    "N_topology_data_diversity_limitation",
+    "O_genuine_model_capacity_limitation",
+    "P_combinations_interactions"
+  ],
+  "rule_do_not_conclude_O_before_A_through_N": true,
+  "locked_test": {
+    "opened_before": false,
+    "guard_function": "locked_test_opened(repo_root) in src/hydroswarm/evaluation/live_robustness.py and robustness_scale.py",
+    "policy": "every diagnostic script must call the guard and abort on true; no locked path enumerated/run/inspected"
+  },
+  "data_sources": {
+    "reused": [
+      "reports/evaluation/live-robustness/post-remediation-results.json",
+      "reports/evaluation/live-robustness/post-remediation-summary.json",
+      "reports/evaluation/live-robustness/post-remediation-targeted",
+      "reports/results/v4/pre-freeze-implementation-handoff.md#stage-d-scout-policy-comparison",
+      "reports/results/v4/phase13-metrics-and-baselines.md",
+      "reports/results/v4/architecture-freeze.json",
+      "reports/results/v4/phase14-promotion-gates.md"
+    ],
+    "new": {
+      "train_serve_parity": {"split": "validation", "corpus": "data/learning-v2/cycle-b2", "seed": 20260813, "n": 20},
+      "temporal_ablation": {"depths": ["full", 12, 6, 4, 3, 2, 1], "causal_prefixes": "1..full", "seed": 20260813, "n": 20},
+      "last_snapshot_experiment": {"conditions": ["latest", "earliest", "midpoint", "short_history", "full_causal", "oracle_future_upper_bound"], "seed": 20260813},
+      "pressure_parity": {"conditions": ["true_wntr", "fixed_25m", "omitted", "noisy_governed"], "seed": 20260813},
+      "calibration_conformal_counterfactual": {"split": "calibration_only", "alphas": [0.05, 0.10, 0.15, 0.20]},
+      "confirmation_holdout": {"n": 40, "seed": 20260899, "excludes": ["train", "calibration_examples_reused_verbatim", "locked"]},
+      "observability_oracle": {"n": 20, "topologies": ["golden-reference", "loop-grid", "branched-loop"]}
+    }
+  },
+  "production_freeze": {
+    "model": "unchanged",
+    "checkpoint": "unchanged",
+    "preprocessing_semantics": "unchanged",
+    "runtime_evidence_semantics": "unchanged",
+    "fusion": "unchanged",
+    "calibration": "unchanged",
+    "conformal_alpha": "unchanged",
+    "ood_thresholds": "unchanged",
+    "planning_thresholds": "unchanged",
+    "sampling_algorithm": "unchanged",
+    "product_apis": "unchanged",
+    "wntr_behavior": "unchanged"
+  },
+  "metrics": [
+    "top1", "top3", "mrr", "posterior_entropy", "confidence",
+    "candidate_set_coverage", "candidate_set_size",
+    "actionable_initial", "actionable_within_1", "actionable_within_2", "actionable_within_3",
+    "median_samples_to_actionability", "safe_abstention_rate",
+    "eig_vs_random_realized_entropy_reduction", "source_rank_improvement", "candidate_contraction",
+    "authority_violations", "unsupported_planning", "verification_bypasses"
+  ],
+  "failure_taxonomy": [
+    "CAP-DATA", "CAP-PARITY", "CAP-TEMPORAL", "CAP-FEATURE", "CAP-CLASSICAL",
+    "CAP-NEURAL", "CAP-FUSION", "CAP-CAL", "CAP-OOD", "CAP-GATE",
+    "CAP-SAMPLE", "CAP-TOPOLOGY", "CAP-HARNESS"
+  ],
+  "stopping_rules": [
+    "reproduction_failure_halts_and_classifies_CAP-EVAL-REPRODUCTION",
+    "section47_escalation_conditions_reported_immediately_not_buried",
+    "main_matrix_changes_only_via_documented_HARNESS_CORRECTION",
+    "optional_pilots_section40_41_only_if_preconditions_actually_hold"
+  ],
+  "no_result_driven_tuning": true,
+  "do_not_merge_this_branch": true
+}
