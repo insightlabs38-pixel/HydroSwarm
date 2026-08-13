@@ -214,8 +214,10 @@ def _payloads(scenario: GeneratedScenario, condition: Condition, origin: datetim
         missing = forced_missing or position not in valid
         concentration = None if missing else max(0.0, float(scenario.observed_concentration[position, source_column]) + condition.bias)
         if not missing and condition.ambiguity == "contradictory" and index % 2:
+            assert concentration is not None
             concentration = max(0.0, concentration + 0.5)
         if not missing and condition.ambiguity == "disagreement":
+            assert concentration is not None
             concentration = 0.0 if index % 2 else concentration + 0.75
         degraded = index in health
         observed_at = origin + timedelta(seconds=float(scenario.timestamps_seconds[position]))
