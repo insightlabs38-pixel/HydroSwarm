@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from collections import defaultdict
+from collections.abc import Mapping
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -161,7 +163,62 @@ def create_app(
         # cannot serialize non-finite floats, turning a correct validation
         # failure into a 500. Omit raw input so every malformed numeric request
         # remains an unambiguous 422 before any handler/persistence runs.
-        detail = [{key: value for key, value in item.items() if key != "input"} for item in error.errors()]
+        unsafe = object()
+
+        def sanitize_context(value: object) -> object:
+            """Return only explicit JSON-safe validation context.
+
+            Pydantic's ``ctx`` may retain the original ``ValueError`` from a
+            model validator.  It must never escape into the response: aside
+            from being non-serializable, arbitrary exception reprs may expose
+            implementation details.  Raw ``input`` is intentionally excluded
+            separately below.
+            """
+
+            if value is None or isinstance(value, (str, bool, int)):
+                return value
+            if isinstance(value, float):
+                return value if math.isfinite(value) else unsafe
+            if isinstance(value, datetime):
+                return value.isoformat()
+            if isinstance(value, Mapping):
+                result: dict[str, object] = {}
+                for key, nested in value.items():
+                    # Pydantic uses this key for the original exception
+                    # object. Never serialize it, even if a future validator
+                    # supplies a string under the same key.
+                    if not isinstance(key, str) or key == "error":
+                        continue
+                    sanitized = sanitize_context(nested)
+                    if sanitized is not unsafe:
+                        result[key] = sanitized
+                return result
+            if isinstance(value, (list, tuple)):
+                result = []
+                for nested in value:
+                    sanitized = sanitize_context(nested)
+                    if sanitized is not unsafe:
+                        result.append(sanitized)
+                return result
+            return unsafe
+
+        def sanitize_item(item: Mapping[str, object]) -> dict[str, object]:
+            result: dict[str, object] = {}
+            for key in ("type", "msg", "url"):
+                value = item.get(key)
+                if isinstance(value, str):
+                    result[key] = value
+            location = item.get("loc")
+            if isinstance(location, (list, tuple)):
+                result["loc"] = [
+                    value for value in location if isinstance(value, (str, int)) and not isinstance(value, bool)
+                ]
+            context = sanitize_context(item.get("ctx"))
+            if context is not unsafe and context not in (None, {}, []):
+                result["ctx"] = context
+            return result
+
+        detail = [sanitize_item(item) for item in error.errors()]
         return JSONResponse(status_code=422, content={"detail": detail})
     app.add_middleware(
         CORSMiddleware,
@@ -201,6 +258,40 @@ def create_app(
     def _require_not_closed(record: IncidentRuntime) -> None:
         if record.state.status == "CLOSED":
             raise HTTPException(status_code=409, detail="CLOSED incidents are terminal")
+
+    def _evidence_identity(observation: SensorObservation) -> tuple[str, str, datetime]:
+        """Canonical identity for one sensor reading at one node and time."""
+
+        return (observation.sensor_id, observation.node_id, observation.observed_at)
+
+    def _validate_initial_evidence(observations: tuple[SensorObservation, ...]) -> None:
+        """Reject duplicate initial evidence before any incident state exists."""
+
+        seen: dict[tuple[str, str, datetime], SensorObservation] = {}
+        for observation in observations:
+            identity = _evidence_identity(observation)
+            previous = seen.get(identity)
+            if previous is None:
+                seen[identity] = observation
+                continue
+            reason = (
+                "DUPLICATE_INITIAL_EVIDENCE"
+                if previous == observation
+                else "CONFLICTING_INITIAL_EVIDENCE"
+            )
+            raise HTTPException(status_code=422, detail={"reason": reason})
+
+    def _effective_sensor_health(observation: SensorObservation) -> float:
+        """Map a declared frozen reading onto the existing health channel.
+
+        Frozen corpus telemetry already uses health ``0.25`` (rather than a
+        new model feature).  Capping a declared frozen live reading to the
+        same value preserves that schema and prevents the deterministic trust
+        gates from treating it as fully healthy.  The raw flag remains in
+        ``SensorObservation`` and the operator-facing incident view.
+        """
+
+        return min(observation.quality, 0.25) if observation.frozen_flag else observation.quality
 
     def _require_planning_authority(record: IncidentRuntime) -> IncidentAnalysisResult:
         """One authority gate for every route that could create or verify plans."""
@@ -275,10 +366,11 @@ def create_app(
                 timestamps_seconds=tuple((item.observed_at - origin).total_seconds() for item in items),
                 concentration_mg_l=tuple(item.concentration_mg_l for item in items),
                 pressure_m=tuple(item.pressure_m for item in items),
-                health=tuple(item.quality for item in items),
+                health=tuple(_effective_sensor_health(item) for item in items),
                 missing=tuple(item.missing for item in items),
                 drift=tuple(item.drift_flag for item in items),
                 delayed=tuple(item.received_at > item.observed_at for item in items),
+                frozen=tuple(item.frozen_flag for item in items),
             ))
         return tuple(result)
 
@@ -583,6 +675,11 @@ def create_app(
     def create_incident(request: IncidentCreate) -> IncidentState:
         if request.network_id not in runtime().networks:
             raise HTTPException(status_code=409, detail="network must be validated first")
+        # This must precede IncidentRuntime creation, audit insertion, and
+        # persistence. Initial observations use the same identity as the
+        # subsequent /samples endpoint; creation rejects malformed duplicate
+        # evidence instead of silently inflating authority.
+        _validate_initial_evidence(request.observations)
         network = runtime().networks[request.network_id]
         known_nodes = set(network.metadata.get("node_ids", ()))
         unknown_nodes = sorted({item.node_id for item in request.observations} - known_nodes)
@@ -797,13 +894,13 @@ def create_app(
             _require_not_closed(record)
             if observation.observed_at < record.create.detected_at:
                 raise HTTPException(status_code=422, detail="sample predates incident detection")
-            identity = (observation.sensor_id, observation.node_id, observation.observed_at)
+            identity = _evidence_identity(observation)
             matches = [
                 item for item in record.state.observations
-                if (item.sensor_id, item.node_id, item.observed_at) == identity
+                if _evidence_identity(item) == identity
             ]
             if matches:
-                if matches[0] == observation:
+                if all(item == observation for item in matches):
                     return record.state
                 raise HTTPException(status_code=409, detail="sample identity conflicts with existing measurement")
             if record.state.sample_count >= record.create.maximum_samples:
@@ -1387,7 +1484,8 @@ def create_app(
                 node_id=observation.node_id,
                 health=(
                     "MISSING" if observation.missing
-                    else "DRIFT" if (observation.drift_flag or observation.frozen_flag)
+                    else "FROZEN" if observation.frozen_flag
+                    else "DRIFT" if observation.drift_flag
                     else "HEALTHY"
                 ),
                 quality=observation.quality,

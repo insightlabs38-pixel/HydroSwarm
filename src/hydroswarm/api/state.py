@@ -167,7 +167,7 @@ class NetworkLinkView(ApiModel):
 class SensorHealthView(ApiModel):
     sensor_id: str
     node_id: str
-    health: Literal["HEALTHY", "DRIFT", "MISSING"]
+    health: Literal["HEALTHY", "DRIFT", "FROZEN", "MISSING"]
     quality: float = Field(ge=0.0, le=1.0)
     observed_at: datetime
     received_at: datetime

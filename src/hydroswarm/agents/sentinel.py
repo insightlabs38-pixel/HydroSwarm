@@ -29,7 +29,12 @@ class HydroSentinel(DeterministicAgent[SentinelOutput]):
         usable = [
             item
             for item in observations
-            if isinstance(item, SensorObservation) and not item.missing and item.quality > 0
+            if (
+                isinstance(item, SensorObservation)
+                and not item.missing
+                and not item.frozen_flag
+                and item.quality > 0
+            )
         ]
         prior = state.get("prior_candidates")
         if isinstance(prior, Mapping) and prior:

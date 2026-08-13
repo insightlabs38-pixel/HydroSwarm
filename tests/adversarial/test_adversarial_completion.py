@@ -7,12 +7,15 @@ and API boundaries without changing scientific or operational policy.
 from __future__ import annotations
 
 from copy import deepcopy
+from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 import hashlib
 import json
 import math
 from pathlib import Path
+import sqlite3
 from tempfile import TemporaryDirectory
+from threading import Barrier
 from uuid import uuid4
 
 import pytest
@@ -145,6 +148,18 @@ def _api_client(tmp_path: Path) -> tuple[TestClient, object]:
     return client, network
 
 
+def _enable_incident_view(client: TestClient, network: object) -> None:
+    """Supply local-only topology display metadata for the manual test network."""
+    record = client.app.state.runtime.networks["completion-network"]
+    metadata = dict(record.metadata)
+    metadata["nodes"] = [
+        {"node_id": str(node), "node_type": "junction", "elevation_m": 0.0, "coordinates": [0.0, 0.0]}
+        for node in network.node_name_list
+    ]
+    metadata["links"] = []
+    client.app.state.runtime.networks["completion-network"] = record.model_copy(update={"metadata": metadata})
+
+
 def _create_and_analyze(client: TestClient, observation: dict[str, object]) -> tuple[str, dict[str, object]]:
     created = client.post(
         "/api/incidents",
@@ -254,7 +269,6 @@ def test_adv05_conflict_after_verified_plan_stales_authority(tmp_path: Path) -> 
     ).status_code == 409
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-27 HIGH: duplicate initial evidence is accepted before sample identity controls run")
 def test_adv27_duplicate_initial_observation_is_rejected_atomically(tmp_path: Path) -> None:
     """A25-B: exact retransmission in incident creation must not enter durable evidence twice."""
     client, _network = _api_client(tmp_path)
@@ -264,21 +278,251 @@ def test_adv27_duplicate_initial_observation_is_rejected_atomically(tmp_path: Pa
         json={"network_id": "completion-network", "detected_at": NOW.isoformat(), "observations": [payload, payload]},
     )
     assert response.status_code == 422
+    assert response.json()["detail"]["reason"] == "DUPLICATE_INITIAL_EVIDENCE"
+    runtime = client.app.state.runtime
+    assert runtime.incidents == {}
+    counts = runtime.store.table_counts()
+    assert counts["incidents"] == counts["observations"] == 0
+    with sqlite3.connect(runtime.ledger.path) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM audit_events").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize(
+    ("change", "reason"),
+    (
+        (lambda payload: payload, "DUPLICATE_INITIAL_EVIDENCE"),
+        (lambda payload: {**payload, "concentration_mg_l": 0.79}, "CONFLICTING_INITIAL_EVIDENCE"),
+        (lambda payload: {**payload, "pressure_m": 25.0}, "CONFLICTING_INITIAL_EVIDENCE"),
+        (lambda payload: {**payload, "quality": 0.9}, "CONFLICTING_INITIAL_EVIDENCE"),
+        (lambda payload: {**payload, "frozen_flag": True}, "CONFLICTING_INITIAL_EVIDENCE"),
+    ),
+)
+def test_adv27_initial_evidence_identity_rejects_all_duplicate_variants(
+    tmp_path: Path, change, reason: str,
+) -> None:
+    """ADV-27: identity collisions are rejected before durable initial evidence exists."""
+    client, _network = _api_client(tmp_path)
+    first = _observation()
+    response = client.post(
+        "/api/incidents",
+        json={
+            "network_id": "completion-network",
+            "detected_at": NOW.isoformat(),
+            "observations": [first, change(dict(first))],
+        },
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"]["reason"] == reason
     assert client.app.state.runtime.store.table_counts()["incidents"] == 0
+    assert client.app.state.runtime.incidents == {}
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-28 HIGH: frozen_flag is not carried into SensorSeries or authority gating")
+@pytest.mark.parametrize(
+    "second",
+    (
+        _observation(sensor="S2"),
+        _observation(node="J2"),
+    ),
+)
+def test_adv27_distinct_sensor_or_node_identity_is_allowed(tmp_path: Path, second: dict[str, object]) -> None:
+    """ADV-27: only sensor+node+observed_at identity collisions are rejected."""
+    client, _network = _api_client(tmp_path)
+    response = client.post(
+        "/api/incidents",
+        json={
+            "network_id": "completion-network",
+            "detected_at": NOW.isoformat(),
+            "observations": [_observation(), second],
+        },
+    )
+    assert response.status_code == 201, response.text
+    state = response.json()
+    assert len(state["observations"]) == 2
+    assert client.app.state.runtime.store.table_counts()["observations"] == 2
+
+
+def test_adv27_samples_keep_shared_identity_idempotency_and_conflict_semantics(tmp_path: Path) -> None:
+    """ADV-27: /samples shares the identity rule while retaining retransmission idempotency."""
+    client, _network = _api_client(tmp_path)
+    created = client.post(
+        "/api/incidents",
+        json={"network_id": "completion-network", "detected_at": NOW.isoformat(), "observations": [_observation()]},
+    )
+    incident_id = created.json()["incident_id"]
+    before = client.get(f"/api/incidents/{incident_id}").json()
+    assert client.post(f"/api/incidents/{incident_id}/samples", json=_observation()).json() == before
+    conflict = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        json=_observation(concentration=0.79),
+    )
+    assert conflict.status_code == 409
+    assert client.get(f"/api/incidents/{incident_id}").json() == before
+
+
+def test_adv27_concurrent_duplicate_sample_arrival_has_one_evidence_effect(tmp_path: Path) -> None:
+    """ADV-27 second pass: concurrent equivalent samples add exactly one evidence record."""
+    client, _network = _api_client(tmp_path)
+    incident_id, _analysis = _create_and_analyze(client, _observation())
+    sample = _observation(sensor="S2", node="J2", concentration=0.15, observed_at=NOW + timedelta(minutes=1))
+    barrier = Barrier(2)
+
+    def submit() -> int:
+        barrier.wait()
+        return client.post(f"/api/incidents/{incident_id}/samples", json=sample).status_code
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        statuses = list(executor.map(lambda _unused: submit(), range(2)))
+    assert statuses == [200, 200]
+    state = client.get(f"/api/incidents/{incident_id}").json()
+    assert state["sample_count"] == 1
+    assert len(state["observations"]) == 2
+
+
 def test_adv28_frozen_sensor_cannot_retain_planning_authority(tmp_path: Path) -> None:
     """A05-5: frozen evidence must reduce authority rather than plan identically to healthy evidence."""
     healthy_client, _network = _api_client(tmp_path / "healthy")
-    frozen_client, _network = _api_client(tmp_path / "frozen")
+    frozen_client, network = _api_client(tmp_path / "frozen")
     _healthy_id, healthy = _create_and_analyze(healthy_client, _observation(frozen=False))
     _frozen_id, frozen = _create_and_analyze(frozen_client, _observation(frozen=True))
     assert healthy["planning_allowed"] is True
     assert frozen["planning_allowed"] is False
+    assert healthy["posterior_history"][-1]["evidence_hash"] != frozen["posterior_history"][-1]["evidence_hash"]
+    _enable_incident_view(frozen_client, network)
+    view = frozen_client.get(f"/api/incidents/{_frozen_id}/view")
+    assert view.status_code == 200, view.text
+    assert view.json()["sensor_health"][0]["health"] == "FROZEN"
 
 
-@pytest.mark.xfail(strict=True, reason="ADV-29 MEDIUM: validation-error ctx contains a non-JSON-serializable ValueError")
+@pytest.mark.parametrize(
+    "observation",
+    (
+        _observation(frozen=True),
+        _observation(frozen=True, quality=0.01),
+        _observation(frozen=True, drift=True),
+        {
+            **_observation(frozen=True, missing=True),
+            "concentration_mg_l": None,
+            "pressure_m": None,
+        },
+    ),
+)
+def test_adv28_frozen_evidence_never_increases_authority(
+    tmp_path: Path, observation: dict[str, object],
+) -> None:
+    """ADV-28: frozen and degraded combinations cannot retain a healthy authority path."""
+    client, _network = _api_client(tmp_path)
+    created = client.post(
+        "/api/incidents",
+        json={"network_id": "completion-network", "detected_at": NOW.isoformat(), "observations": [observation]},
+    )
+    incident_id = created.json()["incident_id"]
+    analyzed = client.post(f"/api/incidents/{incident_id}/analyze")
+    # A fully missing observation cannot localize a signature, but this is
+    # still fail-closed rather than an authority-bearing analysis result.
+    if observation["missing"]:
+        assert analyzed.status_code == 409
+    else:
+        assert analyzed.status_code == 200
+        assert client.get(f"/api/incidents/{incident_id}/analysis").json()["planning_allowed"] is False
+
+
+def test_adv28_multiple_frozen_sensors_are_suppressed_and_distinct_from_healthy(tmp_path: Path) -> None:
+    """ADV-28: one/all frozen readings lower authority and retain distinct evidence provenance."""
+    healthy_client, _network = _api_client(tmp_path / "healthy")
+    mixed_client, _network = _api_client(tmp_path / "mixed")
+    frozen_client, _network = _api_client(tmp_path / "frozen")
+    payloads = [_observation(sensor="S1", node="J1"), _observation(sensor="S2", node="J2", concentration=0.15)]
+
+    def analyze_many(client: TestClient, items: list[dict[str, object]]) -> dict[str, object]:
+        created = client.post(
+            "/api/incidents",
+            json={"network_id": "completion-network", "detected_at": NOW.isoformat(), "observations": items},
+        )
+        assert created.status_code == 201, created.text
+        incident_id = created.json()["incident_id"]
+        assert client.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+        return client.get(f"/api/incidents/{incident_id}/analysis").json()
+
+    healthy = analyze_many(healthy_client, payloads)
+    mixed = analyze_many(mixed_client, [payloads[0], {**payloads[1], "frozen_flag": True}])
+    frozen = analyze_many(frozen_client, [{**item, "frozen_flag": True} for item in payloads])
+    assert frozen["planning_allowed"] is False
+    assert int(mixed["planning_allowed"]) <= int(healthy["planning_allowed"])
+    assert mixed["posterior_history"][-1]["evidence_hash"] != healthy["posterior_history"][-1]["evidence_hash"]
+
+
+def test_adv28_frozen_sample_reanalyzes_and_stales_a_verified_plan(tmp_path: Path) -> None:
+    """ADV-28: a new frozen state changes evidence context and removes old approval authority."""
+    client, _network = _api_client(tmp_path)
+    incident_id, before = _create_and_analyze(client, _observation())
+    plans = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 1})
+    plan_id = plans.json()[0]["plan_id"]
+    assert client.post(f"/api/incidents/{incident_id}/plans/{plan_id}/verify").status_code == 200
+    changed = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        json=_observation(sensor="S2", node="J1", frozen=True, observed_at=NOW + timedelta(minutes=1)),
+    )
+    assert changed.status_code == 200, changed.text
+    after = client.get(f"/api/incidents/{incident_id}/analysis").json()
+    assert after["posterior_history"][-1]["evidence_hash"] != before["posterior_history"][-1]["evidence_hash"]
+    verification = client.get(f"/api/incidents/{incident_id}/export").json()["verifications"][0]
+    assert verification["verification_status"] == "STALE"
+    assert client.post(
+        f"/api/incidents/{incident_id}/plans/{plan_id}/approve",
+        json={"approved": True, "operator_id": "frozen-regression"},
+    ).status_code == 409
+
+
+def test_adv28_freeze_then_unfreeze_reanalyzes_each_new_evidence_context(tmp_path: Path) -> None:
+    """ADV-28 second pass: subsequent frozen/healthy readings never reuse an old analysis identity."""
+    client, _network = _api_client(tmp_path)
+    incident_id, initial = _create_and_analyze(client, _observation())
+    frozen = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        json=_observation(frozen=True, observed_at=NOW + timedelta(minutes=1)),
+    )
+    assert frozen.status_code == 200, frozen.text
+    frozen_analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
+    assert frozen_analysis["planning_allowed"] is False
+    restored = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        json=_observation(frozen=False, observed_at=NOW + timedelta(minutes=2)),
+    )
+    assert restored.status_code == 200, restored.text
+    restored_analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
+    hashes = [
+        initial["posterior_history"][-1]["evidence_hash"],
+        frozen_analysis["posterior_history"][-1]["evidence_hash"],
+        restored_analysis["posterior_history"][-1]["evidence_hash"],
+    ]
+    assert len(set(hashes)) == 3
+    assert restored_analysis["planning_allowed"] is True
+
+
+def test_adv28_frozen_semantics_survive_restart(tmp_path: Path) -> None:
+    """ADV-28: persisted frozen evidence retains the same suppressed authority after restart."""
+    database = tmp_path / "frozen-restart.sqlite3"
+    first_pipeline, network = _pipeline()
+    first = TestClient(create_app(pipeline_factory=first_pipeline, verifier=_verification, database_path=database))
+    assert first.post(
+        "/api/networks/completion-network/validate",
+        json={"node_ids": list(network.node_name_list), "link_count": len(network.link_name_list)},
+    ).status_code == 200
+    created = first.post(
+        "/api/incidents",
+        json={"network_id": "completion-network", "detected_at": NOW.isoformat(), "observations": [_observation(frozen=True)]},
+    )
+    incident_id = created.json()["incident_id"]
+    assert first.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+    assert first.get(f"/api/incidents/{incident_id}/analysis").json()["planning_allowed"] is False
+
+    second_pipeline, _network = _pipeline()
+    second = TestClient(create_app(pipeline_factory=second_pipeline, verifier=_verification, database_path=database))
+    assert second.get(f"/api/incidents/{incident_id}").json()["observations"][0]["frozen_flag"] is True
+    assert second.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+    assert second.get(f"/api/incidents/{incident_id}/analysis").json()["planning_allowed"] is False
+
+
 def test_adv29_received_before_observed_is_controlled_422_without_mutation(tmp_path: Path) -> None:
     """A25-A/F: a cross-field timestamp error must remain a controlled 422, never a 500."""
     client = TestClient(
@@ -296,6 +540,60 @@ def test_adv29_received_before_observed_is_controlled_422_without_mutation(tmp_p
     )
     assert response.status_code == 422
     assert client.get(f"/api/incidents/{incident_id}").json() == before
+
+
+@pytest.mark.parametrize(
+    "payload",
+    (
+        _observation(received_at=NOW - timedelta(seconds=1)),
+        _observation(missing=True),
+        _observation(concentration=float("nan")),
+        _observation(quality=float("inf")),
+        {**_observation(), "sensor_id": []},
+        {**_observation(), "sensor_id": ""},
+        {**_observation(), "unexpected": {"nested": ["field"]}},
+    ),
+)
+def test_adv29_all_observation_validation_errors_are_controlled_and_atomic(
+    tmp_path: Path, payload: dict[str, object],
+) -> None:
+    """ADV-29: malformed observation contracts return JSON-safe 422 responses before mutation."""
+    client = TestClient(
+        create_app(verifier=_verification, database_path=tmp_path / "validation.sqlite3"),
+        raise_server_exceptions=False,
+    )
+    assert client.post("/api/networks/fuzz/validate", json={"node_ids": ["J1", "J2"], "link_count": 1}).status_code == 200
+    incident_id = client.post(
+        "/api/incidents", json={"network_id": "fuzz", "detected_at": NOW.isoformat(), "observations": [_observation()]},
+    ).json()["incident_id"]
+    before = client.get(f"/api/incidents/{incident_id}").json()
+    response = client.post(
+        f"/api/incidents/{incident_id}/samples",
+        content=json.dumps(payload, allow_nan=True),
+        headers={"content-type": "application/json"},
+    )
+    assert response.status_code == 422, response.text
+    assert response.headers["content-type"].startswith("application/json")
+    assert client.get(f"/api/incidents/{incident_id}").json() == before
+    assert "Traceback" not in response.text
+    assert "ValueError(" not in response.text
+    assert str(tmp_path) not in response.text
+    assert "input" not in response.json()["detail"][0]
+
+
+def test_adv29_bad_approval_literal_is_controlled_before_any_approval_mutation(tmp_path: Path) -> None:
+    """ADV-29: non-observation typed requests also preserve controlled validation behavior."""
+    client, _network = _api_client(tmp_path)
+    incident_id, _analysis = _create_and_analyze(client, _observation())
+    plan_id = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 1}).json()[0]["plan_id"]
+    assert client.post(f"/api/incidents/{incident_id}/plans/{plan_id}/verify").status_code == 200
+    before = client.app.state.runtime.store.table_counts()["approvals"]
+    response = client.post(
+        f"/api/incidents/{incident_id}/plans/{plan_id}/approve",
+        json={"approved": False, "operator_id": "validator"},
+    )
+    assert response.status_code == 422
+    assert client.app.state.runtime.store.table_counts()["approvals"] == before
 
 
 _FINITE = st.floats(allow_nan=False, allow_infinity=False, min_value=-1e12, max_value=1e12)

@@ -271,7 +271,7 @@ export interface NetworkLink {
 
 export interface SensorState {
   id: string;
-  health: 'HEALTHY' | 'DRIFT' | 'MISSING';
+  health: 'HEALTHY' | 'DRIFT' | 'FROZEN' | 'MISSING';
   quality: number;
   ageMinutes: number;
   /** Null when this reading was not supplied (SensorHealthView.pressure_m

@@ -204,6 +204,7 @@ class HybridInferencePipeline:
                     "missing": item.missing,
                     "drift": item.drift,
                     "delayed": item.delayed,
+                    "frozen": item.frozen,
                 }
                 for item in sorted(sensor_series, key=lambda value: value.node_id)
             ],
@@ -831,6 +832,12 @@ class HybridInferencePipeline:
             suppression.append(f"OOD_{ood_level.value}")
         if not model_evidence:
             suppression.append("MODEL_EVIDENCE_INSUFFICIENT")
+        # A frozen reading is carried separately for provenance and this
+        # deterministic authority guard, while the existing sensor-health
+        # feature remains the sole HydroCore input.  No plan may be enabled
+        # when every latest sensor reading is explicitly frozen.
+        if sensor_series and all(item.frozen[-1] for item in sensor_series):
+            suppression.append("ALL_SENSORS_FROZEN")
         planning_allowed = evidence_sufficient and not suppression
         candidate_nodes = conformal_nodes or self._credible_nodes(fused_belief)
         if planning_allowed:

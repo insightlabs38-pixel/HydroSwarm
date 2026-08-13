@@ -216,7 +216,7 @@ interface ApiIncidentView {
   sensor_health: {
     sensor_id: string;
     node_id: string;
-    health: 'HEALTHY' | 'DRIFT' | 'MISSING';
+    health: 'HEALTHY' | 'DRIFT' | 'FROZEN' | 'MISSING';
     quality: number;
     observed_at: string;
     received_at: string;
