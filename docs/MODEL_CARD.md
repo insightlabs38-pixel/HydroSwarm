@@ -46,14 +46,24 @@ OOD rows were calibration-inapplicable and planning-suppressed; no authority
 invariant failure occurred. This is limited synthetic development evidence,
 not field validation. Details: [robustness-scale evaluation](evaluation/ROBUSTNESS_SCALE_EVALUATION.md).
 
+The separate LIVE robustness characterization ran 264 real API trajectories
+through dynamic fusion, live OOD, active sampling, persistence, planning, and
+exact WNTR verification. It recorded 252 safe suppressions, 9 safe
+no-usable-evidence abstentions, and 3 verified loop-grid plans; no measured
+authority invariant failed. It also found an unresolved OOD truthfulness issue
+on an unvalidated topology and a repeated-sampling recommendation issue.
+Those findings are not hidden by the favorable safety-boundary result; see
+[the LIVE evaluation](evaluation/LIVE_ROBUSTNESS_EVALUATION.md).
+
 ## Limitations and locked status
 
 - The model and all reported evaluation data are synthetic; no utility-scale
   or field-performance claim is supported.
 - Calibration is marginal and topology/applicability-specific, not a
   per-incident guarantee or cross-topology validation.
-- The robustness study did not answer all requested missingness/coverage
-  strata or live WNTR workflow scaling; unavailable metrics remain null.
+- LIVE evidence covers only 6--9-node governed/development networks; it does
+  not establish utility-scale performance. ROB-LIVE-01 and ROB-LIVE-02 remain
+  unresolved and require review before making operational robustness claims.
 - The locked final evaluation remains unopened (`locked_test_opened: false`).
 
 ## Legacy S/M/L research record

@@ -26,6 +26,7 @@ def test_predeclared_conditions_are_deterministic_and_include_live_matrix() -> N
         "ambiguity", "topology_familiarity", "scale",
     }
     assert all(item.network_id != "locked_final_test" for item in first)
+    assert {item.network_id for item in first if item.topology_class == "development_unseen"} == {"coastal-branch"}
 
 
 def test_locked_test_guard_rejects_locked_and_test_paths() -> None:

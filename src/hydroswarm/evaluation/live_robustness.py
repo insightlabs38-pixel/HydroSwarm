@@ -463,7 +463,21 @@ def summarize(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     groups: dict[str, list[Mapping[str, Any]]] = {}
     for row in rows:
         groups.setdefault(f"{row.get('perturbation_type')}:{row.get('perturbation_level')}", []).append(row)
-    return {"runs": len(rows), "conditions": {name: {"n": len(group), "top1": statistics.fmean(numeric(group, "top1_correct")) if numeric(group, "top1_correct") else None, "top3": statistics.fmean(numeric(group, "top3_correct")) if numeric(group, "top3_correct") else None, "mrr": statistics.fmean(numeric(group, "reciprocal_rank")) if numeric(group, "reciprocal_rank") else None, "planning_eligible_rate": statistics.fmean(numeric(group, "planning_allowed")) if numeric(group, "planning_allowed") else None, "analysis_ms": stats(numeric(group, "analysis_ms")), "total_trajectory_ms": stats(numeric(group, "total_trajectory_ms"))} for name, group in sorted(groups.items())}, "invariant_failures": [row["run_id"] for row in rows if any(value is False for value in (row.get("invariants") or {}).values())], "locked_test_opened": None}
+    plan_rows = [plan for row in rows for plan in (row.get("plans") or [])]
+    sample_rows = [sample for row in rows for sample in (row.get("sample_rounds") or [])]
+    return {
+        "runs": len(rows),
+        "networks": sorted({str(row.get("network_id")) for row in rows if row.get("network_id")}),
+        "topology_classes": sorted({str(row.get("topology_class")) for row in rows if row.get("topology_class")}),
+        "outcomes": {name: sum(row.get("outcome") == name for row in rows) for name in sorted({str(row.get("outcome")) for row in rows})},
+        "conditions": {name: {"n": len(group), "top1": statistics.fmean(numeric(group, "top1_correct")) if numeric(group, "top1_correct") else None, "top3": statistics.fmean(numeric(group, "top3_correct")) if numeric(group, "top3_correct") else None, "mrr": statistics.fmean(numeric(group, "reciprocal_rank")) if numeric(group, "reciprocal_rank") else None, "planning_eligible_rate": statistics.fmean(numeric(group, "planning_allowed")) if numeric(group, "planning_allowed") else None, "analysis_ms": stats(numeric(group, "analysis_ms")), "total_trajectory_ms": stats(numeric(group, "total_trajectory_ms"))} for name, group in sorted(groups.items())},
+        "performance": {field: stats(numeric(rows, field)) for field in ("import_ms", "incident_creation_ms", "analysis_ms", "sampling_ms", "reanalysis_ms", "planning_ms", "verification_ms", "approval_ms", "total_trajectory_ms", "process_rss_before_mb", "peak_process_rss_mb", "process_rss_after_mb")},
+        "sampling": {"rounds": len(sample_rows), "acquired": sum(sample.get("status", "ACQUIRED") == "ACQUIRED" for sample in sample_rows), "stopped": sum(sample.get("status") == "STOP" for sample in sample_rows), "repeated_observed_recommendations": sum(sample.get("status") == "RECOMMENDED_PREVIOUSLY_OBSERVED" for sample in sample_rows), "realized_entropy_reduction_bits": stats([float(sample["entropy_before"]) - float(sample["entropy_after"]) for sample in sample_rows if sample.get("entropy_before") is not None and sample.get("entropy_after") is not None])},
+        "planning": {"plans": len(plan_rows), "decisions": {name: sum(plan.get("verification", {}).get("decision") == name for plan in plan_rows) for name in sorted({str(plan.get("verification", {}).get("decision")) for plan in plan_rows})}, "exact_simulator_calls": sum(int(row.get("exact_simulator_calls") or 0) for row in rows)},
+        "findings": [{"id": "ROB-LIVE-01", "severity": "MEDIUM", "status": "UNRESOLVED", "summary": "re-analysis can recommend a node already represented in current evidence"}, {"id": "ROB-LIVE-02", "severity": "HIGH", "status": "UNRESOLVED", "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"}],
+        "invariant_failures": [row["run_id"] for row in rows if any(value is False for value in (row.get("invariants") or {}).values())],
+        "locked_test_opened": None,
+    }
 
 
 def write_artifacts(output_dir: Path, rows: Sequence[Mapping[str, Any]], *, locked_opened_after: bool) -> dict[str, Any]:

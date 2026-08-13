@@ -34,6 +34,9 @@ characterization**. It did not invoke the LIVE API, dynamic live fusion, live
 OOD calculation, active sampling, plan generation, or WNTR verification. Its
 corrected raw-artifact terminology is documented in
 [CORRECTION.md](../../reports/evaluation/robustness-scale/CORRECTION.md).
+The separate **Study 2: LIVE API end-to-end characterization** is documented
+in [LIVE_ROBUSTNESS_EVALUATION.md](LIVE_ROBUSTNESS_EVALUATION.md); its results
+must not be back-projected into this offline replay.
 
 ## Tested populations and perturbation matrix
 
