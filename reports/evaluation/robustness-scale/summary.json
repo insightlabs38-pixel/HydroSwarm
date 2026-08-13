@@ -1,0 +1,90 @@
+{
+  "authority_invariant_failures": [],
+  "conditions": {
+    "EXTREME_DEMAND": {
+      "candidate_set_size": 0.0,
+      "entropy": 1.417451687460936,
+      "median_inference_ms": 12.45519149233587,
+      "mrr": 0.6996031746031747,
+      "planning_suppression_rate": 1.0,
+      "runs": 24,
+      "top1": 0.5555555555555556,
+      "top3": 0.7777777777777778
+    },
+    "FROZEN_DRIFTING_SENSOR": {
+      "candidate_set_size": 0.0,
+      "entropy": 1.474452396749849,
+      "median_inference_ms": 11.070620501413941,
+      "mrr": 0.7472222222222222,
+      "planning_suppression_rate": 1.0,
+      "runs": 24,
+      "top1": 0.6666666666666666,
+      "top3": 0.7222222222222222
+    },
+    "ROUGHNESS_MISMATCH": {
+      "candidate_set_size": 0.0,
+      "entropy": 1.3579187207581966,
+      "median_inference_ms": 12.277586036361754,
+      "mrr": 0.7611111111111111,
+      "planning_suppression_rate": 1.0,
+      "runs": 24,
+      "top1": 0.6666666666666666,
+      "top3": 0.7777777777777778
+    },
+    "SEVERE_MISSINGNESS": {
+      "candidate_set_size": 0.0,
+      "entropy": 1.7044834942815708,
+      "median_inference_ms": 13.125844998285174,
+      "mrr": 0.8095238095238095,
+      "planning_suppression_rate": 1.0,
+      "runs": 24,
+      "top1": 0.7142857142857143,
+      "top3": 0.8571428571428571
+    },
+    "TANK_STATE_SHIFT": {
+      "candidate_set_size": 0.0,
+      "entropy": 1.1500528836847332,
+      "median_inference_ms": 12.250175524968654,
+      "mrr": 0.8947368421052632,
+      "planning_suppression_rate": 1.0,
+      "runs": 24,
+      "top1": 0.7894736842105263,
+      "top3": 1.0
+    },
+    "UNSEEN_TOPOLOGY": {
+      "candidate_set_size": 0.0,
+      "entropy": 1.8832923582348127,
+      "median_inference_ms": 10.71147050242871,
+      "mrr": 0.5231481481481481,
+      "planning_suppression_rate": 1.0,
+      "runs": 24,
+      "top1": 0.2777777777777778,
+      "top3": 0.7777777777777778
+    },
+    "nominal": {
+      "candidate_set_size": 2.9583333333333335,
+      "entropy": 1.2063574041456822,
+      "median_inference_ms": 15.998261485947296,
+      "mrr": 0.8313492063492063,
+      "planning_suppression_rate": 0.75,
+      "runs": 24,
+      "top1": 0.7619047619047619,
+      "top3": 0.9047619047619048
+    }
+  },
+  "known_limitations": [
+    "Rows are offline replay of governed tensors; live WNTR pipeline, sampling, plan generation, and exact verification are not invoked.",
+    "Candidate posterior is an offline fixed blend because raw hydraulic trust inputs are not stored in tensor shards; authority applicability remains the current deterministic policy.",
+    "Null performance fields mean unavailable, not zero cost."
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "platform": {
+    "cpu_count": 16,
+    "python": "3.12.13",
+    "system": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
+    "total_ram_mb": 64162.7265625
+  },
+  "runs": 168,
+  "schema_version": "hydroswarm-robustness-scale-summary-v1"
+}

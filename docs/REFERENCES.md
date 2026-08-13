@@ -1,8 +1,30 @@
 # References
 
+## Prior Art & Differentiation
+
+HydroSwarm does not claim that contamination localization is novel. The
+distinction below is the implemented, integrated authority path: calibrated
+localization + classical/neural disagreement + active evidence acquisition +
+deterministic safety gates + exact WNTR verification + explicit human approval
++ local/offline reproducibility and audit.
+
+| Prior system / approach | What it does | What HydroSwarm uses or learns from | Where HydroSwarm differs |
+|---|---|---|---|
+| EPANET / [WNTR](https://usepa.github.io/WNTR/) | Hydraulic and water-quality simulation, including resilience analysis tooling | Governed WNTR/EPANET scenario generation and exact response verification | Uses solver output as a required verification boundary inside an authority workflow; it does not claim to replace these simulators |
+| [TEVA-SPOT](https://www.epa.gov/water-research/teva-spot-toolkit) | EPA toolkit for consequence assessment and sensor-placement analysis | The importance of simulated consequence/sensor evidence | Different scope: local incident workflow with current calibrated localization, explicit gates, and human approval |
+| [CANARY](https://www.epa.gov/water-research/canary-event-detection-software) | Water-quality event detection software | Event-detection and water-quality-monitoring context | HydroSwarm does not represent CANARY as a source-localization or response-approval equivalent; it combines a separate advisory localization path with verification gates |
+| Bayesian source localization ([Dawsey et al.](https://doi.org/10.1061/(ASCE)0733-9496(2006)132:4(234)); [Jerez et al.](https://doi.org/10.1016/j.ymssp.2021.107834)) | Combines uncertain monitoring/simulation evidence to rank plausible contamination sources | Classical posterior reasoning and explicit uncertainty | Adds a governed neural residual, calibration applicability checks, disagreement handling, and a response authority boundary; it does not claim Bayesian localization itself is novel |
+| Grab-sampling localization ([Ji et al.](https://doi.org/10.1029/2022WR032784)) | Uses manual samples to improve contamination-source identification | The operational value of additional evidence | Uses deterministic expected-information-gain ranking only as an advisory sampling recommendation, with no autonomous field action |
+| Graph neural methods for water networks ([Spatial GCNs](https://arxiv.org/abs/2211.09587)) | Apply graph learning to water-system tasks | Graph-structured feature processing | HydroCore-v4 is one advisory branch; exact simulation, deterministic gates, and human approval are not delegated to the network |
+
+Claims above describe the cited systems only at the stated level; they do not
+assert that a prior system lacks an unverified feature.
+
 ## Water networks and response
 
 - US EPA, [Water Network Tool for Resilience (WNTR)](https://usepa.github.io/WNTR/).
+- US EPA, [TEVA-SPOT Toolkit](https://www.epa.gov/water-research/teva-spot-toolkit).
+- US EPA, [CANARY Event Detection Software](https://www.epa.gov/water-research/canary-event-detection-software).
 - US EPA, [Water Quality Surveillance and Response](https://www.epa.gov/waterresilience).
 - University of Kentucky,
   [Water Distribution System Research Database](https://uknowledge.uky.edu/wdsrd/).

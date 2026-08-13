@@ -1,5 +1,9 @@
 # HydroSwarm
 
+Current development metadata is `0.1.0` (Python package and operator console).
+Historical hackathon releases remain historical; a later reviewed submission
+commit must receive its own final release/tag.
+
 Offline, physics-verified decision support for drinking-water contamination incidents:
 localize the source, choose the next sample, simulate response alternatives with real
 hydraulic solvers, and require a human to approve before anything happens.

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Added a frozen robustness/scale characterization protocol, deterministic
+  locked-test-excluding runner, raw results, summary, and documentation guard.
+- Reconciled current HydroCore-v4 dataset/model/public-submission documentation
+  with the frozen release bundle and characterization evidence.
+- This is development metadata (`0.1.0`); no release/tag is cut by this entry.
+
 ## 0.2.0 - 2026-08-03
 
 - Added deterministic bounded swarm orchestration and specialist agents.
