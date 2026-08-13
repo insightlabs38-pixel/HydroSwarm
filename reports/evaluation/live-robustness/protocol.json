@@ -6,6 +6,7 @@
   "predecessor": {"study_id": "robustness-scale-v1", "scope": "offline frozen tensor characterization only", "not_measured": ["live API", "real active sampling", "planning", "exact WNTR verification", "workflow latency"]},
   "network_population": [
     {"id": "golden-reference", "path": "data/frozen/golden_network.inp", "topology_class": "governed_reference", "role": "in_distribution_control"},
+    {"id": "loop-grid", "path": "data/topologies/loop-grid.inp", "topology_class": "governed_topology", "role": "medium_scale_and_control"},
     {"id": "branched-loop", "path": "data/topology-transfer/branched-loop.inp", "topology_class": "development_unseen", "role": "unfamiliar_topology"}
   ],
   "seeds": {"reference": [7101, 7102, 7103, 7104, 7105, 7106, 7107, 7108, 7109, 7110, 7111, 7112, 7113, 7114, 7115, 7116, 7117, 7118, 7119, 7120, 7121, 7122, 7123, 7124], "unseen_topology": [7201, 7202, 7203, 7204, 7205, 7206, 7207, 7208], "scale": [7301, 7302, 7303, 7304, 7305, 7306]},
