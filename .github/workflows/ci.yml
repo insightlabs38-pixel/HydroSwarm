@@ -40,7 +40,13 @@ jobs:
       # construction, not by convention alone).
       LFS_REQUIRED_INCLUDE: "data/learning-v2/cycle-b2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/train/**,data/learning-v2/cycle-b2-control-v2/tensors-normalized/validation/**,data/learning-v2/cycle-b2-ood-extension/tensors-normalized/**"
     steps:
+      # The diagnostic-infrastructure suite compares this branch against
+      # its fixed main-base SHA.  Keep the history needed for that
+      # integrity assertion; checkout's default depth of 1 omits it on PR
+      # merge commits and makes `git diff <base> HEAD` fail with exit 128.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # `shell: bash` on every Git-LFS step below: Windows' default step
       # shell is PowerShell, but windows-latest ships Git Bash (installed
