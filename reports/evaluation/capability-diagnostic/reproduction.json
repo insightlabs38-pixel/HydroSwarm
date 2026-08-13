@@ -1,0 +1,48 @@
+{
+  "checkpoint_evaluated": {
+    "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+    "note": "This is the exact checkpoint actually served by models/hydrocore-v4-release (identical sha256), i.e. the real production model -- not merely a same-lineage training-run export.",
+    "path": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810/model.safetensors"
+  },
+  "documented_range": {
+    "mrr": [
+      0.8113,
+      0.8172
+    ],
+    "source": "docs/MODEL_CARD.md; reports/results/v4/phase13-metrics-and-baselines.md (seed 20260810/20260811)",
+    "top1": [
+      0.7205,
+      0.7331
+    ],
+    "top3": [
+      0.868,
+      0.8756
+    ]
+  },
+  "in_documented_range": {
+    "mrr": true,
+    "top1": true,
+    "top3": true
+  },
+  "locked_test_opened_after": false,
+  "original_measurement_checkpoint": {
+    "differs_from_served_checkpoint_file": true,
+    "model_sha256": "779e63a01dabe738f3ca4bce87e9f850ec381a81708e45d56a83338645ceb17e",
+    "note": "scripts/run_phase13_sentinel_metrics.py's own --checkpoints default points here, not at the frozen release bundle. The file differs byte-for-byte (different export path/packaging) from the served checkpoint, so this diagnostic explicitly re-measures against the served checkpoint instead of trusting that the original number transfers.",
+    "path": "experiments/runs/stage-f/no_adapters-seed20260810/20260808T041727Z-de5f4b0e/model-export.safetensors"
+  },
+  "reproduced": {
+    "candidate_coverage_at_3": 0.8679775280898876,
+    "corpus": "data/learning-v2/cycle-b2-joint-v4/tensors-normalized",
+    "ece_raw_uncalibrated": 0.027955978460023907,
+    "examples_localization_eligible": 712,
+    "examples_total": 1000,
+    "mrr": 0.8112593632958801,
+    "split": "validation",
+    "top1": 0.7205056179775281,
+    "top3": 0.8679775280898876
+  },
+  "schema_version": 1,
+  "section": "5_reproduce_controlled_result",
+  "verdict": "REPRODUCED"
+}
