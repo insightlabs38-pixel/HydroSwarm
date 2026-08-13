@@ -23,6 +23,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None, help="number of deterministic conditions to run")
     parser.add_argument("--resume", action="store_true", help="append a disjoint deterministic slice to existing raw rows")
     parser.add_argument("--replace", action="store_true", help="supersede the same deterministic run IDs after a documented harness correction")
+    parser.add_argument("--output-dir", type=Path, default=Path("reports/evaluation/live-robustness"))
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     protocol = load_protocol(root / "reports/evaluation/live-robustness/protocol.json")
@@ -34,7 +35,7 @@ def main() -> int:
     conditions = conditions[args.start:]
     if args.limit is not None:
         conditions = conditions[:args.limit]
-    output_dir = root / "reports/evaluation/live-robustness"
+    output_dir = root / args.output_dir
     rows = []
     results_path = output_dir / "results.json"
     if (args.resume or args.replace) and results_path.exists():

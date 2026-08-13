@@ -1,0 +1,31 @@
+{
+  "pre_fix_study_commit": "0fdd48ae2138a816d87beccdd9b51e3c9ba560be",
+  "locked_test_opened": false,
+  "scientific_identity_changed": false,
+  "findings": {
+    "ROB-LIVE-01": {
+      "severity": "MEDIUM",
+      "root_cause": "API persisted-candidate fallback was not an authoritative sampling result",
+      "post_fix": "current REQUEST_SAMPLE plus non-stopped real recommendation and unsampled node required"
+    },
+    "ROB-LIVE-02": {
+      "severity": "HIGH",
+      "root_cause": "OOD used simulator state identity with an empty validated topology set",
+      "post_fix": "OOD and calibration use network_sha256 structural identity and calibration topology allow-list"
+    }
+  },
+  "golden_reference": {
+    "classification": "GOLD-EXPECTED",
+    "structural_hash": "decd4ac707a3817115c7307940861dafac6d3fad34a3358179f20c7830a2cc79",
+    "in_calibration_validated_topology_hashes": false,
+    "hydraulic_randomization_changes_identity": true
+  },
+  "targeted_coastal": {
+    "runs": 24,
+    "calibrated": false,
+    "network_novelty": 1.0,
+    "ood_level": "CAUTION",
+    "planning_allowed": false,
+    "invariant_failures": 0
+  }
+}

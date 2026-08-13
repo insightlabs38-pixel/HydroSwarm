@@ -593,7 +593,7 @@ class HybridInferencePipeline:
             latencies[name] = max(0.0, (self.clock() - started) * 1000.0)
             return value
 
-        network_hash = (
+        state_hash = (
             self.simulator.state_hash()
             if hasattr(self.simulator, "state_hash")
             else _hash(tuple(sorted(str(node) for node in network.node_name_list)))
@@ -781,7 +781,10 @@ class HybridInferencePipeline:
             "ood_detection",
             lambda: self.ood_detector.evaluate(
                 node_count=len(node_ids),
-                network_hash=network_hash,
+                # OOD topology novelty and conformal applicability must use
+                # the same structural identity.  simulator.state_hash() is
+                # evidence/hydraulic-state provenance, not topology support.
+                network_hash=topology_hash,
                 state=estimated,
                 sensor_series=sensor_series,
                 latent=latent,
@@ -1026,7 +1029,7 @@ class HybridInferencePipeline:
         self._evidence[incident_id] = evidence_history
         self._changes[incident_id] = comparison_history
         provenance = {
-            "network": network_hash,
+            "network": state_hash,
             "topology": topology_hash,
             "signature_artifact": artifact.artifact_hash,
             # model_input_signature_mode (a SignatureMode string, not a

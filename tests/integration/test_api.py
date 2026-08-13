@@ -139,8 +139,9 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
     recommendation = client.post(
         f"/api/incidents/{incident_id}/samples/recommend"
     )
-    assert recommendation.json()["node_id"] == "J1"
-    assert recommendation.json()["runtime_mode"] == "DEMO_FALLBACK"
+    # A demo fallback/persisted candidate is not an authoritative live
+    # sampling decision.  The API must fail closed rather than synthesize one.
+    assert recommendation.status_code == 409
 
     added = client.post(
         f"/api/incidents/{incident_id}/samples",

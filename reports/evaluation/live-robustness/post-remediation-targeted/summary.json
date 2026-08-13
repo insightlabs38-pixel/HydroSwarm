@@ -1,0 +1,155 @@
+{
+  "conditions": {
+    "topology_familiarity:development_unseen": {
+      "analysis_ms": {
+        "max": 841.2937130196951,
+        "median": 168.86245450587012,
+        "min": 158.7401260039769,
+        "n": 24,
+        "p95": 375.5528010078706
+      },
+      "mrr": 0.39999999999999997,
+      "n": 24,
+      "planning_eligible_rate": 0.0,
+      "top1": 0.0,
+      "top3": 0.75,
+      "total_trajectory_ms": {
+        "max": 1295.880347955972,
+        "median": 475.69356151507236,
+        "min": 257.90952902752906,
+        "n": 24,
+        "p95": 1089.1440020059235
+      }
+    }
+  },
+  "findings": [
+    {
+      "id": "ROB-LIVE-01",
+      "severity": "MEDIUM",
+      "status": "UNRESOLVED",
+      "summary": "re-analysis can recommend a node already represented in current evidence"
+    },
+    {
+      "id": "ROB-LIVE-02",
+      "severity": "HIGH",
+      "status": "UNRESOLVED",
+      "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"
+    }
+  ],
+  "invariant_failures": [],
+  "locked_test_opened": false,
+  "networks": [
+    "coastal-branch"
+  ],
+  "outcomes": {
+    "SUPPRESSED": 24
+  },
+  "performance": {
+    "analysis_ms": {
+      "max": 841.2937130196951,
+      "median": 168.86245450587012,
+      "min": 158.7401260039769,
+      "n": 24,
+      "p95": 375.5528010078706
+    },
+    "approval_ms": {
+      "max": null,
+      "median": null,
+      "min": null,
+      "n": 0,
+      "p95": null
+    },
+    "import_ms": {
+      "max": 286.1497290432453,
+      "median": 84.63389749522321,
+      "min": 73.23928800178692,
+      "n": 24,
+      "p95": 92.85662497859448
+    },
+    "incident_creation_ms": {
+      "max": 12.093714030925184,
+      "median": 10.781921504531056,
+      "min": 9.869693021755666,
+      "n": 24,
+      "p95": 11.946715007070452
+    },
+    "peak_process_rss_mb": {
+      "max": 1468.44140625,
+      "median": 1173.443359375,
+      "min": 799.95703125,
+      "n": 24,
+      "p95": 1426.58203125
+    },
+    "planning_ms": {
+      "max": 1.504633983131498,
+      "median": 1.2318580120336264,
+      "min": 1.0720979771576822,
+      "n": 24,
+      "p95": 1.3124599936418235
+    },
+    "process_rss_after_mb": {
+      "max": 1457.59375,
+      "median": 1160.0546875,
+      "min": 799.95703125,
+      "n": 24,
+      "p95": 1422.55859375
+    },
+    "process_rss_before_mb": {
+      "max": 1419.7109375,
+      "median": 1128.673828125,
+      "min": 719.58984375,
+      "n": 24,
+      "p95": 1401.609375
+    },
+    "reanalysis_ms": {
+      "max": 335.66093601984903,
+      "median": 130.8657550252974,
+      "min": 117.70995199913159,
+      "n": 18,
+      "p95": null
+    },
+    "sampling_ms": {
+      "max": 10.508585954084992,
+      "median": 5.328489001840353,
+      "min": 4.639118968043476,
+      "n": 18,
+      "p95": null
+    },
+    "total_trajectory_ms": {
+      "max": 1295.880347955972,
+      "median": 475.69356151507236,
+      "min": 257.90952902752906,
+      "n": 24,
+      "p95": 1089.1440020059235
+    },
+    "verification_ms": {
+      "max": null,
+      "median": null,
+      "min": null,
+      "n": 0,
+      "p95": null
+    }
+  },
+  "planning": {
+    "decisions": {},
+    "exact_simulator_calls": 0,
+    "plans": 0
+  },
+  "runs": 24,
+  "sampling": {
+    "acquired": 24,
+    "realized_entropy_reduction_bits": {
+      "max": -0.003153139006317751,
+      "median": -0.5316648701254685,
+      "min": -1.8056506035813324,
+      "n": 24,
+      "p95": -0.003153139006317751
+    },
+    "repeated_observed_recommendations": 0,
+    "rounds": 48,
+    "stopped": 24
+  },
+  "topology_classes": [
+    "development_unseen"
+  ]
+}
