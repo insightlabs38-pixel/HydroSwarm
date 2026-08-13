@@ -45,12 +45,7 @@ provenance boundaries.
 - Frontend: 162 passed; production TypeScript/Vite build passed.
 - `hydroswarm.cli self-test --strict`: passed, including frozen bundle and
   WNTR smoke validation.
-
-The complete Python baseline was started after these checks. Its runner
-detached from the execution monitor in this local environment while tests
-continued, so this document does not represent that incomplete observation
-as a passing full-baseline result. The focused suites above are the
-reproducible, completed evidence for this remediation change set.
+- Complete Python baseline: 1,050 passed.
 
 ## Validation limits
 

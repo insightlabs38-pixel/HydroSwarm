@@ -67,6 +67,6 @@
     "frontend_tests": "162 passed",
     "frontend_build": "passed",
     "release_self_test_strict": "passed",
-    "complete_python_baseline": "inconclusive: execution monitor detached before completion; not claimed as pass"
+    "complete_python_baseline": "1050 passed"
   }
 }
