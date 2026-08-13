@@ -1,0 +1,211 @@
+{
+  "by_perturbation_type": {
+    "ambiguity": {
+      "classical_only_top1": 0.0,
+      "counts": {
+        "both_wrong": 6,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 12,
+        "neural_wrong_classical_correct": 0
+      },
+      "fused_top1": 0.6666666666666666,
+      "n": 18,
+      "neural_only_top1": 0.6666666666666666,
+      "rates": {
+        "both_wrong": 0.3333333333333333,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.6666666666666666,
+        "neural_wrong_classical_correct": 0.0
+      }
+    },
+    "hydraulic_mismatch": {
+      "classical_only_top1": 0.4,
+      "counts": {
+        "both_wrong": 15,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 3,
+        "neural_wrong_classical_correct": 12
+      },
+      "fused_top1": 0.1,
+      "n": 30,
+      "neural_only_top1": 0.1,
+      "rates": {
+        "both_wrong": 0.5,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.1,
+        "neural_wrong_classical_correct": 0.4
+      }
+    },
+    "measurement_bias": {
+      "classical_only_top1": 0.0,
+      "counts": {
+        "both_wrong": 6,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 12,
+        "neural_wrong_classical_correct": 0
+      },
+      "fused_top1": 0.6666666666666666,
+      "n": 18,
+      "neural_only_top1": 0.6666666666666666,
+      "rates": {
+        "both_wrong": 0.3333333333333333,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.6666666666666666,
+        "neural_wrong_classical_correct": 0.0
+      }
+    },
+    "measurement_noise": {
+      "classical_only_top1": 0.0,
+      "counts": {
+        "both_wrong": 9,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 18,
+        "neural_wrong_classical_correct": 0
+      },
+      "fused_top1": 0.6666666666666666,
+      "n": 27,
+      "neural_only_top1": 0.6666666666666666,
+      "rates": {
+        "both_wrong": 0.3333333333333333,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.6666666666666666,
+        "neural_wrong_classical_correct": 0.0
+      }
+    },
+    "missingness": {
+      "classical_only_top1": 0.2631578947368421,
+      "counts": {
+        "both_wrong": 36,
+        "neural_correct_classical_correct": 9,
+        "neural_correct_classical_wrong": 6,
+        "neural_wrong_classical_correct": 6
+      },
+      "fused_top1": 0.2631578947368421,
+      "n": 57,
+      "neural_only_top1": 0.2631578947368421,
+      "rates": {
+        "both_wrong": 0.631578947368421,
+        "neural_correct_classical_correct": 0.15789473684210525,
+        "neural_correct_classical_wrong": 0.10526315789473684,
+        "neural_wrong_classical_correct": 0.10526315789473684
+      }
+    },
+    "nominal": {
+      "classical_only_top1": 0.25,
+      "counts": {
+        "both_wrong": 9,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 0,
+        "neural_wrong_classical_correct": 3
+      },
+      "fused_top1": 0.0,
+      "n": 12,
+      "neural_only_top1": 0.0,
+      "rates": {
+        "both_wrong": 0.75,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.0,
+        "neural_wrong_classical_correct": 0.25
+      }
+    },
+    "scale": {
+      "classical_only_top1": 0.0,
+      "counts": {
+        "both_wrong": 6,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 3,
+        "neural_wrong_classical_correct": 0
+      },
+      "fused_top1": 0.0,
+      "n": 9,
+      "neural_only_top1": 0.3333333333333333,
+      "rates": {
+        "both_wrong": 0.6666666666666666,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.3333333333333333,
+        "neural_wrong_classical_correct": 0.0
+      }
+    },
+    "sensor_coverage": {
+      "classical_only_top1": 0.25,
+      "counts": {
+        "both_wrong": 24,
+        "neural_correct_classical_correct": 6,
+        "neural_correct_classical_wrong": 3,
+        "neural_wrong_classical_correct": 3
+      },
+      "fused_top1": 0.25,
+      "n": 36,
+      "neural_only_top1": 0.25,
+      "rates": {
+        "both_wrong": 0.6666666666666666,
+        "neural_correct_classical_correct": 0.16666666666666666,
+        "neural_correct_classical_wrong": 0.08333333333333333,
+        "neural_wrong_classical_correct": 0.08333333333333333
+      }
+    },
+    "sensor_health": {
+      "classical_only_top1": 0.125,
+      "counts": {
+        "both_wrong": 12,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 9,
+        "neural_wrong_classical_correct": 3
+      },
+      "fused_top1": 0.375,
+      "n": 24,
+      "neural_only_top1": 0.375,
+      "rates": {
+        "both_wrong": 0.5,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.375,
+        "neural_wrong_classical_correct": 0.125
+      }
+    },
+    "topology_familiarity": {
+      "classical_only_top1": 0.125,
+      "counts": {
+        "both_wrong": 21,
+        "neural_correct_classical_correct": 0,
+        "neural_correct_classical_wrong": 0,
+        "neural_wrong_classical_correct": 3
+      },
+      "fused_top1": 0.0,
+      "n": 24,
+      "neural_only_top1": 0.0,
+      "rates": {
+        "both_wrong": 0.875,
+        "neural_correct_classical_correct": 0.0,
+        "neural_correct_classical_wrong": 0.0,
+        "neural_wrong_classical_correct": 0.125
+      }
+    }
+  },
+  "locked_test_opened": false,
+  "overall": {
+    "classical_only_top1": 0.17647058823529413,
+    "counts": {
+      "both_wrong": 144,
+      "neural_correct_classical_correct": 15,
+      "neural_correct_classical_wrong": 66,
+      "neural_wrong_classical_correct": 30
+    },
+    "fused_top1": 0.3058823529411765,
+    "n": 255,
+    "neural_only_top1": 0.3176470588235294,
+    "rates": {
+      "both_wrong": 0.5647058823529412,
+      "neural_correct_classical_correct": 0.058823529411764705,
+      "neural_correct_classical_wrong": 0.25882352941176473,
+      "neural_wrong_classical_correct": 0.11764705882352941
+    }
+  },
+  "records_excluded_missing_beliefs": 9,
+  "records_excluded_reason": "ABSTAINED/errored runs (e.g. error_class=ANALYZE_409) where neural_belief/classical_belief/fused_belief were never computed; excluded from argmax comparisons since there is no belief to argmax.",
+  "records_used": 255,
+  "schema_version": 1,
+  "section": "14_component_decomposition",
+  "source_data": "reports/evaluation/live-robustness/post-remediation-results.json",
+  "tie_break_note": "argmax ties broken by lexicographically smallest node id (diagnostic-only convention, distinct from and not a claim about production tie-break behavior).",
+  "total_records_in_dataset": 264
+}
