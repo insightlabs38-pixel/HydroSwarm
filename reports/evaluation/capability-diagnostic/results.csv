@@ -1,0 +1,42 @@
+metric,controlled_frozen_eval,live_post_remediation,source
+source_top1,0.7205-0.7331,0.306,reproduction.json / live-robustness/post-remediation-summary.json
+source_top3,0.8680-0.8756,0.847,reproduction.json / live-robustness/post-remediation-summary.json
+mrr,0.8113-0.8172,0.571,reproduction.json / live-robustness/post-remediation-summary.json
+planning_eligible_rate,n/a,0.012,live-robustness/post-remediation-summary.json
+,,,
+experiment,condition,top1,n,source_file
+temporal_ablation,latest_1,0.30,20,temporal-ablation.json
+temporal_ablation,latest_12,0.30,20,temporal-ablation.json
+temporal_ablation,full_25_via_analyze,0.95,20,temporal-ablation.json
+temporal_ablation,causal_prefix_6,1.00,20,temporal-ablation.json
+confirmation_holdout,latest_1,0.05,20,confirmation-holdout.json
+confirmation_holdout,full_trajectory,1.00,20,confirmation-holdout.json
+network_identity,scenario_hash_arm (golden-reference),0.95,20,network-parity.json
+network_identity,production_hash_arm (golden-reference),0.85,20,network-parity.json
+network_identity_confirmation,scenario_hash_arm,0.95,20,confirmation-holdout.json
+network_identity_confirmation,production_hash_arm,0.85,20,confirmation-holdout.json
+component_decomposition_live,neural_only,0.318,255,component-decomposition.json
+component_decomposition_live,classical_only,0.176,255,component-decomposition.json
+component_decomposition_live,fused_hybrid,0.306,255,component-decomposition.json
+calibration_by_network_live,golden-reference_calibrated_rate,0.0,231,live-robustness/post-remediation-results.json (this session)
+calibration_by_network_live,loop-grid_calibrated_rate,1.0,9,live-robustness/post-remediation-results.json (this session)
+calibration_by_network_live,coastal-branch_calibrated_rate,0.0,24,live-robustness/post-remediation-results.json (this session)
+ood_nominal_live,ood_level_CAUTION_rate,1.0,12,live-robustness/post-remediation-results.json (this session)
+suppression_gate_frequency,CALIBRATION_INVALID_OR_MISSING,0.965,255,suppression-analysis.json
+suppression_gate_frequency,OOD_CAUTION,0.965,255,suppression-analysis.json
+suppression_gate_frequency,MODEL_EVIDENCE_INSUFFICIENT,0.824,255,suppression-analysis.json
+suppression_gate_frequency,CANDIDATE_REGION_TOO_BROAD,0.635,255,suppression-analysis.json
+suppression_gate_frequency,HIGH_CLASSICAL_NEURAL_DISAGREEMENT,0.047,255,suppression-analysis.json
+suppression_counterfactual,inference_quality_only_ceiling,0.295,264,suppression-analysis.json
+pressure_parity,true_wntr_top1,0.80,15,pressure-parity.json
+pressure_parity,fixed_25m_top1,0.80,15,pressure-parity.json
+classical_prior_ablation,real_prior_top1,0.70,10,classical-prior-parity.json
+classical_prior_ablation,uniform_prior_top1,0.60,10,classical-prior-parity.json
+classical_prior_ablation,zeroed_prior_top1,0.60,10,classical-prior-parity.json
+calibration_by_condition,1_pristine_exact_config_calibrated_rate,1.0,5,calibration-analysis.json
+calibration_by_condition,4_roughness_only_calibrated_rate,0.0,5,calibration-analysis.json
+calibration_by_condition,8_coastal_unseen_calibrated_rate,0.0,5,calibration-analysis.json
+oracle_upper_bounds,baseline_full_trajectory_top1,0.90,10,observability-analysis.json
+oracle_upper_bounds,oracle_classical_prior_top1,1.00,10,observability-analysis.json
+sampling_baseline_offline_300scenario,classical_eig_resolved_within_3,0.697,300,"pre-freeze-implementation-handoff.md (cited, not re-run)"
+sampling_baseline_offline_300scenario,random_resolved_within_3,0.610,300,"pre-freeze-implementation-handoff.md (cited, not re-run)"
