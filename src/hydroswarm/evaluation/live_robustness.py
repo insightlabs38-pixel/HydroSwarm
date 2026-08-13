@@ -169,7 +169,7 @@ def predeclared_conditions(*, repetitions: int = 3) -> list[Condition]:
         for seed in (7118 + index, 7121 + index):
             base.append(Condition(f"ambiguity-{ambiguity}-{seed}", "ambiguity", ambiguity, seed, ambiguity=ambiguity))
     for seed in range(7201, 7209):
-        base.append(Condition(f"unseen-{seed}", "topology_familiarity", "development_unseen", seed, network_id="branched-loop", topology_class="development_unseen"))
+        base.append(Condition(f"unseen-{seed}", "topology_familiarity", "development_unseen", seed, network_id="coastal-branch", topology_class="development_unseen"))
     for seed in (7301, 7302, 7303):
         base.append(Condition(f"scale-loop-grid-{seed}", "scale", "medium_loop_grid", seed, network_id="loop-grid", topology_class="governed_topology"))
     return [Condition(**{**asdict(item), "repetition": repetition}) for item in base for repetition in range(repetitions)]
@@ -290,7 +290,7 @@ def _invariants(*, analysis: Mapping[str, Any], generate_status: int | None, pla
 
 
 def _network_path(repo_root: Path, network_id: str) -> Path:
-    paths = {"golden-reference": repo_root / "data/frozen/golden_network.inp", "loop-grid": repo_root / "data/topologies/loop-grid.inp", "branched-loop": repo_root / "data/topology-transfer/branched-loop.inp"}
+    paths = {"golden-reference": repo_root / "data/frozen/golden_network.inp", "loop-grid": repo_root / "data/topologies/loop-grid.inp", "branched-loop": repo_root / "data/topology-transfer/branched-loop.inp", "coastal-branch": repo_root / "data/topologies/coastal-branch.inp"}
     path = paths[network_id]
     _reject_locked(str(path))
     return path

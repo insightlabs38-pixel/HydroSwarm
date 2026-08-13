@@ -25,3 +25,14 @@ test state changed.
 The correction also continues to stop rather than insert duplicate synthetic
 evidence when the real sampler recommends an already-observed node. That
 behavior is retained as `ROB-LIVE-01`; it is not a harness error.
+
+3. The initial topology-familiarity rows named `branched-loop` as
+   `development_unseen`. A post-run structural-hash check established that
+   its topology hash is `0b1817cd…`, one of the calibration artifact's
+   validated hashes. Those 24 rows are therefore not evidence about
+   unfamiliar topology. The same deterministic `unseen-*` run IDs are
+   rerun against committed `coastal-branch.inp` (structural hash
+   `d8725933…`, absent from the validated hashes) before results are
+   interpreted. This corrects a fixture label and population selection; it
+   does not change an experiment based on whether its measured result was
+   favorable.

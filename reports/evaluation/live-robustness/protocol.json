@@ -7,7 +7,8 @@
   "network_population": [
     {"id": "golden-reference", "path": "data/frozen/golden_network.inp", "topology_class": "governed_reference", "role": "in_distribution_control"},
     {"id": "loop-grid", "path": "data/topologies/loop-grid.inp", "topology_class": "governed_topology", "role": "medium_scale_and_control"},
-    {"id": "branched-loop", "path": "data/topology-transfer/branched-loop.inp", "topology_class": "development_unseen", "role": "unfamiliar_topology"}
+    {"id": "branched-loop", "path": "data/topology-transfer/branched-loop.inp", "topology_class": "governed_topology_transfer", "role": "validated_transfer_control"},
+    {"id": "coastal-branch", "path": "data/topologies/coastal-branch.inp", "topology_class": "development_unseen", "role": "unfamiliar_topology"}
   ],
   "seeds": {"reference": [7101, 7102, 7103, 7104, 7105, 7106, 7107, 7108, 7109, 7110, 7111, 7112, 7113, 7114, 7115, 7116, 7117, 7118, 7119, 7120, 7121, 7122, 7123, 7124], "unseen_topology": [7201, 7202, 7203, 7204, 7205, 7206, 7207, 7208], "scale": [7301, 7302, 7303, 7304, 7305, 7306]},
   "timing": {"warmup_per_group": 1, "timed_repetitions": 3, "stage_timeout_seconds": 120, "trajectory_timeout_seconds": 300, "p95_minimum_n": 20},
@@ -17,5 +18,6 @@
   "classifications": ["PASS", "FAIL", "OBSERVATION", "LIMITATION", "INCONCLUSIVE", "HARNESS_ERROR"],
   "locked_test_exclusion": {"assert_before": true, "assert_after": true, "rejected_tokens": ["locked_final_test", "locked_topology_test", "test"], "never_open_or_enumerate_locked_examples": true},
   "no_post_result_tuning": true,
+  "amendments": [{"id": "HARNESS-CORRECTION-02", "reason": "branched-loop structural hash is calibration validated; use coastal-branch for unfamiliar topology", "effect": "supersede mislabeled fixture rows; no production parameter changed"}],
   "result_artifacts": ["results.json", "results.csv", "summary.json", "LIVE_ROBUSTNESS_EVALUATION.md"]
 }
