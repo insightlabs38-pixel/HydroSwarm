@@ -18,6 +18,7 @@ from fastapi.testclient import TestClient
 from hydroswarm.agents.controller import SwarmController
 from hydroswarm.agents.schemas import FSMState
 from hydroswarm.api import create_app
+from hydroswarm.api.state import ApiSettings
 from hydroswarm.domain import (
     ConsequenceMetrics,
     OperationalAction,
@@ -331,3 +332,28 @@ def test_positive_infinity_json_is_accepted_and_persisted(tmp_path) -> None:
     assert response.status_code == 201
     incident_id = response.json()["incident_id"]
     assert client.get(f"/api/incidents/{incident_id}").status_code == 200
+
+
+def test_duplicate_and_stale_samples_are_accepted_without_deduplication_or_age_gate(tmp_path) -> None:
+    """ADV-04 detector: the API accepts duplicate IDs/times and years-old evidence."""
+    client, incident_id = _prepared_client(tmp_path)
+    duplicate = _observation(sensor="S1", node="J1")
+    stale = {**_observation(sensor="old", node="J2"), "observed_at": "2000-01-01T00:00:00+00:00"}
+    assert client.post(f"/api/incidents/{incident_id}/samples", json=duplicate).status_code == 200
+    assert client.post(f"/api/incidents/{incident_id}/samples", json=stale).status_code == 200
+    state = client.get(f"/api/incidents/{incident_id}").json()
+    assert state["sample_count"] == 2
+    assert len(state["observations"]) == 3
+
+
+def test_oversized_and_invalid_content_length_requests_fail_before_incident_creation(tmp_path) -> None:
+    """ADV-23 positive control: middleware rejects basic resource-abuse shapes."""
+    client = TestClient(
+        create_app(
+            verifier=_verification,
+            database_path=tmp_path / "limits.sqlite3",
+            settings=ApiSettings(maximum_request_bytes=128),
+        )
+    )
+    assert client.post("/api/incidents", content=b"x" * 129).status_code == 413
+    assert client.post("/api/incidents", content=b"{}", headers={"content-length": "not-an-int"}).status_code == 400
