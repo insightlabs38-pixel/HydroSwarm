@@ -1,0 +1,41 @@
+{
+  "answer_to_is_hydrocore_trained_on_trajectories_but_served_snapshots": true,
+  "examples": [
+    {
+      "seed": 2026081300,
+      "training_temporal_span_seconds": 86400.0,
+      "training_timesteps_per_sensor": 25
+    },
+    {
+      "seed": 2026081301,
+      "training_temporal_span_seconds": 86400.0,
+      "training_timesteps_per_sensor": 25
+    },
+    {
+      "seed": 2026081302,
+      "training_temporal_span_seconds": 86400.0,
+      "training_timesteps_per_sensor": 25
+    },
+    {
+      "seed": 2026081303,
+      "training_temporal_span_seconds": 86400.0,
+      "training_timesteps_per_sensor": 25
+    },
+    {
+      "seed": 2026081304,
+      "training_temporal_span_seconds": 86400.0,
+      "training_timesteps_per_sensor": 25
+    }
+  ],
+  "live_initial_incident": {
+    "source": "hydroswarm.evaluation.live_robustness._payloads, lines 204-238 (this exact LIVE robustness harness)",
+    "temporal_span_seconds": 0,
+    "timesteps_per_sensor": "1 (always -- last valid reading only)"
+  },
+  "training": {
+    "source": "hydroswarm.training.corpus.build_sensor_series -- full scenario.timestamps_seconds grid, always",
+    "temporal_span_hours": 24,
+    "temporal_span_seconds": 86400,
+    "timesteps_per_sensor": "25 (fixed per this repo's scenario generator; verified this session)"
+  }
+}
