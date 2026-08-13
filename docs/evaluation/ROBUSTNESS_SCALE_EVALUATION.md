@@ -29,6 +29,12 @@ Machine-readable rows and aggregation: [results.json](../../reports/evaluation/r
 [results.csv](../../reports/evaluation/robustness-scale/results.csv), and
 [summary.json](../../reports/evaluation/robustness-scale/summary.json).
 
+**Study status correction.** This is **Study 1: Offline frozen tensor
+characterization**. It did not invoke the LIVE API, dynamic live fusion, live
+OOD calculation, active sampling, plan generation, or WNTR verification. Its
+corrected raw-artifact terminology is documented in
+[CORRECTION.md](../../reports/evaluation/robustness-scale/CORRECTION.md).
+
 ## Tested populations and perturbation matrix
 
 Each condition contains a deterministic 24-row content-addressed sample from
@@ -70,10 +76,10 @@ pipeline calculation.
 suppressed, primarily by the existing JS disagreement/candidate-breadth
 guards. This is measured conservative behavior; it is not changed here.
 
-**PASS — unsupported conditions fail closed.** All 144 rows from the six OOD
-conditions marked calibration inapplicable, surfaced
-`OUTSIDE_VALIDATED_RANGE`, and suppressed planning. No unsupported topology
-was presented as cross-topology validated localization.
+**PASS — governed-policy replay.** In the offline governed-policy replay,
+all 144 pre-labeled OOD rows were calibration-inapplicable and
+planning-suppressed. This does not claim that the LIVE runtime independently
+detected those OOD states; Study 2 evaluates that question.
 
 ## Sampling behavior
 
@@ -88,8 +94,8 @@ tensors, so sampling latency and realized information gain are **INCONCLUSIVE**.
 This is a CPU, offline tensor-replay characterization on Linux/aarch64,
 Python 3.12.13, 16 logical CPUs, and 64,163 MB RAM. After one warm-up and five
 repetitions per row, median model-inference latency across conditions ranged
-from 10.7 to 16.0 ms. The process RSS recorded per row is retained in the raw
-artifact; it is process-level rather than model-only memory.
+from 10.7 to 16.0 ms. The point-in-time `process_rss_mb` recorded per row is
+process-level rather than model-only or peak memory.
 
 **INCONCLUSIVE — full workflow scale.** The stored fixtures do not preserve
 live raw telemetry/hydraulic state needed to invoke the exact current WNTR

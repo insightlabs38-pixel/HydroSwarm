@@ -4,7 +4,7 @@
     "EXTREME_DEMAND": {
       "candidate_set_size": 0.0,
       "entropy": 1.417451687460936,
-      "median_inference_ms": 12.45519149233587,
+      "median_inference_ms": 12.394822493661195,
       "mrr": 0.6996031746031747,
       "planning_suppression_rate": 1.0,
       "runs": 24,
@@ -14,7 +14,7 @@
     "FROZEN_DRIFTING_SENSOR": {
       "candidate_set_size": 0.0,
       "entropy": 1.474452396749849,
-      "median_inference_ms": 11.070620501413941,
+      "median_inference_ms": 15.834951511351392,
       "mrr": 0.7472222222222222,
       "planning_suppression_rate": 1.0,
       "runs": 24,
@@ -24,7 +24,7 @@
     "ROUGHNESS_MISMATCH": {
       "candidate_set_size": 0.0,
       "entropy": 1.3579187207581966,
-      "median_inference_ms": 12.277586036361754,
+      "median_inference_ms": 11.765913979616016,
       "mrr": 0.7611111111111111,
       "planning_suppression_rate": 1.0,
       "runs": 24,
@@ -34,7 +34,7 @@
     "SEVERE_MISSINGNESS": {
       "candidate_set_size": 0.0,
       "entropy": 1.7044834942815708,
-      "median_inference_ms": 13.125844998285174,
+      "median_inference_ms": 12.196419993415475,
       "mrr": 0.8095238095238095,
       "planning_suppression_rate": 1.0,
       "runs": 24,
@@ -44,7 +44,7 @@
     "TANK_STATE_SHIFT": {
       "candidate_set_size": 0.0,
       "entropy": 1.1500528836847332,
-      "median_inference_ms": 12.250175524968654,
+      "median_inference_ms": 12.484222505008802,
       "mrr": 0.8947368421052632,
       "planning_suppression_rate": 1.0,
       "runs": 24,
@@ -54,7 +54,7 @@
     "UNSEEN_TOPOLOGY": {
       "candidate_set_size": 0.0,
       "entropy": 1.8832923582348127,
-      "median_inference_ms": 10.71147050242871,
+      "median_inference_ms": 10.599626519251615,
       "mrr": 0.5231481481481481,
       "planning_suppression_rate": 1.0,
       "runs": 24,
@@ -64,7 +64,7 @@
     "nominal": {
       "candidate_set_size": 2.9583333333333335,
       "entropy": 1.2063574041456822,
-      "median_inference_ms": 15.998261485947296,
+      "median_inference_ms": 15.992055006790906,
       "mrr": 0.8313492063492063,
       "planning_suppression_rate": 0.75,
       "runs": 24,

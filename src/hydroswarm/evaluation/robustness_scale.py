@@ -39,7 +39,7 @@ REQUIRED_ROW_FIELDS = (
     "ood_level", "disagreement_js", "evidence_sufficient", "planning_allowed", "control_action",
     "suppression_reasons", "samples_requested", "first_recommended_node",
     "expected_information_gain", "inference_ms", "analysis_ms", "sampling_ms", "planning_ms",
-    "verification_ms", "total_workflow_ms", "peak_rss_mb", "exact_simulator_calls", "outcome", "error_class",
+    "verification_ms", "total_workflow_ms", "process_rss_mb", "exact_simulator_calls", "outcome", "error_class",
     "runtime_mode",
 )
 
@@ -174,9 +174,6 @@ def _row(
         if action is ControlAction.GENERATE_PLANS:
             action = ControlAction.REQUEST_SAMPLE if healthy_fraction >= 0.25 else ControlAction.ABSTAIN
     node_ids = tuple(entry.topology.node_ids) if entry.topology else ()
-    first_sample = None
-    if action is ControlAction.REQUEST_SAMPLE and node_ids:
-        first_sample = node_ids[int(np.argmax(posterior))]
     source_node = node_ids[true_index] if true_index is not None and true_index < len(node_ids) else None
     return {
         "run_id": hashlib.sha256(f"{population}:{entry.scenario_id}".encode()).hexdigest()[:16],
@@ -194,9 +191,13 @@ def _row(
         "disagreement_js": js, "evidence_sufficient": evidence_sufficient, "planning_allowed": planning_allowed,
         "control_action": action.value, "suppression_reasons": suppression,
         "samples_requested": 1 if action is ControlAction.REQUEST_SAMPLE else 0,
-        "first_recommended_node": first_sample, "expected_information_gain": None,
-        "inference_ms": inference_ms, "analysis_ms": inference_ms, "sampling_ms": None, "planning_ms": None,
-        "verification_ms": None, "total_workflow_ms": inference_ms, "peak_rss_mb": rss_mb,
+        # This study does not invoke the active-sampling engine.  A highest-
+        # posterior source is not a sampling recommendation and must never be
+        # presented as one.  Likewise, tensor-forward timing is inference
+        # timing only, not pipeline-analysis or workflow time.
+        "first_recommended_node": None, "expected_information_gain": None,
+        "inference_ms": inference_ms, "analysis_ms": None, "sampling_ms": None, "planning_ms": None,
+        "verification_ms": None, "total_workflow_ms": None, "process_rss_mb": rss_mb,
         "exact_simulator_calls": 0, "outcome": "SUPPRESSED" if not planning_allowed else "ADVISORY_ONLY",
         "error_class": None, "runtime_mode": "OFFLINE_TENSOR_REPLAY",
     }
