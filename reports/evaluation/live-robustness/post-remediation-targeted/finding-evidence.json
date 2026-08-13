@@ -1,0 +1,24 @@
+{
+  "HARNESS-POSTFIX-01": {
+    "evaluated": true,
+    "passed": true,
+    "status": "FIXED",
+    "criteria": ["rows carry runtime_commit", "rows retain study_baseline_commit", "git_commit equals runtime_commit"]
+  },
+  "HARNESS-POSTFIX-02": {
+    "evaluated": true,
+    "passed": true,
+    "status": "FIXED",
+    "criteria": ["finding status derives from measured control evidence", "failed evidence reports REGRESSION"]
+  },
+  "ROB-LIVE-01": {
+    "evaluated": true,
+    "passed": true,
+    "criteria": ["REQUEST_SAMPLE returns 200 only for a real non-stopped unsampled recommendation", "all invalid authority states return 409", "audit event only follows 200"]
+  },
+  "ROB-LIVE-02": {
+    "evaluated": true,
+    "passed": true,
+    "criteria": ["coastal calibration invalid", "coastal topology novelty > 0", "coastal OOD not NORMAL", "coastal planning disabled", "validated loop-grid topology novelty is zero"]
+  }
+}

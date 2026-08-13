@@ -500,6 +500,7 @@ def summarize(
             {"id": "ROB-LIVE-01", "severity": "MEDIUM", "status": _finding_status(finding_evidence, "ROB-LIVE-01"), "summary": "re-analysis can recommend a node already represented in current evidence"},
             {"id": "ROB-LIVE-02", "severity": "HIGH", "status": _finding_status(finding_evidence, "ROB-LIVE-02"), "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"},
         ],
+        "remediation_control_evidence": dict(finding_evidence or {}),
         "invariant_failures": [row["run_id"] for row in rows if any(value is False for value in (row.get("invariants") or {}).values())],
         "locked_test_opened": None,
     }
