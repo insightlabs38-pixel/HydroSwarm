@@ -78,7 +78,12 @@ def build_evidence_certificate(
             expected_candidate_reduction = top.expected_candidate_reduction
             recommended_node_accessible = top.accessible
 
-    if analysis.evidence_sufficient and analysis.control_action != ControlAction.REQUEST_SAMPLE:
+    # Statistical evidence sufficiency is necessary but not sufficient for
+    # operational planning: calibration/OOD/disagreement and deterministic
+    # health gates may still suppress authority.  The certificate must only
+    # state that the planning gate is satisfied when the authoritative result
+    # actually permits planning.
+    if analysis.planning_allowed:
         status = EvidenceCertificateStatus.EVIDENCE_SUFFICIENT
     elif analysis.control_action == ControlAction.ABSTAIN:
         status = EvidenceCertificateStatus.STOP_ABSTAIN

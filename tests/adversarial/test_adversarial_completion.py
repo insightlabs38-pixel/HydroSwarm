@@ -35,7 +35,8 @@ from hydroswarm.domain import (
     SensorObservation,
 )
 from hydroswarm.evaluation import validate_reference_incident_artifact
-from hydroswarm.inference import HybridInferencePipeline
+from hydroswarm.inference import HybridInferencePipeline, OODDetector, OODReference
+from hydroswarm.inference.fusion import ControlAction
 from hydroswarm.preprocessing import DEFAULT_FEATURE_SCHEMA, SensorSeries
 from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
 
@@ -85,10 +86,10 @@ def _signature_artifact() -> SignatureArtifact:
     )
 
 
-def _pipeline() -> tuple[HybridInferencePipeline, object]:
+def _pipeline(model: object | None = None) -> tuple[HybridInferencePipeline, object]:
     network = build_wntr_network()
     network.options.time.duration = 3600
-    model = _PriorFollowingModel()
+    model = model or _PriorFollowingModel()
     model_hash = HybridInferencePipeline._fingerprint_model(model)
     calibration = CalibrationArtifact(
         schema_version="hydroswarm-calibration-v1",
@@ -108,11 +109,18 @@ def _pipeline() -> tuple[HybridInferencePipeline, object]:
     )
 
 
-def _series(node: str, concentration: float, *, health: float = 1.0, drift: bool = False) -> SensorSeries:
+def _series(
+    node: str,
+    concentration: float,
+    *,
+    health: float = 1.0,
+    drift: bool = False,
+    frozen: bool = False,
+) -> SensorSeries:
     return SensorSeries(
         node_id=node, timestamps_seconds=(0.0, 3600.0), concentration_mg_l=(0.0, concentration),
         pressure_m=(25.0, 24.0), health=(health, health), missing=(False, False),
-        drift=(drift, drift), delayed=(False, False),
+        drift=(drift, drift), delayed=(False, False), frozen=(frozen, frozen),
     )
 
 
@@ -146,6 +154,29 @@ def _api_client(tmp_path: Path) -> tuple[TestClient, object]:
     )
     assert response.status_code == 200
     return client, network
+
+
+def _captured_live_series(tmp_path: Path, observation: dict[str, object]) -> SensorSeries:
+    """Run the API conversion into the real pipeline and retain its exact input."""
+    pipeline, network = _pipeline()
+    captured: list[SensorSeries] = []
+    original_analyze = pipeline.analyze
+
+    def capture(*args, **kwargs):
+        captured.extend(args[2])
+        return original_analyze(*args, **kwargs)
+
+    pipeline.analyze = capture
+    client = TestClient(
+        create_app(pipeline_factory=pipeline, verifier=_verification, database_path=tmp_path / "capture.sqlite3")
+    )
+    assert client.post(
+        "/api/networks/completion-network/validate",
+        json={"node_ids": list(network.node_name_list), "link_count": len(network.link_name_list)},
+    ).status_code == 200
+    _create_and_analyze(client, observation)
+    assert len(captured) == 1
+    return captured[0]
 
 
 def _enable_incident_view(client: TestClient, network: object) -> None:
@@ -242,6 +273,65 @@ def test_adv05_near_tie_remains_broad_and_nonplanning() -> None:
     assert result.planning_allowed is False
     assert result.control_action.value != "GENERATE_PLANS"
     _assert_analysis_shape({"fused_belief": dict(result.fused_belief), "candidate_nodes": result.conformal_candidate_nodes})
+
+
+def test_planning_authority_never_exposes_generate_plans_when_any_gate_suppresses() -> None:
+    """Authority invariant: GENERATE_PLANS iff planning_allowed across all pipeline suppression causes."""
+    class LowEvidenceModel(_PriorFollowingModel):
+        def __call__(self, batch):
+            result = super().__call__(batch)
+            result["evidence_sufficiency"] = torch.tensor([[0.0]])
+            return result
+
+    class ContrarianModel(_PriorFollowingModel):
+        def __call__(self, batch):
+            result = super().__call__(batch)
+            result["source_node_logits"] = torch.tensor([[-20.0, -20.0, -20.0, -20.0, -20.0, 20.0]])
+            return result
+
+    normal_pipeline, network = _pipeline()
+    normal = normal_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    assert normal.planning_allowed is True
+    assert normal.control_action == ControlAction.GENERATE_PLANS
+
+    all_frozen = normal_pipeline.analyze(
+        uuid4(), network, [_series("J1", 0.78, health=0.25, drift=True, frozen=True)]
+    )
+    no_calibration_pipeline, network = _pipeline()
+    no_calibration_pipeline.calibration_artifact = None
+    no_calibration = no_calibration_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    broad_pipeline, network = _pipeline()
+    broad = broad_pipeline.analyze(uuid4(), network, [_series("J1", 0.4), _series("J2", 0.65)])
+    low_evidence_pipeline, network = _pipeline(LowEvidenceModel())
+    low_evidence = low_evidence_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    disagreement_pipeline, network = _pipeline(ContrarianModel())
+    disagreement = disagreement_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    caution_pipeline, network = _pipeline()
+    caution_pipeline.ood_detector = OODDetector(OODReference(caution_threshold=0.0, outside_threshold=1.0))
+    caution = caution_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+    outside_pipeline, network = _pipeline()
+    outside_pipeline.ood_detector = OODDetector(OODReference(
+        caution_threshold=0.0,
+        outside_threshold=0.01,
+        validated_network_hashes=("not-this-network",),
+    ))
+    outside = outside_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    expected_reasons = {
+        "ALL_SENSORS_FROZEN": all_frozen,
+        "CALIBRATION_INVALID_OR_MISSING": no_calibration,
+        "CANDIDATE_REGION_TOO_BROAD": broad,
+        "MODEL_EVIDENCE_INSUFFICIENT": low_evidence,
+        "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": disagreement,
+    }
+    for reason, result in expected_reasons.items():
+        assert reason in result.planning_suppression_reasons
+        assert result.planning_allowed is False
+        assert result.control_action != ControlAction.GENERATE_PLANS
+    for result, expected_level in ((caution, "CAUTION"), (outside, "OUTSIDE_VALIDATED_RANGE")):
+        assert result.ood_level.value == expected_level
+        assert result.planning_allowed is False
+        assert result.control_action != ControlAction.GENERATE_PLANS
 
 
 def test_adv05_conflict_after_verified_plan_stales_authority(tmp_path: Path) -> None:
@@ -391,6 +481,46 @@ def test_adv28_frozen_sensor_cannot_retain_planning_authority(tmp_path: Path) ->
     view = frozen_client.get(f"/api/incidents/{_frozen_id}/view")
     assert view.status_code == 200, view.text
     assert view.json()["sensor_health"][0]["health"] == "FROZEN"
+
+
+def test_adv28_live_frozen_sensor_matches_existing_training_feature_convention(tmp_path: Path) -> None:
+    """Train/serve parity: frozen API telemetry uses training's health=.25, drift=True convention."""
+    frozen = _captured_live_series(tmp_path / "frozen", _observation(quality=1.0, frozen=True))
+    frozen_drift = _captured_live_series(
+        tmp_path / "frozen-drift", _observation(quality=1.0, frozen=True, drift=True)
+    )
+    healthy = _captured_live_series(tmp_path / "healthy", _observation(quality=0.7, drift=False, frozen=False))
+    drift = _captured_live_series(tmp_path / "drift", _observation(quality=0.7, drift=True, frozen=False))
+
+    # Existing training.corpus.build_sensor_series emits frozen rows with
+    # health=.25 and drift=True; all other temporal/measurement fields are
+    # preserved independently of the fault flag.
+    assert frozen.timestamps_seconds == (0.0,)
+    assert frozen.concentration_mg_l == (0.78,)
+    assert frozen.pressure_m == (24.0,)
+    assert frozen.health == (0.25,)
+    assert frozen.drift == (True,)
+    assert frozen.frozen == (True,)
+    assert frozen_drift.drift == (True,)
+    assert frozen_drift.frozen == (True,)
+    assert healthy.health == (0.7,)
+    assert healthy.drift == (False,)
+    assert healthy.frozen == (False,)
+    assert drift.health == (0.7,)
+    assert drift.drift == (True,)
+    assert drift.frozen == (False,)
+
+
+def test_adv28_parity_preserves_governed_schema_model_and_calibration_identities() -> None:
+    """Train/serve parity changes existing feature values only, never governed artifact identity."""
+    release = Path("models/hydrocore-v4-release")
+    assert DEFAULT_FEATURE_SCHEMA.fingerprint == "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09"
+    assert hashlib.sha256((release / "model.safetensors").read_bytes()).hexdigest() == (
+        "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7"
+    )
+    assert hashlib.sha256((release / "calibration.json").read_bytes()).hexdigest() == (
+        "953d87bcb0784594db75443d31f005dd180847a78a9ec024d95f79b66a43c1c7"
+    )
 
 
 @pytest.mark.parametrize(

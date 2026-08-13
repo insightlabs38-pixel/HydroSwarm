@@ -67,14 +67,45 @@ No new invariant violation was reproduced: **new findings: NONE**.
 
 ## Validation executed
 
-- Completion adversarial tests: `41 passed` (including the 315 existing
+- Completion adversarial tests: `43 passed` (including the 315 existing
   bounded Hypothesis examples).
 - Existing adversarial study tests: `24 passed`.
 - Focused API, persistence, incident-view, inference, preprocessing, sensor
   health, and control-label tests: `126 passed`.
-- Complete Python suite: `1090 passed` in 10m42s.
+- Complete Python suite: `1097 passed` in 11m23s.
 - `hydroswarm self-test --strict`: passed.
 - Frontend: `162 passed`; production `tsc -b && vite build`: passed.
 
 The frontend test run emitted React `act(...)` warnings, but no test failure;
 they are unrelated to this response-contract expansion.
+
+## Final pre-merge hardening
+
+This follow-up preserves the remediated ADV-27 through ADV-29 findings above
+and does not rewrite their historical evidence.
+
+- **Frozen train/serve parity:** `api.app.sensor_series` now derives its
+  existing model-facing drift channel as `drift_flag OR frozen_flag`, matching
+  `training.corpus.build_sensor_series`'s frozen convention of health `0.25`
+  plus drift `True`. Raw `frozen` remains provenance-only and operator-visible;
+  no model feature was added.
+- **Authority consistency:** `HybridInferencePipeline` now maps any generic
+  uncertainty recommendation of `GENERATE_PLANS` back to a reason-consistent
+  non-planning action when calibration, OOD, disagreement, candidate breadth,
+  model evidence, or all-frozen evidence suppresses planning. Thus
+  `GENERATE_PLANS` is emitted if and only if `planning_allowed` is true.
+- **Evidence certificates:** the certificate grants `EVIDENCE_SUFFICIENT` and
+  says “Planning gate satisfied” only when `analysis.planning_allowed` is
+  true. Statistical evidence sufficiency remains distinct from operational
+  planning authority.
+- **ADV-22 cleanup:** the obsolete negative detector was replaced with a
+  required positive regression verifying LIVE execution/source provenance,
+  computation timestamp, stable hashes, and MISS→HIT cache behavior.
+
+New tests exercise the API conversion values directly, frozen train/serve
+parity, all pipeline suppression categories, certificate truthfulness, and
+the current ADV-22 response contract. The governed feature-schema fingerprint,
+model SHA-256, calibration SHA-256, and scientific thresholds are unchanged.
+Final validation: 24 adversarial-study tests passed, 43 completion tests
+passed, the 154-test focused set passed, the 1,097-test Python suite passed,
+strict self-test passed, and frontend tests/build passed.

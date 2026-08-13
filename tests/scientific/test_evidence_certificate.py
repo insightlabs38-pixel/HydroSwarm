@@ -26,7 +26,12 @@ def _analysis():
 
 
 def test_evidence_sufficient_status_and_message() -> None:
-    analysis = replace(_analysis(), evidence_sufficient=True, control_action=ControlAction.GENERATE_PLANS)
+    analysis = replace(
+        _analysis(),
+        evidence_sufficient=True,
+        planning_allowed=True,
+        control_action=ControlAction.GENERATE_PLANS,
+    )
     certificate = build_evidence_certificate(analysis, sample_budget_remaining=3)
 
     assert certificate.status == EvidenceCertificateStatus.EVIDENCE_SUFFICIENT
@@ -35,8 +40,36 @@ def test_evidence_sufficient_status_and_message() -> None:
     assert "Planning gate satisfied" in certificate.message
 
 
+@pytest.mark.parametrize(
+    ("suppression", "control"),
+    (
+        ("ALL_SENSORS_FROZEN", ControlAction.ABSTAIN),
+        ("HIGH_CLASSICAL_NEURAL_DISAGREEMENT", ControlAction.INSPECT_SENSORS),
+        ("OOD_CAUTION", ControlAction.ABSTAIN),
+        ("CALIBRATION_INVALID_OR_MISSING", ControlAction.ABSTAIN),
+    ),
+)
+def test_statistical_sufficiency_never_claims_planning_authority_when_suppressed(
+    suppression: str, control: ControlAction,
+) -> None:
+    """EvidenceCertificateStatus is authority-aware, not merely statistically sufficient."""
+    analysis = replace(
+        _analysis(),
+        evidence_sufficient=True,
+        planning_allowed=False,
+        planning_suppression_reasons=(suppression,),
+        control_action=control,
+    )
+    certificate = build_evidence_certificate(analysis, sample_budget_remaining=3)
+
+    assert certificate.status != EvidenceCertificateStatus.EVIDENCE_SUFFICIENT
+    assert "Planning gate satisfied" not in certificate.message
+
+
 def test_continue_sampling_status_when_evidence_insufficient_and_budget_remains() -> None:
-    analysis = replace(_analysis(), evidence_sufficient=False, control_action=ControlAction.REQUEST_SAMPLE)
+    analysis = replace(
+        _analysis(), evidence_sufficient=False, planning_allowed=False, control_action=ControlAction.REQUEST_SAMPLE
+    )
     certificate = build_evidence_certificate(analysis, sample_budget_remaining=2)
 
     assert certificate.status == EvidenceCertificateStatus.CONTINUE_SAMPLING
@@ -46,7 +79,9 @@ def test_continue_sampling_status_when_evidence_insufficient_and_budget_remains(
 
 
 def test_stop_budget_exhausted_status_and_message() -> None:
-    analysis = replace(_analysis(), evidence_sufficient=False, control_action=ControlAction.REQUEST_SAMPLE)
+    analysis = replace(
+        _analysis(), evidence_sufficient=False, planning_allowed=False, control_action=ControlAction.REQUEST_SAMPLE
+    )
     certificate = build_evidence_certificate(analysis, sample_budget_remaining=0)
 
     assert certificate.status == EvidenceCertificateStatus.STOP_BUDGET_EXHAUSTED
@@ -56,7 +91,9 @@ def test_stop_budget_exhausted_status_and_message() -> None:
 
 
 def test_stop_abstain_status_takes_priority_over_remaining_budget() -> None:
-    analysis = replace(_analysis(), evidence_sufficient=False, control_action=ControlAction.ABSTAIN)
+    analysis = replace(
+        _analysis(), evidence_sufficient=False, planning_allowed=False, control_action=ControlAction.ABSTAIN
+    )
     certificate = build_evidence_certificate(analysis, sample_budget_remaining=5)
 
     assert certificate.status == EvidenceCertificateStatus.STOP_ABSTAIN
@@ -75,7 +112,9 @@ def test_already_sampled_nodes_and_candidate_set_are_reported() -> None:
 
 
 def test_negative_budget_is_clamped_to_zero_not_reported_negative() -> None:
-    analysis = replace(_analysis(), evidence_sufficient=False, control_action=ControlAction.REQUEST_SAMPLE)
+    analysis = replace(
+        _analysis(), evidence_sufficient=False, planning_allowed=False, control_action=ControlAction.REQUEST_SAMPLE
+    )
     certificate = build_evidence_certificate(analysis, sample_budget_remaining=-1)
     assert certificate.sample_budget_remaining == 0
     assert certificate.status == EvidenceCertificateStatus.STOP_BUDGET_EXHAUSTED
@@ -123,7 +162,9 @@ def test_uncalibrated_analysis_reports_an_uncalibrated_credible_region_not_confo
 
 
 def test_uncalibrated_stop_budget_exhausted_message_does_not_claim_calibration_either() -> None:
-    base = replace(_analysis(), evidence_sufficient=False, control_action=ControlAction.REQUEST_SAMPLE)
+    base = replace(
+        _analysis(), evidence_sufficient=False, planning_allowed=False, control_action=ControlAction.REQUEST_SAMPLE
+    )
     analysis = replace(base, calibrated=False)
     certificate = build_evidence_certificate(analysis, sample_budget_remaining=0)
 

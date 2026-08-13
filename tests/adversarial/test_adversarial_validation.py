@@ -262,14 +262,20 @@ def test_reference_endpoint_rejects_checksum_mismatched_artifact(tmp_path) -> No
     assert response.status_code == 503
 
 
-def test_live_example_cache_response_has_no_explicit_cache_or_provenance_label() -> None:
-    """ADV-22 detector: the cached input payload does not identify its computation/cache provenance."""
-    # The builder is intentionally not invoked: this checks the response contract
-    # independently of expensive WNTR execution by inspecting the documented API model.
-    from hydroswarm.evaluation.live_example import build_live_example_inputs
-
-    assert "cache" not in build_live_example_inputs.__doc__.lower().split("returns", 1)[-1]
-    assert "data_mode" not in str(build_live_example_inputs.__annotations__.get("return", ""))
+@pytest.mark.real_simulation
+def test_adv22_live_example_exposes_explicit_provenance() -> None:
+    """ADV-22 regression: cached LIVE example inputs remain explicitly and stably provenance-labeled."""
+    client = TestClient(create_app())
+    first = client.get("/api/live-example-inputs")
+    second = client.get("/api/live-example-inputs")
+    assert first.status_code == second.status_code == 200
+    first_payload, second_payload = first.json(), second.json()
+    assert first_payload["execution_mode"] == second_payload["execution_mode"] == "LIVE"
+    assert first_payload["input_source"] == second_payload["input_source"] == "FROZEN_REFERENCE_SCENARIO"
+    assert first_payload["cache_status"] == "MISS"
+    assert second_payload["cache_status"] == "HIT"
+    for field in ("computed_at", "input_sha256", "network_sha256", "scenario_sha256"):
+        assert first_payload[field] == second_payload[field]
 
 
 def test_controller_rejects_invalid_direct_transition() -> None:

@@ -76,12 +76,36 @@
   "second_pass_new_findings": [],
   "hypothesis_examples": 315,
   "validation": {
-    "completion_adversarial": "41 passed",
+    "completion_adversarial": "43 passed",
     "existing_adversarial": "24 passed",
     "focused_api_scientific_persistence": "126 passed",
-    "complete_python_suite": "1090 passed in 642.72 seconds",
+    "complete_python_suite": "1097 passed in 682.78 seconds",
     "strict_self_test": "passed",
     "frontend_tests": "162 passed",
     "frontend_build": "passed"
+  },
+  "final_pre_merge_hardening": {
+    "frozen_train_serve_parity": {
+      "result": "PASS",
+      "remediation": "Live drift is derived as drift_flag OR frozen_flag, matching training frozen telemetry while retaining provenance-only frozen metadata."
+    },
+    "planning_control_authority": {
+      "result": "PASS",
+      "invariant": "control_action == GENERATE_PLANS iff planning_allowed == true"
+    },
+    "evidence_certificate_authority": {
+      "result": "PASS",
+      "invariant": "EVIDENCE_SUFFICIENT and Planning gate satisfied require planning_allowed == true"
+    },
+    "adv22_detector": {
+      "result": "PASS",
+      "remediation": "Replaced obsolete negative detector with a positive LIVE provenance and MISS/HIT regression."
+    },
+    "identities_unchanged": {
+      "feature_schema_sha256": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+      "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+      "calibration_sha256": "953d87bcb0784594db75443d31f005dd180847a78a9ec024d95f79b66a43c1c7",
+      "scientific_thresholds_modified": false
+    }
   }
 }

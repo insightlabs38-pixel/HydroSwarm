@@ -368,7 +368,11 @@ def create_app(
                 pressure_m=tuple(item.pressure_m for item in items),
                 health=tuple(_effective_sensor_health(item) for item in items),
                 missing=tuple(item.missing for item in items),
-                drift=tuple(item.drift_flag for item in items),
+                # Frozen telemetry was trained as the existing sensor-health
+                # channel at 0.25 *and* drift=True. Preserve its raw frozen
+                # provenance separately below, while matching that established
+                # model-facing convention without adding a feature column.
+                drift=tuple(item.drift_flag or item.frozen_flag for item in items),
                 delayed=tuple(item.received_at > item.observed_at for item in items),
                 frozen=tuple(item.frozen_flag for item in items),
             ))

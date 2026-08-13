@@ -99,6 +99,46 @@ def _array(value: Any) -> np.ndarray:
     return np.asarray(value, dtype=np.float64)
 
 
+def _fail_closed_control_action(
+    proposed: ControlAction,
+    suppression_reasons: Sequence[str],
+    *,
+    sample_budget_remaining: int,
+) -> ControlAction:
+    """Prevent a generic uncertainty recommendation from outranking authority.
+
+    ``uncertainty_control`` deliberately does not know about calibration and
+    other pipeline-level gates.  If it recommends plan generation after one
+    of those gates suppressed planning, map the known reason to an existing
+    non-planning action.  This leaves the underlying scientific thresholds
+    untouched and keeps ``GENERATE_PLANS`` synonymous with actual authority.
+    """
+
+    if proposed != ControlAction.GENERATE_PLANS:
+        return proposed
+    reasons = frozenset(suppression_reasons)
+    if (
+        "ALL_SENSORS_FROZEN" in reasons
+        or "CALIBRATION_INVALID_OR_MISSING" in reasons
+        or any(reason.startswith("OOD_") for reason in reasons)
+    ):
+        return ControlAction.ABSTAIN
+    if "HIGH_CLASSICAL_NEURAL_DISAGREEMENT" in reasons:
+        return ControlAction.INSPECT_SENSORS
+    if (
+        "CANDIDATE_REGION_TOO_BROAD" in reasons
+        or "MODEL_EVIDENCE_INSUFFICIENT" in reasons
+    ):
+        return (
+            ControlAction.REQUEST_SAMPLE
+            if sample_budget_remaining > 0
+            else ControlAction.ABSTAIN
+        )
+    # Future explicit suppressions must fail closed even before a more
+    # specific action is designed for them.
+    return ControlAction.CONTINUE_ANALYSIS
+
+
 class HybridInferencePipeline:
     """Compose hydraulic evidence and learned residuals without hiding fallbacks."""
 
@@ -848,6 +888,11 @@ class HybridInferencePipeline:
                 disagreement_js=disagreement,
                 ood_score=ood_components.combined,
                 healthy_sensor_fraction=trust.healthy_sensor_fraction,
+                sample_budget_remaining=sample_budget_remaining,
+            )
+            control = _fail_closed_control_action(
+                control,
+                suppression,
                 sample_budget_remaining=sample_budget_remaining,
             )
 
