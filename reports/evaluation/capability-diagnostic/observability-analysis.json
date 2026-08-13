@@ -1,0 +1,1078 @@
+{
+  "key_findings": {
+    "observability_upper_bound": "Closest (most confusable) source-node pair on golden-reference at the canonical hypothesis combo is J1 vs J2, Euclidean distance 108.54 (signature peak magnitudes 61.9 vs 126.1 mg/L -- clearly distinguishable in magnitude, not near-zero). No pair on this network is information-theoretically indistinguishable under full classical-signature evidence, so this network's real model failures cannot be attributed to fundamental unobservability.",
+    "oracle_upper_bounds": "Baseline (real pipeline, full-trajectory evidence, N=10): top1=0.9. Oracle classical prior (delta at true source): top1=1.0 (+0.10). Cited full-history-evidence upper bound (temporal-ablation.json, N=20): top1=1.0 (+0.10 vs this script's own baseline). Both oracle substitutions show only modest (~10-point) headroom over an already-high full-trajectory baseline -- meaning, under FULL-TRAJECTORY evidence, neither classical-prior imperfection nor additional history is the dominant bottleneck; this is consistent with (not contradicting) the separately-established finding (temporal-ablation.json) that the dominant real-world gap is EVIDENCE SPARSITY specifically (the LIVE harness's latest-1-snapshot contract), not these oracle-substituted components.",
+    "sensor_placement_golden_reference": "On golden-reference (4/4 junctions), layout A (default, 4 sensors) and B (requested 8, clamped to 4) are numerically identical by construction (fused top1=0.5 both). Layout C (sparse, 2 sensors) shows fused top1=0.5 (unchanged from A/B) but classical top1 fell from 0.6 to 0.4 and neural top1 fell from 0.4 to 0.1 -- fusion partially masks a real per-component degradation under sparse coverage even where the final fused metric looks flat (N=10, noisy).",
+    "sensor_placement_loop_grid": "NOT a null result on the larger 8-junction network: fused top1 goes 0.3 (sparse, 2 sensors) -> 0.4 (default, 4 sensors) -> 0.6 (full coverage, 8 sensors) -- a real, monotonic, non-trivial sensor-density effect (N=10 per layout, single network/seed family; directional signal, not a precise effect-size estimate)."
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "observability_upper_bound": {
+    "canonical_hypothesis_combo_used": {
+      "demand_regime": "nominal",
+      "duration_min": 60,
+      "relative_strength": 1.0,
+      "start_time_min": 0
+    },
+    "closest_pair": {
+      "correlation": 0.5555555555555548,
+      "correlation_distance": 0.4444444444444452,
+      "euclidean_distance": 108.53935688121383,
+      "node_a": "J1",
+      "node_b": "J2",
+      "signature_a_max_mg_l": 61.90625,
+      "signature_b_max_mg_l": 126.0625
+    },
+    "closest_pair_suspiciously_near_zero": false,
+    "live_confusion_cross_check": {
+      "checked": true,
+      "confusable_pair": [
+        "J1",
+        "J2"
+      ],
+      "live_rows_where_top_prediction_was_the_other_pair_member": 0,
+      "live_rows_with_source_in_pair": 123
+    },
+    "n_source_nodes_compared": 4,
+    "note_on_evidence_window": "The deployed SignatureArtifact's own native temporal resolution is 7 sample times spanning 0-21600s (6.0h) -- this is a fixed, pre-built production configuration distinct from the SCENARIO's own coarser 25-step/24h evidence grid used elsewhere in this diagnostic. This experiment uses the artifact's full native window (all sample_times_seconds it has), which IS the complete evidence the classical signature-matching machinery can ever use regardless of how much raw sensor history is fed to it -- an information-theoretic ceiling on classical identifiability, not an artifact of evidence sparsity.",
+    "pairwise_distances": [
+      {
+        "correlation": 0.5555555555555548,
+        "correlation_distance": 0.4444444444444452,
+        "euclidean_distance": 108.53935688121383,
+        "node_a": "J1",
+        "node_b": "J2",
+        "signature_a_max_mg_l": 61.90625,
+        "signature_b_max_mg_l": 126.0625
+      },
+      {
+        "correlation": 0.5555555555555556,
+        "correlation_distance": 0.4444444444444444,
+        "euclidean_distance": 110.60597912042323,
+        "node_a": "J1",
+        "node_b": "J4",
+        "signature_a_max_mg_l": 61.90625,
+        "signature_b_max_mg_l": 129.5
+      },
+      {
+        "correlation": -0.03703703703703696,
+        "correlation_distance": 1.037037037037037,
+        "euclidean_distance": 180.72632322450983,
+        "node_a": "J2",
+        "node_b": "J4",
+        "signature_a_max_mg_l": 126.0625,
+        "signature_b_max_mg_l": 129.5
+      },
+      {
+        "correlation": -0.06666666666666651,
+        "correlation_distance": 1.0666666666666664,
+        "euclidean_distance": 2484.3150265952963,
+        "node_a": "J1",
+        "node_b": "J3",
+        "signature_a_max_mg_l": 61.90625,
+        "signature_b_max_mg_l": 2482.0
+      },
+      {
+        "correlation": -0.037037037037036986,
+        "correlation_distance": 1.037037037037037,
+        "euclidean_distance": 2485.1993388672568,
+        "node_a": "J2",
+        "node_b": "J3",
+        "signature_a_max_mg_l": 126.0625,
+        "signature_b_max_mg_l": 2482.0
+      },
+      {
+        "correlation": -0.03703703703703705,
+        "correlation_distance": 1.037037037037037,
+        "euclidean_distance": 2485.376078182133,
+        "node_a": "J3",
+        "node_b": "J4",
+        "signature_a_max_mg_l": 2482.0,
+        "signature_b_max_mg_l": 129.5
+      }
+    ],
+    "signature_artifact_sample_times_seconds": [
+      0,
+      3600,
+      7200,
+      10800,
+      14400,
+      18000,
+      21600
+    ],
+    "signature_artifact_sensor_nodes": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ],
+    "source_nodes": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ]
+  },
+  "oracle_upper_bounds": {
+    "A_baseline_real_pipeline": {
+      "per_scenario": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081304,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.04439482201315287
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6015411683485954
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ],
+      "summary": {
+        "mrr": 0.95,
+        "n": 10,
+        "n_ok": 10,
+        "top1": 0.9,
+        "top3": 1.0
+      }
+    },
+    "B_oracle_classical_prior_delta_at_true_source": {
+      "per_scenario": [
+        {
+          "real_classical_prior_true_source_probability": 0.7622701525688171,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9993195533752441
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.6640139222145081,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9996395111083984
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.13261975347995758,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9998337030410767
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.7690255045890808,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9998743534088135
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.5521186590194702,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9504721760749817
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.3751312494277954,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9526216387748718
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.6467143297195435,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9999370574951172
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.4103231728076935,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9999765157699585
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.6116652488708496,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.999846339225769
+        },
+        {
+          "real_classical_prior_true_source_probability": 0.660911500453949,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9997286200523376
+        }
+      ],
+      "summary": {
+        "mrr": 1.0,
+        "n": 10,
+        "n_ok": 10,
+        "top1": 1.0,
+        "top3": 1.0
+      }
+    },
+    "C_oracle_full_history_evidence_cited": {
+      "available": true,
+      "label": "NOT achievable via the real deployed analyze() method today (CAP-PARITY-02); computed by calling feature_builder.build(..., window_steps=25) + model directly, same real frozen checkpoint",
+      "source": "REUSED:reports/evaluation/capability-diagnostic/temporal-ablation.json#true_unclipped_full_trajectory_bypassing_analyze_window_cap.summary",
+      "summary": {
+        "mrr": 1.0,
+        "n": 20,
+        "n_ok": 20,
+        "top1": 1.0,
+        "top3": 1.0
+      }
+    },
+    "label": "NON-PRODUCT, oracle-substitution upper bounds -- answers 'if this component were perfect, how much would overall accuracy improve', not an achievable real configuration.",
+    "leverage": {
+      "full_history_top1_minus_baseline_top1": 0.09999999999999998,
+      "oracle_classical_prior_top1_minus_baseline_top1": 0.09999999999999998
+    }
+  },
+  "schema_version": 1,
+  "sections": "34_sensor_placement_35_observability_upper_bound_36_oracle_upper_bounds",
+  "sensor_placement_effect": {
+    "golden_reference_primary": {
+      "layouts_requested_sensor_count": {
+        "A_current_generator_default": null,
+        "B_high_coverage_sensor_count_8": 8,
+        "C_sparse_sensor_count_2": 2
+      },
+      "network_id": "golden-reference",
+      "network_total_junctions": 4,
+      "note": "This network has 4 total junctions. ScenarioGenerationConfig clamps sensor_count to min(max(1, requested), n_junctions) (src/hydroswarm/data/scenarios.py:228) -- so on networks where n_junctions <= 8, layout B (requested 8) clamps down and may coincide numerically with layout A (the default, 4) if n_junctions == 4, as measured directly below via mean_n_sensors_placed per layout.",
+      "per_layout": {
+        "A_current_generator_default": [
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.3333333333333333,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081300
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.25,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081301
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081302
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.25,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081303
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081304
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081305
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081306
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081307
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081308
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081309
+          }
+        ],
+        "B_high_coverage_sensor_count_8": [
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.3333333333333333,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081300
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.25,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081301
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081302
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.25,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081303
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081304
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081305
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081306
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081307
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081308
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081309
+          }
+        ],
+        "C_sparse_sensor_count_2": [
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081300
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.25,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081301
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081302
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081303
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081304
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081305
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.3333333333333333,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081306
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.3333333333333333,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081307
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081308
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081309
+          }
+        ]
+      },
+      "summary": {
+        "A_current_generator_default": {
+          "classical_top1": 0.6,
+          "classical_top3": 0.9,
+          "fused_mrr": 0.6833333333333333,
+          "fused_top1": 0.5,
+          "fused_top3": 0.8,
+          "mean_n_sensors_placed": 4.0,
+          "n": 10,
+          "n_ok": 10,
+          "neural_top1": 0.4
+        },
+        "B_high_coverage_sensor_count_8": {
+          "classical_top1": 0.6,
+          "classical_top3": 0.9,
+          "fused_mrr": 0.6833333333333333,
+          "fused_top1": 0.5,
+          "fused_top3": 0.8,
+          "mean_n_sensors_placed": 4.0,
+          "n": 10,
+          "n_ok": 10,
+          "neural_top1": 0.4
+        },
+        "C_sparse_sensor_count_2": {
+          "classical_top1": 0.4,
+          "classical_top3": 0.8,
+          "fused_mrr": 0.6916666666666667,
+          "fused_top1": 0.5,
+          "fused_top3": 0.9,
+          "mean_n_sensors_placed": 2.0,
+          "n": 10,
+          "n_ok": 10,
+          "neural_top1": 0.1
+        }
+      }
+    },
+    "loop_grid_supplementary": {
+      "layouts_requested_sensor_count": {
+        "A_current_generator_default": null,
+        "B_high_coverage_sensor_count_8": 8,
+        "C_sparse_sensor_count_2": 2
+      },
+      "network_id": "loop-grid",
+      "network_total_junctions": 8,
+      "note": "This network has 8 total junctions. ScenarioGenerationConfig clamps sensor_count to min(max(1, requested), n_junctions) (src/hydroswarm/data/scenarios.py:228) -- so on networks where n_junctions <= 8, layout B (requested 8) clamps down and may coincide numerically with layout A (the default, 4) if n_junctions == 4, as measured directly below via mean_n_sensors_placed per layout.",
+      "per_layout": {
+        "A_current_generator_default": [
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.3333333333333333,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081300
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.14285714285714285,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081301
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081302
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.14285714285714285,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081303
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.125,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081304
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081305
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081306
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.14285714285714285,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081307
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081308
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 4,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081309
+          }
+        ],
+        "B_high_coverage_sensor_count_8": [
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.5,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081300
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.125,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081301
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081302
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.14285714285714285,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081303
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081304
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081305
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081306
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.16666666666666666,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081307
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081308
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 8,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081309
+          }
+        ],
+        "C_sparse_sensor_count_2": [
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.14285714285714285,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081300
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.14285714285714285,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081301
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.3333333333333333,
+            "fused_top1": 0.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 1.0,
+            "seed": 2026081302
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.125,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081303
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.16666666666666666,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081304
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081305
+          },
+          {
+            "classical_top1": 0.0,
+            "classical_top3": 0.0,
+            "fused_mrr": 0.125,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081306
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 0.25,
+            "fused_top1": 0.0,
+            "fused_top3": 0.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 0.0,
+            "neural_top3": 0.0,
+            "seed": 2026081307
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081308
+          },
+          {
+            "classical_top1": 1.0,
+            "classical_top3": 1.0,
+            "fused_mrr": 1.0,
+            "fused_top1": 1.0,
+            "fused_top3": 1.0,
+            "n_sensors_placed": 2,
+            "neural_top1": 1.0,
+            "neural_top3": 1.0,
+            "seed": 2026081309
+          }
+        ]
+      },
+      "summary": {
+        "A_current_generator_default": {
+          "classical_top1": 0.4,
+          "classical_top3": 0.5,
+          "fused_mrr": 0.5386904761904762,
+          "fused_top1": 0.4,
+          "fused_top3": 0.6,
+          "mean_n_sensors_placed": 4.0,
+          "n": 10,
+          "n_ok": 10,
+          "neural_top1": 0.6
+        },
+        "B_high_coverage_sensor_count_8": {
+          "classical_top1": 0.6,
+          "classical_top3": 0.7,
+          "fused_mrr": 0.6934523809523809,
+          "fused_top1": 0.6,
+          "fused_top3": 0.7,
+          "mean_n_sensors_placed": 8.0,
+          "n": 10,
+          "n_ok": 10,
+          "neural_top1": 0.6
+        },
+        "C_sparse_sensor_count_2": {
+          "classical_top1": 0.4,
+          "classical_top3": 0.5,
+          "fused_mrr": 0.42857142857142855,
+          "fused_top1": 0.3,
+          "fused_top3": 0.4,
+          "mean_n_sensors_placed": 2.0,
+          "n": 10,
+          "n_ok": 10,
+          "neural_top1": 0.3
+        }
+      }
+    },
+    "note": "Section 34 was specified against golden-reference (4 junctions total), where requesting sensor_count=8 clamps to 4 -- IDENTICAL to the default layout A -- so golden-reference alone cannot separate 'default' from 'high-coverage'. A supplementary run on loop-grid (8 junctions, also used elsewhere in this repo's live_robustness.py scale conditions) is included so layout B genuinely differs from A there, giving a real density-effect data point rather than a null comparison on golden-reference alone."
+  }
+}

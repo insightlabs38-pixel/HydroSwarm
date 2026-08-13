@@ -1,0 +1,365 @@
+{
+  "cases": {
+    "a_single_observation": {
+      "case": "a_single_observation",
+      "n_input_observations": 1,
+      "n_output_series": 1,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0
+          ],
+          "delayed": [
+            false
+          ],
+          "frozen": [
+            false
+          ],
+          "health": [
+            1.0
+          ],
+          "missing": [
+            false
+          ],
+          "n_points": 1,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0
+          ],
+          "timestamps_seconds": [
+            0.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    },
+    "b_multi_observation_same_sensor": {
+      "case": "b_multi_observation_same_sensor",
+      "n_input_observations": 3,
+      "n_output_series": 1,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0,
+            1.5,
+            2.0
+          ],
+          "delayed": [
+            false,
+            false,
+            false
+          ],
+          "frozen": [
+            false,
+            false,
+            false
+          ],
+          "health": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "missing": [
+            false,
+            false,
+            false
+          ],
+          "n_points": 3,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0,
+            25.0,
+            25.0
+          ],
+          "timestamps_seconds": [
+            0.0,
+            3600.0,
+            7200.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    },
+    "c_multi_sensor_same_node": {
+      "case": "c_multi_sensor_same_node",
+      "n_input_observations": 4,
+      "n_output_series": 1,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0,
+            1.2,
+            1.4,
+            1.6
+          ],
+          "delayed": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "frozen": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "health": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "missing": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "n_points": 4,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0,
+            25.0,
+            25.0,
+            25.0
+          ],
+          "timestamps_seconds": [
+            0.0,
+            1800.0,
+            3600.0,
+            5400.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    },
+    "d_grab_sample_new_node": {
+      "case": "d_grab_sample_new_node",
+      "n_input_observations": 3,
+      "n_output_series": 2,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0,
+            1.1
+          ],
+          "delayed": [
+            false,
+            false
+          ],
+          "frozen": [
+            false,
+            false
+          ],
+          "health": [
+            1.0,
+            1.0
+          ],
+          "missing": [
+            false,
+            false
+          ],
+          "n_points": 2,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0,
+            25.0
+          ],
+          "timestamps_seconds": [
+            0.0,
+            3600.0
+          ],
+          "timestamps_strictly_ordered": true
+        },
+        {
+          "concentration_mg_l": [
+            0.4
+          ],
+          "delayed": [
+            false
+          ],
+          "frozen": [
+            false
+          ],
+          "health": [
+            1.0
+          ],
+          "missing": [
+            false
+          ],
+          "n_points": 1,
+          "node_id": "J7",
+          "pressure_m": [
+            25.0
+          ],
+          "timestamps_seconds": [
+            2700.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    },
+    "e_out_of_order_input": {
+      "case": "e_out_of_order_input",
+      "n_input_observations": 3,
+      "n_output_series": 1,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0,
+            2.0,
+            3.0
+          ],
+          "delayed": [
+            false,
+            false,
+            false
+          ],
+          "frozen": [
+            false,
+            false,
+            false
+          ],
+          "health": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "missing": [
+            false,
+            false,
+            false
+          ],
+          "n_points": 3,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0,
+            25.0,
+            25.0
+          ],
+          "timestamps_seconds": [
+            0.0,
+            3600.0,
+            7200.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    },
+    "f_delayed_measurement": {
+      "case": "f_delayed_measurement",
+      "n_input_observations": 2,
+      "n_output_series": 1,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0,
+            1.0
+          ],
+          "delayed": [
+            false,
+            true
+          ],
+          "frozen": [
+            false,
+            false
+          ],
+          "health": [
+            1.0,
+            1.0
+          ],
+          "missing": [
+            false,
+            false
+          ],
+          "n_points": 2,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0,
+            25.0
+          ],
+          "timestamps_seconds": [
+            0.0,
+            3600.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    },
+    "g_missing_interspersed": {
+      "case": "g_missing_interspersed",
+      "n_input_observations": 4,
+      "n_output_series": 1,
+      "series": [
+        {
+          "concentration_mg_l": [
+            1.0,
+            null,
+            2.0,
+            null
+          ],
+          "delayed": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "frozen": [
+            false,
+            false,
+            false,
+            false
+          ],
+          "health": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "missing": [
+            false,
+            true,
+            false,
+            true
+          ],
+          "n_points": 4,
+          "node_id": "J1",
+          "pressure_m": [
+            25.0,
+            null,
+            25.0,
+            null
+          ],
+          "timestamps_seconds": [
+            0.0,
+            3600.0,
+            7200.0,
+            10800.0
+          ],
+          "timestamps_strictly_ordered": true
+        }
+      ]
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "overall_pass": true,
+  "replica_source": "scripts/capability_diagnostic/train_serve_parity_full.py:_sensor_series_closure_replica (imported via importlib, not re-copied), itself a verbatim replica of src/hydroswarm/api/app.py's sensor_series() closure lines ~357-380 (not importable -- inline closure).",
+  "schema_version": 1,
+  "section": "12_sensor_series_reconstruction_audit",
+  "semantic_soundness_findings": {
+    "a_single_observation_sound": true,
+    "b_multi_observation_becomes_ordered_series": true,
+    "c_multi_sensor_same_node_merges_by_node_id": true,
+    "d_grab_sample_creates_new_series_not_error": true,
+    "e_out_of_order_input_correctly_sorted": true,
+    "f_delayed_flag_correctly_set": true,
+    "g_missing_pattern_preserved": true
+  },
+  "spurious_second_series_for_new_sensor_id_at_existing_node": {
+    "answer": "NO",
+    "evidence": "Case (c) fed 4 observations from 2 different sensor_ids (SENSOR-A, SENSOR-B) at the SAME node_id (J1). Output: 1 SensorSeries entr(ies), 4 points in that entry. The closure groups by `item.node_id` (src/hydroswarm/api/app.py:~365, `grouped[item.node_id]`), never by sensor_id, so multiple sensor_ids at one node correctly merge into a single ordered series.",
+    "question": "Does creating a new sensor_id for a grab sample at an already-instrumented node cause an unintended SECOND independent series instead of extending that node's history?"
+  }
+}

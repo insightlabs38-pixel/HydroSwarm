@@ -1,0 +1,862 @@
+{
+  "cap_findings": {
+    "CAP-DATA-02": {
+      "downstream_impact": "NONE on current production serving (permute_example is never invoked by the real training loop or serving path -- production always uses a single fixed canonical node order per network, so this defect is currently latent/dormant). It WOULD corrupt any future use of this module for genuine permutation-augmentation training or for a trustworthy automated equivariance regression gate -- right now this diagnostic's own initial raw run is a live demonstration of exactly that failure mode: a real code defect producing a false-positive 'model is broken' signal.",
+      "measured_effect": "Root-cause check (golden-reference, seed 20260813_00, permutation [4,3,5,1,2,0]): RAW measure_equivariance max abs source-logit diff = 2.674341917037964; after correcting ONLY the mask permutation (locally, inside this diagnostic script -- permutation.py itself is unmodified per the production freeze), max abs diff collapses to 1.1920928955078125e-06 (floating-point noise level). Across all 30 tests (3 families x 5 scenarios x 2 permutations), the RAW arm shows 14/30 predicted-source agreements; the CORRECTED arm shows 30/30.",
+      "root_cause": "sensor_mask and quality_mask are both real [time, node]-shaped batch keys (same shape category as temporal_features/quality_features) produced by HydraulicFeatureBuilder.build and consumed by HydroCore per-node-per-timestep, but are absent from both NODE_INDEXED_INPUT_KEYS and TIME_NODE_INDEXED_INPUT_KEYS in src/hydroswarm/training/permutation.py. permute_example() only permutes keys in those two tuples, so it silently leaves sensor_mask/quality_mask in the ORIGINAL node order while every other node-indexed input moves to the new order -- a genuine data/mask misalignment for any non-identity permutation. This is the same 'hand-maintained key tuple falls out of sync with the real schema' drift class this module's own docstring documents already being fixed once for NODE_INDEXED_TARGET_KEYS/NODE_INDEX_TARGET_KEYS (Phase 10.2) -- a second, independent instance, this time on the input side. Confirmed by grep: permute_example is not invoked anywhere in the real training loop (only by this diagnostic and permutation.py's own unit-style call site), so this defect has never been exercised against real data before.",
+      "severity": "LOW for current production behavior (dormant/unused code path); MEDIUM for diagnostic trustworthiness and any future permutation-invariance work -- left unfixed on this branch per the production freeze, reported as a minimized reproducer instead.",
+      "taxonomy": "CAP-DATA",
+      "title": "src/hydroswarm/training/permutation.py's NODE_INDEXED_INPUT_KEYS / TIME_NODE_INDEXED_INPUT_KEYS tuples omit sensor_mask and quality_mask, causing permute_example() to produce internally-inconsistent (mask misaligned with data) permuted examples -- and, before this session's root-causing, made this diagnostic's initial raw measure_equivariance() run falsely appear to find a real model permutation bug."
+    }
+  },
+  "checkpoint": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810/model.safetensors",
+  "checkpoint_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+  "families_tested": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "overall_verdict": {
+    "interpretation": "The RAW measure_equivariance() call (as shipped) reports apparent large non-equivariance across all 3 families -- but this session's root-cause investigation confirmed it is a false signal caused by a real, reproducible defect in permutation.py's own key lists (CAP-DATA-02), NOT a trained-model permutation bug: correcting only the mask permutation (locally, in this script) collapses the difference to floating-point noise and restores 100% predicted-source agreement. TRUE VERDICT: the frozen HydroCore-v4 checkpoint IS node-order equivariant across every governed topology family tested (no Section-47 'permutation bug' escalation warranted for the MODEL itself) -- but permutation.py's own tooling defect (CAP-DATA-02) is real, reproducible, and worth fixing before this module is ever used for real permutation-augmentation training.",
+    "raw_measure_equivariance_exhaustive_pass_all_families": false,
+    "true_model_equivariance_holds_after_correcting_test_tooling_defect": true
+  },
+  "per_family_records": {
+    "branched-loop": [
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 2.384185791015625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          6,
+          5,
+          1,
+          3,
+          2,
+          4,
+          0,
+          7
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.2835904359817505,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081300,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 2.384185791015625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          6,
+          4,
+          1,
+          2,
+          0,
+          3,
+          5,
+          7
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.380833625793457,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081300,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 1.7881393432617188e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          4,
+          3,
+          7,
+          1,
+          2,
+          5,
+          0,
+          6
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 2.8754360675811768,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081301,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 2.384185791015625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          1,
+          6,
+          2,
+          7,
+          5,
+          3,
+          0,
+          4
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 2.5368268489837646,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081301,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 8.344650268554688e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          7,
+          4,
+          0,
+          2,
+          1,
+          3,
+          5,
+          6
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 6.399194240570068,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081302,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 1.430511474609375e-06,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          6,
+          5,
+          4,
+          2,
+          0,
+          1,
+          7,
+          3
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 6.284731864929199,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081302,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 3.5762786865234375e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          6,
+          5,
+          2,
+          4,
+          1,
+          3,
+          7,
+          0
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 2.252042531967163,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081303,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          2,
+          1,
+          6,
+          7,
+          3,
+          5,
+          0,
+          4
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.4804741144180298,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081303,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          5,
+          0,
+          4,
+          7,
+          6,
+          2,
+          3,
+          1
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 11.723569869995117,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081304,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 8,
+        "permutation": [
+          2,
+          3,
+          5,
+          4,
+          7,
+          0,
+          1,
+          6
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 8.077298164367676,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081304,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      }
+    ],
+    "golden-reference": [
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 1.1920928955078125e-06,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          5,
+          3,
+          1,
+          2,
+          4,
+          0
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 2.674341917037964,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081300,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          4,
+          1,
+          2,
+          0,
+          3,
+          5
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 0.6750941276550293,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081300,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 5.960464477539062e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          4,
+          3,
+          5,
+          1,
+          2,
+          0
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 6.890068531036377,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081301,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 5.960464477539062e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          1,
+          5,
+          2,
+          3,
+          0,
+          4
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.6918162107467651,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081301,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          0,
+          4,
+          2,
+          1,
+          3,
+          5
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.0422676801681519,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081302,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 7.152557373046875e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          2,
+          0,
+          1,
+          4,
+          5,
+          3
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.3231645822525024,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081302,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          4,
+          2,
+          1,
+          3,
+          5,
+          0
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 6.624057292938232,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081303,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          5,
+          3,
+          1,
+          2,
+          0,
+          4
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 5.755959510803223,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081303,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.172325134277344e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          0,
+          4,
+          5,
+          2,
+          3,
+          1
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.7300714254379272,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081304,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 2.384185791015625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 6,
+        "permutation": [
+          2,
+          4,
+          3,
+          5,
+          0,
+          1
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 3.9846577644348145,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081304,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      }
+    ],
+    "loop-grid": [
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          1,
+          0,
+          6,
+          7,
+          5,
+          3,
+          2,
+          4,
+          8
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 2.292433738708496,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081300,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          4,
+          8,
+          2,
+          1,
+          6,
+          0,
+          3,
+          5,
+          7
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.8931076526641846,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081300,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 2.384185791015625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          4,
+          3,
+          0,
+          1,
+          2,
+          5,
+          7,
+          6,
+          8
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.7223222255706787,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081301,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 2.7567148208618164e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          5,
+          4,
+          0,
+          1,
+          2,
+          6,
+          7,
+          3,
+          8
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 1.7728736400604248,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081301,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 9.5367431640625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          2,
+          7,
+          4,
+          8,
+          0,
+          1,
+          3,
+          5,
+          6
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 9.214391708374023,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081302,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 7.152557373046875e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          6,
+          4,
+          7,
+          5,
+          2,
+          0,
+          1,
+          8,
+          3
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 3.929133653640747,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": true
+        },
+        "seed": 2026081302,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          6,
+          7,
+          4,
+          2,
+          5,
+          1,
+          3,
+          0,
+          8
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 3.7400150299072266,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081303,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 4.76837158203125e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          2,
+          4,
+          1,
+          8,
+          7,
+          3,
+          5,
+          6,
+          0
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 2.264901638031006,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081303,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 1.430511474609375e-06,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          8,
+          4,
+          6,
+          5,
+          0,
+          7,
+          2,
+          3,
+          1
+        ],
+        "permutation_index": 0,
+        "raw": {
+          "max_absolute_source_logit_difference": 7.548316955566406,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081304,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      },
+      {
+        "corrected_for_permutation_py_mask_omission": {
+          "max_absolute_source_logit_difference": 9.5367431640625e-07,
+          "predicted_source_agrees": true
+        },
+        "node_count": 9,
+        "permutation": [
+          2,
+          3,
+          8,
+          5,
+          4,
+          7,
+          0,
+          1,
+          6
+        ],
+        "permutation_index": 1,
+        "raw": {
+          "max_absolute_source_logit_difference": 7.120604038238525,
+          "non_equivariant_keys": [],
+          "predicted_source_agrees": false
+        },
+        "seed": 2026081304,
+        "signature_mode": "GOVERNED_KNOWN_NETWORK"
+      }
+    ]
+  },
+  "per_family_summary": {
+    "branched-loop": {
+      "corrected": {
+        "all_predicted_source_agree": true,
+        "errors": [],
+        "max_abs_source_logit_difference_over_all_tests": 1.430511474609375e-06,
+        "mean_abs_source_logit_difference": 4.947185516357422e-07,
+        "n_errors": 0,
+        "n_ok": 10,
+        "n_predicted_source_agrees": 10,
+        "n_tests": 10
+      },
+      "raw": {
+        "all_predicted_source_agree": false,
+        "errors": [],
+        "max_abs_source_logit_difference_over_all_tests": 11.723569869995117,
+        "mean_abs_source_logit_difference": 4.42939977645874,
+        "n_errors": 0,
+        "n_ok": 10,
+        "n_predicted_source_agrees": 4,
+        "n_tests": 10
+      }
+    },
+    "golden-reference": {
+      "corrected": {
+        "all_predicted_source_agree": true,
+        "errors": [],
+        "max_abs_source_logit_difference_over_all_tests": 1.1920928955078125e-06,
+        "mean_abs_source_logit_difference": 5.662441253662109e-07,
+        "n_errors": 0,
+        "n_ok": 10,
+        "n_predicted_source_agrees": 10,
+        "n_tests": 10
+      },
+      "raw": {
+        "all_predicted_source_agree": false,
+        "errors": [],
+        "max_abs_source_logit_difference_over_all_tests": 6.890068531036377,
+        "mean_abs_source_logit_difference": 3.2391499042510987,
+        "n_errors": 0,
+        "n_ok": 10,
+        "n_predicted_source_agrees": 9,
+        "n_tests": 10
+      }
+    },
+    "loop-grid": {
+      "corrected": {
+        "all_predicted_source_agree": true,
+        "errors": [],
+        "max_abs_source_logit_difference_over_all_tests": 1.430511474609375e-06,
+        "mean_abs_source_logit_difference": 6.474554538726807e-07,
+        "n_errors": 0,
+        "n_ok": 10,
+        "n_predicted_source_agrees": 10,
+        "n_tests": 10
+      },
+      "raw": {
+        "all_predicted_source_agree": false,
+        "errors": [],
+        "max_abs_source_logit_difference_over_all_tests": 9.214391708374023,
+        "mean_abs_source_logit_difference": 4.149810028076172,
+        "n_errors": 0,
+        "n_ok": 10,
+        "n_predicted_source_agrees": 1,
+        "n_tests": 10
+      }
+    }
+  },
+  "permutations_per_scenario": 2,
+  "root_cause_check": {
+    "corrected_measure_equivariance_max_diff": 1.1920928955078125e-06,
+    "correction_collapses_to_floating_point_noise": true,
+    "example_permutation": [
+      5,
+      3,
+      1,
+      2,
+      4,
+      0
+    ],
+    "identity_permutation_confirms_model_determinism": true,
+    "identity_permutation_max_diff": 0.0,
+    "raw_measure_equivariance_max_diff": 2.674341917037964
+  },
+  "scenarios_per_family": 5,
+  "schema_version": 1,
+  "section": "19_node_order_source_label_alignment_audit",
+  "total_tests": 30
+}
