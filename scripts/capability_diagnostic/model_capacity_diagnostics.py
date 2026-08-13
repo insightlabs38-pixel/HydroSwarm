@@ -63,7 +63,6 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -189,11 +188,6 @@ def _section21_synthesis() -> dict[str, Any]:
     temporal_key_finding = (temporal_ablation or {}).get("verdict", {}).get("key_finding")
     temporal_classification = (temporal_ablation or {}).get("verdict", {}).get("classification")
 
-    validation_is_modest = validation_top1 is not None and validation_top1 < 0.5
-    validation_train_close = None  # cannot be computed -- no train number available (stated honestly, not assumed False or True)
-    val_much_worse_than_dev_holdout = (
-        val_to_devholdout_relative_increase is not None and val_to_devholdout_relative_increase > 0.30
-    )
     concrete_train_serve_defects_found = len(parity_findings) > 0
     concrete_evidence_content_effect_found = temporal_classification == "INPUT_EVIDENCE_REGIME_PROBLEM"
 

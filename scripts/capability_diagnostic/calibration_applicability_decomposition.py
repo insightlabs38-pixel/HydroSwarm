@@ -58,7 +58,6 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from hydroswarm.calibration.conformal import (  # noqa: E402
     CalibrationExample,
     SplitConformalCalibrator,
-    expected_calibration_error,
 )
 from hydroswarm.classical.metrics import localization_top_k, mean_reciprocal_rank  # noqa: E402
 from hydroswarm.data.scenarios import (  # noqa: E402
