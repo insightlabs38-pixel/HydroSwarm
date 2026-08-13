@@ -1,0 +1,281 @@
+{
+  "checkpoint_evaluated": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810/model.safetensors",
+  "comparison_to_full_1000_example_reproduction": {
+    "caveat": "N=10 stride-sampled examples is far too small to precisely match a 1000-example top1 rate (binomial noise at n=10 is roughly +-15 points at this base rate); this is a sanity spot-check for gross inconsistency (e.g. tensor corruption, wrong split), not an independent precision estimate.",
+    "consistent": true,
+    "full_reproduction_top1": 0.7205056179775281,
+    "spot_check_top1_n10": 0.7
+  },
+  "corpus": "data/learning-v2/cycle-b2-joint-v4/tensors-normalized/validation",
+  "determinism": {
+    "all_three_repeated_forward_passes_bit_identical_for_every_example": true,
+    "max_cross_pass_abs_logit_diff_across_all_examples": 0.0,
+    "verdict": "DETERMINISTIC -- no nondeterminism detected in the frozen eval path across 3 repeated forward passes on 10 stored examples."
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "n_examples": 10,
+  "per_example": [
+    {
+      "dataset_index": 0,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.009169622372638629,
+      "localization_eligible": true,
+      "scenario_id": "8e486d3c-4190-5e90-b9ae-c248f0152da9",
+      "top1_correct": true,
+      "top1_probability": 0.9993151426315308,
+      "top1_top2_margin": 0.9989337894367054,
+      "top2_probability": 0.00038135319482535124,
+      "top3_correct": true,
+      "true_source_probability": 0.9993151426315308
+    },
+    {
+      "dataset_index": 100,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.0010019771840219308,
+      "localization_eligible": true,
+      "scenario_id": "76419cd3-e53d-56f6-966e-e8115aea6053",
+      "top1_correct": true,
+      "top1_probability": 0.9999407529830933,
+      "top1_top2_margin": 0.9999124801215657,
+      "top2_probability": 2.827286152751185e-05,
+      "top3_correct": true,
+      "true_source_probability": 0.9999407529830933
+    },
+    {
+      "dataset_index": 200,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.009393759803550958,
+      "localization_eligible": true,
+      "scenario_id": "458863be-609c-58e6-afbd-fec9ba94566b",
+      "top1_correct": true,
+      "top1_probability": 0.9992948770523071,
+      "top1_top2_margin": 0.9989312516991049,
+      "top2_probability": 0.0003636253532022238,
+      "top3_correct": true,
+      "true_source_probability": 0.9992948770523071
+    },
+    {
+      "dataset_index": 300,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.01140475417529017,
+      "localization_eligible": true,
+      "scenario_id": "90591205-d7cf-5735-9557-f94af1bd70a2",
+      "top1_correct": true,
+      "top1_probability": 0.9991044402122498,
+      "top1_top2_margin": 0.9985861045424826,
+      "top2_probability": 0.0005183356697671115,
+      "top3_correct": true,
+      "true_source_probability": 0.9991044402122498
+    },
+    {
+      "dataset_index": 400,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 2.6789278973292525,
+      "localization_eligible": true,
+      "scenario_id": "2fce4bf6-2517-5b25-913f-7ba9958c89eb",
+      "top1_correct": false,
+      "top1_probability": 0.2601712942123413,
+      "top1_top2_margin": 0.07129150629043579,
+      "top2_probability": 0.18887978792190552,
+      "top3_correct": false,
+      "true_source_probability": 0.13464383780956268
+    },
+    {
+      "dataset_index": 500,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.003135267090367026,
+      "localization_eligible": true,
+      "scenario_id": "3392486f-4d8e-5387-be11-670bfdcb1381",
+      "top1_correct": true,
+      "top1_probability": 0.9998070597648621,
+      "top1_top2_margin": 0.9997523724268831,
+      "top2_probability": 5.468733797897585e-05,
+      "top3_correct": true,
+      "true_source_probability": 0.9998070597648621
+    },
+    {
+      "dataset_index": 600,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 2.6047269961770683,
+      "localization_eligible": true,
+      "scenario_id": "b80e89b8-e7f1-5e03-abff-b97af175b43a",
+      "top1_correct": false,
+      "top1_probability": 0.27377864718437195,
+      "top1_top2_margin": 0.02792598307132721,
+      "top2_probability": 0.24585266411304474,
+      "top3_correct": false,
+      "true_source_probability": 0.06260240823030472
+    },
+    {
+      "dataset_index": 700,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.002326388944931209,
+      "localization_eligible": true,
+      "scenario_id": "797e95b6-519c-5a9e-8786-151fb5c9b1ce",
+      "top1_correct": true,
+      "top1_probability": 0.9998608827590942,
+      "top1_top2_margin": 0.99981718703566,
+      "top2_probability": 4.3695723434211686e-05,
+      "top3_correct": true,
+      "true_source_probability": 0.9998608827590942
+    },
+    {
+      "dataset_index": 800,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 2.8747881921534266,
+      "localization_eligible": true,
+      "scenario_id": "b41951ff-cef5-5797-b755-ad7eb6c43aa0",
+      "top1_correct": false,
+      "top1_probability": 0.26705002784729004,
+      "top1_top2_margin": 0.1315256953239441,
+      "top2_probability": 0.13552433252334595,
+      "top3_correct": false,
+      "true_source_probability": 0.11429920792579651
+    },
+    {
+      "dataset_index": 900,
+      "determinism_check": [
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_2"
+        },
+        {
+          "bit_identical": true,
+          "max_abs_diff": 0.0,
+          "run_pair": "1_vs_3"
+        }
+      ],
+      "entropy_bits": 0.2365901586930353,
+      "localization_eligible": true,
+      "scenario_id": "92b3d235-7b43-5403-99c7-7ea64e88caec",
+      "top1_correct": true,
+      "top1_probability": 0.9640468955039978,
+      "top1_top2_margin": 0.9300381429493427,
+      "top2_probability": 0.034008752554655075,
+      "top3_correct": true,
+      "true_source_probability": 0.9640468955039978
+    }
+  ],
+  "schema_version": 1,
+  "section": "20_tensor_level_reproduction",
+  "spot_check_summary": {
+    "mean_entropy_bits": 0.8431465013923584,
+    "mean_top1_top2_margin": 0.7156714512897452,
+    "n_eligible": 10,
+    "top1": 0.7,
+    "top3": 0.7
+  },
+  "stride_indices_sampled": [
+    0,
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+  ]
+}

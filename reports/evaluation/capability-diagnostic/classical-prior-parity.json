@@ -1,0 +1,1023 @@
+{
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "part_a_parity": {
+    "all_governed_scenarios_resolve_governed_known_network": true,
+    "all_resolver_modes_agree_with_direct_resolve_signature_mode": true,
+    "coastal_branch_unseen_topology": {
+      "resolves_to_runtime_generated_imported_network": true,
+      "result": {
+        "classical_prior": {
+          "CB1": 0.04795079305768013,
+          "CB2": 0.028484152629971504,
+          "CB3": 0.0910574421286583,
+          "CB4": 0.05458134412765503,
+          "CB5": 0.15217933058738708,
+          "CB6": 0.6257469654083252
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.44286773285279774,
+          "js_divergence_bits_squared_distance": 0.19613182880217703,
+          "kl_to_uniform_bits": 0.8482467735007113,
+          "n_nodes": 6
+        },
+        "modes_agree": true,
+        "n_junctions": 6,
+        "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+        "prior_entropy_bits": 1.7367157354352873,
+        "prior_max_prob": 0.6257469654083252,
+        "resolve_model_input_signature_library_mode": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+        "resolve_signature_mode_direct": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+        "scenario_id": "645e76de-9791-5a26-b4d3-abc9f5be93be",
+        "seed": 2026081598,
+        "source_node_truth": "CB1",
+        "split": "development_holdout",
+        "topology_family": "coastal-branch"
+      },
+      "seed": 2026081598
+    },
+    "errors": [],
+    "governed_families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid"
+    ],
+    "n_errors": 0,
+    "n_ok": 15,
+    "n_scenarios": 15,
+    "results": [
+      {
+        "classical_prior": {
+          "J1": 0.7592733502388,
+          "J2": 0.0854090079665184,
+          "J3": 0.05848796293139458,
+          "J4": 0.09682965278625488
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.4460380249657575,
+          "js_divergence_bits_squared_distance": 0.19894991971535372,
+          "kl_to_uniform_bits": 0.8294657272152526,
+          "n_nodes": 4
+        },
+        "modes_agree": true,
+        "n_junctions": 4,
+        "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "prior_entropy_bits": 1.170534279881892,
+        "prior_max_prob": 0.7592733502388,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "69609948-f858-533a-bdd2-9de24a42879d",
+        "seed": 2026081500,
+        "source_node_truth": "J1",
+        "split": "validation",
+        "topology_family": "golden-reference"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.27355843782424927,
+          "J2": 0.07961205393075943,
+          "J3": 0.04737420752644539,
+          "J4": 0.5994552969932556
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.3765435070579849,
+          "js_divergence_bits_squared_distance": 0.14178501270752672,
+          "kl_to_uniform_bits": 0.5467726056486608,
+          "n_nodes": 4
+        },
+        "modes_agree": true,
+        "n_junctions": 4,
+        "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "prior_entropy_bits": 1.453227394312103,
+        "prior_max_prob": 0.5994552969932556,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "77f2d294-0b70-59ab-a5e2-7a4a9f896b8e",
+        "seed": 2026081501,
+        "source_node_truth": "J4",
+        "split": "validation",
+        "topology_family": "golden-reference"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.22651267051696777,
+          "J2": 0.18357285857200623,
+          "J3": 0.1741231232881546,
+          "J4": 0.4157913327217102
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.1551558759475409,
+          "js_divergence_bits_squared_distance": 0.024073345841048702,
+          "kl_to_uniform_bits": 0.10026491721235314,
+          "n_nodes": 4
+        },
+        "modes_agree": true,
+        "n_junctions": 4,
+        "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "prior_entropy_bits": 1.8997350759772196,
+        "prior_max_prob": 0.4157913327217102,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "32125f09-808f-57a2-9426-36f8f16ffd4e",
+        "seed": 2026081502,
+        "source_node_truth": "J1",
+        "split": "validation",
+        "topology_family": "golden-reference"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.4838297367095947,
+          "J2": 0.264126718044281,
+          "J3": 0.03336344286799431,
+          "J4": 0.21868012845516205
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.3095947637689896,
+          "js_divergence_bits_squared_distance": 0.09584891775317647,
+          "kl_to_uniform_bits": 0.3426592569196697,
+          "n_nodes": 4
+        },
+        "modes_agree": true,
+        "n_junctions": 4,
+        "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "prior_entropy_bits": 1.6573407486776528,
+        "prior_max_prob": 0.4838297367095947,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "cd1ca910-2a70-5e3b-8613-4dea656e75f2",
+        "seed": 2026081503,
+        "source_node_truth": "J1",
+        "split": "validation",
+        "topology_family": "golden-reference"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.039942413568496704,
+          "J2": 0.12557107210159302,
+          "J3": 0.6612662672996521,
+          "J4": 0.1732202172279358
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.3882766716305278,
+          "js_divergence_bits_squared_distance": 0.15075877373248073,
+          "kl_to_uniform_bits": 0.6058377524511847,
+          "n_nodes": 4
+        },
+        "modes_agree": true,
+        "n_junctions": 4,
+        "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "prior_entropy_bits": 1.3941622489952048,
+        "prior_max_prob": 0.6612662672996521,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "d31b80a7-cf23-514d-8ce9-dd52efb42552",
+        "seed": 2026081504,
+        "source_node_truth": "J3",
+        "split": "validation",
+        "topology_family": "golden-reference"
+      },
+      {
+        "classical_prior": {
+          "JA": 0.021947365254163742,
+          "JB": 0.05926083028316498,
+          "JC": 0.19450326263904572,
+          "JD": 0.05801030993461609,
+          "JE": 0.5647708773612976,
+          "JF": 0.040995288640260696,
+          "JG": 0.06051207333803177
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.4424943310085963,
+          "js_divergence_bits_squared_distance": 0.1958012329747452,
+          "kl_to_uniform_bits": 0.8478009815763805,
+          "n_nodes": 7
+        },
+        "modes_agree": true,
+        "n_junctions": 7,
+        "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "prior_entropy_bits": 1.9595539443321222,
+        "prior_max_prob": 0.5647708773612976,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "5ec3f1ef-4f36-56a5-a7b1-0be1acfa1fec",
+        "seed": 2026081505,
+        "source_node_truth": "JE",
+        "split": "validation",
+        "topology_family": "branched-loop"
+      },
+      {
+        "classical_prior": {
+          "JA": 0.043379221111536026,
+          "JB": 0.07124234735965729,
+          "JC": 0.028347495943307877,
+          "JD": 0.6649457812309265,
+          "JE": 0.03259535878896713,
+          "JF": 0.050186123698949814,
+          "JG": 0.10930369049310684
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.4863333473536509,
+          "js_divergence_bits_squared_distance": 0.23652012474820688,
+          "kl_to_uniform_bits": 1.0756012253614917,
+          "n_nodes": 7
+        },
+        "modes_agree": true,
+        "n_junctions": 7,
+        "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "prior_entropy_bits": 1.7317537020802494,
+        "prior_max_prob": 0.6649457812309265,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "65077f16-ab5d-51d8-89bb-6c2cbc1a0ac7",
+        "seed": 2026081506,
+        "source_node_truth": "JA",
+        "split": "validation",
+        "topology_family": "branched-loop"
+      },
+      {
+        "classical_prior": {
+          "JA": 0.020802529528737068,
+          "JB": 0.02991858683526516,
+          "JC": 0.1290838122367859,
+          "JD": 0.05895358696579933,
+          "JE": 0.3243032693862915,
+          "JF": 0.3241851329803467,
+          "JG": 0.11275308579206467
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.36399563712568267,
+          "js_divergence_bits_squared_distance": 0.13249282384653166,
+          "kl_to_uniform_bits": 0.5088824725728662,
+          "n_nodes": 7
+        },
+        "modes_agree": true,
+        "n_junctions": 7,
+        "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "prior_entropy_bits": 2.298472452672757,
+        "prior_max_prob": 0.3243032693862915,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "d4c3f5e4-6f5c-59ec-984c-de094a3f9f6b",
+        "seed": 2026081507,
+        "source_node_truth": "JE",
+        "split": "validation",
+        "topology_family": "branched-loop"
+      },
+      {
+        "classical_prior": {
+          "JA": 0.17421549558639526,
+          "JB": 0.5321059823036194,
+          "JC": 0.06355395168066025,
+          "JD": 0.031447842717170715,
+          "JE": 0.06605318933725357,
+          "JF": 0.02132062427699566,
+          "JG": 0.1113029345870018
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.4178355788797276,
+          "js_divergence_bits_squared_distance": 0.17458657097775707,
+          "kl_to_uniform_bits": 0.744329835584936,
+          "n_nodes": 7
+        },
+        "modes_agree": true,
+        "n_junctions": 7,
+        "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "prior_entropy_bits": 2.06302509918267,
+        "prior_max_prob": 0.5321059823036194,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "ca462374-8c1d-5ba6-8e65-2f81a700a84e",
+        "seed": 2026081508,
+        "source_node_truth": "JB",
+        "split": "validation",
+        "topology_family": "branched-loop"
+      },
+      {
+        "classical_prior": {
+          "JA": 0.4757401645183563,
+          "JB": 0.2774355709552765,
+          "JC": 0.026004362851381302,
+          "JD": 0.04158725589513779,
+          "JE": 0.039959050714969635,
+          "JF": 0.08188442140817642,
+          "JG": 0.05738916993141174
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.42317815446638485,
+          "js_divergence_bits_squared_distance": 0.17907975041757548,
+          "kl_to_uniform_bits": 0.7387110184887102,
+          "n_nodes": 7
+        },
+        "modes_agree": true,
+        "n_junctions": 7,
+        "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "prior_entropy_bits": 2.068643901237053,
+        "prior_max_prob": 0.4757401645183563,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "d8acf8d9-4ee6-5214-856e-a379df1daaf4",
+        "seed": 2026081509,
+        "source_node_truth": "JF",
+        "split": "validation",
+        "topology_family": "branched-loop"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.31572863459587097,
+          "J2": 0.42707929015159607,
+          "J3": 0.062375277280807495,
+          "J4": 0.047952696681022644,
+          "J5": 0.0562654472887516,
+          "J6": 0.024264153093099594,
+          "J7": 0.030790235847234726,
+          "J8": 0.03554423898458481
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.43802992793931006,
+          "js_divergence_bits_squared_distance": 0.19187021777051716,
+          "kl_to_uniform_bits": 0.8013397999656241,
+          "n_nodes": 8
+        },
+        "modes_agree": true,
+        "n_junctions": 8,
+        "network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "prior_entropy_bits": 2.1986601803210477,
+        "prior_max_prob": 0.42707929015159607,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "9f0d6a4b-333b-5d2e-9e19-33ab7206168d",
+        "seed": 2026081510,
+        "source_node_truth": "J1",
+        "split": "validation",
+        "topology_family": "loop-grid"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.029591117054224014,
+          "J2": 0.035076938569545746,
+          "J3": 0.35996535420417786,
+          "J4": 0.17178915441036224,
+          "J5": 0.2619328796863556,
+          "J6": 0.019936371594667435,
+          "J7": 0.05711406469345093,
+          "J8": 0.06459414958953857
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.3905831273114241,
+          "js_divergence_bits_squared_distance": 0.1525551793403721,
+          "kl_to_uniform_bits": 0.6029548384380208,
+          "n_nodes": 8
+        },
+        "modes_agree": true,
+        "n_junctions": 8,
+        "network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "prior_entropy_bits": 2.397045190003828,
+        "prior_max_prob": 0.35996535420417786,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "91042354-4476-5d13-b9f2-7867d7270aa4",
+        "seed": 2026081511,
+        "source_node_truth": "J2",
+        "split": "validation",
+        "topology_family": "loop-grid"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.49476340413093567,
+          "J2": 0.19753330945968628,
+          "J3": 0.014027521945536137,
+          "J4": 0.041310589760541916,
+          "J5": 0.08323848247528076,
+          "J6": 0.04510023817420006,
+          "J7": 0.06182815879583359,
+          "J8": 0.06219828501343727
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.42001439340475033,
+          "js_divergence_bits_squared_distance": 0.17641209066716038,
+          "kl_to_uniform_bits": 0.7615816893369616,
+          "n_nodes": 8
+        },
+        "modes_agree": true,
+        "n_junctions": 8,
+        "network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "prior_entropy_bits": 2.2384183025112128,
+        "prior_max_prob": 0.49476340413093567,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "383ba2a9-3dc5-5b6f-add5-2f75126d90d1",
+        "seed": 2026081512,
+        "source_node_truth": "J5",
+        "split": "validation",
+        "topology_family": "loop-grid"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.017786234617233276,
+          "J2": 0.022039787843823433,
+          "J3": 0.050225600600242615,
+          "J4": 0.07083489000797272,
+          "J5": 0.13242162764072418,
+          "J6": 0.4041749835014343,
+          "J7": 0.21295221149921417,
+          "J8": 0.08956465125083923
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.3810477753436698,
+          "js_divergence_bits_squared_distance": 0.14519740709435985,
+          "kl_to_uniform_bits": 0.5865828834385131,
+          "n_nodes": 8
+        },
+        "modes_agree": true,
+        "n_junctions": 8,
+        "network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "prior_entropy_bits": 2.4134171039047114,
+        "prior_max_prob": 0.4041749835014343,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "6fe9ea94-5b12-58b8-bbd9-b062a563db32",
+        "seed": 2026081513,
+        "source_node_truth": "J6",
+        "split": "validation",
+        "topology_family": "loop-grid"
+      },
+      {
+        "classical_prior": {
+          "J1": 0.009098891168832779,
+          "J2": 0.08205407112836838,
+          "J3": 0.2191084325313568,
+          "J4": 0.21903227269649506,
+          "J5": 0.06313861161470413,
+          "J6": 0.06280539929866791,
+          "J7": 0.12562942504882812,
+          "J8": 0.2191329002380371
+        },
+        "js_vs_uniform": {
+          "js_distance_bits": 0.299223400110443,
+          "js_divergence_bits_squared_distance": 0.08953464317365427,
+          "kl_to_uniform_bits": 0.32424045851213024,
+          "n_nodes": 8
+        },
+        "modes_agree": true,
+        "n_junctions": 8,
+        "network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "prior_entropy_bits": 2.675759546081393,
+        "prior_max_prob": 0.2191329002380371,
+        "resolve_model_input_signature_library_mode": "GOVERNED_KNOWN_NETWORK",
+        "resolve_signature_mode_direct": "GOVERNED_KNOWN_NETWORK",
+        "scenario_id": "433ef69b-d0b4-523b-bbca-102c1baf13ee",
+        "seed": 2026081514,
+        "source_node_truth": "J3",
+        "split": "validation",
+        "topology_family": "loop-grid"
+      }
+    ],
+    "seeds_by_family": {
+      "branched-loop": [
+        2026081505,
+        2026081506,
+        2026081507,
+        2026081508,
+        2026081509
+      ],
+      "golden-reference": [
+        2026081500,
+        2026081501,
+        2026081502,
+        2026081503,
+        2026081504
+      ],
+      "loop-grid": [
+        2026081510,
+        2026081511,
+        2026081512,
+        2026081513,
+        2026081514
+      ]
+    },
+    "shape_comparison_coastal_vs_governed_average": {
+      "average_governed_shape_resampled": [
+        0.1635370742487222,
+        0.13932506573049,
+        0.11511305721225787,
+        0.09138702757185296,
+        0.07505118691662552,
+        0.05995039461951996,
+        0.0465117021972998,
+        0.03950990107718956,
+        0.03510325815505229,
+        0.03237731758538726,
+        0.030061673449411127,
+        0.027855220370704505,
+        0.025522837385953876,
+        0.023160475324114582,
+        0.0209490342574267,
+        0.019018765389843817,
+        0.017133640939871273,
+        0.015055885650198749,
+        0.012810789189425558,
+        0.01056569272865237
+      ],
+      "caveat": "This compares CONCENTRATION SHAPE only (how peaked vs flat each prior is), not node-identity alignment -- coastal-branch (6 junctions) and the governed families (4/7/8 junctions) have no shared node space, so a node-aligned JS divergence is not meaningful across topologies. This resampling is a best-effort proxy, not a rigorous distributional equivalence claim.",
+      "coastal_shape_resampled": [
+        0.21620647151483052,
+        0.17314703383543906,
+        0.1300875961560476,
+        0.0870281584766561,
+        0.0514690990350337,
+        0.04591155254448755,
+        0.040354006053941384,
+        0.03479645956339523,
+        0.030135286726994615,
+        0.02681867437181233,
+        0.02350206201663005,
+        0.020185449661447762,
+        0.018497072481462647,
+        0.017894185418275654,
+        0.017291298355088656,
+        0.01668841129190166,
+        0.01515182057313369,
+        0.01338180394047047,
+        0.011611787307807249,
+        0.009841770675144027
+      ],
+      "interpretation": "If js_divergence_coastal_vs_average_governed_shape is small relative to js_divergence_coastal_vs_uniform_raw / js_divergence_average_governed_shape_vs_uniform, the runtime-generated (coastal) prior has a SIMILARLY-SHAPED (similarly peaked/flat) distribution to the governed priors, not a degenerate/collapsed-to-uniform one, despite using the RUNTIME_GENERATED_IMPORTED_NETWORK signature path rather than a committed training artifact.",
+      "js_divergence_average_governed_shape_vs_uniform": 0.10969137626968328,
+      "js_divergence_coastal_vs_average_governed_shape": 0.008869144178042592,
+      "js_divergence_coastal_vs_uniform_raw": 0.19613182880217703,
+      "method": "sorted-descending-probability, resampled to 20 bins via linear interpolation, renormalized"
+    }
+  },
+  "part_b_ablation": {
+    "condition_notes": {
+      "a_real_governed_prior": "Baseline: real governed classical_prior computed via model_input_classical_prior.",
+      "b_uniform_prior": "Uniform 1/N prior over junctions -- tests whether the model needs a peaked prior at all.",
+      "c_oracle_prior_identical_to_a_for_governed_topology": "Identical to condition (a) for these governed topologies -- there is no separate 'oracle' prior available beyond the real governed one for a topology already in the governed set. Reported explicitly as a duplicate rather than padded with a fabricated distinct condition, per the diagnostic protocol's rule-zero prohibition on invented numbers.",
+      "d_zeroed_prior": "All-zero classical_prior tensor -- tests whether the forward pass tolerates a degenerate all-zero prior feature."
+    },
+    "condition_summary": {
+      "a_real_governed_prior": {
+        "errors": [],
+        "mean_true_source_probability": 0.7382519364356994,
+        "mrr": 0.780952380952381,
+        "n": 10,
+        "n_errors": 0,
+        "n_ok": 10,
+        "top1": 0.7,
+        "top3": 0.8
+      },
+      "b_uniform_prior": {
+        "errors": [],
+        "mean_true_source_probability": 0.5990196205675602,
+        "mrr": 0.7309523809523809,
+        "n": 10,
+        "n_errors": 0,
+        "n_ok": 10,
+        "top1": 0.6,
+        "top3": 0.9
+      },
+      "c_oracle_prior_identical_to_a_for_governed_topology": {
+        "errors": [],
+        "mean_true_source_probability": 0.7382519364356994,
+        "mrr": 0.780952380952381,
+        "n": 10,
+        "n_errors": 0,
+        "n_ok": 10,
+        "top1": 0.7,
+        "top3": 0.8
+      },
+      "d_zeroed_prior": {
+        "errors": [],
+        "mean_true_source_probability": 0.48183667454868556,
+        "mrr": 0.7142857142857143,
+        "n": 10,
+        "n_errors": 0,
+        "n_ok": 10,
+        "top1": 0.6,
+        "top3": 0.8
+      }
+    },
+    "conditions": [
+      "a_real_governed_prior",
+      "b_uniform_prior",
+      "c_oracle_prior_identical_to_a_for_governed_topology",
+      "d_zeroed_prior"
+    ],
+    "errors_building_scenarios": [],
+    "n_errors_building_scenarios": 0,
+    "n_scenarios_used": 10,
+    "per_scenario_results": [
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9999469518661499,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999469518661499
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.9998875856399536,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9998875856399536
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9999469518661499,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999469518661499
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.9924187660217285,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9924187660217285
+          }
+        },
+        "scenario_id": "69609948-f858-533a-bdd2-9de24a42879d",
+        "seed": 2026081500,
+        "source_node_truth": "J1",
+        "topology_family": "golden-reference"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9997289776802063,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9997289776802063
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.9562234878540039,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9562234878540039
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9997289776802063,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9997289776802063
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.5569650530815125,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5569650530815125
+          }
+        },
+        "scenario_id": "77f2d294-0b70-59ab-a5e2-7a4a9f896b8e",
+        "seed": 2026081501,
+        "source_node_truth": "J4",
+        "topology_family": "golden-reference"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9995852112770081,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9995852112770081
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.9995087385177612,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9995087385177612
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9995852112770081,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9995852112770081
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.9834745526313782,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9834745526313782
+          }
+        },
+        "scenario_id": "32125f09-808f-57a2-9426-36f8f16ffd4e",
+        "seed": 2026081502,
+        "source_node_truth": "J1",
+        "topology_family": "golden-reference"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9999641180038452,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999641180038452
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.9999485015869141,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999485015869141
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9999641180038452,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999641180038452
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.9987756609916687,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9987756609916687
+          }
+        },
+        "scenario_id": "cd1ca910-2a70-5e3b-8613-4dea656e75f2",
+        "seed": 2026081503,
+        "source_node_truth": "J1",
+        "topology_family": "golden-reference"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9999110698699951,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999110698699951
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.4202573895454407,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4202573895454407
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9999110698699951,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9999110698699951
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.5501602292060852,
+            "ok": true,
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2070235162973404
+          }
+        },
+        "scenario_id": "d31b80a7-cf23-514d-8ce9-dd52efb42552",
+        "seed": 2026081504,
+        "source_node_truth": "J3",
+        "topology_family": "golden-reference"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9995386600494385,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9995386600494385
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.9799420833587646,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9799420833587646
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9995386600494385,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9995386600494385
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.42802894115448,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.42802894115448
+          }
+        },
+        "scenario_id": "5ec3f1ef-4f36-56a5-a7b1-0be1acfa1fec",
+        "seed": 2026081505,
+        "source_node_truth": "JE",
+        "topology_family": "branched-loop"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.3231372833251953,
+            "ok": true,
+            "reciprocal_rank": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.08363530784845352
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.23410485684871674,
+            "ok": true,
+            "reciprocal_rank": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.09792274981737137
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.3231372833251953,
+            "ok": true,
+            "reciprocal_rank": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.08363530784845352
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.258697509765625,
+            "ok": true,
+            "reciprocal_rank": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.05814870074391365
+          }
+        },
+        "scenario_id": "65077f16-ab5d-51d8-89bb-6c2cbc1a0ac7",
+        "seed": 2026081506,
+        "source_node_truth": "JA",
+        "topology_family": "branched-loop"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.24987629055976868,
+            "ok": true,
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2375136911869049
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.2310192883014679,
+            "ok": true,
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.17516982555389404
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.24987629055976868,
+            "ok": true,
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2375136911869049
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.24551211297512054,
+            "ok": true,
+            "reciprocal_rank": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.025866961106657982
+          }
+        },
+        "scenario_id": "d4c3f5e4-6f5c-59ec-984c-de094a3f9f6b",
+        "seed": 2026081507,
+        "source_node_truth": "JE",
+        "topology_family": "branched-loop"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.9872249364852905,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9872249364852905
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.7611541748046875,
+            "ok": true,
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.19323943555355072
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.9872249364852905,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9872249364852905
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.40433281660079956,
+            "ok": true,
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.40433281660079956
+          }
+        },
+        "scenario_id": "ca462374-8c1d-5ba6-8e65-2f81a700a84e",
+        "seed": 2026081508,
+        "source_node_truth": "JB",
+        "topology_family": "branched-loop"
+      },
+      {
+        "conditions": {
+          "a_real_governed_prior": {
+            "max_belief_probability": 0.22393272817134857,
+            "ok": true,
+            "reciprocal_rank": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.0754704400897026
+          },
+          "b_uniform_prior": {
+            "max_belief_probability": 0.19461698830127716,
+            "ok": true,
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1680964082479477
+          },
+          "c_oracle_prior_identical_to_a_for_governed_topology": {
+            "max_belief_probability": 0.22393272817134857,
+            "ok": true,
+            "reciprocal_rank": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.0754704400897026
+          },
+          "d_zeroed_prior": {
+            "max_belief_probability": 0.25800952315330505,
+            "ok": true,
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1633317768573761
+          }
+        },
+        "scenario_id": "d8acf8d9-4ee6-5214-856e-a379df1daaf4",
+        "seed": 2026081509,
+        "source_node_truth": "JF",
+        "topology_family": "branched-loop"
+      }
+    ],
+    "prior_load_bearing_verdict": {
+      "classical_prior_is_load_bearing_for_neural_head": false,
+      "interpretation": "A large drop from real to uniform/zeroed prior means the model's source_node prediction is substantially anchored to the classical_prior FEATURE itself (not purely learned from raw hydraulic/temporal features), which would make any classical-prior train/serve mismatch (Section E hypothesis) a first-order contributor to LIVE's localization gap. A small/no drop means the classical prior is a secondary signal for this head.",
+      "real_minus_uniform_top1": 0.09999999999999998,
+      "real_top1": 0.7,
+      "uniform_top1": 0.6,
+      "zeroed_top1": 0.6
+    },
+    "zeroed_prior_forward_pass_safe": true
+  },
+  "schema_version": 1,
+  "sections": "16_17_classical_prior_parity_and_ablation"
+}
