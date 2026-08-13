@@ -24,6 +24,7 @@ def main() -> int:
     parser.add_argument("--resume", action="store_true", help="append a disjoint deterministic slice to existing raw rows")
     parser.add_argument("--replace", action="store_true", help="supersede the same deterministic run IDs after a documented harness correction")
     parser.add_argument("--output-dir", type=Path, default=Path("reports/evaluation/live-robustness"))
+    parser.add_argument("--finding-evidence", type=Path, default=None, help="measured remediation-control evidence used to derive post-fix finding status")
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     protocol = load_protocol(root / "reports/evaluation/live-robustness/protocol.json")
@@ -52,7 +53,8 @@ def main() -> int:
     rows.extend(new_rows)
     if locked_test_opened(root):
         raise SystemExit("locked_test_opened changed during LIVE study")
-    summary = write_artifacts(output_dir, rows, locked_opened_after=False)
+    evidence = json.loads((root / args.finding_evidence).read_text(encoding="utf-8")) if args.finding_evidence else None
+    summary = write_artifacts(output_dir, rows, locked_opened_after=False, finding_evidence=evidence)
     print(f"wrote {len(new_rows)} LIVE rows ({len(rows)} total); invariant failures: {len(summary['invariant_failures'])}")
     return 0
 

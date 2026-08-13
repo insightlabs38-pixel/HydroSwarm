@@ -16,6 +16,7 @@ import math
 import os
 import platform
 import statistics
+import subprocess
 import tempfile
 import threading
 from dataclasses import asdict, dataclass
@@ -43,7 +44,7 @@ from hydroswarm.simulation.wrapper import wntr
 
 LOCKED_TOKENS = ("locked_final_test", "locked_topology_test")
 REQUIRED_ROW_FIELDS = (
-    "run_id", "git_commit", "model_sha256", "calibration_sha256", "feature_schema_sha256",
+    "run_id", "git_commit", "study_baseline_commit", "runtime_commit", "model_sha256", "calibration_sha256", "feature_schema_sha256",
     "normalization_sha256", "signature_policy_sha256", "network_id", "network_sha256",
     "topology_class", "random_seed", "source_node", "node_count", "link_count",
     "sensor_count", "observation_count", "perturbation_type", "perturbation_level",
@@ -108,6 +109,13 @@ class PeakRSS:
 
 def _json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def runtime_commit(repo_root: Path) -> str:
+    """The checkout that executed an evaluation row, never its study baseline."""
+    return subprocess.check_output(
+        ("git", "rev-parse", "HEAD"), cwd=repo_root, text=True
+    ).strip()
 
 
 def _sha256(path: Path) -> str:
@@ -308,7 +316,10 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
     baseline: dict[str, Any] = {field: None for field in REQUIRED_ROW_FIELDS}
     baseline.update({
         "run_id": hashlib.sha256(f"{condition.name}:{condition.repetition}".encode()).hexdigest()[:16],
-        "git_commit": protocol["system_under_test_commit"], "network_id": condition.network_id,
+        "study_baseline_commit": protocol["system_under_test_commit"],
+        "runtime_commit": runtime_commit(repo_root),
+        # Retained for compatibility; it means the code that executed the row.
+        "git_commit": runtime_commit(repo_root), "network_id": condition.network_id,
         "network_sha256": _sha256(path), "topology_class": condition.topology_class,
         "random_seed": condition.seed, "source_node": scenario.manifest.incident.source_nodes[0],
         "node_count": len(network.node_name_list), "link_count": len(network.link_name_list),
@@ -451,7 +462,16 @@ def _identity_fields(repo_root: Path) -> dict[str, Any]:
     return {"model_sha256": factory.model_hash, "calibration_sha256": manifest["calibration"]["artifact_hash"], "feature_schema_sha256": manifest["schema_hashes"]["feature_schema_hash"], "normalization_sha256": manifest["normalization"]["normalization_hash"], "signature_policy_sha256": manifest["fusion_and_signature_policy"]["signature_policy_hash"], "platform": platform.platform(), "python_version": platform.python_version()}
 
 
-def summarize(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+def _finding_status(evidence: Mapping[str, Any] | None, finding_id: str) -> str:
+    item = (evidence or {}).get(finding_id)
+    if item is None or not bool(item.get("evaluated")):
+        return "NOT_EVALUATED"
+    return "REMEDIATED" if bool(item.get("passed")) else "REGRESSION"
+
+
+def summarize(
+    rows: Sequence[Mapping[str, Any]], *, finding_evidence: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     def numeric(items: Iterable[Mapping[str, Any]], field: str) -> list[float]:
         return [float(item[field]) for item in items if item.get(field) is not None]
     def stats(values: Sequence[float]) -> dict[str, float | int | None]:
@@ -474,15 +494,23 @@ def summarize(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "performance": {field: stats(numeric(rows, field)) for field in ("import_ms", "incident_creation_ms", "analysis_ms", "sampling_ms", "reanalysis_ms", "planning_ms", "verification_ms", "approval_ms", "total_trajectory_ms", "process_rss_before_mb", "peak_process_rss_mb", "process_rss_after_mb")},
         "sampling": {"rounds": len(sample_rows), "acquired": sum(sample.get("status", "ACQUIRED") == "ACQUIRED" for sample in sample_rows), "stopped": sum(sample.get("status") == "STOP" for sample in sample_rows), "repeated_observed_recommendations": sum(sample.get("status") == "RECOMMENDED_PREVIOUSLY_OBSERVED" for sample in sample_rows), "realized_entropy_reduction_bits": stats([float(sample["entropy_before"]) - float(sample["entropy_after"]) for sample in sample_rows if sample.get("entropy_before") is not None and sample.get("entropy_after") is not None])},
         "planning": {"plans": len(plan_rows), "decisions": {name: sum(plan.get("verification", {}).get("decision") == name for plan in plan_rows) for name in sorted({str(plan.get("verification", {}).get("decision")) for plan in plan_rows})}, "exact_simulator_calls": sum(int(row.get("exact_simulator_calls") or 0) for row in rows)},
-        "findings": [{"id": "ROB-LIVE-01", "severity": "MEDIUM", "status": "UNRESOLVED", "summary": "re-analysis can recommend a node already represented in current evidence"}, {"id": "ROB-LIVE-02", "severity": "HIGH", "status": "UNRESOLVED", "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"}],
+        "study_baseline_commits": sorted({str(row.get("study_baseline_commit")) for row in rows if row.get("study_baseline_commit")}),
+        "runtime_commits": sorted({str(row.get("runtime_commit")) for row in rows if row.get("runtime_commit")}),
+        "findings": [
+            {"id": "ROB-LIVE-01", "severity": "MEDIUM", "status": _finding_status(finding_evidence, "ROB-LIVE-01"), "summary": "re-analysis can recommend a node already represented in current evidence"},
+            {"id": "ROB-LIVE-02", "severity": "HIGH", "status": _finding_status(finding_evidence, "ROB-LIVE-02"), "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"},
+        ],
         "invariant_failures": [row["run_id"] for row in rows if any(value is False for value in (row.get("invariants") or {}).values())],
         "locked_test_opened": None,
     }
 
 
-def write_artifacts(output_dir: Path, rows: Sequence[Mapping[str, Any]], *, locked_opened_after: bool) -> dict[str, Any]:
+def write_artifacts(
+    output_dir: Path, rows: Sequence[Mapping[str, Any]], *, locked_opened_after: bool,
+    finding_evidence: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    summary = summarize(rows)
+    summary = summarize(rows, finding_evidence=finding_evidence)
     summary["locked_test_opened"] = locked_opened_after
     (output_dir / "results.json").write_text(json.dumps(list(rows), indent=2, sort_keys=True) + "\n", encoding="utf-8")
     with (output_dir / "results.csv").open("w", newline="", encoding="utf-8") as stream:

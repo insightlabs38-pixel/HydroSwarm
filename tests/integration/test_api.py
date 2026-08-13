@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from dataclasses import replace
 import hashlib
 
 from fastapi.testclient import TestClient
@@ -18,6 +19,7 @@ from hydroswarm.inference.fusion import ControlAction
 from hydroswarm.inference.ood import OODComponents
 from hydroswarm.inference.results import HybridRuntimeMode, IncidentAnalysisResult, SemanticPredictions
 from hydroswarm.planning import PlanProposal
+from hydroswarm.sampling import ActiveSamplingResult, SampleCandidate
 
 
 NOW = datetime(2026, 8, 3, tzinfo=UTC)
@@ -93,6 +95,40 @@ def _install_authoritative_test_analysis(
     record.runtime_mode = HybridRuntimeMode.CLASSICAL_SAFE.value
     record.fallback_reasons = ()
     return plans
+
+
+def _sample_result(*, node: str | None, stop: bool = False) -> ActiveSamplingResult:
+    candidate = SampleCandidate(
+        node_id="J2", score=1.0, expected_information_gain_bits=0.5,
+        expected_candidate_reduction=1.0, leading_hypothesis_separation=1.0,
+        detection_probability=1.0, collection_time_minutes=1.0,
+        operational_cost=1.0, redundancy=0.0, accessible=True,
+        classical_rank=1, neural_residual_delta=0.0,
+    )
+    return ActiveSamplingResult((candidate,), node, stop, "sampling stopped" if stop else None, 1.0)
+
+
+def test_sampling_api_requires_current_authoritative_recommendation(tmp_path) -> None:
+    client = TestClient(create_app(verifier=_verification, ledger_path=tmp_path / "audit.sqlite3"))
+    assert client.post("/api/networks/net-sampling/validate", json={"node_ids": ["J1", "J2"], "link_count": 1}).status_code == 200
+    created = client.post("/api/incidents", json={"network_id": "net-sampling", "detected_at": NOW.isoformat(), "observations": [_observation()], "maximum_samples": 2})
+    incident_id = created.json()["incident_id"]
+    assert client.post(f"/api/incidents/{incident_id}/analyze").status_code == 200
+    _install_authoritative_test_analysis(client, incident_id)
+    from uuid import UUID
+    record = client.app.state.runtime.incidents[UUID(incident_id)]
+    original = record.analysis
+    assert isinstance(original, IncidentAnalysisResult)
+    for action, result in ((ControlAction.CONTINUE_ANALYSIS, None), (ControlAction.ABSTAIN, None), (ControlAction.GENERATE_PLANS, None), (ControlAction.REQUEST_SAMPLE, None), (ControlAction.REQUEST_SAMPLE, _sample_result(node=None, stop=True))):
+        record.analysis = replace(original, control_action=action, sample_result=result)
+        assert client.post(f"/api/incidents/{incident_id}/samples/recommend").status_code == 409
+    record.analysis = replace(original, control_action=ControlAction.REQUEST_SAMPLE, sample_result=_sample_result(node="J1"))
+    assert client.post(f"/api/incidents/{incident_id}/samples/recommend").status_code == 409
+    record.analysis = replace(original, control_action=ControlAction.REQUEST_SAMPLE, sample_result=_sample_result(node="J2"))
+    response = client.post(f"/api/incidents/{incident_id}/samples/recommend")
+    assert response.status_code == 200 and response.json()["node_id"] == "J2"
+    events = client.get(f"/api/incidents/{incident_id}/events").json()
+    assert [event["event_type"] for event in events].count("SAMPLE_RECOMMENDED") == 1
 
 
 def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None:
