@@ -6,6 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 import hashlib
+from threading import RLock
 from pathlib import Path
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -26,7 +27,7 @@ from hydroswarm.worker import PersistentJobQueue
 
 
 class ApiModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
 
 
 class ApiSettings(ApiModel):
@@ -285,6 +286,9 @@ class IncidentRuntime:
     pipeline: Any | None = None
     swarm: Any | None = None
     progress: dict[str, Any] = field(default_factory=lambda: {"state": "IDLE", "progress": 0.0})
+    #: Serializes state-changing API paths for this incident. SQLite's unique
+    #: constraints remain the durable backstop across process boundaries.
+    lock: RLock = field(default_factory=RLock, repr=False)
 
 
 @dataclass(slots=True)

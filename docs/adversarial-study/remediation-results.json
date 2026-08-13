@@ -1,0 +1,72 @@
+{
+  "scope": "adversarial remediation",
+  "branch": "fix/adversarial-remediation",
+  "historical_audit_modified": false,
+  "scientific_thresholds_modified": false,
+  "results": [
+    {
+      "finding": "ADV-09",
+      "root_cause": "workflow DEMO_FALLBACK override",
+      "changed_files": ["src/hydroswarm/api/app.py"],
+      "invariant_restored": "suppressed analysis cannot plan, verify, or enter approval",
+      "regression": "test_planning_suppression_is_not_bypassable_through_workflow_endpoint",
+      "result": "pass"
+    },
+    {
+      "finding": "ADV-03",
+      "root_cause": "nonfinite float acceptance and error serialization",
+      "changed_files": ["src/hydroswarm/domain/schemas.py", "src/hydroswarm/api/state.py", "src/hydroswarm/api/app.py"],
+      "invariant_restored": "nonfinite requests return 422 before persistence",
+      "regression": "test_all_externally_reachable_observation_numbers_reject_nonfinite; test_positive_infinity_json_is_rejected_before_persistence",
+      "result": "pass"
+    },
+    {
+      "finding": "ADV-04",
+      "root_cause": "no sample identity or incident-time guard",
+      "changed_files": ["src/hydroswarm/api/app.py"],
+      "invariant_restored": "retransmission is idempotent; changed duplicate conflicts; predating sample fails",
+      "regression": "test_duplicate_and_stale_samples_are_non_evidence",
+      "result": "pass"
+    },
+    {
+      "finding": "ADV-13 / ADV-15",
+      "root_cause": "verification bound only a plan id and network id",
+      "changed_files": ["src/hydroswarm/api/app.py", "src/hydroswarm/domain/schemas.py", "src/hydroswarm/storage/scenario_store.py"],
+      "invariant_restored": "approval requires exact plan, authoritative-network, and context bindings",
+      "regression": "test_approval_requires_current_exact_plan_network_and_context_bindings; test_network_id_cannot_be_replaced",
+      "result": "pass"
+    },
+    {
+      "finding": "ADV-17",
+      "root_cause": "approval route/persistence permitted replay and weak ordering",
+      "changed_files": ["src/hydroswarm/api/app.py", "src/hydroswarm/api/state.py", "src/hydroswarm/storage/scenario_store.py"],
+      "invariant_restored": "only APPROVAL plus pending can close once; duplicate receipts/events are prevented",
+      "regression": "test_approval_is_one_way_and_duplicate_receipts_are_not_persisted; test_sample_and_approval_race_cannot_bypass_terminal_or_stale_guards; test_verify_and_approval_race_serializes_a_valid_lifecycle",
+      "result": "pass"
+    },
+    {
+      "finding": "ADV-21",
+      "root_cause": "reference endpoint parsed JSON without semantic validation",
+      "changed_files": ["src/hydroswarm/evaluation/reference_demo.py", "src/hydroswarm/api/app.py"],
+      "invariant_restored": "forged/corrupt reference replay fails closed",
+      "regression": "test_reference_endpoint_rejects_checksum_mismatched_artifact",
+      "result": "pass"
+    },
+    {
+      "finding": "ADV-22",
+      "root_cause": "missing LIVE cache provenance",
+      "changed_files": ["src/hydroswarm/evaluation/live_example.py", "frontend/src/api/liveExampleFlow.ts"],
+      "invariant_restored": "LIVE frozen inputs are machine-readably distinguished from replay/cached outputs",
+      "regression": "tests/integration/test_live_example_endpoint.py::test_live_example_inputs_is_cached_across_requests_within_one_app_instance",
+      "result": "pass"
+    }
+  ],
+  "validation": {
+    "adversarial_regressions": "24 passed",
+    "focused_scientific_reference_network": "68 passed",
+    "frontend_tests": "162 passed",
+    "frontend_build": "passed",
+    "release_self_test_strict": "passed",
+    "complete_python_baseline": "inconclusive: execution monitor detached before completion; not claimed as pass"
+  }
+}

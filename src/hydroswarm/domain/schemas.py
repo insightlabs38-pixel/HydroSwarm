@@ -19,7 +19,10 @@ NonNegative = Annotated[float, Field(ge=0.0)]
 
 
 class FrozenModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", frozen=True)
+    # External operational contracts must never admit NaN or infinity.  A
+    # seemingly-valid non-negative infinity is not physical evidence and can
+    # poison downstream numerical code before a later gate sees it.
+    model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
 
 
 class ActionType(StrEnum):
@@ -224,6 +227,14 @@ class PlanVerification(FrozenModel):
     #: has access to that context; PlanVerifier itself does not), never by
     #: PlanVerifier. None only for verifications predating this field.
     context_hash: str | None = None
+    #: Canonical content identity of the exact OperationalPlan that entered
+    #: verification.  Missing values are legacy records and are never
+    #: approvable.
+    plan_hash: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    #: Authoritative network-content identity at verification time.  For an
+    #: imported network this is the actual INP-byte SHA-256, checked again at
+    #: approval; missing values are legacy records and are never approvable.
+    network_hash: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     #: CURRENT until a behavior-critical context component changes (new
     #: sample, re-analysis, recalibration, ...), at which point this plan's
     #: PRIOR verification is marked STALE / SUPERSEDED here -- retained in
@@ -381,4 +392,3 @@ class EvidenceCertificate(FrozenModel):
     sample_budget_remaining: int = Field(ge=0)
     already_sampled_nodes: tuple[str, ...] = ()
     recommended_node_accessible: bool | None = None
-

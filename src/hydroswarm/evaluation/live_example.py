@@ -18,6 +18,8 @@ real production pipeline decides what happens next.
 from __future__ import annotations
 
 import json
+import hashlib
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -76,7 +78,10 @@ def build_live_example_inputs(frozen_scenario_dir: str | Path) -> dict[str, Any]
     """
     frozen = Path(frozen_scenario_dir).resolve()
     network_path = frozen / "live_example_network.inp"
-    scenario = json.loads((frozen / "live_example_scenario.json").read_text())
+    scenario_path = frozen / "live_example_scenario.json"
+    scenario_bytes = scenario_path.read_bytes()
+    network_bytes = network_path.read_bytes()
+    scenario = json.loads(scenario_bytes)
 
     profile_kwargs = scenario["source_profile"]
     simulator = HydraulicSimulator(network_path)
@@ -101,7 +106,7 @@ def build_live_example_inputs(frozen_scenario_dir: str | Path) -> dict[str, Any]
 
     return {
         "network_filename": "live_example_network.inp",
-        "network_inp_text": network_path.read_text(encoding="utf-8"),
+        "network_inp_text": network_bytes.decode("utf-8"),
         "true_source": TRUE_SOURCE,
         "candidate_nodes": list(CANDIDATES),
         "initial_observation": {
@@ -118,4 +123,10 @@ def build_live_example_inputs(frozen_scenario_dir: str | Path) -> dict[str, Any]
         "candidate_signatures_mg_l": node_signatures,
         "sample_time_seconds": sample_time,
         "contamination_threshold_mg_l": scenario["contamination_threshold_mg_l"],
+        "execution_mode": "LIVE",
+        "input_source": "FROZEN_REFERENCE_SCENARIO",
+        "computed_at": datetime.now(UTC).isoformat(),
+        "network_sha256": hashlib.sha256(network_bytes).hexdigest(),
+        "scenario_sha256": hashlib.sha256(scenario_bytes).hexdigest(),
+        "input_sha256": hashlib.sha256(network_bytes + scenario_bytes).hexdigest(),
     }
