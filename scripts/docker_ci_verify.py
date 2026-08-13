@@ -226,6 +226,13 @@ def cmd_live_workflow(args: argparse.Namespace) -> int:
         print(f"[docker-ci] real WNTR/EPANET verification of {plan['plan_id']}: {verification['decision']}")
         if verification["decision"] == "VERIFIED" and verified_plan_id is None:
             verified_plan_id = plan["plan_id"]
+            # A CURRENT VERIFIED plan moves the incident to APPROVAL.  Do
+            # not verify a later candidate before this approval: a rejected
+            # later verification would correctly move the incident back to
+            # PLANNING and invalidate the approval boundary we are testing.
+            # This gate needs one real verified plan, not a weaker
+            # multi-verification lifecycle.
+            break
 
     assert verified_plan_id is not None, "no plan was VERIFIED by real WNTR verification -- cannot reach approval"
 
@@ -260,25 +267,27 @@ def cmd_verify_persistence(args: argparse.Namespace) -> int:
     state = json.loads(Path(args.state_file).read_text())
     incident_id = state["incident_id"]
 
-    # Incident evidence, plans, verifications, and approvals are durable;
-    # the hybrid analysis object is deliberately in-memory because it holds
-    # non-serializable pipeline state.  Rebuild that projection through the
-    # real API after restart before requesting its derived IncidentView.
-    # This proves both that the volume retained the incident and that the
-    # runtime can recover it without treating cached analysis as evidence.
-    status, body = _request(base_url, "POST", f"/api/incidents/{incident_id}/analyze")
-    assert status == 200, f"persisted incident {incident_id} could not be re-analyzed after restart: {status}: {body}"
-
-    status, view = _request(base_url, "GET", f"/api/incidents/{incident_id}/view")
+    # Incident evidence, plans, verifications, approvals, and audit events
+    # are durable; hybrid analysis is deliberately in-memory.  The workflow
+    # approves its selected plan before restart, making CLOSED terminal.
+    # Re-analysis would therefore be an invalid lifecycle transition rather
+    # than a persistence check.  Check the persisted terminal state and the
+    # persisted audit chain directly instead.
+    status, incident = _request(base_url, "GET", f"/api/incidents/{incident_id}")
     assert status == 200, (
         f"incident {incident_id} not found after restart (status {status}) -- "
         "the data volume did not actually persist"
     )
-    runtime_mode = view.get("runtime_mode") or view.get("runtimeMode")
-    assert runtime_mode == state["runtime_mode"], (
-        f"runtime_mode changed across restart: was {state['runtime_mode']!r}, now {runtime_mode!r}"
+    assert incident.get("status") == state["status"], (
+        f"incident status changed across restart: was {state['status']!r}, now {incident.get('status')!r}"
     )
-    print(f"[docker-ci] incident {incident_id} survived restart with matching runtime_mode={runtime_mode}")
+
+    status, replay = _request(base_url, "POST", f"/api/incidents/{incident_id}/replay")
+    assert status == 200, f"persisted incident replay failed after restart: {status}: {replay}"
+    assert replay.get("chain_valid") is True, "persisted incident audit chain is invalid after restart"
+    event_types = {event.get("event_type") for event in replay.get("events", [])}
+    assert "PLAN_APPROVED" in event_types, "persisted audit chain lacks the approval event"
+    print(f"[docker-ci] incident {incident_id} survived restart with status={incident['status']} and a valid audit chain")
     print("[docker-ci] verify-persistence PASSED")
     return 0
 
