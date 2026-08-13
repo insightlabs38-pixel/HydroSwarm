@@ -55,3 +55,13 @@ No golden product correction is required.
 
 Model, calibration, feature schema, normalization, signature policy, alpha,
 thresholds, and WNTR policy are unchanged. No additional finding was found.
+
+## Post-remediation campaign
+
+The separate 264-row post-remediation campaign is preserved under
+`reports/evaluation/live-robustness/post-remediation-*`. It records runtime
+commit `2c7060fa7dd5149a05b9828124ddcd5f0d8b8bec` and the original study
+baseline separately. ROB-LIVE-01 and ROB-LIVE-02 are REMEDIATED by measured
+controls and full-matrix evidence; HARNESS-POSTFIX-01 and
+HARNESS-POSTFIX-02 are FIXED. See
+[LIVE_ROBUSTNESS_POST_REMEDIATION.md](LIVE_ROBUSTNESS_POST_REMEDIATION.md).
