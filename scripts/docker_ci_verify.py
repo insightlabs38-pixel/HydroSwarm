@@ -250,9 +250,17 @@ def cmd_live_workflow(args: argparse.Namespace) -> int:
     runtime_mode = view.get("runtime_mode") or view.get("runtimeMode")
     print(f"[docker-ci] incident view: runtime_mode={runtime_mode}")
 
+    # /view is an operator projection and deliberately does not duplicate
+    # IncidentState.status.  Read the authority-bearing lifecycle state
+    # from its own endpoint before carrying it across the restart boundary.
+    status, terminal_state = _request(base_url, "GET", f"/api/incidents/{incident_id}")
+    assert status == 200, f"terminal incident state failed: {status}: {terminal_state}"
+    terminal_status = terminal_state.get("status")
+    assert terminal_status == "CLOSED", f"approved incident did not reach CLOSED: {terminal_status!r}"
+
     if args.state_file:
         Path(args.state_file).write_text(
-            json.dumps({"incident_id": incident_id, "runtime_mode": runtime_mode, "status": view.get("status")})
+            json.dumps({"incident_id": incident_id, "runtime_mode": runtime_mode, "status": terminal_status})
         )
         print(f"[docker-ci] wrote persistence-check state to {args.state_file}")
 

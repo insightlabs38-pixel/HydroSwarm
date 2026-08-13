@@ -162,6 +162,8 @@ def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> 
             return 200, {"receipt_id": str(uuid4())}
         if path.endswith("/view"):
             return 200, {"runtime_mode": "LIVE", "status": "CLOSED"}
+        if path == f"/api/incidents/{incident_id}":
+            return 200, {"status": "CLOSED"}
         if path.endswith("/analyze") or path.endswith("/samples"):
             return 200, {}
         raise AssertionError(f"unexpected request: {path}")
@@ -174,6 +176,7 @@ def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> 
     assert f"/api/incidents/{incident_id}/plans/{first_plan_id}/verify" in requested_paths
     assert f"/api/incidents/{incident_id}/plans/{second_plan_id}/verify" not in requested_paths
     assert f"/api/incidents/{incident_id}/plans/{first_plan_id}/approve" in requested_paths
+    assert f"/api/incidents/{incident_id}" in requested_paths
 
 
 def test_persistence_check_does_not_reanalyze_a_closed_incident(monkeypatch, tmp_path) -> None:
