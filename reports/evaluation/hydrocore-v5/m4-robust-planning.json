@@ -1,0 +1,4447 @@
+{
+  "alpha": 0.1,
+  "bucket_depths": {
+    "EARLY": 2,
+    "MATURE": 12,
+    "MID": 4
+  },
+  "calibration_scheme": "B_DEPTH_AWARE (frozen in Milestone 3, refit here identically over all CAUSAL_PREFIX_DEPTHS)",
+  "control_has_authority_invariant_violations": false,
+  "exit_decision": "MECHANISM_VALIDATED_NO_MATERIAL_ACTIONABILITY_GAIN_AT_K3",
+  "incidents": [
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.14651870727539,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6519807350000519,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.14651870727539,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "36bc533c-3a8c-5e03-b9d8-bc534e623302",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "c0aef784-696f-5cc5-8cd8-a435580a294e",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J4",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.717903137207031,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.7974779979999767,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.717903137207031,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "ebea6a46-0f6d-5629-a3cd-4e6512df03ea",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "1c4ab6c3-79f9-52b5-8fb8-d550781a3f9f",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J1",
+        "J4",
+        "J2"
+      ],
+      "candidate_set_size": 3,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.351320266723633,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.9332334509999782,
+      "eligible": true,
+      "exact_simulator_calls": 18,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.351320266723633,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 12,
+      "scenario_id": "8569f9d9-9600-5f39-929a-a56b2b2c7f35",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "2584280e-1061-5735-bddc-df27520665d8",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.098725318908691,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6376060630000211,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.098725318908691,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "c612cf36-8976-5280-8a06-712e7ffd18ce",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": null,
+        "suppressed": false,
+        "verified": false,
+        "worst_case": null
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.791734642999927,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": true,
+        "false_safe": false,
+        "robustly_verified": false,
+        "selected_template": null,
+        "suppressed": false,
+        "worst_case": null
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "b7877fd8-c4da-55ca-9352-77534484670b",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.1937894821167,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6464782009998089,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.1937894821167,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "18a32e9d-5d8a-573a-9c7f-d016d6c95835",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.909527778625488,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.8047997620001297,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.909527778625488,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "c556d34e-426e-5bf8-92b0-c21c926e0a61",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "e0d097ea-eb9c-5957-aba5-edfec1d6af8f",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J3",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.460192680358887,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.78746591800018,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.460192680358887,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "6a31d772-4178-56a6-914c-a12b603c7558",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "4edc286a-7737-58a7-bd91-d4851516aae7",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.066401481628418,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.811920733000079,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.066401481628418,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "97ba2d6e-17ce-5f69-8cf6-4ccf67ac5fe6",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.198328971862793,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6479859210003269,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.198328971862793,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "ea87c6bf-66d2-5d21-a7fa-9d3759cf46de",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "a86bfd64-0e8e-5880-9182-19a132f59e21",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J1",
+        "J4",
+        "J2"
+      ],
+      "candidate_set_size": 3,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.518309593200684,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.9377092969998557,
+      "eligible": true,
+      "exact_simulator_calls": 18,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.518309593200684,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 12,
+      "scenario_id": "475f38ec-249e-5a52-812f-a331c0652fb0",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "f147c8a7-95b7-5b85-bf28-a25e383b58f5",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "ce4513bc-6a5f-5d3a-9bcc-da1269818fc1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.138296127319336,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6495866479999677,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.138296127319336,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "948cdff9-61b1-5f22-a30f-c9d88617789e",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J4",
+        "J1"
+      ],
+      "candidate_set_size": 3,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.788972854614258,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.9375909880000108,
+      "eligible": true,
+      "exact_simulator_calls": 18,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.788972854614258,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 12,
+      "scenario_id": "062a0def-2915-5947-aead-623d2419b097",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "7b0146af-d136-5791-b794-c6a83bced8ed",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.960594177246094,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.798056009999982,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.960594177246094,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "e812ae75-1328-51b0-bf84-f98a0cb88f55",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J1",
+        "J4"
+      ],
+      "candidate_set_size": 3,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.333460807800293,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.952978603000247,
+      "eligible": true,
+      "exact_simulator_calls": 18,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.333460807800293,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 12,
+      "scenario_id": "b9133767-0a86-51dd-b116-93397db605cd",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J4",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.646428108215332,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.8190202809996663,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.646428108215332,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "8477a8c4-e751-554a-8356-22ce363e343f",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.084494590759277,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.7951485599996886,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.084494590759277,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "9473b779-26d8-52f0-9260-73fe60fa59c8",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "6589c511-1679-5560-a8fa-f1274d338b5b",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "4ccff861-55f5-539d-aad3-4d1bbe352d93",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "3c815367-8965-5b9f-8a41-eef53395ed97",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": null,
+        "suppressed": false,
+        "verified": false,
+        "worst_case": null
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6556640539997716,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": true,
+        "false_safe": false,
+        "robustly_verified": false,
+        "selected_template": null,
+        "suppressed": false,
+        "worst_case": null
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "bc62e6ba-afb3-59d9-93d2-3c37985d091d",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.558098793029785,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6600900869998441,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.558098793029785,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "7e8e507e-8115-5bc9-898e-2e49a026dd74",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "fc4452dc-72ef-5d58-8bf1-ed4e28978160",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J4",
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 3,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.206598281860352,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.9483501579998119,
+      "eligible": true,
+      "exact_simulator_calls": 18,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.206598281860352,
+          "population_impacted": 3.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 12,
+      "scenario_id": "8d5ed0a8-731f-5afa-bde6-7ca87b47d17f",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "9027a15b-a80b-5b4d-a0d0-6a2dd5cf9929",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J1",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.460954666137695,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.7952847579999798,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.460954666137695,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "ecbbff1b-cff5-5350-8df4-6010f9ed207a",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "144ed96f-5a6c-564a-81e3-ef0ccc5425b1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "57be2181-7a8d-5ac7-9093-43a869f52898",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "EARLY",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.927042961120605,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 2,
+      "elapsed_seconds": 0.6578450030001477,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.927042961120605,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "084aaccc-9c07-554b-946e-f0a66ce46cb0",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "fd59d7ff-92f5-5f34-bf2a-cc9fff19226a",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "EARLY",
+      "candidate_set_size": 4,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 2,
+      "eligible": false,
+      "exceeds_k": true,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "6d2fac27-f24a-5f19-b9d7-39138403ffeb",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.14651870727539,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6549467770000774,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.14651870727539,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "36bc533c-3a8c-5e03-b9d8-bc534e623302",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.468229293823242,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8037738319999335,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.468229293823242,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "c0aef784-696f-5cc5-8cd8-a435580a294e",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.717903137207031,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.7996369990000858,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.717903137207031,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "ebea6a46-0f6d-5629-a3cd-4e6512df03ea",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1",
+        "J4",
+        "J2"
+      ],
+      "candidate_set_size": 3,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.41871452331543,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.9565572060000704,
+      "eligible": true,
+      "exact_simulator_calls": 18,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.41871452331543,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 12,
+      "scenario_id": "1c4ab6c3-79f9-52b5-8fb8-d550781a3f9f",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.351320266723633,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.655410170000323,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.351320266723633,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "8569f9d9-9600-5f39-929a-a56b2b2c7f35",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.6246337890625,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8159963049997714,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.6246337890625,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "2584280e-1061-5735-bddc-df27520665d8",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.098725318908691,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6491455490004228,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.098725318908691,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "c612cf36-8976-5280-8a06-712e7ffd18ce",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": null,
+        "suppressed": false,
+        "verified": false,
+        "worst_case": null
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8048593380003695,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": true,
+        "false_safe": false,
+        "robustly_verified": false,
+        "selected_template": null,
+        "suppressed": false,
+        "worst_case": null
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "b7877fd8-c4da-55ca-9352-77534484670b",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.1937894821167,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6536978909998652,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.1937894821167,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "18a32e9d-5d8a-573a-9c7f-d016d6c95835",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.909527778625488,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.653045289000147,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.909527778625488,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "c556d34e-426e-5bf8-92b0-c21c926e0a61",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.089042663574219,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6529477380004209,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.089042663574219,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "e0d097ea-eb9c-5957-aba5-edfec1d6af8f",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.460192680358887,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6559277310002471,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.460192680358887,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "6a31d772-4178-56a6-914c-a12b603c7558",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.008397102355957,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6516756780001742,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.008397102355957,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "4edc286a-7737-58a7-bd91-d4851516aae7",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.066401481628418,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6501304980001805,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.066401481628418,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "97ba2d6e-17ce-5f69-8cf6-4ccf67ac5fe6",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.198328971862793,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6517229319997568,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.198328971862793,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "ea87c6bf-66d2-5d21-a7fa-9d3759cf46de",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.73641300201416,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6590638220000073,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "FLUSH_DOWNSTREAM",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.533272743225098,
+          "population_impacted": 3.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "a86bfd64-0e8e-5880-9182-19a132f59e21",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.518309593200684,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6445521330001611,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.518309593200684,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "475f38ec-249e-5a52-812f-a331c0652fb0",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.486651420593262,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.655225843000153,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.486651420593262,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "f147c8a7-95b7-5b85-bf28-a25e383b58f5",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.190934181213379,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8085677630001555,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.190934181213379,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "ce4513bc-6a5f-5d3a-9bcc-da1269818fc1",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.138296127319336,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6512479400003031,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.138296127319336,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "948cdff9-61b1-5f22-a30f-c9d88617789e",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.788972854614258,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6427084009997088,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.788972854614258,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "062a0def-2915-5947-aead-623d2419b097",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.71682357788086,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.654995597999914,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.71682357788086,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "7b0146af-d136-5791-b794-c6a83bced8ed",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2",
+        "J1"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.960594177246094,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.810166307000145,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.960594177246094,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "e812ae75-1328-51b0-bf84-f98a0cb88f55",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.333460807800293,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6575403790002383,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.333460807800293,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "b9133767-0a86-51dd-b116-93397db605cd",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.646428108215332,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8065931590003856,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.646428108215332,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "8477a8c4-e751-554a-8356-22ce363e343f",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.084494590759277,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6544253420001951,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.084494590759277,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "9473b779-26d8-52f0-9260-73fe60fa59c8",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.461694717407227,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6606168839998645,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.461694717407227,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "6589c511-1679-5560-a8fa-f1274d338b5b",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.17397689819336,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6563090869999542,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.17397689819336,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "4ccff861-55f5-539d-aad3-4d1bbe352d93",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.317577362060547,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6563937900000383,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.317577362060547,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "3c815367-8965-5b9f-8a41-eef53395ed97",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": null,
+        "suppressed": false,
+        "verified": false,
+        "worst_case": null
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6725143789999493,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": true,
+        "false_safe": false,
+        "robustly_verified": false,
+        "selected_template": null,
+        "suppressed": false,
+        "worst_case": null
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "bc62e6ba-afb3-59d9-93d2-3c37985d091d",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.558098793029785,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6601463120000517,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.558098793029785,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "7e8e507e-8115-5bc9-898e-2e49a026dd74",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.70167064666748,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.659883918000105,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.70167064666748,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "fc4452dc-72ef-5d58-8bf1-ed4e28978160",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.206598281860352,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6559453600002598,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.206598281860352,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "8d5ed0a8-731f-5afa-bde6-7ca87b47d17f",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J4",
+        "J2"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.02956771850586,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8135538689998612,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.02956771850586,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "9027a15b-a80b-5b4d-a0d0-6a2dd5cf9929",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.460954666137695,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6499928910002382,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.460954666137695,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "ecbbff1b-cff5-5350-8df4-6010f9ed207a",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J2",
+        "J4"
+      ],
+      "candidate_set_size": 2,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.920233726501465,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.8081522160000532,
+      "eligible": true,
+      "exact_simulator_calls": 15,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.920233726501465,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 9,
+      "scenario_id": "144ed96f-5a6c-564a-81e3-ef0ccc5425b1",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.158870697021484,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6639053630001399,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.158870697021484,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "57be2181-7a8d-5ac7-9093-43a869f52898",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.927042961120605,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.667472226999962,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.927042961120605,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "084aaccc-9c07-554b-946e-f0a66ce46cb0",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.19234848022461,
+          "population_impacted": 3.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.6612462640000558,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.19234848022461,
+          "population_impacted": 3.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "fd59d7ff-92f5-5f34-bf2a-cc9fff19226a",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MID",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.201193809509277,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 4,
+      "elapsed_seconds": 0.666538484999819,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.201193809509277,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "6d2fac27-f24a-5f19-b9d7-39138403ffeb",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.14651870727539,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6710746089997883,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.14651870727539,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "36bc533c-3a8c-5e03-b9d8-bc534e623302",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.468229293823242,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6620862030003991,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.468229293823242,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "c0aef784-696f-5cc5-8cd8-a435580a294e",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.717903137207031,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6556120969999029,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.717903137207031,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "ebea6a46-0f6d-5629-a3cd-4e6512df03ea",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.41871452331543,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6583452730001227,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.41871452331543,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "1c4ab6c3-79f9-52b5-8fb8-d550781a3f9f",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.351320266723633,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6663891470002454,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.351320266723633,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "8569f9d9-9600-5f39-929a-a56b2b2c7f35",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.6246337890625,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6572662240000682,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.6246337890625,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "2584280e-1061-5735-bddc-df27520665d8",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.098725318908691,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6547045649999745,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.098725318908691,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "c612cf36-8976-5280-8a06-712e7ffd18ce",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": null,
+        "suppressed": false,
+        "verified": false,
+        "worst_case": null
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6607874139999694,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": true,
+        "false_safe": false,
+        "robustly_verified": false,
+        "selected_template": null,
+        "suppressed": false,
+        "worst_case": null
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "b7877fd8-c4da-55ca-9352-77534484670b",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.1937894821167,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6544274050002059,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.1937894821167,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "18a32e9d-5d8a-573a-9c7f-d016d6c95835",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.909527778625488,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6593474829996921,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.909527778625488,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "c556d34e-426e-5bf8-92b0-c21c926e0a61",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.089042663574219,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6617849419999402,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.089042663574219,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "e0d097ea-eb9c-5957-aba5-edfec1d6af8f",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.460192680358887,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6597845240003153,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.460192680358887,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "6a31d772-4178-56a6-914c-a12b603c7558",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.008397102355957,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6647583339999983,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.008397102355957,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "4edc286a-7737-58a7-bd91-d4851516aae7",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.066401481628418,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6619239090000519,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.066401481628418,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "97ba2d6e-17ce-5f69-8cf6-4ccf67ac5fe6",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.198328971862793,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6565155509997567,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.198328971862793,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "ea87c6bf-66d2-5d21-a7fa-9d3759cf46de",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "MATURE",
+      "candidate_set_size": 0,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 12,
+      "eligible": false,
+      "exceeds_k": false,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "a86bfd64-0e8e-5880-9182-19a132f59e21",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.518309593200684,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6547620259998439,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.518309593200684,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "475f38ec-249e-5a52-812f-a331c0652fb0",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.486651420593262,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6698974410001028,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.486651420593262,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "f147c8a7-95b7-5b85-bf28-a25e383b58f5",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "MATURE",
+      "candidate_set_size": 0,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 12,
+      "eligible": false,
+      "exceeds_k": false,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "ce4513bc-6a5f-5d3a-9bcc-da1269818fc1",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.138296127319336,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6622858309997355,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.138296127319336,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "948cdff9-61b1-5f22-a30f-c9d88617789e",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.788972854614258,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6551773240003058,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.788972854614258,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "062a0def-2915-5947-aead-623d2419b097",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.71682357788086,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.663907178000045,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.71682357788086,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "7b0146af-d136-5791-b794-c6a83bced8ed",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "MATURE",
+      "candidate_set_size": 0,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 12,
+      "eligible": false,
+      "exceeds_k": false,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "e812ae75-1328-51b0-bf84-f98a0cb88f55",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.333460807800293,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6779390599999715,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.333460807800293,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "b9133767-0a86-51dd-b116-93397db605cd",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J4"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.646428108215332,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6688143770002171,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.646428108215332,
+          "population_impacted": 2.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "8477a8c4-e751-554a-8356-22ce363e343f",
+      "top1_node": "J4",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J2"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.084494590759277,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6572495939999499,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.084494590759277,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "9473b779-26d8-52f0-9260-73fe60fa59c8",
+      "top1_node": "J2",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.461694717407227,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6738971019999553,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.461694717407227,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "6589c511-1679-5560-a8fa-f1274d338b5b",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.17397689819336,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6692586870003652,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.17397689819336,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "4ccff861-55f5-539d-aad3-4d1bbe352d93",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.317577362060547,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.654826619999767,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.317577362060547,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "3c815367-8965-5b9f-8a41-eef53395ed97",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": null,
+        "suppressed": false,
+        "verified": false,
+        "worst_case": null
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6660208360003708,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": true,
+        "false_safe": false,
+        "robustly_verified": false,
+        "selected_template": null,
+        "suppressed": false,
+        "worst_case": null
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "bc62e6ba-afb3-59d9-93d2-3c37985d091d",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.558098793029785,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6708456540000043,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.558098793029785,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "7e8e507e-8115-5bc9-898e-2e49a026dd74",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.70167064666748,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6621194160002233,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.70167064666748,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "fc4452dc-72ef-5d58-8bf1-ed4e28978160",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.206598281860352,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6514955940001528,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.206598281860352,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "8d5ed0a8-731f-5afa-bde6-7ca87b47d17f",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "bucket": "MATURE",
+      "candidate_set_size": 0,
+      "control": {
+        "suppressed": true
+      },
+      "depth": 12,
+      "eligible": false,
+      "exceeds_k": false,
+      "robust": {
+        "suppressed": true
+      },
+      "scenario_id": "9027a15b-a80b-5b4d-a0d0-6a2dd5cf9929",
+      "true_source_in_candidate_set": false
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.460954666137695,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6562819030000355,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.460954666137695,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "ecbbff1b-cff5-5350-8df4-6010f9ed207a",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.920233726501465,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.665276391000134,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.920233726501465,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "144ed96f-5a6c-564a-81e3-ef0ccc5425b1",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J3"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.158870697021484,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6562601289997474,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.158870697021484,
+          "population_impacted": 1.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "57be2181-7a8d-5ac7-9093-43a869f52898",
+      "top1_node": "J3",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 10.927042961120605,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.669260113999826,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 10.927042961120605,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "084aaccc-9c07-554b-946e-f0a66ce46cb0",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.19234848022461,
+          "population_impacted": 3.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6639447259999542,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.19234848022461,
+          "population_impacted": 3.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "fd59d7ff-92f5-5f34-bf2a-cc9fff19226a",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    },
+    {
+      "attempted_plans": 3,
+      "bucket": "MATURE",
+      "candidate_nodes": [
+        "J1"
+      ],
+      "candidate_set_size": 1,
+      "control": {
+        "false_safe": false,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "verified": true,
+        "worst_case": {
+          "minimum_pressure_m": 11.201193809509277,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "control_exact_simulator_calls": 6,
+      "depth": 12,
+      "elapsed_seconds": 0.6674093629999334,
+      "eligible": true,
+      "exact_simulator_calls": 12,
+      "exceeds_k": false,
+      "robust": {
+        "fail_closed": false,
+        "false_safe": false,
+        "robustly_verified": true,
+        "selected_template": "PROTECT_CRITICAL",
+        "suppressed": false,
+        "worst_case": {
+          "minimum_pressure_m": 11.201193809509277,
+          "population_impacted": 4.0,
+          "service_availability": 1.0
+        }
+      },
+      "robust_exact_simulator_calls": 6,
+      "scenario_id": "6d2fac27-f24a-5f19-b9d7-39138403ffeb",
+      "top1_node": "J1",
+      "true_source_in_candidate_set": true
+    }
+  ],
+  "k_max_candidates": 3,
+  "k_max_candidates_justification": "hydroswarm.simulation.wrapper.MAXIMUM_EVALUATION_HYPOTHESES -- the existing hard architectural ceiling for exact multi-hypothesis WNTR verification; equals production's own HybridInferencePipeline.maximum_planning_candidates default (3), so this experiment cannot show an eligibility-driven actionability gain (see module docstring).",
+  "locked_test_opened_after": false,
+  "material_actionability_gain": false,
+  "max_incidents_per_bucket": 40,
+  "maximum_exact_simulations_per_arm": 3,
+  "overall": {
+    "control_false_safe_count": 0,
+    "control_false_safe_rate_of_control_verified": 0.0,
+    "control_verified_rate_of_eligible": 0.9387755102040817,
+    "decision_disagreement_count_multi_candidate": 0,
+    "decision_disagreement_rate_multi_candidate": 0.0,
+    "exceeds_k_rate": 0.15,
+    "genuinely_multi_candidate_count": 24,
+    "mean_candidate_set_size": 1.6666666666666667,
+    "mean_control_exact_simulator_calls": 6.0,
+    "mean_elapsed_seconds_per_incident": 0.7027242508469805,
+    "mean_robust_exact_simulator_calls": 6.918367346938775,
+    "mean_worst_case_service_availability_control": 1.0,
+    "mean_worst_case_service_availability_robust": 1.0,
+    "n": 120,
+    "planning_eligible_rate": 0.8166666666666667,
+    "robust_fail_closed_rate_of_eligible": 0.061224489795918366,
+    "robust_false_safe_count": 0,
+    "robust_false_safe_rate_of_robust_verified": 0.0,
+    "robust_verified_rate_of_eligible": 0.9387755102040817,
+    "true_source_coverage_rate_eligible": 0.8877551020408163
+  },
+  "per_bucket": {
+    "EARLY": {
+      "control_false_safe_count": 0,
+      "control_false_safe_rate_of_control_verified": 0.0,
+      "control_verified_rate_of_eligible": 0.9090909090909091,
+      "decision_disagreement_count_multi_candidate": 0,
+      "decision_disagreement_rate_multi_candidate": 0.0,
+      "exceeds_k_rate": 0.45,
+      "genuinely_multi_candidate_count": 14,
+      "mean_candidate_set_size": 2.825,
+      "mean_control_exact_simulator_calls": 6.0,
+      "mean_elapsed_seconds_per_incident": 0.778091266909066,
+      "mean_robust_exact_simulator_calls": 8.590909090909092,
+      "mean_worst_case_service_availability_control": 1.0,
+      "mean_worst_case_service_availability_robust": 1.0,
+      "n": 40,
+      "planning_eligible_rate": 0.55,
+      "robust_fail_closed_rate_of_eligible": 0.09090909090909091,
+      "robust_false_safe_count": 0,
+      "robust_false_safe_rate_of_robust_verified": 0.0,
+      "robust_verified_rate_of_eligible": 0.9090909090909091,
+      "true_source_coverage_rate_eligible": 0.8181818181818182
+    },
+    "MATURE": {
+      "control_false_safe_count": 0,
+      "control_false_safe_rate_of_control_verified": 0.0,
+      "control_verified_rate_of_eligible": 0.9444444444444444,
+      "decision_disagreement_count_multi_candidate": 0,
+      "decision_disagreement_rate_multi_candidate": null,
+      "exceeds_k_rate": 0.0,
+      "genuinely_multi_candidate_count": 0,
+      "mean_candidate_set_size": 0.9,
+      "mean_control_exact_simulator_calls": 6.0,
+      "mean_elapsed_seconds_per_incident": 0.6622704735000298,
+      "mean_robust_exact_simulator_calls": 6.0,
+      "mean_worst_case_service_availability_control": 1.0,
+      "mean_worst_case_service_availability_robust": 1.0,
+      "n": 40,
+      "planning_eligible_rate": 0.9,
+      "robust_fail_closed_rate_of_eligible": 0.05555555555555555,
+      "robust_false_safe_count": 0,
+      "robust_false_safe_rate_of_robust_verified": 0.0,
+      "robust_verified_rate_of_eligible": 0.9444444444444444,
+      "true_source_coverage_rate_eligible": 1.0
+    },
+    "MID": {
+      "control_false_safe_count": 0,
+      "control_false_safe_rate_of_control_verified": 0.0,
+      "control_verified_rate_of_eligible": 0.95,
+      "decision_disagreement_count_multi_candidate": 0,
+      "decision_disagreement_rate_multi_candidate": 0.0,
+      "exceeds_k_rate": 0.0,
+      "genuinely_multi_candidate_count": 10,
+      "mean_candidate_set_size": 1.275,
+      "mean_control_exact_simulator_calls": 6.0,
+      "mean_elapsed_seconds_per_incident": 0.6976807916250891,
+      "mean_robust_exact_simulator_calls": 6.825,
+      "mean_worst_case_service_availability_control": 1.0,
+      "mean_worst_case_service_availability_robust": 1.0,
+      "n": 40,
+      "planning_eligible_rate": 1.0,
+      "robust_fail_closed_rate_of_eligible": 0.05,
+      "robust_false_safe_count": 0,
+      "robust_false_safe_rate_of_robust_verified": 0.0,
+      "robust_verified_rate_of_eligible": 0.95,
+      "true_source_coverage_rate_eligible": 0.825
+    }
+  },
+  "predictor": {
+    "description": "Milestone-1 winner (arm A); Milestone 2 decision was PCGRAD_JUSTIFIED",
+    "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/A-seed31874/20260814T065947Z-44557eae/model-export.safetensors",
+    "use_adapters": false
+  },
+  "purpose": "Milestone 4 (experiments.txt): robust planning under source uncertainty.",
+  "schema_version": 1,
+  "zero_robust_authority_invariant_violations": true
+}
