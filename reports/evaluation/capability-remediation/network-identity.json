@@ -1,0 +1,32 @@
+{
+  "calibration_sha": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
+  "code_under_test_commit": "41aae8795cd2d25894f9521f5ac7ea17d04256a5",
+  "decision": "Numerical canonicalization was selected because governed golden-reference has historical in-memory and EPANET .inp construction paths; it preserves one product-facing canonical identity without duplicating an allow-list.",
+  "feature_schema_sha": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "governed_families": {
+    "branched-loop": {
+      "canonical_hash": "9926474d1f8e7925d47ad3d77740cd27ff1b6d1d42f95d87acca52e244c01d46",
+      "old_hash": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056"
+    },
+    "golden-reference": {
+      "canonical_hash": "5508d2721298ea31b9caa37db81fa90d66a5b7fb17587f78cd5b9bcf8f299c8c",
+      "old_hash": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+    },
+    "loop-grid": {
+      "canonical_hash": "35af6056fe885934bc8bda9b1e6ac178926ac24cac47bc8f2c00fb045730c2a9",
+      "old_hash": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88"
+    }
+  },
+  "identity_semantics": "SHA-256 of canonical node/link structure with static length, diameter, and roughness serialized at 9 significant decimal digits; mutable demand and tank state are excluded.",
+  "locked_test_opened": false,
+  "model_sha": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+  "normalization_sha": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+  "regression_checks": [
+    "EPANET write/parse round trip preserves the canonical golden identity.",
+    "Demand and tank state do not alter structural identity.",
+    "A meaningful static roughness change alters structural identity.",
+    "Governed family lookup is hash-only; an uploaded display name cannot confer applicability."
+  ],
+  "schema_version": 1,
+  "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811"
+}

@@ -321,7 +321,7 @@ def test_committed_training_topology_file_resolves_to_governed_mode(tmp_path: Pa
 #: session-accumulated); found by the real_simulation runtime audit in
 #: tests/conftest.py on a clean-cache CI run.
 @pytest.mark.real_simulation
-def test_golden_fixture_snapshot_resolves_to_runtime_generated_mode(tmp_path: Path) -> None:
+def test_golden_fixture_snapshot_resolves_to_governed_mode_when_static_identity_matches(tmp_path: Path) -> None:
     """data/frozen/golden_network.inp is a single frozen RANDOMIZED
     scenario snapshot (see data/frozen/manifest.json's
     hydroswarm.evaluation.golden.freeze_golden_inputs generator), not the
@@ -337,7 +337,7 @@ def test_golden_fixture_snapshot_resolves_to_runtime_generated_mode(tmp_path: Pa
     network_path = _REPO_ROOT / "data" / "frozen" / "golden_network.inp"
     factory(None, network_path)
 
-    assert factory.signature_mode == "RUNTIME_GENERATED_IMPORTED_NETWORK"
+    assert factory.signature_mode == "GOVERNED_KNOWN_NETWORK"
 
 
 #: Masked locally by a warm data/generated/signatures cache (gitignored,

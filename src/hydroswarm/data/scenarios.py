@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import math
 import platform
 from dataclasses import asdict, dataclass
 from enum import StrEnum
@@ -166,15 +167,41 @@ class SplitPlanner:
         return DatasetSplit.VALIDATION if bucket == 0 else DatasetSplit.TRAIN
 
 
+STRUCTURAL_NUMERIC_SIGNIFICANT_DIGITS = 9
+
+
+def _canonical_structural_number(value: Any) -> str:
+    """Serialize physical link values with explicit identity precision.
+
+    EPANET's `.inp` import/export path can introduce insignificant binary
+    representation tails (for example ``0.3`` vs ``0.2999999999988``). Nine
+    significant decimal digits are materially far below the source-data
+    precision while preserving meaningful pipe configuration changes.
+    """
+
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError("structural network values must be finite")
+    return format(number, f".{STRUCTURAL_NUMERIC_SIGNIFICANT_DIGITS}g")
+
+
 def network_sha256(network: Any) -> str:
+    """Canonical structural identity, independent of mutable simulator state.
+
+    This is deliberately based on topology and static link geometry only:
+    demand and tank state belong to incident/simulator provenance, not model
+    or calibration applicability.  Numeric serialization is explicit so the
+    canonical identity survives an EPANET `.inp` round trip.
+    """
+
     payload = {
         "nodes": sorted(network.node_name_list),
         "links": [
             (
                 name, network.get_link(name).start_node_name, network.get_link(name).end_node_name,
-                float(getattr(network.get_link(name), "length", 0.0)),
-                float(getattr(network.get_link(name), "diameter", 0.0)),
-                float(getattr(network.get_link(name), "roughness", 0.0)),
+                _canonical_structural_number(getattr(network.get_link(name), "length", 0.0)),
+                _canonical_structural_number(getattr(network.get_link(name), "diameter", 0.0)),
+                _canonical_structural_number(getattr(network.get_link(name), "roughness", 0.0)),
             ) for name in sorted(network.link_name_list)
         ],
     }

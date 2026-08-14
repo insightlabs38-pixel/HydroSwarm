@@ -70,6 +70,10 @@ class SampleRecommendation(ApiModel):
     action: Literal["SAMPLE"] = "SAMPLE"
     node_id: str
     expected_information_gain: Annotated[float, Field(ge=0.0)]
+    #: The physical collection delay used by the active-sampling model.  This
+    #: makes the recommendation's acquisition-time assumption observable to
+    #: operators and evaluators instead of leaving it as hidden ranker state.
+    expected_collection_delay_minutes: Annotated[float, Field(ge=0.0)] = 30.0
     alternatives: tuple[str, ...] = ()
     runtime_mode: str = "UNKNOWN"
     fallback_reasons: tuple[str, ...] = ()
@@ -136,6 +140,10 @@ class AnalysisResponse(ApiModel):
     fused_belief: dict[str, float]
     candidate_nodes: tuple[str, ...]
     calibrated: bool
+    calibration_source: Literal[
+        "NETWORK_SPECIFIC", "CONDITION_SPECIFIC", "GLOBAL", "INAPPLICABLE"
+    ] = "INAPPLICABLE"
+    calibration_group_identifier: str | None = None
     ood_level: str
     disagreement_js: float | None
     evidence_sufficient: bool

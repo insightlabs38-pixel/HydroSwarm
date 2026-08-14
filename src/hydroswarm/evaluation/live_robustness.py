@@ -26,6 +26,7 @@ from time import perf_counter
 from typing import Any, Iterable, Mapping, Sequence
 
 import psutil
+import numpy as np
 
 from hydroswarm.api import create_app
 from hydroswarm.data.scenarios import (
@@ -34,6 +35,7 @@ from hydroswarm.data.scenarios import (
     GeneratedScenario,
     ScenarioGenerationConfig,
     WNTRScenarioGenerator,
+    network_sha256,
 )
 from hydroswarm.inference import IncidentAnalysisResult
 from hydroswarm.runtime import V4PipelineFactory
@@ -43,7 +45,7 @@ from hydroswarm.simulation.wrapper import wntr
 
 LOCKED_TOKENS = ("locked_final_test", "locked_topology_test")
 REQUIRED_ROW_FIELDS = (
-    "run_id", "git_commit", "study_baseline_commit", "runtime_commit", "model_sha256", "calibration_sha256", "feature_schema_sha256",
+    "run_id", "git_commit", "study_baseline_commit", "runtime_commit", "code_under_test_commit", "model_sha256", "calibration_sha256", "feature_schema_sha256",
     "normalization_sha256", "signature_policy_sha256", "network_id", "network_sha256",
     "topology_class", "random_seed", "source_node", "node_count", "link_count",
     "sensor_count", "observation_count", "perturbation_type", "perturbation_level",
@@ -201,40 +203,63 @@ def _ranked_health_indices(count: int, fraction: float) -> set[int]:
     return set(range(min(count, max(1, math.ceil(count * fraction))))) if fraction else set()
 
 
-def _payloads(scenario: GeneratedScenario, condition: Condition, origin: datetime) -> list[dict[str, Any]]:
+def _payloads(
+    scenario: GeneratedScenario,
+    condition: Condition,
+    origin: datetime,
+    *,
+    decision_time_seconds: float | None = None,
+) -> list[dict[str, Any]]:
+    """Build only the telemetry causally available at a decision time.
+
+    The previous harness retained one last-valid report per sensor, silently
+    discarding real history.  The product contract instead carries every
+    report through the decision time (the feature builder bounds it to 25
+    steps).  Callers can select an early checkpoint; absent one, the final
+    simulated report is the decision time and all prior reports are present.
+    """
+
     selected_count = max(1, math.ceil(len(scenario.sensor_nodes) * condition.coverage))
     selected = tuple(sorted(scenario.sensor_nodes))[:selected_count]
     health = _ranked_health_indices(len(selected), condition.health_fraction)
+    cutoff = (
+        float(decision_time_seconds)
+        if decision_time_seconds is not None
+        else float(scenario.timestamps_seconds[-1])
+    )
     result: list[dict[str, Any]] = []
     for index, node_id in enumerate(selected):
         source_column = scenario.sensor_nodes.index(node_id)
         valid = [position for position, value in enumerate(scenario.observation_mask[:, source_column]) if bool(value)]
-        position = valid[-1] if valid else len(scenario.timestamps_seconds) - 1
+        available = [position for position, timestamp in enumerate(scenario.timestamps_seconds) if timestamp <= cutoff]
+        if not available:
+            continue
         forced_missing = int(hashlib.sha256(f"{condition.seed}:{node_id}:{condition.name}".encode()).hexdigest()[:8], 16) / 2**32 < condition.missing_rate
-        missing = forced_missing or position not in valid
-        concentration = None if missing else max(0.0, float(scenario.observed_concentration[position, source_column]) + condition.bias)
-        if not missing and condition.ambiguity == "contradictory" and index % 2:
-            assert concentration is not None
-            concentration = max(0.0, concentration + 0.5)
-        if not missing and condition.ambiguity == "disagreement":
-            assert concentration is not None
-            concentration = 0.0 if index % 2 else concentration + 0.75
         degraded = index in health
-        observed_at = origin + timedelta(seconds=float(scenario.timestamps_seconds[position]))
-        delayed = degraded and condition.health_mode == "delayed"
-        result.append({
-            "sensor_id": f"initial-{node_id}", "node_id": node_id,
-            "observed_at": observed_at.isoformat(),
-            "received_at": (observed_at + timedelta(minutes=15) if delayed else observed_at).isoformat(),
-            "concentration_mg_l": concentration, "pressure_m": None if missing else 25.0,
-            "quality": 0.20 if degraded and condition.health_mode == "quality" else 1.0,
-            "missing": missing or (degraded and condition.health_mode == "communication_missing"),
-            "drift_flag": bool(degraded and condition.health_mode == "drift"),
-            "frozen_flag": bool(degraded and condition.health_mode == "frozen"),
-        })
-        if result[-1]["missing"]:
-            result[-1]["concentration_mg_l"] = None
-            result[-1]["pressure_m"] = None
+        for position in available:
+            missing = forced_missing or position not in valid
+            concentration = None if missing else max(0.0, float(scenario.observed_concentration[position, source_column]) + condition.bias)
+            if not missing and condition.ambiguity == "contradictory" and index % 2:
+                assert concentration is not None
+                concentration = max(0.0, concentration + 0.5)
+            if not missing and condition.ambiguity == "disagreement":
+                assert concentration is not None
+                concentration = 0.0 if index % 2 else concentration + 0.75
+            observed_at = origin + timedelta(seconds=float(scenario.timestamps_seconds[position]))
+            delayed = degraded and condition.health_mode == "delayed"
+            result.append({
+                "sensor_id": f"initial-{node_id}", "node_id": node_id,
+                "observed_at": observed_at.isoformat(),
+                "received_at": (observed_at + timedelta(minutes=15) if delayed else observed_at).isoformat(),
+                "concentration_mg_l": concentration, "pressure_m": None if missing else 25.0,
+                "quality": 0.20 if degraded and condition.health_mode == "quality" else 1.0,
+                "missing": missing or (degraded and condition.health_mode == "communication_missing"),
+                "drift_flag": bool(degraded and condition.health_mode == "drift"),
+                "frozen_flag": bool(degraded and condition.health_mode == "frozen"),
+            })
+            if result[-1]["missing"]:
+                result[-1]["concentration_mg_l"] = None
+                result[-1]["pressure_m"] = None
     return result
 
 
@@ -265,16 +290,36 @@ def _analysis_internal(app: Any, incident_id: str) -> IncidentAnalysisResult:
     return record.analysis
 
 
-def _sample_observation(node_id: str, scenario: GeneratedScenario, randomized_network: Any, origin: datetime, sample_index: int) -> dict[str, Any]:
+def _sample_observation(
+    node_id: str,
+    scenario: GeneratedScenario,
+    randomized_network: Any,
+    origin: datetime,
+    sample_index: int,
+    *,
+    decision_time_seconds: float,
+    collection_delay_minutes: float,
+    noise_std: float,
+    seed: int,
+) -> dict[str, Any]:
+    """Materialize the same delayed/noisy measurement EIG ranked.
+
+    A recommendation is for a grab collected after its declared delay, not
+    for the final value in an incident trajectory.  Deterministic seeded
+    noise uses the ranker's declared ``noise_scale_mg_l`` semantics.
+    """
     simulation = HydraulicSimulator(randomized_network).simulate_incident(
         scenario.manifest.incident.source_nodes[0],
         strength_mg_min=10.0 * scenario.manifest.incident.relative_strength,
         start_minute=scenario.manifest.incident.start_minute,
         duration_minutes=scenario.manifest.incident.duration_minutes,
     )
-    position = -1
+    acquisition_time = decision_time_seconds + collection_delay_minutes * 60.0
+    position = int(np.argmin(np.abs(np.asarray(simulation.concentration_mg_l.index, dtype=float) - acquisition_time)))
     timestamp = origin + timedelta(seconds=float(simulation.concentration_mg_l.index[position]))
-    return {"sensor_id": f"sample-{sample_index}-{node_id}", "node_id": node_id, "observed_at": timestamp.isoformat(), "received_at": timestamp.isoformat(), "concentration_mg_l": max(0.0, float(simulation.concentration_mg_l.loc[:, node_id].iloc[position])), "pressure_m": 25.0, "quality": 1.0, "missing": False, "drift_flag": False, "frozen_flag": False}
+    rng = np.random.default_rng(seed + sample_index)
+    concentration = max(0.0, float(simulation.concentration_mg_l.loc[:, node_id].iloc[position]) + rng.normal(0.0, noise_std))
+    return {"sensor_id": f"sample-{sample_index}-{node_id}", "node_id": node_id, "observed_at": timestamp.isoformat(), "received_at": timestamp.isoformat(), "concentration_mg_l": concentration, "pressure_m": 25.0, "quality": 1.0, "missing": False, "drift_flag": False, "frozen_flag": False}
 
 
 def _invariants(*, analysis: Mapping[str, Any], generate_status: int | None, plans: Sequence[Mapping[str, Any]], approval_status: int | None, stale_approval_status: int | None) -> dict[str, bool | None]:
@@ -319,9 +364,13 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
         "run_id": hashlib.sha256(f"{condition.name}:{condition.repetition}".encode()).hexdigest()[:16],
         "study_baseline_commit": protocol["system_under_test_commit"],
         "runtime_commit": runtime_commit(repo_root),
+        "code_under_test_commit": runtime_commit(repo_root),
         # Retained for compatibility; it means the code that executed the row.
         "git_commit": runtime_commit(repo_root), "network_id": condition.network_id,
-        "network_sha256": _sha256(path), "topology_class": condition.topology_class,
+        # This is the structural identity used by the runtime's calibration and
+        # OOD decisions.  The upload-file digest is provenance, not topology
+        # identity, and must not be reported under this field.
+        "network_sha256": network_sha256(network), "topology_class": condition.topology_class,
         "random_seed": condition.seed, "source_node": scenario.manifest.incident.source_nodes[0],
         "node_count": len(network.node_name_list), "link_count": len(network.link_name_list),
         "sensor_count": len({item["node_id"] for item in observations}), "observation_count": len(observations),
@@ -367,11 +416,16 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
             baseline.update(_metric_fields(analysis, baseline["source_node"]))
             baseline.update({"classical_belief": analysis["classical_belief"], "neural_belief": analysis["neural_belief"], "fused_belief": analysis["fused_belief"], "fusion_trust": internal.fusion_diagnostics.classical_trust if internal.fusion_diagnostics else None, "disagreement_js": analysis["disagreement_js"], "calibrated": analysis["calibrated"], "ood_level": analysis["ood_level"], "ood_components": asdict(internal.ood_components), "evidence_sufficient": analysis["evidence_sufficient"], "planning_allowed": analysis["planning_allowed"], "control_action": analysis["control_action"], "suppression_reasons": list(internal.planning_suppression_reasons), "runtime_mode": analysis["runtime_mode"]})
             observed_nodes = {item["node_id"] for item in observations}
+            available_observations = list(observations)
             for sample_index in range(3):
                 if baseline["planning_allowed"]:
                     break
                 before_entropy = _entropy(analysis["fused_belief"])
                 before_candidates = len(analysis["candidate_nodes"])
+                before_ranked = sorted(
+                    analysis["fused_belief"],
+                    key=lambda node: (-analysis["fused_belief"][node], node),
+                )
                 sample_start = perf_counter()
                 recommendation = client.post(f"/api/incidents/{incident_id}/samples/recommend")
                 sampling_ms = (perf_counter() - sample_start) * 1000
@@ -386,7 +440,17 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
                     # would otherwise make the harness conceal the issue.
                     baseline["sample_rounds"].append({"round": sample_index, "status": "RECOMMENDED_PREVIOUSLY_OBSERVED", "recommended_node": recommendation_json["node_id"], "expected_information_gain": recommendation_json["expected_information_gain"], "sampling_ms": sampling_ms, "finding_id": "ROB-LIVE-01"})
                     break
-                observation = _sample_observation(recommendation_json["node_id"], scenario, randomized, origin, sample_index)
+                decision_time = max(
+                    (item["observed_at"] for item in available_observations), default=origin.isoformat()
+                )
+                decision_seconds = (datetime.fromisoformat(decision_time) - origin).total_seconds()
+                observation = _sample_observation(
+                    recommendation_json["node_id"], scenario, randomized, origin, sample_index,
+                    decision_time_seconds=decision_seconds,
+                    collection_delay_minutes=float(recommendation_json["expected_collection_delay_minutes"]),
+                    noise_std=0.05,
+                    seed=condition.seed,
+                )
                 reanalysis_start = perf_counter()
                 added = client.post(f"/api/incidents/{incident_id}/samples", json=observation)
                 reanalysis_ms = (perf_counter() - reanalysis_start) * 1000
@@ -394,8 +458,10 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
                     baseline["sample_rounds"].append({"round": sample_index, "status": "ADD_FAILED", "http_status": added.status_code, "sampling_ms": sampling_ms, "reanalysis_ms": reanalysis_ms})
                     break
                 observed_nodes.add(recommendation_json["node_id"])
+                available_observations.append(observation)
                 analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
-                baseline["sample_rounds"].append({"round": sample_index, "recommended_node": recommendation_json["node_id"], "expected_information_gain": recommendation_json["expected_information_gain"], "entropy_before": before_entropy, "entropy_after": _entropy(analysis["fused_belief"]), "candidate_size_before": before_candidates, "candidate_size_after": len(analysis["candidate_nodes"]), "sampling_ms": sampling_ms, "reanalysis_ms": reanalysis_ms, "planning_allowed_after": analysis["planning_allowed"], "control_action_after": analysis["control_action"]})
+                ranked_after = sorted(analysis["fused_belief"], key=lambda node: (-analysis["fused_belief"][node], node))
+                baseline["sample_rounds"].append({"round": sample_index, "recommended_node": recommendation_json["node_id"], "expected_information_gain": recommendation_json["expected_information_gain"], "expected_collection_delay_minutes": recommendation_json["expected_collection_delay_minutes"], "entropy_before": before_entropy, "entropy_after": _entropy(analysis["fused_belief"]), "candidate_size_before": before_candidates, "candidate_size_after": len(analysis["candidate_nodes"]), "true_source_rank_before": before_ranked.index(baseline["source_node"]) + 1 if baseline["source_node"] in before_ranked else None, "true_source_rank_after": ranked_after.index(baseline["source_node"]) + 1 if baseline["source_node"] in ranked_after else None, "sampling_ms": sampling_ms, "reanalysis_ms": reanalysis_ms, "planning_allowed_after": analysis["planning_allowed"], "control_action_after": analysis["control_action"]})
                 baseline["sampling_ms"] = (baseline["sampling_ms"] or 0.0) + sampling_ms
                 baseline["reanalysis_ms"] = (baseline["reanalysis_ms"] or 0.0) + reanalysis_ms
                 internal = _analysis_internal(app, incident_id)
@@ -460,7 +526,8 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
 def _identity_fields(repo_root: Path) -> dict[str, Any]:
     manifest = _json(repo_root / "reports/results/v4/architecture-freeze.json")
     factory = V4PipelineFactory(repo_root / "models/hydrocore-v4-release", project_root=repo_root)
-    return {"model_sha256": factory.model_hash, "calibration_sha256": manifest["calibration"]["artifact_hash"], "feature_schema_sha256": manifest["schema_hashes"]["feature_schema_hash"], "normalization_sha256": manifest["normalization"]["normalization_hash"], "signature_policy_sha256": manifest["fusion_and_signature_policy"]["signature_policy_hash"], "platform": platform.platform(), "python_version": platform.python_version()}
+    release_calibration = _json(repo_root / "models/hydrocore-v4-release/calibration-status.json")
+    return {"model_sha256": factory.model_hash, "calibration_sha256": release_calibration["calibration_artifact_hash"], "feature_schema_sha256": manifest["schema_hashes"]["feature_schema_hash"], "normalization_sha256": manifest["normalization"]["normalization_hash"], "signature_policy_sha256": manifest["fusion_and_signature_policy"]["signature_policy_hash"], "platform": platform.platform(), "python_version": platform.python_version()}
 
 
 def _finding_status(evidence: Mapping[str, Any] | None, finding_id: str) -> str:

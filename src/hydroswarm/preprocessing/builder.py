@@ -128,8 +128,10 @@ class HydraulicFeatureBuilder:
         arrival_residual: Mapping[str, float] | None = None,
         positive_consistency: Mapping[str, float] | None = None,
         negative_consistency: Mapping[str, float] | None = None,
-        window_steps: int = 12,
+        window_steps: int = 25,
     ) -> BuiltHydroBatch:
+        if window_steps < 1:
+            raise ValueError("window_steps must be positive")
         node_ids = tuple(str(item) for item in canonical_node_order(network.node_name_list))
         positions = {node: index for index, node in enumerate(node_ids)}
         reservoirs = set(network.reservoir_name_list)
@@ -149,7 +151,7 @@ class HydraulicFeatureBuilder:
             concentration = (
                 series.concentration_mg_l[-1] if series and series.concentration_mg_l[-1] is not None else 0.0
             )
-            health = series.health[-1] if series else 0.0
+            health = 0.0 if series is None or series.missing[-1] else series.health[-1]
             age = now - series.timestamps_seconds[-1] if series else now
             missing = float(series is None or series.missing[-1])
             node_type = 2.0 if node_id in reservoirs else 3.0 if node_id in tanks else 1.0
@@ -247,7 +249,8 @@ class HydraulicFeatureBuilder:
                     float(series.delayed[source_index]),
                 ]
                 quality[time_index, node_index] = [
-                    series.health[source_index], float(series.missing[source_index]),
+                    0.0 if series.missing[source_index] else series.health[source_index],
+                    float(series.missing[source_index]),
                     float(series.drift[source_index]), age / 86_400.0,
                 ]
         sample = GraphSample(

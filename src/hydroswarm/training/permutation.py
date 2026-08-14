@@ -34,9 +34,10 @@ NODE_INDEXED_INPUT_KEYS = (
     "classical_prior",
     "source_candidate_mask",
     "node_mask",
+    "sensor_mask",
 )
 #: Inputs indexed [time, nodes, ...] -- permuted along dim 1.
-TIME_NODE_INDEXED_INPUT_KEYS = ("temporal_features", "quality_features")
+TIME_NODE_INDEXED_INPUT_KEYS = ("temporal_features", "quality_features", "quality_mask")
 #: Targets indexed [nodes] -- permuted along dim 0. Derived from
 #: targets_v2.NODE_ARRAY_TARGETS (never listed separately by hand) --
 #: core-issues3.txt Phase 10.2: this module's own hand-maintained tuple

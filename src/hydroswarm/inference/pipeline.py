@@ -22,6 +22,8 @@ from hydroswarm.classical import (
     localize_with_signatures,
 )
 from hydroswarm.calibration import CalibrationArtifact, SplitConformalCalibrator
+from hydroswarm.calibration.conformal import classify_runtime_condition
+from hydroswarm.classical.signature_policy import governed_network_family
 from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.inference.fusion import (
     DYNAMIC_TRUST_FUSION_CONFIG,
@@ -704,6 +706,7 @@ class HybridInferencePipeline:
                 estimated,
                 sensor_series,
                 classical_prior=model_input_prior,
+                window_steps=25,
             ),
         )
         node_ids = built.node_ids
@@ -845,10 +848,19 @@ class HybridInferencePipeline:
                 calibrated = False
             else:
                 calibrated = True
+        calibration_source = "INAPPLICABLE"
+        calibration_group_identifier: str | None = None
         if calibrated and calibration is not None:
-            indices = SplitConformalCalibrator(calibration).candidate_set(
+            calibrator = SplitConformalCalibrator(calibration)
+            canonical_family = governed_network_family(topology_hash)
+            condition = classify_runtime_condition(sensor_series)
+            calibration_source, calibration_group_identifier, _scores = calibrator.selection(
+                network_id=canonical_family, condition=condition
+            )
+            indices = calibrator.candidate_set(
                 fused_vector,
-                network_id=str(getattr(network, "name", "unknown")),
+                network_id=canonical_family,
+                condition=condition,
                 ood_level=ood_level.value,
             )
             conformal_nodes = tuple(node_ids[index] for index in indices)
@@ -921,6 +933,11 @@ class HybridInferencePipeline:
                     hypothesis_weights,
                     constraints=constraints,
                     neural_residual_deltas=neural_deltas,
+                    target_sample_time_seconds=max(
+                        timestamp
+                        for series in sensor_series
+                        for timestamp in series.timestamps_seconds
+                    ),
                 ),
             )
         else:
@@ -1080,6 +1097,8 @@ class HybridInferencePipeline:
             latencies_ms=latencies,
             provenance_hashes=provenance,
             evidence_hash=evidence_hash,
+            calibration_source=calibration_source,
+            calibration_group_identifier=calibration_group_identifier,
         )
         self._cache[cache_key] = result
         return result

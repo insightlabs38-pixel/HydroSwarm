@@ -1,0 +1,31 @@
+campaign,metric,value,n,source,code_under_test_commit
+sampling:EIG,actionable_initial,0.35,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,actionable_within_1,0.375,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,actionable_within_2,0.375,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,actionable_within_3,0.375,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,final_top1,0.8,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,final_top3,1.0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_candidate_contraction,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_rank_improvement,1,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_realized_entropy_reduction,0.957196790175124,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_samples_to_actionability,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,n,40,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,never_resolved,0.625,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_initial,0.35,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_within_1,0.45,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_within_2,0.45,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_within_3,0.45,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,final_top1,0.825,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,final_top3,1.0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_candidate_contraction,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_rank_improvement,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_realized_entropy_reduction,0.9571561362536282,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_samples_to_actionability,0.0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,n,40,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,never_resolved,0.55,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,top1,0.9087301587301587,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,top3,0.9722222222222222,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,mrr,0.9472222222222222,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,coverage,0.8849206349206349,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,candidate_size,0.9523809523809523,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,entropy,0.1183908460394767,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5

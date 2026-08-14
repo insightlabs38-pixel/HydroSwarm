@@ -124,3 +124,5 @@ class IncidentAnalysisResult:
     latencies_ms: Mapping[str, float]
     provenance_hashes: Mapping[str, str]
     evidence_hash: str
+    calibration_source: str = "INAPPLICABLE"
+    calibration_group_identifier: str | None = None

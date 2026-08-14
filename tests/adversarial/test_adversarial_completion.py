@@ -519,7 +519,7 @@ def test_adv28_parity_preserves_governed_schema_model_and_calibration_identities
         "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7"
     )
     assert hashlib.sha256((release / "calibration.json").read_bytes()).hexdigest() == (
-        "953d87bcb0784594db75443d31f005dd180847a78a9ec024d95f79b66a43c1c7"
+        "cfde52de72ef89c467fc59fbdbc93f5633acae52f36c67a8921f22165d494843"
     )
 
 

@@ -1,6 +1,6 @@
 {
   "alpha": 0.1,
-  "calibration_artifact_hash": "829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa",
+  "calibration_artifact_hash": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
   "coverage": 0.9143258426966292,
   "fusion_config_hash": "fuse_source_probabilities-v1",
   "schema_version": 1,

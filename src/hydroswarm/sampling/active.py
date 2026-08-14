@@ -60,9 +60,17 @@ def rank_sample_locations(
     noise_scale_mg_l: float = 0.05,
     detection_threshold_mg_l: float = 0.001,
     neural_residual_deltas: Mapping[str, float] | None = None,
+    target_sample_time_seconds: float | None = None,
     top_k: int = 20,
 ) -> ActiveSamplingResult:
-    """Rank locations by expected discrimination, detectability, delay, cost, and redundancy."""
+    """Rank the measurement expected at a causal collection time.
+
+    ``target_sample_time_seconds`` is the current decision time; when passed
+    by production each candidate is evaluated at that time plus its configured
+    collection delay, not at the maximum of a future signature trajectory.
+    ``None`` preserves the legacy offline-analysis behavior for callers that
+    do not model an acquisition time; production never uses that fallback.
+    """
     constraints = constraints or SamplingConstraints()
     if noise_scale_mg_l <= 0 or top_k <= 0:
         raise ValueError("noise scale and top_k must be positive")
@@ -83,7 +91,13 @@ def rank_sample_locations(
         if node not in possible or node in constraints.already_sampled:
             continue
         traces = values[:, :, sensor_index]
-        prediction = traces.max(axis=1)
+        delay = float(constraints.collection_time_minutes.get(node, 30.0))
+        if target_sample_time_seconds is None:
+            prediction = traces.max(axis=1)
+        else:
+            acquisition_time = target_sample_time_seconds + delay * 60.0
+            sample_index = int(np.argmin(np.abs(np.asarray(artifact.sample_times_seconds) - acquisition_time)))
+            prediction = traces[:, sample_index]
         prediction_vectors[node] = prediction
         mean = float(np.dot(weights, prediction))
         variance = float(np.dot(weights, (prediction - mean) ** 2))
@@ -100,7 +114,6 @@ def rank_sample_locations(
             if len(top_hypotheses) > 1 else 0.0
         )
         detection = float(weights[prediction >= detection_threshold_mg_l].sum())
-        delay = float(constraints.collection_time_minutes.get(node, 30.0))
         cost = max(0.0, float(constraints.operational_cost.get(node, 1.0)))
         accessible = constraints.accessible.get(node, True) and delay <= constraints.maximum_delay_minutes
         candidates.append(SampleCandidate(

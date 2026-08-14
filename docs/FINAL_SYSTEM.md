@@ -15,7 +15,7 @@ page is authoritative -- report the discrepancy rather than trusting the other d
 | Normalization hash | `e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114` |
 | Feature schema hash | `7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09` |
 | Signature policy hash | `06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811` |
-| Calibration SHA-256 | `829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa` |
+| Calibration SHA-256 | `cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1` |
 | Calibration status | `FITTED`, alpha=0.1, held-out coverage 91.4% |
 | Freeze declaration | [architecture-freeze-declaration.md](../reports/results/v4/architecture-freeze-declaration.md) |
 | Freeze manifest | [architecture-freeze.json](../reports/results/v4/architecture-freeze.json) |

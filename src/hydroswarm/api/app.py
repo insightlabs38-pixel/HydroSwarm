@@ -292,6 +292,11 @@ def create_app(
         ``SensorObservation`` and the operator-facing incident view.
         """
 
+        if observation.missing:
+            # HydroCore-v4's existing quality channel represents available
+            # measurement health.  A missing reading is unavailable evidence,
+            # never a healthy observation with an absent value.
+            return 0.0
         return min(observation.quality, 0.25) if observation.frozen_flag else observation.quality
 
     def _require_planning_authority(record: IncidentRuntime) -> IncidentAnalysisResult:
@@ -356,7 +361,14 @@ def create_app(
 
     def sensor_series(record: IncidentRuntime) -> tuple[SensorSeries, ...]:
         grouped: dict[str, list[SensorObservation]] = defaultdict(list)
+        analysis_time = utc_now()
         for item in record.state.observations:
+            # Retain a prematurely received record for audit/persistence, but
+            # it is not causal evidence until its reported receipt time.  This
+            # also lets a later reanalysis include it without fabricating a
+            # history entry or deleting operator provenance.
+            if item.received_at > analysis_time:
+                continue
             grouped[item.node_id].append(item)
         origin = record.create.detected_at
         result: list[SensorSeries] = []
@@ -392,6 +404,8 @@ def create_app(
                 fused_belief=dict(item.fused_belief),
                 candidate_nodes=item.conformal_candidate_nodes,
                 calibrated=item.calibrated,
+                calibration_source=item.calibration_source,
+                calibration_group_identifier=item.calibration_group_identifier,
                 ood_level=item.ood_level.value,
                 disagreement_js=item.fusion_diagnostics.disagreement_js if item.fusion_diagnostics else None,
                 evidence_sufficient=item.evidence_sufficient,
@@ -498,6 +512,16 @@ def create_app(
                 "runtime_mode": record.runtime_mode,
                 "fallback_reasons": list(record.fallback_reasons),
                 "candidate_nodes": list(record.state.candidates.node_ids),
+                "calibration_source": (
+                    record.analysis.calibration_source
+                    if isinstance(record.analysis, IncidentAnalysisResult)
+                    else "INAPPLICABLE"
+                ),
+                "calibration_group_identifier": (
+                    record.analysis.calibration_group_identifier
+                    if isinstance(record.analysis, IncidentAnalysisResult)
+                    else None
+                ),
             },
         )
         runtime().persist(record)
@@ -881,6 +905,7 @@ def create_app(
             recommendation = SampleRecommendation(
                 node_id=sampled.recommended_node,
                 expected_information_gain=selected.expected_information_gain_bits,
+                expected_collection_delay_minutes=selected.collection_time_minutes,
                 alternatives=tuple(item.node_id for item in sampled.ranked[1:3]),
                 runtime_mode=record.runtime_mode,
                 fallback_reasons=record.fallback_reasons,

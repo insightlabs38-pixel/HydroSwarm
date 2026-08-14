@@ -2,7 +2,7 @@
   "action_template_schema_hash": "3a447a74bd2254c109364fcf5434b06bd49ba9d7ed537dac91098b1e4e98116d",
   "architecture_version": "hydrocore-v4",
   "calibration_alpha": 0.1,
-  "calibration_artifact_hash": "829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa",
+  "calibration_artifact_hash": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
   "calibration_coverage": 0.9143258426966292,
   "calibration_status": "FITTED",
   "checkpoint_identity_fingerprint": "a94069adba25230f58f24f57901b855fab3a702aabd5e30cf0bc105e002e90a1",
@@ -10,7 +10,7 @@
   "edge_normalization_sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
   "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
   "fusion_policy_hash": "fuse_source_probabilities-v1",
-  "generated_at": "2026-08-08T23:16:45.984304+00:00",
+  "generated_at": "2026-08-14T01:53:02.183366+00:00",
   "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
   "next_step_schema_hash": "d808002c32920183bd33980a012c45e16e499dcf18d4ae13066c8bc809fcb682",
   "node_normalization_sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
@@ -43,7 +43,7 @@
     "8b47091e93388e5d086e7c3b31679c617ce1f23ed48af5cefa86fe08c54714fb",
     "f9677550ded024ecae0e6e301245da904cd447e404a07e41fcb8d9786e8d5365"
   ],
-  "source_git_sha": "c5d2dd563746105de05ec355e675e7d38ccefdeb",
+  "source_git_sha": "dec954c7dbc3408469d1dbc412ad4be83d310585",
   "supported_outputs": [
     "candidate_reduction",
     "containment_time_proxy",
