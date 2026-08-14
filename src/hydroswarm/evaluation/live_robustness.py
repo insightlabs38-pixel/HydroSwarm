@@ -45,7 +45,7 @@ from hydroswarm.simulation.wrapper import wntr
 
 LOCKED_TOKENS = ("locked_final_test", "locked_topology_test")
 REQUIRED_ROW_FIELDS = (
-    "run_id", "git_commit", "study_baseline_commit", "runtime_commit", "model_sha256", "calibration_sha256", "feature_schema_sha256",
+    "run_id", "git_commit", "study_baseline_commit", "runtime_commit", "code_under_test_commit", "model_sha256", "calibration_sha256", "feature_schema_sha256",
     "normalization_sha256", "signature_policy_sha256", "network_id", "network_sha256",
     "topology_class", "random_seed", "source_node", "node_count", "link_count",
     "sensor_count", "observation_count", "perturbation_type", "perturbation_level",
@@ -364,6 +364,7 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
         "run_id": hashlib.sha256(f"{condition.name}:{condition.repetition}".encode()).hexdigest()[:16],
         "study_baseline_commit": protocol["system_under_test_commit"],
         "runtime_commit": runtime_commit(repo_root),
+        "code_under_test_commit": runtime_commit(repo_root),
         # Retained for compatibility; it means the code that executed the row.
         "git_commit": runtime_commit(repo_root), "network_id": condition.network_id,
         # This is the structural identity used by the runtime's calibration and
