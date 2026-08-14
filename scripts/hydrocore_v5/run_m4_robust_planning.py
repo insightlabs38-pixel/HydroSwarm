@@ -54,6 +54,29 @@ per-bucket incident cap, both fixed before any result was inspected, to
 keep exact-WNTR verification cost practical (experiments.txt 4.3's
 "computational cost remains practical").
 
+Milestone-4 correction (this revision): the ground-truth false-safe check
+is now UNCONDITIONAL -- every eligible incident where control or robust
+selects a plan is exact-WNTR verified against the real held-out
+IncidentSourceProfile regardless of whether the true source falls inside
+the conformal candidate set. The prior revision gated this check on
+`true_node in candidate_probs`, so candidate-set coverage MISSES were
+never actually checked and silently defaulted to false_safe=False --
+indistinguishable in the report from "checked and found safe". See
+`_false_safe_breakdown` for the unconditional / conditional (coverage-hit)
+/ coverage-miss false-safe counts and rates this now reports for both
+policies.
+
+SCOPE LIMITATION: ROBUSTLY_VERIFIED in this milestone means exact
+verification across every plausible SOURCE-LOCATION candidate in the
+conformal region, holding the remaining modeled incident-profile
+assumptions (start time, duration, injection strength -- all taken from
+`IncidentSourceProfile`'s governed defaults, per node, exactly like
+production's own `_runtime_evaluation_context`) fixed. It is not a claim
+of robustness over all uncertain contamination parameters: the
+`WeightedSourceHypothesis` set varies candidate node identity only, never
+jointly samples start_minute/duration_minutes/relative_strength. This
+milestone does not model those additional uncertainties.
+
 Writes:
   reports/evaluation/hydrocore-v5/m4-robust-planning.json
   reports/evaluation/hydrocore-v5/m4-summary.md
@@ -125,6 +148,16 @@ BUCKET_DEPTH: dict[str, int] = {"EARLY": 2, "MID": 4, "MATURE": 12}
 MAX_INCIDENTS_PER_BUCKET = 40
 MAXIMUM_EXACT_SIMULATIONS = 3  # matches production's runtime prescreen budget
 DEFAULT_CONTAMINATION_THRESHOLD_MG_L: float = IncidentCreate.model_fields["contamination_threshold_mg_l"].default
+
+SCOPE_LIMITATION = (
+    "ROBUSTLY_VERIFIED in Milestone 4 means exact verification across every plausible source-location candidate "
+    "in the conformal region, holding the remaining modeled incident-profile assumptions fixed. It is not a claim "
+    "of robustness over all uncertain contamination parameters. The WeightedSourceHypothesis set varies candidate "
+    "source node identity only; start_minute, duration_minutes, and relative_strength are held at "
+    "IncidentSourceProfile's governed defaults for every hypothesis (matching production's own "
+    "_runtime_evaluation_context), never jointly sampled or varied across the hypothesis set. This milestone does "
+    "not model uncertainty in source timing, duration, or injection strength."
+)
 
 
 def _planning_context(incident_id, network, graph, probable_nodes, sampled_nodes) -> PlanGenerationContext:
@@ -254,19 +287,31 @@ def _evaluate_incident(
     robust_runs_after = simulator.exact_runs
     elapsed_seconds = time.perf_counter() - started
 
-    control_false_safe = False
-    robust_false_safe = False
-    if true_node in candidate_probs:
-        true_profile = incident_truth_to_source_profile(scenario.manifest.incident, is_contamination=True)
-        truth_eval_context = PlanEvaluationContext(
-            contamination_threshold_mg_l=DEFAULT_CONTAMINATION_THRESHOLD_MG_L, source_profile=true_profile
-        )
-        if control_selected is not None:
-            truth_check = verifier.verify(control_selected[0].plan, truth_eval_context)
-            control_false_safe = truth_check.decision != PlanDecision.VERIFIED
-        if robust_selected is not None:
-            truth_check = verifier.verify(robust_selected[0].plan, truth_eval_context)
-            robust_false_safe = truth_check.decision != PlanDecision.VERIFIED
+    #: Unconditional ground-truth safety audit (Milestone-4 correction):
+    #: EVERY eligible incident where control or robust selects a plan gets
+    #: exact-WNTR verified against the real held-out IncidentSourceProfile,
+    #: regardless of whether the true source is inside the conformal
+    #: candidate set. Previously this check was gated on
+    #: `true_node in candidate_probs`, so coverage-miss incidents were never
+    #: actually tested and silently defaulted to false_safe=False --
+    #: indistinguishable from "checked and safe". `false_safe` is now None
+    #: (not applicable -- nothing was selected to check) only when no plan
+    #: was selected at all; whenever a plan IS selected it is always
+    #: checked, so an untested-but-selected incident can never occur.
+    true_profile = incident_truth_to_source_profile(scenario.manifest.incident, is_contamination=True)
+    truth_eval_context = PlanEvaluationContext(
+        contamination_threshold_mg_l=DEFAULT_CONTAMINATION_THRESHOLD_MG_L, source_profile=true_profile
+    )
+    control_truth_checked = control_selected is not None
+    control_false_safe = None
+    if control_truth_checked:
+        truth_check = verifier.verify(control_selected[0].plan, truth_eval_context)
+        control_false_safe = truth_check.decision != PlanDecision.VERIFIED
+    robust_truth_checked = robust_selected is not None
+    robust_false_safe = None
+    if robust_truth_checked:
+        truth_check = verifier.verify(robust_selected[0].plan, truth_eval_context)
+        robust_false_safe = truth_check.decision != PlanDecision.VERIFIED
 
     result.update({
         "eligible": True,
@@ -283,6 +328,7 @@ def _evaluate_incident(
             "verified": control_selected is not None,
             "selected_template": control_selected[0].template if control_selected else None,
             "worst_case": _worst_metrics(control_selected[1]) if control_selected else None,
+            "truth_checked": control_truth_checked,
             "false_safe": control_false_safe,
         },
         "robust": {
@@ -291,10 +337,38 @@ def _evaluate_incident(
             "fail_closed": robust_selected is None,
             "selected_template": robust_selected[0].template if robust_selected else None,
             "worst_case": _worst_metrics(robust_selected[1]) if robust_selected else None,
+            "truth_checked": robust_truth_checked,
             "false_safe": robust_false_safe,
         },
     })
     return result
+
+
+def _false_safe_breakdown(selected: list[dict[str, Any]], *, policy: str) -> dict[str, Any]:
+    """Unconditional/conditional/coverage-miss false-safe counts and rates
+    for one policy ("control" or "robust"), over the incidents where that
+    policy actually selected a plan (and therefore actually ran the
+    ground-truth check -- see _evaluate_incident's truth_checked field)."""
+
+    on_hit = [r for r in selected if r["true_source_in_candidate_set"]]
+    on_miss = [r for r in selected if not r["true_source_in_candidate_set"]]
+    false_safe_all = [r for r in selected if r[policy]["false_safe"]]
+    false_safe_hit = [r for r in on_hit if r[policy]["false_safe"]]
+    false_safe_miss = [r for r in on_miss if r[policy]["false_safe"]]
+    assert all(r[policy]["truth_checked"] for r in selected), (
+        f"{policy}: every selected-plan incident must have been ground-truth checked"
+    )
+    return {
+        "selected_count": len(selected),
+        "selected_on_coverage_hit_count": len(on_hit),
+        "selected_on_coverage_miss_count": len(on_miss),
+        "false_safe_count_unconditional": len(false_safe_all),
+        "false_safe_rate_unconditional": (len(false_safe_all) / len(selected)) if selected else None,
+        "false_safe_count_conditional_coverage_hit": len(false_safe_hit),
+        "false_safe_rate_conditional_coverage_hit": (len(false_safe_hit) / len(on_hit)) if on_hit else None,
+        "false_safe_count_coverage_miss": len(false_safe_miss),
+        "false_safe_rate_coverage_miss": (len(false_safe_miss) / len(on_miss)) if on_miss else None,
+    }
 
 
 def _bucket_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
@@ -303,9 +377,8 @@ def _bucket_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     exceeds_k = [r for r in records if r.get("exceeds_k")]
     control_verified = [r for r in eligible if r["control"]["verified"]]
     robust_verified = [r for r in eligible if r["robust"]["robustly_verified"]]
-    control_false_safe = [r for r in control_verified if r["control"]["false_safe"]]
-    robust_false_safe = [r for r in robust_verified if r["robust"]["false_safe"]]
     coverage_applicable = [r for r in eligible if r["true_source_in_candidate_set"]]
+    coverage_miss = [r for r in eligible if not r["true_source_in_candidate_set"]]
     #: The only incidents where control (top-1 only) and robust (whole
     #: region) COULD structurally disagree -- at candidate_set_size == 1
     #: robust degenerates to exactly one hypothesis, identical to control by
@@ -319,12 +392,17 @@ def _bucket_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
     def _mean(values: list[float]) -> float | None:
         return statistics.fmean(values) if values else None
 
+    control_false_safe = _false_safe_breakdown(control_verified, policy="control")
+    robust_false_safe = _false_safe_breakdown(robust_verified, policy="robust")
+
     return {
         "n": n,
         "planning_eligible_rate": len(eligible) / n if n else 0.0,
         "exceeds_k_rate": len(exceeds_k) / n if n else 0.0,
         "mean_candidate_set_size": _mean([r["candidate_set_size"] for r in records]),
         "true_source_coverage_rate_eligible": (len(coverage_applicable) / len(eligible)) if eligible else None,
+        "candidate_coverage_hit_count": len(coverage_applicable),
+        "candidate_coverage_miss_count": len(coverage_miss),
         "genuinely_multi_candidate_count": len(genuinely_multi_candidate),
         "decision_disagreement_count_multi_candidate": len(decisions_disagree),
         "decision_disagreement_rate_multi_candidate": (
@@ -335,14 +413,20 @@ def _bucket_summary(records: list[dict[str, Any]]) -> dict[str, Any]:
         "robust_fail_closed_rate_of_eligible": (
             sum(1 for r in eligible if r["robust"]["fail_closed"]) / len(eligible)
         ) if eligible else None,
-        "control_false_safe_count": len(control_false_safe),
-        "control_false_safe_rate_of_control_verified": (
-            len(control_false_safe) / len(control_verified)
-        ) if control_verified else None,
-        "robust_false_safe_count": len(robust_false_safe),
-        "robust_false_safe_rate_of_robust_verified": (
-            len(robust_false_safe) / len(robust_verified)
-        ) if robust_verified else None,
+        #: Unconditional ground-truth safety audit (Milestone-4 correction):
+        #: every incident counted here where that policy selected a plan was
+        #: ACTUALLY exact-WNTR checked against the real held-out source,
+        #: whether or not that source was inside the conformal candidate
+        #: set -- see _evaluate_incident / _false_safe_breakdown.
+        "control_false_safe": control_false_safe,
+        "robust_false_safe": robust_false_safe,
+        # Back-compat top-level aliases for the unconditional counts (now
+        # genuinely unconditional, unlike the pre-correction fields of the
+        # same name).
+        "control_false_safe_count": control_false_safe["false_safe_count_unconditional"],
+        "control_false_safe_rate_of_control_verified": control_false_safe["false_safe_rate_unconditional"],
+        "robust_false_safe_count": robust_false_safe["false_safe_count_unconditional"],
+        "robust_false_safe_rate_of_robust_verified": robust_false_safe["false_safe_rate_unconditional"],
         "mean_worst_case_service_availability_control": _mean(
             [r["control"]["worst_case"]["service_availability"] for r in control_verified if r["control"]["worst_case"]]
         ),
@@ -424,9 +508,28 @@ def main() -> int:
     bucket_summaries = {bucket: _bucket_summary(items) for bucket, items in per_bucket_incidents.items()}
     overall_summary = _bucket_summary(all_incidents)
 
+    #: Unconditional: overall_summary["robust_false_safe_count"] is now the
+    #: `false_safe_count_unconditional` alias, computed over EVERY incident
+    #: where robust actually selected a plan (coverage hits and misses
+    #: alike) -- see the Milestone-4 correction note in the module
+    #: docstring and _false_safe_breakdown.
     zero_robust_invariant_violations = overall_summary["robust_false_safe_count"] == 0
     control_has_violations = overall_summary["control_false_safe_count"] > 0
     material_actionability_gain = False  # K == production's existing maximum_planning_candidates; see module docstring.
+
+    #: Preserve (never drop) the exact incidents behind any robust
+    #: false-safe finding, for precise failure-mode classification, per the
+    #: Milestone-4 correction's decision rule: "if robust false-safe
+    #: incidents appear, preserve them, classify the failure mode
+    #: precisely, and STOP."
+    robust_false_safe_incidents = [
+        item for item in all_incidents
+        if item.get("eligible") and item["robust"]["truth_checked"] and item["robust"]["false_safe"]
+    ]
+    control_false_safe_incidents = [
+        item for item in all_incidents
+        if item.get("eligible") and item["control"]["truth_checked"] and item["control"]["false_safe"]
+    ]
 
     if zero_robust_invariant_violations and material_actionability_gain:
         exit_decision = "PROMOTE_ROBUST_PLANNING"
@@ -451,11 +554,22 @@ def main() -> int:
         "bucket_depths": BUCKET_DEPTH,
         "max_incidents_per_bucket": MAX_INCIDENTS_PER_BUCKET,
         "maximum_exact_simulations_per_arm": MAXIMUM_EXACT_SIMULATIONS,
+        "scope_limitation": SCOPE_LIMITATION,
+        "ground_truth_safety_audit": (
+            "Unconditional: every eligible incident where control or robust selected a plan is exact-WNTR "
+            "verified against the real held-out IncidentSourceProfile, regardless of candidate-set coverage. "
+            "See per_bucket/overall control_false_safe / robust_false_safe breakdowns "
+            "(false_safe_count_unconditional, false_safe_count_conditional_coverage_hit, "
+            "false_safe_count_coverage_miss) and incidents[*].control.truth_checked / "
+            "incidents[*].robust.truth_checked (always True whenever that policy selected a plan)."
+        ),
         "per_bucket": bucket_summaries,
         "overall": overall_summary,
         "incidents": all_incidents,
         "zero_robust_authority_invariant_violations": zero_robust_invariant_violations,
         "control_has_authority_invariant_violations": control_has_violations,
+        "robust_false_safe_incidents": robust_false_safe_incidents,
+        "control_false_safe_incidents": control_false_safe_incidents,
         "material_actionability_gain": material_actionability_gain,
         "exit_decision": exit_decision,
         "locked_test_opened_after": locked_test_opened(ROOT),
@@ -472,19 +586,48 @@ def main() -> int:
         "(hydroswarm.simulation.wrapper.MAXIMUM_EVALUATION_HYPOTHESES -- the existing hard ceiling, "
         "equal to production's maximum_planning_candidates default; never relaxed).",
         "",
+        "## Scope limitation",
+        "",
+        SCOPE_LIMITATION,
+        "",
+        "## Ground-truth safety audit methodology (Milestone-4 correction)",
+        "",
+        "Every eligible incident where control or robust selected a plan is exact-WNTR verified against the real "
+        "held-out `IncidentSourceProfile`, unconditionally -- including incidents where the true source falls "
+        "OUTSIDE the conformal candidate set (a calibration-coverage miss). The prior revision only ran this check "
+        "when the true source was inside the candidate set, so coverage misses were silently reported as "
+        "false_safe=False without ever being tested. That gate has been removed.",
+        "",
         "## Per-bucket results (development_holdout, one representative depth/bucket, "
         f"n<={MAX_INCIDENTS_PER_BUCKET}/bucket)",
         "",
-        "| bucket | depth | n | eligible | exceeds-K | control verified | robust verified | "
-        "control false-safe | robust false-safe |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "| bucket | depth | n | eligible | exceeds-K | coverage hit | coverage miss | control verified | "
+        "robust verified | control false-safe (unconditional) | robust false-safe (unconditional) |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for bucket, depth in BUCKET_DEPTH.items():
         s = bucket_summaries[bucket]
         lines.append(
             f"| {bucket} | {depth} | {s['n']} | {s['planning_eligible_rate']:.2f} | {s['exceeds_k_rate']:.2f} | "
+            f"{s['candidate_coverage_hit_count']} | {s['candidate_coverage_miss_count']} | "
             f"{(s['control_verified_rate_of_eligible'] or 0):.2f} | {(s['robust_verified_rate_of_eligible'] or 0):.2f} | "
             f"{s['control_false_safe_count']} | {s['robust_false_safe_count']} |"
+        )
+    lines += [
+        "",
+        "## False-safe breakdown by policy (unconditional / conditional-on-coverage-hit / coverage-miss-only), overall",
+        "",
+        "| policy | selected | selected on hit | selected on miss | false-safe (unconditional) | rate | "
+        "false-safe (coverage hit) | rate | false-safe (coverage miss) | rate |",
+        "|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for policy_name, fs in (("control", overall_summary["control_false_safe"]), ("robust", overall_summary["robust_false_safe"])):
+        lines.append(
+            f"| {policy_name} | {fs['selected_count']} | {fs['selected_on_coverage_hit_count']} | "
+            f"{fs['selected_on_coverage_miss_count']} | {fs['false_safe_count_unconditional']} | "
+            f"{fs['false_safe_rate_unconditional']} | {fs['false_safe_count_conditional_coverage_hit']} | "
+            f"{fs['false_safe_rate_conditional_coverage_hit']} | {fs['false_safe_count_coverage_miss']} | "
+            f"{fs['false_safe_rate_coverage_miss']} |"
         )
     lines += [
         "",
@@ -493,6 +636,10 @@ def main() -> int:
         f"- Planning eligible (region size 1-{K_MAX_CANDIDATES}): {overall_summary['planning_eligible_rate']:.3f}",
         f"- Region exceeds K (not reachable without a future architecture decision): "
         f"{overall_summary['exceeds_k_rate']:.3f} -- fails closed under both policies, no actionability claimed.",
+        f"- Candidate-set coverage: {overall_summary['candidate_coverage_hit_count']} hit / "
+        f"{overall_summary['candidate_coverage_miss_count']} miss (true source outside the conformal candidate "
+        f"set) among eligible incidents -- coverage misses are now included in the unconditional false-safe audit "
+        f"below, not skipped.",
         f"- Control (naive single top-1-hypothesis) verified rate of eligible: "
         f"{(overall_summary['control_verified_rate_of_eligible'] or 0):.3f}",
         f"- Robust (whole-region multi-hypothesis) verified rate of eligible: "
@@ -529,8 +676,40 @@ def main() -> int:
         "could not and does not claim a reachable-incident actionability increase (see module docstring for why, "
         "and the exceeds-K rate above for how much traffic a future K-relaxation would need to address).",
         "",
-        f"**Exit decision: {exit_decision}**",
     ]
+    if robust_false_safe_incidents:
+        lines += [
+            "## ROBUST FALSE-SAFE INCIDENTS (preserved for failure-mode classification)",
+            "",
+            "The robust (whole-region) policy selected a plan as ROBUSTLY_VERIFIED that the exact-WNTR check "
+            "against the incident's real held-out source found unsafe. Full per-incident records below; the full "
+            "detail (candidate set, worst-case metrics, selected template) is also in "
+            "`robust_false_safe_incidents` in the JSON artifact.",
+            "",
+        ]
+        for item in robust_false_safe_incidents:
+            lines.append(
+                f"- scenario `{item['scenario_id']}` bucket={item['bucket']} depth={item['depth']} "
+                f"candidate_set_size={item['candidate_set_size']} "
+                f"true_source_in_candidate_set={item['true_source_in_candidate_set']} "
+                f"selected_template={item['robust']['selected_template']} "
+                f"worst_case={item['robust']['worst_case']}"
+            )
+        lines.append("")
+    if control_false_safe_incidents:
+        lines += [
+            "## Control false-safe incidents (naive single-hypothesis verification, for reference)",
+            "",
+        ]
+        for item in control_false_safe_incidents:
+            lines.append(
+                f"- scenario `{item['scenario_id']}` bucket={item['bucket']} depth={item['depth']} "
+                f"candidate_set_size={item['candidate_set_size']} "
+                f"true_source_in_candidate_set={item['true_source_in_candidate_set']} "
+                f"selected_template={item['control']['selected_template']}"
+            )
+        lines.append("")
+    lines.append(f"**Exit decision: {exit_decision}**")
     OUTPUT_SUMMARY.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps({"exit_decision": exit_decision, "overall": overall_summary}, indent=2, default=str))
     return 0
