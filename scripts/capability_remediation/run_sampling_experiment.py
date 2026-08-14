@@ -157,6 +157,11 @@ def _run_strategy(
     evidence = list(initial)
     result = pipeline.analyze(uuid.uuid4(), network, evidence, sample_budget_remaining=MAX_SAMPLES)
     states = [_state(result, truth, sample_budget_remaining=MAX_SAMPLES, threshold=pipeline.evidence_threshold)]
+    if not states[0]["calibrated"] or states[0]["ood_level"] != "NORMAL":
+        raise ValueError(
+            "final supported-network sampling campaign requires canonical calibration and NORMAL OOD; "
+            f"got calibrated={states[0]['calibrated']} ood={states[0]['ood_level']}"
+        )
     rounds: list[dict[str, Any]] = []
     stop_reason: str | None = None
     for sample_index in range(MAX_SAMPLES):
@@ -314,7 +319,15 @@ def main() -> int:
     base, generator, rows = wntr.network.WaterNetworkModel(str(path)), WNTRScenarioGenerator(), []
     factory = V4PipelineFactory(ROOT / "models/hydrocore-v4-release", project_root=ROOT)
     for seed in SEEDS:
-        scenario, network = generator.generate_with_network(base, ScenarioGenerationConfig(seed=seed, network_id="golden-reference", network_family="golden-reference", split=DatasetSplit.DEVELOPMENT_HOLDOUT, stage=CurriculumStage.OPERATIONAL, sensor_count=4, sensor_noise_std=NOISE_STD))
+        scenario, network = generator.generate_with_network(base, ScenarioGenerationConfig(
+            seed=seed, network_id="golden-reference", network_family="golden-reference",
+            split=DatasetSplit.DEVELOPMENT_HOLDOUT, stage=CurriculumStage.OPERATIONAL,
+            sensor_count=4, sensor_noise_std=0.0, demand_regimes=(1.0,),
+            roughness_variation_fraction=0.0, tank_level_variation_fraction=0.0,
+            strength_bins=(1.0,), start_time_bins_min=(0,), pipe_outage_probability=0.0,
+            missing_probability=0.0, frozen_probability=0.0,
+            communication_outage_probability=0.0,
+        ))
         all_series = build_sensor_series(scenario, build_feature_context(network))
         initial = [SensorSeries(node_id=item.node_id, timestamps_seconds=item.timestamps_seconds[:INITIAL_STEPS], concentration_mg_l=item.concentration_mg_l[:INITIAL_STEPS], pressure_m=item.pressure_m[:INITIAL_STEPS], health=item.health[:INITIAL_STEPS], missing=item.missing[:INITIAL_STEPS], drift=item.drift[:INITIAL_STEPS], delayed=item.delayed[:INITIAL_STEPS], frozen=item.frozen[:INITIAL_STEPS]) for item in all_series[:2]]
         truth = scenario.manifest.incident.source_nodes[0]
