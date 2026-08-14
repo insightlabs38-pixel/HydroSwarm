@@ -1,0 +1,98 @@
+{
+  "causal_prefix_depths": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "corpus_regeneration_note": "Fresh host-native generation, not a replay of the historical committed cycle-b2 corpus: replaying scripts/generate_cycle_b_corpus.py's own _generate_topology_scenarios exactly reproduced 0/3000 golden-reference train scenarios' scenario_id/sensor_nodes/source_nodes on this host (cross-environment WNTR/numpy RNG divergence, consistent with but more severe than the cross-architecture non-reproducibility already documented in scripts/restore_cycle_b2_train_scenario_cache.py). This corpus therefore does not share scenario_ids with cycle-b2/joint-v4 and is not used to compare against the frozen v4 baseline curve directly -- only the causal-prefix ARMS trained on it are compared to each other (Milestone 1's actual scientific question).",
+  "event_scope": "CONTAMINATION only (event_presence=True for every scenario).",
+  "locked_test_opened_after": false,
+  "network_family": "golden-reference",
+  "prefix_causality_spotcheck": {
+    "all_pass": true,
+    "full_history_timesteps": 25,
+    "per_depth": {
+      "1": {
+        "actual_timesteps": 1,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 1
+      },
+      "12": {
+        "actual_timesteps": 12,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 12
+      },
+      "2": {
+        "actual_timesteps": 2,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 2
+      },
+      "25": {
+        "actual_timesteps": 25,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 25
+      },
+      "3": {
+        "actual_timesteps": 3,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 3
+      },
+      "4": {
+        "actual_timesteps": 4,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 4
+      },
+      "6": {
+        "actual_timesteps": 6,
+        "is_prefix_of_full": true,
+        "matches_min_depth_n": true,
+        "requested_depth": 6
+      }
+    },
+    "scenario_id": "36bc533c-3a8c-5e03-b9d8-bc534e623302"
+  },
+  "purpose": "Milestone 1.1 (experiments.txt): v5 causal-prefix corpus construction and split-safety validation.",
+  "schema_version": 1,
+  "signature_library_manifest_hash": "c66bb843a95b86cac43d88b15919381aa9e3f92020bc4712c473ad6fb482f55c",
+  "split_integrity": {
+    "counts_by_split": {
+      "calibration": 150,
+      "development_holdout": 120,
+      "train": 600,
+      "validation": 100
+    },
+    "cross_split_scenario_id_collisions": [],
+    "disjoint": true,
+    "total_scenarios": 970
+  },
+  "split_policy": "Splits assigned via disjoint seed ranges BEFORE any prefix depth is generated; every depth-truncated example is a lazy view (hydroswarm.training.causal_prefix.CausalPrefixDatasetView) over an already-split-assigned GeneratedScenario, so prefixing cannot move a scenario between splits.",
+  "split_seed_ranges": {
+    "calibration": {
+      "count": 150,
+      "start_seed": 903000000
+    },
+    "development_holdout": {
+      "count": 120,
+      "start_seed": 902000000
+    },
+    "train": {
+      "count": 600,
+      "start_seed": 900000000
+    },
+    "validation": {
+      "count": 100,
+      "start_seed": 901000000
+    }
+  },
+  "supervised_task_scope": "Sentinel task family only (source_node, source_region, start_time, duration, relative_strength, event_presence, event_cause, evidence_sufficiency, sensor_fault). Scout/Strategist/OOD/auxiliary heads remain declared in task_weights (configs/training-v5-causal.yaml, require_complete_task_weights=True) but receive no target in this corpus -- an explicit scope limit, not a silent omission; see hydroswarm.training.causal_prefix module docstring."
+}
