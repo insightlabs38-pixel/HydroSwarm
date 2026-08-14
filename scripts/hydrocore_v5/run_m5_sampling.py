@@ -84,25 +84,78 @@ Sample budget = 3 per arm; a coverage stratum with few remaining
 unsampled junctions (75% coverage leaves only 1) naturally caps how far
 that stratum's curve can run -- reported honestly, not padded.
 
-5.5 Primary metrics: actionable within <=1/2/3 samples, median samples to
-actionability, never-actionable fraction. Secondary: final top-1/top-3,
-candidate-set contraction, entropy reduction, source-rank improvement.
-"Actionable" mirrors Milestone 4's own simplification (conformal
-candidate-set size in [1, K=3], same K as
-`hydroswarm.simulation.wrapper.MAXIMUM_EVALUATION_HYPOTHESES` /
-production's `maximum_planning_candidates` default) rather than
-reconstructing the full pipeline's OOD/disagreement/frozen-sensor gate
-matrix, which this experiment does not vary.
+5.5 Primary metrics: candidate-gate-pass within <=1/2/3 samples, median
+samples to candidate-gate-pass, never-candidate-gate-pass fraction.
+Secondary: final top-1/top-3, candidate-set contraction, entropy
+reduction, source-rank improvement.
+
+Milestone-5 correction (this revision) -- three evaluation gaps fixed,
+predictor/calibration/K/policies/weights/seeds/sample-budget/incidents
+all held bit-for-bit unchanged (only new observations/reports were
+added; no decision variable that could change which node gets sampled
+was touched):
+
+1. CANDIDATE_GATE_PASS renaming. What the original revision called
+   "actionable" (conformal candidate-set size in [1, K=3], the same K as
+   `hydroswarm.simulation.wrapper.MAXIMUM_EVALUATION_HYPOTHESES` /
+   production's `maximum_planning_candidates` default) is renamed
+   throughout to `candidate_gate_pass` -- it is only the candidate-count
+   planning gate, not full product actionability, and must not be
+   reported as if it were.
+
+2. Conformal coverage after adaptive sampling. Every recorded state
+   (initial, after each sample actually taken -- sampling stops as soon
+   as candidate_gate_pass becomes true, exactly as before, so not every
+   incident reaches round 3; this is unchanged behavior, not new
+   truncation) now records `true_source_in_candidate_set`. Reported
+   overall, by arm, by round, by initial evidence depth, and by initial
+   sensor coverage, each checked against the alpha=0.1 target (~90%
+   coverage) with a material-undercoverage flag at the same 5pp bar
+   Milestone 3 used (`run_m3_calibration.py`) -- a policy is never
+   credited with an "improvement" if it is really just shrinking sets by
+   under-covering the true source.
+
+3. Planning-compatible actionability (experimental, six-component
+   composite): calibration applicable; candidate count in [1, K];
+   model evidence sufficiency (raw `evidence_sufficiency` head, threshold
+   0.55, matching HybridInferencePipeline's own default and its exact
+   `scalar(...)`-no-sigmoid convention) passes; classical/neural
+   disagreement below production's threshold; OOD NORMAL; deterministic
+   sensor-state guards (ALL_SENSORS_FROZEN) pass. Per component,
+   faithfully reconstructed where this experiment's own real, already-
+   computed signals make that possible (calibration_applicable,
+   candidate_count_in_k, model_evidence_sufficient, sensor_guards_pass);
+   explicitly marked NOT_EVALUATED, never silently approximated, where
+   they are not: `disagreement_below_threshold` requires the full
+   classical-Bayesian/neural fusion-diagnostics machinery
+   (`hydroswarm.inference.fusion`) this experiment never builds (see the
+   architecture note above -- routing through the full pipeline was
+   already rejected for the B_DEPTH_AWARE incompatibility), and
+   `ood_normal` requires production's real DETERMINISTIC `OODDetector`
+   controller -- the model's own `ood_logits`/`ood_category_logits` heads
+   exist but are explicitly documented elsewhere
+   (`hydroswarm.inference.authority.ood_certificate`) as advisory-only,
+   never authoritative, so substituting them would misrepresent
+   production authority rather than faithfully reconstruct it. Because
+   two of six required components are NOT_EVALUATED, the composite
+   `planning_compatible` gate itself is NOT_EVALUATED for every state in
+   this experiment (never approximated as true from the other four
+   passing); Milestone 5's "initially non-actionable subset" analysis
+   therefore operates on `candidate_gate_pass` (the one fully-evaluated
+   gate), stated explicitly rather than silently substituted.
 
 Statistical comparison: paired bootstrap (5000 resamples, seeded) over
 the 108 matched incidents for each non-random arm vs RANDOM_VALID_UNSAMPLED
-on actionable_within_3 and (among incidents both arms resolved) samples-
-to-resolution. Promotion requires the predeclared 5.5/experiments.txt bar:
->=10pp actionable<=3 improvement with a 95% CI excluding zero, or a
-clearly (CI-excluding-zero) lower paired samples-to-resolution
-distribution -- never a bare point estimate. If no arm clears this bar:
-ACTIVE_SAMPLING_REMAINS_ADVISORY (matching the M0/CAP-REM-02 baseline
-finding's own language) -- not overclaimed.
+on candidate_gate_pass_within_3 and (among incidents both arms resolved)
+samples-to-resolution. Promotion requires the predeclared 5.5/
+experiments.txt bar: >=10pp candidate_gate_pass<=3 improvement with a 95%
+CI excluding zero, or a clearly (CI-excluding-zero) lower paired
+samples-to-resolution distribution -- never a bare point estimate -- AND
+(Milestone-5 correction) that arm's own empirical candidate-set coverage
+must not be materially below the alpha=0.1 target; an arm that only looks
+better because it under-covers the true source is never promoted. If no
+arm clears this bar: ACTIVE_SAMPLING_REMAINS_ADVISORY (matching the
+M0/CAP-REM-02 baseline finding's own language) -- not overclaimed.
 
 Uses development_holdout only (never locked_final_test /
 locked_topology_test). No predictor, calibration, K, or verification
@@ -178,6 +231,21 @@ N_PER_CELL = 12  # 3 coverage x 3 depth x 12 = 108 paired incidents (>=100 prefe
 ARMS: tuple[str, ...] = ("RANDOM_VALID_UNSAMPLED", "CURRENT_EIG", "CANDIDATE_CONTRACTION", "DECISION_GAIN")
 BOOTSTRAP_RESAMPLES = 5000
 BOOTSTRAP_SEED = 20260814
+
+#: Milestone 5 correction (this revision). Sentinel for a production
+#: authority sub-gate this experiment cannot faithfully reconstruct
+#: (rather than silently approximating it) -- see PLANNING_COMPATIBLE_
+#: GATES and the module docstring addendum below.
+NOT_EVALUATED = "NOT_EVALUATED"
+#: hydroswarm.inference.pipeline.HybridInferencePipeline's own default
+#: (evidence_threshold=0.55); reused unmodified, never weakened.
+EVIDENCE_SUFFICIENCY_THRESHOLD = 0.55
+#: Target conformal coverage is 1-alpha; "materially below target" reuses
+#: Milestone 3's own 5pp convention (run_m3_calibration.py) so undercoverage
+#: is flagged on the same bar throughout the v5 program, not a new one
+#: invented here.
+COVERAGE_TARGET = 1 - ALPHA
+MATERIAL_UNDERCOVERAGE_PP = 5.0
 
 #: Predeclared decision-gain weights (5.3); see module docstring for
 #: rationale. Development-data-only signals; never includes the true
@@ -302,7 +370,7 @@ def main() -> int:  # noqa: C901
 
     node_ids_ref: list[str] = []
 
-    def _posterior_and_candidates(network, feature_context, series, bucket: str) -> tuple[dict[str, float], tuple[str, ...], list[str]]:
+    def _posterior_and_candidates(network, feature_context, series, bucket: str) -> dict[str, Any]:
         classical_prior = model_input_classical_prior(library, list(library.node_ids), series, target_timestamps)
         built = HydraulicFeatureBuilder().build(
             network, feature_context.graph, feature_context.state, series,
@@ -318,7 +386,14 @@ def main() -> int:  # noqa: C901
         indices = calibrator.candidate_set(probs, condition=condition, network_id=f"golden-reference:{bucket}")
         candidate_nodes = [node_ids[index] for index in indices]
         fused_belief = dict(zip(node_ids, probs, strict=True))
-        return fused_belief, tuple(candidate_nodes), node_ids
+        #: HybridInferencePipeline._build_semantic_predictions' own `scalar(...)`
+        #: convention (src/hydroswarm/inference/pipeline.py): the raw head
+        #: value used directly, no sigmoid applied.
+        evidence_sufficiency_value = float(output["evidence_sufficiency"].reshape(-1)[0].item())
+        return {
+            "fused_belief": fused_belief, "candidate_nodes": tuple(candidate_nodes), "node_ids": node_ids,
+            "evidence_sufficiency": evidence_sufficiency_value,
+        }
 
     def _entropy_bits(belief: dict[str, float]) -> float:
         values = np.asarray([max(v, 1e-12) for v in belief.values()], dtype=float)
@@ -328,6 +403,41 @@ def main() -> int:  # noqa: C901
     def _rank(belief: dict[str, float], truth: str) -> int:
         ordered = sorted(belief, key=lambda node: (-belief[node], node))
         return ordered.index(truth) + 1 if truth in ordered else len(ordered)
+
+    def _sensor_guards_pass(series) -> bool:
+        """Faithful reconstruction of HybridInferencePipeline.analyze's
+        ALL_SENSORS_FROZEN authority guard: no plan may be enabled when
+        every latest sensor reading is explicitly frozen (pipeline.py)."""
+
+        return not (series and all(item.frozen[-1] for item in series))
+
+    def _gate_bundle(*, candidate_gate_pass: bool, evidence_sufficiency_value: float, series) -> dict[str, Any]:
+        """Milestone-5 correction, requirement 3: the six-component
+        planning-compatible actionability state. Components this
+        experiment's own real signals can faithfully compute are computed;
+        components requiring machinery this experiment does not build
+        (full classical/neural fusion disagreement; the real deterministic
+        OODDetector, as opposed to the model's own advisory-only OOD
+        heads) are explicitly NOT_EVALUATED rather than approximated. See
+        module docstring for the full rationale per component."""
+
+        calibration_applicable = True  # model+calibrator built together in this one process; always identity-compatible here.
+        model_evidence_sufficient = evidence_sufficiency_value >= EVIDENCE_SUFFICIENCY_THRESHOLD
+        sensor_guards_pass = _sensor_guards_pass(series)
+        components = {
+            "calibration_applicable": calibration_applicable,
+            "candidate_count_in_k": candidate_gate_pass,
+            "model_evidence_sufficient": model_evidence_sufficient,
+            "disagreement_below_threshold": NOT_EVALUATED,
+            "ood_normal": NOT_EVALUATED,
+            "sensor_guards_pass": sensor_guards_pass,
+        }
+        planning_compatible = (
+            NOT_EVALUATED
+            if any(value == NOT_EVALUATED for value in components.values())
+            else all(components.values())
+        )
+        return {**components, "planning_compatible": planning_compatible}
 
     def _measurement(network, scenario, node: str, *, decision_seconds: float, delay_minutes: float, rng: np.random.Generator) -> tuple[SensorSeries, float]:
         incident = scenario.manifest.incident
@@ -364,6 +474,23 @@ def main() -> int:  # noqa: C901
             return max(accessible, key=lambda c: (_decision_gain_score(c), c.node_id)).node_id
         raise ValueError(f"unknown arm: {arm}")
 
+    def _build_state(result: dict[str, Any], *, truth: str, round_index: int, series) -> dict[str, Any]:
+        candidates = result["candidate_nodes"]
+        candidate_gate_pass = 1 <= len(candidates) <= K_MAX_CANDIDATES
+        gates = _gate_bundle(
+            candidate_gate_pass=candidate_gate_pass, evidence_sufficiency_value=result["evidence_sufficiency"],
+            series=series,
+        )
+        return {
+            "round_index": round_index,
+            "candidate_set_size": len(candidates), "entropy_bits": _entropy_bits(result["fused_belief"]),
+            "true_source_rank": _rank(result["fused_belief"], truth), "top1_correct": _rank(result["fused_belief"], truth) == 1,
+            "candidate_gate_pass": candidate_gate_pass,
+            "true_source_in_candidate_set": truth in candidates,
+            "evidence_sufficiency": result["evidence_sufficiency"],
+            **gates,
+        }
+
     rows: list[dict[str, Any]] = []
     for incident in incidents:
         bucket = DEPTH_BUCKET_OF[incident["depth"]]
@@ -371,18 +498,13 @@ def main() -> int:  # noqa: C901
         incident_key = (incident["coverage_label"], incident["depth"], incident["seed"])
         for arm in ARMS:
             series = list(incident["initial_series"])
-            belief, candidates, node_ids = _posterior_and_candidates(
-                incident["network"], incident["feature_context"], series, bucket
-            )
-            states = [{
-                "candidate_set_size": len(candidates), "entropy_bits": _entropy_bits(belief),
-                "true_source_rank": _rank(belief, truth), "top1_correct": _rank(belief, truth) == 1,
-                "actionable": 1 <= len(candidates) <= K_MAX_CANDIDATES,
-            }]
+            result = _posterior_and_candidates(incident["network"], incident["feature_context"], series, bucket)
+            belief, candidates = result["fused_belief"], result["candidate_nodes"]
+            states = [_build_state(result, truth=truth, round_index=0, series=series)]
             rounds: list[dict[str, Any]] = []
             sampled_nodes = {item.node_id for item in series}
             for round_index in range(MAX_SAMPLES):
-                if states[-1]["actionable"]:
+                if states[-1]["candidate_gate_pass"]:
                     break
                 unsampled = [node for node in junctions if node not in sampled_nodes]
                 if not unsampled:
@@ -407,14 +529,9 @@ def main() -> int:  # noqa: C901
                 series.append(observation)
                 sampled_nodes.add(node)
                 before = states[-1]
-                belief, candidates, node_ids = _posterior_and_candidates(
-                    incident["network"], incident["feature_context"], series, bucket
-                )
-                after = {
-                    "candidate_set_size": len(candidates), "entropy_bits": _entropy_bits(belief),
-                    "true_source_rank": _rank(belief, truth), "top1_correct": _rank(belief, truth) == 1,
-                    "actionable": 1 <= len(candidates) <= K_MAX_CANDIDATES,
-                }
+                result = _posterior_and_candidates(incident["network"], incident["feature_context"], series, bucket)
+                belief, candidates = result["fused_belief"], result["candidate_nodes"]
+                after = _build_state(result, truth=truth, round_index=round_index + 1, series=series)
                 states.append(after)
                 rounds.append({
                     "round": round_index + 1, "selected_node": node,
@@ -423,13 +540,16 @@ def main() -> int:  # noqa: C901
                     "entropy_before": before["entropy_bits"], "entropy_after": after["entropy_bits"],
                     "true_source_rank_before": before["true_source_rank"], "true_source_rank_after": after["true_source_rank"],
                 })
-            actionable_within = 0 if states[0]["actionable"] else next(
-                (index for index, state in enumerate(states[1:], start=1) if state["actionable"]), None
+            candidate_gate_pass_within = 0 if states[0]["candidate_gate_pass"] else next(
+                (index for index, state in enumerate(states[1:], start=1) if state["candidate_gate_pass"]), None
             )
             rows.append({
                 "arm": arm, "coverage_label": incident["coverage_label"], "sensor_count": incident["sensor_count"],
                 "depth": incident["depth"], "depth_bucket": bucket, "seed": incident["seed"], "truth": truth,
-                "initial_actionable": states[0]["actionable"], "actionable_within": actionable_within,
+                "initial_candidate_gate_pass": states[0]["candidate_gate_pass"],
+                "candidate_gate_pass_within": candidate_gate_pass_within,
+                "initial_true_source_in_candidate_set": states[0]["true_source_in_candidate_set"],
+                "initial_planning_compatible": states[0]["planning_compatible"],
                 "unsampled_available": len(junctions) - incident["sensor_count"],
                 "final_top1": states[-1]["top1_correct"], "final_top3": states[-1]["true_source_rank"] <= 3,
                 "final_rank": states[-1]["true_source_rank"],
@@ -439,19 +559,23 @@ def main() -> int:  # noqa: C901
             })
 
     def _summary(arm_rows: list[dict[str, Any]]) -> dict[str, Any]:
-        resolved = [row["actionable_within"] for row in arm_rows if row["actionable_within"] is not None]
+        resolved = [row["candidate_gate_pass_within"] for row in arm_rows if row["candidate_gate_pass_within"] is not None]
         n = len(arm_rows)
+        if n == 0:
+            return {"n": 0}
         return {
             "n": n,
-            "actionable_initial": sum(row["initial_actionable"] for row in arm_rows) / n,
+            "candidate_gate_pass_rate_initial": sum(row["initial_candidate_gate_pass"] for row in arm_rows) / n,
             **{
-                f"actionable_within_{step}": sum(
-                    row["actionable_within"] is not None and row["actionable_within"] <= step for row in arm_rows
+                f"candidate_gate_pass_within_{step}": sum(
+                    row["candidate_gate_pass_within"] is not None and row["candidate_gate_pass_within"] <= step
+                    for row in arm_rows
                 ) / n
                 for step in range(1, MAX_SAMPLES + 1)
             },
-            "median_samples_to_actionability": statistics.median(resolved) if resolved else None,
-            "never_actionable_fraction": sum(row["actionable_within"] is None for row in arm_rows) / n,
+            "median_samples_to_candidate_gate_pass": statistics.median(resolved) if resolved else None,
+            "mean_samples_to_candidate_gate_pass": statistics.fmean(resolved) if resolved else None,
+            "never_candidate_gate_pass_fraction": sum(row["candidate_gate_pass_within"] is None for row in arm_rows) / n,
             "final_top1": sum(row["final_top1"] for row in arm_rows) / n,
             "final_top3": sum(row["final_top3"] for row in arm_rows) / n,
             "mean_candidate_contraction": statistics.fmean(row["candidate_contraction"] for row in arm_rows),
@@ -470,16 +594,16 @@ def main() -> int:  # noqa: C901
         for arm, cells in by_arm_and_cell.items()
     }
 
-    def _paired_bootstrap_actionable3(arm: str) -> dict[str, Any]:
+    def _paired_bootstrap_candidate_gate_pass3(arm: str) -> dict[str, Any]:
         random_rows = {(row["coverage_label"], row["depth"], row["seed"]): row for row in by_arm["RANDOM_VALID_UNSAMPLED"]}
         arm_rows = {(row["coverage_label"], row["depth"], row["seed"]): row for row in by_arm[arm]}
         keys = sorted(set(random_rows) & set(arm_rows))
         arm_ind = np.asarray([
-            1.0 if arm_rows[k]["actionable_within"] is not None and arm_rows[k]["actionable_within"] <= 3 else 0.0
+            1.0 if arm_rows[k]["candidate_gate_pass_within"] is not None and arm_rows[k]["candidate_gate_pass_within"] <= 3 else 0.0
             for k in keys
         ])
         random_ind = np.asarray([
-            1.0 if random_rows[k]["actionable_within"] is not None and random_rows[k]["actionable_within"] <= 3 else 0.0
+            1.0 if random_rows[k]["candidate_gate_pass_within"] is not None and random_rows[k]["candidate_gate_pass_within"] <= 3 else 0.0
             for k in keys
         ])
         point_estimate = float(arm_ind.mean() - random_ind.mean())
@@ -502,12 +626,12 @@ def main() -> int:  # noqa: C901
         arm_rows = {(row["coverage_label"], row["depth"], row["seed"]): row for row in by_arm[arm]}
         keys = sorted(
             k for k in set(random_rows) & set(arm_rows)
-            if random_rows[k]["actionable_within"] is not None and arm_rows[k]["actionable_within"] is not None
+            if random_rows[k]["candidate_gate_pass_within"] is not None and arm_rows[k]["candidate_gate_pass_within"] is not None
         )
         if not keys:
             return {"n_paired_resolved": 0, "point_estimate": None, "ci95_low": None, "ci95_high": None, "ci_excludes_zero": False}
-        arm_vals = np.asarray([arm_rows[k]["actionable_within"] for k in keys], dtype=float)
-        random_vals = np.asarray([random_rows[k]["actionable_within"] for k in keys], dtype=float)
+        arm_vals = np.asarray([arm_rows[k]["candidate_gate_pass_within"] for k in keys], dtype=float)
+        random_vals = np.asarray([random_rows[k]["candidate_gate_pass_within"] for k in keys], dtype=float)
         point_estimate = float(np.median(arm_vals) - np.median(random_vals))
         rng = np.random.default_rng(BOOTSTRAP_SEED + 1)
         n = len(keys)
@@ -522,29 +646,126 @@ def main() -> int:  # noqa: C901
             "clearly_lower": ci_high < 0,
         }
 
+    #: Milestone-5 correction, requirement 1: flatten every recorded state
+    #: (initial + each sample actually taken) with its context, for
+    #: conformal-coverage-after-adaptive-sampling reporting.
+    flat_states: list[dict[str, Any]] = []
+    for row in rows:
+        for state in row["states"]:
+            flat_states.append({
+                **state, "arm": row["arm"], "coverage_label": row["coverage_label"],
+                "depth": row["depth"], "seed": row["seed"],
+            })
+
+    def _coverage_summary(states: list[dict[str, Any]]) -> dict[str, Any]:
+        n = len(states)
+        if n == 0:
+            return {"n": 0, "empirical_coverage": None, "materially_below_target": None}
+        hits = sum(1 for state in states if state["true_source_in_candidate_set"])
+        coverage = hits / n
+        se = (coverage * (1 - coverage) / n) ** 0.5 if n else 0.0
+        undercoverage_pp = max(0.0, (COVERAGE_TARGET - coverage) * 100)
+        return {
+            "n": n, "hits": hits, "empirical_coverage": coverage,
+            "coverage_95ci": [max(0.0, coverage - 1.96 * se), min(1.0, coverage + 1.96 * se)],
+            "target_coverage": COVERAGE_TARGET, "undercoverage_pp": undercoverage_pp,
+            "materially_below_target": undercoverage_pp > MATERIAL_UNDERCOVERAGE_PP,
+        }
+
+    coverage_overall = _coverage_summary(flat_states)
+    coverage_by_arm = {arm: _coverage_summary([s for s in flat_states if s["arm"] == arm]) for arm in ARMS}
+    coverage_by_round = {
+        str(round_index): _coverage_summary([s for s in flat_states if s["round_index"] == round_index])
+        for round_index in range(MAX_SAMPLES + 1)
+    }
+    coverage_by_depth = {
+        str(depth): _coverage_summary([s for s in flat_states if s["depth"] == depth]) for depth in DEPTH_STRATA
+    }
+    coverage_by_initial_sensor_coverage = {
+        label: _coverage_summary([s for s in flat_states if s["coverage_label"] == label]) for label in COVERAGE_STRATA
+    }
+    coverage_summary = {
+        "overall": coverage_overall, "by_arm": coverage_by_arm, "by_round": coverage_by_round,
+        "by_initial_depth": coverage_by_depth, "by_initial_sensor_coverage": coverage_by_initial_sensor_coverage,
+    }
+    #: Milestone-5 correction, requirement 1's explicit "do not treat
+    #: smaller candidate sets as improvement if coverage degrades" bar,
+    #: surfaced prominently (not left to a table alone): flag any
+    #: post-sample round (>=1) whose coverage is materially below target,
+    #: even though aggregate by-arm coverage may look fine (the same
+    #: aggregate-can-mask-a-subgroup-failure lesson Milestone 3 already
+    #: learned the hard way -- see run_m3_calibration.py).
+    post_sample_rounds_below_target = [
+        round_index for round_index in range(1, MAX_SAMPLES + 1)
+        if coverage_by_round[str(round_index)]["n"] and coverage_by_round[str(round_index)]["materially_below_target"]
+    ]
+    coverage_degradation_note = (
+        (
+            "COVERAGE DEGRADATION DETECTED after active sampling: round(s) "
+            f"{post_sample_rounds_below_target} have empirical coverage materially below the "
+            f"{COVERAGE_TARGET:.0%} target (by >{MATERIAL_UNDERCOVERAGE_PP}pp) even though aggregate by-arm "
+            "coverage looks close to target (the aggregate number masks this, exactly the subgroup-failure "
+            "pattern Milestone 3 found and corrected for). This suggests the frozen B_DEPTH_AWARE calibration -- "
+            "fit on fixed evidence depths from the original PASSIVE corpus -- may not fully transfer to the "
+            "different evidence distribution created by actively adding a new sensor node mid-incident. Per "
+            "instruction, calibration fitting is NOT re-tuned in this correction; this is reported as a genuine, "
+            "unresolved limitation of applying Milestone 3's calibration to Milestone 5's active-sampling "
+            "setting, and any apparent per-arm improvement in candidate_gate_pass during these rounds should be "
+            "read with this degradation in mind."
+        ) if post_sample_rounds_below_target else
+        "No post-sample round showed conformal coverage materially below the alpha=0.1 target."
+    )
+
+    #: Milestone-5 correction, requirement 4: sampler performance on the
+    #: subset that actually exercises the sampler (fails the initial
+    #: candidate gate). planning_compatible is NOT_EVALUATED end-to-end
+    #: (requirement 3), so this operates on candidate_gate_pass, the one
+    #: fully-evaluated gate -- stated explicitly, not silently substituted.
+    initially_non_gate_pass_subset = {
+        arm: _summary([row for row in by_arm[arm] if not row["initial_candidate_gate_pass"]])
+        for arm in ARMS
+    }
+
     comparisons = {
         arm: {
-            "actionable_within_3_vs_random": _paired_bootstrap_actionable3(arm),
+            "candidate_gate_pass_within_3_vs_random": _paired_bootstrap_candidate_gate_pass3(arm),
             "samples_to_resolution_vs_random": _paired_bootstrap_samples_to_resolution(arm),
         }
         for arm in ARMS if arm != "RANDOM_VALID_UNSAMPLED"
     }
+    #: Milestone-5 correction, requirement 5's final-decision rule: an arm
+    #: that only looks better because its own candidate-set coverage
+    #: deteriorates materially below target is never promoted, even if it
+    #: clears the point-estimate/CI bar above.
     promoted_arms = [
         arm for arm, comparison in comparisons.items()
-        if comparison["actionable_within_3_vs_random"]["meets_10pp_bar"]
-        or comparison["samples_to_resolution_vs_random"]["clearly_lower"]
+        if (
+            comparison["candidate_gate_pass_within_3_vs_random"]["meets_10pp_bar"]
+            or comparison["samples_to_resolution_vs_random"]["clearly_lower"]
+        )
+        and not coverage_by_arm[arm]["materially_below_target"]
     ]
     exit_decision = f"PROMOTE_{promoted_arms[0]}" if promoted_arms else "ACTIVE_SAMPLING_REMAINS_ADVISORY"
 
-    initial_actionable_rate = arm_summaries["RANDOM_VALID_UNSAMPLED"]["actionable_initial"]
+    initial_gate_pass_rate = arm_summaries["RANDOM_VALID_UNSAMPLED"]["candidate_gate_pass_rate_initial"]
     limitation_note = (
-        f"Ceiling-effect caveat: {initial_actionable_rate:.1%} of incidents were ALREADY actionable "
+        f"Ceiling-effect caveat: {initial_gate_pass_rate:.1%} of incidents ALREADY passed the candidate gate "
         f"(candidate-set size in [1, {K_MAX_CANDIDATES}]) before any sample was taken, on the golden-reference "
         "network's 4-junction action space -- K=3 already covers most of that space, so there is limited room "
         "for any sampling policy (including CURRENT_EIG, the production baseline) to demonstrate a large effect "
         "on this specific network. The comparison above is real and not invalidated by this, but a null/near-null "
         "result here should not be read as ruling out a larger effect on a bigger network with more source "
         "candidates; it was not tested (out of scope for this milestone -- topology diversity is Milestone 7)."
+    )
+    gate_reconstruction_note = (
+        "planning_compatible (experiments.txt Milestone 5 correction requirement 3) is NOT_EVALUATED for every "
+        "state in this experiment: 2 of its 6 required components (disagreement_below_threshold, ood_normal) "
+        "require production machinery (full classical/neural fusion diagnostics; the real deterministic "
+        "OODDetector) this experiment does not build, and are explicitly marked NOT_EVALUATED rather than "
+        "approximated from the model's own advisory-only OOD heads or omitted from the composite. "
+        "calibration_applicable, candidate_count_in_k (== candidate_gate_pass), model_evidence_sufficient "
+        "(raw evidence_sufficiency head >= 0.55, production's own threshold/convention), and sensor_guards_pass "
+        "(ALL_SENSORS_FROZEN) ARE faithfully computed per state -- see per-state fields in `rows[*].states[*]`."
     )
 
     report = {
@@ -564,6 +785,11 @@ def main() -> int:  # noqa: C901
         "bootstrap_resamples": BOOTSTRAP_RESAMPLES,
         "arm_summaries": arm_summaries,
         "per_cell_summary": per_cell_summary,
+        "coverage_summary": coverage_summary,
+        "coverage_degradation_note": coverage_degradation_note,
+        "post_sample_rounds_below_coverage_target": post_sample_rounds_below_target,
+        "gate_reconstruction_note": gate_reconstruction_note,
+        "initially_non_candidate_gate_pass_subset": initially_non_gate_pass_subset,
         "comparisons_vs_random": comparisons,
         "exit_decision": exit_decision,
         "limitation_note": limitation_note,
@@ -582,32 +808,90 @@ def main() -> int:  # noqa: C901
         f"({', '.join(f'{k}={v}' for k, v in COVERAGE_STRATA.items())} coverage x depth {DEPTH_STRATA}, "
         f"{N_PER_CELL}/cell).",
         "",
-        "## Arm summaries",
+        "## Arm summaries (candidate_gate_pass = candidate-count planning gate ONLY, "
+        "NOT full product actionability -- see Limitations)",
         "",
-        "| arm | n | actionable<=1 | actionable<=2 | actionable<=3 | median samples | never actionable | final top-1 | final top-3 |",
+        "| arm | n | gate<=1 | gate<=2 | gate<=3 | median samples | never gate-pass | final top-1 | final top-3 |",
         "|---|---|---|---|---|---|---|---|---|",
     ]
     for arm in ARMS:
         s = arm_summaries[arm]
         lines.append(
-            f"| {arm} | {s['n']} | {s['actionable_within_1']:.3f} | {s['actionable_within_2']:.3f} | "
-            f"{s['actionable_within_3']:.3f} | {s['median_samples_to_actionability']} | "
-            f"{s['never_actionable_fraction']:.3f} | {s['final_top1']:.3f} | {s['final_top3']:.3f} |"
+            f"| {arm} | {s['n']} | {s['candidate_gate_pass_within_1']:.3f} | {s['candidate_gate_pass_within_2']:.3f} | "
+            f"{s['candidate_gate_pass_within_3']:.3f} | {s['median_samples_to_candidate_gate_pass']} | "
+            f"{s['never_candidate_gate_pass_fraction']:.3f} | {s['final_top1']:.3f} | {s['final_top3']:.3f} |"
         )
+    lines += [
+        "",
+        "## Conformal coverage after adaptive sampling (target ~"
+        f"{COVERAGE_TARGET:.0%}, alpha={ALPHA}; material-undercoverage bar = {MATERIAL_UNDERCOVERAGE_PP}pp, "
+        "matching Milestone 3)",
+        "",
+        f"Overall: n={coverage_overall['n']}, empirical coverage={coverage_overall['empirical_coverage']:.3f}, "
+        f"95% CI={coverage_overall['coverage_95ci']}, "
+        f"materially below target={coverage_overall['materially_below_target']}",
+        "",
+        "### By arm",
+        "",
+        "| arm | n | empirical coverage | 95% CI | materially below target |",
+        "|---|---|---|---|---|",
+    ]
+    for arm in ARMS:
+        c = coverage_by_arm[arm]
+        lines.append(f"| {arm} | {c['n']} | {c['empirical_coverage']:.3f} | {c['coverage_95ci']} | {c['materially_below_target']} |")
+    lines += ["", "### By round (0 = initial, before any sample)", "", "| round | n | empirical coverage | 95% CI | materially below target |", "|---|---|---|---|---|"]
+    for round_index in range(MAX_SAMPLES + 1):
+        c = coverage_by_round[str(round_index)]
+        if c["n"]:
+            lines.append(f"| {round_index} | {c['n']} | {c['empirical_coverage']:.3f} | {c['coverage_95ci']} | {c['materially_below_target']} |")
+    lines += ["", "### By initial evidence depth", "", "| depth | n | empirical coverage | 95% CI | materially below target |", "|---|---|---|---|---|"]
+    for depth in DEPTH_STRATA:
+        c = coverage_by_depth[str(depth)]
+        lines.append(f"| {depth} | {c['n']} | {c['empirical_coverage']:.3f} | {c['coverage_95ci']} | {c['materially_below_target']} |")
+    lines += ["", "### By initial sensor coverage", "", "| coverage | n | empirical coverage | 95% CI | materially below target |", "|---|---|---|---|---|"]
+    for label in COVERAGE_STRATA:
+        c = coverage_by_initial_sensor_coverage[label]
+        lines.append(f"| {label} | {c['n']} | {c['empirical_coverage']:.3f} | {c['coverage_95ci']} | {c['materially_below_target']} |")
+
+    lines += [
+        "",
+        f"**{coverage_degradation_note}**",
+        "",
+        "## Planning-compatible actionability (experimental)",
+        "",
+        gate_reconstruction_note,
+        "",
+        "## Initially non-gate-pass subset (the population that actually exercises the sampler; "
+        "planning_compatible is NOT_EVALUATED end-to-end, so this uses candidate_gate_pass -- see above)",
+        "",
+        "| arm | N requiring sampling | resolved<=1 | resolved<=2 | resolved<=3 | never resolved | median samples | mean samples |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for arm in ARMS:
+        s = initially_non_gate_pass_subset[arm]
+        if s.get("n"):
+            lines.append(
+                f"| {arm} | {s['n']} | {s['candidate_gate_pass_within_1']:.3f} | {s['candidate_gate_pass_within_2']:.3f} | "
+                f"{s['candidate_gate_pass_within_3']:.3f} | {s['never_candidate_gate_pass_fraction']:.3f} | "
+                f"{s['median_samples_to_candidate_gate_pass']} | {s['mean_samples_to_candidate_gate_pass']} |"
+            )
+        else:
+            lines.append(f"| {arm} | 0 | - | - | - | - | - | - |")
+
     lines += [
         "",
         "## Paired bootstrap comparison vs RANDOM_VALID_UNSAMPLED (95% CI, "
         f"{BOOTSTRAP_RESAMPLES} resamples)",
         "",
-        "| arm | actionable<=3 delta (pp) | 95% CI | meets >=10pp+CI bar | samples-to-resolution delta | 95% CI | clearly lower |",
-        "|---|---|---|---|---|---|---|",
+        "| arm | gate-pass<=3 delta (pp) | 95% CI | meets >=10pp+CI bar | coverage materially below target | samples-to-resolution delta | 95% CI | clearly lower |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for arm, comparison in comparisons.items():
-        a3 = comparison["actionable_within_3_vs_random"]
+        a3 = comparison["candidate_gate_pass_within_3_vs_random"]
         sr = comparison["samples_to_resolution_vs_random"]
         lines.append(
             f"| {arm} | {a3['point_estimate_pp']:.1f} | [{a3['ci95_low_pp']:.1f}, {a3['ci95_high_pp']:.1f}] | "
-            f"{a3['meets_10pp_bar']} | {sr['point_estimate']} | "
+            f"{a3['meets_10pp_bar']} | {coverage_by_arm[arm]['materially_below_target']} | {sr['point_estimate']} | "
             f"[{sr.get('ci95_low')}, {sr.get('ci95_high')}] | {sr.get('clearly_lower', False)} |"
         )
     lines += [
@@ -618,10 +902,12 @@ def main() -> int:  # noqa: C901
         "",
         f"**Exit decision: {exit_decision}**",
         "",
-        "Per the predeclared promotion rule (experiments.txt 5.5 / this script's module docstring): a policy is "
-        "promoted only if it clears >=10pp actionable<=3 improvement with a 95% CI excluding zero, or a clearly "
-        "(CI-excluding-zero) lower paired samples-to-resolution distribution -- never a bare point-estimate "
-        "difference. If no arm clears this bar, active sampling remains advisory, matching the M0/CAP-REM-02 "
+        "Per the predeclared promotion rule (experiments.txt 5.5 / this script's module docstring, Milestone-5 "
+        "correction): a policy is promoted only if it clears >=10pp candidate_gate_pass<=3 improvement with a 95% "
+        "CI excluding zero, or a clearly (CI-excluding-zero) lower paired samples-to-resolution distribution -- "
+        "never a bare point-estimate difference -- AND its own empirical candidate-set coverage is not materially "
+        "below the alpha=0.1 target; an arm that only looks better because it under-covers the true source is "
+        "never promoted. If no arm clears this bar, active sampling remains advisory, matching the M0/CAP-REM-02 "
         "baseline finding this milestone was designed to test.",
     ]
     OUTPUT_SUMMARY.write_text("\n".join(lines) + "\n", encoding="utf-8")
