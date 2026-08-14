@@ -48,6 +48,46 @@ Aggregate top-1 accuracy equal does NOT by itself imply 'predictions are identic
 | 6 | 48 | 0.625 | 0.812 (n=48) | 0.625 (n=48) | 0.812 (n=48) | 0.5023 | 1.9698 |
 | 8 | 48 | 0.625 | 0.812 (n=48) | 0.625 (n=48) | 0.812 (n=48) | 0.5022 | 1.9694 |
 
+### Milestone-6 final validity check: onset-stratified paired analysis (potential pre-onset confound)
+
+The incident pool's onset bins are 0/60/120/240 minutes; at depth=2 the max elapsed span (60 min) means only onset=0 incidents are guaranteed real post-onset evidence at EVERY cadence. Splitting the pooled paired analysis by true onset (onset used only to select which real incidents fall in which row here -- never fed to the model) checks whether pooled invariance survives when contamination is actually observable.
+
+**depth2_confound_suspected: False** (pooled depth=2 fraction identical: 1.000; onset=0-only depth=2 fraction identical: 1.000)
+
+| depth | onset (min) | n matched | fraction identical predicted_node | mean L1 dist | top1 @15min | top1 @30min | top1 @60min |
+|---|---|---|---|---|---|---|---|
+| 2 | 0 | 12 | 1.000 | 0.0001 | 1.000 | 1.000 | 1.000 |
+| 2 | 60 | 12 | 1.000 | 0.0287 | 0.250 | 0.250 | 0.250 |
+| 2 | 120 | 12 | 1.000 | 0.0328 | 0.250 | 0.250 | 0.250 |
+| 2 | 240 | 12 | 1.000 | 0.0394 | 0.250 | 0.250 | 0.250 |
+| 3 | 0 | 12 | 1.000 | 0.0019 | 1.000 | 1.000 | 1.000 |
+| 3 | 60 | 12 | 0.250 | 1.0086 | 0.250 | 0.250 | 1.000 |
+| 3 | 120 | 12 | 1.000 | 0.0335 | 0.250 | 0.250 | 0.250 |
+| 3 | 240 | 12 | 1.000 | 0.0320 | 0.250 | 0.250 | 0.250 |
+| 4 | 0 | 12 | 1.000 | 0.0017 | 1.000 | 1.000 | 1.000 |
+| 4 | 60 | 12 | 0.250 | 0.9994 | 0.250 | 1.000 | 1.000 |
+| 4 | 120 | 12 | 0.250 | 1.0035 | 0.250 | 0.250 | 1.000 |
+| 4 | 240 | 12 | 1.000 | 0.0268 | 0.250 | 0.250 | 0.250 |
+| 6 | 0 | 12 | 1.000 | 0.0006 | 1.000 | 1.000 | 1.000 |
+| 6 | 60 | 12 | 1.000 | 0.0017 | 1.000 | 1.000 | 1.000 |
+| 6 | 120 | 12 | 0.250 | 0.9997 | 0.250 | 1.000 | 1.000 |
+| 6 | 240 | 12 | 0.250 | 1.0073 | 0.250 | 0.250 | 0.750 |
+| 8 | 0 | 12 | 1.000 | 0.0004 | 1.000 | 1.000 | 1.000 |
+| 8 | 60 | 12 | 1.000 | 0.0018 | 1.000 | 1.000 | 1.000 |
+| 8 | 120 | 12 | 0.250 | 0.9995 | 0.250 | 1.000 | 1.000 |
+| 8 | 240 | 12 | 0.250 | 1.0073 | 0.250 | 0.250 | 1.000 |
+
+### Milestone-6 final validity check: post-onset-anchored diagnostic (AUTHORITATIVE for the 6.5 decision)
+
+Evidence = the first N real reports AT OR AFTER true contamination onset, per cadence (onset used only to select which reports to include; never written into any model input -- see `_cadence_evidence_since_onset`'s docstring). Compares the SAME incidents across cadences.
+
+**report_count_conflation_post_onset_n2: True** (bar=0.90); **report_count_conflation_post_onset_n3: True**
+
+| N post-onset reports | n matched | fraction identical predicted_node (all cadences) | 15v30 agreement | 15v60 agreement | 30v60 agreement | mean L1 dist | max L1 dist | top1 @15min | top1 @30min | top1 @60min |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 2 | 48 | 1.000 | 1.000 (n=48) | 1.000 (n=48) | 1.000 (n=48) | 0.0004 | 0.0067 | 0.938 | 0.938 | 0.938 |
+| 3 | 48 | 0.938 | 1.000 (n=48) | 0.938 (n=48) | 0.938 (n=48) | 0.0913 | 1.9944 | 0.938 | 0.938 | 1.000 |
+
 ## 6.2 Detection delay
 
 N incidents: 48. Onset never fed as model input: **True**.
@@ -94,7 +134,7 @@ N junctions: 4. Evidence depth: 3 reports (EARLY bucket). K=3.
 
 hydroswarm.model.encoders.TemporalEncoder already encodes masked histories using elapsed timestamps rather than array position (its own docstring); HydraulicFeatureBuilder.build already feeds real per-timestep age (elapsed seconds since the latest observation) into temporal_features and quality_features, plus real absolute timestamps into the batch. An explicit elapsed-time representation already exists in HydroCore's architecture -- confirmed by inspection, not assumed. This remains true regardless of the corrected cadence finding below: HydroCore already has elapsed-time-aware temporal features, so even if the problem remains, the recommended next experiment continues to be cadence-diversified causal-prefix training and/or a controlled timestamp-conditioning ablation at matched model size -- never a new temporal architecture.
 
-(A) Corrected matched-physical-time result: max cadence-sensitivity spread at a VERIFIED-ALIGNED elapsed-time boundary is 0.00pp (bar: 10pp) -- below the predeclared bar; no material cadence-dependent behavior at matched physical time. (B) Fixed-report-count (depth=2; elapsed spans by cadence: 15min cadence=15.0min elapsed, 30min cadence=30.0min elapsed, 60min cadence=60.0min elapsed) PAIRED predicted-node identity: 1.000 of matched incidents predict the exact SAME node across every available cadence (bar: 0.90; mean L1 probability-vector distance across cadence pairs: 0.025282343158967616). This is aggregate-and-paired evidence of report-count/time conflation at the earliest meaningful depth: paired predictions, not merely aggregate accuracy, are substantially invariant. Since HydroCore's TemporalEncoder already encodes elapsed timestamps (not array position) yet at least one of the above signals still shows a cadence/report-count problem, the existing representation's GENERALIZATION -- not its presence -- is implicated: train_records/calibration_records/M1's causal-prefix corpus all use a fixed hourly reporting cadence, so the model has never actually been trained on report sequences where consecutive reports span 15 or 30 minutes rather than 60. The correctly targeted follow-up is therefore a training-distribution diversification (cadence-varied causal-prefix corpus, i.e. re-running Milestone 1's arm construction with randomized inter-report spacing) and/or a controlled ablation of the TemporalEncoder's timestamp-conditioning at matched model size -- NOT a new architecture built from scratch. Not executed in this correction (a full retrain is explicitly out of scope); recorded here as the concrete next milestone recommendation, per experiments.txt's own decision tree ('M6: is cadence/delay robustness poor? YES -> test explicit time encoding').
+(A) Corrected matched-physical-time result: max cadence-sensitivity spread at a VERIFIED-ALIGNED elapsed-time boundary is 0.00pp (bar: 10pp) -- below the predeclared bar; no material cadence-dependent behavior at matched physical time. (B_pooled, NOT authoritative -- see C) t=0-anchored depth=2 paired identity: 1.000 pooled across all onset bins (bar 0.90), vs 1.000 for the onset=0 stratum ALONE (the only stratum guaranteed real post-onset signal at every cadence at depth=2) -- onset stratification does not overturn the pooled figure; no confound detected in this signal. (C, AUTHORITATIVE) Post-onset-anchored paired identity: at N=2 real post-onset reports, 1.000 of matched incidents predict the identical node across all cadences (bar 0.90); at N=3, 0.938. Substantial invariance PERSISTS even when contamination evidence is genuinely present, confirming real report-count/time conflation -- not a pre-onset artifact. Since HydroCore's TemporalEncoder already encodes elapsed timestamps (not array position) yet the post-onset-anchored evidence (C) still shows genuine report-count/time conflation, the existing representation's GENERALIZATION -- not its presence -- is implicated: train_records/calibration_records/M1's causal-prefix corpus all use a fixed hourly reporting cadence, so the model has never actually been trained on report sequences where consecutive reports span 15 or 30 minutes rather than 60. The correctly targeted follow-up is therefore a training-distribution diversification (cadence-varied causal-prefix corpus, i.e. re-running Milestone 1's arm construction with randomized inter-report spacing) and/or a controlled ablation of the TemporalEncoder's timestamp-conditioning at matched model size -- NOT a new architecture built from scratch. Not executed in this correction (a full retrain is explicitly out of scope); recorded here as the concrete next milestone recommendation, per experiments.txt's own decision tree ('M6: is cadence/delay robustness poor? YES -> test explicit time encoding').
 
 ## Limitations
 

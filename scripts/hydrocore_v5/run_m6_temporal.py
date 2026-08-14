@@ -325,6 +325,42 @@ def _cadence_evidence_up_to_checkpoint(
     return out
 
 
+def _cadence_evidence_since_onset(
+    full_series: Sequence[SensorSeries], *, stride: int, onset_seconds: float, n_reports: int,
+) -> list[SensorSeries] | None:
+    """Milestone-6 final validity check (item 2): the post-onset-anchored
+    construction. `onset_seconds` is used ONLY to select which of the
+    cadence's own strided report positions to include -- it is never
+    written into any SensorSeries field or fed to the model (the model
+    only ever sees the resulting timestamps/concentrations, exactly like
+    every other evidence-construction helper in this file).
+
+    For each sensor, takes the cadence's own strided report positions (0,
+    stride, 2*stride, ...) that fall AT OR AFTER `onset_seconds`, then
+    keeps the first `n_reports` of those -- i.e. "the first N reports this
+    cadence would actually deliver once contamination has truly begun",
+    as opposed to `_resample_series`'s first N reports from t=0 regardless
+    of onset (which `_cadence_evidence_up_to_checkpoint`'s sibling,
+    `_resample_series`-based `depth_rows`, uses, and which this check
+    exists to stress-test for a pre-onset confound).
+
+    Returns None if fewer than `n_reports` post-onset positions exist in
+    the underlying series for this cadence (never pads/fabricates a
+    missing future report)."""
+
+    if not full_series:
+        raise ValueError("full_series must not be empty")
+    out = []
+    for item in full_series:
+        n = len(item.timestamps_seconds)
+        strided = list(range(0, n, stride))
+        post_onset = [i for i in strided if item.timestamps_seconds[i] >= onset_seconds]
+        if len(post_onset) < n_reports:
+            return None
+        out.append(_slice_series(item, post_onset[:n_reports]))
+    return out
+
+
 def _prediction_fields(probs: list[float], node_ids: list[str]) -> dict[str, Any]:
     """Milestone-6 correction (item 3): the paired-identity fields every
     cadence-comparison row now carries, so "identical prediction" claims
@@ -387,6 +423,11 @@ def _paired_prediction_analysis(rows_by_cadence: dict[int, dict[tuple, dict[str,
         )
         pairwise_top1_agreement[f"{c1}v{c2}"] = {"n": len(pair_keys), "agreement_fraction": agree / len(pair_keys)}
 
+    top1_by_cadence = {
+        str(cadence): statistics.fmean(rows_by_cadence[cadence][key]["top1"] for key in common_keys)
+        for cadence in cadences
+    } if common_keys else {}
+
     return {
         "distance_metric": "L1 (sum of absolute differences between the two probability vectors over the same node ordering)",
         "n_incidents_matched_across_all_cadences": n,
@@ -395,7 +436,32 @@ def _paired_prediction_analysis(rows_by_cadence: dict[int, dict[tuple, dict[str,
         "pairwise_top1_agreement": pairwise_top1_agreement,
         "mean_l1_probability_distance": statistics.fmean(l1_distances) if l1_distances else None,
         "max_l1_probability_distance": max(l1_distances) if l1_distances else None,
+        "top1_by_cadence": top1_by_cadence,
     }
+
+
+def _grouped_paired_analysis(
+    rows: Sequence[dict[str, Any]], *, cadences: Sequence[int], cadence_field: str, group_field: str,
+) -> dict[str, Any]:
+    """Milestone-6 final validity check (item 1): groups `rows` by
+    `group_field` (e.g. `onset_minutes`) and runs `_paired_prediction_analysis`
+    independently within each group -- so a confound where one group (e.g.
+    pre-onset incidents) dominates the pooled statistic cannot masquerade
+    as a genuine cross-cadence finding. `rows` must carry `incident_key`,
+    `predicted_node`, `probs`, `top1` (from `_prediction_fields`/
+    `_row_metrics`)."""
+
+    groups = sorted({row[group_field] for row in rows})
+    out: dict[str, Any] = {}
+    for group_value in groups:
+        rows_by_cadence: dict[int, dict[tuple, dict[str, Any]]] = {}
+        for cadence in cadences:
+            subset = [row for row in rows if row[cadence_field] == cadence and row[group_field] == group_value]
+            if subset:
+                rows_by_cadence[cadence] = {row["incident_key"]: row for row in subset}
+        if len(rows_by_cadence) >= 2:
+            out[str(group_value)] = _paired_prediction_analysis(rows_by_cadence)
+    return out
 
 
 def _infer(
@@ -660,6 +726,120 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
         and depth2_paired["fraction_identical_predicted_node_all_cadences"] >= PAIRED_INVARIANCE_FRACTION_BAR
     )
 
+    # ---- Final validity check (item 1): the t=0-anchored depth_rows above
+    # can confound "report-count/time conflation" with "no contamination
+    # signal was in the window yet" -- the incident pool's onset bins are
+    # 0/60/120/240 minutes, so at depth=2 (max elapsed span 60 minutes
+    # across all three cadences) only the onset=0 incidents are guaranteed
+    # to contain any post-onset evidence at every cadence; onset=60/120/240
+    # incidents' depth=2 windows are wholly or mostly PRE-onset. Stratifying
+    # paired_by_depth by true onset (never fed to the model -- see
+    # depth_rows' own construction, which never reads onset into any
+    # SensorSeries field) checks whether the pooled invariance above
+    # actually holds when contamination is observable, or is dominated by
+    # trivially-invariant pre-onset cases.
+    onset_stratified_paired_by_depth: dict[str, Any] = {}
+    for depth in REPORT_COUNTS:
+        if depth < 2:
+            continue
+        depth_subset = [r for r in depth_rows if r["report_count"] == depth]
+        stratified = _grouped_paired_analysis(
+            depth_subset, cadences=CADENCES_MINUTES, cadence_field="cadence_minutes", group_field="onset_minutes",
+        )
+        if stratified:
+            onset_stratified_paired_by_depth[str(depth)] = stratified
+
+    onset0_depth2 = onset_stratified_paired_by_depth.get("2", {}).get("0")
+    onset0_depth2_identical_fraction = (
+        onset0_depth2.get("fraction_identical_predicted_node_all_cadences") if onset0_depth2 else None
+    )
+    #: The pooled depth=2 claim is confounded if it met the invariance bar
+    #: while the ONLY onset stratum guaranteed real post-onset signal at
+    #: every cadence (onset=0) does NOT meet that same bar -- i.e. the
+    #: pooled number was materially propped up by pre-onset (no-signal)
+    #: incidents rather than reflecting genuine cadence-invariant behavior
+    #: on real contamination evidence.
+    depth2_confound_suspected = bool(
+        report_count_conflation_at_depth2
+        and onset0_depth2_identical_fraction is not None
+        and onset0_depth2_identical_fraction < PAIRED_INVARIANCE_FRACTION_BAR
+    )
+
+    # ---- Final validity check (item 2): post-onset-anchored diagnostic.
+    # `onset_seconds` is used ONLY to select which real reports to include
+    # (see _cadence_evidence_since_onset's docstring) -- never fed to the
+    # model. Tests whether prediction invariance persists when the
+    # evidence actually contains contamination signal from the start.
+    POST_ONSET_REPORT_COUNTS: tuple[int, ...] = (2, 3)
+    post_onset_rows: list[dict[str, Any]] = []
+    for incident in incidents:
+        truth = incident["source"]
+        incident_key = (incident["seed"], incident["source"], incident["onset_minutes"])
+        onset_seconds = incident["onset_minutes"] * 60.0
+        for cadence in CADENCES_MINUTES:
+            stride = STRIDE_OF[cadence]
+            for n_reports in POST_ONSET_REPORT_COUNTS:
+                series = _cadence_evidence_since_onset(
+                    incident["full_series"], stride=stride, onset_seconds=onset_seconds, n_reports=n_reports,
+                )
+                if series is None:
+                    continue  # fewer than n_reports post-onset positions available -- never fabricated.
+                first_timestamp = series[0].timestamps_seconds[0]
+                last_timestamp = series[0].timestamps_seconds[-1]
+                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps)
+                metrics = _row_metrics(result["probs"], result["node_ids"], truth)
+                prediction = _prediction_fields(result["probs"], result["node_ids"])
+                #: `actual_elapsed_minutes` is an alias for
+                #: `elapsed_since_first_post_onset_report_minutes` (same
+                #: value): the shared `_aggregate` closure expects this
+                #: exact key name across depth_rows/checkpoint_rows/
+                #: post_onset_rows so one aggregation implementation works
+                #: for all three row families.
+                elapsed_within_window_minutes = (last_timestamp - first_timestamp) / 60.0
+                post_onset_rows.append({
+                    "incident_key": incident_key, "seed": incident["seed"], "source": truth,
+                    "onset_minutes": incident["onset_minutes"], "cadence_minutes": cadence,
+                    "n_reports": n_reports, "first_evidence_timestamp": first_timestamp,
+                    "last_evidence_timestamp": last_timestamp,
+                    "actual_elapsed_minutes": elapsed_within_window_minutes,
+                    "elapsed_since_first_post_onset_report_minutes": elapsed_within_window_minutes,
+                    "elapsed_since_true_onset_to_first_report_minutes": (first_timestamp - onset_seconds) / 60.0,
+                    "elapsed_since_true_onset_to_last_report_minutes": (last_timestamp - onset_seconds) / 60.0,
+                    "latency_seconds": result["latency_seconds"], **metrics, **prediction,
+                })
+
+    post_onset_paired_by_n: dict[str, Any] = {}
+    post_onset_by_cadence_and_n: dict[str, dict[str, Any]] = {}
+    for n_reports in POST_ONSET_REPORT_COUNTS:
+        rows_by_cadence: dict[int, dict[tuple, dict[str, Any]]] = {}
+        for cadence in CADENCES_MINUTES:
+            subset = [r for r in post_onset_rows if r["cadence_minutes"] == cadence and r["n_reports"] == n_reports]
+            if subset:
+                rows_by_cadence[cadence] = {r["incident_key"]: r for r in subset}
+                post_onset_by_cadence_and_n.setdefault(str(cadence), {})[str(n_reports)] = _aggregate(subset)
+        if len(rows_by_cadence) >= 2:
+            post_onset_paired_by_n[str(n_reports)] = _paired_prediction_analysis(rows_by_cadence)
+
+    post_onset_n2 = post_onset_paired_by_n.get("2")
+    post_onset_n2_identical_fraction = (
+        post_onset_n2.get("fraction_identical_predicted_node_all_cadences") if post_onset_n2 else None
+    )
+    post_onset_n3 = post_onset_paired_by_n.get("3")
+    post_onset_n3_identical_fraction = (
+        post_onset_n3.get("fraction_identical_predicted_node_all_cadences") if post_onset_n3 else None
+    )
+    report_count_conflation_post_onset_n2 = bool(
+        post_onset_n2_identical_fraction is not None and post_onset_n2_identical_fraction >= PAIRED_INVARIANCE_FRACTION_BAR
+    )
+    report_count_conflation_post_onset_n3 = bool(
+        post_onset_n3_identical_fraction is not None and post_onset_n3_identical_fraction >= PAIRED_INVARIANCE_FRACTION_BAR
+    )
+    #: item 3's authoritative decision signal: genuine report-count/time
+    #: conflation on REAL post-onset evidence, not the t=0-anchored
+    #: (possibly pre-onset-confounded) depth=2 signal.
+    temporal_confound_confirmed = depth2_confound_suspected
+    post_onset_trigger = report_count_conflation_post_onset_n2 or report_count_conflation_post_onset_n3
+
     # ---- Matched-elapsed-time rows (item 1: the off-by-one fix). Built
     # directly from real timestamps via _cadence_evidence_up_to_checkpoint
     # -- never from a depth = checkpoint // cadence formula.
@@ -766,6 +946,19 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
             "distinguish 'aggregate top-1 accuracy is equal' from 'predictions are identical'. Predictor, "
             "calibration, alpha, K, incident pool, topology, and seeds are all UNCHANGED from the prior revision."
         ),
+        "final_validity_check_note": (
+            "Milestone-6 final validity check (this revision): the incident pool's onset bins (0/60/120/240 "
+            "minutes) mean the t=0-anchored depth=2 evidence window (max elapsed span 60 minutes across all "
+            "cadences) is wholly or mostly PRE-onset for 3 of 4 onset strata -- so the pooled "
+            "report_count_conflation_at_depth2 finding could reflect trivial invariance on no-signal evidence "
+            "rather than genuine cadence-invariant behavior on real contamination evidence. Added (1) "
+            "onset_stratified_paired_by_depth (the same paired analysis, split by true onset -- never fed to "
+            "the model, used only to select which real reports to evaluate) and (2) a post-onset-anchored "
+            "diagnostic (post_onset_rows/post_onset_paired_by_n: the first N=2/3 reports at or after TRUE onset "
+            "per cadence, onset again used only for evidence selection, never as a model input). The FINAL 6.5 "
+            "decision is now driven by the post-onset evidence (report_count_conflation_post_onset_n2/n3), not "
+            "the potentially-confounded pooled depth=2 signal -- see temporal_confound_confirmed."
+        ),
         "purpose": "Milestone 6.1: telemetry cadence -- report-count vs elapsed-physical-time curves.",
         "practicality_note": CADENCE_PRACTICALITY_NOTE,
         "cadences_minutes": list(CADENCES_MINUTES),
@@ -784,8 +977,21 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
         "paired_prediction_analysis_by_depth": paired_by_depth,
         "paired_invariance_fraction_bar": PAIRED_INVARIANCE_FRACTION_BAR,
         "report_count_conflation_at_depth2": report_count_conflation_at_depth2,
+        "onset_stratified_paired_by_depth": onset_stratified_paired_by_depth,
+        "onset0_depth2_identical_fraction": onset0_depth2_identical_fraction,
+        "depth2_confound_suspected": depth2_confound_suspected,
+        "post_onset_report_counts": list(POST_ONSET_REPORT_COUNTS),
+        "post_onset_by_cadence_and_n": post_onset_by_cadence_and_n,
+        "post_onset_paired_by_n": post_onset_paired_by_n,
+        "post_onset_n2_identical_fraction": post_onset_n2_identical_fraction,
+        "post_onset_n3_identical_fraction": post_onset_n3_identical_fraction,
+        "report_count_conflation_post_onset_n2": report_count_conflation_post_onset_n2,
+        "report_count_conflation_post_onset_n3": report_count_conflation_post_onset_n3,
+        "temporal_confound_confirmed": temporal_confound_confirmed,
+        "post_onset_trigger": post_onset_trigger,
         "depth_rows": depth_rows,
         "checkpoint_rows": checkpoint_rows,
+        "post_onset_rows": post_onset_rows,
         "locked_test_opened_after": locked_test_opened(ROOT),
     }
 
@@ -1313,24 +1519,31 @@ def main(*, rerun_all: bool = False) -> int:
 
     # 6.5 conditional architecture decision, driven by 6.1's own CORRECTED
     # measured results (item 4: do not assume the prior decision remains
-    # correct -- recompute from scratch). Two independent signals, per
-    # experiments.txt's own interpretation guidance:
-    #   A) corrected matched-physical-time results: material cadence-
-    #      dependent behavior at a verified-aligned elapsed-time boundary.
-    #   B) fixed-report-count PAIRED predictions (depth=2, the earliest
-    #      meaningful comparison -- depth=1 excluded, see
-    #      depth1_elapsed_time_caveat) substantially invariant despite
-    #      materially different elapsed durations.
+    # correct -- recompute from scratch). Milestone-6 final validity check:
+    # the pooled t=0-anchored depth=2 signal (B_pooled below) can be
+    # confounded by pre-onset (no-signal) incidents -- see
+    # cadence_report["final_validity_check_note"] -- so the AUTHORITATIVE
+    # decision signal is now the post-onset-anchored diagnostic (C), not
+    # B_pooled. Three signals reported:
+    #   A) corrected matched-physical-time results (verified-aligned).
+    #   B_pooled) t=0-anchored fixed-report-count paired invariance,
+    #      reported for continuity but explicitly NOT authoritative if
+    #      temporal_confound_confirmed.
+    #   C) post-onset-anchored paired invariance (N=2/3 real reports after
+    #      TRUE onset, onset used only to select evidence, never fed to
+    #      the model) -- this drives the final decision.
     strongly_sensitive = cadence_report["strongly_cadence_sensitive"]
-    count_conflation = cadence_report["report_count_conflation_at_depth2"]
-    trigger = strongly_sensitive or count_conflation
+    pooled_count_conflation = cadence_report["report_count_conflation_at_depth2"]
+    confound_confirmed = cadence_report["temporal_confound_confirmed"]
+    post_onset_trigger = cadence_report["post_onset_trigger"]
+    trigger = strongly_sensitive or post_onset_trigger
     depth2_paired = cadence_report["paired_prediction_analysis_by_depth"].get("2")
     depth2_identical_fraction = (
         depth2_paired.get("fraction_identical_predicted_node_all_cadences") if depth2_paired else None
     )
-    depth2_elapsed = cadence_report["report_count_invariance_at_fixed_depth"].get("2", {}).get(
-        "actual_elapsed_minutes_by_cadence"
-    )
+    onset0_fraction = cadence_report["onset0_depth2_identical_fraction"]
+    n2_fraction = cadence_report["post_onset_n2_identical_fraction"]
+    n3_fraction = cadence_report["post_onset_n3_identical_fraction"]
 
     finding_a = (
         f"(A) Corrected matched-physical-time result: max cadence-sensitivity spread at a VERIFIED-ALIGNED "
@@ -1339,25 +1552,30 @@ def main(*, rerun_all: bool = False) -> int:
         + ("material cadence-dependent behavior remains a measured problem." if strongly_sensitive
            else "below the predeclared bar; no material cadence-dependent behavior at matched physical time.")
     )
-    if depth2_paired and depth2_identical_fraction is not None:
-        elapsed_span_text = (
-            ", ".join(f"{cadence}min cadence={minutes:.1f}min elapsed" for cadence, minutes in sorted(depth2_elapsed.items(), key=lambda kv: int(kv[0])))
-            if depth2_elapsed else "unavailable"
+    finding_b_pooled = (
+        f"(B_pooled, NOT authoritative -- see C) t=0-anchored depth=2 paired identity: "
+        f"{'n/a' if depth2_identical_fraction is None else f'{depth2_identical_fraction:.3f}'} pooled across all "
+        f"onset bins (bar {cadence_report['paired_invariance_fraction_bar']:.2f}), vs "
+        f"{'n/a' if onset0_fraction is None else f'{onset0_fraction:.3f}'} for the onset=0 stratum ALONE (the "
+        "only stratum guaranteed real post-onset signal at every cadence at depth=2) -- "
+        + (
+            "the pooled figure met the bar while the onset=0-only figure did NOT, confirming the pooled number "
+            "is inflated by pre-onset (no-signal) incidents rather than reflecting genuine time-invariant "
+            "behavior on real evidence; this pooled claim is RETRACTED as evidence of report-count/time "
+            "conflation." if confound_confirmed else
+            "onset stratification does not overturn the pooled figure; no confound detected in this signal."
         )
-        finding_b = (
-            f"(B) Fixed-report-count (depth=2; elapsed spans by cadence: {elapsed_span_text}) PAIRED "
-            f"predicted-node identity: {depth2_identical_fraction:.3f} of matched incidents predict the exact "
-            f"SAME node across every available cadence (bar: {cadence_report['paired_invariance_fraction_bar']:.2f}; "
-            f"mean L1 probability-vector distance across cadence pairs: "
-            f"{depth2_paired.get('mean_l1_probability_distance')}). "
-            + ("This is aggregate-and-paired evidence of report-count/time conflation at the earliest meaningful "
-               "depth: paired predictions, not merely aggregate accuracy, are substantially invariant." if count_conflation
-               else "Paired predictions are NOT substantially invariant at this bar; wording is restricted to "
-               "'aggregate top-1 accuracy' where only aggregates match, never 'predictions are identical' unless "
-               "verified paired.")
-        )
-    else:
-        finding_b = "(B) No depth=2 paired-prediction data available (insufficient overlapping cadences)."
+    )
+    finding_c = (
+        f"(C, AUTHORITATIVE) Post-onset-anchored paired identity: at N=2 real post-onset reports, "
+        f"{'n/a' if n2_fraction is None else f'{n2_fraction:.3f}'} of matched incidents predict the identical "
+        f"node across all cadences (bar {cadence_report['paired_invariance_fraction_bar']:.2f}); at N=3, "
+        f"{'n/a' if n3_fraction is None else f'{n3_fraction:.3f}'}. "
+        + ("Substantial invariance PERSISTS even when contamination evidence is genuinely present, confirming "
+           "real report-count/time conflation -- not a pre-onset artifact." if post_onset_trigger else
+           "Invariance does NOT persist once evidence is anchored to true onset -- the original report-count/"
+           "time conflation claim does not hold up on real contamination evidence.")
+    )
 
     architecture_note = {
         "existing_temporal_representation": (
@@ -1374,8 +1592,10 @@ def main(*, rerun_all: bool = False) -> int:
         "cadence_sensitivity_measured_pp": cadence_report["max_cadence_sensitivity_spread_pp"],
         "bar_pp": cadence_report["strong_cadence_sensitivity_bar_pp"],
         "strongly_cadence_sensitive": strongly_sensitive,
-        "report_count_conflation_at_depth2": count_conflation,
-        "depth2_paired_identical_fraction": depth2_identical_fraction,
+        "report_count_conflation_at_depth2_pooled": pooled_count_conflation,
+        "temporal_confound_confirmed": confound_confirmed,
+        "report_count_conflation_post_onset_n2": cadence_report["report_count_conflation_post_onset_n2"],
+        "report_count_conflation_post_onset_n3": cadence_report["report_count_conflation_post_onset_n3"],
         "paired_invariance_fraction_bar": cadence_report["paired_invariance_fraction_bar"],
         "depth1_elapsed_time_caveat": cadence_report["depth1_elapsed_time_caveat"],
         "decision": (
@@ -1383,12 +1603,12 @@ def main(*, rerun_all: bool = False) -> int:
             "NEW_TEMPORAL_REPRESENTATION_EXPERIMENT_NOT_TRIGGERED"
         ),
         "rationale": (
-            f"{finding_a} {finding_b} "
+            f"{finding_a} {finding_b_pooled} {finding_c} "
             + (
                 (
                     "Since HydroCore's TemporalEncoder already encodes elapsed timestamps (not array position) "
-                    "yet at least one of the above signals still shows a cadence/report-count problem, the "
-                    "existing representation's GENERALIZATION -- not its presence -- is implicated: "
+                    "yet the post-onset-anchored evidence (C) still shows genuine report-count/time conflation, "
+                    "the existing representation's GENERALIZATION -- not its presence -- is implicated: "
                     "train_records/calibration_records/M1's causal-prefix corpus all use a fixed hourly "
                     "reporting cadence, so the model has never actually been trained on report sequences where "
                     "consecutive reports span 15 or 30 minutes rather than 60. The correctly targeted follow-up "
@@ -1401,11 +1621,14 @@ def main(*, rerun_all: bool = False) -> int:
                     "poor? YES -> test explicit time encoding')."
                 ) if trigger else
                 (
-                    "Both signals fell below their predeclared bars after the correction. Per experiments.txt "
+                    "The post-onset-anchored diagnostic (C) -- the authoritative signal for this decision -- "
+                    "did not show substantial paired-prediction invariance despite materially different elapsed "
+                    "durations, and matched-physical-time sensitivity (A) is below its bar. Per experiments.txt "
                     "Milestone 6.5 ('do not add continuous-time complexity unless the cadence study demonstrates "
                     "the need') and Milestone 9's identical restatement, no new architecture experiment is "
-                    "warranted; the prior revision's WARRANTED conclusion is retracted for the corrected "
-                    "matched-elapsed-time/paired-prediction evidence rather than preserved."
+                    "warranted. The prior revision's WARRANTED conclusion (driven by the pooled, pre-onset-"
+                    "confounded depth=2 signal) is RETRACTED, not preserved: once anchored to true onset, the "
+                    "apparent report-count/time conflation does not hold up on real contamination evidence."
                 )
             )
         ),
@@ -1521,6 +1744,69 @@ def _render_summary(predictor_description, export_path, cadence_report, delay_re
             f"| {depth} | {entry['n_incidents_matched_across_all_cadences']} | "
             f"{'-' if frac is None else f'{frac:.3f}'} | {_agree('15v30')} | {_agree('15v60')} | {_agree('30v60')} | "
             f"{'-' if mean_l1 is None else f'{mean_l1:.4f}'} | {'-' if max_l1 is None else f'{max_l1:.4f}'} |"
+        )
+    pooled_depth2_fraction = cadence_report["paired_prediction_analysis_by_depth"].get("2", {}).get(
+        "fraction_identical_predicted_node_all_cadences"
+    )
+    onset0_depth2_fraction = cadence_report["onset0_depth2_identical_fraction"]
+    lines += [
+        "",
+        "### Milestone-6 final validity check: onset-stratified paired analysis (potential pre-onset confound)",
+        "",
+        "The incident pool's onset bins are 0/60/120/240 minutes; at depth=2 the max elapsed span (60 min) means "
+        "only onset=0 incidents are guaranteed real post-onset evidence at EVERY cadence. Splitting the pooled "
+        "paired analysis by true onset (onset used only to select which real incidents fall in which row here -- "
+        "never fed to the model) checks whether pooled invariance survives when contamination is actually "
+        "observable.",
+        "",
+        f"**depth2_confound_suspected: {cadence_report['depth2_confound_suspected']}** "
+        f"(pooled depth=2 fraction identical: {'n/a' if pooled_depth2_fraction is None else f'{pooled_depth2_fraction:.3f}'}; "
+        f"onset=0-only depth=2 fraction identical: {'n/a' if onset0_depth2_fraction is None else f'{onset0_depth2_fraction:.3f}'})",
+        "",
+        "| depth | onset (min) | n matched | fraction identical predicted_node | mean L1 dist | top1 @15min | top1 @30min | top1 @60min |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for depth, by_onset in sorted(cadence_report["onset_stratified_paired_by_depth"].items(), key=lambda kv: int(kv[0])):
+        for onset, entry in sorted(by_onset.items(), key=lambda kv: int(kv[0])):
+            frac = entry["fraction_identical_predicted_node_all_cadences"]
+            mean_l1 = entry["mean_l1_probability_distance"]
+            t1 = entry.get("top1_by_cadence", {})
+            lines.append(
+                f"| {depth} | {onset} | {entry['n_incidents_matched_across_all_cadences']} | "
+                f"{'-' if frac is None else f'{frac:.3f}'} | {'-' if mean_l1 is None else f'{mean_l1:.4f}'} | "
+                f"{t1.get('15', float('nan')):.3f} | {t1.get('30', float('nan')):.3f} | {t1.get('60', float('nan')):.3f} |"
+            )
+    lines += [
+        "",
+        "### Milestone-6 final validity check: post-onset-anchored diagnostic (AUTHORITATIVE for the 6.5 decision)",
+        "",
+        "Evidence = the first N real reports AT OR AFTER true contamination onset, per cadence (onset used only "
+        "to select which reports to include; never written into any model input -- see "
+        "`_cadence_evidence_since_onset`'s docstring). Compares the SAME incidents across cadences.",
+        "",
+        f"**report_count_conflation_post_onset_n2: {cadence_report['report_count_conflation_post_onset_n2']}** "
+        f"(bar={cadence_report['paired_invariance_fraction_bar']:.2f}); "
+        f"**report_count_conflation_post_onset_n3: {cadence_report['report_count_conflation_post_onset_n3']}**",
+        "",
+        "| N post-onset reports | n matched | fraction identical predicted_node (all cadences) | 15v30 agreement | 15v60 agreement | 30v60 agreement | mean L1 dist | max L1 dist | top1 @15min | top1 @30min | top1 @60min |",
+        "|---|---|---|---|---|---|---|---|---|---|---|",
+    ]
+    for n_reports, entry in sorted(cadence_report["post_onset_paired_by_n"].items(), key=lambda kv: int(kv[0])):
+        pw = entry["pairwise_top1_agreement"]
+
+        def _agree2(key):
+            v = pw.get(key)
+            return "-" if not v else f"{v['agreement_fraction']:.3f} (n={v['n']})"
+
+        frac = entry["fraction_identical_predicted_node_all_cadences"]
+        mean_l1 = entry["mean_l1_probability_distance"]
+        max_l1 = entry["max_l1_probability_distance"]
+        t1 = entry.get("top1_by_cadence", {})
+        lines.append(
+            f"| {n_reports} | {entry['n_incidents_matched_across_all_cadences']} | "
+            f"{'-' if frac is None else f'{frac:.3f}'} | {_agree2('15v30')} | {_agree2('15v60')} | {_agree2('30v60')} | "
+            f"{'-' if mean_l1 is None else f'{mean_l1:.4f}'} | {'-' if max_l1 is None else f'{max_l1:.4f}'} | "
+            f"{t1.get('15', float('nan')):.3f} | {t1.get('30', float('nan')):.3f} | {t1.get('60', float('nan')):.3f} |"
         )
     lines += [
         "",
