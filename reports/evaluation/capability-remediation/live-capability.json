@@ -1,166 +1,164 @@
 {
-  "conditions": {
-    "nominal:clean_operational": {
-      "analysis_ms": {
-        "max": 439.1159890219569,
-        "median": 141.16413402371109,
-        "min": 140.6748269801028,
-        "n": 4,
-        "p95": null
-      },
-      "mrr": 1.0,
-      "n": 4,
-      "planning_eligible_rate": 0.75,
-      "top1": 1.0,
-      "top3": 1.0,
-      "total_trajectory_ms": {
-        "max": 680.7032190263271,
-        "median": 385.36062597995624,
-        "min": 211.2667390028946,
-        "n": 4,
-        "p95": null
-      }
-    }
+  "applicability": {
+    "calibrated_rate": 0.9047619047619048,
+    "supported_false_calibration_invalid_rate": 0.0,
+    "supported_ood_normal_rate": 1.0,
+    "unseen_ood_normal_rate": 0.0
   },
-  "findings": [
-    {
-      "id": "ROB-LIVE-01",
-      "severity": "MEDIUM",
-      "status": "NOT_EVALUATED",
-      "summary": "re-analysis can recommend a node already represented in current evidence"
-    },
-    {
-      "id": "ROB-LIVE-02",
-      "severity": "HIGH",
-      "status": "NOT_EVALUATED",
-      "summary": "unvalidated coastal topology receives live OOD NORMAL despite calibration inapplicability"
-    }
-  ],
+  "calibration_sha": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
+  "code_under_test_commit": "41aae8795cd2d25894f9521f5ac7ea17d04256a5",
+  "feature_schema_sha": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "frozen_matrix_runs": 264,
   "invariant_failures": [],
   "locked_test_opened": false,
-  "networks": [
-    "golden-reference"
-  ],
-  "outcomes": {
-    "SUPPRESSED": 1,
-    "VERIFIED": 3
+  "model_sha": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+  "normalization_sha": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+  "overall": {
+    "candidate_size": 0.9523809523809523,
+    "coverage": 0.8849206349206349,
+    "entropy": 0.1183908460394767,
+    "mrr": 0.9472222222222222,
+    "top1": 0.9087301587301587,
+    "top3": 0.9722222222222222
   },
   "performance": {
     "analysis_ms": {
-      "max": 439.1159890219569,
-      "median": 141.16413402371109,
-      "min": 140.6748269801028,
-      "n": 4,
-      "p95": null
+      "max": 1229.5254479977302,
+      "median": 213.9471395057626,
+      "min": 59.75476698949933,
+      "n": 264,
+      "p95": 257.00467004207894
     },
     "approval_ms": {
-      "max": 1.621244999114424,
-      "median": 1.5734629705548286,
-      "min": 1.5430970233865082,
-      "n": 3,
-      "p95": null
+      "max": 2.295388956554234,
+      "median": 2.0048734731972218,
+      "min": 1.7314599826931953,
+      "n": 180,
+      "p95": 2.1177440066821873
     },
     "import_ms": {
-      "max": 57.33703001169488,
-      "median": 55.653180490480736,
-      "min": 54.37775905011222,
-      "n": 4,
-      "p95": null
+      "max": 1085.611017944757,
+      "median": 128.71513402205892,
+      "min": 69.38361201900989,
+      "n": 264,
+      "p95": 164.24244502559304
     },
     "incident_creation_ms": {
-      "max": 12.259864015504718,
-      "median": 11.404457472963259,
-      "min": 10.791025997605175,
-      "n": 4,
-      "p95": null
+      "max": 43.93745603738353,
+      "median": 13.215315528213978,
+      "min": 10.565023985691369,
+      "n": 264,
+      "p95": 14.866268029436469
     },
     "peak_process_rss_mb": {
-      "max": 919.703125,
-      "median": 876.11328125,
-      "min": 798.7578125,
-      "n": 4,
-      "p95": null
+      "max": 4409.83203125,
+      "median": 3603.064453125,
+      "min": 799.0546875,
+      "n": 246,
+      "p95": 4336.59765625
     },
     "planning_ms": {
-      "max": 9.883010003250092,
-      "median": 9.361987991724163,
-      "min": 1.0656629456207156,
-      "n": 4,
-      "p95": null
+      "max": 12.001405004411936,
+      "median": 9.90507853566669,
+      "min": 1.080153975635767,
+      "n": 246,
+      "p95": 11.143498995807022
     },
     "process_rss_after_mb": {
-      "max": 919.671875,
-      "median": 872.84765625,
-      "min": 798.75,
-      "n": 4,
-      "p95": null
+      "max": 4394.98046875,
+      "median": 3590.884765625,
+      "min": 799.04296875,
+      "n": 246,
+      "p95": 4324.33984375
     },
     "process_rss_before_mb": {
-      "max": 881.91015625,
-      "median": 834.98046875,
-      "min": 719.5859375,
-      "n": 4,
-      "p95": null
+      "max": 4386.875,
+      "median": 3568.66796875,
+      "min": 719.55859375,
+      "n": 246,
+      "p95": 4304.2265625
     },
     "reanalysis_ms": {
-      "max": null,
-      "median": null,
-      "min": null,
-      "n": 0,
+      "max": 419.68369600363076,
+      "median": 323.32395849516615,
+      "min": 154.09101999830455,
+      "n": 12,
       "p95": null
     },
     "sampling_ms": {
-      "max": null,
-      "median": null,
-      "min": null,
-      "n": 0,
+      "max": 10.435434989631176,
+      "median": 9.743272967170924,
+      "min": 4.7365460195578635,
+      "n": 12,
       "p95": null
     },
     "total_trajectory_ms": {
-      "max": 680.7032190263271,
-      "median": 385.36062597995624,
-      "min": 211.2667390028946,
-      "n": 4,
-      "p95": null
+      "max": 3834.887054981664,
+      "median": 687.2763420105912,
+      "min": 228.60873799072579,
+      "n": 264,
+      "p95": 897.1036319853738
     },
     "verification_ms": {
-      "max": 164.95794197544456,
-      "median": 162.89608797524124,
-      "min": 158.28377095749602,
-      "n": 3,
-      "p95": null
+      "max": 2659.500035981182,
+      "median": 381.23062351951376,
+      "min": 214.31727899471298,
+      "n": 180,
+      "p95": 464.73377296933904
     }
   },
   "planning": {
     "decisions": {
-      "ABSTAINED": 3,
-      "VERIFIED": 3
+      "ABSTAINED": 182,
+      "REJECTED": 0,
+      "VERIFIED": 185
     },
-    "exact_simulator_calls": 6,
-    "plans": 6
+    "exact_simulator_calls": 367,
+    "plans": 367
   },
-  "remediation_control_evidence": {},
-  "runs": 4,
-  "runtime_commits": [
-    "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7"
+  "populations": [
+    "ambiguity",
+    "hydraulic_mismatch",
+    "measurement_bias",
+    "measurement_noise",
+    "missingness",
+    "nominal",
+    "nominal_supported_control",
+    "scale",
+    "sensor_coverage",
+    "sensor_health",
+    "topology_familiarity"
   ],
+  "runs": 270,
   "sampling": {
-    "acquired": 0,
+    "acquired": 23,
     "realized_entropy_reduction_bits": {
-      "max": null,
-      "median": null,
-      "min": null,
-      "n": 0,
-      "p95": null
+      "median": 0.13264094642523228,
+      "n": 23
     },
     "repeated_observed_recommendations": 0,
-    "rounds": 1,
-    "stopped": 1
+    "rounds": 90,
+    "stopped": 67
   },
-  "study_baseline_commits": [
-    "e45f72cf730d3f12c13dbcb9403c64f185510173"
-  ],
-  "topology_classes": [
-    "governed_reference"
-  ]
+  "schema_version": 1,
+  "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811",
+  "supplementary_supported_topology_controls": 6,
+  "supported_nominal": {
+    "mrr": 0.9277777777777777,
+    "top1": 0.8888888888888888,
+    "top3": 0.9444444444444444
+  },
+  "suppression_counts": {
+    "CALIBRATION_INVALID_OR_MISSING": 24,
+    "CANDIDATE_REGION_TOO_BROAD": 30,
+    "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 7,
+    "MODEL_EVIDENCE_INSUFFICIENT": 30,
+    "OOD_CAUTION": 24
+  },
+  "utility": {
+    "actionable_within_1": null,
+    "actionable_within_2": null,
+    "actionable_within_3": null,
+    "initial_actionable": 0.7341269841269841
+  }
 }

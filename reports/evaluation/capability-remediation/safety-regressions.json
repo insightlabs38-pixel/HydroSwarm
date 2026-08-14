@@ -1,15 +1,23 @@
 {
-  "alpha": 0.1,
-  "artifact": "models/hydrocore-v4-release/calibration.json",
+  "ROB-LIVE-01": {
+    "evidence": "LIVE runtime rejects non-REQUEST_SAMPLE/no-authoritative-result recommendations; targeted API authority tests pass.",
+    "invalid_authority_recommendations": 0,
+    "repeated_observed_recommendations": 0,
+    "status": "REMEDIATED"
+  },
+  "ROB-LIVE-02": {
+    "status": "REMEDIATED",
+    "supported_topology_novelty_max": 0.0,
+    "unseen_calibrated_rate": 0.0,
+    "unseen_ood_normal_rate": 0.0,
+    "unseen_planning_allowed_rate": 0.0,
+    "unseen_topology_novelty_min": 1.0
+  },
+  "authority_invariant_failures": [],
   "calibration_sha": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
   "code_under_test_commit": "41aae8795cd2d25894f9521f5ac7ea17d04256a5",
-  "coverage": 0.9143258426966292,
-  "coverage_by_condition": null,
-  "coverage_by_network": null,
   "feature_schema_sha": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
-  "fit_population": "existing designated calibration split only",
   "locked_test_opened": false,
-  "mean_candidate_size": 2.800561797752809,
   "model_sha": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
   "normalization_sha": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
   "schema_version": 1,

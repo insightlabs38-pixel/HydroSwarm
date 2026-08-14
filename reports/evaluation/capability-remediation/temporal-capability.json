@@ -1,4 +1,5 @@
 {
+  "calibration_sha": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
   "checkpoints": {
     "1": {
       "calibrated": 1.0,
@@ -85,11 +86,16 @@
       "top3": 0.8
     }
   },
+  "code_under_test_commit": "41aae8795cd2d25894f9521f5ac7ea17d04256a5",
+  "feature_schema_sha": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "locked_test_opened": false,
   "locked_test_opened_after": false,
   "locked_test_opened_before": false,
   "maximum_causal_window_steps": 25,
+  "model_sha": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
   "negative_baseline": "latest_only uses one final report per sensor and is not product behavior",
   "network": "golden-reference",
+  "normalization_sha": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
   "population": "development only",
   "purpose": "post-remediation causal temporal capability; no future observations",
   "records": {
@@ -1788,5 +1794,6 @@
       }
     ]
   },
-  "schema_version": 1
+  "schema_version": 1,
+  "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811"
 }

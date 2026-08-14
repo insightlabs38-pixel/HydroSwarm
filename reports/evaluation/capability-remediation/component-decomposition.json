@@ -1,4 +1,7 @@
 {
+  "calibration_sha": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
+  "code_under_test_commit": "41aae8795cd2d25894f9521f5ac7ea17d04256a5",
+  "feature_schema_sha": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
   "known_network_component_summary": {
     "classical_top1": 0.5833333333333334,
     "fusion_harms": [
@@ -29,8 +32,11 @@
     "n": 24,
     "neural_top1": 0.5416666666666666
   },
+  "locked_test_opened": false,
   "locked_test_opened_after": false,
   "locked_test_opened_before": false,
+  "model_sha": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+  "normalization_sha": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
   "population": "development-only causal full-window incidents",
   "rows": [
     {
@@ -834,5 +840,6 @@
       "truth": "CB2"
     }
   ],
-  "schema_version": 1
+  "schema_version": 1,
+  "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811"
 }

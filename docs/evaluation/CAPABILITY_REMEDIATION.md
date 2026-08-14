@@ -1,72 +1,90 @@
-# Capability remediation
+# Capability remediation finalization
 
-This remediation starts from merged main
-`dec954c7dbc3408469d1dbc412ad4be83d310585`. The diagnostic reports remain
-unchanged. All results here use development-only data; the locked final and
-locked topology tests were not opened.
+This branch remediated the demonstrated serving defects without changing the
+HydroCore-v4 weights: canonical structural identity, calibration/OOD
+applicability, causal telemetry history, missing-health semantics, the
+25-step feature window, calibration group selection, and sampling timing.
+Historical diagnostic and pre-remediation evidence remain unchanged.
 
-## Corrected product behavior
+## Scientific identity
 
-- Governed network identity is one canonical, explicit nine-significant-digit
-  structural serialization. It makes programmatic construction and canonical
-  EPANET parsing agree without an allow-list. Mutable demand and tank state
-  remain simulator-state provenance, not structural identity.
-- Production now carries all causal reports through analysis and explicitly
-  supplies HydroCore-v4's 25-step maximum feature window. Missing readings
-  produce effective health 0.0.
-- Runtime uses canonical governed family plus deterministic evidence condition
-  to select Mondrian calibration and exposes both calibration source and group
-  in analysis and the immutable audit event.
-- Sampling ranks the predicted measurement at recommendation time plus the
-  reported per-node collection delay. The API returns that delay, and the
-  development evaluator materializes the matching delayed, seeded-noisy
-  measurement (sigma 0.05 mg/L).
+The final campaigns ran against code commit
+`41aae8795cd2d25894f9521f5ac7ea17d04256a5`. HydroCore-v4 remains
+`a501ad87…`; feature schema, normalization, signature policy, fusion, and
+authority thresholds are unchanged. Calibration was previously refit solely
+from the designated calibration split after the canonical topology identity
+change. The locked test and locked topology test remain unopened.
 
-The product and evidence contract is [PRODUCT_CAPABILITY_CONTRACT.md](../PRODUCT_CAPABILITY_CONTRACT.md).
-Network compatibility, model/calibration applicability, and operational
-readiness remain independent concepts.
+The governed canonical golden hash is `5508d272…`; programmatic and EPANET
+paths resolve the same identity. Supported topology observations are calibrated
+and OOD-NORMAL; unseen coastal is calibration-invalid, topology-novel
+(1.0), OOD-CAUTION, and cannot plan.
 
-## Measurements
+## Causal evidence and model decision
 
-The complete machine-readable record is in
-`reports/evaluation/capability-remediation/`.
+The causal temporal curve remains: top-1 0.15/0.50/0.45/0.80/0.80 at
+1/2/3/6/25 steps, versus 0.20 for final latest-only evidence. Controlled
+validation reproduced top-1 0.7205, top-3 0.8680, and MRR 0.8113.
 
-- Calibration was refit only on the designated 712-example calibration split,
-  preserving alpha 0.1. Coverage is 0.9143 and mean candidate size is 2.8006.
-  Model, schema, and normalization hashes did not change.
-- Canonical golden, branched-loop, and loop-grid are all calibrated with OOD
-  NORMAL rate 1.0 in the development topology study. Coastal unseen is
-  calibration-invalid, has OOD NORMAL rate 0.0, and has planning rate 0.0.
-- The causal-prefix study (n=20 golden development incidents) gives top-1 of
-  0.15/0.50/0.45/0.80/0.80 at 1/2/3/6/25 steps, while final latest-only is
-  0.20. This confirms the runtime no longer silently acts latest-only, but
-  also demonstrates weak genuinely early evidence.
-- The API-driven nominal LIVE slice (n=4) has top-1/top-3/MRR 1.0/1.0/1.0,
-  calibration-valid rate 1.0, OOD NORMAL rate 1.0, planning eligibility 0.75,
-  and no authority invariant failures.
-- The sparse 50%-coverage paired sampling slice (n=20, three-step prefix,
-  three-sample budget) has EIG median realized entropy reduction 0.7818 bits
-  versus 0.0 for random; however actionable within three samples is 0.0 for
-  both and EIG final top-1 is 0.70 versus random 0.75. Safety thresholds were
-  not adjusted to mask that result.
-- Full train/serve parity passes across all three governed networks and clean
-  and degraded conditions, including node/edge/temporal-quality masks,
-  classical prior, ordering, and signatures.
+CAP-REM-01 is therefore a **causal-prefix training-distribution limitation**.
+It does not establish a parameter-capacity bottleneck. No retraining was
+performed here; the appropriate follow-up is a separate causal-prefix
+HydroCore-v5 experiment.
 
-## Findings and model decision
+## CAP-REM-02: active sampling
 
-CAP-REM-01: early causal prefixes remain materially weak (top-1 0.15 at one
-step and 0.45 at three) while later causal evidence is strong. This is a
-training-distribution finding, not parameter-count evidence.
+The final paired development experiment used 40 canonical golden incidents,
+three causal steps, 50% initial sensor coverage, three samples, 30-minute
+acquisition delay, and matched seeded 0.05 mg/L noise.
 
-CAP-REM-02: after semantic alignment, EIG reduces entropy but does not
-materially outperform random on the primary actionability metric in the
-predeclared sparse development slice. This requires a focused follow-up;
-no safety or fusion tuning was performed here.
+EIG had median realized entropy reduction 0.9572 bits and positive realized
+reduction in every EIG round, with expected/realized Spearman 0.544. It did
+not demonstrate better operational actionability: EIG was actionable within
+three samples in 0.375 of incidents; random valid-unsampled was 0.450.
 
-Therefore the model decision is:
+The post-sample decomposition found no stale analysis, calibration-group,
+timestamp, or API/runtime divergence. In localization-correct-but-suppressed
+states, conformal candidate breadth was the dominant blocker (48 states),
+followed by learned model-evidence insufficiency (20). The candidate-region
+blocker was the sole blocker in 45 states. Thresholds and alpha were not
+retuned.
 
-> CAUSAL-PREFIX RETRAINING JUSTIFIED, CAPACITY INCREASE NOT YET JUSTIFIED
+CAP-REM-02 is consequently scoped as a **current product limitation**:
+active sampling is evidence guidance that can reduce uncertainty, but current
+development evidence does not show that it reduces samples-to-actionability
+versus random in the sparse causal regime. It remains advisory/experimental
+until revisited after causal-prefix training.
 
-The branch is **not ready for a PR** until CAP-REM-02 is resolved or scoped as
-a product limitation and the broader required LIVE/safety campaign is run.
+## Full production-path LIVE campaign
+
+The frozen 264-run API-driven LIVE matrix completed with zero authority
+invariant failures. A separate six-run clean supported-topology control slice
+then covered branched-loop and loop-grid without altering that frozen matrix.
+Together the 270 API-path runs cover nominal, missingness, sensor health,
+sensor coverage, measurement noise/bias, hydraulic shifts, ambiguity, unseen
+topology, scale, and all three governed supported networks. Overall analyzed
+outcomes were top-1 0.9087, top-3 0.9722, MRR 0.9472; supported nominal was
+0.8889/0.9444/0.9278. Canonical supported runs had no false
+calibration-invalid result and were OOD-NORMAL; coastal remained
+calibration-invalid, topology-novel, OOD-CAUTION, and ineligible to plan.
+
+The combined campaign generated 367 plans, 185 VERIFIED results, 182
+ABSTAINED plan results, and 367 exact WNTR calls. It acquired 23 samples; no
+already-observed recommendation occurred. ROB-LIVE-01 and ROB-LIVE-02 are
+remediated.
+
+See the machine-readable final record in
+`reports/evaluation/capability-remediation/`, notably `sampling.json`,
+`sampling-blockers.json`, `full-live-results.json`,
+`supported-topology-controls.json`, `full-live-summary.json`,
+`safety-regressions.json`, and `summary.json`.
+
+## Remaining limitation and next step
+
+Do not claim EIG operational superiority or treat an uncommissioned topology's
+planning suppression as a localization failure. The branch includes only the
+design for network commissioning in
+[NETWORK_COMMISSIONING_DESIGN.md](../NETWORK_COMMISSIONING_DESIGN.md).
+
+The next model work, if authorized, is a separate causal-prefix training
+experiment—not a capacity increase or architecture rewrite.

@@ -1,39 +1,31 @@
-campaign,metric,value,n,source
-temporal:1,top1,0.15,20,temporal-capability.json
-temporal:1,top3,0.8,20,temporal-capability.json
-temporal:1,mrr,0.4583333333333333,20,temporal-capability.json
-temporal:1,planning_eligible,0.0,20,temporal-capability.json
-temporal:12,top1,0.8,20,temporal-capability.json
-temporal:12,top3,1.0,20,temporal-capability.json
-temporal:12,mrr,0.875,20,temporal-capability.json
-temporal:12,planning_eligible,0.65,20,temporal-capability.json
-temporal:2,top1,0.5,20,temporal-capability.json
-temporal:2,top3,0.95,20,temporal-capability.json
-temporal:2,mrr,0.6791666666666667,20,temporal-capability.json
-temporal:2,planning_eligible,0.2,20,temporal-capability.json
-temporal:25,top1,0.8,20,temporal-capability.json
-temporal:25,top3,1.0,20,temporal-capability.json
-temporal:25,mrr,0.875,20,temporal-capability.json
-temporal:25,planning_eligible,0.65,20,temporal-capability.json
-temporal:3,top1,0.45,20,temporal-capability.json
-temporal:3,top3,0.9,20,temporal-capability.json
-temporal:3,mrr,0.6583333333333333,20,temporal-capability.json
-temporal:3,planning_eligible,0.3,20,temporal-capability.json
-temporal:6,top1,0.8,20,temporal-capability.json
-temporal:6,top3,1.0,20,temporal-capability.json
-temporal:6,mrr,0.875,20,temporal-capability.json
-temporal:6,planning_eligible,0.65,20,temporal-capability.json
-temporal:latest_only,top1,0.2,20,temporal-capability.json
-temporal:latest_only,top3,0.8,20,temporal-capability.json
-temporal:latest_only,mrr,0.4666666666666667,20,temporal-capability.json
-temporal:latest_only,planning_eligible,0.0,20,temporal-capability.json
-sampling:EIG,actionable_within_3,0.0,20,sampling.json
-sampling:EIG,median_realized_entropy_reduction,0.7818218766009248,20,sampling.json
-sampling:EIG,never_resolved,1.0,20,sampling.json
-sampling:EIG,top1_after_n,0.7,20,sampling.json
-sampling:EIG,top3_after_n,1.0,20,sampling.json
-sampling:RANDOM,actionable_within_3,0.0,20,sampling.json
-sampling:RANDOM,median_realized_entropy_reduction,-0.0,20,sampling.json
-sampling:RANDOM,never_resolved,1.0,20,sampling.json
-sampling:RANDOM,top1_after_n,0.75,20,sampling.json
-sampling:RANDOM,top3_after_n,1.0,20,sampling.json
+campaign,metric,value,n,source,code_under_test_commit
+sampling:EIG,actionable_initial,0.35,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,actionable_within_1,0.375,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,actionable_within_2,0.375,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,actionable_within_3,0.375,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,final_top1,0.8,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,final_top3,1.0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_candidate_contraction,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_rank_improvement,1,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_realized_entropy_reduction,0.957196790175124,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,median_samples_to_actionability,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,n,40,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:EIG,never_resolved,0.625,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_initial,0.35,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_within_1,0.45,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_within_2,0.45,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,actionable_within_3,0.45,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,final_top1,0.825,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,final_top3,1.0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_candidate_contraction,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_rank_improvement,0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_realized_entropy_reduction,0.9571561362536282,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,median_samples_to_actionability,0.0,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,n,40,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+sampling:RANDOM,never_resolved,0.55,40,sampling.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,top1,0.9087301587301587,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,top3,0.9722222222222222,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,mrr,0.9472222222222222,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,coverage,0.8849206349206349,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,candidate_size,0.9523809523809523,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
+full-live,entropy,0.1183908460394767,270,full-live-results.json + supported-topology-controls.json,41aae8795cd2d25894f9521f5ac7ea17d04256a5
