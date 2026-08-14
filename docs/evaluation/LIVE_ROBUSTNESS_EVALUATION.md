@@ -1,5 +1,11 @@
 # HydroSwarm End-to-End LIVE Robustness and Scalability Characterization
 
+> **Current status:** `ROB-LIVE-01` and `ROB-LIVE-02`, reported below as open
+> findings, are **remediated** as of the capability-remediation branch. See
+> [LIVE robustness post-remediation](LIVE_ROBUSTNESS_POST_REMEDIATION.md) and
+> [Capability remediation](CAPABILITY_REMEDIATION.md). This page is preserved
+> unchanged as the original pre-remediation discovery record.
+
 ## Executive summary
 
 Study 2 executed 264 deterministic, API-driven HydroSwarm incident trajectories against frozen HydroCore-v4. Unlike Study 1, it used the real network importer, persistence, `HybridInferencePipeline.analyze()`, dynamic fusion, conformal calibration, live OOD calculation, active-sampling endpoint, plan generator, exact WNTR verifier, and approval route. No model, calibration, schema, threshold, physics, or authority policy changed.

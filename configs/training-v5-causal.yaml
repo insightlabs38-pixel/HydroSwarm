@@ -1,0 +1,99 @@
+# v5 causal-prefix training configuration (Milestone 0.3 / experiments.txt).
+#
+# This is the config any promotion-quality Milestone 1+ v5 run (Arms A/B/C
+# and their seeds) must load via:
+#
+#   TrainingConfig.from_yaml(
+#       "configs/training-v5-causal.yaml",
+#       require_complete_task_weights=True,
+#   )
+#
+# require_complete_task_weights=True fails closed
+# (hydroswarm.training.losses.IncompleteTaskWeightsError) unless task_weights
+# below has an explicit entry for every task in
+# hydroswarm.training.losses.ALL_TASK_NAMES, so a v5 run cannot silently
+# depend on compute_multitask_loss's hidden per-call default the way
+# historical scripts/run_stage_f_training.py's TrainingConfig(...) call (no
+# task_weights passed at all) and its _evaluate() helper (calls
+# compute_multitask_loss(output, targets) with no task_weights) both did --
+# see docs/evaluation/HYDROCORE_V5_EXPERIMENT_PROTOCOL.md's "no historical
+# Stage-F reuse" note. Do not import or extend run_stage_f_training.py; build
+# v5 runners against this config instead.
+#
+# task_weights below is intentionally identical to the values in
+# configs/training.yaml (the repository's own current, explicit, reviewed
+# multitask weighting -- core-issues3.txt Phase 11.1), not re-derived: this
+# milestone changes training DATA distribution (causal-prefix depths) and
+# fixes the gradient-conflict diagnostic, not task weighting.
+# Milestone 2 is the predeclared place to revisit these weights based on
+# measured conflict, not this file.
+training:
+  seed: 31874
+  epochs: 20
+  batch_size: 2
+  gradient_accumulation_steps: 4
+  learning_rate: 0.0003
+  weight_decay: 0.01
+  gradient_clip_norm: 1.0
+  warmup_steps: 10
+  scheduler: cosine
+  checkpoint_every_epochs: 1
+  early_stopping_patience: 5
+  minimum_delta: 0.0
+  maximum_runtime_seconds: 28800
+  minimum_free_disk_gb: 1.0
+  num_workers: 0
+  device: cpu
+  fp32: true
+  deterministic: true
+  gradnorm_logging: true
+  # Milestone 2.1 needs per-task gradient-conflict diagnostics from the
+  # start of the v5 program (grouped by causal depth) -- unlike
+  # configs/training.yaml's off-by-default posture, this v5 config turns it
+  # on so Milestone 1 arms already produce the data Milestone 2 depends on.
+  # Still opt-in-by-value only: pcgrad_enabled below stays false, matching
+  # "Do not enable PCGrad automatically" (Milestone 0.4) and "Do not enable
+  # it merely because the implementation exists" (Milestone 2.3).
+  gradient_conflict_logging: true
+  pcgrad_enabled: false
+  task_weights:
+    # --- Sentinel: primary scientific objectives -----------------------
+    source_node: 1.0
+    source_region: 0.5  # coarser, secondary localization signal alongside source_node
+    start_time: 0.5
+    duration: 0.5
+    relative_strength: 0.5
+    event_presence: 1.0  # incident on/off gate -- upstream of every other Sentinel head
+    event_cause: 1.0
+    sensor_fault: 1.0
+    evidence_sufficiency: 1.0  # safety-adjacent control signal; must not be deprioritized
+    # --- Scout: next-sample selection -----------------------------------
+    sample_node: 1.0
+    information_gain: 0.5
+    candidate_reduction: 0.5  # secondary Scout signal, same tier as information_gain
+    should_continue_sampling: 0.5  # incident-level Scout stop/continue advisory
+    # --- Strategist: bounded-plan ranking -------------------------------
+    action_template: 1.0  # v3-legacy head; still trained by the unmodified default v3 model
+    target_pointer: 1.0  # v3-legacy head; see action_template above
+    plan_validity: 1.0
+    plan_value: 0.5
+    # Consequence proxies are explicitly non-authoritative (mission
+    # statement) -- weighted below plan_value/plan_validity, the two
+    # outputs that actually drive ranking/verification.
+    exposure_proxy: 0.3
+    pressure_risk_proxy: 0.3
+    service_loss_proxy: 0.3
+    containment_time_proxy: 0.3
+    plan_regret_proxy: 0.3
+    # --- OOD / control: advisory, never authoritative over deterministic
+    # severity/fail-closed gating -----------------------------------------
+    ood_class: 1.0
+    next_step: 1.0
+    # --- Auxiliary: shape the shared backbone, never operator-authoritative
+    sensor_reconstruction: 0.25
+    travel_time: 0.1  # matches losses.AUXILIARY_TASK_DEFAULT_WEIGHT
+    # future_concentration is structurally disabled (its target generator
+    # always returns an all-masked placeholder, so this weight never
+    # multiplies a real loss). Recorded explicitly, at 0.0, so its absence
+    # is never mistaken for an omission this config forgot.
+    future_concentration: 0.0

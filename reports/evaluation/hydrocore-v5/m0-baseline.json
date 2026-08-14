@@ -1,0 +1,161 @@
+{
+  "calibration_alpha": 0.1,
+  "calibration_coverage": 0.9143258426966292,
+  "calibration_sha": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
+  "causal_prefix_curve": {
+    "checkpoints": {
+      "1": {
+        "calibrated": 1.0,
+        "candidate_size": 0.0,
+        "entropy": 1.3884682385587501,
+        "evidence_sufficient": 0.0,
+        "mrr": 0.4583333333333333,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.0,
+        "top1": 0.15,
+        "top3": 0.8
+      },
+      "12": {
+        "calibrated": 1.0,
+        "candidate_size": 0.7,
+        "entropy": 0.3549790299116823,
+        "evidence_sufficient": 0.65,
+        "mrr": 0.875,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.65,
+        "top1": 0.8,
+        "top3": 1.0
+      },
+      "2": {
+        "calibrated": 1.0,
+        "candidate_size": 0.2,
+        "entropy": 1.0454154672164697,
+        "evidence_sufficient": 0.2,
+        "mrr": 0.6791666666666667,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.2,
+        "top1": 0.5,
+        "top3": 0.95
+      },
+      "25": {
+        "calibrated": 1.0,
+        "candidate_size": 0.7,
+        "entropy": 0.3549790299116823,
+        "evidence_sufficient": 0.65,
+        "mrr": 0.875,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.65,
+        "top1": 0.8,
+        "top3": 1.0
+      },
+      "3": {
+        "calibrated": 1.0,
+        "candidate_size": 0.4,
+        "entropy": 0.70511533509817,
+        "evidence_sufficient": 0.35,
+        "mrr": 0.6583333333333333,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.3,
+        "top1": 0.45,
+        "top3": 0.9
+      },
+      "6": {
+        "calibrated": 1.0,
+        "candidate_size": 0.7,
+        "entropy": 0.3549790299116823,
+        "evidence_sufficient": 0.65,
+        "mrr": 0.875,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.65,
+        "top1": 0.8,
+        "top3": 1.0
+      },
+      "latest_only": {
+        "calibrated": 1.0,
+        "candidate_size": 0.1,
+        "entropy": 1.4843062040463733,
+        "evidence_sufficient": 0.1,
+        "mrr": 0.4666666666666667,
+        "n": 20,
+        "ood_normal": 1.0,
+        "planning_eligible": 0.0,
+        "top1": 0.2,
+        "top3": 0.8
+      }
+    },
+    "confirmation": {
+      "identity_matches_shipped_checkpoint": true,
+      "source": "reports/evaluation/capability-remediation/temporal-capability.json"
+    },
+    "top1_by_depth": {
+      "1": 0.15,
+      "12": 0.8,
+      "2": 0.5,
+      "25": 0.8,
+      "3": 0.45,
+      "6": 0.8,
+      "latest_only": 0.2
+    }
+  },
+  "code_under_test_commit": "b7699387a1a825a9b69034ded74321bd1049fc19",
+  "controlled_reproduction": {
+    "examples": 712,
+    "historical_range_reproduced": true,
+    "historical_ranges": {
+      "mrr": [
+        0.8113,
+        0.8172
+      ],
+      "top1": [
+        0.7205,
+        0.7331
+      ],
+      "top3": [
+        0.868,
+        0.8756
+      ]
+    },
+    "in_range": {
+      "mrr": true,
+      "top1": true,
+      "top3": true
+    },
+    "mrr": 0.8112593632958801,
+    "split": "validation",
+    "top1": 0.7205056179775281,
+    "top3": 0.8679775280898876
+  },
+  "current_sampling_baseline": {
+    "actionable_within_three_samples": {
+      "eig": 0.375,
+      "random_valid_unsampled": 0.45
+    },
+    "confirmation": {
+      "identity_matches_shipped_checkpoint": true,
+      "source": "reports/evaluation/capability-remediation/sampling.json"
+    },
+    "expected_vs_realized": {
+      "fraction_positive": 1.0,
+      "fraction_rank_improving": 0.64,
+      "fraction_rank_worsening": 0.32,
+      "median_realized_entropy_reduction": 0.957196790175124,
+      "p25_realized_entropy_reduction": 0.9571561362536282,
+      "p75_realized_entropy_reduction": 0.9573357119928534,
+      "spearman": 0.5443621296573892
+    },
+    "note": "CAP-REM-02: EIG did not beat random on samples-to-actionability; see docs/evaluation/CAPABILITY_REMEDIATION.md."
+  },
+  "feature_schema_sha": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "locked_test_opened": false,
+  "model_sha": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+  "normalization_sha": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+  "purpose": "Milestone 0.5 (experiments.txt): shipped HydroCore-v4 baseline reproduced before any v5 change.",
+  "schema_version": 1,
+  "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811"
+}
