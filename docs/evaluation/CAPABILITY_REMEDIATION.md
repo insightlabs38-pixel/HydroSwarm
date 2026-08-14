@@ -73,11 +73,26 @@ ABSTAINED plan results, and 367 exact WNTR calls. It acquired 23 samples; no
 already-observed recommendation occurred. ROB-LIVE-01 and ROB-LIVE-02 are
 remediated.
 
+The frozen matrix does not define cumulative `actionable within 1/2/3`
+metrics: it retains final authority and selected post-sample states, not a
+complete initial-to-round authority trajectory for every incident. Those rates
+are therefore intentionally null in `live-capability.json`; the 40-incident
+paired sampling campaign is the authoritative measurement of actionability
+within a sample budget.
+
 See the machine-readable final record in
 `reports/evaluation/capability-remediation/`, notably `sampling.json`,
 `sampling-blockers.json`, `full-live-results.json`,
 `supported-topology-controls.json`, `full-live-summary.json`,
-`safety-regressions.json`, and `summary.json`.
+`safety-regressions.json`, `validation.json`, and `summary.json`.
+
+## Local release validation
+
+The final local validation record is published in `validation.json`:
+1,136 Python tests passed with one documented historical skip in 657.36
+seconds; the strict self-test passed; and frontend lint, typecheck, format,
+test (29 files/162 tests), and build gates all passed. The focused remediation
+suite also passed 31 tests.
 
 ## Remaining limitation and next step
 

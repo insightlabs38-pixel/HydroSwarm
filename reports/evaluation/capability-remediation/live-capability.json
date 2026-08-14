@@ -156,6 +156,7 @@
     "OOD_CAUTION": 24
   },
   "utility": {
+    "actionability_within_reason": "Not defined for the frozen LIVE matrix: its rows retain final authority and selected post-sample states, but do not retain an initial-to-each-round planning-authority trajectory for every incident. The paired sampling campaign is the authoritative <=N actionability measurement.",
     "actionable_within_1": null,
     "actionable_within_2": null,
     "actionable_within_3": null,
