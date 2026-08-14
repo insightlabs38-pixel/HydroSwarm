@@ -329,7 +329,7 @@ def main() -> int:
         "calibration_sha": json.loads((ROOT / "models/hydrocore-v4-release/calibration-status.json").read_text())["calibration_artifact_hash"],
         "feature_schema_sha": factory.identity.feature_schema_hash,
         "normalization_sha": factory.identity.normalization_hash,
-        "signature_policy_hash": factory.identity.signature_policy_hash,
+        "signature_policy_hash": factory.signature_policy_hash,
         "locked_test_opened": False,
     }
     payload = {
