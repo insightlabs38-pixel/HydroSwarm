@@ -462,7 +462,19 @@ def task_gradient_conflict(
     Deliberately primary-vs-all rather than all-vs-all (see PRIMARY_TASKS'
     own docstring for why). A pair is omitted if either task's gradient
     is entirely `None` (allow_unused -- the loss does not actually depend
-    on any shared trainable parameter this batch)."""
+    on any shared trainable parameter this batch).
+
+    Every present task's flattened gradient is aligned to the same
+    per-parameter coordinate system: a parameter this task's loss does not
+    depend on (``allow_unused`` gradient of `None`) contributes a zero
+    vector of that parameter's own shape, rather than being dropped
+    (Milestone 0.4). Two tasks that use different, unequal-sized parameter
+    subsets previously produced flattened vectors of different lengths
+    whose components had no defined correspondence to each other --
+    `torch.dot`/cosine over them was not a scientifically meaningful
+    comparison (it either raised on shape mismatch or, worse, silently
+    compared unrelated parameters' gradient components when lengths
+    happened to coincide)."""
 
     parameters = tuple(parameter for parameter in model.parameters() if parameter.requires_grad)
     present_primary = sorted(primary_tasks & set(task_losses))
@@ -471,8 +483,16 @@ def task_gradient_conflict(
     flattened: dict[str, Tensor | None] = {}
     for name, loss in task_losses.items():
         gradients = torch.autograd.grad(loss, parameters, retain_graph=True, allow_unused=True)
-        pieces = [gradient.detach().float().reshape(-1) for gradient in gradients if gradient is not None]
-        flattened[name] = torch.cat(pieces) if pieces else None
+        if all(gradient is None for gradient in gradients):
+            flattened[name] = None
+            continue
+        pieces = [
+            gradient.detach().float().reshape(-1)
+            if gradient is not None
+            else torch.zeros(parameter.numel(), dtype=torch.float32)
+            for gradient, parameter in zip(gradients, parameters)
+        ]
+        flattened[name] = torch.cat(pieces)
     conflict: dict[str, float] = {}
     for primary in present_primary:
         primary_vector = flattened[primary]

@@ -25,6 +25,7 @@ from hydroswarm.training.losses import (
 
 _ROOT = Path(__file__).resolve().parents[2]
 _TRAINING_YAML = _ROOT / "configs" / "training.yaml"
+_TRAINING_V5_CAUSAL_YAML = _ROOT / "configs" / "training-v5-causal.yaml"
 
 
 def _tiny_model(**overrides) -> HydroCore:
@@ -175,6 +176,16 @@ def test_configs_training_yaml_declares_every_retained_task_weight_explicitly() 
     assert ALL_TASK_NAMES <= set(config.task_weights)
 
 
+def test_configs_training_v5_causal_yaml_declares_every_retained_task_weight_explicitly() -> None:
+    # Milestone 0.3 (experiments.txt): every promotion-quality v5 run must
+    # load this config with require_complete_task_weights=True. This proves
+    # the file itself satisfies that gate rather than relying on a future
+    # runner to discover an omission at run time.
+    config = TrainingConfig.from_yaml(_TRAINING_V5_CAUSAL_YAML, require_complete_task_weights=True)
+    assert ALL_TASK_NAMES <= set(config.task_weights)
+    assert config.pcgrad_enabled is False
+
+
 def test_from_yaml_raises_on_an_incomplete_config_when_required(tmp_path: Path) -> None:
     incomplete_yaml = tmp_path / "incomplete.yaml"
     incomplete_yaml.write_text(
@@ -237,6 +248,89 @@ def test_task_gradient_conflict_omits_a_pair_with_only_one_present_task() -> Non
     result = compute_multitask_loss(output, targets)
     assert set(result.tasks) == {"source_node"}
     assert task_gradient_conflict(result.tasks, model) == {}
+
+
+class _DisjointHeadModule(torch.nn.Module):
+    """Three independent, unequal-sized parameter groups: `a` (3,) and `b`
+    (2,) are each used by exactly one of two tasks below; `shared` (1,) is
+    used by both. Registration order (a, b, shared) matters: it fixes the
+    per-parameter coordinate system `model.parameters()` iterates in."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.a = torch.nn.Parameter(torch.tensor([1.0, 2.0, 3.0]))
+        self.b = torch.nn.Parameter(torch.tensor([4.0, 5.0]))
+        self.shared = torch.nn.Parameter(torch.tensor([6.0]))
+
+
+def test_task_gradient_conflict_aligns_disjoint_parameter_subsets_by_position() -> None:
+    # Milestone 0.4 regression: "primary" only touches `a` and `shared`;
+    # "other" only touches `b` and `shared` -- disjoint, unequal-sized
+    # per-task parameter subsets (3+1=4 vs 2+1=3 parameters if None
+    # gradients were dropped instead of zero-filled by shape). Before the
+    # fix, `flattened["primary"]` and `flattened["other"]` had different
+    # lengths and `torch.dot` raised a shape-mismatch RuntimeError here --
+    # this test would not even run under the old implementation, let alone
+    # pass.
+    module = _DisjointHeadModule()
+    loss_primary = (module.a**2).sum() + 2.0 * module.shared.sum()
+    loss_other = (module.b**3).sum() + 3.0 * module.shared.sum()
+
+    conflict = task_gradient_conflict(
+        {"primary": loss_primary, "other": loss_other},
+        module,
+        primary_tasks=frozenset({"primary"}),
+    )
+
+    parameters = tuple(module.parameters())
+    grads_primary = torch.autograd.grad(loss_primary, parameters, retain_graph=True, allow_unused=True)
+    grads_other = torch.autograd.grad(loss_other, parameters, retain_graph=True, allow_unused=True)
+    expected_primary = torch.cat(
+        [
+            g.detach().float().reshape(-1) if g is not None else torch.zeros(p.numel())
+            for g, p in zip(grads_primary, parameters)
+        ]
+    )
+    expected_other = torch.cat(
+        [
+            g.detach().float().reshape(-1) if g is not None else torch.zeros(p.numel())
+            for g, p in zip(grads_other, parameters)
+        ]
+    )
+    # Both vectors span every trainable parameter (3 + 2 + 1 = 6), proving
+    # `a`'s and `b`'s zero segments were kept rather than dropped -- a
+    # common per-parameter coordinate system, not two independently
+    # shrunk/reordered vectors.
+    assert expected_primary.shape == expected_other.shape == (6,)
+    expected_cosine = float(
+        torch.dot(expected_primary, expected_other) / (expected_primary.norm() * expected_other.norm())
+    )
+    assert conflict["primary|other"] == pytest.approx(expected_cosine)
+    # `a` and `b` never share a gradient component, so only the shared
+    # parameter's [12.0] . [18.0] contributes to the numerator: the cosine
+    # is strictly between 0 and 1, not the 0.0 a fully-orthogonal
+    # (shape-mismatched-then-truncated) comparison would silently produce.
+    assert 0.0 < conflict["primary|other"] < 1.0
+
+
+def test_task_gradient_conflict_zero_fills_unused_parameters_not_drops_them() -> None:
+    # Same disjoint setup, but isolates the zero-fill claim directly: the
+    # "other" task's contribution to the flattened vector at `a`'s position
+    # must be an explicit zero of `a`'s shape (matching Milestone 0.4's
+    # "parameter unused by that task -> zero vector with same parameter
+    # shape"), not simply absent from the vector.
+    module = _DisjointHeadModule()
+    loss_primary = (module.a**2).sum()
+    loss_other = (module.b**3).sum()
+
+    conflict = task_gradient_conflict(
+        {"primary": loss_primary, "other": loss_other},
+        module,
+        primary_tasks=frozenset({"primary"}),
+    )
+    # `a` and `b` share no parameter, and neither touches `shared`, so the
+    # zero-filled vectors are exactly orthogonal: cosine is exactly 0.
+    assert conflict["primary|other"] == pytest.approx(0.0, abs=1e-6)
 
 
 def test_pcgrad_and_gradient_conflict_logging_default_off() -> None:

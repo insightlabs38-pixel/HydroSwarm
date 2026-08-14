@@ -28,10 +28,16 @@ received no real training-split gradient and must not influence live authority.
 
 Source probabilities are fused with a classical signature posterior. The
 shipping split-conformal calibration artifact has alpha 0.1, hash
-`829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa`, and
+`cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1`, and
 held-out calibration coverage 91.4%. Unknown topology, invalid calibration,
 OOD, broad candidate regions, high disagreement, or insufficient evidence
 can suppress planning. No model output can verify, approve, or execute a plan.
+
+Calibration was refit (same alpha, same calibration split) after capability
+remediation changed the canonical structural-identity hash for the governed
+topology families; see [Capability remediation](evaluation/CAPABILITY_REMEDIATION.md)
+for the old/new hash pairs. Model weights, feature schema, normalization, and
+signature policy did not change.
 
 ## Measured evidence
 
@@ -62,8 +68,29 @@ Those findings are not hidden by the favorable safety-boundary result; see
 - Calibration is marginal and topology/applicability-specific, not a
   per-incident guarantee or cross-topology validation.
 - LIVE evidence covers only 6--9-node governed/development networks; it does
-  not establish utility-scale performance. ROB-LIVE-01 and ROB-LIVE-02 remain
-  unresolved and require review before making operational robustness claims.
+  not establish utility-scale performance. **ROB-LIVE-01 and ROB-LIVE-02 are
+  remediated**: the post-remediation 264-run replay of the frozen LIVE matrix
+  recorded 0 repeated-observed sampling recommendations (was 27) and correct
+  `CAUTION`/topology-novelty 1.0 on the unvalidated coastal network (was a
+  false `NORMAL`). See
+  [LIVE robustness post-remediation](evaluation/LIVE_ROBUSTNESS_POST_REMEDIATION.md).
+- **CAP-REM-01** (causal-prefix training-distribution limitation): the
+  controlled 1/2/3/6/25-step causal curve (~15/50/45/80/80% top-1) reproduces
+  after remediation and is a training-distribution limitation, not a
+  parameter-capacity bottleneck. No retraining occurred on the remediation
+  branch; a separate causal-prefix HydroCore-v5 experiment is the predeclared
+  follow-up. See [Capability remediation](evaluation/CAPABILITY_REMEDIATION.md).
+- **CAP-REM-02** (active-sampling scope limitation): a 40-incident paired
+  development experiment found EIG reduces posterior entropy but did not beat
+  random valid-unsampled selection on samples-to-actionability (37.5% vs
+  45.0% actionable within three samples); broad conformal candidate regions,
+  not evidence insufficiency, were the dominant blocker. Active sampling
+  remains advisory/experimental pending revisit after causal-prefix training.
+- Capability remediation changed serving-layer behavior only (canonical
+  structural identity, calibration/OOD applicability, causal telemetry
+  history, missing-health semantics, the 25-step feature window, calibration
+  group selection, and sampling timing); it did not retrain or alter
+  HydroCore-v4 weights.
 - The locked final evaluation remains unopened (`locked_test_opened: false`).
 
 ## Legacy S/M/L research record
