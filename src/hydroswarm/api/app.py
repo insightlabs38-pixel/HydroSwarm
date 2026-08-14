@@ -292,6 +292,11 @@ def create_app(
         ``SensorObservation`` and the operator-facing incident view.
         """
 
+        if observation.missing:
+            # HydroCore-v4's existing quality channel represents available
+            # measurement health.  A missing reading is unavailable evidence,
+            # never a healthy observation with an absent value.
+            return 0.0
         return min(observation.quality, 0.25) if observation.frozen_flag else observation.quality
 
     def _require_planning_authority(record: IncidentRuntime) -> IncidentAnalysisResult:

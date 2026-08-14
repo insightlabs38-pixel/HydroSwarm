@@ -17,6 +17,26 @@ from hydroswarm.preprocessing.builder import NO_NORMALIZATION_SENTINEL
 CALIBRATION_SCHEMA_VERSION = "hydroswarm-calibration-v1"
 
 
+def classify_runtime_condition(sensor_series: Sequence[object]) -> str:
+    """Map actual evidence quality to the calibration fit's condition keys.
+
+    This deliberately consumes only model-facing evidence semantics, never UI
+    text. Runtime cannot truthfully infer synthetic SHIFT/ADVERSARIAL labels,
+    so normal evidence is CLEAN; delayed operational reporting is OPERATIONAL;
+    missing, frozen, or drifted evidence is DEGRADED.
+    """
+
+    if any(
+        any(getattr(series, field)[index] for index in range(len(series.timestamps_seconds)))
+        for series in sensor_series
+        for field in ("missing", "frozen", "drift")
+    ):
+        return "DEGRADED"
+    if any(any(series.delayed) for series in sensor_series):
+        return "OPERATIONAL"
+    return "CLEAN"
+
+
 @dataclass(frozen=True, slots=True)
 class CalibrationExample:
     probabilities: tuple[float, ...]
@@ -213,11 +233,7 @@ class SplitConformalCalibrator:
         if ood_level == "OUTSIDE_VALIDATED_RANGE":
             return ()
         values = _normalize(probabilities)
-        scores = self.artifact.global_scores
-        if network_id in self.artifact.network_scores:
-            scores = self.artifact.network_scores[network_id]
-        elif condition in self.artifact.mondrian_scores:
-            scores = self.artifact.mondrian_scores[condition]
+        _source, _group, scores = self.selection(condition=condition, network_id=network_id)
         threshold = _quantile(scores, self.artifact.alpha)
         return tuple(int(index) for index in np.flatnonzero(1.0 - values <= threshold))
 
@@ -277,4 +293,14 @@ class SplitConformalCalibrator:
             data["validated_topology_hashes"] = tuple(data["validated_topology_hashes"])
         data["report"] = CalibrationReport(**data["report"])
         return cls(CalibrationArtifact(**data))
+    def selection(
+        self, *, condition: str | None = None, network_id: str | None = None
+    ) -> tuple[str, str, tuple[float, ...]]:
+        """Return the selected calibrated group and make fallback explicit."""
+
+        if network_id is not None and network_id in self.artifact.network_scores:
+            return "NETWORK_SPECIFIC", network_id, self.artifact.network_scores[network_id]
+        if condition is not None and condition in self.artifact.mondrian_scores:
+            return "CONDITION_SPECIFIC", condition, self.artifact.mondrian_scores[condition]
+        return "GLOBAL", "global", self.artifact.global_scores
 

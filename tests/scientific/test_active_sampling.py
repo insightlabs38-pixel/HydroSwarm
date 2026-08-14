@@ -39,3 +39,18 @@ def test_duplicate_and_inaccessible_samples_are_not_recommended() -> None:
     assert result.stop
     assert result.stop_reason == "no_accessible_sample"
     assert result.recommended_node is None
+
+
+def test_explicit_acquisition_time_does_not_peek_at_future_signature_peaks() -> None:
+    data = artifact()
+    posterior = {item.identifier: 0.5 for item in data.hypotheses}
+    # S2 distinguishes hypotheses only at 60 seconds. At time zero, with no
+    # collection delay, causal ranking must not use that future observation.
+    result = rank_sample_locations(
+        data,
+        posterior,
+        constraints=SamplingConstraints(collection_time_minutes={"S1": 0.0, "S2": 0.0}),
+        target_sample_time_seconds=0.0,
+    )
+    assert result.stop
+    assert result.stop_reason == "marginal_value_below_threshold"

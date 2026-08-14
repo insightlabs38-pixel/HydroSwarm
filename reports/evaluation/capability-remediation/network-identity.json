@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "identity_semantics": "SHA-256 of canonical node/link structure with static length, diameter, and roughness serialized at 9 significant decimal digits; mutable demand and tank state are excluded.",
+  "decision": "Numerical canonicalization was selected because governed golden-reference has historical in-memory and EPANET .inp construction paths; it preserves one product-facing canonical identity without duplicating an allow-list.",
+  "governed_families": {
+    "golden-reference": {
+      "old_hash": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+      "canonical_hash": "5508d2721298ea31b9caa37db81fa90d66a5b7fb17587f78cd5b9bcf8f299c8c"
+    },
+    "branched-loop": {
+      "old_hash": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+      "canonical_hash": "9926474d1f8e7925d47ad3d77740cd27ff1b6d1d42f95d87acca52e244c01d46"
+    },
+    "loop-grid": {
+      "old_hash": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+      "canonical_hash": "35af6056fe885934bc8bda9b1e6ac178926ac24cac47bc8f2c00fb045730c2a9"
+    }
+  },
+  "regression_checks": [
+    "EPANET write/parse round trip preserves the canonical golden identity.",
+    "Demand and tank state do not alter structural identity.",
+    "A meaningful static roughness change alters structural identity.",
+    "Governed family lookup is hash-only; an uploaded display name cannot confer applicability."
+  ]
+}

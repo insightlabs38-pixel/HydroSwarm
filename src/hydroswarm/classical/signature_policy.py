@@ -82,6 +82,7 @@ __all__ = [
     "GOVERNED_TRAINING_SIGNATURE_POLICY",
     "KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH",
     "KNOWN_TRAINING_TOPOLOGY_HASHES",
+    "governed_network_family",
     "SignatureMode",
     "SignaturePolicy",
     "resolve_signature_mode",
@@ -167,11 +168,22 @@ GOVERNED_TRAINING_SIGNATURE_POLICY = SignaturePolicy(
 #: match (core-issues5.txt delta item 1). ``KNOWN_TRAINING_TOPOLOGY_HASHES``
 #: is derived from this mapping's keys so the two can never drift apart.
 KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH: dict[str, str] = {
-    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e": "golden-reference",
-    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056": "branched-loop",
-    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88": "loop-grid",
+    "5508d2721298ea31b9caa37db81fa90d66a5b7fb17587f78cd5b9bcf8f299c8c": "golden-reference",
+    "9926474d1f8e7925d47ad3d77740cd27ff1b6d1d42f95d87acca52e244c01d46": "branched-loop",
+    "35af6056fe885934bc8bda9b1e6ac178926ac24cac47bc8f2c00fb045730c2a9": "loop-grid",
 }
 KNOWN_TRAINING_TOPOLOGY_HASHES: frozenset[str] = frozenset(KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH)
+
+
+def governed_network_family(topology_hash: str) -> str | None:
+    """Return the governed family solely from canonical structural identity.
+
+    Display names are intentionally not consulted: an uploaded network cannot
+    obtain known-network calibration merely by naming itself after a governed
+    family.
+    """
+
+    return KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH.get(topology_hash)
 
 
 def resolve_signature_mode(

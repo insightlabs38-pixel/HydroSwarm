@@ -34,6 +34,7 @@ from hydroswarm.data.scenarios import (
     GeneratedScenario,
     ScenarioGenerationConfig,
     WNTRScenarioGenerator,
+    network_sha256,
 )
 from hydroswarm.inference import IncidentAnalysisResult
 from hydroswarm.runtime import V4PipelineFactory
@@ -201,40 +202,63 @@ def _ranked_health_indices(count: int, fraction: float) -> set[int]:
     return set(range(min(count, max(1, math.ceil(count * fraction))))) if fraction else set()
 
 
-def _payloads(scenario: GeneratedScenario, condition: Condition, origin: datetime) -> list[dict[str, Any]]:
+def _payloads(
+    scenario: GeneratedScenario,
+    condition: Condition,
+    origin: datetime,
+    *,
+    decision_time_seconds: float | None = None,
+) -> list[dict[str, Any]]:
+    """Build only the telemetry causally available at a decision time.
+
+    The previous harness retained one last-valid report per sensor, silently
+    discarding real history.  The product contract instead carries every
+    report through the decision time (the feature builder bounds it to 25
+    steps).  Callers can select an early checkpoint; absent one, the final
+    simulated report is the decision time and all prior reports are present.
+    """
+
     selected_count = max(1, math.ceil(len(scenario.sensor_nodes) * condition.coverage))
     selected = tuple(sorted(scenario.sensor_nodes))[:selected_count]
     health = _ranked_health_indices(len(selected), condition.health_fraction)
+    cutoff = (
+        float(decision_time_seconds)
+        if decision_time_seconds is not None
+        else float(scenario.timestamps_seconds[-1])
+    )
     result: list[dict[str, Any]] = []
     for index, node_id in enumerate(selected):
         source_column = scenario.sensor_nodes.index(node_id)
         valid = [position for position, value in enumerate(scenario.observation_mask[:, source_column]) if bool(value)]
-        position = valid[-1] if valid else len(scenario.timestamps_seconds) - 1
+        available = [position for position, timestamp in enumerate(scenario.timestamps_seconds) if timestamp <= cutoff]
+        if not available:
+            continue
         forced_missing = int(hashlib.sha256(f"{condition.seed}:{node_id}:{condition.name}".encode()).hexdigest()[:8], 16) / 2**32 < condition.missing_rate
-        missing = forced_missing or position not in valid
-        concentration = None if missing else max(0.0, float(scenario.observed_concentration[position, source_column]) + condition.bias)
-        if not missing and condition.ambiguity == "contradictory" and index % 2:
-            assert concentration is not None
-            concentration = max(0.0, concentration + 0.5)
-        if not missing and condition.ambiguity == "disagreement":
-            assert concentration is not None
-            concentration = 0.0 if index % 2 else concentration + 0.75
         degraded = index in health
-        observed_at = origin + timedelta(seconds=float(scenario.timestamps_seconds[position]))
-        delayed = degraded and condition.health_mode == "delayed"
-        result.append({
-            "sensor_id": f"initial-{node_id}", "node_id": node_id,
-            "observed_at": observed_at.isoformat(),
-            "received_at": (observed_at + timedelta(minutes=15) if delayed else observed_at).isoformat(),
-            "concentration_mg_l": concentration, "pressure_m": None if missing else 25.0,
-            "quality": 0.20 if degraded and condition.health_mode == "quality" else 1.0,
-            "missing": missing or (degraded and condition.health_mode == "communication_missing"),
-            "drift_flag": bool(degraded and condition.health_mode == "drift"),
-            "frozen_flag": bool(degraded and condition.health_mode == "frozen"),
-        })
-        if result[-1]["missing"]:
-            result[-1]["concentration_mg_l"] = None
-            result[-1]["pressure_m"] = None
+        for position in available:
+            missing = forced_missing or position not in valid
+            concentration = None if missing else max(0.0, float(scenario.observed_concentration[position, source_column]) + condition.bias)
+            if not missing and condition.ambiguity == "contradictory" and index % 2:
+                assert concentration is not None
+                concentration = max(0.0, concentration + 0.5)
+            if not missing and condition.ambiguity == "disagreement":
+                assert concentration is not None
+                concentration = 0.0 if index % 2 else concentration + 0.75
+            observed_at = origin + timedelta(seconds=float(scenario.timestamps_seconds[position]))
+            delayed = degraded and condition.health_mode == "delayed"
+            result.append({
+                "sensor_id": f"initial-{node_id}", "node_id": node_id,
+                "observed_at": observed_at.isoformat(),
+                "received_at": (observed_at + timedelta(minutes=15) if delayed else observed_at).isoformat(),
+                "concentration_mg_l": concentration, "pressure_m": None if missing else 25.0,
+                "quality": 0.20 if degraded and condition.health_mode == "quality" else 1.0,
+                "missing": missing or (degraded and condition.health_mode == "communication_missing"),
+                "drift_flag": bool(degraded and condition.health_mode == "drift"),
+                "frozen_flag": bool(degraded and condition.health_mode == "frozen"),
+            })
+            if result[-1]["missing"]:
+                result[-1]["concentration_mg_l"] = None
+                result[-1]["pressure_m"] = None
     return result
 
 
@@ -321,7 +345,10 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
         "runtime_commit": runtime_commit(repo_root),
         # Retained for compatibility; it means the code that executed the row.
         "git_commit": runtime_commit(repo_root), "network_id": condition.network_id,
-        "network_sha256": _sha256(path), "topology_class": condition.topology_class,
+        # This is the structural identity used by the runtime's calibration and
+        # OOD decisions.  The upload-file digest is provenance, not topology
+        # identity, and must not be reported under this field.
+        "network_sha256": network_sha256(network), "topology_class": condition.topology_class,
         "random_seed": condition.seed, "source_node": scenario.manifest.incident.source_nodes[0],
         "node_count": len(network.node_name_list), "link_count": len(network.link_name_list),
         "sensor_count": len({item["node_id"] for item in observations}), "observation_count": len(observations),
@@ -460,7 +487,8 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
 def _identity_fields(repo_root: Path) -> dict[str, Any]:
     manifest = _json(repo_root / "reports/results/v4/architecture-freeze.json")
     factory = V4PipelineFactory(repo_root / "models/hydrocore-v4-release", project_root=repo_root)
-    return {"model_sha256": factory.model_hash, "calibration_sha256": manifest["calibration"]["artifact_hash"], "feature_schema_sha256": manifest["schema_hashes"]["feature_schema_hash"], "normalization_sha256": manifest["normalization"]["normalization_hash"], "signature_policy_sha256": manifest["fusion_and_signature_policy"]["signature_policy_hash"], "platform": platform.platform(), "python_version": platform.python_version()}
+    release_calibration = _json(repo_root / "models/hydrocore-v4-release/calibration-status.json")
+    return {"model_sha256": factory.model_hash, "calibration_sha256": release_calibration["calibration_artifact_hash"], "feature_schema_sha256": manifest["schema_hashes"]["feature_schema_hash"], "normalization_sha256": manifest["normalization"]["normalization_hash"], "signature_policy_sha256": manifest["fusion_and_signature_policy"]["signature_policy_hash"], "platform": platform.platform(), "python_version": platform.python_version()}
 
 
 def _finding_status(evidence: Mapping[str, Any] | None, finding_id: str) -> str:

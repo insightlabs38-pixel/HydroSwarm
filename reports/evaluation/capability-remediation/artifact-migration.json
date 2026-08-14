@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "changed_artifacts": [
+    {
+      "path": "models/hydrocore-v4-release/calibration.json",
+      "old_file_sha256": "953d87bcb0784594db75443d31f005dd180847a78a9ec024d95f79b66a43c1c7",
+      "new_file_sha256": "cfde52de72ef89c467fc59fbdbc93f5633acae52f36c67a8921f22165d494843",
+      "reason": "Calibration topology applicability now uses canonical structural hashes."
+    },
+    {
+      "path": "models/hydrocore-v4-release/{calibration-status,runtime_manifest,artifact-manifest,SHA256SUMS}.json",
+      "reason": "Regenerated release integrity metadata after the valid calibration replacement."
+    }
+  ],
+  "unchanged_artifacts": [
+    "models/hydrocore-v4-release/model.safetensors",
+    "models/hydrocore-v4-release/node-normalization.json",
+    "models/hydrocore-v4-release/edge-normalization.json"
+  ]
+}

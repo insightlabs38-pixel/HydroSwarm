@@ -7,8 +7,8 @@ loaded by `V4PipelineFactory` and wired as the default `pipeline_factory` for th
 `hydroswarm.api.app:app` production entry point (UI-11.1). This is an exact byte-for-byte
 copy of `experiments/runs/v4-release-bundle/no_adapters-seed20260810/` (an ephemeral,
 gitignored path — see `experiments/runs/`'s own convention) at the moment
-`hydrocore-v4-architecture-freeze` was tagged; nothing in this directory was regenerated,
-retrained, or recalibrated to produce this commit.
+`hydrocore-v4-architecture-freeze` was tagged, except for the documented
+capability-remediation calibration refit. Model weights and normalization remain unchanged.
 
 Frozen identity (matches the `hydrocore-v4-architecture-freeze` git tag and
 `reports/results/v4/architecture-freeze.json` exactly):
@@ -16,7 +16,7 @@ Frozen identity (matches the `hydrocore-v4-architecture-freeze` git tag and
 - architecture: `hydrocore-v4`, variant `small` (HydroCore-S), `use_adapters=false`,
   `prior_mode=feature_only`, seed `20260810`
 - model SHA-256: `a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7`
-- calibration artifact hash: `829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa`
+- calibration artifact hash: `cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1`
   (FITTED, alpha=0.1, empirical coverage 91.43%)
 - normalization hash: `e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114`
 - runtime-enabled outputs: `event_cause`, `event_presence`, `evidence_sufficiency`,
