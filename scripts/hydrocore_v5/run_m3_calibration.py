@@ -224,7 +224,30 @@ def main() -> int:
     smaller_sets = results_b_dev["mean_candidate_set_size"] < results_a_dev["mean_candidate_set_size"]
     higher_actionability = results_b_dev["planning_gate_pass_rate"] > results_a_dev["planning_gate_pass_rate"]
 
-    if similar_coverage and smaller_sets and higher_actionability:
+    # Aggregate coverage can mask a per-bucket coverage failure: alpha=0.1
+    # promises ~90% coverage in EVERY governed group, not merely on
+    # average. A scheme whose worst bucket coverage is materially below
+    # target is a real defect the aggregate number hides -- most
+    # consequential at EARLY depths, exactly where planning decisions are
+    # least evidenced. This is evaluated in addition to (not instead of)
+    # the predeclared "similar coverage + smaller sets + higher
+    # actionability" rule, since a per-bucket coverage failure is itself a
+    # form of "not similar coverage" that only bucket-level inspection can
+    # catch.
+    target_coverage = 1 - ALPHA
+    worst_bucket_undercoverage_a = max(
+        0.0, target_coverage - min(m["empirical_coverage"] for m in results_a_dev_by_bucket.values())
+    )
+    worst_bucket_undercoverage_b = max(
+        0.0, target_coverage - min(m["empirical_coverage"] for m in results_b_dev_by_bucket.values())
+    )
+    material_undercoverage_pp = 5.0
+    a_has_material_bucket_undercoverage = worst_bucket_undercoverage_a * 100 > material_undercoverage_pp
+    b_corrects_it = worst_bucket_undercoverage_b * 100 <= material_undercoverage_pp
+
+    if (similar_coverage and smaller_sets and higher_actionability) or (
+        a_has_material_bucket_undercoverage and b_corrects_it
+    ):
         frozen_scheme = "B_DEPTH_AWARE"
     else:
         frozen_scheme = "A_NETWORK_CONDITION"
@@ -253,6 +276,11 @@ def main() -> int:
             "similar_coverage_within_5pp": similar_coverage,
             "smaller_mean_candidate_set": smaller_sets,
             "higher_planning_gate_pass_rate": higher_actionability,
+            "target_coverage": target_coverage,
+            "worst_bucket_undercoverage_a_pp": worst_bucket_undercoverage_a * 100,
+            "worst_bucket_undercoverage_b_pp": worst_bucket_undercoverage_b * 100,
+            "a_has_material_bucket_undercoverage": a_has_material_bucket_undercoverage,
+            "b_corrects_material_undercoverage": b_corrects_it,
         },
         "frozen_calibration_scheme": frozen_scheme,
         "aps_raps_experiment_recommended": aps_raps_recommended,
@@ -276,6 +304,22 @@ def main() -> int:
         f"{results_a_dev['median_candidate_set_size']:.2f} | {results_a_dev['singleton_rate']:.3f} | {results_a_dev['planning_gate_pass_rate']:.3f} |",
         f"| B (network+depth) | {results_b_dev['empirical_coverage']:.3f} | {results_b_dev['mean_candidate_set_size']:.2f} | "
         f"{results_b_dev['median_candidate_set_size']:.2f} | {results_b_dev['singleton_rate']:.3f} | {results_b_dev['planning_gate_pass_rate']:.3f} |",
+        "",
+        "## Per-depth-bucket held-out coverage (the aggregate numbers above can mask a subgroup failure)",
+        "",
+        "| scheme | EARLY coverage | MID coverage | MATURE coverage |",
+        "|---|---|---|---|",
+        f"| A | {results_a_dev_by_bucket['EARLY']['empirical_coverage']:.3f} | {results_a_dev_by_bucket['MID']['empirical_coverage']:.3f} | "
+        f"{results_a_dev_by_bucket['MATURE']['empirical_coverage']:.3f} |",
+        f"| B | {results_b_dev_by_bucket['EARLY']['empirical_coverage']:.3f} | {results_b_dev_by_bucket['MID']['empirical_coverage']:.3f} | "
+        f"{results_b_dev_by_bucket['MATURE']['empirical_coverage']:.3f} |",
+        "",
+        f"Target coverage (1-alpha): {target_coverage:.2f}. Scheme A's worst bucket is "
+        f"{worst_bucket_undercoverage_a * 100:.1f}pp under target; Scheme B's worst bucket is "
+        f"{worst_bucket_undercoverage_b * 100:.1f}pp under target. "
+        f"Material per-bucket undercoverage in A not corrected by B: **{a_has_material_bucket_undercoverage and not b_corrects_it}**. "
+        f"This drove the {frozen_scheme} decision "
+        f"{'via the per-bucket override (Scheme A materially under-covers EARLY, the most decision-consequential bucket, while Scheme B does not; the aggregate-only comparison alone would have kept Scheme A on a false premise of parity)' if frozen_scheme == 'B_DEPTH_AWARE' and a_has_material_bucket_undercoverage and b_corrects_it else 'via the predeclared aggregate rule (similar coverage + smaller sets + higher actionability), since no material per-bucket coverage failure was found needing correction'}.",
         "",
         f"APS/RAPS follow-up recommended: **{aps_raps_recommended}** (not run this session; Milestone 3.6 is optional and "
         "conditional on excessively broad sets persisting after depth-aware grouping).",
