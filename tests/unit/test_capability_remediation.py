@@ -10,7 +10,7 @@ from hydroswarm.calibration.conformal import classify_runtime_condition
 from hydroswarm.classical.signature_policy import governed_network_family
 from hydroswarm.data.scenarios import network_sha256
 from hydroswarm.preprocessing.builder import SensorSeries
-from hydroswarm.simulation import build_wntr_network
+from hydroswarm.simulation import HydraulicSimulator, build_wntr_network
 
 
 def _series(
@@ -56,6 +56,37 @@ def test_epanet_round_trip_preserves_governed_structural_identity(tmp_path) -> N
     wntr.network.write_inpfile(network, str(path))
     reparsed = wntr.network.WaterNetworkModel(str(path))
     assert network_sha256(reparsed) == baseline
+
+
+def test_programmatic_and_canonical_golden_inp_resolve_the_same_identity() -> None:
+    root = __import__("pathlib").Path(__file__).resolve().parents[2]
+    assert network_sha256(build_wntr_network()) == network_sha256(
+        wntr.network.WaterNetworkModel(str(root / "data/frozen/golden_network.inp"))
+    )
+
+
+@pytest.mark.parametrize(
+    ("relative_path", "family"),
+    [
+        ("data/frozen/golden_network.inp", "golden-reference"),
+        ("data/topology-transfer/branched-loop.inp", "branched-loop"),
+        ("data/topologies/loop-grid.inp", "loop-grid"),
+    ],
+)
+def test_each_governed_canonical_inp_has_a_stable_hash_based_family(relative_path: str, family: str) -> None:
+    root = __import__("pathlib").Path(__file__).resolve().parents[2]
+    parsed = wntr.network.WaterNetworkModel(str(root / relative_path))
+    assert governed_network_family(network_sha256(parsed)) == family
+
+
+def test_runtime_state_identity_remains_distinct_from_structural_identity() -> None:
+    network = build_wntr_network()
+    structural = network_sha256(network)
+    state_before = HydraulicSimulator(network).state_hash()
+    network.get_node("J1").demand_timeseries_list[0].base_value *= 1.25
+    network.get_node("T1").init_level += 1.0
+    assert network_sha256(network) == structural
+    assert HydraulicSimulator(network).state_hash() != state_before
 
 
 def test_governed_family_is_hash_based_not_display_name() -> None:

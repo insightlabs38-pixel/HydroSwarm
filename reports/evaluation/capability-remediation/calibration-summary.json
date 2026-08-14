@@ -1,0 +1,11 @@
+{
+  "alpha": 0.1,
+  "artifact": "models/hydrocore-v4-release/calibration.json",
+  "coverage": 0.9143258426966292,
+  "coverage_by_condition": null,
+  "coverage_by_network": null,
+  "fit_population": "existing designated calibration split only",
+  "locked_test_opened": false,
+  "mean_candidate_size": 2.800561797752809,
+  "schema_version": 1
+}

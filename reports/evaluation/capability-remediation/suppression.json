@@ -1,0 +1,10 @@
+{
+  "calibration_invalid_rate": 0.0,
+  "counts": {
+    "MODEL_EVIDENCE_INSUFFICIENT": 1
+  },
+  "locked_test_opened": false,
+  "ood_caution_rate": 0.0,
+  "population": "four canonical causal LIVE development runs",
+  "schema_version": 1
+}

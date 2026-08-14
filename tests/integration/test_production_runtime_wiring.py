@@ -176,6 +176,8 @@ def test_v4_factory_drives_a_real_incident_analysis_through_the_production_app(t
 
     analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
     assert analysis["runtime_mode"] == "FULL_HYBRID"
+    assert analysis["calibration_source"] == "NETWORK_SPECIFIC"
+    assert analysis["calibration_group_identifier"] == "loop-grid"
 
 
 @pytest.mark.real_simulation

@@ -1,0 +1,34 @@
+{
+  "canonical_supported": {
+    "known_branched_loop": {
+      "calibrated": 1.0,
+      "ood_normal": 1.0
+    },
+    "known_golden_reference": {
+      "calibrated": 1.0,
+      "ood_normal": 1.0
+    },
+    "known_loop_grid": {
+      "calibrated": 1.0,
+      "ood_normal": 1.0
+    }
+  },
+  "expectation": "Unknown topology remains calibration-inapplicable and non-NORMAL OOD.",
+  "locked_test_opened": false,
+  "schema_version": 1,
+  "unseen_development": {
+    "calibrated": 0.0,
+    "classical_mrr": 0.9375,
+    "classical_top1": 0.875,
+    "classical_top3": 1.0,
+    "hybrid_mrr": 0.8166666666666667,
+    "hybrid_top1": 0.75,
+    "hybrid_top3": 0.875,
+    "n": 8,
+    "neural_mrr": 0.47291666666666665,
+    "neural_top1": 0.25,
+    "neural_top3": 0.625,
+    "ood_normal": 0.0,
+    "planning_allowed": 0.0
+  }
+}

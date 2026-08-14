@@ -26,6 +26,7 @@ from time import perf_counter
 from typing import Any, Iterable, Mapping, Sequence
 
 import psutil
+import numpy as np
 
 from hydroswarm.api import create_app
 from hydroswarm.data.scenarios import (
@@ -289,16 +290,36 @@ def _analysis_internal(app: Any, incident_id: str) -> IncidentAnalysisResult:
     return record.analysis
 
 
-def _sample_observation(node_id: str, scenario: GeneratedScenario, randomized_network: Any, origin: datetime, sample_index: int) -> dict[str, Any]:
+def _sample_observation(
+    node_id: str,
+    scenario: GeneratedScenario,
+    randomized_network: Any,
+    origin: datetime,
+    sample_index: int,
+    *,
+    decision_time_seconds: float,
+    collection_delay_minutes: float,
+    noise_std: float,
+    seed: int,
+) -> dict[str, Any]:
+    """Materialize the same delayed/noisy measurement EIG ranked.
+
+    A recommendation is for a grab collected after its declared delay, not
+    for the final value in an incident trajectory.  Deterministic seeded
+    noise uses the ranker's declared ``noise_scale_mg_l`` semantics.
+    """
     simulation = HydraulicSimulator(randomized_network).simulate_incident(
         scenario.manifest.incident.source_nodes[0],
         strength_mg_min=10.0 * scenario.manifest.incident.relative_strength,
         start_minute=scenario.manifest.incident.start_minute,
         duration_minutes=scenario.manifest.incident.duration_minutes,
     )
-    position = -1
+    acquisition_time = decision_time_seconds + collection_delay_minutes * 60.0
+    position = int(np.argmin(np.abs(np.asarray(simulation.concentration_mg_l.index, dtype=float) - acquisition_time)))
     timestamp = origin + timedelta(seconds=float(simulation.concentration_mg_l.index[position]))
-    return {"sensor_id": f"sample-{sample_index}-{node_id}", "node_id": node_id, "observed_at": timestamp.isoformat(), "received_at": timestamp.isoformat(), "concentration_mg_l": max(0.0, float(simulation.concentration_mg_l.loc[:, node_id].iloc[position])), "pressure_m": 25.0, "quality": 1.0, "missing": False, "drift_flag": False, "frozen_flag": False}
+    rng = np.random.default_rng(seed + sample_index)
+    concentration = max(0.0, float(simulation.concentration_mg_l.loc[:, node_id].iloc[position]) + rng.normal(0.0, noise_std))
+    return {"sensor_id": f"sample-{sample_index}-{node_id}", "node_id": node_id, "observed_at": timestamp.isoformat(), "received_at": timestamp.isoformat(), "concentration_mg_l": concentration, "pressure_m": 25.0, "quality": 1.0, "missing": False, "drift_flag": False, "frozen_flag": False}
 
 
 def _invariants(*, analysis: Mapping[str, Any], generate_status: int | None, plans: Sequence[Mapping[str, Any]], approval_status: int | None, stale_approval_status: int | None) -> dict[str, bool | None]:
@@ -394,11 +415,16 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
             baseline.update(_metric_fields(analysis, baseline["source_node"]))
             baseline.update({"classical_belief": analysis["classical_belief"], "neural_belief": analysis["neural_belief"], "fused_belief": analysis["fused_belief"], "fusion_trust": internal.fusion_diagnostics.classical_trust if internal.fusion_diagnostics else None, "disagreement_js": analysis["disagreement_js"], "calibrated": analysis["calibrated"], "ood_level": analysis["ood_level"], "ood_components": asdict(internal.ood_components), "evidence_sufficient": analysis["evidence_sufficient"], "planning_allowed": analysis["planning_allowed"], "control_action": analysis["control_action"], "suppression_reasons": list(internal.planning_suppression_reasons), "runtime_mode": analysis["runtime_mode"]})
             observed_nodes = {item["node_id"] for item in observations}
+            available_observations = list(observations)
             for sample_index in range(3):
                 if baseline["planning_allowed"]:
                     break
                 before_entropy = _entropy(analysis["fused_belief"])
                 before_candidates = len(analysis["candidate_nodes"])
+                before_ranked = sorted(
+                    analysis["fused_belief"],
+                    key=lambda node: (-analysis["fused_belief"][node], node),
+                )
                 sample_start = perf_counter()
                 recommendation = client.post(f"/api/incidents/{incident_id}/samples/recommend")
                 sampling_ms = (perf_counter() - sample_start) * 1000
@@ -413,7 +439,17 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
                     # would otherwise make the harness conceal the issue.
                     baseline["sample_rounds"].append({"round": sample_index, "status": "RECOMMENDED_PREVIOUSLY_OBSERVED", "recommended_node": recommendation_json["node_id"], "expected_information_gain": recommendation_json["expected_information_gain"], "sampling_ms": sampling_ms, "finding_id": "ROB-LIVE-01"})
                     break
-                observation = _sample_observation(recommendation_json["node_id"], scenario, randomized, origin, sample_index)
+                decision_time = max(
+                    (item["observed_at"] for item in available_observations), default=origin.isoformat()
+                )
+                decision_seconds = (datetime.fromisoformat(decision_time) - origin).total_seconds()
+                observation = _sample_observation(
+                    recommendation_json["node_id"], scenario, randomized, origin, sample_index,
+                    decision_time_seconds=decision_seconds,
+                    collection_delay_minutes=float(recommendation_json["expected_collection_delay_minutes"]),
+                    noise_std=0.05,
+                    seed=condition.seed,
+                )
                 reanalysis_start = perf_counter()
                 added = client.post(f"/api/incidents/{incident_id}/samples", json=observation)
                 reanalysis_ms = (perf_counter() - reanalysis_start) * 1000
@@ -421,8 +457,10 @@ def run_condition(repo_root: Path, condition: Condition, *, protocol: Mapping[st
                     baseline["sample_rounds"].append({"round": sample_index, "status": "ADD_FAILED", "http_status": added.status_code, "sampling_ms": sampling_ms, "reanalysis_ms": reanalysis_ms})
                     break
                 observed_nodes.add(recommendation_json["node_id"])
+                available_observations.append(observation)
                 analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
-                baseline["sample_rounds"].append({"round": sample_index, "recommended_node": recommendation_json["node_id"], "expected_information_gain": recommendation_json["expected_information_gain"], "entropy_before": before_entropy, "entropy_after": _entropy(analysis["fused_belief"]), "candidate_size_before": before_candidates, "candidate_size_after": len(analysis["candidate_nodes"]), "sampling_ms": sampling_ms, "reanalysis_ms": reanalysis_ms, "planning_allowed_after": analysis["planning_allowed"], "control_action_after": analysis["control_action"]})
+                ranked_after = sorted(analysis["fused_belief"], key=lambda node: (-analysis["fused_belief"][node], node))
+                baseline["sample_rounds"].append({"round": sample_index, "recommended_node": recommendation_json["node_id"], "expected_information_gain": recommendation_json["expected_information_gain"], "expected_collection_delay_minutes": recommendation_json["expected_collection_delay_minutes"], "entropy_before": before_entropy, "entropy_after": _entropy(analysis["fused_belief"]), "candidate_size_before": before_candidates, "candidate_size_after": len(analysis["candidate_nodes"]), "true_source_rank_before": before_ranked.index(baseline["source_node"]) + 1 if baseline["source_node"] in before_ranked else None, "true_source_rank_after": ranked_after.index(baseline["source_node"]) + 1 if baseline["source_node"] in ranked_after else None, "sampling_ms": sampling_ms, "reanalysis_ms": reanalysis_ms, "planning_allowed_after": analysis["planning_allowed"], "control_action_after": analysis["control_action"]})
                 baseline["sampling_ms"] = (baseline["sampling_ms"] or 0.0) + sampling_ms
                 baseline["reanalysis_ms"] = (baseline["reanalysis_ms"] or 0.0) + reanalysis_ms
                 internal = _analysis_internal(app, incident_id)

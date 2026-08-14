@@ -1,0 +1,1088 @@
+{
+  "expected_collection_delay_minutes": 30.0,
+  "expected_vs_realized": {
+    "fraction_positive": 1.0,
+    "fraction_strongly_negative": 0.0,
+    "median_realized_entropy_reduction": 0.7818218766009248,
+    "spearman": 0.4593406593406593
+  },
+  "initial_causal_steps": 3,
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "measurement_noise_std_mg_l": 0.05,
+  "network": "golden-reference",
+  "paired_design": "same incident, source, initial evidence, physics, noise seed, and three-sample budget",
+  "rows": [
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081601,
+      "strategy": "EIG",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081601,
+      "strategy": "RANDOM",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.023633383611958998,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.110314168008047,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9181582835766752,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081602,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.8482047145055611,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9181582835766752,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.824571330893602,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081602,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081603,
+      "strategy": "EIG",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081603,
+      "strategy": "RANDOM",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081604,
+      "strategy": "EIG",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081604,
+      "strategy": "RANDOM",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.3769141961543643,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.351014068078122,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6551110592437966,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 5.63126387594649,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.29234058508031613,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081605,
+      "strategy": "EIG",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.3769141961543643,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6551110592437966,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.29234058508031613,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081605,
+      "strategy": "RANDOM",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.39489561711778426,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.371680859913321,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6892078540470855,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 5.623760295803233,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.2589554361169624,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081606,
+      "strategy": "EIG",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.39489561711778426,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6892078540470855,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.2589554361169624,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081606,
+      "strategy": "RANDOM",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081607,
+      "strategy": "EIG",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081607,
+      "strategy": "RANDOM",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.14445087656332478,
+      "final_rank": 3,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.178155431722223,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.8655477113539614,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081608,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.8458482934079696,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9770948208736683,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.8129445263643518,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081608,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.2917262186412449,
+      "final_rank": 3,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.075569534435834,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6159404088407342,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081609,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.4818929816739863,
+      "final_rank": 2,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6159404088407342,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.1901667630327415,
+          "round": 2,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        }
+      ],
+      "seed": 2026081609,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.03335389229312247,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.178697965998827,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9772766085209237,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081610,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.8465276103318367,
+      "final_rank": 3,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9695357703324549,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 2
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.8054328798502453,
+          "round": 2,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 3
+        }
+      ],
+      "seed": 2026081610,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081611,
+      "strategy": "EIG",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081611,
+      "strategy": "RANDOM",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081612,
+      "strategy": "EIG",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081612,
+      "strategy": "RANDOM",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.02246153404765724,
+      "final_rank": 3,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.142371111382192,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9513016800583847,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 3
+        }
+      ],
+      "seed": 2026081613,
+      "strategy": "EIG",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.8144045902377344,
+      "final_rank": 2,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.933054707392745,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 3
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.7736960835244373,
+          "round": 2,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        }
+      ],
+      "seed": 2026081613,
+      "strategy": "RANDOM",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.05228888912834789,
+      "final_rank": 2,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.163989188444993,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9431104380961046,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081614,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.77760276122348,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9711784202166677,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.7533818542156951,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081614,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081615,
+      "strategy": "EIG",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081615,
+      "strategy": "RANDOM",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081616,
+      "strategy": "EIG",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081616,
+      "strategy": "RANDOM",
+      "truth": "J1"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [],
+      "seed": 2026081617,
+      "strategy": "EIG",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 0.0,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081617,
+      "strategy": "RANDOM",
+      "truth": "J2"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.41735674735577555,
+      "final_rank": 2,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.436410536153914,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.6980960418478883,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 2
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 5.654559265332484,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.3027040851380056,
+          "round": 2,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081618,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.4156616899160621,
+      "final_rank": 2,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.7473799421448579,
+          "round": 1,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 2
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.25511524228074944,
+          "round": 2,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 3
+        }
+      ],
+      "seed": 2026081618,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.1702199783913745,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -1.0017999164540754,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081619,
+      "strategy": "EIG",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": -0.0,
+      "final_rank": 1,
+      "final_top1": true,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9747994658206367,
+          "round": 1,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.027000450633438686,
+          "round": 2,
+          "true_source_rank_after": 1,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081619,
+      "strategy": "RANDOM",
+      "truth": "J3"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 0.022275535093418675,
+      "final_rank": 2,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": 6.133633950548908,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9427382624226448,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 1
+        }
+      ],
+      "seed": 2026081620,
+      "strategy": "EIG",
+      "truth": "J4"
+    },
+    {
+      "actionable_within": null,
+      "final_entropy": 1.8276400428947819,
+      "final_rank": 3,
+      "final_top1": false,
+      "final_top3": true,
+      "initial_actionable": false,
+      "rounds": [
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J4",
+          "planning_allowed_after": false,
+          "realized_entropy_change": -0.9427382624226448,
+          "round": 1,
+          "true_source_rank_after": 2,
+          "true_source_rank_before": 1
+        },
+        {
+          "collection_delay_minutes": 30.0,
+          "expected_information_gain": null,
+          "node": "J3",
+          "planning_allowed_after": false,
+          "realized_entropy_change": 1.8053645078013631,
+          "round": 2,
+          "true_source_rank_after": 3,
+          "true_source_rank_before": 2
+        }
+      ],
+      "seed": 2026081620,
+      "strategy": "RANDOM",
+      "truth": "J4"
+    }
+  ],
+  "schema_version": 1,
+  "sensor_coverage": "50% (2 of 4 junctions; deliberately not the fully instrumented demo)",
+  "strategies": {
+    "EIG": {
+      "actionable_within_3": 0.0,
+      "median_realized_entropy_reduction": 0.7818218766009248,
+      "n": 20,
+      "never_resolved": 1.0,
+      "top1_after_n": 0.7,
+      "top3_after_n": 1.0
+    },
+    "RANDOM": {
+      "actionable_within_3": 0.0,
+      "median_realized_entropy_reduction": -0.0,
+      "n": 20,
+      "never_resolved": 1.0,
+      "top1_after_n": 0.75,
+      "top3_after_n": 1.0
+    }
+  }
+}

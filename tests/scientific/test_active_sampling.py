@@ -54,3 +54,16 @@ def test_explicit_acquisition_time_does_not_peek_at_future_signature_peaks() -> 
     )
     assert result.stop
     assert result.stop_reason == "marginal_value_below_threshold"
+
+
+def test_collection_delay_selects_the_measurement_time_used_for_ranking() -> None:
+    data = artifact()
+    posterior = {item.identifier: 0.5 for item in data.hypotheses}
+    result = rank_sample_locations(
+        data,
+        posterior,
+        constraints=SamplingConstraints(collection_time_minutes={"S1": 0.0, "S2": 1.0}),
+        target_sample_time_seconds=0.0,
+    )
+    assert result.recommended_node == "S2"
+    assert result.ranked[0].collection_time_minutes == 1.0

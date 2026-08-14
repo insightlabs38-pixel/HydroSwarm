@@ -1,0 +1,88 @@
+{
+  "conditions": {
+    "known_branched_loop": {
+      "calibrated": 1.0,
+      "classical_mrr": 0.6979166666666666,
+      "classical_top1": 0.5,
+      "classical_top3": 0.875,
+      "hybrid_mrr": 0.7261904761904762,
+      "hybrid_top1": 0.625,
+      "hybrid_top3": 0.75,
+      "n": 8,
+      "neural_mrr": 0.7261904761904762,
+      "neural_top1": 0.625,
+      "neural_top3": 0.75,
+      "ood_normal": 1.0,
+      "planning_allowed": 0.5
+    },
+    "known_golden_reference": {
+      "calibrated": 1.0,
+      "classical_mrr": 0.84375,
+      "classical_top1": 0.75,
+      "classical_top3": 0.875,
+      "hybrid_mrr": 0.7708333333333334,
+      "hybrid_top1": 0.625,
+      "hybrid_top3": 1.0,
+      "n": 8,
+      "neural_mrr": 0.7708333333333334,
+      "neural_top1": 0.625,
+      "neural_top3": 1.0,
+      "ood_normal": 1.0,
+      "planning_allowed": 0.625
+    },
+    "known_loop_grid": {
+      "calibrated": 1.0,
+      "classical_mrr": 0.6324404761904762,
+      "classical_top1": 0.5,
+      "classical_top3": 0.75,
+      "hybrid_mrr": 0.6145833333333334,
+      "hybrid_top1": 0.5,
+      "hybrid_top3": 0.75,
+      "n": 8,
+      "neural_mrr": 0.5416666666666666,
+      "neural_top1": 0.375,
+      "neural_top3": 0.625,
+      "ood_normal": 1.0,
+      "planning_allowed": 0.375
+    },
+    "same_family_randomized": {
+      "calibrated": 0.0,
+      "classical_mrr": 0.84375,
+      "classical_top1": 0.75,
+      "classical_top3": 0.875,
+      "hybrid_mrr": 0.71875,
+      "hybrid_top1": 0.625,
+      "hybrid_top3": 0.625,
+      "n": 8,
+      "neural_mrr": 0.71875,
+      "neural_top1": 0.625,
+      "neural_top3": 0.625,
+      "ood_normal": 0.0,
+      "planning_allowed": 0.0
+    },
+    "unseen_development_coastal": {
+      "calibrated": 0.0,
+      "classical_mrr": 0.9375,
+      "classical_top1": 0.875,
+      "classical_top3": 1.0,
+      "hybrid_mrr": 0.8166666666666667,
+      "hybrid_top1": 0.75,
+      "hybrid_top3": 0.875,
+      "n": 8,
+      "neural_mrr": 0.47291666666666665,
+      "neural_top1": 0.25,
+      "neural_top3": 0.625,
+      "ood_normal": 0.0,
+      "planning_allowed": 0.0
+    }
+  },
+  "interpretation": {
+    "known": "Known governed networks should be compatible and calibrated.",
+    "same_family_randomized": "A changed static configuration is physically compatible but intentionally loses calibration applicability until commissioned.",
+    "unseen_development": "Unseen topology is a zero-shot localization measurement only; planning suppression is expected until commissioning."
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "population": "development-only; no locked topology test",
+  "schema_version": 1
+}

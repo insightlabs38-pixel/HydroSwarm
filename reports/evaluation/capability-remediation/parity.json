@@ -1,0 +1,643 @@
+{
+  "cycle_b2_root": "data/learning-v2/cycle-b2",
+  "evaluated_fixtures": [
+    {
+      "condition": "clean",
+      "network_family": "golden-reference",
+      "passed": true,
+      "seed": 2026081700,
+      "source": "J1"
+    },
+    {
+      "condition": "degraded",
+      "network_family": "golden-reference",
+      "passed": true,
+      "seed": 2026081701,
+      "source": "J2"
+    },
+    {
+      "condition": "clean",
+      "network_family": "branched-loop",
+      "passed": true,
+      "seed": 2026082700,
+      "source": "JA"
+    },
+    {
+      "condition": "degraded",
+      "network_family": "branched-loop",
+      "passed": true,
+      "seed": 2026082701,
+      "source": "JB"
+    },
+    {
+      "condition": "clean",
+      "network_family": "loop-grid",
+      "passed": true,
+      "seed": 2026083700,
+      "source": "J1"
+    },
+    {
+      "condition": "degraded",
+      "network_family": "loop-grid",
+      "passed": true,
+      "seed": 2026083701,
+      "source": "J2"
+    }
+  ],
+  "fields": [
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "signature_policy_identity",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "mode=GOVERNED_KNOWN_NETWORK for a TRAIN_TOPOLOGIES fixture -- expected GOVERNED_KNOWN_NETWORK; resolve_signature_mode=GOVERNED_KNOWN_NETWORK",
+      "field": "signature_mode_is_governed",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000; diverging columns: none",
+      "field": "node_features",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'J1': 0.72996985912323, 'J2': 0.059142112731933594, 'J3': 0.06752313673496246, 'J4': 0.14336489140987396}, live={'J1': 0.72996985912323, 'J2': 0.059142112731933594, 'J3': 0.06752313673496246, 'J4': 0.14336489140987396}, max_abs_diff=0.00000000 -- both paths now use hydroswarm.training.corpus.model_input_classical_prior against the same committed, training-fit SignatureLibrary (delta item 1 fix)",
+      "field": "classical_prior",
+      "passed": true,
+      "scenario_id": "1d3f615c-c9ea-5d9d-9051-ce052104b63f"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "signature_policy_identity",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "mode=GOVERNED_KNOWN_NETWORK for a TRAIN_TOPOLOGIES fixture -- expected GOVERNED_KNOWN_NETWORK; resolve_signature_mode=GOVERNED_KNOWN_NETWORK",
+      "field": "signature_mode_is_governed",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000; diverging columns: none",
+      "field": "node_features",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'J1': 0.09577710926532745, 'J2': 0.7358790040016174, 'J3': 0.049603380262851715, 'J4': 0.11874048411846161}, live={'J1': 0.09577710926532745, 'J2': 0.7358790040016174, 'J3': 0.049603380262851715, 'J4': 0.11874048411846161}, max_abs_diff=0.00000000 -- both paths now use hydroswarm.training.corpus.model_input_classical_prior against the same committed, training-fit SignatureLibrary (delta item 1 fix)",
+      "field": "classical_prior",
+      "passed": true,
+      "scenario_id": "4a88ec94-c4b2-54b6-b092-abc87015aee4"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "signature_policy_identity",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "mode=GOVERNED_KNOWN_NETWORK for a TRAIN_TOPOLOGIES fixture -- expected GOVERNED_KNOWN_NETWORK; resolve_signature_mode=GOVERNED_KNOWN_NETWORK",
+      "field": "signature_mode_is_governed",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000; diverging columns: none",
+      "field": "node_features",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'JA': 0.7016969323158264, 'JB': 0.033980488777160645, 'JC': 0.04801949858665466, 'JD': 0.03136454522609711, 'JE': 0.03801718354225159, 'JF': 0.07075907289981842, 'JG': 0.07616225630044937}, live={'JA': 0.7016969323158264, 'JB': 0.033980488777160645, 'JC': 0.04801949858665466, 'JD': 0.03136454522609711, 'JE': 0.03801718354225159, 'JF': 0.07075907289981842, 'JG': 0.07616225630044937}, max_abs_diff=0.00000000 -- both paths now use hydroswarm.training.corpus.model_input_classical_prior against the same committed, training-fit SignatureLibrary (delta item 1 fix)",
+      "field": "classical_prior",
+      "passed": true,
+      "scenario_id": "7b591272-ce4a-5675-8222-27c69dba6b75"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "signature_policy_identity",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "mode=GOVERNED_KNOWN_NETWORK for a TRAIN_TOPOLOGIES fixture -- expected GOVERNED_KNOWN_NETWORK; resolve_signature_mode=GOVERNED_KNOWN_NETWORK",
+      "field": "signature_mode_is_governed",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000; diverging columns: none",
+      "field": "node_features",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'JA': 0.2357557713985443, 'JB': 0.533381998538971, 'JC': 0.03466743603348732, 'JD': 0.07876518368721008, 'JE': 0.03943121060729027, 'JF': 0.03878658637404442, 'JG': 0.03921179100871086}, live={'JA': 0.2357557713985443, 'JB': 0.533381998538971, 'JC': 0.03466743603348732, 'JD': 0.07876518368721008, 'JE': 0.03943121060729027, 'JF': 0.03878658637404442, 'JG': 0.03921179100871086}, max_abs_diff=0.00000000 -- both paths now use hydroswarm.training.corpus.model_input_classical_prior against the same committed, training-fit SignatureLibrary (delta item 1 fix)",
+      "field": "classical_prior",
+      "passed": true,
+      "scenario_id": "d84bc65c-2a6e-5db1-9f07-8821679e2524"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "signature_policy_identity",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "mode=GOVERNED_KNOWN_NETWORK for a TRAIN_TOPOLOGIES fixture -- expected GOVERNED_KNOWN_NETWORK; resolve_signature_mode=GOVERNED_KNOWN_NETWORK",
+      "field": "signature_mode_is_governed",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000; diverging columns: none",
+      "field": "node_features",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'J1': 0.6071871519088745, 'J2': 0.1101231575012207, 'J3': 0.042618732899427414, 'J4': 0.04315847158432007, 'J5': 0.10223470628261566, 'J6': 0.047705795615911484, 'J7': 0.02230614610016346, 'J8': 0.024665825068950653}, live={'J1': 0.6071871519088745, 'J2': 0.1101231575012207, 'J3': 0.042618732899427414, 'J4': 0.04315847158432007, 'J5': 0.10223470628261566, 'J6': 0.047705795615911484, 'J7': 0.02230614610016346, 'J8': 0.024665825068950653}, max_abs_diff=0.00000000 -- both paths now use hydroswarm.training.corpus.model_input_classical_prior against the same committed, training-fit SignatureLibrary (delta item 1 fix)",
+      "field": "classical_prior",
+      "passed": true,
+      "scenario_id": "20dae5b5-57d9-5c38-870d-94a7012b4629"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "signature_policy_identity",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "mode=GOVERNED_KNOWN_NETWORK for a TRAIN_TOPOLOGIES fixture -- expected GOVERNED_KNOWN_NETWORK; resolve_signature_mode=GOVERNED_KNOWN_NETWORK",
+      "field": "signature_mode_is_governed",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_ids",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "feature_schema_hash",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "normalization_hash",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_features_shape",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_features_shape",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "node_mask",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "edge_mask",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "sensor_mask",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "exact",
+      "detail": "match",
+      "field": "source_candidate_mask",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000; diverging columns: none",
+      "field": "node_features",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "max_abs_diff=0.00000000",
+      "field": "edge_features",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    },
+    {
+      "comparison": "tolerance",
+      "detail": "corpus={'J1': 0.16702266037464142, 'J2': 0.3300457000732422, 'J3': 0.2954082190990448, 'J4': 0.04053996875882149, 'J5': 0.02381598763167858, 'J6': 0.023225564509630203, 'J7': 0.046863917261362076, 'J8': 0.0730779767036438}, live={'J1': 0.16702266037464142, 'J2': 0.3300457000732422, 'J3': 0.2954082190990448, 'J4': 0.04053996875882149, 'J5': 0.02381598763167858, 'J6': 0.023225564509630203, 'J7': 0.046863917261362076, 'J8': 0.0730779767036438}, max_abs_diff=0.00000000 -- both paths now use hydroswarm.training.corpus.model_input_classical_prior against the same committed, training-fit SignatureLibrary (delta item 1 fix)",
+      "field": "classical_prior",
+      "passed": true,
+      "scenario_id": "f265acf2-9826-525b-8b20-193114213e73"
+    }
+  ],
+  "gate": "train_serve_parity",
+  "generated_at": "2026-08-14T03:03:46.485138+00:00",
+  "normalization_dir": "data/learning-v2/cycle-b2/normalization",
+  "normalization_fingerprint": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+  "passed": true,
+  "schema_version": 2
+}

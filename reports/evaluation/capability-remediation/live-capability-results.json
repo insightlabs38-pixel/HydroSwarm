@@ -1,7 +1,7 @@
 [
   {
-    "analysis_ms": 528.7007610313594,
-    "approval_ms": 2.0859100040979683,
+    "analysis_ms": 439.1159890219569,
+    "approval_ms": 1.5734629705548286,
     "calibrated": true,
     "calibration_sha256": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
     "candidate_set_size": 1,
@@ -30,9 +30,9 @@
       "T1": 0.0
     },
     "fusion_trust": 0.6907057833910881,
-    "git_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
-    "import_ms": 63.088768045417964,
-    "incident_creation_ms": 13.136774010490626,
+    "git_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
+    "import_ms": 54.37775905011222,
+    "incident_creation_ms": 10.791025997605175,
     "invariants": {
       "INV-1": true,
       "INV-10": true,
@@ -70,19 +70,19 @@
     },
     "ood_level": "NORMAL",
     "outcome": "VERIFIED",
-    "peak_process_rss_mb": 799.08984375,
+    "peak_process_rss_mb": 798.7578125,
     "perturbation_level": "clean_operational",
     "perturbation_type": "nominal",
     "planning_allowed": true,
-    "planning_ms": 9.650026040617377,
+    "planning_ms": 9.356052963994443,
     "plans": [
       {
         "action_types": [
           "END_PLAN"
         ],
         "approval_status": 409,
-        "plan_hash": "903907b56209d8d9541e96b6c4ab7b8b0ccc4f6461b19ab3233aadefd60265c0",
-        "plan_id": "344e0d9c-411e-580a-9d60-1dd3c5d39b7e",
+        "plan_hash": "1742feefc13d4f96b8eed360059223d122b486d16af20d269b84a7af7845f214",
+        "plan_id": "4c3bd11b-439f-5daa-80b6-0b4133ab29dd",
         "verification": {
           "abstention_reason": null,
           "consequences": {
@@ -131,24 +131,24 @@
             "simulator_version": "1.5.0"
           },
           "network_hash": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
-          "plan_hash": "661f02ec4f27274c29c9e858bf0923fa3a0ca32a653b1f2e401fac785ce6cdd2",
-          "plan_id": "344e0d9c-411e-580a-9d60-1dd3c5d39b7e",
+          "plan_hash": "251c80a178a2a67692e3c65d4f7e02b7d3f16e5d3ae2a98d0bc8907c95e334b6",
+          "plan_id": "4c3bd11b-439f-5daa-80b6-0b4133ab29dd",
           "rejection_codes": [],
           "simulator": "WNTRSimulator",
           "simulator_version": "1.5.0",
-          "state_hash": "b58a99686da19d69b7fccab64aeebafaa48c6bda528c465201f86e8d2187a602",
+          "state_hash": "5d4271c82f5ebb981e6b3a6b7e4679a36736d7b143fb4c0652de4e8927db68ee",
           "verification_status": "CURRENT",
-          "verified_at": "2026-08-14T02:25:13.377216Z",
+          "verified_at": "2026-08-14T03:01:08.588585Z",
           "worst_case_consequences": null
         },
-        "verification_ms": 131.35989499278367
+        "verification_ms": 103.79630496026948
       },
       {
         "action_types": [
           "CLOSE_PIPE"
         ],
-        "plan_hash": "e3aba9c50f8cbd2e4c97ac54bbe0fe212a87fd7683c4e9b6b72fa15918e07adb",
-        "plan_id": "80869ad5-ebfe-56a2-a999-0eca4eebead4",
+        "plan_hash": "49d37b3939367e06176d69a99070ef6e999ddd183925227a33bf689fa1708a3d",
+        "plan_id": "001b700b-5892-5268-aea3-fa98c7654cfa",
         "verification": {
           "abstention_reason": "SIMULATION_BUDGET_EXCEEDED",
           "consequences": null,
@@ -180,29 +180,29 @@
             "simulator_version": "1.5.0"
           },
           "network_hash": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
-          "plan_hash": "4c19f2be8c3d94ed9e29292d8bf4389315d9a62847f74a1f0817def51df3db15",
-          "plan_id": "80869ad5-ebfe-56a2-a999-0eca4eebead4",
+          "plan_hash": "e0f2d552c204e5ca68a66a87841a7c4ef70ec8841e878ed2d227ee542300f846",
+          "plan_id": "001b700b-5892-5268-aea3-fa98c7654cfa",
           "rejection_codes": [],
           "simulator": "WNTRSimulator",
           "simulator_version": "1.5.0",
-          "state_hash": "e5bed266b7da32fcc594637b21c33a00a485400dd9f3ca1f2b2513d87384387e",
+          "state_hash": "31aa9fe8e1a51fda79e7f6e88dfc2f658c0b2f602f8febbdf6b85654bfc4dd04",
           "verification_status": "CURRENT",
-          "verified_at": "2026-08-14T02:25:13.451149Z",
+          "verified_at": "2026-08-14T03:01:08.646324Z",
           "worst_case_consequences": null
         },
-        "verification_ms": 73.58213403495029
+        "verification_ms": 59.09978301497176
       }
     ],
     "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
     "posterior_entropy": -0.0,
-    "process_rss_after_mb": 799.06640625,
-    "process_rss_before_mb": 719.48828125,
+    "process_rss_after_mb": 798.75,
+    "process_rss_before_mb": 719.5859375,
     "python_version": "3.12.13",
     "random_seed": 7101,
     "reanalysis_ms": null,
     "reciprocal_rank": 1.0,
     "run_id": "885033bb5787a8ac",
-    "runtime_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
+    "runtime_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
     "runtime_mode": "FULL_HYBRID",
     "sample_rounds": [],
     "sampling_ms": null,
@@ -214,12 +214,12 @@
     "top1_correct": true,
     "top3_correct": true,
     "topology_class": "governed_reference",
-    "total_trajectory_ms": 824.7166539658792,
+    "total_trajectory_ms": 680.7032190263271,
     "true_source_probability": 1.0,
-    "verification_ms": 204.94202902773395
+    "verification_ms": 162.89608797524124
   },
   {
-    "analysis_ms": 157.28292794665322,
+    "analysis_ms": 140.6748269801028,
     "approval_ms": null,
     "calibrated": true,
     "calibration_sha256": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
@@ -249,9 +249,9 @@
       "T1": 0.0
     },
     "fusion_trust": 0.6951737095025815,
-    "git_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
-    "import_ms": 70.21699700271711,
-    "incident_creation_ms": 12.680843006819487,
+    "git_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
+    "import_ms": 55.19638798432425,
+    "incident_creation_ms": 10.856067994609475,
     "invariants": {
       "INV-1": true,
       "INV-10": true,
@@ -289,28 +289,28 @@
     },
     "ood_level": "NORMAL",
     "outcome": "SUPPRESSED",
-    "peak_process_rss_mb": 861.1796875,
+    "peak_process_rss_mb": 867.4765625,
     "perturbation_level": "clean_operational",
     "perturbation_type": "nominal",
     "planning_allowed": false,
-    "planning_ms": 1.1216959683224559,
+    "planning_ms": 1.0656629456207156,
     "plans": [],
     "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
     "posterior_entropy": -0.0,
-    "process_rss_after_mb": 848.37109375,
-    "process_rss_before_mb": 810.56640625,
+    "process_rss_after_mb": 860.97265625,
+    "process_rss_before_mb": 822.73046875,
     "python_version": "3.12.13",
     "random_seed": 7102,
     "reanalysis_ms": null,
     "reciprocal_rank": 1.0,
     "run_id": "69ea0e1e94757d71",
-    "runtime_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
+    "runtime_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
     "runtime_mode": "FULL_HYBRID",
     "sample_rounds": [
       {
         "http_status": 409,
         "round": 0,
-        "sampling_ms": 1.0798780131153762,
+        "sampling_ms": 1.0425489745102823,
         "status": "STOP"
       }
     ],
@@ -325,13 +325,13 @@
     "top1_correct": true,
     "top3_correct": true,
     "topology_class": "governed_reference",
-    "total_trajectory_ms": 245.09019503602758,
+    "total_trajectory_ms": 211.2667390028946,
     "true_source_probability": 1.0,
     "verification_ms": null
   },
   {
-    "analysis_ms": 159.56686798017472,
-    "approval_ms": 1.9740280113182962,
+    "analysis_ms": 141.27216499764472,
+    "approval_ms": 1.5430970233865082,
     "calibrated": true,
     "calibration_sha256": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
     "candidate_set_size": 1,
@@ -360,9 +360,9 @@
       "T1": 0.0
     },
     "fusion_trust": 0.6947635313433,
-    "git_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
-    "import_ms": 71.63993001449853,
-    "incident_creation_ms": 11.667767015751451,
+    "git_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
+    "import_ms": 56.109972996637225,
+    "incident_creation_ms": 12.259864015504718,
     "invariants": {
       "INV-1": true,
       "INV-10": true,
@@ -400,19 +400,19 @@
     },
     "ood_level": "NORMAL",
     "outcome": "VERIFIED",
-    "peak_process_rss_mb": 896.875,
+    "peak_process_rss_mb": 884.75,
     "perturbation_level": "clean_operational",
     "perturbation_type": "nominal",
     "planning_allowed": true,
-    "planning_ms": 10.337865969631821,
+    "planning_ms": 9.367923019453883,
     "plans": [
       {
         "action_types": [
           "END_PLAN"
         ],
         "approval_status": 409,
-        "plan_hash": "5b06a841ea7858bb2509b79ef64a7e26fb3f10d0a4538c48ae50b04f9bdf0c6f",
-        "plan_id": "7c759e61-8ad4-5edf-a861-a685126e8b94",
+        "plan_hash": "98931fdd38700087fc1846fff775b51e148529b82b3996de8e39ac8397c5d46f",
+        "plan_id": "f73cb1fc-7627-552c-bdc1-cccd352b06e7",
         "verification": {
           "abstention_reason": null,
           "consequences": {
@@ -461,24 +461,24 @@
             "simulator_version": "1.5.0"
           },
           "network_hash": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
-          "plan_hash": "37b6d3553083f2742199c0b7a4cbbc2b80cfffe4377d4f97e38055f4c2ec0e70",
-          "plan_id": "7c759e61-8ad4-5edf-a861-a685126e8b94",
+          "plan_hash": "af775999210a2561a46f668a9477804f1eaf60551763bf8b1029776fca12cc37",
+          "plan_id": "f73cb1fc-7627-552c-bdc1-cccd352b06e7",
           "rejection_codes": [],
           "simulator": "WNTRSimulator",
           "simulator_version": "1.5.0",
-          "state_hash": "1b2d37c15bfea6424964471240e5ca4f1440f589bd7690c265e3e45194524b09",
+          "state_hash": "7cd1ffb10dc26979e4a3e65f71adfd276a03e4feced6f255198ae2da59f5b5c3",
           "verification_status": "CURRENT",
-          "verified_at": "2026-08-14T02:25:14.531713Z",
+          "verified_at": "2026-08-14T03:01:09.550370Z",
           "worst_case_consequences": null
         },
-        "verification_ms": 132.71187199279666
+        "verification_ms": 103.17095299251378
       },
       {
         "action_types": [
           "CLOSE_PIPE"
         ],
-        "plan_hash": "a66545efb4f8984203ff8235c96368b06e00e792c442f1ff3d8681b71f441694",
-        "plan_id": "69e58d32-937f-5166-bbd2-b1cf484adb05",
+        "plan_hash": "f4a13f9948cfdba3b84810da36ee5fac2c41d1f9eadf91a0d14e0eda1f5f7150",
+        "plan_id": "3dd9cde2-dca9-5a91-9f1f-ad81888782b7",
         "verification": {
           "abstention_reason": "SIMULATION_BUDGET_EXCEEDED",
           "consequences": null,
@@ -510,29 +510,29 @@
             "simulator_version": "1.5.0"
           },
           "network_hash": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
-          "plan_hash": "b3cce98ebb6261bba6ff9ef950a6798040ae04f8888ad17b587abbcd6be2bf12",
-          "plan_id": "69e58d32-937f-5166-bbd2-b1cf484adb05",
+          "plan_hash": "3f8d2130cbcf7543815a1a0527d20633478b66be3ad41e8066f9cbbc5d180a1a",
+          "plan_id": "3dd9cde2-dca9-5a91-9f1f-ad81888782b7",
           "rejection_codes": [],
           "simulator": "WNTRSimulator",
           "simulator_version": "1.5.0",
-          "state_hash": "7505c50d817ecc379a76711d6b975632fd1869455cf206832c1964b7aaa9bd86",
+          "state_hash": "8d796e3855377b4f7c524cf504e86bae48381c4a0034de31bd6b9b9a2862a7a8",
           "verification_status": "CURRENT",
-          "verified_at": "2026-08-14T02:25:14.605795Z",
+          "verified_at": "2026-08-14T03:01:09.606280Z",
           "worst_case_consequences": null
         },
-        "verification_ms": 73.87725304579362
+        "verification_ms": 55.11281796498224
       }
     ],
     "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
     "posterior_entropy": -0.0,
-    "process_rss_after_mb": 886.046875,
-    "process_rss_before_mb": 848.53515625,
+    "process_rss_after_mb": 884.72265625,
+    "process_rss_before_mb": 847.23046875,
     "python_version": "3.12.13",
     "random_seed": 7103,
     "reanalysis_ms": null,
     "reciprocal_rank": 1.0,
     "run_id": "02aac2617577fd5f",
-    "runtime_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
+    "runtime_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
     "runtime_mode": "FULL_HYBRID",
     "sample_rounds": [],
     "sampling_ms": null,
@@ -544,13 +544,13 @@
     "top1_correct": true,
     "top3_correct": true,
     "topology_class": "governed_reference",
-    "total_trajectory_ms": 464.8335739620961,
+    "total_trajectory_ms": 381.3760429620743,
     "true_source_probability": 1.0,
-    "verification_ms": 206.58912503859028
+    "verification_ms": 158.28377095749602
   },
   {
-    "analysis_ms": 157.7030600165017,
-    "approval_ms": 2.012869983445853,
+    "analysis_ms": 141.05610304977745,
+    "approval_ms": 1.621244999114424,
     "calibrated": true,
     "calibration_sha256": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
     "candidate_set_size": 1,
@@ -579,9 +579,9 @@
       "T1": 0.0
     },
     "fusion_trust": 0.6960102581594725,
-    "git_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
-    "import_ms": 70.52283600205556,
-    "incident_creation_ms": 12.887916003819555,
+    "git_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
+    "import_ms": 57.33703001169488,
+    "incident_creation_ms": 11.952846951317042,
     "invariants": {
       "INV-1": true,
       "INV-10": true,
@@ -619,19 +619,19 @@
     },
     "ood_level": "NORMAL",
     "outcome": "VERIFIED",
-    "peak_process_rss_mb": 930.50390625,
+    "peak_process_rss_mb": 919.703125,
     "perturbation_level": "clean_operational",
     "perturbation_type": "nominal",
     "planning_allowed": true,
-    "planning_ms": 9.920854994561523,
+    "planning_ms": 9.883010003250092,
     "plans": [
       {
         "action_types": [
           "END_PLAN"
         ],
         "approval_status": 409,
-        "plan_hash": "73b97b9c3c54994a60f386c923f0a45c0da18f4a35a6ce9c70cc0828f7e77b10",
-        "plan_id": "e9f361a4-7a32-530f-899d-f0e7335785e4",
+        "plan_hash": "6ebd955366133e090fef442bee714e7d217dcb76bd10d16618205be131eb2887",
+        "plan_id": "474500ba-474b-5c99-bfba-cd78ceeb5dc4",
         "verification": {
           "abstention_reason": null,
           "consequences": {
@@ -680,24 +680,24 @@
             "simulator_version": "1.5.0"
           },
           "network_hash": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
-          "plan_hash": "22f4512d09a0902018aaf53df96dd2d6d76e2d5b765b8f79a5cd83750f551354",
-          "plan_id": "e9f361a4-7a32-530f-899d-f0e7335785e4",
+          "plan_hash": "9b4045308526b9fdf4343f9735b8143780515bf37e1c68518e8907fdb06b55bd",
+          "plan_id": "474500ba-474b-5c99-bfba-cd78ceeb5dc4",
           "rejection_codes": [],
           "simulator": "WNTRSimulator",
           "simulator_version": "1.5.0",
-          "state_hash": "4c1c28c8fffaee98cf05bbf6cef71765113b5954de2eeb43984d8e7ef785504f",
+          "state_hash": "00836765dd57695b4c3f9a569980058ce947e2534cab06c3558d41c77aa6900f",
           "verification_status": "CURRENT",
-          "verified_at": "2026-08-14T02:25:15.226577Z",
+          "verified_at": "2026-08-14T03:01:10.120095Z",
           "worst_case_consequences": null
         },
-        "verification_ms": 142.44858297752216
+        "verification_ms": 105.93306797090918
       },
       {
         "action_types": [
           "CLOSE_PIPE"
         ],
-        "plan_hash": "01961d20f3b49f087d762849ae601e6d8b63c7a9862c5a763c7c9be30c4b51ca",
-        "plan_id": "b490bd96-8f43-54ab-ab66-ccfc538df2bd",
+        "plan_hash": "88ea2121eac6c3ef88831c92724a8efe2709d1377c01580cdcff012de1293340",
+        "plan_id": "05f5c345-6ba4-5b6d-845c-35955ca5690f",
         "verification": {
           "abstention_reason": "SIMULATION_BUDGET_EXCEEDED",
           "consequences": null,
@@ -729,29 +729,29 @@
             "simulator_version": "1.5.0"
           },
           "network_hash": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
-          "plan_hash": "1e661c8ea52a46355426d01e107c694de2a57a04b2bacb510a38708ff457e3fc",
-          "plan_id": "b490bd96-8f43-54ab-ab66-ccfc538df2bd",
+          "plan_hash": "20e14f7f6b93cfda327774421d6107cb24a4d0ff5b3accb5f0187ee4d713596b",
+          "plan_id": "05f5c345-6ba4-5b6d-845c-35955ca5690f",
           "rejection_codes": [],
           "simulator": "WNTRSimulator",
           "simulator_version": "1.5.0",
-          "state_hash": "c3de9c9e8fc6f3d78ab3f50053e1bfad28d54f9479a49c9d0548c81c95188c17",
+          "state_hash": "391f612a619970cdf1b48b51a00066e9a6d1c88cf12ba88b2c5f53e6df444073",
           "verification_status": "CURRENT",
-          "verified_at": "2026-08-14T02:25:15.306607Z",
+          "verified_at": "2026-08-14T03:01:10.179354Z",
           "worst_case_consequences": null
         },
-        "verification_ms": 78.15242296783254
+        "verification_ms": 59.02487400453538
       }
     ],
     "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
     "posterior_entropy": -0.0,
-    "process_rss_after_mb": 920.00390625,
-    "process_rss_before_mb": 882.23046875,
+    "process_rss_after_mb": 919.671875,
+    "process_rss_before_mb": 881.91015625,
     "python_version": "3.12.13",
     "random_seed": 7104,
     "reanalysis_ms": null,
     "reciprocal_rank": 1.0,
     "run_id": "813fa0f1b64d2be7",
-    "runtime_commit": "dec954c7dbc3408469d1dbc412ad4be83d310585",
+    "runtime_commit": "4bd47ff384712e63e47d81b144e0bf1ee3ad51d7",
     "runtime_mode": "FULL_HYBRID",
     "sample_rounds": [],
     "sampling_ms": null,
@@ -763,8 +763,8 @@
     "top1_correct": true,
     "top3_correct": true,
     "topology_class": "governed_reference",
-    "total_trajectory_ms": 476.62515699630603,
+    "total_trajectory_ms": 389.3452089978382,
     "true_source_probability": 1.0,
-    "verification_ms": 220.6010059453547
+    "verification_ms": 164.95794197544456
   }
 ]
