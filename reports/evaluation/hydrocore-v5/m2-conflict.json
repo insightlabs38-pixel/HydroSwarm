@@ -1,0 +1,1490 @@
+{
+  "base_model": {
+    "arm": "A",
+    "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/A-seed31874/20260814T065947Z-44557eae/model-export.safetensors",
+    "m1_decision": "NO_ARM_MEETS_PROMOTION_RULE",
+    "seed": 31874
+  },
+  "locked_test_opened_after": false,
+  "per_depth": {
+    "1": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 7.647600376500656,
+          "mean_raw_loss": 1.2611164569854736,
+          "mean_weighted_contribution": 0.6305582284927368,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.0002779512281943851,
+          "mean_raw_loss": 1.2994711778446798e-05,
+          "mean_weighted_contribution": 1.2994711778446798e-05,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.0006373308952053759,
+          "mean_raw_loss": 3.380408591813951e-05,
+          "mean_weighted_contribution": 3.380408591813951e-05,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.36751110784771623,
+          "mean_raw_loss": 0.09099932344785581,
+          "mean_weighted_contribution": 0.09099932344785581,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 8.923769473453143,
+          "mean_raw_loss": 1.3231523911158243,
+          "mean_weighted_contribution": 0.6615761955579121,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 22.311194159326295,
+          "mean_raw_loss": 10.329461002349854,
+          "mean_weighted_contribution": 10.329461002349854,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 11.373174100914541,
+          "mean_raw_loss": 2.4518500943978627,
+          "mean_weighted_contribution": 2.4518500943978627,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 8.421960686224956,
+          "mean_raw_loss": 0.6730303923288982,
+          "mean_weighted_contribution": 0.3365151961644491,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 7.425410749811683,
+          "mean_raw_loss": 1.4684212962786356,
+          "mean_weighted_contribution": 0.7342106481393178,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": -0.029137411912216415,
+          "min": -0.10659078820420391,
+          "negative_fraction": 0.8333333333333334
+        },
+        "event_presence|event_cause": {
+          "mean": 0.24141891160106602,
+          "min": 0.18428515601873166,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.04717959577290481,
+          "min": -0.11976258632002289,
+          "negative_fraction": 0.06666666666666667
+        },
+        "event_presence|relative_strength": {
+          "mean": 0.13999716920391872,
+          "min": -0.20019608680248935,
+          "negative_fraction": 0.16666666666666666
+        },
+        "event_presence|sensor_fault": {
+          "mean": -0.17798150261172554,
+          "min": -0.24786206050169673,
+          "negative_fraction": 1.0
+        },
+        "event_presence|source_node": {
+          "mean": -0.03765362680590707,
+          "min": -0.16868437820398732,
+          "negative_fraction": 0.7333333333333333
+        },
+        "event_presence|source_region": {
+          "mean": 0.12411858845062468,
+          "min": -0.3765233507367328,
+          "negative_fraction": 0.3
+        },
+        "event_presence|start_time": {
+          "mean": -0.03109040272469081,
+          "min": -0.22085496588697928,
+          "negative_fraction": 0.6666666666666666
+        },
+        "sensor_fault|duration": {
+          "mean": 0.024630407675869888,
+          "min": -0.048020324721008936,
+          "negative_fraction": 0.26666666666666666
+        },
+        "sensor_fault|event_cause": {
+          "mean": -0.17260171749577344,
+          "min": -0.24657947676419592,
+          "negative_fraction": 1.0
+        },
+        "sensor_fault|event_presence": {
+          "mean": -0.17798150261172554,
+          "min": -0.24786206050169673,
+          "negative_fraction": 1.0
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.05640137230430212,
+          "min": -0.040471569470297473,
+          "negative_fraction": 0.06666666666666667
+        },
+        "sensor_fault|relative_strength": {
+          "mean": -0.022008288316704813,
+          "min": -0.09610012224616059,
+          "negative_fraction": 0.8
+        },
+        "sensor_fault|source_node": {
+          "mean": -0.04432048327803299,
+          "min": -0.34732853245077555,
+          "negative_fraction": 0.6666666666666666
+        },
+        "sensor_fault|source_region": {
+          "mean": -0.12426249722261738,
+          "min": -0.42369696452796796,
+          "negative_fraction": 0.7
+        },
+        "sensor_fault|start_time": {
+          "mean": 0.018240848964608862,
+          "min": -0.10829949222608838,
+          "negative_fraction": 0.4
+        },
+        "source_node|duration": {
+          "mean": -0.012659190277553066,
+          "min": -0.23764575916172437,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|event_cause": {
+          "mean": -0.05672811724407261,
+          "min": -0.15796335538688094,
+          "negative_fraction": 0.9
+        },
+        "source_node|event_presence": {
+          "mean": -0.03765362680590707,
+          "min": -0.16868437820398732,
+          "negative_fraction": 0.7333333333333333
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": -0.09625629047169405,
+          "min": -0.2457101974039333,
+          "negative_fraction": 0.8
+        },
+        "source_node|relative_strength": {
+          "mean": -0.03954882391826917,
+          "min": -0.19712695654737358,
+          "negative_fraction": 0.6666666666666666
+        },
+        "source_node|sensor_fault": {
+          "mean": -0.04432048327803299,
+          "min": -0.34732853245077555,
+          "negative_fraction": 0.6666666666666666
+        },
+        "source_node|source_region": {
+          "mean": 0.08827743366681329,
+          "min": -0.3110299696542978,
+          "negative_fraction": 0.36666666666666664
+        },
+        "source_node|start_time": {
+          "mean": 0.06690176041600834,
+          "min": -0.1724780409470151,
+          "negative_fraction": 0.3
+        }
+      }
+    },
+    "12": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 8.034490166118523,
+          "mean_raw_loss": 1.0480324049790701,
+          "mean_weighted_contribution": 0.5240162024895351,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.022149147170832082,
+          "mean_raw_loss": 0.0006371940563743313,
+          "mean_weighted_contribution": 0.0006371940563743313,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.029982263434773924,
+          "mean_raw_loss": 0.0010920204241604856,
+          "mean_weighted_contribution": 0.0010920204241604856,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.1828691668802095,
+          "mean_raw_loss": 0.007672459771856666,
+          "mean_weighted_contribution": 0.007672459771856666,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 26.06019421757451,
+          "mean_raw_loss": 1.6808678766091665,
+          "mean_weighted_contribution": 0.8404339383045832,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 0.02408439314314118,
+          "mean_raw_loss": 0.0012918507544479021,
+          "mean_weighted_contribution": 0.0012918507544479021,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 3.235433163312824,
+          "mean_raw_loss": 0.05270565522757049,
+          "mean_weighted_contribution": 0.05270565522757049,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 1.8984958104402037,
+          "mean_raw_loss": 0.043541503086453305,
+          "mean_weighted_contribution": 0.021770751543226653,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 9.154732986543603,
+          "mean_raw_loss": 1.0272044877211253,
+          "mean_weighted_contribution": 0.5136022438605626,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": 0.036617086910738436,
+          "min": -0.39756955637450275,
+          "negative_fraction": 0.4
+        },
+        "event_presence|event_cause": {
+          "mean": 0.6671682781287644,
+          "min": 0.3564723703140456,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.44158120544910723,
+          "min": 0.13681304908133665,
+          "negative_fraction": 0.0
+        },
+        "event_presence|relative_strength": {
+          "mean": 0.23736548239706384,
+          "min": -0.3408203568370438,
+          "negative_fraction": 0.26666666666666666
+        },
+        "event_presence|sensor_fault": {
+          "mean": 0.3864288375007836,
+          "min": -0.3199738509527725,
+          "negative_fraction": 0.03333333333333333
+        },
+        "event_presence|source_node": {
+          "mean": 0.12710221624922582,
+          "min": -0.15962491578860777,
+          "negative_fraction": 0.16666666666666666
+        },
+        "event_presence|source_region": {
+          "mean": 0.10061015537878976,
+          "min": -0.2281905284147746,
+          "negative_fraction": 0.36666666666666664
+        },
+        "event_presence|start_time": {
+          "mean": -0.016874435137134627,
+          "min": -0.6013328781318985,
+          "negative_fraction": 0.4666666666666667
+        },
+        "sensor_fault|duration": {
+          "mean": 0.016499962755235666,
+          "min": -0.2744083205811888,
+          "negative_fraction": 0.5
+        },
+        "sensor_fault|event_cause": {
+          "mean": 0.3847160263655868,
+          "min": -0.3078504223660021,
+          "negative_fraction": 0.03333333333333333
+        },
+        "sensor_fault|event_presence": {
+          "mean": 0.3864288375007836,
+          "min": -0.3199738509527725,
+          "negative_fraction": 0.03333333333333333
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.13838246897325263,
+          "min": -0.5146295382396443,
+          "negative_fraction": 0.13333333333333333
+        },
+        "sensor_fault|relative_strength": {
+          "mean": 0.007366950859674013,
+          "min": -0.4789627391879517,
+          "negative_fraction": 0.4666666666666667
+        },
+        "sensor_fault|source_node": {
+          "mean": -0.06692269157634183,
+          "min": -0.25272263385154276,
+          "negative_fraction": 0.7666666666666667
+        },
+        "sensor_fault|source_region": {
+          "mean": 0.0033630609017352418,
+          "min": -0.28270048270747783,
+          "negative_fraction": 0.43333333333333335
+        },
+        "sensor_fault|start_time": {
+          "mean": 0.002806313729984082,
+          "min": -0.576089041344957,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|duration": {
+          "mean": 0.09896048271944982,
+          "min": -0.2982578801085962,
+          "negative_fraction": 0.36666666666666664
+        },
+        "source_node|event_cause": {
+          "mean": 0.1741577150034707,
+          "min": -0.19962780978479863,
+          "negative_fraction": 0.03333333333333333
+        },
+        "source_node|event_presence": {
+          "mean": 0.12710221624922582,
+          "min": -0.15962491578860777,
+          "negative_fraction": 0.16666666666666666
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": 0.2674111481723703,
+          "min": -0.2566752836888999,
+          "negative_fraction": 0.06666666666666667
+        },
+        "source_node|relative_strength": {
+          "mean": 0.11556720977130448,
+          "min": -0.3378580357092702,
+          "negative_fraction": 0.2
+        },
+        "source_node|sensor_fault": {
+          "mean": -0.06692269157634183,
+          "min": -0.25272263385154276,
+          "negative_fraction": 0.7666666666666667
+        },
+        "source_node|source_region": {
+          "mean": 0.13221912118016563,
+          "min": -0.3700061572680535,
+          "negative_fraction": 0.36666666666666664
+        },
+        "source_node|start_time": {
+          "mean": -0.023085157099316862,
+          "min": -0.6361644279699549,
+          "negative_fraction": 0.4666666666666667
+        }
+      }
+    },
+    "2": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 8.891342165160085,
+          "mean_raw_loss": 1.374732462565104,
+          "mean_weighted_contribution": 0.687366231282552,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.013703867040113995,
+          "mean_raw_loss": 0.00018634888638189296,
+          "mean_weighted_contribution": 0.00018634888638189296,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.01801782211869783,
+          "mean_raw_loss": 0.00033438384695424854,
+          "mean_weighted_contribution": 0.00033438384695424854,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.10888314164036356,
+          "mean_raw_loss": 0.005577391906020542,
+          "mean_weighted_contribution": 0.005577391906020542,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 20.444540855495696,
+          "mean_raw_loss": 1.6072485427061716,
+          "mean_weighted_contribution": 0.8036242713530858,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 0.021523787945048566,
+          "mean_raw_loss": 0.0005202198954066262,
+          "mean_weighted_contribution": 0.0005202198954066262,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 9.156276065268766,
+          "mean_raw_loss": 2.250752979516983,
+          "mean_weighted_contribution": 2.250752979516983,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 10.729543886541771,
+          "mean_raw_loss": 1.167019624542445,
+          "mean_weighted_contribution": 0.5835098122712224,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 16.266255144554783,
+          "mean_raw_loss": 1.8098977565765382,
+          "mean_weighted_contribution": 0.9049488782882691,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": -0.057900992746706036,
+          "min": -0.6069317524136711,
+          "negative_fraction": 0.5333333333333333
+        },
+        "event_presence|event_cause": {
+          "mean": 0.5587686739435503,
+          "min": 0.29634939601606997,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.17454376593995724,
+          "min": -0.5262904315964533,
+          "negative_fraction": 0.03333333333333333
+        },
+        "event_presence|relative_strength": {
+          "mean": 0.34981581035893333,
+          "min": -0.26513870258967964,
+          "negative_fraction": 0.13333333333333333
+        },
+        "event_presence|sensor_fault": {
+          "mean": 0.3867038248025247,
+          "min": -0.368079052465856,
+          "negative_fraction": 0.06666666666666667
+        },
+        "event_presence|source_node": {
+          "mean": 0.025210503116925027,
+          "min": -0.19715413974831536,
+          "negative_fraction": 0.4
+        },
+        "event_presence|source_region": {
+          "mean": 0.09521462401704127,
+          "min": -0.2627433071080789,
+          "negative_fraction": 0.2
+        },
+        "event_presence|start_time": {
+          "mean": 0.03171987217772542,
+          "min": -0.43920510214943814,
+          "negative_fraction": 0.5666666666666667
+        },
+        "sensor_fault|duration": {
+          "mean": 0.02148310724688142,
+          "min": -0.6675017587106494,
+          "negative_fraction": 0.5666666666666667
+        },
+        "sensor_fault|event_cause": {
+          "mean": 0.3967813687869746,
+          "min": -0.23665176848912098,
+          "negative_fraction": 0.03333333333333333
+        },
+        "sensor_fault|event_presence": {
+          "mean": 0.3867038248025247,
+          "min": -0.368079052465856,
+          "negative_fraction": 0.06666666666666667
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.025532090299910316,
+          "min": -0.6030265854591705,
+          "negative_fraction": 0.26666666666666666
+        },
+        "sensor_fault|relative_strength": {
+          "mean": 0.163150570042554,
+          "min": -0.7509971780992272,
+          "negative_fraction": 0.16666666666666666
+        },
+        "sensor_fault|source_node": {
+          "mean": 0.11741967660982085,
+          "min": -0.13891598802204594,
+          "negative_fraction": 0.1
+        },
+        "sensor_fault|source_region": {
+          "mean": 0.04698407387860566,
+          "min": -0.2593173455752667,
+          "negative_fraction": 0.3333333333333333
+        },
+        "sensor_fault|start_time": {
+          "mean": 0.07542972320790925,
+          "min": -0.30056446965757444,
+          "negative_fraction": 0.3333333333333333
+        },
+        "source_node|duration": {
+          "mean": 0.005902662196557561,
+          "min": -0.11141143394122922,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|event_cause": {
+          "mean": 0.014368797906998822,
+          "min": -0.24367289838142928,
+          "negative_fraction": 0.43333333333333335
+        },
+        "source_node|event_presence": {
+          "mean": 0.025210503116925027,
+          "min": -0.19715413974831536,
+          "negative_fraction": 0.4
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": -0.06169077492005341,
+          "min": -0.38775689462215407,
+          "negative_fraction": 0.6666666666666666
+        },
+        "source_node|relative_strength": {
+          "mean": -0.030684019746436596,
+          "min": -0.20138434247676643,
+          "negative_fraction": 0.5666666666666667
+        },
+        "source_node|sensor_fault": {
+          "mean": 0.11741967660982085,
+          "min": -0.13891598802204594,
+          "negative_fraction": 0.1
+        },
+        "source_node|source_region": {
+          "mean": 0.20816705784549827,
+          "min": -0.3524285808347256,
+          "negative_fraction": 0.16666666666666666
+        },
+        "source_node|start_time": {
+          "mean": -0.002045185539761906,
+          "min": -0.1826367318100123,
+          "negative_fraction": 0.43333333333333335
+        }
+      }
+    },
+    "25": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 7.7542910951066215,
+          "mean_raw_loss": 1.0361310998598734,
+          "mean_weighted_contribution": 0.5180655499299367,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.018718011343652443,
+          "mean_raw_loss": 0.0005952930162796596,
+          "mean_weighted_contribution": 0.0005952930162796596,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.022871689103397583,
+          "mean_raw_loss": 0.0009373994582953552,
+          "mean_weighted_contribution": 0.0009373994582953552,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.1254666215708242,
+          "mean_raw_loss": 0.005871325250094136,
+          "mean_weighted_contribution": 0.005871325250094136,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 9.926735498533425,
+          "mean_raw_loss": 0.4895760183533033,
+          "mean_weighted_contribution": 0.24478800917665164,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 0.025517855186435515,
+          "mean_raw_loss": 0.0014789587313619754,
+          "mean_weighted_contribution": 0.0014789587313619754,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 0.4552917305279006,
+          "mean_raw_loss": 0.01714814317335064,
+          "mean_weighted_contribution": 0.01714814317335064,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 0.9511174446945355,
+          "mean_raw_loss": 0.03605550199669475,
+          "mean_weighted_contribution": 0.018027750998347376,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 6.404701157628847,
+          "mean_raw_loss": 0.8064145654439926,
+          "mean_weighted_contribution": 0.4032072827219963,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": -0.024298977652606676,
+          "min": -0.40974521456528257,
+          "negative_fraction": 0.5333333333333333
+        },
+        "event_presence|event_cause": {
+          "mean": 0.6673520582869227,
+          "min": 0.3680910161685769,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.34590825278554255,
+          "min": -0.006604870039250917,
+          "negative_fraction": 0.03333333333333333
+        },
+        "event_presence|relative_strength": {
+          "mean": -0.05697415008839151,
+          "min": -0.5225890981422485,
+          "negative_fraction": 0.5333333333333333
+        },
+        "event_presence|sensor_fault": {
+          "mean": 0.4733024994639533,
+          "min": 0.19879565092729243,
+          "negative_fraction": 0.0
+        },
+        "event_presence|source_node": {
+          "mean": 0.07062456695201652,
+          "min": -0.4608252480560136,
+          "negative_fraction": 0.26666666666666666
+        },
+        "event_presence|source_region": {
+          "mean": 0.053002874896988406,
+          "min": -0.42611978596347894,
+          "negative_fraction": 0.36666666666666664
+        },
+        "event_presence|start_time": {
+          "mean": -0.004698810672844362,
+          "min": -0.3636966821954584,
+          "negative_fraction": 0.43333333333333335
+        },
+        "sensor_fault|duration": {
+          "mean": -0.005821649975812346,
+          "min": -0.20249699714354866,
+          "negative_fraction": 0.4666666666666667
+        },
+        "sensor_fault|event_cause": {
+          "mean": 0.4607437321634637,
+          "min": 0.22731269471392862,
+          "negative_fraction": 0.0
+        },
+        "sensor_fault|event_presence": {
+          "mean": 0.4733024994639533,
+          "min": 0.19879565092729243,
+          "negative_fraction": 0.0
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.12575262916551108,
+          "min": -0.06122718923778051,
+          "negative_fraction": 0.23333333333333334
+        },
+        "sensor_fault|relative_strength": {
+          "mean": -0.04291504521931307,
+          "min": -0.3364547828150961,
+          "negative_fraction": 0.5333333333333333
+        },
+        "sensor_fault|source_node": {
+          "mean": -0.1391781110781859,
+          "min": -0.42667728017461776,
+          "negative_fraction": 0.9333333333333333
+        },
+        "sensor_fault|source_region": {
+          "mean": 0.03165475845477284,
+          "min": -0.3808935464524692,
+          "negative_fraction": 0.4666666666666667
+        },
+        "sensor_fault|start_time": {
+          "mean": -0.009793459445776196,
+          "min": -0.2427831972388369,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|duration": {
+          "mean": -0.010163078366999234,
+          "min": -0.506757798162146,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|event_cause": {
+          "mean": 0.11631255130338493,
+          "min": -0.4653293088239079,
+          "negative_fraction": 0.13333333333333333
+        },
+        "source_node|event_presence": {
+          "mean": 0.07062456695201652,
+          "min": -0.4608252480560136,
+          "negative_fraction": 0.26666666666666666
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": 0.30039738927684234,
+          "min": -0.12833823650225595,
+          "negative_fraction": 0.03333333333333333
+        },
+        "source_node|relative_strength": {
+          "mean": 0.04522935221762135,
+          "min": -0.36586053056649565,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|sensor_fault": {
+          "mean": -0.1391781110781859,
+          "min": -0.42667728017461776,
+          "negative_fraction": 0.9333333333333333
+        },
+        "source_node|source_region": {
+          "mean": 0.05646145103422245,
+          "min": -0.40829118860046143,
+          "negative_fraction": 0.5
+        },
+        "source_node|start_time": {
+          "mean": -0.01544647506031196,
+          "min": -0.5721980098147316,
+          "negative_fraction": 0.5333333333333333
+        }
+      }
+    },
+    "3": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 9.744893813084872,
+          "mean_raw_loss": 1.3412940204143524,
+          "mean_weighted_contribution": 0.6706470102071762,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.011877865400059707,
+          "mean_raw_loss": 0.00025062551321752835,
+          "mean_weighted_contribution": 0.00025062551321752835,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.01534140776727208,
+          "mean_raw_loss": 0.00041901096725875203,
+          "mean_weighted_contribution": 0.00041901096725875203,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.15986530052724612,
+          "mean_raw_loss": 0.006578035815618932,
+          "mean_weighted_contribution": 0.006578035815618932,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 23.3991105014011,
+          "mean_raw_loss": 1.7809550702571868,
+          "mean_weighted_contribution": 0.8904775351285934,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 0.016903571280518354,
+          "mean_raw_loss": 0.0006740566982140687,
+          "mean_weighted_contribution": 0.0006740566982140687,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 8.554268209801686,
+          "mean_raw_loss": 1.9545271555582682,
+          "mean_weighted_contribution": 1.9545271555582682,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 7.296987337886246,
+          "mean_raw_loss": 0.8219638960125546,
+          "mean_weighted_contribution": 0.4109819480062773,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 14.960042787733771,
+          "mean_raw_loss": 1.8806417604287466,
+          "mean_weighted_contribution": 0.9403208802143733,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": 0.03909107701996617,
+          "min": -0.6618598357528204,
+          "negative_fraction": 0.3333333333333333
+        },
+        "event_presence|event_cause": {
+          "mean": 0.6628530480043344,
+          "min": 0.284767535182351,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.3239000064332311,
+          "min": 0.0068103218770254395,
+          "negative_fraction": 0.0
+        },
+        "event_presence|relative_strength": {
+          "mean": 0.3330591275371232,
+          "min": -0.19350065898374838,
+          "negative_fraction": 0.13333333333333333
+        },
+        "event_presence|sensor_fault": {
+          "mean": 0.3975260015498049,
+          "min": -0.32673877297224474,
+          "negative_fraction": 0.06666666666666667
+        },
+        "event_presence|source_node": {
+          "mean": 0.03931576969449318,
+          "min": -0.16064831250151212,
+          "negative_fraction": 0.3333333333333333
+        },
+        "event_presence|source_region": {
+          "mean": 0.00834823887695301,
+          "min": -0.3092182854610333,
+          "negative_fraction": 0.4
+        },
+        "event_presence|start_time": {
+          "mean": -0.09401907345969601,
+          "min": -0.8762547314652052,
+          "negative_fraction": 0.5666666666666667
+        },
+        "sensor_fault|duration": {
+          "mean": 0.08396496027722572,
+          "min": -0.5650106700606328,
+          "negative_fraction": 0.3333333333333333
+        },
+        "sensor_fault|event_cause": {
+          "mean": 0.4152180222143073,
+          "min": -0.2316258941385878,
+          "negative_fraction": 0.06666666666666667
+        },
+        "sensor_fault|event_presence": {
+          "mean": 0.3975260015498049,
+          "min": -0.32673877297224474,
+          "negative_fraction": 0.06666666666666667
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.09600932566525684,
+          "min": -0.40553469285437566,
+          "negative_fraction": 0.26666666666666666
+        },
+        "sensor_fault|relative_strength": {
+          "mean": 0.09974287846803359,
+          "min": -0.5583702674992552,
+          "negative_fraction": 0.3
+        },
+        "sensor_fault|source_node": {
+          "mean": 0.09895473808668541,
+          "min": -0.18984810737564048,
+          "negative_fraction": 0.16666666666666666
+        },
+        "sensor_fault|source_region": {
+          "mean": -0.002400444323947213,
+          "min": -0.2512774722691414,
+          "negative_fraction": 0.5333333333333333
+        },
+        "sensor_fault|start_time": {
+          "mean": -0.0027132893305415423,
+          "min": -0.505307646290964,
+          "negative_fraction": 0.5666666666666667
+        },
+        "source_node|duration": {
+          "mean": -0.007659142140611538,
+          "min": -0.13141849763740496,
+          "negative_fraction": 0.5666666666666667
+        },
+        "source_node|event_cause": {
+          "mean": 0.03552938793206937,
+          "min": -0.18447823349699452,
+          "negative_fraction": 0.3333333333333333
+        },
+        "source_node|event_presence": {
+          "mean": 0.03931576969449318,
+          "min": -0.16064831250151212,
+          "negative_fraction": 0.3333333333333333
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": -0.028872748507763602,
+          "min": -0.28869446730912235,
+          "negative_fraction": 0.5333333333333333
+        },
+        "source_node|relative_strength": {
+          "mean": -0.009721782739525292,
+          "min": -0.1748110991786298,
+          "negative_fraction": 0.5666666666666667
+        },
+        "source_node|sensor_fault": {
+          "mean": 0.09895473808668541,
+          "min": -0.18984810737564048,
+          "negative_fraction": 0.16666666666666666
+        },
+        "source_node|source_region": {
+          "mean": 0.14093814901526533,
+          "min": -0.4133144194472486,
+          "negative_fraction": 0.16666666666666666
+        },
+        "source_node|start_time": {
+          "mean": 0.0162452578272672,
+          "min": -0.22668197074462176,
+          "negative_fraction": 0.43333333333333335
+        }
+      }
+    },
+    "4": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 9.099153968523835,
+          "mean_raw_loss": 1.2297683835029602,
+          "mean_weighted_contribution": 0.6148841917514801,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.01270926937650643,
+          "mean_raw_loss": 0.00037161809341341724,
+          "mean_weighted_contribution": 0.00037161809341341724,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.018353290824898234,
+          "mean_raw_loss": 0.0006940144739928655,
+          "mean_weighted_contribution": 0.0006940144739928655,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.12289370284495596,
+          "mean_raw_loss": 0.0060415348581348855,
+          "mean_weighted_contribution": 0.0060415348581348855,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 21.89379681511137,
+          "mean_raw_loss": 2.0776054501533507,
+          "mean_weighted_contribution": 1.0388027250766754,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 0.019793855461168918,
+          "mean_raw_loss": 0.0010070748374952623,
+          "mean_weighted_contribution": 0.0010070748374952623,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 4.731181191672096,
+          "mean_raw_loss": 0.7619016973262963,
+          "mean_weighted_contribution": 0.7619016973262963,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 4.0186474603752265,
+          "mean_raw_loss": 0.3090867536297689,
+          "mean_weighted_contribution": 0.15454337681488445,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 15.215700100339713,
+          "mean_raw_loss": 1.5764921128749847,
+          "mean_weighted_contribution": 0.7882460564374923,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": 0.041193587356428266,
+          "min": -0.3708649180590069,
+          "negative_fraction": 0.5
+        },
+        "event_presence|event_cause": {
+          "mean": 0.6271890668808887,
+          "min": 0.3350032938453976,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.3103744859386212,
+          "min": 0.06962456395805029,
+          "negative_fraction": 0.0
+        },
+        "event_presence|relative_strength": {
+          "mean": 0.3111327637718635,
+          "min": -0.1359797944447553,
+          "negative_fraction": 0.06666666666666667
+        },
+        "event_presence|sensor_fault": {
+          "mean": 0.40859994647748715,
+          "min": 0.03802438973702692,
+          "negative_fraction": 0.0
+        },
+        "event_presence|source_node": {
+          "mean": 0.05723481997334131,
+          "min": -0.23703515760976276,
+          "negative_fraction": 0.26666666666666666
+        },
+        "event_presence|source_region": {
+          "mean": 0.04532485715489298,
+          "min": -0.2946038837812551,
+          "negative_fraction": 0.26666666666666666
+        },
+        "event_presence|start_time": {
+          "mean": -0.05393988819894295,
+          "min": -0.7599906593452839,
+          "negative_fraction": 0.5666666666666667
+        },
+        "sensor_fault|duration": {
+          "mean": 0.03317514134497746,
+          "min": -0.44231802547300686,
+          "negative_fraction": 0.4666666666666667
+        },
+        "sensor_fault|event_cause": {
+          "mean": 0.41316643642386636,
+          "min": 0.060879330226190166,
+          "negative_fraction": 0.0
+        },
+        "sensor_fault|event_presence": {
+          "mean": 0.40859994647748715,
+          "min": 0.03802438973702692,
+          "negative_fraction": 0.0
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.11858831702541232,
+          "min": -0.12557427112445566,
+          "negative_fraction": 0.06666666666666667
+        },
+        "sensor_fault|relative_strength": {
+          "mean": 0.08062366328300596,
+          "min": -0.6921785725419624,
+          "negative_fraction": 0.26666666666666666
+        },
+        "sensor_fault|source_node": {
+          "mean": 0.004460385564557554,
+          "min": -0.3597884548103145,
+          "negative_fraction": 0.4
+        },
+        "sensor_fault|source_region": {
+          "mean": 0.013035730130339897,
+          "min": -0.3201173706785168,
+          "negative_fraction": 0.36666666666666664
+        },
+        "sensor_fault|start_time": {
+          "mean": -0.037049211929929056,
+          "min": -0.5147833025463558,
+          "negative_fraction": 0.6
+        },
+        "source_node|duration": {
+          "mean": 0.011878648880387126,
+          "min": -0.30895815785510283,
+          "negative_fraction": 0.5
+        },
+        "source_node|event_cause": {
+          "mean": 0.07373038945206666,
+          "min": -0.21422238062367135,
+          "negative_fraction": 0.3
+        },
+        "source_node|event_presence": {
+          "mean": 0.05723481997334131,
+          "min": -0.23703515760976276,
+          "negative_fraction": 0.26666666666666666
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": 0.08800574067989483,
+          "min": -0.34727311644763315,
+          "negative_fraction": 0.36666666666666664
+        },
+        "source_node|relative_strength": {
+          "mean": 0.0191498209145651,
+          "min": -0.4333005183772058,
+          "negative_fraction": 0.4666666666666667
+        },
+        "source_node|sensor_fault": {
+          "mean": 0.004460385564557554,
+          "min": -0.3597884548103145,
+          "negative_fraction": 0.4
+        },
+        "source_node|source_region": {
+          "mean": 0.10465108087250855,
+          "min": -0.5739452411546271,
+          "negative_fraction": 0.36666666666666664
+        },
+        "source_node|start_time": {
+          "mean": -0.025285969095274616,
+          "min": -0.5101449837457425,
+          "negative_fraction": 0.5666666666666667
+        }
+      }
+    },
+    "6": {
+      "n_scenarios": 120,
+      "per_task": {
+        "duration": {
+          "mean_gradient_norm": 8.218582871542006,
+          "mean_raw_loss": 1.1298118313153585,
+          "mean_weighted_contribution": 0.5649059156576792,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_cause": {
+          "mean_gradient_norm": 0.01500535257254031,
+          "mean_raw_loss": 0.0003948017930573163,
+          "mean_weighted_contribution": 0.0003948017930573163,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "event_presence": {
+          "mean_gradient_norm": 0.02078584173524144,
+          "mean_raw_loss": 0.0007457809668267145,
+          "mean_weighted_contribution": 0.0007457809668267145,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "evidence_sufficiency": {
+          "mean_gradient_norm": 0.16431283316621415,
+          "mean_raw_loss": 0.006706506153568626,
+          "mean_weighted_contribution": 0.006706506153568626,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "relative_strength": {
+          "mean_gradient_norm": 19.766821839903013,
+          "mean_raw_loss": 2.091460947195689,
+          "mean_weighted_contribution": 1.0457304735978445,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "sensor_fault": {
+          "mean_gradient_norm": 0.019622231544668425,
+          "mean_raw_loss": 0.0010368455317802728,
+          "mean_weighted_contribution": 0.0010368455317802728,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 440
+        },
+        "source_node": {
+          "mean_gradient_norm": 2.972238202410132,
+          "mean_raw_loss": 0.1403437559279458,
+          "mean_weighted_contribution": 0.1403437559279458,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "source_region": {
+          "mean_gradient_norm": 2.294190550814463,
+          "mean_raw_loss": 0.0802401890590166,
+          "mean_weighted_contribution": 0.0401200945295083,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        },
+        "start_time": {
+          "mean_gradient_norm": 10.900197953765439,
+          "mean_raw_loss": 1.2836278676986694,
+          "mean_weighted_contribution": 0.6418139338493347,
+          "supervised_in_this_corpus": true,
+          "total_valid_targets": 120
+        }
+      },
+      "primary_vs_other_cosine": {
+        "event_presence|duration": {
+          "mean": 0.017101996796626474,
+          "min": -0.46867321823951985,
+          "negative_fraction": 0.5
+        },
+        "event_presence|event_cause": {
+          "mean": 0.6306512954967897,
+          "min": 0.3523599127159118,
+          "negative_fraction": 0.0
+        },
+        "event_presence|evidence_sufficiency": {
+          "mean": 0.3631929952468524,
+          "min": 0.02324696299368266,
+          "negative_fraction": 0.0
+        },
+        "event_presence|relative_strength": {
+          "mean": 0.28619918882774603,
+          "min": -0.19587328263268616,
+          "negative_fraction": 0.1
+        },
+        "event_presence|sensor_fault": {
+          "mean": 0.30952711913754954,
+          "min": -0.37807394747330586,
+          "negative_fraction": 0.06666666666666667
+        },
+        "event_presence|source_node": {
+          "mean": 0.10755995285542051,
+          "min": -0.4656564137788692,
+          "negative_fraction": 0.36666666666666664
+        },
+        "event_presence|source_region": {
+          "mean": 0.007934466441518283,
+          "min": -0.325550534611941,
+          "negative_fraction": 0.4
+        },
+        "event_presence|start_time": {
+          "mean": -0.11193184309335728,
+          "min": -0.7783296717326311,
+          "negative_fraction": 0.5666666666666667
+        },
+        "sensor_fault|duration": {
+          "mean": -0.013424906904545947,
+          "min": -0.6990590125490878,
+          "negative_fraction": 0.5333333333333333
+        },
+        "sensor_fault|event_cause": {
+          "mean": 0.3202247578846412,
+          "min": -0.12978170906342995,
+          "negative_fraction": 0.03333333333333333
+        },
+        "sensor_fault|event_presence": {
+          "mean": 0.30952711913754954,
+          "min": -0.37807394747330586,
+          "negative_fraction": 0.06666666666666667
+        },
+        "sensor_fault|evidence_sufficiency": {
+          "mean": 0.11227317307068836,
+          "min": -0.056402039728195796,
+          "negative_fraction": 0.13333333333333333
+        },
+        "sensor_fault|relative_strength": {
+          "mean": -0.005950817854393024,
+          "min": -0.6617281216587458,
+          "negative_fraction": 0.3
+        },
+        "sensor_fault|source_node": {
+          "mean": -0.047705504968992306,
+          "min": -0.2453151233985279,
+          "negative_fraction": 0.8
+        },
+        "sensor_fault|source_region": {
+          "mean": -0.017956377152778657,
+          "min": -0.5197553193550581,
+          "negative_fraction": 0.36666666666666664
+        },
+        "sensor_fault|start_time": {
+          "mean": 0.02929803903804525,
+          "min": -0.22475306175730628,
+          "negative_fraction": 0.5
+        },
+        "source_node|duration": {
+          "mean": 0.022393832939021106,
+          "min": -0.49466611840035424,
+          "negative_fraction": 0.4
+        },
+        "source_node|event_cause": {
+          "mean": 0.15363382944344794,
+          "min": -0.3533982147009626,
+          "negative_fraction": 0.3333333333333333
+        },
+        "source_node|event_presence": {
+          "mean": 0.10755995285542051,
+          "min": -0.4656564137788692,
+          "negative_fraction": 0.36666666666666664
+        },
+        "source_node|evidence_sufficiency": {
+          "mean": 0.2625663056666919,
+          "min": -0.11992494049533944,
+          "negative_fraction": 0.1
+        },
+        "source_node|relative_strength": {
+          "mean": 0.050974073722340106,
+          "min": -0.7990157377816384,
+          "negative_fraction": 0.3
+        },
+        "source_node|sensor_fault": {
+          "mean": -0.047705504968992306,
+          "min": -0.2453151233985279,
+          "negative_fraction": 0.8
+        },
+        "source_node|source_region": {
+          "mean": 0.020757445477096077,
+          "min": -0.5246166975463841,
+          "negative_fraction": 0.5666666666666667
+        },
+        "source_node|start_time": {
+          "mean": 0.019295220259329882,
+          "min": -0.5500698170007354,
+          "negative_fraction": 0.43333333333333335
+        }
+      }
+    }
+  },
+  "per_depth_bucket": {
+    "EARLY": {
+      "depths": [
+        1,
+        2,
+        3
+      ],
+      "frequent_negative_conflict_pairs": [
+        "event_presence|duration",
+        "event_presence|start_time",
+        "sensor_fault|source_region",
+        "source_node|duration",
+        "source_node|event_cause",
+        "source_node|evidence_sufficiency",
+        "source_node|relative_strength"
+      ],
+      "primary_vs_other_cosine": {
+        "event_presence|duration": -0.01598244254631876,
+        "event_presence|event_cause": 0.4876802111829836,
+        "event_presence|evidence_sufficiency": 0.1818744560486977,
+        "event_presence|relative_strength": 0.2742907023666584,
+        "event_presence|sensor_fault": 0.20208277458020132,
+        "event_presence|source_node": 0.008957548668503712,
+        "event_presence|source_region": 0.07589381711487299,
+        "event_presence|start_time": -0.03112986800222047,
+        "sensor_fault|duration": 0.04335949173332568,
+        "sensor_fault|event_cause": 0.2131325578351695,
+        "sensor_fault|event_presence": 0.20208277458020132,
+        "sensor_fault|evidence_sufficiency": 0.05931426275648976,
+        "sensor_fault|relative_strength": 0.08029505339796093,
+        "sensor_fault|source_node": 0.057351310472824414,
+        "sensor_fault|source_region": -0.026559622555986314,
+        "sensor_fault|start_time": 0.03031909428065886,
+        "source_node|duration": -0.004805223407202348,
+        "source_node|event_cause": -0.00227664380166814,
+        "source_node|event_presence": 0.008957548668503712,
+        "source_node|evidence_sufficiency": -0.06227327129983703,
+        "source_node|relative_strength": -0.02665154213474369,
+        "source_node|sensor_fault": 0.057351310472824414,
+        "source_node|source_region": 0.1457942135091923,
+        "source_node|start_time": 0.027033944234504545
+      }
+    },
+    "MATURE": {
+      "depths": [
+        12,
+        25
+      ],
+      "frequent_negative_conflict_pairs": [
+        "sensor_fault|relative_strength",
+        "sensor_fault|source_node",
+        "sensor_fault|start_time",
+        "source_node|sensor_fault",
+        "source_node|start_time"
+      ],
+      "primary_vs_other_cosine": {
+        "event_presence|duration": 0.00615905462906588,
+        "event_presence|event_cause": 0.6672601682078436,
+        "event_presence|evidence_sufficiency": 0.3937447291173249,
+        "event_presence|relative_strength": 0.09019566615433616,
+        "event_presence|sensor_fault": 0.42986566848236846,
+        "event_presence|source_node": 0.09886339160062117,
+        "event_presence|source_region": 0.07680651513788908,
+        "event_presence|start_time": -0.010786622904989494,
+        "sensor_fault|duration": 0.00533915638971166,
+        "sensor_fault|event_cause": 0.42272987926452527,
+        "sensor_fault|event_presence": 0.42986566848236846,
+        "sensor_fault|evidence_sufficiency": 0.13206754906938184,
+        "sensor_fault|relative_strength": -0.01777404717981953,
+        "sensor_fault|source_node": -0.10305040132726387,
+        "sensor_fault|source_region": 0.017508909678254043,
+        "sensor_fault|start_time": -0.0034935728578960575,
+        "source_node|duration": 0.044398702176225296,
+        "source_node|event_cause": 0.14523513315342781,
+        "source_node|event_presence": 0.09886339160062117,
+        "source_node|evidence_sufficiency": 0.28390426872460633,
+        "source_node|relative_strength": 0.08039828099446292,
+        "source_node|sensor_fault": -0.10305040132726387,
+        "source_node|source_region": 0.09434028610719404,
+        "source_node|start_time": -0.01926581607981441
+      }
+    },
+    "MID": {
+      "depths": [
+        4,
+        6
+      ],
+      "frequent_negative_conflict_pairs": [
+        "event_presence|duration",
+        "event_presence|start_time",
+        "sensor_fault|duration",
+        "sensor_fault|source_node",
+        "sensor_fault|start_time",
+        "source_node|sensor_fault",
+        "source_node|start_time"
+      ],
+      "primary_vs_other_cosine": {
+        "event_presence|duration": 0.02914779207652737,
+        "event_presence|event_cause": 0.6289201811888392,
+        "event_presence|evidence_sufficiency": 0.3367837405927368,
+        "event_presence|relative_strength": 0.29866597629980474,
+        "event_presence|sensor_fault": 0.35906353280751835,
+        "event_presence|source_node": 0.08239738641438091,
+        "event_presence|source_region": 0.02662966179820563,
+        "event_presence|start_time": -0.08293586564615012,
+        "sensor_fault|duration": 0.009875117220215758,
+        "sensor_fault|event_cause": 0.3666955971542538,
+        "sensor_fault|event_presence": 0.35906353280751835,
+        "sensor_fault|evidence_sufficiency": 0.11543074504805034,
+        "sensor_fault|relative_strength": 0.03733642271430647,
+        "sensor_fault|source_node": -0.021622559702217374,
+        "sensor_fault|source_region": -0.0024603235112193797,
+        "sensor_fault|start_time": -0.0038755864459419035,
+        "source_node|duration": 0.017136240909704115,
+        "source_node|event_cause": 0.1136821094477573,
+        "source_node|event_presence": 0.08239738641438091,
+        "source_node|evidence_sufficiency": 0.1752860231732934,
+        "source_node|relative_strength": 0.0350619473184526,
+        "source_node|sensor_fault": -0.021622559702217374,
+        "source_node|source_region": 0.06270426317480231,
+        "source_node|start_time": -0.002995374417972367
+      }
+    }
+  },
+  "primary_tasks_with_real_supervision": [
+    "event_presence",
+    "sensor_fault",
+    "source_node"
+  ],
+  "primary_tasks_without_supervision_this_session": [
+    "ood_class",
+    "plan_validity",
+    "sample_node"
+  ],
+  "purpose": "Milestone 2.1 (experiments.txt): per-task loss/gradient/conflict diagnostics grouped by causal depth.",
+  "schema_version": 1,
+  "scope_limitation": "Scout/Strategist/OOD primary tasks (ood_class, plan_validity, sample_node) never receive a real target in this corpus and show DEGENERATE_NO_SUPERVISION (graph-connected zero loss/gradient) below, not a genuine conflict measurement -- a real interference study for those tasks needs a jointly-supervised corpus, deferred beyond this session, reported as a negative/limitation finding rather than omitted.",
+  "supervised_tasks_in_this_corpus": [
+    "duration",
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "sensor_fault",
+    "source_node",
+    "source_region",
+    "start_time"
+  ],
+  "task_weights_source": "configs/training-v5-causal.yaml"
+}

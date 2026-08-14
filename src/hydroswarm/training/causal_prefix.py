@@ -73,7 +73,7 @@ FULL_HISTORY_DEPTH = 25
 #: docstring's scope note). Kept as an explicit, importable constant so
 #: every script that reports on this corpus (M1 eval, M2 conflict analysis)
 #: agrees on exactly which tasks have real (non-fully-masked) targets here.
-SUPERVISED_TASKS: tuple[str, ...] = (
+SUPERVISED_TASKS: frozenset[str] = frozenset({
     "source_node",
     "source_region",
     "start_time",
@@ -83,7 +83,7 @@ SUPERVISED_TASKS: tuple[str, ...] = (
     "event_cause",
     "evidence_sufficiency",
     "sensor_fault",
-)
+})
 
 
 def truncate_causal_prefix(series: SensorSeries, depth: int) -> SensorSeries:
