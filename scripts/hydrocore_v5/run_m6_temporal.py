@@ -235,17 +235,14 @@ def _seeded_rng(*parts: object) -> np.random.Generator:
     return np.random.default_rng(seed_int)
 
 
-def _resample_series(series: SensorSeries, *, stride: int, depth: int) -> SensorSeries:
-    """First `depth` points of `series` at spacing `stride` (indices
-    0, stride, 2*stride, ...) -- growing evidence from incident onset,
-    same "prefix" semantics as `hydroswarm.training.causal_prefix.
-    truncate_causal_prefix`, generalized with a stride so it can express a
-    coarser report cadence than the underlying array's own resolution."""
+def _slice_series(series: SensorSeries, indices: Sequence[int]) -> SensorSeries:
+    """`series` restricted to `indices` (must be non-empty, ascending --
+    SensorSeries's own __post_init__ enforces non-decreasing timestamps).
+    Factored out of `_resample_series`/`_truncate_series_by_time`/
+    `_cadence_evidence_up_to_checkpoint` so all three share one
+    field-projection implementation rather than three copies that could
+    silently drift apart."""
 
-    n = len(series.timestamps_seconds)
-    indices = [i for i in range(0, n, stride)][: max(depth, 1)]
-    if not indices:
-        indices = [0]
     return SensorSeries(
         node_id=series.node_id,
         timestamps_seconds=tuple(series.timestamps_seconds[i] for i in indices),
@@ -257,6 +254,31 @@ def _resample_series(series: SensorSeries, *, stride: int, depth: int) -> Sensor
         delayed=tuple(series.delayed[i] for i in indices),
         frozen=tuple(series.frozen[i] for i in indices),
     )
+
+
+def _resample_series(series: SensorSeries, *, stride: int, depth: int) -> SensorSeries:
+    """First `depth` points of `series` at spacing `stride` (indices
+    0, stride, 2*stride, ..., (depth-1)*stride) -- growing evidence from
+    incident onset, same "prefix" semantics as `hydroswarm.training.
+    causal_prefix.truncate_causal_prefix`, generalized with a stride so it
+    can express a coarser report cadence than the underlying array's own
+    resolution.
+
+    Milestone-6 correction note: `depth` points spaced `stride` apart span
+    `(depth - 1) * stride` steps, i.e. `(depth - 1) * cadence_minutes` of
+    ELAPSED TIME (first index 0, last index `(depth-1)*stride`), NOT
+    `depth * cadence_minutes` -- a depth=1 series is a single instant and
+    spans zero elapsed time regardless of cadence. This function itself
+    was never wrong (it just returns "the first `depth` strided points");
+    the bug fixed this milestone was every CALLER that inferred elapsed
+    time from `depth * cadence` instead of reading the actual timestamps
+    the resulting series carries -- see `run_cadence_experiment`."""
+
+    n = len(series.timestamps_seconds)
+    indices = [i for i in range(0, n, stride)][: max(depth, 1)]
+    if not indices:
+        indices = [0]
+    return _slice_series(series, indices)
 
 
 def _truncate_series_by_time(series: SensorSeries, *, cutoff_seconds: float) -> SensorSeries | None:
@@ -267,17 +289,113 @@ def _truncate_series_by_time(series: SensorSeries, *, cutoff_seconds: float) -> 
     indices = [i for i, t in enumerate(series.timestamps_seconds) if t <= cutoff_seconds]
     if not indices:
         return None
-    return SensorSeries(
-        node_id=series.node_id,
-        timestamps_seconds=tuple(series.timestamps_seconds[i] for i in indices),
-        concentration_mg_l=tuple(series.concentration_mg_l[i] for i in indices),
-        pressure_m=tuple(series.pressure_m[i] for i in indices),
-        health=tuple(series.health[i] for i in indices),
-        missing=tuple(series.missing[i] for i in indices),
-        drift=tuple(series.drift[i] for i in indices),
-        delayed=tuple(series.delayed[i] for i in indices),
-        frozen=tuple(series.frozen[i] for i in indices),
-    )
+    return _slice_series(series, indices)
+
+
+def _cadence_evidence_up_to_checkpoint(
+    full_series: Sequence[SensorSeries], *, stride: int, checkpoint_minutes: int,
+) -> list[SensorSeries]:
+    """Milestone-6 correction (item 1): the ROBUST construction the
+    corrected matched-elapsed-time analysis uses instead of the retired
+    `depth = checkpoint // cadence` formula. For each sensor, first takes
+    the cadence's own strided report positions (0, stride, 2*stride, ...
+    -- the reports that sensor ACTUALLY produces at this cadence), then
+    keeps only those at or before `first_timestamp + checkpoint_minutes`
+    -- i.e. "every report this cadence would really have delivered by this
+    physical-time boundary", read from real timestamps rather than
+    inferred from depth/cadence arithmetic. Always keeps at least the
+    first (t=0) report, matching every other truncation helper in this
+    file's "depth >= 1" convention. Robust to `checkpoint_minutes` not
+    being an exact multiple of `stride` (falls back to whatever the
+    cadence actually delivered by then, never rounds up past the
+    boundary)."""
+
+    if not full_series:
+        raise ValueError("full_series must not be empty")
+    first_ts = full_series[0].timestamps_seconds[0]
+    cutoff = first_ts + checkpoint_minutes * 60.0
+    out = []
+    for item in full_series:
+        n = len(item.timestamps_seconds)
+        strided = list(range(0, n, stride))
+        selected = [i for i in strided if item.timestamps_seconds[i] <= cutoff]
+        if not selected:
+            selected = [strided[0]] if strided else [0]
+        out.append(_slice_series(item, selected))
+    return out
+
+
+def _prediction_fields(probs: list[float], node_ids: list[str]) -> dict[str, Any]:
+    """Milestone-6 correction (item 3): the paired-identity fields every
+    cadence-comparison row now carries, so "identical prediction" claims
+    can be verified per-incident instead of inferred from equal aggregate
+    accuracy (two cadences can share top-1=0.5 while disagreeing on WHICH
+    half of the incidents they get right)."""
+
+    predicted_index = max(range(len(probs)), key=lambda i: probs[i])
+    return {
+        "predicted_index": predicted_index,
+        "predicted_node": node_ids[predicted_index],
+        "probs": list(probs),
+    }
+
+
+def _l1_distance(a: Sequence[float], b: Sequence[float]) -> float:
+    """L1 (sum of absolute differences) distance between two probability
+    vectors over the same node ordering -- chosen (over e.g.
+    Jensen-Shannon) for being simple, bounded ([0, 2] for two probability
+    vectors), and directly interpretable as "total probability mass moved
+    between predicted sources"; used consistently for every probability-
+    vector-distance figure this correction reports."""
+
+    return float(sum(abs(x - y) for x, y in zip(a, b, strict=True)))
+
+
+def _paired_prediction_analysis(rows_by_cadence: dict[int, dict[tuple, dict[str, Any]]]) -> dict[str, Any]:
+    """Milestone-6 correction (item 3). `rows_by_cadence[cadence][incident_key]`
+    is one inference row (must carry predicted_node/probs from
+    `_prediction_fields`). Compares the SAME incidents (by `incident_key`)
+    across every cadence that has data for them -- never aggregate-only.
+    Distance metric: L1 (`_l1_distance`), see that function's docstring."""
+
+    cadences = sorted(rows_by_cadence)
+    common_keys = None
+    for cadence in cadences:
+        keys = set(rows_by_cadence[cadence])
+        common_keys = keys if common_keys is None else (common_keys & keys)
+    common_keys = common_keys or set()
+    n = len(common_keys)
+
+    identical_all = 0
+    l1_distances: list[float] = []
+    for key in common_keys:
+        predicted_nodes = [rows_by_cadence[c][key]["predicted_node"] for c in cadences]
+        if len(set(predicted_nodes)) == 1:
+            identical_all += 1
+        for c1, c2 in itertools.combinations(cadences, 2):
+            l1_distances.append(_l1_distance(rows_by_cadence[c1][key]["probs"], rows_by_cadence[c2][key]["probs"]))
+
+    pairwise_top1_agreement: dict[str, Any] = {}
+    for c1, c2 in itertools.combinations(cadences, 2):
+        pair_keys = set(rows_by_cadence[c1]) & set(rows_by_cadence[c2])
+        if not pair_keys:
+            pairwise_top1_agreement[f"{c1}v{c2}"] = None
+            continue
+        agree = sum(
+            1 for key in pair_keys
+            if rows_by_cadence[c1][key]["predicted_node"] == rows_by_cadence[c2][key]["predicted_node"]
+        )
+        pairwise_top1_agreement[f"{c1}v{c2}"] = {"n": len(pair_keys), "agreement_fraction": agree / len(pair_keys)}
+
+    return {
+        "distance_metric": "L1 (sum of absolute differences between the two probability vectors over the same node ordering)",
+        "n_incidents_matched_across_all_cadences": n,
+        "fraction_identical_predicted_node_all_cadences": (identical_all / n) if n else None,
+        "fraction_prediction_changes_across_cadences": (1.0 - identical_all / n) if n else None,
+        "pairwise_top1_agreement": pairwise_top1_agreement,
+        "mean_l1_probability_distance": statistics.fmean(l1_distances) if l1_distances else None,
+        "max_l1_probability_distance": max(l1_distances) if l1_distances else None,
+    }
 
 
 def _infer(
@@ -421,9 +539,22 @@ def _generate_cadence_incident_pool(junctions: tuple[str, ...]) -> list[dict[str
 
 
 def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict[str, Any]:
-    rows = []
+    """Milestone-6 correction: see this file's module-level "Milestone 6
+    correction" note and `_cadence_evidence_up_to_checkpoint`/
+    `_paired_prediction_analysis`'s docstrings for the specific bugs fixed
+    (matched-elapsed-time off-by-one; fixed-report-count elapsed labels;
+    paired prediction-identity analysis added)."""
+
+    REPORTING_RESOLUTION_MINUTES = REPORT_TIMESTEP_SECONDS / 60.0  # 15.0 -- the finest cadence's own resolution.
+
+    # ---- Fixed report-count rows (depth axis). Construction itself
+    # (_resample_series) was never wrong; every row now additionally
+    # carries the REAL first/last timestamp and predicted_node/probs so
+    # elapsed time and prediction identity are read from data, not formula.
+    depth_rows: list[dict[str, Any]] = []
     for incident in incidents:
         truth = incident["source"]
+        incident_key = (incident["seed"], incident["source"], incident["onset_minutes"])
         for cadence in CADENCES_MINUTES:
             stride = STRIDE_OF[cadence]
             available = len(range(0, len(incident["full_series"][0].timestamps_seconds), stride))
@@ -431,13 +562,18 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
                 if depth > available:
                     continue
                 series = [_resample_series(item, stride=stride, depth=depth) for item in incident["full_series"]]
-                elapsed_minutes = (series[0].timestamps_seconds[-1] - series[0].timestamps_seconds[0]) / 60.0
+                first_timestamp = series[0].timestamps_seconds[0]
+                last_timestamp = series[0].timestamps_seconds[-1]
+                actual_elapsed_minutes = (last_timestamp - first_timestamp) / 60.0
                 result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps)
                 metrics = _row_metrics(result["probs"], result["node_ids"], truth)
-                rows.append({
-                    "seed": incident["seed"], "source": truth, "onset_minutes": incident["onset_minutes"],
-                    "cadence_minutes": cadence, "depth_reports": depth, "elapsed_minutes": elapsed_minutes,
-                    "latency_seconds": result["latency_seconds"], **metrics,
+                prediction = _prediction_fields(result["probs"], result["node_ids"])
+                depth_rows.append({
+                    "incident_key": incident_key, "seed": incident["seed"], "source": truth,
+                    "onset_minutes": incident["onset_minutes"], "cadence_minutes": cadence, "report_count": depth,
+                    "first_timestamp": first_timestamp, "last_timestamp": last_timestamp,
+                    "actual_elapsed_minutes": actual_elapsed_minutes,
+                    "latency_seconds": result["latency_seconds"], **metrics, **prediction,
                 })
 
     def _aggregate(group: list[dict[str, Any]]) -> dict[str, Any]:
@@ -447,7 +583,10 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
             "n": len(group),
             **{
                 metric: statistics.fmean(row[metric] for row in group)
-                for metric in ("top1", "top3", "mrr", "nll", "brier", "posterior_entropy", "true_source_rank", "latency_seconds")
+                for metric in (
+                    "top1", "top3", "mrr", "nll", "brier", "posterior_entropy", "true_source_rank",
+                    "latency_seconds", "actual_elapsed_minutes",
+                )
             },
         }
 
@@ -455,33 +594,154 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
     for cadence in CADENCES_MINUTES:
         by_cadence_depth[str(cadence)] = {}
         for depth in REPORT_COUNTS:
-            group = [r for r in rows if r["cadence_minutes"] == cadence and r["depth_reports"] == depth]
+            group = [r for r in depth_rows if r["cadence_minutes"] == cadence and r["report_count"] == depth]
             by_cadence_depth[str(cadence)][str(depth)] = _aggregate(group)
+
+    #: Milestone-6 correction (item 2): elapsed time here is now the
+    #: ACTUAL mean `actual_elapsed_minutes` already aggregated above
+    #: (identical across incidents for this clean, shared-grid pool --
+    #: verified, not assumed, via the per-row values feeding the mean),
+    #: never `depth * cadence`.
+    report_count_invariance: dict[str, Any] = {}
+    for depth in REPORT_COUNTS:
+        top1s, elapsed_by_cadence = {}, {}
+        for cadence in CADENCES_MINUTES:
+            entry = by_cadence_depth[str(cadence)].get(str(depth))
+            if entry and entry.get("n", 0) > 0:
+                top1s[str(cadence)] = entry["top1"]
+                elapsed_by_cadence[str(cadence)] = entry["actual_elapsed_minutes"]
+        if len(top1s) >= 2:
+            report_count_invariance[str(depth)] = {
+                "top1_by_cadence": top1s,
+                "actual_elapsed_minutes_by_cadence": elapsed_by_cadence,
+                "spread_pp": (max(top1s.values()) - min(top1s.values())) * 100,
+            }
+
+    #: Milestone-6 correction ("important interpretation"): depth=1 is a
+    #: single observation and spans ZERO elapsed time at every cadence
+    #: (first_timestamp == last_timestamp) -- identical behavior there is
+    #: EXPECTED and is NEVER used as evidence of report-count/elapsed-time
+    #: conflation. The earliest MEANINGFUL fixed-report-count comparison
+    #: is depth >= 2 (and the go/no-go trigger below uses depth=2
+    #: specifically, the earliest one).
+    DEPTH1_ELAPSED_TIME_CAVEAT = (
+        "depth=1 is a single observation and therefore spans 0 minutes of elapsed time regardless of cadence "
+        "(first_timestamp == last_timestamp for every cadence). Identical behavior at depth=1 is EXPECTED and is "
+        "NEVER used as evidence of report-count/elapsed-time conflation; the earliest meaningful fixed-report-"
+        "count comparison in this analysis is depth >= 2."
+    )
+
+    #: Milestone-6 correction (item 3): paired per-incident predicted-node
+    #: identity, fixed report count, depth >= 2 only (depth=1 excluded per
+    #: DEPTH1_ELAPSED_TIME_CAVEAT). Distinguishes "aggregate top-1 accuracy
+    #: is equal" from "predictions are identical" -- see
+    #: _paired_prediction_analysis's docstring.
+    paired_by_depth: dict[str, Any] = {}
+    for depth in REPORT_COUNTS:
+        if depth < 2:
+            continue
+        rows_by_cadence: dict[int, dict[tuple, dict[str, Any]]] = {}
+        for cadence in CADENCES_MINUTES:
+            group = [r for r in depth_rows if r["cadence_minutes"] == cadence and r["report_count"] == depth]
+            if group:
+                rows_by_cadence[cadence] = {r["incident_key"]: r for r in group}
+        if len(rows_by_cadence) >= 2:
+            paired_by_depth[str(depth)] = _paired_prediction_analysis(rows_by_cadence)
+
+    #: Predeclared bar (item 4B): paired predictions are "substantially
+    #: invariant" if >=90% of matched incidents predict the exact same
+    #: node across every available cadence. Evaluated ONLY at depth=2 --
+    #: the earliest meaningful fixed-report-count comparison.
+    PAIRED_INVARIANCE_FRACTION_BAR = 0.9
+    depth2_paired = paired_by_depth.get("2")
+    report_count_conflation_at_depth2 = bool(
+        depth2_paired
+        and depth2_paired.get("fraction_identical_predicted_node_all_cadences") is not None
+        and depth2_paired["fraction_identical_predicted_node_all_cadences"] >= PAIRED_INVARIANCE_FRACTION_BAR
+    )
+
+    # ---- Matched-elapsed-time rows (item 1: the off-by-one fix). Built
+    # directly from real timestamps via _cadence_evidence_up_to_checkpoint
+    # -- never from a depth = checkpoint // cadence formula.
+    checkpoint_rows: list[dict[str, Any]] = []
+    for incident in incidents:
+        truth = incident["source"]
+        incident_key = (incident["seed"], incident["source"], incident["onset_minutes"])
+        for cadence in CADENCES_MINUTES:
+            stride = STRIDE_OF[cadence]
+            for checkpoint in ELAPSED_CHECKPOINTS_MIN:
+                series = _cadence_evidence_up_to_checkpoint(incident["full_series"], stride=stride, checkpoint_minutes=checkpoint)
+                first_timestamp = series[0].timestamps_seconds[0]
+                last_timestamp = series[0].timestamps_seconds[-1]
+                actual_elapsed_minutes = (last_timestamp - first_timestamp) / 60.0
+                report_count = max(len(item.timestamps_seconds) for item in series)
+                #: A cadence that has not yet delivered any report beyond
+                #: t=0 by this checkpoint has NOT actually reached the
+                #: physical boundary being tested -- excluded from the
+                #: matched comparison (still recorded, flagged) rather
+                #: than silently compared against cadences that did reach it.
+                matched_checkpoint = report_count > 1
+                assert not matched_checkpoint or abs(actual_elapsed_minutes - checkpoint) <= REPORTING_RESOLUTION_MINUTES, (
+                    f"matched-elapsed-time construction misaligned: cadence={cadence}min checkpoint={checkpoint}min "
+                    f"produced actual_elapsed_minutes={actual_elapsed_minutes} "
+                    f"(tolerance={REPORTING_RESOLUTION_MINUTES}min)"
+                )
+                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps)
+                metrics = _row_metrics(result["probs"], result["node_ids"], truth)
+                prediction = _prediction_fields(result["probs"], result["node_ids"])
+                checkpoint_rows.append({
+                    "incident_key": incident_key, "seed": incident["seed"], "source": truth,
+                    "onset_minutes": incident["onset_minutes"], "cadence_minutes": cadence,
+                    "checkpoint_minutes": checkpoint, "report_count": report_count,
+                    "first_timestamp": first_timestamp, "last_timestamp": last_timestamp,
+                    "actual_elapsed_minutes": actual_elapsed_minutes, "matched_checkpoint": matched_checkpoint,
+                    "latency_seconds": result["latency_seconds"], **metrics, **prediction,
+                })
 
     by_cadence_elapsed: dict[str, dict[str, Any]] = {}
     for cadence in CADENCES_MINUTES:
         by_cadence_elapsed[str(cadence)] = {}
         for checkpoint in ELAPSED_CHECKPOINTS_MIN:
-            depth = checkpoint // cadence
-            if depth < 1:
+            group = [
+                r for r in checkpoint_rows
+                if r["cadence_minutes"] == cadence and r["checkpoint_minutes"] == checkpoint and r["matched_checkpoint"]
+            ]
+            if not group:
+                by_cadence_elapsed[str(cadence)][str(checkpoint)] = {"n": 0}
                 continue
-            group = [r for r in rows if r["cadence_minutes"] == cadence and r["depth_reports"] == depth]
-            by_cadence_elapsed[str(cadence)][str(checkpoint)] = {"depth_used": depth, **_aggregate(group)}
+            by_cadence_elapsed[str(cadence)][str(checkpoint)] = {
+                "report_count_used": statistics.fmean(r["report_count"] for r in group),
+                **_aggregate(group),
+            }
 
-    # Core scientific comparison: at a FIXED elapsed time, does performance
-    # differ materially by cadence (i.e. by report COUNT alone, holding
-    # physical time fixed)? Cadence sensitivity = max spread across
-    # cadences of top1 at the same elapsed-time checkpoint.
-    cadence_sensitivity = {}
+    # Core scientific comparison: at a FIXED, VERIFIED-ALIGNED elapsed
+    # time, does performance differ materially by cadence? Cadence
+    # sensitivity = max spread across cadences of top1 at the same
+    # elapsed-time checkpoint. Cross-cadence alignment is asserted before
+    # any two cadences are compared at a checkpoint (item 1's explicit
+    # "add assertions" requirement).
+    cadence_sensitivity: dict[str, Any] = {}
     for checkpoint in ELAPSED_CHECKPOINTS_MIN:
-        top1s = {}
+        top1s: dict[str, float] = {}
+        actual_elapsed_by_cadence: dict[str, float] = {}
         for cadence in CADENCES_MINUTES:
             entry = by_cadence_elapsed[str(cadence)].get(str(checkpoint))
             if entry and entry.get("n", 0) > 0:
                 top1s[str(cadence)] = entry["top1"]
+                actual_elapsed_by_cadence[str(cadence)] = entry["actual_elapsed_minutes"]
+        if len(actual_elapsed_by_cadence) >= 2:
+            spread_minutes = max(actual_elapsed_by_cadence.values()) - min(actual_elapsed_by_cadence.values())
+            assert spread_minutes <= REPORTING_RESOLUTION_MINUTES, (
+                f"matched-elapsed-time groups at checkpoint={checkpoint}min are NOT genuinely aligned: "
+                f"actual elapsed minutes by cadence = {actual_elapsed_by_cadence} "
+                f"(spread={spread_minutes}min, tolerance={REPORTING_RESOLUTION_MINUTES}min)"
+            )
         if len(top1s) >= 2:
             spread_pp = (max(top1s.values()) - min(top1s.values())) * 100
-            cadence_sensitivity[str(checkpoint)] = {"top1_by_cadence": top1s, "spread_pp": spread_pp}
+            cadence_sensitivity[str(checkpoint)] = {
+                "top1_by_cadence": top1s, "actual_elapsed_minutes_by_cadence": actual_elapsed_by_cadence,
+                "spread_pp": spread_pp,
+            }
 
     max_spread_pp = max((entry["spread_pp"] for entry in cadence_sensitivity.values()), default=0.0)
     #: Predeclared bar (mirrors Milestone 1's own 10pp "meaningful gain" bar,
@@ -491,54 +751,27 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
     STRONG_CADENCE_SENSITIVITY_BAR_PP = 10.0
     strongly_cadence_sensitive = max_spread_pp >= STRONG_CADENCE_SENSITIVITY_BAR_PP
 
-    #: The literal reading of the milestone's own stated concern ("A model
-    #: should not accidentally equate 'six samples' with one fixed
-    #: physical duration"): at a FIXED report COUNT, performance should
-    #: differ across cadences if the model is actually using elapsed time
-    #: (a depth-4 report set spans 4x as much real time at 60min cadence
-    #: as at 15min cadence) -- near-IDENTICAL performance across cadences
-    #: at the same depth, despite that time-span difference, is the
-    #: report-count-conflation signature this metric is built to catch.
-    #: Complementary to (not a replacement for) `cadence_sensitivity_at_
-    #: matched_elapsed_time` above, which instead asks whether denser
-    #: sampling helps within a FIXED time window (a distinct, generally
-    #: benign question about information density).
-    report_count_invariance = {}
-    for depth in REPORT_COUNTS:
-        top1s = {}
-        for cadence in CADENCES_MINUTES:
-            entry = by_cadence_depth[str(cadence)].get(str(depth))
-            if entry and entry.get("n", 0) > 0:
-                top1s[str(cadence)] = entry["top1"]
-        if len(top1s) >= 2:
-            report_count_invariance[str(depth)] = {
-                "top1_by_cadence": top1s,
-                "elapsed_minutes_by_cadence": {c: depth * int(c) for c in top1s},
-                "spread_pp": (max(top1s.values()) - min(top1s.values())) * 100,
-            }
-    #: "Earliest depths" = 1-2 reports specifically (not the full EARLY
-    #: 1-3 bucket): this is deliberately the narrowest honest claim the
-    #: data supports. Measured result (this run): depth=1 and depth=2 both
-    #: show EXACTLY 0.00pp spread (bit-for-bit identical top-1 across all
-    #: three cadences, despite up to a 4x difference in the elapsed time
-    #: those reports actually span) -- the strongest possible instance of
-    #: the milestone's own stated concern. depth=3 does NOT continue this
-    #: pattern (18.75pp spread, real cadence sensitivity reappears), so
-    #: this flag intentionally does NOT claim invariance across the whole
-    #: EARLY bucket -- only the exact depths where the data shows it.
-    LOW_DEPTH_INVARIANCE_BAR_PP = 5.0
-    earliest_depth_entries = {depth: entry for depth, entry in report_count_invariance.items() if int(depth) <= 2}
-    report_count_conflation_at_low_depth = bool(earliest_depth_entries) and all(
-        entry["spread_pp"] <= LOW_DEPTH_INVARIANCE_BAR_PP for entry in earliest_depth_entries.values()
-    )
-
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "correction_note": (
+            "Milestone-6 correction (this revision): fixed an off-by-one in the matched-elapsed-time analysis -- "
+            "N reports spaced `cadence` apart span (N-1)*cadence minutes of elapsed time, not N*cadence (a "
+            "SensorSeries's own first index is t=0). Matched-elapsed-time evidence is now constructed directly "
+            "from real timestamps via _cadence_evidence_up_to_checkpoint (timestamp <= first_timestamp + "
+            "checkpoint) rather than a depth=checkpoint//cadence formula, with explicit per-row and cross-cadence "
+            "alignment assertions. Fixed-report-count elapsed-time labels now report actual_elapsed_minutes read "
+            "from the resulting series rather than depth*cadence. depth=1 (zero elapsed span at every cadence) is "
+            "no longer used as evidence of report-count/time conflation -- see depth1_elapsed_time_caveat. Added "
+            "paired per-incident predicted-node identity analysis (paired_prediction_analysis_by_depth) to "
+            "distinguish 'aggregate top-1 accuracy is equal' from 'predictions are identical'. Predictor, "
+            "calibration, alpha, K, incident pool, topology, and seeds are all UNCHANGED from the prior revision."
+        ),
         "purpose": "Milestone 6.1: telemetry cadence -- report-count vs elapsed-physical-time curves.",
         "practicality_note": CADENCE_PRACTICALITY_NOTE,
         "cadences_minutes": list(CADENCES_MINUTES),
         "report_counts": list(REPORT_COUNTS),
         "elapsed_checkpoints_minutes": list(ELAPSED_CHECKPOINTS_MIN),
+        "reporting_resolution_minutes": REPORTING_RESOLUTION_MINUTES,
         "n_incidents": len(incidents),
         "by_cadence_and_report_count": by_cadence_depth,
         "by_cadence_and_elapsed_time": by_cadence_elapsed,
@@ -547,9 +780,12 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
         "strong_cadence_sensitivity_bar_pp": STRONG_CADENCE_SENSITIVITY_BAR_PP,
         "strongly_cadence_sensitive": strongly_cadence_sensitive,
         "report_count_invariance_at_fixed_depth": report_count_invariance,
-        "low_depth_invariance_bar_pp": LOW_DEPTH_INVARIANCE_BAR_PP,
-        "report_count_conflation_at_low_depth": report_count_conflation_at_low_depth,
-        "rows": rows,
+        "depth1_elapsed_time_caveat": DEPTH1_ELAPSED_TIME_CAVEAT,
+        "paired_prediction_analysis_by_depth": paired_by_depth,
+        "paired_invariance_fraction_bar": PAIRED_INVARIANCE_FRACTION_BAR,
+        "report_count_conflation_at_depth2": report_count_conflation_at_depth2,
+        "depth_rows": depth_rows,
+        "checkpoint_rows": checkpoint_rows,
         "locked_test_opened_after": locked_test_opened(ROOT),
     }
 
@@ -1013,15 +1249,29 @@ def run_sensor_placement_experiment(model, library, target_timestamps, network, 
 # ---------------------------------------------------------------------------
 
 
-def main() -> int:
+def main(*, rerun_all: bool = False) -> int:
+    """Milestone-6 correction (item 5/6): by default (`rerun_all=False`)
+    this is a NARROW cadence-analysis correction -- only 6.1 is
+    recomputed; 6.2 (detection delay), 6.3 (irregular telemetry), and 6.4
+    (sensor placement) are byte-for-byte scientifically unaffected by the
+    matched-elapsed-time/report-count bug fixed here (verified by
+    inspection: `run_detection_delay_experiment` and
+    `run_sensor_placement_experiment` already derive their own timing from
+    real timestamps -- `_truncate_series_by_time`'s `cutoff` and
+    `_placement_measurement`'s `decision_seconds` -- never from a
+    depth*cadence-style formula; `run_irregular_telemetry_experiment` uses
+    `_resample_series` at one FIXED depth and never labels an elapsed-time
+    value at all), so their existing committed JSON artifacts are loaded
+    from disk unchanged rather than rerun. Pass `rerun_all=True` to force
+    a full rerun of 6.2-6.4 as well (e.g. to double check preservation is
+    still valid after an unrelated change) -- not used by default."""
+
     assert not locked_test_opened(ROOT), "locked test must remain closed"
 
     model, export_path, predictor_description = _load_frozen_predictor()
     train_records = build_scenario_pool("train", network_loader=build_wntr_network)
-    calibration_records = build_scenario_pool("calibration", network_loader=build_wntr_network)
     library = fit_pool_signature_library(train_records)
     target_timestamps = build_sensor_series(train_records[0].scenario, train_records[0].feature_context)[0].timestamps_seconds
-    calibrator = _fit_frozen_calibrator(model, library, calibration_records)
 
     junctions = tuple(sorted(train_records[0].network.junction_name_list))
 
@@ -1030,86 +1280,133 @@ def main() -> int:
     incidents = _generate_cadence_incident_pool(junctions)
     print(f"  {len(incidents)} incidents generated")
 
-    print("running 6.1 cadence experiment...")
+    print("running 6.1 cadence experiment (CORRECTED this revision)...")
     cadence_report = run_cadence_experiment(model, library, target_timestamps, incidents)
     OUT_CADENCE.parent.mkdir(parents=True, exist_ok=True)
     OUT_CADENCE.write_text(json.dumps(cadence_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
     print(f"  max cadence-sensitivity spread: {cadence_report['max_cadence_sensitivity_spread_pp']:.2f}pp; "
           f"strongly_cadence_sensitive={cadence_report['strongly_cadence_sensitive']}")
 
-    print("running 6.2 detection-delay experiment...")
-    delay_report = run_detection_delay_experiment(model, library, target_timestamps, incidents)
-    OUT_DELAY.write_text(json.dumps(delay_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    if rerun_all:
+        print("running 6.2 detection-delay experiment (--rerun-all)...")
+        delay_report = run_detection_delay_experiment(model, library, target_timestamps, incidents)
+        OUT_DELAY.write_text(json.dumps(delay_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
 
-    print("running 6.3 irregular-telemetry stress experiment...")
-    irregular_report = run_irregular_telemetry_experiment(model, library, target_timestamps, incidents)
-    OUT_IRREGULAR.write_text(json.dumps(irregular_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+        print("running 6.3 irregular-telemetry stress experiment (--rerun-all)...")
+        irregular_report = run_irregular_telemetry_experiment(model, library, target_timestamps, incidents)
+        OUT_IRREGULAR.write_text(json.dumps(irregular_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
 
-    print("running 6.4 sensor-placement experiment...")
-    reference_network = train_records[0].network
-    reference_context = train_records[0].feature_context
-    placement_report = run_sensor_placement_experiment(
-        model, library, target_timestamps, reference_network, reference_context, junctions, calibrator,
-    )
-    OUT_PLACEMENT.write_text(json.dumps(placement_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+        print("running 6.4 sensor-placement experiment (--rerun-all)...")
+        calibration_records = build_scenario_pool("calibration", network_loader=build_wntr_network)
+        calibrator = _fit_frozen_calibrator(model, library, calibration_records)
+        reference_network = train_records[0].network
+        reference_context = train_records[0].feature_context
+        placement_report = run_sensor_placement_experiment(
+            model, library, target_timestamps, reference_network, reference_context, junctions, calibrator,
+        )
+        OUT_PLACEMENT.write_text(json.dumps(placement_report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    else:
+        print("6.2/6.3/6.4 PRESERVED (loaded from existing committed artifacts, not rerun -- see main()'s docstring).")
+        delay_report = json.loads(OUT_DELAY.read_text())
+        irregular_report = json.loads(OUT_IRREGULAR.read_text())
+        placement_report = json.loads(OUT_PLACEMENT.read_text())
 
-    # 6.5 conditional architecture decision, driven by 6.1's own measured results
-    # (BOTH signals: matched-elapsed-time sensitivity AND the more literal
-    # report-count-invariance-at-fixed-depth reading of the milestone's own
-    # stated concern -- see run_cadence_experiment's docstring comments).
+    # 6.5 conditional architecture decision, driven by 6.1's own CORRECTED
+    # measured results (item 4: do not assume the prior decision remains
+    # correct -- recompute from scratch). Two independent signals, per
+    # experiments.txt's own interpretation guidance:
+    #   A) corrected matched-physical-time results: material cadence-
+    #      dependent behavior at a verified-aligned elapsed-time boundary.
+    #   B) fixed-report-count PAIRED predictions (depth=2, the earliest
+    #      meaningful comparison -- depth=1 excluded, see
+    #      depth1_elapsed_time_caveat) substantially invariant despite
+    #      materially different elapsed durations.
     strongly_sensitive = cadence_report["strongly_cadence_sensitive"]
-    count_conflation = cadence_report["report_count_conflation_at_low_depth"]
+    count_conflation = cadence_report["report_count_conflation_at_depth2"]
     trigger = strongly_sensitive or count_conflation
+    depth2_paired = cadence_report["paired_prediction_analysis_by_depth"].get("2")
+    depth2_identical_fraction = (
+        depth2_paired.get("fraction_identical_predicted_node_all_cadences") if depth2_paired else None
+    )
+    depth2_elapsed = cadence_report["report_count_invariance_at_fixed_depth"].get("2", {}).get(
+        "actual_elapsed_minutes_by_cadence"
+    )
+
+    finding_a = (
+        f"(A) Corrected matched-physical-time result: max cadence-sensitivity spread at a VERIFIED-ALIGNED "
+        f"elapsed-time boundary is {cadence_report['max_cadence_sensitivity_spread_pp']:.2f}pp "
+        f"(bar: {cadence_report['strong_cadence_sensitivity_bar_pp']:.0f}pp) -- "
+        + ("material cadence-dependent behavior remains a measured problem." if strongly_sensitive
+           else "below the predeclared bar; no material cadence-dependent behavior at matched physical time.")
+    )
+    if depth2_paired and depth2_identical_fraction is not None:
+        elapsed_span_text = (
+            ", ".join(f"{cadence}min cadence={minutes:.1f}min elapsed" for cadence, minutes in sorted(depth2_elapsed.items(), key=lambda kv: int(kv[0])))
+            if depth2_elapsed else "unavailable"
+        )
+        finding_b = (
+            f"(B) Fixed-report-count (depth=2; elapsed spans by cadence: {elapsed_span_text}) PAIRED "
+            f"predicted-node identity: {depth2_identical_fraction:.3f} of matched incidents predict the exact "
+            f"SAME node across every available cadence (bar: {cadence_report['paired_invariance_fraction_bar']:.2f}; "
+            f"mean L1 probability-vector distance across cadence pairs: "
+            f"{depth2_paired.get('mean_l1_probability_distance')}). "
+            + ("This is aggregate-and-paired evidence of report-count/time conflation at the earliest meaningful "
+               "depth: paired predictions, not merely aggregate accuracy, are substantially invariant." if count_conflation
+               else "Paired predictions are NOT substantially invariant at this bar; wording is restricted to "
+               "'aggregate top-1 accuracy' where only aggregates match, never 'predictions are identical' unless "
+               "verified paired.")
+        )
+    else:
+        finding_b = "(B) No depth=2 paired-prediction data available (insufficient overlapping cadences)."
+
     architecture_note = {
         "existing_temporal_representation": (
             "hydroswarm.model.encoders.TemporalEncoder already encodes masked histories using elapsed "
             "timestamps rather than array position (its own docstring); HydraulicFeatureBuilder.build already "
             "feeds real per-timestep age (elapsed seconds since the latest observation) into temporal_features "
             "and quality_features, plus real absolute timestamps into the batch. An explicit elapsed-time "
-            "representation already exists in HydroCore's architecture -- confirmed by inspection, not assumed."
+            "representation already exists in HydroCore's architecture -- confirmed by inspection, not assumed. "
+            "This remains true regardless of the corrected cadence finding below: HydroCore already has "
+            "elapsed-time-aware temporal features, so even if the problem remains, the recommended next "
+            "experiment continues to be cadence-diversified causal-prefix training and/or a controlled "
+            "timestamp-conditioning ablation at matched model size -- never a new temporal architecture."
         ),
         "cadence_sensitivity_measured_pp": cadence_report["max_cadence_sensitivity_spread_pp"],
         "bar_pp": cadence_report["strong_cadence_sensitivity_bar_pp"],
         "strongly_cadence_sensitive": strongly_sensitive,
-        "report_count_conflation_at_low_depth": count_conflation,
-        "low_depth_invariance_bar_pp": cadence_report["low_depth_invariance_bar_pp"],
+        "report_count_conflation_at_depth2": count_conflation,
+        "depth2_paired_identical_fraction": depth2_identical_fraction,
+        "paired_invariance_fraction_bar": cadence_report["paired_invariance_fraction_bar"],
+        "depth1_elapsed_time_caveat": cadence_report["depth1_elapsed_time_caveat"],
         "decision": (
             "NEW_TEMPORAL_REPRESENTATION_EXPERIMENT_WARRANTED" if trigger else
             "NEW_TEMPORAL_REPRESENTATION_EXPERIMENT_NOT_TRIGGERED"
         ),
         "rationale": (
-            (
-                "6.1 found BOTH: (a) matched-elapsed-time cadence sensitivity at or above the predeclared "
-                f"{cadence_report['strong_cadence_sensitivity_bar_pp']:.0f}pp bar "
-                f"({cadence_report['max_cadence_sensitivity_spread_pp']:.2f}pp measured), and (b) at the two "
-                "EARLIEST report counts specifically (depth=1 and depth=2 -- NOT the whole EARLY 1-3 bucket: "
-                "depth=3 breaks this pattern, see below), top-1 is BIT-FOR-BIT IDENTICAL across all three "
-                "cadences (0.00pp spread) despite up to a 4x difference in the elapsed time those 1-2 reports "
-                "actually span (15/30/60 min at depth=1; 30/60/120 min at depth=2) -- the literal, and "
-                "strongest possible, signature of the milestone's own stated concern, 'a model should not "
-                "accidentally equate six samples with one fixed physical duration.' This exact invariance does "
-                "NOT continue at depth=3 (18.75pp spread reappears there -- real cadence sensitivity returns), "
-                "so the finding is reported precisely as 'depths 1-2 only', not generalized to the full EARLY "
-                "bucket. Since HydroCore's TemporalEncoder already encodes elapsed "
-                "timestamps (not array position) yet still shows this pattern, the existing representation's "
-                "GENERALIZATION -- not its presence -- is implicated: train_records/calibration_records/M1's "
-                "causal-prefix corpus all use a fixed hourly reporting cadence, so the model has never actually "
-                "been trained on report sequences where consecutive reports span 15 or 30 minutes rather than "
-                "60. The correctly targeted follow-up is therefore a training-distribution diversification "
-                "(cadence-varied causal-prefix corpus, i.e. re-running Milestone 1's arm construction with "
-                "randomized inter-report spacing) and/or a controlled ablation of the TemporalEncoder's "
-                "timestamp-conditioning at matched model size -- NOT a new architecture built from scratch, "
-                "and not simply adding more temporal-encoding complexity on top of the encoder that already "
-                "exists. Not executed in this milestone (a full retrain is out of scope for an evaluation-"
-                "only script against the frozen Milestone-1 predictor); recorded here as the concrete next "
-                "milestone recommendation, per experiments.txt's own decision tree ('M6: is cadence/delay "
-                "robustness poor? YES -> test explicit time encoding')."
-            ) if trigger else
-            (
-                "6.1 found cadence sensitivity below both predeclared bars (matched-elapsed-time spread and "
-                "fixed-depth report-count invariance). Per experiments.txt Milestone 6.5 ('do not add "
-                "continuous-time complexity unless the cadence study demonstrates the need') and Milestone 9's "
-                "identical restatement, no new architecture experiment is run this milestone."
+            f"{finding_a} {finding_b} "
+            + (
+                (
+                    "Since HydroCore's TemporalEncoder already encodes elapsed timestamps (not array position) "
+                    "yet at least one of the above signals still shows a cadence/report-count problem, the "
+                    "existing representation's GENERALIZATION -- not its presence -- is implicated: "
+                    "train_records/calibration_records/M1's causal-prefix corpus all use a fixed hourly "
+                    "reporting cadence, so the model has never actually been trained on report sequences where "
+                    "consecutive reports span 15 or 30 minutes rather than 60. The correctly targeted follow-up "
+                    "is therefore a training-distribution diversification (cadence-varied causal-prefix corpus, "
+                    "i.e. re-running Milestone 1's arm construction with randomized inter-report spacing) and/or "
+                    "a controlled ablation of the TemporalEncoder's timestamp-conditioning at matched model size "
+                    "-- NOT a new architecture built from scratch. Not executed in this correction (a full "
+                    "retrain is explicitly out of scope); recorded here as the concrete next milestone "
+                    "recommendation, per experiments.txt's own decision tree ('M6: is cadence/delay robustness "
+                    "poor? YES -> test explicit time encoding')."
+                ) if trigger else
+                (
+                    "Both signals fell below their predeclared bars after the correction. Per experiments.txt "
+                    "Milestone 6.5 ('do not add continuous-time complexity unless the cadence study demonstrates "
+                    "the need') and Milestone 9's identical restatement, no new architecture experiment is "
+                    "warranted; the prior revision's WARRANTED conclusion is retracted for the corrected "
+                    "matched-elapsed-time/paired-prediction evidence rather than preserved."
+                )
             )
         ),
     }
@@ -1133,38 +1430,97 @@ def _render_summary(predictor_description, export_path, cadence_report, delay_re
         "",
         "## 6.1 Telemetry cadence",
         "",
+        "**Milestone-6 correction applied this revision** (see `correction_note` in m6-cadence.json for the "
+        "full text): the matched-elapsed-time analysis had an off-by-one -- N reports spaced `cadence` apart "
+        "span (N-1)*cadence minutes of elapsed time, not N*cadence. Matched-elapsed-time evidence is now built "
+        "directly from real timestamps (`timestamp <= first_timestamp + checkpoint`) with explicit per-row and "
+        "cross-cadence alignment assertions, never from a `depth = checkpoint // cadence` formula. "
+        "Fixed-report-count elapsed-time labels now report the ACTUAL elapsed minutes read from the resulting "
+        "series, never `depth * cadence`. Paired per-incident predicted-node identity analysis was added to "
+        "distinguish 'aggregate top-1 accuracy is equal' from 'predictions are identical'. Predictor, "
+        "calibration, alpha, K, incident pool, topology, and seeds are unchanged from the prior revision.",
+        "",
         f"Practicality: used cadences {cadence_report['cadences_minutes']} min (5 min dropped -- see "
-        "`practicality_note` in m6-cadence.json for the measured 180s-timeout-vs-0.04s evidence).",
-        f"N incidents: {cadence_report['n_incidents']}. Max cadence-sensitivity spread at matched elapsed "
-        f"time: **{cadence_report['max_cadence_sensitivity_spread_pp']:.2f}pp** "
+        "`practicality_note` in m6-cadence.json for the measured 180s-timeout-vs-0.04s evidence, unchanged "
+        "this revision).",
+        "",
+        "### Fixed PHYSICAL elapsed-time comparison (corrected)",
+        "",
+        f"N incidents: {cadence_report['n_incidents']}. Reporting resolution (alignment tolerance): "
+        f"{cadence_report['reporting_resolution_minutes']:.0f} min. Every row below passed a per-row "
+        "actual-elapsed-vs-checkpoint assertion AND a cross-cadence alignment assertion before being compared "
+        "(script raises, does not silently compare, on misalignment). Max cadence-sensitivity spread at a "
+        f"VERIFIED-ALIGNED elapsed-time boundary: **{cadence_report['max_cadence_sensitivity_spread_pp']:.2f}pp** "
         f"(bar: {cadence_report['strong_cadence_sensitivity_bar_pp']:.0f}pp). "
         f"Strongly cadence-sensitive: **{cadence_report['strongly_cadence_sensitive']}**.",
         "",
-        "| elapsed (min) | top1 @15min | top1 @30min | top1 @60min | spread (pp) |",
-        "|---|---|---|---|---|",
+        "| checkpoint (min) | actual elapsed @15min | actual elapsed @30min | actual elapsed @60min | top1 @15min | top1 @30min | top1 @60min | spread (pp) |",
+        "|---|---|---|---|---|---|---|---|",
     ]
     for checkpoint, entry in sorted(cadence_report["cadence_sensitivity_at_matched_elapsed_time"].items(), key=lambda kv: int(kv[0])):
         t = entry["top1_by_cadence"]
+        e = entry["actual_elapsed_minutes_by_cadence"]
+
+        def _fmt(d, key):
+            v = d.get(key)
+            return "-" if v is None else f"{v:.1f}"
+
         lines.append(
-            f"| {checkpoint} | {t.get('15', float('nan')):.3f} | {t.get('30', float('nan')):.3f} | "
-            f"{t.get('60', float('nan')):.3f} | {entry['spread_pp']:.2f} |"
+            f"| {checkpoint} | {_fmt(e, '15')} | {_fmt(e, '30')} | {_fmt(e, '60')} | "
+            f"{t.get('15', float('nan')):.3f} | {t.get('30', float('nan')):.3f} | {t.get('60', float('nan')):.3f} | "
+            f"{entry['spread_pp']:.2f} |"
         )
     lines += [
         "",
-        f"Report-count invariance at FIXED depth (literal reading of 'six samples != one fixed duration'; "
-        f"depths 1-2 only flat-spread bar: {cadence_report['low_depth_invariance_bar_pp']:.0f}pp) -- "
-        f"**report_count_conflation_at_low_depth (depths 1-2): {cadence_report['report_count_conflation_at_low_depth']}**:",
+        "### Fixed REPORT-COUNT comparison (corrected elapsed labels)",
         "",
-        "| depth (reports) | elapsed @15min | elapsed @30min | elapsed @60min | top1 @15min | top1 @30min | top1 @60min | spread (pp) |",
+        cadence_report["depth1_elapsed_time_caveat"],
+        "",
+        "| depth (reports) | actual elapsed @15min | actual elapsed @30min | actual elapsed @60min | top1 @15min | top1 @30min | top1 @60min | spread (pp) |",
         "|---|---|---|---|---|---|---|---|",
     ]
     for depth, entry in sorted(cadence_report["report_count_invariance_at_fixed_depth"].items(), key=lambda kv: int(kv[0])):
         t = entry["top1_by_cadence"]
-        e = entry["elapsed_minutes_by_cadence"]
+        e = entry["actual_elapsed_minutes_by_cadence"]
+
+        def _fmt2(d, key):
+            v = d.get(key)
+            return "-" if v is None else f"{v:.1f}"
+
+        note = "  (depth=1: NOT evidence -- see caveat above)" if depth == "1" else ""
         lines.append(
-            f"| {depth} | {e.get('15', '-')} | {e.get('30', '-')} | {e.get('60', '-')} | "
+            f"| {depth}{note} | {_fmt2(e, '15')} | {_fmt2(e, '30')} | {_fmt2(e, '60')} | "
             f"{t.get('15', float('nan')):.3f} | {t.get('30', float('nan')):.3f} | {t.get('60', float('nan')):.3f} | "
             f"{entry['spread_pp']:.2f} |"
+        )
+    lines += [
+        "",
+        "### Paired prediction-identity analysis (fixed report count, depth >= 2)",
+        "",
+        "Aggregate top-1 accuracy equal does NOT by itself imply 'predictions are identical' -- this table "
+        "verifies per-incident predicted-node identity across cadences directly. L1 = sum of absolute "
+        "differences between the two probability vectors over the same node ordering.",
+        "",
+        f"**report_count_conflation_at_depth2 (paired, bar={cadence_report['paired_invariance_fraction_bar']:.2f}): "
+        f"{cadence_report['report_count_conflation_at_depth2']}**",
+        "",
+        "| depth | n matched | fraction identical predicted_node (all cadences) | 15v30 agreement | 15v60 agreement | 30v60 agreement | mean L1 dist | max L1 dist |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for depth, entry in sorted(cadence_report["paired_prediction_analysis_by_depth"].items(), key=lambda kv: int(kv[0])):
+        pw = entry["pairwise_top1_agreement"]
+
+        def _agree(key):
+            v = pw.get(key)
+            return "-" if not v else f"{v['agreement_fraction']:.3f} (n={v['n']})"
+
+        frac = entry["fraction_identical_predicted_node_all_cadences"]
+        mean_l1 = entry["mean_l1_probability_distance"]
+        max_l1 = entry["max_l1_probability_distance"]
+        lines.append(
+            f"| {depth} | {entry['n_incidents_matched_across_all_cadences']} | "
+            f"{'-' if frac is None else f'{frac:.3f}'} | {_agree('15v30')} | {_agree('15v60')} | {_agree('30v60')} | "
+            f"{'-' if mean_l1 is None else f'{mean_l1:.4f}'} | {'-' if max_l1 is None else f'{max_l1:.4f}'} |"
         )
     lines += [
         "",
@@ -1235,9 +1591,28 @@ def _render_summary(predictor_description, export_path, cadence_report, delay_re
         "identifiability diagnostic are network-structural (no incident-specific information), matching "
         "Milestone 1.2's identifiability baseline's own scope limits. 6.3's stress cases are development-only "
         "diagnostics per the milestone text and are not used to select or tune anything.",
+        "",
+        "## Milestone-6 correction scope",
+        "",
+        "This revision recomputes ONLY 6.1 (telemetry cadence): a matched-elapsed-time off-by-one and a "
+        "fixed-report-count elapsed-time mislabeling, both described above. 6.2 (detection delay), 6.3 "
+        "(irregular telemetry), and 6.4 (sensor placement) are PRESERVED byte-for-byte from the prior revision "
+        "-- their own timing/elapsed-time constructions were verified by inspection to already derive from real "
+        "timestamps (never a depth*cadence-style formula), so no direct implementation inconsistency from the "
+        "6.1 fix carries over to them; they were not rerun. The frozen Milestone-1 predictor, Milestone-3 "
+        "B_DEPTH_AWARE calibrator, alpha=0.1, K=3, topology, incident pool construction, and random seeds are "
+        "all unchanged from the prior revision throughout this correction.",
     ]
     return lines
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--rerun-all", action="store_true",
+        help="Also rerun 6.2/6.3/6.4 instead of loading their preserved artifacts (see main()'s docstring).",
+    )
+    args = parser.parse_args()
+    raise SystemExit(main(rerun_all=args.rerun_all))
