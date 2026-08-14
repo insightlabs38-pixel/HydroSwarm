@@ -1,0 +1,4944 @@
+{
+  "causal_prefix_ablation": {
+    "per_scenario": {
+      "1": [
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.23696715036296404
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0014774542962176984
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.23561108126294894
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9932148450124852
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9931999322660058
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4309722371908618
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.00187088183044689
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12721645067876766
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.002003543652821007
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2361065388961276
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.43320406586450383
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.43236471945244626
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.43209073175161744
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.1271671840528303
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.23563844839141695
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12671932294189464
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.23462671181112427
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.43562481486819987
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081318,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0018579396827626317
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5042223129810948
+        }
+      ],
+      "12": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.934546872510875
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7789797438925035
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.983350584690401
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081313,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081314,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9999254184476223
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ],
+      "18": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.649451914389072
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081305,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3207469982374032
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081311,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.33997239107438865
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081313,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081314,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9999810457108863
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ],
+      "2": [
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.22957582269484514
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.009044935919311633
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.22848025449492176
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.823325565205051
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.994783866649605
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081305,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.008660888159285184
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0013869376198941245
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12649770306093655
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.06634718002061804
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.37210374827491827
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4296543443980056
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.43463181803491246
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0027700896720202384
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0048396050135479755
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12647694671552326
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.431730906955783
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081318,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.004323368189780544
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25185653547031894
+        }
+      ],
+      "25": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081304,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.04439482201315287
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6015411683485954
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8598378191731437
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081313,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081314,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8441847360391832
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ],
+      "3": [
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.23218049320852047
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.01848500842560704
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6316261730901072
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9114449549381959
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081305,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.029587460437837068
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0014226917311953161
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12617453854936594
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.030440196485907792
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.433690495919723
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9911046498091121
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.004737209231839358
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.011505588632971943
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081318,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0075228563204636275
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25821367062501976
+        }
+      ],
+      "4": [
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.23419862052455845
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.06565595047900875
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.08781194453970084
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9691839970593873
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6746704912486097
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0014357795583398775
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12606488323505463
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4322534359114071
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9826287921423281
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0048154559575098186
+        },
+        {
+          "reciprocal_rank": 0.25,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.01140391935490628
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ],
+      "6": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9325905497753281
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7016115636898173
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.982288643600492
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081313,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081314,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ],
+      "9": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9204329410137603
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7232429071011748
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9805850942379514
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081313,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081314,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.999947864006815
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ]
+    },
+    "summary": {
+      "1": {
+        "mean_true_source_probability": 0.3111078183623769,
+        "mrr": 0.6166666666666667,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.4,
+        "top3": 0.7
+      },
+      "12": {
+        "mean_true_source_probability": 0.98484013097707,
+        "mrr": 1.0,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 1.0,
+        "top3": 1.0
+      },
+      "18": {
+        "mean_true_source_probability": 0.9155076174705876,
+        "mrr": 0.95,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.9,
+        "top3": 1.0
+      },
+      "2": {
+        "mean_true_source_probability": 0.3273245258274639,
+        "mrr": 0.625,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.4,
+        "top3": 0.8
+      },
+      "25": {
+        "mean_true_source_probability": 0.9174979272787038,
+        "mrr": 0.975,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.95,
+        "top3": 1.0
+      },
+      "3": {
+        "mean_true_source_probability": 0.4844067993702933,
+        "mrr": 0.6875,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.5,
+        "top3": 0.85
+      },
+      "4": {
+        "mean_true_source_probability": 0.6295061635005406,
+        "mrr": 0.7625,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.65,
+        "top3": 0.85
+      },
+      "6": {
+        "mean_true_source_probability": 0.9808245378532818,
+        "mrr": 1.0,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 1.0,
+        "top3": 1.0
+      },
+      "9": {
+        "mean_true_source_probability": 0.981210440317985,
+        "mrr": 1.0,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 1.0,
+        "top3": 1.0
+      }
+    }
+  },
+  "evidence_contract": {
+    "answer_to_is_hydrocore_trained_on_trajectories_but_served_snapshots": true,
+    "examples": [
+      {
+        "seed": 2026081300,
+        "training_temporal_span_seconds": 86400.0,
+        "training_timesteps_per_sensor": 25
+      },
+      {
+        "seed": 2026081301,
+        "training_temporal_span_seconds": 86400.0,
+        "training_timesteps_per_sensor": 25
+      },
+      {
+        "seed": 2026081302,
+        "training_temporal_span_seconds": 86400.0,
+        "training_timesteps_per_sensor": 25
+      },
+      {
+        "seed": 2026081303,
+        "training_temporal_span_seconds": 86400.0,
+        "training_timesteps_per_sensor": 25
+      },
+      {
+        "seed": 2026081304,
+        "training_temporal_span_seconds": 86400.0,
+        "training_timesteps_per_sensor": 25
+      }
+    ],
+    "live_initial_incident": {
+      "source": "hydroswarm.evaluation.live_robustness._payloads, lines 204-238 (this exact LIVE robustness harness)",
+      "temporal_span_seconds": 0,
+      "timesteps_per_sensor": "1 (always -- last valid reading only)"
+    },
+    "training": {
+      "source": "hydroswarm.training.corpus.build_sensor_series -- full scenario.timestamps_seconds grid, always",
+      "temporal_span_hours": 24,
+      "temporal_span_seconds": 86400,
+      "timesteps_per_sensor": "25 (fixed per this repo's scenario generator; verified this session)"
+    }
+  },
+  "live_harness_last_snapshot_finding": "hydroswarm.evaluation.live_robustness._payloads (src/hydroswarm/evaluation/live_robustness.py:204-238) sends exactly ONE observation per sensor for the INITIAL LIVE incident evidence -- position = valid[-1] (the single latest valid reading), confirmed by direct source reading this session. This is the 'latest snapshot only' condition (diagnostic.txt Section 9 condition A); this script's 'latest_1' depth result directly measures its real accuracy impact using the exact frozen model.",
+  "locked_test_opened_after": false,
+  "n_scenarios": 20,
+  "network": "golden-reference",
+  "schema_version": 1,
+  "sections": "7_evidence_contract_8_temporal_ablation_9_snapshot_experiment_10_timestamp_audit",
+  "temporal_ablation_latest_k": {
+    "per_scenario": {
+      "1": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03202615624000634,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2613067924577486
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2613067924577486
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.0304027200916984,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.26407885963164185
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.26407885963164185
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.032154191679155966,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.26145443206103003
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.26145443206103003
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5407332999876588,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.0006470286880827851
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0006470286880827851
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03302222029652177,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.19868725017276065
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081304,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.19868725017276065
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.032242295454810124,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.41430305545652857
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.41430305545652857
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.0321015594320674,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.1258435631276858
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.1258435631276858
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03036167131080288,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12372059992617382
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12372059992617382
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.0325366449699543,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2606188720289386
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2606188720289386
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03075375642068865,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.26356196193549514
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.26356196193549514
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03175594162564365,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.41049924888284034
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4104992488828403
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.031873620129747884,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4119163344859683
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4119163344859683
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03327372980247026,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.41799222481573606
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.41799222481573606
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5410211369597844,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.0003294060639341503
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0003294060639341503
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.029557710097684917,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2652731146070413
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2652731146070413
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03394565851270531,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12369056536923248
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12369056536923248
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.032398489952942124,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2608553402171162
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2608553402171162
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5714285714285713
+          },
+          "disagreement_js": 0.22762605389562385,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9907074337505729
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9951574190537836
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5714285714285714
+          },
+          "disagreement_js": 0.22556540054435972,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9897839917634731
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": true,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.994589730370613
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03183664289916813,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.26215957196998735
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.26215957196998735
+        }
+      ],
+      "12": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.19816741979660366,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.0301411529819458
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0301411529819458
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.26549430653709116,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.039516497587513
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.039516497587513
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.27859366847306316,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.009846744508539604
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.009846744508539604
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.527682995666789,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.002142770956397616
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.002142770956397616
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.4833590953726647,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.009389705497259013
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081304,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.009389705497259013
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030873278434279422,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4209843469099288
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4209843469099288
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.14285714285714288
+          },
+          "disagreement_js": 0.18411889854722113,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.011715531115405358
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.004865362263640206
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.21031131725342156,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.7617111382890313
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7617111382890313
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030904230308777324,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2952867297999278
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2952867297999278
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.2664806442344131,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.03916814741341441
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.03916814741341441
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030129336870664308,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4198321992258497
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4198321992258497
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.2821276197900858,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.7297380136928963
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7297380136928963
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1428571428571429
+          },
+          "disagreement_js": 0.15950024969916915,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.04645575414650849
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081312,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.03081397488144278
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.39999999999999997
+          },
+          "disagreement_js": 0.3563669849743959,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.11869879711960593
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.20251878907857007
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5476480622041116,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.00012792322674269545
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.00012792322674269545
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.034089652433928155,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.11813220505383161
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.11813220505383161
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.29210249490376755,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.00849418113263651
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.00849418113263651
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.2529503705409094,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.12234081861016831
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081317,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.12234081861016831
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.3323537227908201,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.8822362844524269
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8822362844524269
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.11946084940595397,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5905303332470129
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5905303332470129
+        }
+      ],
+      "2": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03129568965957339,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2553780741192763
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2553780741192763
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030240689045472634,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2575487124052866
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2575487124052866
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.14285714285714288
+          },
+          "disagreement_js": 0.1867173843998698,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.008974664903406811
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0037919193702878303
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5401871808448948,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.0007361289722714088
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0007361289722714088
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5714285714285713
+          },
+          "disagreement_js": 0.13564121992099207,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9303787218208153
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9702956348845801
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.0320561382588477,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.41466933551840524
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.41466933551840524
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03186811612466663,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12443533860574815
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12443533860574815
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030377126656123615,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12246422407637549
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12246422407637549
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03213663820115141,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2543767426542165
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2543767426542165
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03092716179523434,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25654696016146455
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25654696016146455
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03179703372710739,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.41173149946670917
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.41173149946670917
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03138007064714499,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4105222936101052
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4105222936101052
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03378384588863694,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4212398507070857
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4212398507070857
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5405054630285584,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.00035654506727161937
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.00035654506727161937
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.031899957568514874,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25535454423949716
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25535454423949716
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03303958072912275,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12271642613900842
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12271642613900838
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.031847242048594404,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25501696548442065
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2550169654844207
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5105374660991258,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9894218012042046
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9894218012042046
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.32771582369041796,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.8822055706142645
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8822055706142645
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1428571428571429
+          },
+          "disagreement_js": 0.11091883198616019,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.030465957594712496
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.013178022777728537
+        }
+      ],
+      "3": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03137042144840839,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2564429886693007
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2564429886693007
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030546188804440398,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2584089162575743
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2584089162575743
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.4828592451983211,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.006541550341832064
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.006541550341832064
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5403000109500926,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.000722162090002997
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.000722162090002997
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.38724710461944245,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9272420265964991
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9272420265964991
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.14285714285714288
+          },
+          "disagreement_js": 0.07250087169552924,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.07173287476374351
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081305,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.03116799782970187
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.060419192585014894,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.08409066025676554
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.08409066025676554
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03070702345099814,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.1223090900475532
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12230909004755318
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.14285714285714288
+          },
+          "disagreement_js": 0.07322000887929078,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.046865812087202106
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.02087606287899081
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03185970912129754,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2564200554640199
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2564200554640199
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03153089665787694,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4095358135689322
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4095358135689322
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03148181781643558,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.41032692681353455
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.41032692681353455
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1428571428571429
+          },
+          "disagreement_js": 0.036439481662250826,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.13233436797560594
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081312,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.06114675514819522
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5406147463774996,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.00035023310770539666
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.00035023310770539666
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03308344921552475,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25507754069729294
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.255077540697293
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.032232111472957785,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12287672581114427
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12287672581114427
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03317788667812127,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25466205379427675
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25466205379427675
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5046556281547154,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9873357879690289
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9873357879690289
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.1405214181603954,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.6792578353148735
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6792578353148735
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.2438880013023879,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.0457037401085157
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0457037401085157
+        }
+      ],
+      "4": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03196639978432575,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2571307347918363
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2571307347918363
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030478844370192444,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25958215789278244
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25958215789278244
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.4836064579292119,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.0066056783963022924
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0066056783963022924
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.540356468469313,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.000714964916179615
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.000714964916179615
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.37984408106989576,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9219727489347743
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081304,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9219727489347743
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.3859164710225357,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.03591207881509374
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081305,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.03591207881509374
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.10050492337645026,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.06616718620816235
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.06616718620816237
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03124358997571635,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12215248763112083
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12215248763112083
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.3869312854492454,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.022882130662661673
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.022882130662661673
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03145485652480666,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2579100912935015
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2579100912935015
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.030632528606476063,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4066947036400831
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4066947036400831
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03198950475358034,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4123330232446489
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4123330232446489
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5714285714285713
+          },
+          "disagreement_js": 0.0898742241743202,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.6714517813434127
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8391085073733495
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5406699810511506,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.00034654703607302483
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.00034654703607302483
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.031228907718561193,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2582463862977363
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2582463862977363
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03360075628595628,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12191590249835015
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12191590249835015
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03288982687685465,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2558468990951808
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2558468990951808
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.45550107992248695,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.966626163247371
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.966626163247371
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.028992733519286724,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.28538775651009496
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081318,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.28538775651009496
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.23359696820570047,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.046754794239184036
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.046754794239184036
+        }
+      ],
+      "6": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03197394757305781,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2590310363655272
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081300,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2590310363655272
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03155100120646727,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2598243863344527
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081301,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2598243863344527
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.08429887932077942,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.183241690656097
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081302,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.183241690656097
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5404221284041132,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.0007065490491496897
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081303,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.0007065490491496897
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.1428571428571429
+          },
+          "disagreement_js": 0.026230204690119788,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.07911594248808572
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081304,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0450451768405703
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.14285714285714288
+          },
+          "disagreement_js": 0.05815322451162271,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.05119947885561946
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081305,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.02428138081443422
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.05842026024340872,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.08148655593815061
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081306,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0814865559381506
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.031702074188188926,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12139627346252178
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081307,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12139627346252178
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.14285714285714288
+          },
+          "disagreement_js": 0.12013224686638158,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.02847243526025439
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.3333333333333333,
+          "seed": 2026081308,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.016132619682147197
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.02988960372506428,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.26267215657727466
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081309,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.26267215657727466
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.5714285714285713
+          },
+          "disagreement_js": 0.11265048320514712,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9070193152265789
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9599494970829903
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.032438414712459715,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4130733338209713
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4130733338209713
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.09999999999999998
+          },
+          "disagreement_js": 0.16099925332541132,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4399739143506181
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081312,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.24919283878052764
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.5404344542349311,
+          "evidence_sufficient": true,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.00035381960976353205
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081313,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.00035381960976353205
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03164952090845626,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2598919946356038
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081314,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2598919946356038
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03355316602727578,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12124355778718919
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081315,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12124355778718919
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.032831236127903236,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25806337771562476
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081316,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25806337771562476
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 3,
+          "classical_metrics": {
+            "reciprocal_rank": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.2065138137229517,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.7652526145532527
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7652526145532527
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.03793973328416653,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.12139383473108266
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.25,
+          "seed": 2026081318,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.12139383473108266
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "classical_metrics": {
+            "reciprocal_rank": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "disagreement_js": 0.034270456016883166,
+          "evidence_sufficient": false,
+          "neural_metrics": {
+            "reciprocal_rank": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25563379129698977
+          },
+          "ood_level": "NORMAL",
+          "planning_allowed": false,
+          "posterior_entropy": null,
+          "reciprocal_rank": 0.5,
+          "seed": 2026081319,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.25563379129698977
+        }
+      ],
+      "full_via_analyze": [
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081300,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081301,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081302,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081303,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 0.5,
+          "seed": 2026081304,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.04439482201315287
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081305,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6015411683485954
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081306,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081307,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081308,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081309,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081310,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081311,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8598378191731437
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081312,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081313,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081314,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8441847360391832
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081315,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081316,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081317,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081318,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        {
+          "reciprocal_rank": 1.0,
+          "seed": 2026081319,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        }
+      ]
+    },
+    "primary_diagnostic_curve_top1_by_depth": {
+      "1": 0.3,
+      "12": 0.3,
+      "2": 0.35,
+      "3": 0.25,
+      "4": 0.25,
+      "6": 0.15,
+      "full_via_analyze": 0.95
+    },
+    "summary": {
+      "1": {
+        "mean_true_source_probability": 0.31583426856611696,
+        "mrr": 0.5916666666666667,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.3,
+        "top3": 0.8
+      },
+      "12": {
+        "mean_true_source_probability": 0.23589086594045874,
+        "mrr": 0.5625,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.3,
+        "top3": 0.75
+      },
+      "2": {
+        "mean_true_source_probability": 0.3210993295039104,
+        "mrr": 0.6041666666666667,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.35,
+        "top3": 0.75
+      },
+      "3": {
+        "mean_true_source_probability": 0.25952474613828697,
+        "mrr": 0.5458333333333333,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.25,
+        "top3": 0.75
+      },
+      "4": {
+        "mean_true_source_probability": 0.27721454713622434,
+        "mrr": 0.5458333333333333,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.25,
+        "top3": 0.75
+      },
+      "6": {
+        "mean_true_source_probability": 0.23289332428671602,
+        "mrr": 0.4833333333333333,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.15,
+        "top3": 0.7
+      },
+      "full_via_analyze": {
+        "mean_true_source_probability": 0.9174979272787038,
+        "mrr": 0.975,
+        "n": 20,
+        "n_errors": 0,
+        "n_ok": 20,
+        "top1": 0.95,
+        "top3": 1.0
+      }
+    }
+  },
+  "true_unclipped_full_trajectory_bypassing_analyze_window_cap": {
+    "label": "NOT achievable via the real deployed analyze() method today (CAP-PARITY-02); computed by calling feature_builder.build(..., window_steps=25) + model directly, same real frozen checkpoint",
+    "per_scenario": [
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081300,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9991551637649536
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081301,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9995521903038025
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081302,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9979366064071655
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081303,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9998214840888977
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081304,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9150115251541138
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081305,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.7921524047851562
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081306,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999120235443115
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081307,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.999915361404419
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081308,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999775886535645
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081309,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9998619556427002
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081310,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999704360961914
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081311,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9809159636497498
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081312,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9998834133148193
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081313,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999411106109619
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081314,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999264478683472
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081315,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999831914901733
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081316,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.999921441078186
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081317,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999014139175415
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081318,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9999114274978638
+      },
+      {
+        "reciprocal_rank": 1.0,
+        "seed": 2026081319,
+        "top1": 1.0,
+        "top3": 1.0,
+        "true_source_probability": 0.9969659447669983
+      }
+    ],
+    "summary": {
+      "mrr": 1.0,
+      "n": 20,
+      "n_ok": 20,
+      "top1": 1.0,
+      "top3": 1.0
+    }
+  },
+  "verdict": {
+    "causal_prefix_top1_by_k": {
+      "1": 0.4,
+      "12": 1.0,
+      "18": 0.9,
+      "2": 0.4,
+      "25": 0.95,
+      "3": 0.5,
+      "4": 0.65,
+      "6": 1.0,
+      "9": 1.0
+    },
+    "caveat": "N=20 scenarios, single network (golden-reference) -- latest-k figures individually are noisy (each scenario is a binary correct/incorrect outcome, so +-1 scenario is a 5-point swing); the causal-prefix monotonic trend and the large full-vs-partial gap are large enough to be robust to that noise, the flat latest-k plateau's exact shape is not.",
+    "classification": "INPUT_EVIDENCE_REGIME_PROBLEM",
+    "collapses_from_full_to_sparse": 0.7,
+    "full_via_analyze_top1": 0.95,
+    "key_finding": "LATEST-k (sliding window ending at the incident's final observation) stays flat/noisy (top1 in [0.15, 0.35]) for k=1..12 and only jumps to 0.95 at k=25 (full). CAUSAL-PREFIX (earliest-k, i.e. a genuinely growing trajectory from the incident's ONSET) improves MONOTONICALLY-ISH and reaches top1=1.0 by just 6 timesteps -- far less evidence than 'latest-12' needs, because it captures the contamination onset dynamics the classical physics-based signature matching depends on, while a late-window slice (including the real LIVE harness's actual single-last-reading policy) systematically misses that onset. This means the LIVE harness's 'send the latest valid reading only' choice is not merely sparse -- it selects close to the LEAST informative single point available for this system's classical localizer, not a representative or best-case snapshot.",
+    "latest_k_top1_by_k": {
+      "1": 0.3,
+      "12": 0.3,
+      "2": 0.35,
+      "3": 0.25,
+      "4": 0.25,
+      "6": 0.15
+    }
+  }
+}

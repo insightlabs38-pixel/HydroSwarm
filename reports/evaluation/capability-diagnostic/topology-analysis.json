@@ -1,0 +1,1062 @@
+{
+  "conditions": {
+    "A_pristine_golden_reference": {
+      "per_scenario": [
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.04994286277685793
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082100
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.43690963042856557
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082101
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9867399169905509
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082102
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.8533641251525721
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082103
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.7449004034649276
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082104
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.786715894832347
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082105
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.7772174006097265
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082106
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.4707510847671932
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082107
+        }
+      ],
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 2,
+        "degree_max": 3,
+        "degree_mean": 2.3333333333333335,
+        "degree_min": 1,
+        "degree_stdev": 0.7453559924999299,
+        "graph_edge_count_directed": 7,
+        "graph_edge_count_undirected": 7,
+        "graph_node_count": 6,
+        "junction_count": 4,
+        "link_count": 7
+      }
+    },
+    "B_randomized_physical_config_golden_reference": {
+      "per_scenario": [
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.25
+          },
+          "fused": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.012703064886671724
+          },
+          "network_sha256": "120257f89bd690fdff19be64719deddcd838d30f57e8e4a8f2b5b692bc0d8378",
+          "neural": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.012703064886671724
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082100
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "2454bd436a4b8e6febc10522bc8be1a65a72482cbe9af9342baf602b90c8772c",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.6168583682355095
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082101
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "09a58b01841f52a8e47bfeb4d5b2c2d34beac40f1f2e98e5d57af33a7100a244",
+          "neural": {
+            "mrr": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.37068415874807953
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082102
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "89fa36bbe7a3326a7466add746c8f058e5b5def2b0bdc498dbf00c4a638e0ecb",
+          "neural": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1608393847686541
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082103
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "bd755402b766800ab14d58108d1b19a37d3c693cdfbd29bc58aa46c8ef1dfff9",
+          "neural": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.1441920273266294
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082104
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "97906f286b6d24a55dfc0c138307bd204a685555ee1a1c93b272aeb80cc63465",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9798977357060176
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082105
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "b40bc8ea57dd036844cc1a4fe37c637432e23d49d5a031da65dfae267982d55c",
+          "neural": {
+            "mrr": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.14493533201866723
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082106
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "a903661bffd3ef0847fa72266895c3629ba78d0410ff7e2d2097ea3062c6d659",
+          "neural": {
+            "mrr": 0.5,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.2981653439002089
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082107
+        }
+      ],
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 2,
+        "degree_max": 3,
+        "degree_mean": 2.3333333333333335,
+        "degree_min": 1,
+        "degree_stdev": 0.7453559924999299,
+        "graph_edge_count_directed": 7,
+        "graph_edge_count_undirected": 7,
+        "graph_node_count": 6,
+        "junction_count": 4,
+        "link_count": 7
+      },
+      "structural_descriptors_note": "Identical to condition A -- roughness/tank-level/demand randomization changes hydraulic PARAMETER VALUES on existing links/nodes, never graph connectivity (no nodes/links added or removed), so node/link counts and degree sequence are structurally invariant under this condition by construction; only network_sha256 (which folds in roughness) differs per scenario."
+    },
+    "C_another_governed_family_branched_loop": {
+      "per_scenario": [
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9994787794384647
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082100
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.0769230769230769
+          },
+          "fused": {
+            "mrr": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.028599588467590073
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.056212263721461
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082101
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9995819771179344
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082102
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.19999999999999998
+          },
+          "fused": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.15928892014444265
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.15338892825056122
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082103
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9997708037664595
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082104
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9991624414014948
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082105
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.08571428571428572
+          },
+          "fused": {
+            "mrr": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.05461252144531364
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 0.14285714285714285,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.08813801928447826
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082106
+        },
+        {
+          "calibrated": true,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9992501108417519
+          },
+          "ood_level": "NORMAL",
+          "seed": 2026082107
+        }
+      ],
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 1,
+        "degree_max": 3,
+        "degree_mean": 2.0,
+        "degree_min": 1,
+        "degree_stdev": 0.7071067811865476,
+        "graph_edge_count_directed": 8,
+        "graph_edge_count_undirected": 8,
+        "graph_node_count": 8,
+        "junction_count": 7,
+        "link_count": 8
+      }
+    },
+    "D_development_transfer_coastal_branch": {
+      "per_scenario": [
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 0.3333333333333333,
+            "top1": 0.0,
+            "top3": 1.0,
+            "true_source_probability": 0.007938044547113126
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082100
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.1
+          },
+          "fused": {
+            "mrr": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.015524091753242045
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.03224258161704737
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082101
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.8971042177046483
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082102
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9119001380637467
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082103
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.33333333333333326
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.8182787138268
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.7590273038880553
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082104
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 0.9782826802071596
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082105
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 0.2,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.09375
+          },
+          "fused": {
+            "mrr": 0.2,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.03972096124281308
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 0.25,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.07348361654074086
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082106
+        },
+        {
+          "calibrated": false,
+          "classical": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "fused": {
+            "mrr": 1.0,
+            "top1": 1.0,
+            "top3": 1.0,
+            "true_source_probability": 1.0
+          },
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "neural": {
+            "mrr": 0.16666666666666666,
+            "top1": 0.0,
+            "top3": 0.0,
+            "true_source_probability": 0.01775836825840881
+          },
+          "ood_level": "CAUTION",
+          "seed": 2026082107
+        }
+      ],
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 1,
+        "degree_max": 4,
+        "degree_mean": 2.0,
+        "degree_min": 1,
+        "degree_stdev": 0.8660254037844386,
+        "graph_edge_count_directed": 8,
+        "graph_edge_count_undirected": 8,
+        "graph_node_count": 8,
+        "junction_count": 6,
+        "link_count": 8
+      }
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "methodology_note": "Conditions A/C/D pass the SAME (pristine, unrandomized) network object used to build feature context/sensor series directly to pipeline.analyze(), matching this repo's existing diagnostic convention (train_serve_parity_full.py, temporal_evidence_ablation.py). Condition B instead passes the REAL randomized WNTR model returned by generate_with_network() (not the pristine network) so that its structural hash and hydraulic evidence both genuinely reflect the randomized physical configuration -- otherwise a randomized-but-then-discarded config would be indistinguishable from condition A at the analyze() call boundary.",
+  "n_scenarios_per_condition": 8,
+  "schema_version": 1,
+  "section": "23_topology_generalization_decomposition",
+  "seeds": [
+    2026082100,
+    2026082101,
+    2026082102,
+    2026082103,
+    2026082104,
+    2026082105,
+    2026082106,
+    2026082107
+  ],
+  "structural_distance_vs_transfer_quality": {
+    "caveat": "n=4 conditions -- far too small for a real correlation statistic (no p-value/coefficient is computed or claimed). This reports whether the SAME ordinal ranking holds under both 'transfer quality' and each structural-distance proxy, as a qualitative, data-grounded observation only, per the task's own framing.",
+    "ordering_by_cycle_rank_diff_asc": [
+      "A_pristine_golden_reference",
+      "B_randomized_physical_config_golden_reference",
+      "C_another_governed_family_branched_loop",
+      "D_development_transfer_coastal_branch"
+    ],
+    "ordering_by_fused_top1_desc": [
+      "A_pristine_golden_reference",
+      "B_randomized_physical_config_golden_reference",
+      "D_development_transfer_coastal_branch",
+      "C_another_governed_family_branched_loop"
+    ],
+    "ordering_by_node_count_diff_asc": [
+      "A_pristine_golden_reference",
+      "B_randomized_physical_config_golden_reference",
+      "C_another_governed_family_branched_loop",
+      "D_development_transfer_coastal_branch"
+    ],
+    "orderings_agree_cycle_rank": false,
+    "orderings_agree_node_count": false
+  },
+  "summary": {
+    "A_pristine_golden_reference": {
+      "aggregate": {
+        "calibrated_rate": 1.0,
+        "classical": {
+          "mean_true_source_probability": 1.0,
+          "mrr": 1.0,
+          "n_with_metrics": 8,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        "fused": {
+          "mean_true_source_probability": 1.0,
+          "mrr": 1.0,
+          "n_with_metrics": 8,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        "n": 8,
+        "n_errors": 0,
+        "n_ok": 8,
+        "neural": {
+          "mean_true_source_probability": 0.6383176648778426,
+          "mrr": 0.8541666666666666,
+          "n_with_metrics": 8,
+          "top1": 0.75,
+          "top3": 1.0
+        }
+      },
+      "cycle_rank_diff_from_golden_reference": 0,
+      "degree_mean_diff_from_golden_reference": 0.0,
+      "node_count_diff_from_golden_reference": 0,
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 2,
+        "degree_max": 3,
+        "degree_mean": 2.3333333333333335,
+        "degree_min": 1,
+        "degree_stdev": 0.7453559924999299,
+        "graph_edge_count_directed": 7,
+        "graph_edge_count_undirected": 7,
+        "graph_node_count": 6,
+        "junction_count": 4,
+        "link_count": 7
+      }
+    },
+    "B_randomized_physical_config_golden_reference": {
+      "aggregate": {
+        "calibrated_rate": 0.0,
+        "classical": {
+          "mean_true_source_probability": 0.90625,
+          "mrr": 1.0,
+          "n_with_metrics": 8,
+          "top1": 1.0,
+          "top3": 1.0
+        },
+        "fused": {
+          "mean_true_source_probability": 0.876587883110834,
+          "mrr": 0.9166666666666666,
+          "n_with_metrics": 8,
+          "top1": 0.875,
+          "top3": 1.0
+        },
+        "n": 8,
+        "n_errors": 0,
+        "n_ok": 8,
+        "neural": {
+          "mean_true_source_probability": 0.34103442694880476,
+          "mrr": 0.53125,
+          "n_with_metrics": 8,
+          "top1": 0.25,
+          "top3": 0.875
+        }
+      },
+      "cycle_rank_diff_from_golden_reference": 0,
+      "degree_mean_diff_from_golden_reference": 0.0,
+      "node_count_diff_from_golden_reference": 0,
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 2,
+        "degree_max": 3,
+        "degree_mean": 2.3333333333333335,
+        "degree_min": 1,
+        "degree_stdev": 0.7453559924999299,
+        "graph_edge_count_directed": 7,
+        "graph_edge_count_undirected": 7,
+        "graph_node_count": 6,
+        "junction_count": 4,
+        "link_count": 7
+      }
+    },
+    "C_another_governed_family_branched_loop": {
+      "aggregate": {
+        "calibrated_rate": 1.0,
+        "classical": {
+          "mean_true_source_probability": 0.6703296703296703,
+          "mrr": 0.7023809523809523,
+          "n_with_metrics": 8,
+          "top1": 0.625,
+          "top3": 0.75
+        },
+        "fused": {
+          "mean_true_source_probability": 0.6553126287571683,
+          "mrr": 0.7053571428571429,
+          "n_with_metrics": 8,
+          "top1": 0.625,
+          "top3": 0.75
+        },
+        "n": 8,
+        "n_errors": 0,
+        "n_ok": 8,
+        "neural": {
+          "mean_true_source_probability": 0.6618729154778257,
+          "mrr": 0.7053571428571429,
+          "n_with_metrics": 8,
+          "top1": 0.625,
+          "top3": 0.75
+        }
+      },
+      "cycle_rank_diff_from_golden_reference": 1,
+      "degree_mean_diff_from_golden_reference": 0.3333333333333335,
+      "node_count_diff_from_golden_reference": 2,
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 1,
+        "degree_max": 3,
+        "degree_mean": 2.0,
+        "degree_min": 1,
+        "degree_stdev": 0.7071067811865476,
+        "graph_edge_count_directed": 8,
+        "graph_edge_count_undirected": 8,
+        "graph_node_count": 8,
+        "junction_count": 7,
+        "link_count": 8
+      }
+    },
+    "D_development_transfer_coastal_branch": {
+      "aggregate": {
+        "calibrated_rate": 0.0,
+        "classical": {
+          "mean_true_source_probability": 0.6908854166666667,
+          "mrr": 0.7958333333333333,
+          "n_with_metrics": 8,
+          "top1": 0.75,
+          "top3": 0.75
+        },
+        "fused": {
+          "mean_true_source_probability": 0.7341904708528569,
+          "mrr": 0.7958333333333333,
+          "n_with_metrics": 8,
+          "top1": 0.75,
+          "top3": 0.75
+        },
+        "n": 8,
+        "n_errors": 0,
+        "n_ok": 8,
+        "neural": {
+          "mean_true_source_probability": 0.459717118853365,
+          "mrr": 0.6145833333333334,
+          "n_with_metrics": 8,
+          "top1": 0.5,
+          "top3": 0.625
+        }
+      },
+      "cycle_rank_diff_from_golden_reference": 1,
+      "degree_mean_diff_from_golden_reference": 0.3333333333333335,
+      "node_count_diff_from_golden_reference": 2,
+      "structural_descriptors": {
+        "connected_components": 1,
+        "cycle_rank": 1,
+        "degree_max": 4,
+        "degree_mean": 2.0,
+        "degree_min": 1,
+        "degree_stdev": 0.8660254037844386,
+        "graph_edge_count_directed": 8,
+        "graph_edge_count_undirected": 8,
+        "graph_node_count": 8,
+        "junction_count": 6,
+        "link_count": 8
+      }
+    }
+  }
+}

@@ -1,0 +1,1505 @@
+{
+  "conditions": [
+    "true_wntr",
+    "fixed_25m",
+    "omitted",
+    "noisy_governed"
+  ],
+  "delta_fused_top1_vs_true_wntr": {
+    "fixed_25m": 0.0,
+    "noisy_governed": 0.0,
+    "omitted": 0.1333333333333333,
+    "true_wntr": 0.0
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "n_scenarios": 15,
+  "network": "golden-reference",
+  "noise_sigma_m": 2.0,
+  "per_condition_aggregate": {
+    "fixed_25m": {
+      "errors": [],
+      "evidence_sufficient_rate": 0.0,
+      "fused_mrr_mean": 0.8833333333333333,
+      "fused_top1_mean": 0.8,
+      "fused_top3_mean": 0.9333333333333333,
+      "mean_candidate_set_size": 1.3333333333333333,
+      "mean_disagreement_js": 0.2741414121677419,
+      "n": 15,
+      "n_errors": 0,
+      "n_nan_belief": 0,
+      "n_ok": 15,
+      "neural_top1_mean": 0.6666666666666666,
+      "ood_level_counts": {
+        "NORMAL": 15
+      }
+    },
+    "noisy_governed": {
+      "errors": [],
+      "evidence_sufficient_rate": 0.0,
+      "fused_mrr_mean": 0.8833333333333333,
+      "fused_top1_mean": 0.8,
+      "fused_top3_mean": 0.9333333333333333,
+      "mean_candidate_set_size": 1.3333333333333333,
+      "mean_disagreement_js": 0.27421537845725574,
+      "n": 15,
+      "n_errors": 0,
+      "n_nan_belief": 0,
+      "n_ok": 15,
+      "neural_top1_mean": 0.6666666666666666,
+      "ood_level_counts": {
+        "NORMAL": 15
+      }
+    },
+    "omitted": {
+      "errors": [],
+      "evidence_sufficient_rate": 0.3333333333333333,
+      "fused_mrr_mean": 0.95,
+      "fused_top1_mean": 0.9333333333333333,
+      "fused_top3_mean": 0.9333333333333333,
+      "mean_candidate_set_size": 1.0666666666666667,
+      "mean_disagreement_js": 0.09154567368847673,
+      "n": 15,
+      "n_errors": 0,
+      "n_nan_belief": 0,
+      "n_ok": 15,
+      "neural_top1_mean": 0.9333333333333333,
+      "ood_level_counts": {
+        "NORMAL": 15
+      }
+    },
+    "true_wntr": {
+      "errors": [],
+      "evidence_sufficient_rate": 0.0,
+      "fused_mrr_mean": 0.8833333333333333,
+      "fused_top1_mean": 0.8,
+      "fused_top3_mean": 0.9333333333333333,
+      "mean_candidate_set_size": 1.3333333333333333,
+      "mean_disagreement_js": 0.2742096322304511,
+      "n": 15,
+      "n_errors": 0,
+      "n_nan_belief": 0,
+      "n_ok": 15,
+      "neural_top1_mean": 0.6666666666666666,
+      "ood_level_counts": {
+        "NORMAL": 15
+      }
+    }
+  },
+  "per_scenario_by_condition": {
+    "fixed_25m": [
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.21501598232080385,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6307904959249315
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081400
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.4617383622029892,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3307483285040689
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081401
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.3990556481586668,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3964237492607205
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081402
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 3,
+        "disagreement_js": 0.17195878578328544,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2836731863174475
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.17128428434025783
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081403
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.10236819428685882,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8097217972920906
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081404
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.5992916600951286,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2083545602082513
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081405
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.08112532778749562,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8469130817158113
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081406
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.24800808850965242,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5838088214358748
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081407
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.11355718300715202,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.3333333333333333,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.06110192320047431
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081408
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.7570801503647564,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.10069264321820348
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081409
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 4,
+        "disagreement_js": 0.08303645973591593,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.34500745869889154
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3646122953222603
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081410
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.2558317093053266,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5730051812214354
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081411
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.1580736050799277,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7175191371807021
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081412
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.3851485575449073,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4119037622358911
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081413
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.08083146833326221,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8474356893490563
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081414
+      }
+    ],
+    "noisy_governed": [
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.21487090197521322,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6310022626573903
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081400
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.4615751455724244,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3309108814609184
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081401
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.3992521537093192,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3962074410656241
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081402
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 3,
+        "disagreement_js": 0.17206720411690057,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2835181861110794
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.17117804742185563
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081403
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.10247725701552862,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8095338168097144
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081404
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.5993656640796194,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2082961997109083
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081405
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.08120114707243786,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8467782789738011
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081406
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.24809993746875839,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5836812472197196
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081407
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.11352910039280224,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.3333333333333333,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.06104481686566141
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081408
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.7572544509488289,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.10059162982736815
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081409
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 4,
+        "disagreement_js": 0.08307231361377504,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3448853087601386
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3644737151187966
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081410
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.25597610992990827,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5728069732851467
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081411
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.15822817796911653,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7172736627294264
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081412
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.38545373692980633,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4115604181983033
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081413
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.08080737606439731,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8474785456257061
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081414
+      }
+    ],
+    "omitted": [
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.14145658543510312,
+        "evidence_sufficient": true,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7442374549459605
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": true,
+        "seed": 2026081400
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.2067655460130037,
+        "evidence_sufficient": true,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6429064105154548
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": true,
+        "seed": 2026081401
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.0063006482037565505,
+        "evidence_sufficient": true,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9874558165614025
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": true,
+        "seed": 2026081402
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.2703562765561128,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9853559363065607
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9730763511307393
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081403
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.0387264960904541,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.924674102828825
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081404
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.11198227335580957,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7932656845950297
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081405
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.00543807771037479,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9891664064443042
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081406
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.002026248563799995,
+        "evidence_sufficient": true,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9959534208119677
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": true,
+        "seed": 2026081407
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.16322898647060624,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2846123584444971
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081408
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.013063342074975306,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9741180960573185
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081409
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 2,
+        "disagreement_js": 0.3380176076162043,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7599639434926067
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7613800710277772
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081410
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.03704219736790204,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9278631356977827
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081411
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.013768819652808514,
+        "evidence_sufficient": true,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.972734208612115
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": true,
+        "seed": 2026081412
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.021502786081062965,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.957655186202768
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081413
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.0035092141351769097,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.9929993103540421
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081414
+      }
+    ],
+    "true_wntr": [
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.21490195125206452,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.6309569376765868
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081400
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.4615551960667983,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3309307528047363
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081401
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.3991988833721331,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.39626607303313716
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081402
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 3,
+        "disagreement_js": 0.17207305933616024,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.2835052601594963
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.1711691166944534
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081403
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.1024612194034141,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8095614573520137
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081404
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.599363906683605,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.20829758552686808
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081405
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.0812004612188976,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8467794983189076
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081406
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.24812668061512744,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.583644105465922
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081407
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.11352476248004367,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.3333333333333333,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.06104613803101004
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081408
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.7572535546453716,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.25,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.10059214916861513
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081409
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 4,
+        "disagreement_js": 0.08306950939248342,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3448896184612744
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 0.5,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.3644776959094547
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081410
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.25599140753031424,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.5727859779419875
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081411
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.15824408066751972,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.7172484111159119
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081412
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.38537770917095093,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.4116459383252935
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081413
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "disagreement_js": 0.08080210162188232,
+        "evidence_sufficient": false,
+        "fused": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0
+        },
+        "neural": {
+          "belief_has_nan": false,
+          "reciprocal_rank": 1.0,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 0.8474879282126163
+        },
+        "ood_level": "NORMAL",
+        "planning_allowed": false,
+        "seed": 2026081414
+      }
+    ]
+  },
+  "schema_version": 1,
+  "section": "11_pressure_representation_parity",
+  "seeds": [
+    2026081400,
+    2026081401,
+    2026081402,
+    2026081403,
+    2026081404,
+    2026081405,
+    2026081406,
+    2026081407,
+    2026081408,
+    2026081409,
+    2026081410,
+    2026081411,
+    2026081412,
+    2026081413,
+    2026081414
+  ],
+  "structural_finding": "Confirmed by reading src/hydroswarm/preprocessing/builder.py: SensorSeries.pressure_m feeds ONLY temporal_features[:, :, 1] (pressure_m/100.0, or NaN when None) at builder.py line ~245. The node_features 'pressure_value' column (index 4, builder.py line ~166) is built independently from state.pressure_m[node_id].estimate (the real hydraulic-state estimate), never from SensorSeries. So any pressure-representation error here can only corrupt the temporal channel, not the per-node snapshot pressure feature.",
+  "verdict": {
+    "caveat": "N=15 scenarios, single network/topology (golden-reference), each scenario a binary correct/incorrect outcome (~6.7-point swing per scenario) -- small |delta| here is consistent with 'no large effect' but does not rule out a modest one; see per-scenario records for raw values.",
+    "classification": "fixed-25m pressure fixture does NOT measurably distort top1 in this sample (|delta| <= 0.05); pressure representation is not a primary driver of the LIVE gap by itself",
+    "fixed_25m_delta_top1": 0.0,
+    "fixed_25m_measurably_distorts_top1": false
+  }
+}

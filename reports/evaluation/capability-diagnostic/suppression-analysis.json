@@ -1,0 +1,242 @@
+{
+  "actionable_within_n": {
+    "actionable_initial": {
+      "eligible_count": 3,
+      "eligible_rate_of_264_total": 0.011363636363636364,
+      "eligible_rate_of_known": 0.011764705882352941,
+      "n_known": 255
+    },
+    "actionable_within_1": {
+      "eligible_count": 3,
+      "eligible_rate_of_264_total": 0.011363636363636364,
+      "eligible_rate_of_known": 0.011764705882352941,
+      "n_known": 255
+    },
+    "actionable_within_2": {
+      "eligible_count": 3,
+      "eligible_rate_of_264_total": 0.011363636363636364,
+      "eligible_rate_of_known": 0.011764705882352941,
+      "n_known": 255
+    },
+    "actionable_within_3": {
+      "eligible_count": 3,
+      "eligible_rate_of_264_total": 0.011363636363636364,
+      "eligible_rate_of_known": 0.011764705882352941,
+      "n_known": 255
+    },
+    "data_support": "PARTIALLY SUPPORTED BY REAL DATA: 213/264 records' sample_rounds contain only a single immediate STOP entry (http_status=409, sampling request rejected, no real sample incorporated) so no round-level transition is observable for them beyond the initial planning_allowed state. Only records whose sample_rounds entries carry the richer schema (entropy_before/after, candidate_size_before/after, planning_allowed_after, recommended_node -- i.e. a real sample was actually incorporated and the incident was reanalyzed) provide genuine round-by-round transition evidence.",
+    "median_samples_to_actionability_among_those_that_became_actionable_via_sampling": 0,
+    "n_that_became_actionable_via_sampling_1_to_3_rounds": 3,
+    "per_record_transitions_sample": [
+      {
+        "actionable_initial": false,
+        "actionable_within_1": false,
+        "actionable_within_2": false,
+        "actionable_within_3": false,
+        "became_actionable_at_round": null,
+        "n_rich_rounds_observed": 0,
+        "run_id": "885033bb5787a8ac"
+      },
+      {
+        "actionable_initial": false,
+        "actionable_within_1": false,
+        "actionable_within_2": false,
+        "actionable_within_3": false,
+        "became_actionable_at_round": null,
+        "n_rich_rounds_observed": 0,
+        "run_id": "790bcbc65fd81556"
+      },
+      {
+        "actionable_initial": false,
+        "actionable_within_1": false,
+        "actionable_within_2": false,
+        "actionable_within_3": false,
+        "became_actionable_at_round": null,
+        "n_rich_rounds_observed": 0,
+        "run_id": "29910b1b1eb8a42c"
+      },
+      {
+        "actionable_initial": false,
+        "actionable_within_1": false,
+        "actionable_within_2": false,
+        "actionable_within_3": false,
+        "became_actionable_at_round": null,
+        "n_rich_rounds_observed": 0,
+        "run_id": "69ea0e1e94757d71"
+      },
+      {
+        "actionable_initial": false,
+        "actionable_within_1": false,
+        "actionable_within_2": false,
+        "actionable_within_3": false,
+        "became_actionable_at_round": null,
+        "n_rich_rounds_observed": 0,
+        "run_id": "9fc26ee81c366c3c"
+      }
+    ],
+    "records_with_at_least_one_rich_round": 39,
+    "records_with_at_least_one_rich_round_fraction_of_264": 0.14772727272727273,
+    "top1_correct_within_n": "NOT RUN -- per-round sample_rounds entries record entropy_before/after, candidate_size_before/after, expected_information_gain, and recommended_node (the next node chosen to sample), but do NOT record a per-round belief/posterior snapshot or an explicit top-1 node identity after each round. There is therefore no way to determine, from this dataset alone, whether the top-1 localization guess would be correct after N rounds -- only whether the incident would be planning-ELIGIBLE (a distinct, gate-based notion) after N rounds, which is reported above. Recomputing true per-round top-1 correctness would require re-running the live harness with per-round belief capture, which is out of scope for this data-mining task.",
+    "total_rich_rounds_observed": 60
+  },
+  "evidence_sufficiency_diagnostic": {
+    "confusion_table": {
+      "evidence_sufficient_false_top1_correct_false": 171,
+      "evidence_sufficient_false_top1_correct_true": 78,
+      "evidence_sufficient_true_top1_correct_false": 6,
+      "evidence_sufficient_true_top1_correct_true": 0
+    },
+    "conservatism_rate_among_actually_correct_incidents": 1.0,
+    "interpretation": "conservatism_rate_among_actually_correct_incidents is the fraction of incidents where top1 localization was ALREADY correct but evidence_sufficient was still False (i.e. the incident was blocked from planning despite being right). A high value here indicates the evidence-sufficiency head/gate combination is excessively conservative rather than well-correlated with real usefulness; a low value (most correct incidents are also flagged sufficient) indicates good correlation.",
+    "n_records_with_both_fields": 255,
+    "precision_of_evidence_sufficient_false_signal": 0.6867469879518072,
+    "precision_of_evidence_sufficient_true_signal": 0.0,
+    "verdict": "EXCESSIVELY_CONSERVATIVE"
+  },
+  "gate_counterfactual_actionability": {
+    "disagreement_threshold_used": 0.5,
+    "maximum_planning_candidates_used": 3,
+    "method": "Gate-firing sets are read directly from each record's recorded suppression_reasons list (verified equivalent to the pipeline's own gate logic: empty list iff planning_allowed==True across all 255 analyzable records). For each scenario, one gate family is removed from every record's fired-gate set and the incident is counted eligible iff no gate remains. Denominator is always all 264 records per protocol instruction (non-analyzable/ABSTAINED records can never become eligible under any gate-relaxation, since analysis never completed for them).",
+    "observed_gate_families_present_in_data": [
+      "CALIBRATION_INVALID_OR_MISSING",
+      "CANDIDATE_REGION_TOO_BROAD",
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+      "MODEL_EVIDENCE_INSUFFICIENT",
+      "OOD"
+    ],
+    "scenarios": {
+      "_headline_comparison": {
+        "matches_protocol_confirmed_premise_rate_0_012": true,
+        "observed_planning_eligible_count_of_264": 3,
+        "observed_planning_eligible_rate_of_264": 0.011363636363636364
+      },
+      "all_except_calibration": {
+        "eligible_count_of_255_analyzable": 3,
+        "eligible_count_of_264_total": 3,
+        "eligible_fraction_of_255_analyzable": 0.011764705882352941,
+        "eligible_fraction_of_264_total": 0.011363636363636364,
+        "gates_removed": [
+          "CALIBRATION_INVALID_OR_MISSING"
+        ]
+      },
+      "all_except_candidate_size": {
+        "eligible_count_of_255_analyzable": 3,
+        "eligible_count_of_264_total": 3,
+        "eligible_fraction_of_255_analyzable": 0.011764705882352941,
+        "eligible_fraction_of_264_total": 0.011363636363636364,
+        "gates_removed": [
+          "CANDIDATE_REGION_TOO_BROAD"
+        ]
+      },
+      "all_except_disagreement": {
+        "eligible_count_of_255_analyzable": 6,
+        "eligible_count_of_264_total": 6,
+        "eligible_fraction_of_255_analyzable": 0.023529411764705882,
+        "eligible_fraction_of_264_total": 0.022727272727272728,
+        "gates_removed": [
+          "HIGH_CLASSICAL_NEURAL_DISAGREEMENT"
+        ]
+      },
+      "all_except_evidence_sufficiency": {
+        "eligible_count_of_255_analyzable": 3,
+        "eligible_count_of_264_total": 3,
+        "eligible_fraction_of_255_analyzable": 0.011764705882352941,
+        "eligible_fraction_of_264_total": 0.011363636363636364,
+        "gates_removed": [
+          "MODEL_EVIDENCE_INSUFFICIENT"
+        ]
+      },
+      "all_except_ood": {
+        "eligible_count_of_255_analyzable": 3,
+        "eligible_count_of_264_total": 3,
+        "eligible_fraction_of_255_analyzable": 0.011764705882352941,
+        "eligible_fraction_of_264_total": 0.011363636363636364,
+        "gates_removed": [
+          "OOD"
+        ]
+      },
+      "all_gates_active_observed": {
+        "eligible_count_of_255_analyzable": 3,
+        "eligible_count_of_264_total": 3,
+        "eligible_fraction_of_255_analyzable": 0.011764705882352941,
+        "eligible_fraction_of_264_total": 0.011363636363636364,
+        "gates_removed": []
+      },
+      "inference_quality_only": {
+        "description": "Idealized counterfactual: suppress ONLY when the top-1 localization guess is actually wrong (oracle correctness gate), removing calibration/candidate-size/evidence-sufficiency/disagreement/OOD gates entirely. This is a ceiling, not an achievable policy (correctness is not known at decision time), used only to show how much of current suppression is attributable to genuine localization failure versus conservative proxies.",
+        "eligible_count_of_264_total": 78,
+        "eligible_fraction_of_264_total": 0.29545454545454547,
+        "eligible_fraction_of_known_top1": 0.3058823529411765,
+        "n_with_known_top1_correct": 255
+      }
+    },
+    "source_of_thresholds": "src/hydroswarm/inference/pipeline.py:159-160 (defaults, unchanged/read-only)"
+  },
+  "locked_test_opened": false,
+  "schema_version": 1,
+  "sections": "27_suppression_decomposition, 28_evidence_sufficiency_diagnostic, 29_actionable_within_n",
+  "source_data": "reports/evaluation/live-robustness/post-remediation-results.json",
+  "suppression_reason_decomposition": {
+    "dominant_blocker_gate_family": "CALIBRATION_INVALID_OR_MISSING",
+    "first_blocker_gate_family_frequency": {
+      "CALIBRATION_INVALID_OR_MISSING": 246,
+      "CANDIDATE_REGION_TOO_BROAD": 3,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 3
+    },
+    "first_blocker_raw_frequency": {
+      "CALIBRATION_INVALID_OR_MISSING": 246,
+      "CANDIDATE_REGION_TOO_BROAD": 3,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 3
+    },
+    "gate_family_frequency": {
+      "CALIBRATION_INVALID_OR_MISSING": 246,
+      "CANDIDATE_REGION_TOO_BROAD": 162,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 12,
+      "MODEL_EVIDENCE_INSUFFICIENT": 210,
+      "OOD": 246
+    },
+    "gate_family_rate_of_analyzable": {
+      "CALIBRATION_INVALID_OR_MISSING": 0.9647058823529412,
+      "CANDIDATE_REGION_TOO_BROAD": 0.6352941176470588,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 0.047058823529411764,
+      "MODEL_EVIDENCE_INSUFFICIENT": 0.8235294117647058,
+      "OOD": 0.9647058823529412
+    },
+    "n_analyzable_records": 255,
+    "n_non_analyzable_records": 9,
+    "n_simultaneous_blockers_histogram": {
+      "0": 3,
+      "1": 3,
+      "2": 36,
+      "3": 51,
+      "4": 162
+    },
+    "non_analyzable_reason": "outcome=ABSTAINED runs with error_class set (e.g. ANALYZE_409) where analysis never completed and suppression_reasons is null; excluded from gate accounting since no gate ever ran.",
+    "pairwise_gate_family_cooccurrence": {
+      "CALIBRATION_INVALID_OR_MISSING+CANDIDATE_REGION_TOO_BROAD": 159,
+      "CALIBRATION_INVALID_OR_MISSING+HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 9,
+      "CALIBRATION_INVALID_OR_MISSING+MODEL_EVIDENCE_INSUFFICIENT": 207,
+      "CALIBRATION_INVALID_OR_MISSING+OOD": 246,
+      "CANDIDATE_REGION_TOO_BROAD+MODEL_EVIDENCE_INSUFFICIENT": 162,
+      "CANDIDATE_REGION_TOO_BROAD+OOD": 159,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT+MODEL_EVIDENCE_INSUFFICIENT": 3,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT+OOD": 9,
+      "MODEL_EVIDENCE_INSUFFICIENT+OOD": 207
+    },
+    "raw_reason_frequency": {
+      "CALIBRATION_INVALID_OR_MISSING": 246,
+      "CANDIDATE_REGION_TOO_BROAD": 162,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 12,
+      "MODEL_EVIDENCE_INSUFFICIENT": 210,
+      "OOD_CAUTION": 246
+    },
+    "raw_reason_rate_of_analyzable": {
+      "CALIBRATION_INVALID_OR_MISSING": 0.9647058823529412,
+      "CANDIDATE_REGION_TOO_BROAD": 0.6352941176470588,
+      "HIGH_CLASSICAL_NEURAL_DISAGREEMENT": 0.047058823529411764,
+      "MODEL_EVIDENCE_INSUFFICIENT": 0.8235294117647058,
+      "OOD_CAUTION": 0.9647058823529412
+    }
+  },
+  "total_records_in_dataset": 264
+}

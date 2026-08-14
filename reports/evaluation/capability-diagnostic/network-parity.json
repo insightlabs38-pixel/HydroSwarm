@@ -1,0 +1,993 @@
+{
+  "cap_findings": {
+    "CAP-DATA-01": {
+      "measured_effect": {
+        "golden-reference": {
+          "mean_classical_prior_max_abs_diff": 0.437714346498251,
+          "n_signature_mode_mismatches_of_n_scenarios": "20/20",
+          "production_arm_top1_mean": 0.85,
+          "production_network_sha256": "decd4ac707a3817115c7307940861dafac6d3fad34a3358179f20c7830a2cc79",
+          "production_signature_mode": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+          "scenario_arm_top1_mean": 0.95,
+          "scenario_network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "scenario_signature_mode": "GOVERNED_KNOWN_NETWORK",
+          "top1_delta_production_vs_scenario": -0.09999999999999998
+        }
+      },
+      "root_cause": "hydroswarm.simulation.network.build_wntr_network() constructs golden-reference programmatically (used by every scenario-generation/training/most-diagnostic-script call site this session). src/hydroswarm/runtime/v4_defaults.py V4PipelineFactory.__call__ (line ~269) instead loads data/frozen/golden_network.inp via wntr.network.WaterNetworkModel(str(network_path)) -- an EPANET-format round trip. src/hydroswarm/api/app.py's real perform_analysis (line ~433) passes exactly `network = pipeline.simulator.network` (the FILE-LOADED network) into pipeline.analyze() for every real production incident -- never the programmatically-built network. The two networks' pipe length/diameter/elevation floats differ only at the ~1e-9 relative (EPANET unit round-trip) level -- not a real hydraulic difference -- but hydroswarm.data.scenarios.network_sha256() hashes exact JSON float reprs, so this negligible numerical noise produces a COMPLETELY different hash. hydroswarm.classical.signature_policy.KNOWN_TRAINING_TOPOLOGY_FAMILY_BY_HASH is keyed by the PROGRAMMATIC build's hash only, so the production-real, file-loaded network's hash is absent from it, and resolve_signature_mode() returns RUNTIME_GENERATED_IMPORTED_NETWORK for every real golden-reference incident.",
+      "severity": "HIGH if top1_delta_production_vs_scenario is large and classical_prior_max_abs_diff is non-trivial (feeds directly into the trained model's expected input distribution); see measured_effect above for the actual numbers from this run, not an assumed severity.",
+      "taxonomy": "CAP-DATA",
+      "title": "Golden-reference network built programmatically for scenario generation/training diverges (by structural hash) from the .inp-file-loaded network production actually serves against, causing REAL LIVE incidents to silently resolve RUNTIME_GENERATED_IMPORTED_NETWORK signature mode instead of the governed GOVERNED_KNOWN_NETWORK mode the model was trained under."
+    }
+  },
+  "families": {
+    "branched-loop": {
+      "downstream_effect": {
+        "max_classical_prior_max_abs_diff": 0.0,
+        "mean_classical_prior_max_abs_diff": 0.0,
+        "n_errors": 0,
+        "n_ok": 5,
+        "n_scenarios": 5,
+        "n_signature_mode_mismatches": 0,
+        "production_arm_top1_mean": 0.6,
+        "records": [
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.5,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.5,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081300,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.14285714285714285,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.14285714285714285,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081301,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081302,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081303,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081304,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          }
+        ],
+        "scenario_arm_top1_mean": 0.6,
+        "top1_delta_production_minus_scenario": 0.0
+      },
+      "governed_training_family": true,
+      "identity": {
+        "family": "branched-loop",
+        "production_hash_in_known_training_hashes": true,
+        "production_inp_file_sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed",
+        "production_inp_path": "data/topology-transfer/branched-loop.inp",
+        "production_network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "production_network_signature_mode": "GOVERNED_KNOWN_NETWORK",
+        "production_network_state_hash": "c5cc9105c55424867cdb585a5a0399c213c0002d2291a07a5d69e9e78c070feb",
+        "scenario_hash_in_known_training_hashes": true,
+        "scenario_network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "scenario_network_signature_mode": "GOVERNED_KNOWN_NETWORK",
+        "scenario_network_state_hash": "c5cc9105c55424867cdb585a5a0399c213c0002d2291a07a5d69e9e78c070feb",
+        "signature_modes_match": true,
+        "state_hashes_match": true,
+        "structural_hashes_match": true
+      },
+      "topology_metadata_check": {
+        "example_network_hash": "c5cc9105c55424867cdb585a5a0399c213c0002d2291a07a5d69e9e78c070feb",
+        "example_topology_hash": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "example_topology_hash_matches_scenario_hash": true,
+        "matches_scenario_network_sha256": true,
+        "scenario_manifest_network_sha256": "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+        "signature_mode_used_for_training": "GOVERNED_KNOWN_NETWORK"
+      },
+      "verdict": "PASS"
+    },
+    "coastal-branch": {
+      "downstream_effect": {
+        "max_classical_prior_max_abs_diff": 0.0,
+        "mean_classical_prior_max_abs_diff": 0.0,
+        "n_errors": 0,
+        "n_ok": 5,
+        "n_scenarios": 5,
+        "n_signature_mode_mismatches": 0,
+        "production_arm_top1_mean": 0.4,
+        "records": [
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.25,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.25,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "seed": 2026081300,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.16666666666666666,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.16666666666666666,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "seed": 2026081301,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "seed": 2026081302,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.16666666666666666,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.16666666666666666,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "seed": 2026081303,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "seed": 2026081304,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK"
+          }
+        ],
+        "scenario_arm_top1_mean": 0.4,
+        "top1_delta_production_minus_scenario": 0.0
+      },
+      "governed_training_family": false,
+      "identity": {
+        "family": "coastal-branch",
+        "production_hash_in_known_training_hashes": false,
+        "production_inp_file_sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f",
+        "production_inp_path": "data/topologies/coastal-branch.inp",
+        "production_network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+        "production_network_signature_mode": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+        "production_network_state_hash": "23aa40ca88ac8fa2c2c41eb0b95222701c69d98578e2028b505faba021748b52",
+        "scenario_hash_in_known_training_hashes": false,
+        "scenario_network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+        "scenario_network_signature_mode": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+        "scenario_network_state_hash": "23aa40ca88ac8fa2c2c41eb0b95222701c69d98578e2028b505faba021748b52",
+        "signature_modes_match": true,
+        "state_hashes_match": true,
+        "structural_hashes_match": true
+      },
+      "topology_metadata_check": {
+        "example_network_hash": "23aa40ca88ac8fa2c2c41eb0b95222701c69d98578e2028b505faba021748b52",
+        "example_topology_hash": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+        "example_topology_hash_matches_scenario_hash": true,
+        "matches_scenario_network_sha256": true,
+        "scenario_manifest_network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+        "signature_mode_used_for_training": "RUNTIME_GENERATED_IMPORTED_NETWORK"
+      },
+      "verdict": "PASS"
+    },
+    "golden-reference": {
+      "downstream_effect": {
+        "max_classical_prior_max_abs_diff": 0.680082269012928,
+        "mean_classical_prior_max_abs_diff": 0.437714346498251,
+        "n_errors": 0,
+        "n_ok": 20,
+        "n_scenarios": 20,
+        "n_signature_mode_mismatches": 20,
+        "production_arm_top1_mean": 0.85,
+        "records": [
+          {
+            "classical_prior_max_abs_diff": 0.680082269012928,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081300,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.5813886523246765,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081301,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.2161533236503601,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081302,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.35512135922908783,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081303,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.18493305519223213,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.5,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.5,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081304,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.3368854485452175,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.5,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081305,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.4827602505683899,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081306,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.37639806419610977,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081307,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.5295237675309181,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081308,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.4684293866157532,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081309,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.6111776605248451,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081310,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.3014373332262039,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.5,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081311,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.06986689567565918,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081312,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.5947762429714203,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081313,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.629267230629921,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081314,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.25860482454299927,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081315,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.26083073019981384,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081316,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.625232420861721,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081317,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.5743349194526672,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081318,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.6170830950140953,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "CAUTION"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081319,
+            "signature_mode_production_arm": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          }
+        ],
+        "scenario_arm_top1_mean": 0.95,
+        "top1_delta_production_minus_scenario": -0.09999999999999998
+      },
+      "governed_training_family": true,
+      "identity": {
+        "family": "golden-reference",
+        "production_hash_in_known_training_hashes": false,
+        "production_inp_file_sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef",
+        "production_inp_path": "data/frozen/golden_network.inp",
+        "production_network_sha256": "decd4ac707a3817115c7307940861dafac6d3fad34a3358179f20c7830a2cc79",
+        "production_network_signature_mode": "RUNTIME_GENERATED_IMPORTED_NETWORK",
+        "production_network_state_hash": "05840153b12763142ff8468e36ea6f3dd20dbf240edda09b5c0760512caf552d",
+        "scenario_hash_in_known_training_hashes": true,
+        "scenario_network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "scenario_network_signature_mode": "GOVERNED_KNOWN_NETWORK",
+        "scenario_network_state_hash": "358b022c806829b9f985e4ded363208e91ed3308a8ffc65e2ff031c6f2cdcf61",
+        "signature_modes_match": false,
+        "state_hashes_match": false,
+        "structural_hashes_match": false
+      },
+      "topology_metadata_check": {
+        "example_network_hash": "358b022c806829b9f985e4ded363208e91ed3308a8ffc65e2ff031c6f2cdcf61",
+        "example_topology_hash": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "example_topology_hash_matches_scenario_hash": true,
+        "matches_scenario_network_sha256": true,
+        "scenario_manifest_network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "signature_mode_used_for_training": "GOVERNED_KNOWN_NETWORK"
+      },
+      "verdict": "FAIL"
+    },
+    "loop-grid": {
+      "downstream_effect": {
+        "max_classical_prior_max_abs_diff": 0.0,
+        "mean_classical_prior_max_abs_diff": 0.0,
+        "n_errors": 0,
+        "n_ok": 5,
+        "n_scenarios": 5,
+        "n_signature_mode_mismatches": 0,
+        "production_arm_top1_mean": 0.2,
+        "records": [
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.3333333333333333,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.3333333333333333,
+                "top1": 0.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081300,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.14285714285714285,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.14285714285714285,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081301,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 1.0,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081302,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.14285714285714285,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.14285714285714285,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081303,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          },
+          {
+            "classical_prior_max_abs_diff": 0.0,
+            "production_arm": {
+              "fused": {
+                "reciprocal_rank": 0.125,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "scenario_arm": {
+              "fused": {
+                "reciprocal_rank": 0.125,
+                "top1": 0.0,
+                "top3": 0.0
+              },
+              "ood_level": "NORMAL"
+            },
+            "seed": 2026081304,
+            "signature_mode_production_arm": "GOVERNED_KNOWN_NETWORK",
+            "signature_mode_scenario_arm": "GOVERNED_KNOWN_NETWORK"
+          }
+        ],
+        "scenario_arm_top1_mean": 0.2,
+        "top1_delta_production_minus_scenario": 0.0
+      },
+      "governed_training_family": true,
+      "identity": {
+        "family": "loop-grid",
+        "production_hash_in_known_training_hashes": true,
+        "production_inp_file_sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6",
+        "production_inp_path": "data/topologies/loop-grid.inp",
+        "production_network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "production_network_signature_mode": "GOVERNED_KNOWN_NETWORK",
+        "production_network_state_hash": "80958e0faf3ff79ce03f139d6e6e85aefc55db30721feb65bddaf77f15248019",
+        "scenario_hash_in_known_training_hashes": true,
+        "scenario_network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "scenario_network_signature_mode": "GOVERNED_KNOWN_NETWORK",
+        "scenario_network_state_hash": "80958e0faf3ff79ce03f139d6e6e85aefc55db30721feb65bddaf77f15248019",
+        "signature_modes_match": true,
+        "state_hashes_match": true,
+        "structural_hashes_match": true
+      },
+      "topology_metadata_check": {
+        "example_network_hash": "80958e0faf3ff79ce03f139d6e6e85aefc55db30721feb65bddaf77f15248019",
+        "example_topology_hash": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "example_topology_hash_matches_scenario_hash": true,
+        "matches_scenario_network_sha256": true,
+        "scenario_manifest_network_sha256": "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+        "signature_mode_used_for_training": "GOVERNED_KNOWN_NETWORK"
+      },
+      "verdict": "PASS"
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "mismatched_families": [
+    "golden-reference"
+  ],
+  "schema_version": 1,
+  "section": "13_data_generator_runtime_network_parity",
+  "seed_family": "20260813_00.. (same N=20 parity scenarios as Sections 6/11)",
+  "summary": {
+    "branched-loop": {
+      "signature_modes_match": true,
+      "state_hashes_match": true,
+      "structural_hashes_match": true,
+      "verdict": "PASS"
+    },
+    "coastal-branch": {
+      "signature_modes_match": true,
+      "state_hashes_match": true,
+      "structural_hashes_match": true,
+      "verdict": "PASS"
+    },
+    "golden-reference": {
+      "signature_modes_match": false,
+      "state_hashes_match": false,
+      "structural_hashes_match": false,
+      "verdict": "FAIL"
+    },
+    "loop-grid": {
+      "signature_modes_match": true,
+      "state_hashes_match": true,
+      "structural_hashes_match": true,
+      "verdict": "PASS"
+    }
+  }
+}

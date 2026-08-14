@@ -1,0 +1,804 @@
+{
+  "confidence_analysis": {
+    "accuracy_vs_posterior_entropy_decile_bins": [
+      {
+        "bin_index": 0,
+        "empirical_accuracy": 0.21052631578947367,
+        "mean_value": 0.0675539509466557,
+        "n": 57,
+        "value_range": [
+          -0.0,
+          0.26893931237088725
+        ]
+      },
+      {
+        "bin_index": 1,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.5727852640609454,
+        "n": 3,
+        "value_range": [
+          0.5727852640609454,
+          0.5727852640609454
+        ]
+      },
+      {
+        "bin_index": 2,
+        "empirical_accuracy": 0.3333333333333333,
+        "mean_value": 0.8729449280022084,
+        "n": 9,
+        "value_range": [
+          0.8693400094768742,
+          0.8762263964019981
+        ]
+      },
+      {
+        "bin_index": 3,
+        "n": 0
+      },
+      {
+        "bin_index": 4,
+        "empirical_accuracy": 0.6666666666666666,
+        "mean_value": 1.387691567395576,
+        "n": 9,
+        "value_range": [
+          1.3663257849945032,
+          1.430423132197722
+        ]
+      },
+      {
+        "bin_index": 5,
+        "empirical_accuracy": 0.0,
+        "mean_value": 1.57428312751929,
+        "n": 9,
+        "value_range": [
+          1.5610288466499218,
+          1.6006417531367783
+        ]
+      },
+      {
+        "bin_index": 6,
+        "empirical_accuracy": 0.36538461538461536,
+        "mean_value": 1.8286093575191347,
+        "n": 156,
+        "value_range": [
+          1.7851438965876067,
+          1.861023113006479
+        ]
+      },
+      {
+        "bin_index": 7,
+        "n": 0
+      },
+      {
+        "bin_index": 8,
+        "empirical_accuracy": 0.0,
+        "mean_value": 2.530429858488245,
+        "n": 9,
+        "value_range": [
+          2.5211107376016346,
+          2.54880617525607
+        ]
+      },
+      {
+        "bin_index": 9,
+        "empirical_accuracy": 0.0,
+        "mean_value": 2.9307045583591234,
+        "n": 3,
+        "value_range": [
+          2.930704558359124,
+          2.930704558359124
+        ]
+      }
+    ],
+    "accuracy_vs_top1_top2_margin_decile_bins": [
+      {
+        "bin_index": 0,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.04390755358497176,
+        "n": 21,
+        "value_range": [
+          0.0038663809419578754,
+          0.09456676499982666
+        ]
+      },
+      {
+        "bin_index": 1,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.1999982701205418,
+        "n": 6,
+        "value_range": [
+          0.19969705787155423,
+          0.20029948236952938
+        ]
+      },
+      {
+        "bin_index": 2,
+        "empirical_accuracy": 0.3617021276595745,
+        "mean_value": 0.2828935359336061,
+        "n": 141,
+        "value_range": [
+          0.22031394281481198,
+          0.30089958444824794
+        ]
+      },
+      {
+        "bin_index": 3,
+        "empirical_accuracy": 0.6666666666666666,
+        "mean_value": 0.3275719929317482,
+        "n": 9,
+        "value_range": [
+          0.30779471875007447,
+          0.366732530009954
+        ]
+      },
+      {
+        "bin_index": 4,
+        "empirical_accuracy": 0.6666666666666666,
+        "mean_value": 0.4909702962936803,
+        "n": 9,
+        "value_range": [
+          0.4766255440882866,
+          0.4981426723963771
+        ]
+      },
+      {
+        "bin_index": 5,
+        "n": 0
+      },
+      {
+        "bin_index": 6,
+        "n": 0
+      },
+      {
+        "bin_index": 7,
+        "empirical_accuracy": 0.25,
+        "mean_value": 0.7307511855523264,
+        "n": 12,
+        "value_range": [
+          0.7139856654022043,
+          0.778261607436701
+        ]
+      },
+      {
+        "bin_index": 8,
+        "n": 0
+      },
+      {
+        "bin_index": 9,
+        "empirical_accuracy": 0.21052631578947367,
+        "mean_value": 0.9842378793176421,
+        "n": 57,
+        "value_range": [
+          0.9256105969404304,
+          1.0
+        ]
+      }
+    ],
+    "confidence_range_observed": [
+      0.0,
+      0.9980898873012308
+    ],
+    "confidence_vs_accuracy_decile_bins": [
+      {
+        "bin_index": 0,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.003785615962986121,
+        "n": 57,
+        "value_range": [
+          0.0,
+          0.025306634278636077
+        ]
+      },
+      {
+        "bin_index": 1,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.17809938993106098,
+        "n": 105,
+        "value_range": [
+          0.10660682289777666,
+          0.19384417436810464
+        ]
+      },
+      {
+        "bin_index": 2,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.22629383577597942,
+        "n": 9,
+        "value_range": [
+          0.21964077777813437,
+          0.239171072436062
+        ]
+      },
+      {
+        "bin_index": 3,
+        "empirical_accuracy": 0.0,
+        "mean_value": 0.36682444014998655,
+        "n": 6,
+        "value_range": [
+          0.36672474881847805,
+          0.36692413148149505
+        ]
+      },
+      {
+        "bin_index": 4,
+        "empirical_accuracy": 1.0,
+        "mean_value": 0.4751368580666821,
+        "n": 57,
+        "value_range": [
+          0.45596808291767116,
+          0.4896726527315603
+        ]
+      },
+      {
+        "bin_index": 5,
+        "n": 0
+      },
+      {
+        "bin_index": 6,
+        "empirical_accuracy": 1.0,
+        "mean_value": 0.6782505538527984,
+        "n": 6,
+        "value_range": [
+          0.6782505538527984,
+          0.6782505538527984
+        ]
+      },
+      {
+        "bin_index": 7,
+        "n": 0
+      },
+      {
+        "bin_index": 8,
+        "empirical_accuracy": 1.0,
+        "mean_value": 0.8215020110762672,
+        "n": 3,
+        "value_range": [
+          0.8215020110762672,
+          0.8215020110762672
+        ]
+      },
+      {
+        "bin_index": 9,
+        "empirical_accuracy": 1.0,
+        "mean_value": 0.9801882375009074,
+        "n": 12,
+        "value_range": [
+          0.9621373902405385,
+          0.9980898873012308
+        ]
+      }
+    ],
+    "expected_calibration_error_ece": 0.21872446313481558,
+    "high_confidence_quintile": {
+      "empirical_accuracy": 1.0,
+      "mean_confidence": 0.9801882375009074,
+      "n": 12
+    },
+    "low_confidence_quintile": {
+      "empirical_accuracy": 0.0,
+      "mean_confidence": 0.003785615962986121,
+      "n": 57
+    },
+    "n_scored_records": 255,
+    "n_with_true_source_probability": 255,
+    "posterior_entropy_range_observed": [
+      -0.0,
+      2.930704558359124
+    ],
+    "top1_top2_margin_range_observed": [
+      0.0038663809419578754,
+      1.0
+    ],
+    "verdict": "APPROPRIATELY_UNCERTAIN",
+    "verdict_method": "Compares empirical accuracy in the highest-confidence quintile of bins against the lowest-confidence quintile. APPROPRIATELY_UNCERTAIN: high-confidence accuracy is >=0.7 and exceeds low-confidence accuracy (errors concentrate where the model is already less sure). WRONG_AND_CONFIDENT: high-confidence accuracy is <0.5 (the model is often wrong even when it reports high true_source_probability -- a miscalibration red flag). MIXED: neither clean pattern holds."
+  },
+  "error_clustering": {
+    "by_dimension": {
+      "calibrated": {
+        "dimension": "calibrated",
+        "slices": {
+          "False": {
+            "failure_rate": 0.6829268292682927,
+            "failure_rate_minus_overall_base_rate": -0.011190817790530772,
+            "n": 246
+          },
+          "True": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          }
+        }
+      },
+      "disagreement_js_quartiles": {
+        "dimension": "disagreement_js",
+        "quartile_cuts": [
+          0.040212543272854936,
+          0.04049929948160037,
+          0.1838031932488503
+        ],
+        "slices": {
+          "Q1_lowest": {
+            "failure_rate": 0.7272727272727273,
+            "failure_rate_minus_overall_base_rate": 0.03315508021390379,
+            "n": 66
+          },
+          "Q2": {
+            "failure_rate": 0.7619047619047619,
+            "failure_rate_minus_overall_base_rate": 0.06778711484593836,
+            "n": 63
+          },
+          "Q3": {
+            "failure_rate": 0.47619047619047616,
+            "failure_rate_minus_overall_base_rate": -0.21792717086834734,
+            "n": 63
+          },
+          "Q4_highest": {
+            "failure_rate": 0.8095238095238095,
+            "failure_rate_minus_overall_base_rate": 0.11540616246498603,
+            "n": 63
+          }
+        }
+      },
+      "network_id": {
+        "dimension": "network_id",
+        "slices": {
+          "coastal-branch": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 24
+          },
+          "golden-reference": {
+            "failure_rate": 0.6486486486486487,
+            "failure_rate_minus_overall_base_rate": -0.04546899841017482,
+            "n": 222
+          },
+          "loop-grid": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          }
+        }
+      },
+      "node_count": {
+        "dimension": "node_count",
+        "slices": {
+          "6": {
+            "failure_rate": 0.6486486486486487,
+            "failure_rate_minus_overall_base_rate": -0.04546899841017482,
+            "n": 222
+          },
+          "8": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 24
+          },
+          "9": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          }
+        }
+      },
+      "observation_count": {
+        "dimension": "observation_count",
+        "slices": {
+          "1": {
+            "failure_rate": 0.6666666666666666,
+            "failure_rate_minus_overall_base_rate": -0.027450980392156876,
+            "n": 9
+          },
+          "2": {
+            "failure_rate": 0.6666666666666666,
+            "failure_rate_minus_overall_base_rate": -0.027450980392156876,
+            "n": 9
+          },
+          "3": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          },
+          "4": {
+            "failure_rate": 0.6842105263157895,
+            "failure_rate_minus_overall_base_rate": -0.009907120743034015,
+            "n": 228
+          }
+        }
+      },
+      "ood_level": {
+        "dimension": "ood_level",
+        "slices": {
+          "CAUTION": {
+            "failure_rate": 0.6829268292682927,
+            "failure_rate_minus_overall_base_rate": -0.011190817790530772,
+            "n": 246
+          },
+          "NORMAL": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          }
+        }
+      },
+      "perturbation_level": {
+        "dimension": "perturbation_level",
+        "slices": {
+          "0%": {
+            "failure_rate": 0.75,
+            "failure_rate_minus_overall_base_rate": 0.055882352941176494,
+            "n": 12
+          },
+          "10%": {
+            "failure_rate": 0.75,
+            "failure_rate_minus_overall_base_rate": 0.055882352941176494,
+            "n": 12
+          },
+          "100%": {
+            "failure_rate": 0.6666666666666666,
+            "failure_rate_minus_overall_base_rate": -0.027450980392156876,
+            "n": 9
+          },
+          "25%": {
+            "failure_rate": 0.7142857142857143,
+            "failure_rate_minus_overall_base_rate": 0.020168067226890796,
+            "n": 21
+          },
+          "50%": {
+            "failure_rate": 0.5714285714285714,
+            "failure_rate_minus_overall_base_rate": -0.12268907563025211,
+            "n": 21
+          },
+          "75%": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 18
+          },
+          "clean_operational": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 12
+          },
+          "contradictory": {
+            "failure_rate": 0.0,
+            "failure_rate_minus_overall_base_rate": -0.6941176470588235,
+            "n": 6
+          },
+          "delayed:75%": {
+            "failure_rate": 0.5,
+            "failure_rate_minus_overall_base_rate": -0.1941176470588235,
+            "n": 6
+          },
+          "demand": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 6
+          },
+          "development_unseen": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 24
+          },
+          "disagreement": {
+            "failure_rate": 0.5,
+            "failure_rate_minus_overall_base_rate": -0.1941176470588235,
+            "n": 6
+          },
+          "drift:50%": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 6
+          },
+          "frozen:50%": {
+            "failure_rate": 0.0,
+            "failure_rate_minus_overall_base_rate": -0.6941176470588235,
+            "n": 6
+          },
+          "medium_loop_grid": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          },
+          "moderate": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 9
+          },
+          "near_tie": {
+            "failure_rate": 0.5,
+            "failure_rate_minus_overall_base_rate": -0.1941176470588235,
+            "n": 6
+          },
+          "negative": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 9
+          },
+          "nominal": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 9
+          },
+          "positive": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 9
+          },
+          "quality:25%": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 6
+          },
+          "roughness": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 6
+          },
+          "severe": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 9
+          },
+          "source_strength": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 6
+          },
+          "tank_state": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 6
+          },
+          "timing": {
+            "failure_rate": 0.5,
+            "failure_rate_minus_overall_base_rate": -0.1941176470588235,
+            "n": 6
+          }
+        }
+      },
+      "perturbation_type": {
+        "dimension": "perturbation_type",
+        "slices": {
+          "ambiguity": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 18
+          },
+          "hydraulic_mismatch": {
+            "failure_rate": 0.9,
+            "failure_rate_minus_overall_base_rate": 0.20588235294117652,
+            "n": 30
+          },
+          "measurement_bias": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 18
+          },
+          "measurement_noise": {
+            "failure_rate": 0.3333333333333333,
+            "failure_rate_minus_overall_base_rate": -0.3607843137254902,
+            "n": 27
+          },
+          "missingness": {
+            "failure_rate": 0.7368421052631579,
+            "failure_rate_minus_overall_base_rate": 0.04272445820433435,
+            "n": 57
+          },
+          "nominal": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 12
+          },
+          "scale": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          },
+          "sensor_coverage": {
+            "failure_rate": 0.75,
+            "failure_rate_minus_overall_base_rate": 0.055882352941176494,
+            "n": 36
+          },
+          "sensor_health": {
+            "failure_rate": 0.625,
+            "failure_rate_minus_overall_base_rate": -0.0691176470588235,
+            "n": 24
+          },
+          "topology_familiarity": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 24
+          }
+        }
+      },
+      "posterior_entropy_quartiles": {
+        "dimension": "posterior_entropy",
+        "quartile_cuts": [
+          0.873268378127753,
+          1.8286245559235916,
+          1.830035269864569
+        ],
+        "slices": {
+          "Q1_lowest": {
+            "failure_rate": 0.7727272727272727,
+            "failure_rate_minus_overall_base_rate": 0.0786096256684492,
+            "n": 66
+          },
+          "Q2": {
+            "failure_rate": 0.5238095238095238,
+            "failure_rate_minus_overall_base_rate": -0.17030812324929967,
+            "n": 63
+          },
+          "Q3": {
+            "failure_rate": 0.7727272727272727,
+            "failure_rate_minus_overall_base_rate": 0.0786096256684492,
+            "n": 66
+          },
+          "Q4_highest": {
+            "failure_rate": 0.7,
+            "failure_rate_minus_overall_base_rate": 0.00588235294117645,
+            "n": 60
+          }
+        }
+      },
+      "sensor_count": {
+        "dimension": "sensor_count",
+        "slices": {
+          "1": {
+            "failure_rate": 0.6666666666666666,
+            "failure_rate_minus_overall_base_rate": -0.027450980392156876,
+            "n": 9
+          },
+          "2": {
+            "failure_rate": 0.6666666666666666,
+            "failure_rate_minus_overall_base_rate": -0.027450980392156876,
+            "n": 9
+          },
+          "3": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          },
+          "4": {
+            "failure_rate": 0.6842105263157895,
+            "failure_rate_minus_overall_base_rate": -0.009907120743034015,
+            "n": 228
+          }
+        }
+      },
+      "topology_class": {
+        "dimension": "topology_class",
+        "slices": {
+          "development_unseen": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 24
+          },
+          "governed_reference": {
+            "failure_rate": 0.6486486486486487,
+            "failure_rate_minus_overall_base_rate": -0.04546899841017482,
+            "n": 222
+          },
+          "governed_topology": {
+            "failure_rate": 1.0,
+            "failure_rate_minus_overall_base_rate": 0.3058823529411765,
+            "n": 9
+          }
+        }
+      }
+    },
+    "most_disproportionately_failing_slices_n_ge_5": [
+      {
+        "dimension": "perturbation_type",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 12,
+        "slice": "nominal"
+      },
+      {
+        "dimension": "perturbation_type",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 24,
+        "slice": "topology_familiarity"
+      },
+      {
+        "dimension": "perturbation_type",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 9,
+        "slice": "scale"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 12,
+        "slice": "clean_operational"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 18,
+        "slice": "75%"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 6,
+        "slice": "quality:25%"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 6,
+        "slice": "drift:50%"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 6,
+        "slice": "demand"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 6,
+        "slice": "roughness"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 6,
+        "slice": "tank_state"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 6,
+        "slice": "source_strength"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 24,
+        "slice": "development_unseen"
+      },
+      {
+        "dimension": "perturbation_level",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 9,
+        "slice": "medium_loop_grid"
+      },
+      {
+        "dimension": "topology_class",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 24,
+        "slice": "development_unseen"
+      },
+      {
+        "dimension": "topology_class",
+        "excess_over_base_rate": 0.3058823529411765,
+        "failure_rate": 1.0,
+        "n": 9,
+        "slice": "governed_topology"
+      }
+    ],
+    "n_excluded_no_top1_correct_known": 9,
+    "n_scored_records": 255,
+    "overall_failure_rate_base_rate": 0.6941176470588235
+  },
+  "locked_test_opened": false,
+  "schema_version": 1,
+  "sections": "37_error_clustering, 38_confidence_calibration_analysis",
+  "source_data": "reports/evaluation/live-robustness/post-remediation-results.json",
+  "total_records_in_dataset": 264
+}

@@ -1,0 +1,1459 @@
+{
+  "cap_findings": {
+    "CAP-CAL-01": {
+      "downstream_impact": "Every real LIVE incident served against the golden-reference network (231/264 = 87.5% of the post-remediation LIVE robustness campaign) has calibrated=False purely from this construction asymmetry, independent of any hydraulic randomization, sensor condition, or genuine model uncertainty -- confirmed directly against reports/evaluation/live-robustness/post-remediation-results.json in cross_check_vs_live_suppression_data below.",
+      "measured_effect": {
+        "branched_loop_and_loop_grid_do_not_exhibit_this": {
+          "branched_loop_parsed_hash_in_validated": true,
+          "loop_grid_parsed_hash_in_validated": true,
+          "why": "Both families' corpus-generation loader (scripts/generate_cycle_b_corpus.py's TRAIN_TOPOLOGIES) AND V4PipelineFactory's runtime loader parse the SAME .inp file the same way, so there is no construction-path asymmetry for them."
+        },
+        "hashes_match": false,
+        "in_memory_hash_in_validated_topology_hashes": true,
+        "network_sha256_in_memory_construction": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+        "network_sha256_parsed_from_canonical_inp": "decd4ac707a3817115c7307940861dafac6d3fad34a3358179f20c7830a2cc79",
+        "parsed_hash_in_validated_topology_hashes": false,
+        "sample_link_attribute_diffs": [
+          {
+            "in_memory_length_diameter_roughness": [
+              1050.0,
+              0.3,
+              115.0
+            ],
+            "link": "P_J1_J2",
+            "parsed_from_inp_length_diameter_roughness": [
+              1050.0000000110401,
+              0.2999999999988,
+              115.0
+            ]
+          },
+          {
+            "in_memory_length_diameter_roughness": [
+              1200.0,
+              0.25,
+              110.0
+            ],
+            "link": "P_J2_J3",
+            "parsed_from_inp_length_diameter_roughness": [
+              1199.9999999952001,
+              0.24999999999899997,
+              110.0
+            ]
+          },
+          {
+            "in_memory_length_diameter_roughness": [
+              850.0,
+              0.25,
+              115.0
+            ],
+            "link": "P_J2_T1",
+            "parsed_from_inp_length_diameter_roughness": [
+              850.00000001184,
+              0.24999999999899997,
+              115.0
+            ]
+          }
+        ]
+      },
+      "root_cause": "build_wntr_network() (used at corpus/calibration-fit time for golden-reference) constructs the network programmatically in Python with exact decimal literals. V4PipelineFactory.__call__ (the exact factory hydroswarm.api.app uses in production) instead calls wntr.network.WaterNetworkModel(str(network_path)) against data/frozen/golden_network.inp -- parsing that INP file round-trips every link's length/diameter/roughness through EPANET's US-customary-unit internal representation, introducing ~1e-9..1e-11 relative floating-point noise per attribute. hydroswarm.data.scenarios.network_sha256 hashes those exact floats, so the two constructions of the LITERAL SAME topology never match.",
+      "severity": "HIGH -- a pure construction-path artifact, unrelated to model capability, silently invalidates calibration for the majority topology family in every real serving path exercised so far.",
+      "taxonomy": "CAP-CAL",
+      "title": "golden-reference network_sha256 never matches between corpus-fit construction and runtime-served construction"
+    },
+    "CAP-CAL-02": {
+      "downstream_impact": "On the rare real LIVE incidents that DO pass the topology-hash gate (e.g. all 9 loop-grid LIVE runs, all calibrated=True), the candidate set is computed from the POOLED global nonconformity-score distribution across all 3 governed families and 5 curriculum stages, not the network- or condition-specific distribution the architecture-freeze report's coverage_by_network/coverage_by_condition breakdown (reports/results/v4/architecture-freeze.json) implies is available and meaningfully different (0.8940-0.9285 range across conditions/networks) -- that finer-grained calibration is fit but never actually consulted in production.",
+      "measured_effect": {
+        "any_runtime_name_attr_value_matches_a_network_scores_key": false,
+        "artifact_mondrian_scores_keys": [
+          "ADVERSARIAL",
+          "CLEAN",
+          "DEGRADED",
+          "OPERATIONAL",
+          "SHIFT"
+        ],
+        "artifact_network_scores_keys": [
+          "branched-loop",
+          "golden-reference",
+          "loop-grid"
+        ],
+        "branched_loop_network_name_attr_parsed_from_inp": "/workspace/HydroSwarm/data/topology-transfer/branched-loop.inp",
+        "golden_reference_network_name_attr_in_memory": "hydroswarm-demo",
+        "golden_reference_network_name_attr_parsed_from_inp": "/workspace/HydroSwarm/data/frozen/golden_network.inp",
+        "loop_grid_network_name_attr_parsed_from_inp": "/workspace/HydroSwarm/data/topologies/loop-grid.inp",
+        "runtime_condition_kwarg_ever_passed": "No -- pipeline.py's real call site (`SplitConformalCalibrator(calibration).candidate_set(fused_vector, network_id=str(getattr(network, 'name', 'unknown')), ood_level=ood_level.value)`) has no condition= argument at all, confirmed by direct source inspection this session."
+      },
+      "root_cause": "SplitConformalCalibrator.candidate_set checks `network_id in self.artifact.network_scores` then `elif condition in self.artifact.mondrian_scores`. The fit-time network_id label is the corpus's clean family name ('golden-reference'/'branched-loop'/'loop-grid'); the real call site (HybridInferencePipeline.analyze, src/hydroswarm/inference/pipeline.py) passes network_id=str(getattr(network, name, 'unknown')) -- the raw WNTR model .name attribute -- and never passes condition= at all (defaults to None).",
+      "severity": "MEDIUM -- does not by itself explain the near-zero planning-eligible rate (that is dominated by CAP-CAL-01 and genuine topology mismatch), but means even a hypothetical CAP-CAL-01 fix would still not deliver the artifact's intended per-network calibration precision.",
+      "taxonomy": "CAP-CAL",
+      "title": "Mondrian (per-network, per-condition) conformal scores are unreachable at runtime; candidate_set always falls back to pooled global_scores"
+    }
+  },
+  "conditions": {
+    "1_pristine_exact_config": {
+      "aggregate": {
+        "calibrated_rate": 1.0,
+        "distinct_network_sha256_values": [
+          "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+        ],
+        "mean_candidate_set_size_when_calibrated": 1.8,
+        "mean_raw_top1_regardless_of_calibration": 0.6,
+        "mean_top3_regardless_of_calibration": 0.8,
+        "n": 5,
+        "n_errors": 0,
+        "n_ok": 5
+      },
+      "per_scenario": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "condition": "1_pristine_exact_config",
+          "fused_belief": {
+            "J1": 0.21526015252022895,
+            "J2": 0.46595647973732823,
+            "J3": 0.18186607980890956,
+            "J4": 0.13691728793353322,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.5,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "CANDIDATE_REGION_TOO_BROAD",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082200,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.21526015252022895,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "1_pristine_exact_config",
+          "fused_belief": {
+            "J1": 0.0,
+            "J2": 0.0,
+            "J3": 1.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082201,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J3"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "condition": "1_pristine_exact_config",
+          "fused_belief": {
+            "J1": 0.02519817899729502,
+            "J2": 0.23304509053214897,
+            "J3": 0.038695141620199776,
+            "J4": 0.7030615888503562,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082202,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.02519817899729502,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "1_pristine_exact_config",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082203,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "1_pristine_exact_config",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082204,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        }
+      ]
+    },
+    "2_demand_only": {
+      "aggregate": {
+        "calibrated_rate": 1.0,
+        "distinct_network_sha256_values": [
+          "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+        ],
+        "mean_candidate_set_size_when_calibrated": 1.8,
+        "mean_raw_top1_regardless_of_calibration": 0.6,
+        "mean_top3_regardless_of_calibration": 0.6,
+        "n": 5,
+        "n_errors": 0,
+        "n_ok": 5
+      },
+      "per_scenario": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "condition": "2_demand_only",
+          "fused_belief": {
+            "J1": 0.21459337331957615,
+            "J2": 0.32339172678587275,
+            "J3": 0.2201040280910482,
+            "J4": 0.24191087180350276,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "CANDIDATE_REGION_TOO_BROAD",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082200,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.21459337331957615,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "2_demand_only",
+          "fused_belief": {
+            "J1": 0.0,
+            "J2": 0.0,
+            "J3": 1.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082201,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J3"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "condition": "2_demand_only",
+          "fused_belief": {
+            "J1": 0.032120022072460674,
+            "J2": 0.34539654665306546,
+            "J3": 0.038675491299612244,
+            "J4": 0.5838079399748617,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082202,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.032120022072460674,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "2_demand_only",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082203,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "2_demand_only",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082204,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        }
+      ]
+    },
+    "3_tank_only": {
+      "aggregate": {
+        "calibrated_rate": 1.0,
+        "distinct_network_sha256_values": [
+          "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+        ],
+        "mean_candidate_set_size_when_calibrated": 1.8,
+        "mean_raw_top1_regardless_of_calibration": 0.6,
+        "mean_top3_regardless_of_calibration": 0.8,
+        "n": 5,
+        "n_errors": 0,
+        "n_ok": 5
+      },
+      "per_scenario": [
+        {
+          "calibrated": true,
+          "candidate_set_size": 4,
+          "condition": "3_tank_only",
+          "fused_belief": {
+            "J1": 0.21526091299719602,
+            "J2": 0.4659504327492656,
+            "J3": 0.18186863017823118,
+            "J4": 0.1369200240753073,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.5,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "CANDIDATE_REGION_TOO_BROAD",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082200,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.21526091299719602,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "3_tank_only",
+          "fused_belief": {
+            "J1": 0.0,
+            "J2": 0.0,
+            "J3": 1.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082201,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J3"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 2,
+          "condition": "3_tank_only",
+          "fused_belief": {
+            "J1": 0.025198043788298194,
+            "J2": 0.23304955949763212,
+            "J3": 0.03869441274648434,
+            "J4": 0.7030579839675853,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082202,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.025198043788298194,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "3_tank_only",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082203,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        },
+        {
+          "calibrated": true,
+          "candidate_set_size": 1,
+          "condition": "3_tank_only",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e",
+          "ood_level": "NORMAL",
+          "planning_suppression_reasons": [
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": null,
+          "seed": 2026082204,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        }
+      ]
+    },
+    "4_roughness_only": {
+      "aggregate": {
+        "calibrated_rate": 0.0,
+        "distinct_network_sha256_values": [
+          "2e6264e063bceadb6dd0b848fec326f5c1711041db16a058a6294064097a02b9",
+          "5d41f47092d67786c48aef44e90c6d199ae7bc990cc8b41bf61d730c7426506e",
+          "8b649d9defec49254dbcba7179cf91ae09183654050b7100015485d948e8d5d0",
+          "aff97fa8d25f6291e2f11c82c52c4d110dcdccdbcac0c20afcb196a8e7c6b4fe",
+          "cce530b279b4bde5412455c901c0723b2a91f91a7f03c3c2a9e3f70f2167e97a"
+        ],
+        "mean_candidate_set_size_when_calibrated": null,
+        "mean_raw_top1_regardless_of_calibration": 0.6,
+        "mean_top3_regardless_of_calibration": 0.6,
+        "n": 5,
+        "n_errors": 0,
+        "n_ok": 5
+      },
+      "per_scenario": [
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "4_roughness_only",
+          "fused_belief": {
+            "J1": 0.07288405884832982,
+            "J2": 0.6281771697773454,
+            "J3": 0.22158391950428558,
+            "J4": 0.07735485187003925,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "8b649d9defec49254dbcba7179cf91ae09183654050b7100015485d948e8d5d0",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 3,
+          "seed": 2026082200,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.07288405884832982,
+          "truth": "J1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "4_roughness_only",
+          "fused_belief": {
+            "J1": 0.0,
+            "J2": 0.0,
+            "J3": 1.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "cce530b279b4bde5412455c901c0723b2a91f91a7f03c3c2a9e3f70f2167e97a",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082201,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J3"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "4_roughness_only",
+          "fused_belief": {
+            "J1": 0.004394214690524648,
+            "J2": 0.9491534512838252,
+            "J3": 0.015477049905905978,
+            "J4": 0.03097528411974425,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "5d41f47092d67786c48aef44e90c6d199ae7bc990cc8b41bf61d730c7426506e",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082202,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.004394214690524648,
+          "truth": "J1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "4_roughness_only",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "aff97fa8d25f6291e2f11c82c52c4d110dcdccdbcac0c20afcb196a8e7c6b4fe",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "OOD_CAUTION"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082203,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "4_roughness_only",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "2e6264e063bceadb6dd0b848fec326f5c1711041db16a058a6294064097a02b9",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082204,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        }
+      ]
+    },
+    "5_pipe_length_changed": {
+      "reason": "hydroswarm.data.scenarios.ScenarioGenerationConfig has no pipe-length-variation field (fields confirmed by direct source inspection this session: seed, network_id, network_family, split, stage, event_type, source_node, start_time_bins_min, duration_bins_min, strength_bins, demand_regimes, sensor_count, sensor_noise_std, missing_probability, drift_per_hour, frozen_probability, communication_outage_probability, quantization_step, unit_mismatch_probability, roughness_variation_fraction, tank_level_variation_fraction, pipe_outage_probability, base_strength_mg_min) -- constructing an artificial ad hoc length perturbation would not be a real, governed generator config, so per the task instruction this condition is skipped rather than forced.",
+      "status": "NOT RUN"
+    },
+    "6_diameter_changed": {
+      "reason": "Same as condition 5 -- no diameter-variation field exists on ScenarioGenerationConfig.",
+      "status": "NOT RUN"
+    },
+    "7_all_hydraulic_randomized": {
+      "aggregate": {
+        "calibrated_rate": 0.0,
+        "distinct_network_sha256_values": [
+          "2e6264e063bceadb6dd0b848fec326f5c1711041db16a058a6294064097a02b9",
+          "5d41f47092d67786c48aef44e90c6d199ae7bc990cc8b41bf61d730c7426506e",
+          "8b649d9defec49254dbcba7179cf91ae09183654050b7100015485d948e8d5d0",
+          "aff97fa8d25f6291e2f11c82c52c4d110dcdccdbcac0c20afcb196a8e7c6b4fe",
+          "cce530b279b4bde5412455c901c0723b2a91f91a7f03c3c2a9e3f70f2167e97a"
+        ],
+        "mean_candidate_set_size_when_calibrated": null,
+        "mean_raw_top1_regardless_of_calibration": 0.6,
+        "mean_top3_regardless_of_calibration": 0.6,
+        "n": 5,
+        "n_errors": 0,
+        "n_ok": 5
+      },
+      "per_scenario": [
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "7_all_hydraulic_randomized",
+          "fused_belief": {
+            "J1": 0.10667872070673858,
+            "J2": 0.24197668598755367,
+            "J3": 0.346033726899196,
+            "J4": 0.30531086640651184,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "8b649d9defec49254dbcba7179cf91ae09183654050b7100015485d948e8d5d0",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "CANDIDATE_REGION_TOO_BROAD",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 4,
+          "seed": 2026082200,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.10667872070673858,
+          "truth": "J1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "7_all_hydraulic_randomized",
+          "fused_belief": {
+            "J1": 0.0,
+            "J2": 0.0,
+            "J3": 1.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "cce530b279b4bde5412455c901c0723b2a91f91a7f03c3c2a9e3f70f2167e97a",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082201,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J3"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "7_all_hydraulic_randomized",
+          "fused_belief": {
+            "J1": 0.0189766097022861,
+            "J2": 0.8797756555233495,
+            "J3": 0.026225124942115142,
+            "J4": 0.07502260983224916,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "5d41f47092d67786c48aef44e90c6d199ae7bc990cc8b41bf61d730c7426506e",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 2,
+          "seed": 2026082202,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.0189766097022861,
+          "truth": "J1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "7_all_hydraulic_randomized",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "aff97fa8d25f6291e2f11c82c52c4d110dcdccdbcac0c20afcb196a8e7c6b4fe",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "OOD_CAUTION"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082203,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "7_all_hydraulic_randomized",
+          "fused_belief": {
+            "J1": 1.0,
+            "J2": 0.0,
+            "J3": 0.0,
+            "J4": 0.0,
+            "R1": 0.0,
+            "T1": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "hydroswarm-demo",
+          "network_sha256": "2e6264e063bceadb6dd0b848fec326f5c1711041db16a058a6294064097a02b9",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082204,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "J1"
+        }
+      ]
+    },
+    "8_unseen_graph_connectivity_coastal_branch": {
+      "aggregate": {
+        "calibrated_rate": 0.0,
+        "distinct_network_sha256_values": [
+          "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60"
+        ],
+        "mean_candidate_set_size_when_calibrated": null,
+        "mean_raw_top1_regardless_of_calibration": 0.4,
+        "mean_top3_regardless_of_calibration": 0.8,
+        "n": 5,
+        "n_errors": 0,
+        "n_ok": 5
+      },
+      "per_scenario": [
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "8_unseen_graph_connectivity_coastal_branch",
+          "fused_belief": {
+            "CB1": 0.06401510004507484,
+            "CB2": 0.062139485912553104,
+            "CB3": 0.044051899652714145,
+            "CB4": 0.019830521257766687,
+            "CB5": 0.7972258644517902,
+            "CB6": 0.012737128680101042,
+            "R4": 0.0,
+            "T2": 0.0
+          },
+          "mrr": 0.3333333333333333,
+          "network_name_attr": "/workspace/HydroSwarm/data/topologies/coastal-branch.inp",
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 3,
+          "seed": 2026082200,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.062139485912553104,
+          "truth": "CB2"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "8_unseen_graph_connectivity_coastal_branch",
+          "fused_belief": {
+            "CB1": 0.0,
+            "CB2": 0.0,
+            "CB3": 0.0,
+            "CB4": 1.0,
+            "CB5": 0.0,
+            "CB6": 0.0,
+            "R4": 0.0,
+            "T2": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "/workspace/HydroSwarm/data/topologies/coastal-branch.inp",
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082201,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "CB4"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "8_unseen_graph_connectivity_coastal_branch",
+          "fused_belief": {
+            "CB1": 0.028082553281902945,
+            "CB2": 0.06544778108338614,
+            "CB3": 0.024809331132607595,
+            "CB4": 0.03181619800055633,
+            "CB5": 0.02296991336702218,
+            "CB6": 0.8268742231345247,
+            "R4": 0.0,
+            "T2": 0.0
+          },
+          "mrr": 0.5,
+          "network_name_attr": "/workspace/HydroSwarm/data/topologies/coastal-branch.inp",
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 3,
+          "seed": 2026082202,
+          "top1": 0.0,
+          "top3": 1.0,
+          "true_source_probability": 0.06544778108338614,
+          "truth": "CB2"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "8_unseen_graph_connectivity_coastal_branch",
+          "fused_belief": {
+            "CB1": 0.06713825958291113,
+            "CB2": 0.057431696781506884,
+            "CB3": 0.027422571467266486,
+            "CB4": 0.2011568590222237,
+            "CB5": 0.11705883441490454,
+            "CB6": 0.5297917787311872,
+            "R4": 0.0,
+            "T2": 0.0
+          },
+          "mrr": 0.25,
+          "network_name_attr": "/workspace/HydroSwarm/data/topologies/coastal-branch.inp",
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "CANDIDATE_REGION_TOO_BROAD",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 4,
+          "seed": 2026082203,
+          "top1": 0.0,
+          "top3": 0.0,
+          "true_source_probability": 0.06713825958291113,
+          "truth": "CB1"
+        },
+        {
+          "calibrated": false,
+          "candidate_set_size": null,
+          "condition": "8_unseen_graph_connectivity_coastal_branch",
+          "fused_belief": {
+            "CB1": 1.0,
+            "CB2": 0.0,
+            "CB3": 0.0,
+            "CB4": 0.0,
+            "CB5": 0.0,
+            "CB6": 0.0,
+            "R4": 0.0,
+            "T2": 0.0
+          },
+          "mrr": 1.0,
+          "network_name_attr": "/workspace/HydroSwarm/data/topologies/coastal-branch.inp",
+          "network_sha256": "d872593359166ea7414651e4b506e9ff3f13e073579cb608479d7848afca9c60",
+          "ood_level": "CAUTION",
+          "planning_suppression_reasons": [
+            "CALIBRATION_INVALID_OR_MISSING",
+            "OOD_CAUTION",
+            "MODEL_EVIDENCE_INSUFFICIENT"
+          ],
+          "raw_candidate_set_size_uncalibrated_fallback": 1,
+          "seed": 2026082204,
+          "top1": 1.0,
+          "top3": 1.0,
+          "true_source_probability": 1.0,
+          "truth": "CB1"
+        }
+      ]
+    }
+  },
+  "conformal_candidate_set_diagnostic": {
+    "alpha_sensitivity": {
+      "approximation_fidelity_check_at_alpha_0.10": {
+        "note": "Compares this script's approximated-fusion refit at alpha=0.10 against the real production artifact's alpha=0.10 numbers -- a large gap would mean the fixed_weight_fusion approximation is not a trustworthy stand-in for judging alpha sensitivity; a small gap supports treating the alpha sweep above as informative even though it is not the exact production fusion.",
+        "production_alpha_0.10_coverage": 0.9143258426966292,
+        "this_scripts_alpha_0.10_coverage": 0.9073033707865169
+      },
+      "caveat": "Per diagnostic.txt's own instruction, alternative-alpha results here are NOT production-valid and must never be treated as such -- they exist only to characterize sensitivity direction/magnitude, using a documented fusion approximation, not the exact deployed dynamic-trust fusion.",
+      "fusion_approximation": "fixed_weight_fusion(neural_weight=0.6) -- see module docstring for why exact dynamic-trust fusion cannot be reconstructed from stored tensors alone",
+      "n_calibration_examples_used": 712,
+      "production_alpha_0.10_for_comparison": {
+        "coverage": 0.9143258426966292,
+        "examples": 712,
+        "expected_calibration_error": 0.0878951730544455,
+        "mean_set_size": 2.800561797752809,
+        "source": "models/hydrocore-v4-release/calibration.json (real, exact production fusion, exact production fit)"
+      },
+      "results_by_alpha": {
+        "0.05": {
+          "coverage": 0.9578651685393258,
+          "coverage_by_condition": {
+            "ADVERSARIAL": 0.9509803921568627,
+            "CLEAN": 0.9673202614379085,
+            "DEGRADED": 0.9607843137254902,
+            "OPERATIONAL": 0.9738562091503268,
+            "SHIFT": 0.9337748344370861
+          },
+          "coverage_by_network": {
+            "branched-loop": 0.9578059071729957,
+            "golden-reference": 0.957983193277311,
+            "loop-grid": 0.9578059071729957
+          },
+          "examples": 712,
+          "expected_calibration_error": 0.02664295344950049,
+          "mean_set_size": 2.800561797752809
+        },
+        "0.1": {
+          "coverage": 0.9073033707865169,
+          "coverage_by_condition": {
+            "ADVERSARIAL": 0.8921568627450981,
+            "CLEAN": 0.9411764705882353,
+            "DEGRADED": 0.934640522875817,
+            "OPERATIONAL": 0.9215686274509803,
+            "SHIFT": 0.8410596026490066
+          },
+          "coverage_by_network": {
+            "branched-loop": 0.9071729957805907,
+            "golden-reference": 0.907563025210084,
+            "loop-grid": 0.9071729957805907
+          },
+          "examples": 712,
+          "expected_calibration_error": 0.02664295344950049,
+          "mean_set_size": 2.335674157303371
+        },
+        "0.15": {
+          "coverage": 0.8567415730337079,
+          "coverage_by_condition": {
+            "ADVERSARIAL": 0.8627450980392157,
+            "CLEAN": 0.9019607843137255,
+            "DEGRADED": 0.8888888888888888,
+            "OPERATIONAL": 0.8562091503267973,
+            "SHIFT": 0.7748344370860927
+          },
+          "coverage_by_network": {
+            "branched-loop": 0.8565400843881856,
+            "golden-reference": 0.8571428571428571,
+            "loop-grid": 0.8565400843881856
+          },
+          "examples": 712,
+          "expected_calibration_error": 0.02664295344950049,
+          "mean_set_size": 1.9213483146067416
+        },
+        "0.2": {
+          "coverage": 0.8061797752808989,
+          "coverage_by_condition": {
+            "ADVERSARIAL": 0.803921568627451,
+            "CLEAN": 0.8758169934640523,
+            "DEGRADED": 0.8104575163398693,
+            "OPERATIONAL": 0.8104575163398693,
+            "SHIFT": 0.7284768211920529
+          },
+          "coverage_by_network": {
+            "branched-loop": 0.8059071729957806,
+            "golden-reference": 0.8067226890756303,
+            "loop-grid": 0.8059071729957806
+          },
+          "examples": 712,
+          "expected_calibration_error": 0.02664295344950049,
+          "mean_set_size": 1.6601123595505618
+        }
+      },
+      "status": "RAN -- real refit, approximated fusion (see docstring)"
+    },
+    "candidate_size_condition_1_pristine_vs_condition_7_all_randomized": {
+      "condition_1_calibrated_rate": 1.0,
+      "condition_1_mean_candidate_set_size_when_calibrated": 1.8,
+      "condition_7_calibrated_rate": 0.0,
+      "condition_7_raw_uncalibrated_fallback_candidate_sizes": [
+        4,
+        1,
+        2,
+        1,
+        1
+      ],
+      "note": "condition 7 is uncalibrated (network_sha256 mismatch from roughness randomization -- see CAP-CAL-01/policy_counterfactual), so its real conformal_candidate_nodes at inference time is the pipeline's uncalibrated fallback (_credible_nodes over the raw fused belief, NOT a conformal region) -- informationally comparable in size only, not in coverage-guarantee semantics, to condition 1's real conformal candidate sets."
+    },
+    "condition_1_pristine_calibration_valid_examples": [
+      {
+        "calibrated": true,
+        "candidate_set_size": 4,
+        "region_gate_fired": true,
+        "seed": 2026082200,
+        "true_source_probability": 0.21526015252022895,
+        "truth_covered": true
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "region_gate_fired": false,
+        "seed": 2026082201,
+        "true_source_probability": 1.0,
+        "truth_covered": true
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 2,
+        "region_gate_fired": false,
+        "seed": 2026082202,
+        "true_source_probability": 0.02519817899729502,
+        "truth_covered": false
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "region_gate_fired": false,
+        "seed": 2026082203,
+        "true_source_probability": 1.0,
+        "truth_covered": true
+      },
+      {
+        "calibrated": true,
+        "candidate_set_size": 1,
+        "region_gate_fired": false,
+        "seed": 2026082204,
+        "true_source_probability": 1.0,
+        "truth_covered": true
+      }
+    ]
+  },
+  "cross_check_vs_live_suppression_data": {
+    "paragraph": "Task 2's controlled-path evidence and the already-committed real LIVE suppression numbers agree with each other precisely, and together point to CAP-CAL-01 (construction-path hash asymmetry) as the dominant, not merely contributing, driver of the 96.5% CALIBRATION_INVALID_OR_MISSING rate reported in reports/evaluation/capability-diagnostic/suppression-analysis.json (246/255 = 96.5% of analyzable LIVE incidents). Recomputing directly from reports/evaluation/live-robustness/post-remediation-results.json in this script: {'golden-reference': {'n': 231, 'calibrated_true_count': 0, 'calibrated_true_rate': 0.0, 'calibration_invalid_or_missing_count': 222}, 'coastal-branch': {'n': 24, 'calibrated_true_count': 0, 'calibrated_true_rate': 0.0, 'calibration_invalid_or_missing_count': 24}, 'loop-grid': {'n': 9, 'calibrated_true_count': 9, 'calibrated_true_rate': 1.0, 'calibration_invalid_or_missing_count': 0}} -- golden-reference (231/264 = 87.5% of all LIVE runs) shows calibrated=True on 0 of 231 runs and fires CALIBRATION_INVALID_OR_MISSING on 222 of them; coastal-branch (genuinely unseen topology, correctly gated) shows the same 0% calibrated; loop-grid -- which does NOT suffer CAP-CAL-01 because both its corpus-fit and runtime loaders parse the identical .inp file -- shows 100% calibrated (9/9). Summed, 246 calibration-invalid incidents were recomputed directly, which matches the previously-cited 246 exactly (True). This means the bulk of LIVE's calibration-invalidity is not explained by 'not exact pristine hydraulic config' in the general sense task 2 was framed around -- real LIVE incidents against golden-reference would fail the topology-hash gate even under a literal zero-perturbation pristine scenario, purely from the .inp-parse-vs-in-memory construction mismatch (this script's condition 1, which IS calibrated=True, only achieves that because it deliberately reuses the SAME in-memory build_wntr_network() object the corpus was fit against -- exactly the construction path the real LIVE server never takes). The task 2 hydraulic decomposition (policy_counterfactual above) still explains a real, secondary effect on top of CAP-CAL-01: even if CAP-CAL-01 were fixed, roughness randomization (present by default in this repo's own scenario generator -- ScenarioGenerationConfig.roughness_variation_fraction defaults to 0.05, not 0.0) would independently invalidate calibration on any LIVE incident whose real, deployed hydraulic model has pipe roughness values that differ at all from golden-reference's training-time roughness -- which for a real, aging, physically-instrumented network is the norm rather than the exception. Demand- and tank-level differences, by contrast, are invisible to this specific gate (network_sha256 never encodes them) and would not by themselves invalidate calibration.",
+    "recomputed_data": {
+      "live_calibrated_rate_by_network_id": {
+        "coastal-branch": {
+          "calibrated_true_count": 0,
+          "calibrated_true_rate": 0.0,
+          "calibration_invalid_or_missing_count": 24,
+          "n": 24
+        },
+        "golden-reference": {
+          "calibrated_true_count": 0,
+          "calibrated_true_rate": 0.0,
+          "calibration_invalid_or_missing_count": 222,
+          "n": 231
+        },
+        "loop-grid": {
+          "calibrated_true_count": 9,
+          "calibrated_true_rate": 1.0,
+          "calibration_invalid_or_missing_count": 0,
+          "n": 9
+        }
+      },
+      "live_post_remediation_results_source": "reports/evaluation/live-robustness/post-remediation-results.json",
+      "matches_previously_cited_246_of_255_96.5pct": true,
+      "recomputed_total_calibration_invalid_or_missing_across_all_networks": 246,
+      "suppression_analysis_file_note": "reports/evaluation/capability-diagnostic/suppression-analysis.json exists and was cited (not re-derived) for the 246/255 (96.5%) headline figure."
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "methodology_note": "Every real (non-NOT-RUN) condition passes the REAL randomized WNTR model returned by generate_with_network() (not the pristine network) to pipeline.analyze(), so the feature context, sensor evidence, AND the network object's own structural hash all genuinely reflect that condition's hydraulic configuration -- this is what makes network_sha256 vary meaningfully across conditions 1-7 below, isolating the real effect of each config axis on calibration applicability.",
+  "n_scenarios_per_real_condition": 5,
+  "policy_counterfactual": {
+    "1_pristine_exact_config": {
+      "n_applicable_under_policy_a_current_exact_identity": 5,
+      "n_applicable_under_policy_b_connectivity_family": 5,
+      "n_newly_applicable_under_policy_b": 0,
+      "n_scenarios": 5,
+      "per_scenario": [
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 4,
+          "policy_b_truth_covered": true,
+          "seed": 2026082200
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082201
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 2,
+          "policy_b_truth_covered": false,
+          "seed": 2026082202
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082203
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082204
+        }
+      ],
+      "policy_b_coverage_rate": 0.8,
+      "policy_b_mean_candidate_set_size": 1.8
+    },
+    "2_demand_only": {
+      "n_applicable_under_policy_a_current_exact_identity": 5,
+      "n_applicable_under_policy_b_connectivity_family": 5,
+      "n_newly_applicable_under_policy_b": 0,
+      "n_scenarios": 5,
+      "per_scenario": [
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 4,
+          "policy_b_truth_covered": true,
+          "seed": 2026082200
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082201
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 2,
+          "policy_b_truth_covered": false,
+          "seed": 2026082202
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082203
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082204
+        }
+      ],
+      "policy_b_coverage_rate": 0.8,
+      "policy_b_mean_candidate_set_size": 1.8
+    },
+    "3_tank_only": {
+      "n_applicable_under_policy_a_current_exact_identity": 5,
+      "n_applicable_under_policy_b_connectivity_family": 5,
+      "n_newly_applicable_under_policy_b": 0,
+      "n_scenarios": 5,
+      "per_scenario": [
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 4,
+          "policy_b_truth_covered": true,
+          "seed": 2026082200
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082201
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 2,
+          "policy_b_truth_covered": false,
+          "seed": 2026082202
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082203
+        },
+        {
+          "already_applicable_under_policy_a": true,
+          "newly_applicable_under_policy_b": false,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082204
+        }
+      ],
+      "policy_b_coverage_rate": 0.8,
+      "policy_b_mean_candidate_set_size": 1.8
+    },
+    "4_roughness_only": {
+      "n_applicable_under_policy_a_current_exact_identity": 0,
+      "n_applicable_under_policy_b_connectivity_family": 5,
+      "n_newly_applicable_under_policy_b": 5,
+      "n_scenarios": 5,
+      "per_scenario": [
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 4,
+          "policy_b_truth_covered": true,
+          "seed": 2026082200
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082201
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": false,
+          "seed": 2026082202
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082203
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082204
+        }
+      ],
+      "policy_b_coverage_rate": 0.8,
+      "policy_b_mean_candidate_set_size": 1.6
+    },
+    "7_all_hydraulic_randomized": {
+      "n_applicable_under_policy_a_current_exact_identity": 0,
+      "n_applicable_under_policy_b_connectivity_family": 5,
+      "n_newly_applicable_under_policy_b": 5,
+      "n_scenarios": 5,
+      "per_scenario": [
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 4,
+          "policy_b_truth_covered": true,
+          "seed": 2026082200
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082201
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 2,
+          "policy_b_truth_covered": false,
+          "seed": 2026082202
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082203
+        },
+        {
+          "already_applicable_under_policy_a": false,
+          "newly_applicable_under_policy_b": true,
+          "policy_b_candidate_set_size": 1,
+          "policy_b_truth_covered": true,
+          "seed": 2026082204
+        }
+      ],
+      "policy_b_coverage_rate": 0.8,
+      "policy_b_mean_candidate_set_size": 1.8
+    },
+    "excluded_condition_8_note": "condition 8 (coastal-branch) is deliberately excluded from this counterfactual: it does not share golden-reference's connectivity, so it is out of scope for a 'connectivity-family identity' policy by definition, not merely by the current exact-hash policy.",
+    "summary": {
+      "interpretation": "Conditions 2 (demand-only) and 3 (tank-only) are ALREADY calibration-applicable under the current real exact-hash policy (Policy A) -- see cap_findings and the main per-condition results above: network_sha256 only hashes node names and link length/diameter/roughness, so demand and tank-level randomization never change it. Only conditions 4 (roughness-only) and 7 (all hydraulic randomized) are newly granted applicability under Policy B, because only roughness perturbation is actually part of the hashed identity. This means the 'exact configuration identity' bottleneck in this controlled setting is really an 'exact ROUGHNESS identity' bottleneck specifically, not a general hydraulic-configuration-identity one -- a materially narrower (and more fixable) claim than the task's framing initially suggested.",
+      "total_newly_applicable_scenarios_across_conditions_2_3_4_7": 10
+    }
+  },
+  "schema_version": 1,
+  "sections": "24_calibration_applicability_decomposition_25_policy_counterfactual_26_conformal_candidate_set_diagnostic_suppression_cross_check",
+  "seeds": [
+    2026082200,
+    2026082201,
+    2026082202,
+    2026082203,
+    2026082204
+  ]
+}

@@ -1,0 +1,458 @@
+{
+  "default_sensor_count_finding": {
+    "control_action_at_default": "REQUEST_SAMPLE",
+    "finding": "The golden-reference network has exactly 4 junctions total (build_wntr_network(), src/hydroswarm/simulation/network.py), matching pipeline.signature_artifact.sensor_nodes exactly (verified this session: {'J1','J2','J3','J4'} both times), and ScenarioGenerationConfig's own default sensor_count is also 4 (src/hydroswarm/data/scenarios.py:87). At these real production defaults, every possible active-sampling candidate node is ALREADY an initially-observed sensor from incident creation onward, so rank_sample_locations' `possible = set(artifact.sensor_nodes)` minus `constraints.already_sampled` is always empty and active sampling can never recommend a genuinely new location on this network -- structurally identical in cause to the already-known, already-documented ROB-LIVE-01 finding (ranker recommending a previously-observed node) in live_robustness.py:382-388, just manifesting here as 'no candidates at all' rather than 'recommended a duplicate'. This means the sample_time_ablation experiment below is NOT reproducible at the real, default, all-sensors-placed golden-reference configuration; it uses sensor_count=2 (still real WNTRScenarioGenerator-governed generation) purely to create the unobserved candidates needed to exercise rank_sample_locations at all, and that deviation from the harness's real default coverage is disclosed explicitly, not hidden.",
+    "network_total_junctions": 4,
+    "sample_result_stop_reason_at_default": "no_accessible_sample",
+    "scenario_generation_config_default_sensor_count": 4,
+    "scenario_sensor_nodes_at_default": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ],
+    "signature_artifact_sensor_nodes": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ]
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "sample_time_ablation": {
+    "beyond_horizon_conditions_not_run_reason": "b_plus_1_interval and c_plus_2_interval: NOT RUN for all scenarios that reached this stage -- extending options.time.duration past 24h to obtain real acquisition-time data there raised WNTR SimulationIncompleteError ('simulation ended before the configured duration') every time, a genuine physical/configuration limit of this network's demand/tank pattern definitions (only governed out to 24h), not a script bug. See per_scenario[*].conditions.{b,c}_*.not_run for the exact real exception text captured per scenario.",
+    "condition_summary": {
+      "a_recommendation_time": {
+        "mean_entropy_change_bits": -0.8753228597742103,
+        "mean_rank_improvement": 0.6,
+        "mean_reciprocal_rank": 0.45,
+        "n": 5,
+        "n_ok": 5,
+        "top1": 0.0,
+        "top3": 0.8
+      },
+      "b_plus_1_interval": {
+        "mean_entropy_change_bits": null,
+        "mean_rank_improvement": null,
+        "mean_reciprocal_rank": null,
+        "n": 5,
+        "n_ok": 0,
+        "top1": null,
+        "top3": null
+      },
+      "c_plus_2_interval": {
+        "mean_entropy_change_bits": null,
+        "mean_rank_improvement": null,
+        "mean_reciprocal_rank": null,
+        "n": 5,
+        "n_ok": 0,
+        "top1": null,
+        "top3": null
+      },
+      "d_final_available": {
+        "mean_entropy_change_bits": -0.8753228597742103,
+        "mean_rank_improvement": 0.6,
+        "mean_reciprocal_rank": 0.45,
+        "n": 5,
+        "n_ok": 5,
+        "top1": 0.0,
+        "top3": 0.8
+      }
+    },
+    "key_finding": "Of 5/10 scenarios where analyze() actually issued a REQUEST_SAMPLE recommendation (requiring sensor_count=2, see default_sensor_count_finding), EVERY recommended sample's real concentration value at the current recommendation time (target_time_seconds=86400, the only acquisition time achievable at all within the network's real 24h horizon) came back exactly 0.0 mg/L -- i.e. the real, non-fabricated end-of-horizon sample the system actually takes is a clean non-detection at every one of these 5 incidents. This directly and empirically confirms the sampling_model_audit's code-reading finding: EIG scores candidates using a peak-over-time prediction vector, but the harness's real _sample_observation call (position=-1, always end-of-24h-horizon) systematically delivers a decayed/near-zero value instead. Despite this, top3 improved to 0.8 and mean posterior entropy DROPPED by 0.875 bits on average (the model becomes more CONFIDENT after a null reading, since a confirmed non-detection is genuinely Bayesian-informative for ruling out nearby candidates) -- but top1 stayed at 0.0 across all 5, so that added confidence does not reliably land on the true source. Conditions (b)/(c) (would-be earlier, less-decayed samples) could not be measured at all on this network/duration configuration -- see beyond_horizon_conditions_not_run_reason -- so whether an EARLIER (closer-to-peak) sample would have produced a materially different, more useful reading remains genuinely open and is NOT claimed here.",
+    "n_scenarios_attempted": 10,
+    "n_scenarios_sample_recommended": 5,
+    "n_scenarios_skipped_no_sample_recommended": 5,
+    "note_on_conditions_a_and_d": "Measured directly: (a) recommendation-time and (d) final-available-timestep target the SAME target_time_seconds (scenario.timestamps_seconds[-1]) in every scenario in this repo's current fixed 25-step/24h golden-reference grid, because the real LIVE harness's own initial-evidence anchor (the latest-1 truncation used here to match live_robustness._payloads' 'last valid reading' semantics) already sits at that same final grid point. Any residual numeric difference between the two conditions' 'actual_sampled_time_seconds' reflects only re-simulation index-snapping to the nearest available EPANET report step, not a real time-of-sample distinction -- there is no such thing today as sampling 'later within the normal production horizon' in this system; (b)/(c) required extending the simulated duration past the network's compiled 24h horizon (data/frozen/golden_network.inp via src/hydroswarm/simulation/network.py:163) to obtain real (non-fabricated, real WNTR-simulated) values at all.",
+    "per_scenario": [
+      {
+        "control_action": "GENERATE_PLANS",
+        "initial_entropy_bits": 0.04790844649718112,
+        "initial_rank": 3,
+        "initial_top1": 0.0,
+        "sample_recommended": false,
+        "seed": 2026081300,
+        "skip_reason": "no_sample_result_object",
+        "suppression_reasons": [],
+        "t_now": 86400.0,
+        "truth": "J1"
+      },
+      {
+        "conditions": {
+          "a_recommendation_time": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.10558542205831188,
+            "entropy_change": -0.685292399128,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 1,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          },
+          "b_plus_1_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 90000.0
+          },
+          "c_plus_2_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 93600.0
+          },
+          "d_final_available": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.10558542205831188,
+            "entropy_change": -0.685292399128,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 1,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          }
+        },
+        "control_action": "REQUEST_SAMPLE",
+        "expected_information_gain_bits": 5.947902007047421,
+        "initial_entropy_bits": 0.7908778211863119,
+        "initial_rank": 3,
+        "initial_top1": 0.0,
+        "recommended_node": "J3",
+        "sample_recommended": true,
+        "seed": 2026081301,
+        "suppression_reasons": [
+          "MODEL_EVIDENCE_INSUFFICIENT"
+        ],
+        "t_now": 86400.0,
+        "target_times": {
+          "a_recommendation_time": 86400.0,
+          "b_plus_1_interval": 90000.0,
+          "c_plus_2_interval": 93600.0,
+          "d_final_available": 86400.0
+        },
+        "truth": "J1"
+      },
+      {
+        "conditions": {
+          "a_recommendation_time": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.10621163603791389,
+            "entropy_change": -0.9388288342096427,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 2,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          },
+          "b_plus_1_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 90000.0
+          },
+          "c_plus_2_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 93600.0
+          },
+          "d_final_available": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.10621163603791389,
+            "entropy_change": -0.9388288342096427,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 2,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          }
+        },
+        "control_action": "REQUEST_SAMPLE",
+        "expected_information_gain_bits": 6.202408420123811,
+        "initial_entropy_bits": 1.0450404702475566,
+        "initial_rank": 4,
+        "initial_top1": 0.0,
+        "recommended_node": "J3",
+        "sample_recommended": true,
+        "seed": 2026081302,
+        "suppression_reasons": [
+          "MODEL_EVIDENCE_INSUFFICIENT"
+        ],
+        "t_now": 86400.0,
+        "target_times": {
+          "a_recommendation_time": 86400.0,
+          "b_plus_1_interval": 90000.0,
+          "c_plus_2_interval": 93600.0,
+          "d_final_available": 86400.0
+        },
+        "truth": "J1"
+      },
+      {
+        "control_action": "GENERATE_PLANS",
+        "initial_entropy_bits": 0.5969310866150702,
+        "initial_rank": 2,
+        "initial_top1": 0.0,
+        "sample_recommended": false,
+        "seed": 2026081303,
+        "skip_reason": "no_sample_result_object",
+        "suppression_reasons": [],
+        "t_now": 86400.0,
+        "truth": "J4"
+      },
+      {
+        "conditions": {
+          "a_recommendation_time": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.054243405892366196,
+            "entropy_change": -0.9774260451450585,
+            "planning_allowed": true,
+            "rank": 4,
+            "rank_improvement": -3,
+            "reciprocal_rank": 0.25,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 0.0
+          },
+          "b_plus_1_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 90000.0
+          },
+          "c_plus_2_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 93600.0
+          },
+          "d_final_available": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.054243405892366196,
+            "entropy_change": -0.9774260451450585,
+            "planning_allowed": true,
+            "rank": 4,
+            "rank_improvement": -3,
+            "reciprocal_rank": 0.25,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 0.0
+          }
+        },
+        "control_action": "REQUEST_SAMPLE",
+        "expected_information_gain_bits": 6.194974757190851,
+        "initial_entropy_bits": 1.0316694510374247,
+        "initial_rank": 1,
+        "initial_top1": 1.0,
+        "recommended_node": "J4",
+        "sample_recommended": true,
+        "seed": 2026081304,
+        "suppression_reasons": [
+          "MODEL_EVIDENCE_INSUFFICIENT"
+        ],
+        "t_now": 86400.0,
+        "target_times": {
+          "a_recommendation_time": 86400.0,
+          "b_plus_1_interval": 90000.0,
+          "c_plus_2_interval": 93600.0,
+          "d_final_available": 86400.0
+        },
+        "truth": "J4"
+      },
+      {
+        "conditions": {
+          "a_recommendation_time": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.05337803045293215,
+            "entropy_change": -0.9774557790087679,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 2,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          },
+          "b_plus_1_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 90000.0
+          },
+          "c_plus_2_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 93600.0
+          },
+          "d_final_available": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.05337803045293215,
+            "entropy_change": -0.9774557790087679,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 2,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          }
+        },
+        "control_action": "REQUEST_SAMPLE",
+        "expected_information_gain_bits": 6.194289827533527,
+        "initial_entropy_bits": 1.0308338094617,
+        "initial_rank": 4,
+        "initial_top1": 0.0,
+        "recommended_node": "J4",
+        "sample_recommended": true,
+        "seed": 2026081305,
+        "suppression_reasons": [
+          "MODEL_EVIDENCE_INSUFFICIENT"
+        ],
+        "t_now": 86400.0,
+        "target_times": {
+          "a_recommendation_time": 86400.0,
+          "b_plus_1_interval": 90000.0,
+          "c_plus_2_interval": 93600.0,
+          "d_final_available": 86400.0
+        },
+        "truth": "J3"
+      },
+      {
+        "control_action": "GENERATE_PLANS",
+        "initial_entropy_bits": 0.5969310866150702,
+        "initial_rank": 3,
+        "initial_top1": 0.0,
+        "sample_recommended": false,
+        "seed": 2026081306,
+        "skip_reason": "no_sample_result_object",
+        "suppression_reasons": [],
+        "t_now": 86400.0,
+        "truth": "J2"
+      },
+      {
+        "control_action": "GENERATE_PLANS",
+        "initial_entropy_bits": 0.6027496854341721,
+        "initial_rank": 3,
+        "initial_top1": 0.0,
+        "sample_recommended": false,
+        "seed": 2026081307,
+        "skip_reason": "no_sample_result_object",
+        "suppression_reasons": [],
+        "t_now": 86400.0,
+        "truth": "J2"
+      },
+      {
+        "control_action": "GENERATE_PLANS",
+        "initial_entropy_bits": 0.0619472397666405,
+        "initial_rank": 4,
+        "initial_top1": 0.0,
+        "sample_recommended": false,
+        "seed": 2026081308,
+        "skip_reason": "no_sample_result_object",
+        "suppression_reasons": [],
+        "t_now": 86400.0,
+        "truth": "J1"
+      },
+      {
+        "conditions": {
+          "a_recommendation_time": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.12658354736444974,
+            "entropy_change": -0.7976112413795822,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 1,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          },
+          "b_plus_1_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 90000.0
+          },
+          "c_plus_2_interval": {
+            "not_run": "NOT RUN -- extending simulated duration past the network's standard 24h horizon to reach beyond-horizon acquisition times failed with a real WNTR error (this network's demand/tank patterns are only governed out to 24h): SimulationIncompleteError: simulation ended before the configured duration",
+            "target_time_seconds": 93600.0
+          },
+          "d_final_available": {
+            "actual_sampled_time_seconds": 86400.0,
+            "beyond_production_horizon": false,
+            "entropy_bits": 0.12658354736444974,
+            "entropy_change": -0.7976112413795822,
+            "planning_allowed": true,
+            "rank": 2,
+            "rank_improvement": 1,
+            "reciprocal_rank": 0.5,
+            "sampled_concentration_mg_l": 0.0,
+            "target_time_seconds": 86400.0,
+            "top1": 0.0,
+            "top3": 1.0
+          }
+        },
+        "control_action": "REQUEST_SAMPLE",
+        "expected_information_gain_bits": 6.080240771381282,
+        "initial_entropy_bits": 0.9241947887440319,
+        "initial_rank": 3,
+        "initial_top1": 0.0,
+        "recommended_node": "J3",
+        "sample_recommended": true,
+        "seed": 2026081309,
+        "suppression_reasons": [
+          "MODEL_EVIDENCE_INSUFFICIENT"
+        ],
+        "t_now": 86400.0,
+        "target_times": {
+          "a_recommendation_time": 86400.0,
+          "b_plus_1_interval": 90000.0,
+          "c_plus_2_interval": 93600.0,
+          "d_final_available": 86400.0
+        },
+        "truth": "J1"
+      }
+    ]
+  },
+  "sampling_model_audit": {
+    "eig_internal_assumptions": {
+      "detection_threshold_mg_l": 0.001,
+      "duration_and_strength_and_hydraulic_state": "Not modeled per-call either: the `values`/`traces` array comes entirely from `artifact.library`, a SignatureArtifact pre-built (elsewhere, at signature-cache-build time -- hydroswarm.classical.signatures.py:160-205) over a FIXED grid of (start_time_bins, duration_bins, strength_bins, demand_regimes) hypotheses. rank_sample_locations only re-weights across these pre-existing discretized hypotheses via the caller-supplied `posterior` mapping; it never re-simulates or adjusts for the actual incident's true (continuous) start time, duration, or strength, or for how much real time has elapsed since detection when the sample call happens.",
+      "noise_model": "Gaussian, std = noise_scale_mg_l = 0.05 mg/L by default (active.py:60 parameter default; pipeline.py:916-924 passes the caller's `noise_scale` argument through unchanged, whose own default at HybridInferencePipeline.analyze is 0.05 -- pipeline.py:566). Used directly in `information_gain = min(current_entropy, 0.5 * log2(1 + variance / noise_scale_mg_l**2))` (active.py:90-92) -- i.e. EIG explicitly assumes any future sample will be corrupted by i.i.d. N(0, 0.05^2) mg/L noise when it computes expected information gain.",
+      "sensor_model": "Candidate sample locations are `artifact.sensor_nodes` (active.py:78, `possible = set(candidate_nodes or artifact.sensor_nodes)`) -- the FIXED candidate list baked into the same pre-built SignatureArtifact, filtered only by `constraints.accessible`/`already_sampled`/`maximum_delay_minutes` (operator-supplied operational constraints), never by real sensor measurement-noise or health characteristics beyond the single scalar `noise_scale_mg_l` above.",
+      "time_of_observation": "NO explicit time/elapsed-time-since-detection parameter exists on rank_sample_locations at all (confirmed by its real signature: artifact, posterior, constraints, candidate_nodes, noise_scale_mg_l, detection_threshold_mg_l, neural_residual_deltas, top_k -- no 'now' or 'elapsed_minutes' argument). Its scoring is built from `prediction = traces.max(axis=1)` (active.py:86, where `traces = values[:, :, sensor_index]` has shape [n_hypotheses, n_time]) -- i.e. for each hypothesis it takes the PEAK concentration reached AT ANY TIME across that hypothesis's full pre-simulated trajectory at this sensor, not a value tied to a specific acquisition time. `expected_candidate_reduction` (active.py:93-97, `spread = np.ptp(prediction)`) and `leading_hypothesis_separation` (active.py:98-101) are built from this same peak-value vector."
+    },
+    "eig_module": {
+      "file": "src/hydroswarm/sampling/active.py",
+      "function": "rank_sample_locations",
+      "verified_source_file": "/workspace/HydroSwarm/src/hydroswarm/sampling/active.py",
+      "verified_start_line": 54
+    },
+    "harness_sample_acquisition": {
+      "behavior": "Re-simulates the FULL incident fresh via `HydraulicSimulator(randomized_network).simulate_incident(source_node, strength_mg_min=10.0*relative_strength, start_minute=..., duration_minutes=...)` using the scenario's REAL/true (continuous) incident parameters -- more physically accurate than the EIG artifact's discretized hypothesis bins, but built on a network object structurally decoupled from what the EIG scoring assumed when it ranked candidates.",
+      "file": "src/hydroswarm/evaluation/live_robustness.py",
+      "function": "_sample_observation",
+      "noise": "None. The returned observation sets `\"quality\": 1.0, \"missing\": False` and computes `concentration_mg_l` directly from the deterministic WNTR output with no added stochastic noise term (live_robustness.py:277).",
+      "pressure_m": "Fixed constant 25.0 (live_robustness.py:277), identical to the fixed 25.0 used for INITIAL evidence at live_robustness.py:229.",
+      "sample_time": "`position = -1` (live_robustness.py:275) -- ALWAYS the LAST timestep of the freshly re-simulated trajectory, i.e. the end of the network's configured total simulation duration (24h / 86400s for golden-reference, src/hydroswarm/simulation/network.py:163). This is a LATE/END-OF-HORIZON value, not a peak-across-time value and not tied to any notion of elapsed time since detection.",
+      "verified_lines": "268-277"
+    },
+    "match_or_diverge": {
+      "duration_strength_hydraulic_state": "PARTIAL DIVERGE. EIG reasons only over a fixed discretized hypothesis grid (start/duration/strength/demand bins) built once ahead of time; the harness's real re-simulation uses the scenario's true continuous parameters. Whenever the true incident's parameters fall between the artifact's discretization bins, EIG's peak-value predictions for the correct hypothesis will not exactly match what the harness's fresh re-simulation would show at ANY time, compounding the time-semantics mismatch above.",
+      "noise_semantics": "DIVERGE. EIG assumes samples arrive corrupted by N(0, 0.05^2) mg/L Gaussian noise when computing expected information gain; the harness's real samples are noiseless deterministic WNTR output. This means EIG's information-gain estimate is, if anything, conservative relative to what a noiseless real sample could deliver -- the opposite-direction error from the time-semantics mismatch above (that one over-estimates value, this one under-estimates it), so the two do not simply cancel; their combined net effect on real recommendation quality is exactly what section 33's real experiment below measures empirically rather than assuming analytically.",
+      "sensor_model": "MATCH (trivially) for pressure -- rank_sample_locations does not use pressure_m in its scoring at all (only concentration `traces`), so the harness's fixed pressure_m=25.0 (same constant used for initial evidence) does not directly corrupt EIG's own candidate ranking, though it still corrupts the PRESSURE-derived HydroCore features once the sample is folded back into `analyze()`, a distinct issue from the EIG audit itself.",
+      "time_semantics": "DIVERGE. EIG's information-gain/detection-probability math is built on a peak-over-time prediction vector (traces.max over the full hypothesis trajectory); the harness's real delivered sample is instead whatever concentration exists at the FINAL timestep of the full simulated horizon. For a bounded contaminant release (duration_minutes typically well under the network's 24h horizon), a plume's concentration at most nodes peaks mid-trajectory then decays toward baseline by the end of a 24h simulation -- so the harness's real sample is systematically biased toward LOW/near-baseline values relative to what EIG's own scoring assumed it was optimizing detectability/separation for. This is a genuine, structural EIG/harness observation-model mismatch, not merely sparse evidence."
+    }
+  },
+  "schema_version": 1,
+  "sections": "30_active_sampling_observation_model_audit_33_sample_time_ablation"
+}

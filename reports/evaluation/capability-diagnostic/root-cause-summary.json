@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "section": "42_43_root_cause_ranking_and_taxonomy",
+  "cap_findings": {
+    "CAP-DATA-01": {
+      "title": "golden-reference network built two different ways (programmatic vs .inp-file-loaded) diverges by structural hash",
+      "taxonomy": "CAP-DATA",
+      "severity": "HIGH",
+      "source": "reports/evaluation/capability-diagnostic/network-parity.json",
+      "confirmed_independently_by": ["network-parity.json (agent 1)", "calibration-analysis.json CAP-CAL-01 (agent 2, independent investigation)", "direct hand computation this session", "confirmation-holdout.json (fresh 40-scenario replication)"],
+      "measured_effect": "top1 0.95 (scenario-hash arm) vs 0.85 (production-hash arm), classical_prior mean abs diff 0.44 (N=20); replication set: identical qualitative pattern (N=20 fresh)."
+    },
+    "CAP-CAL-01": {
+      "title": "Direct consequence of CAP-DATA-01: golden-reference network hash is absent from validated_topology_hashes at serving time",
+      "taxonomy": "CAP-CAL",
+      "severity": "HIGH",
+      "source": "reports/evaluation/capability-diagnostic/calibration-analysis.json",
+      "measured_effect": "231/264 (87.5%) of the real LIVE post-remediation campaign runs against golden-reference; calibrated_rate=0.0% for all of them (verified directly against reports/evaluation/live-robustness/post-remediation-results.json this session). loop-grid (9/264, no construction-path asymmetry) is 100% calibrated -- exact match to the predicted pattern."
+    },
+    "CAP-OOD-01": {
+      "title": "Same network-hash mismatch (CAP-DATA-01) forces OOD=CAUTION for every golden-reference LIVE incident via a hard override, independent of any real distributional anomaly",
+      "taxonomy": "CAP-OOD",
+      "severity": "HIGH",
+      "source": "src/hydroswarm/inference/ood.py:44-49 (topology_novelty returns 1.0 whenever network_hash not in validated_network_hashes) and line 128 (`if network_novelty > 0 and level == OODLevel.NORMAL: level = OODLevel.CAUTION`) -- read and confirmed directly this session, not from a subagent report.",
+      "measured_effect": "All 12 real LIVE nominal:clean_operational records (perturbation_type=nominal, the closest analog to a clean controlled scenario) show ood_level=CAUTION, never NORMAL -- verified directly against reports/evaluation/live-robustness/post-remediation-results.json this session. This is the SAME root cause as CAP-CAL-01, manifesting through a second, independent gate (OOD) via validated_network_hashes being derived from the identical calibration artifact's validated_topology_hashes. Together CAP-DATA-01/CAP-CAL-01/CAP-OOD-01 form a single causal chain: one float-precision network-hash mismatch simultaneously defeats both suppression gates for 87.5% of LIVE traffic."
+    },
+    "CAP-CAL-02": {
+      "title": "Mondrian (per-network, per-condition) conformal scores are unreachable at runtime; candidate_set always falls back to pooled global scores",
+      "taxonomy": "CAP-CAL",
+      "severity": "MEDIUM",
+      "source": "reports/evaluation/capability-diagnostic/calibration-analysis.json",
+      "measured_effect": "Real call site passes network_id=str(getattr(network,'name','unknown')) (e.g. 'hydroswarm-demo') against an artifact keyed by clean corpus family names, and never passes condition= at all -- confirmed by direct source inspection. Secondary to CAP-CAL-01 (does not by itself explain near-zero planning eligibility) but means even a CAP-CAL-01 fix would not deliver the artifact's intended per-condition precision."
+    },
+    "CAP-PARITY-01": {
+      "title": "Production health channel does not reflect missing==True",
+      "taxonomy": "CAP-PARITY",
+      "severity": "MEDIUM",
+      "source": "reports/evaluation/capability-diagnostic/train-serve-parity.json",
+      "measured_effect": "60 affected (node,timestep) cells across 17/20 fresh scenarios; also corrupts node_features' current-health snapshot column on 4/20 scenarios when a node's latest reading is missing."
+    },
+    "CAP-PARITY-02": {
+      "title": "HybridInferencePipeline.analyze's feature_building stage never passes window_steps, silently defaulting to 12 instead of training's full-trajectory length (25)",
+      "taxonomy": "CAP-PARITY",
+      "severity": "LOW-MEDIUM",
+      "source": "reports/evaluation/capability-diagnostic/train-serve-parity.json",
+      "measured_effect": "Confirmed via direct tensor shape divergence ([1,25,...] vs [1,12,...]) under mathematically-equivalent full evidence. Rarely binds today given current LIVE evidence sparsity (CAP-TEMPORAL-01 below dominates), but would independently start truncating evidence the moment incidents carry >12 real observations."
+    },
+    "CAP-TEMPORAL-01": {
+      "title": "LIVE robustness harness sends exactly ONE observation per sensor (last valid reading only) as initial incident evidence, vs training's full 25-timestep/24-hour trajectory",
+      "taxonomy": "CAP-TEMPORAL",
+      "severity": "HIGH",
+      "source": "src/hydroswarm/evaluation/live_robustness.py _payloads, lines ~204-238 (position = valid[-1]); reports/evaluation/capability-diagnostic/temporal-ablation.json; reports/evaluation/capability-diagnostic/confirmation-holdout.json",
+      "measured_effect": "LATEST-k evidence stays flat/noisy (top1 0.15-0.35) for k=1..12 while CAUSAL-PREFIX (earliest-k, a real growing trajectory) reaches top1=1.0 by just 6 timesteps and full-25 reaches 0.95-1.0. The single-last-reading policy is close to the LEAST informative evidence choice available for this system's classical signature matching, which depends on contamination-onset dynamics a late-window slice misses. Confirmed on an independent fresh 40-scenario holdout: latest-1 top1=0.05 vs full-trajectory top1=1.0.",
+      "note": "This is a harness/product evidence-policy choice, not a code defect per se -- classified CAP-TEMPORAL (evidence-history/timing mismatch) per the taxonomy, distinct from CAP-HARNESS (which would imply the measurement itself is wrong rather than the evidence-content choice)."
+    },
+    "CAP-SAMPLE-01": {
+      "title": "Active-sampling EIG scoring and the LIVE harness's actual sample-acquisition behavior diverge on two independent axes",
+      "taxonomy": "CAP-SAMPLE",
+      "severity": "MEDIUM",
+      "source": "reports/evaluation/capability-diagnostic/sampling-analysis.json; src/hydroswarm/sampling/active.py (rank_sample_locations has no time-of-observation parameter, assumes Gaussian noise std=0.05mg/L); src/hydroswarm/evaluation/live_robustness.py (harness always samples at end-of-24h-horizon with zero added noise)",
+      "measured_effect": "Confirmed empirically: with sensor_count reduced to 2 (default golden-reference sensor_count=4 already saturates all candidates, making sampling structurally unreachable at default config -- a related, secondary finding), every recommended sample's real concentration came back exactly 0.0 mg/L (end-of-horizon decay), yet entropy still dropped ~0.88 bits on average from the informative null reading; top1 stayed 0/5. Distinct from, and secondary to, CAP-TEMPORAL-01 -- but the pre-existing 300-scenario classical_eig-vs-random comparison (reports/results/v4/pre-freeze-implementation-handoff.md, cited not re-run) already shows real classical EIG beats random on a fair operational metric (69.7% vs 61.0% resolved-within-3), so the sampling ALGORITHM itself is not the primary problem -- its assumptions about WHEN a sample is taken diverge from what this specific harness does."
+    },
+    "CAP-DATA-02": {
+      "title": "training/permutation.py's mask-key tuples omit sensor_mask/quality_mask, producing internally-inconsistent permuted examples",
+      "taxonomy": "CAP-DATA",
+      "severity": "LOW (dormant/unused production code path)",
+      "source": "reports/evaluation/capability-diagnostic/node-order-audit.json",
+      "measured_effect": "Not invoked anywhere in the real training loop today (dormant). After correcting the permutation locally within the diagnostic script only (no production files touched), the real model IS genuinely node-order equivariant across all 3 governed families (~1e-6 max diff, 30/30 agreement) -- this bug does NOT explain any of the LIVE gap; flagged only because it would silently corrupt any future permutation-augmentation training run."
+    }
+  },
+  "not_supported": {
+    "pressure_representation": "Fixed 25m pressure (matching the real LIVE harness exactly) does NOT measurably distort top1 (0.80 vs 0.80 true-pressure baseline, N=15) -- ruled out as a primary driver.",
+    "sensor_series_reconstruction": "All 7 tested cases (multi-sensor-per-node merge, grab-sample-at-new-node, out-of-order timestamps, delayed/missing interleaving) behave correctly -- no spurious duplicate-series defect.",
+    "classical_prior_distribution_shift": "Coastal (unseen) topology's runtime-generated prior is NOT degenerate (JS divergence from governed-topology shape = 0.0089, far closer than either-vs-uniform's 0.11-0.196).",
+    "node_order_permutation_bug_in_deployed_model": "The real frozen model IS genuinely node-order equivariant (see CAP-DATA-02 above -- the apparent bug was in unused diagnostic/training tooling, not the deployed model).",
+    "tensor_nondeterminism": "10 stored validation examples run 3x each are bit-identical across repeats.",
+    "observability_ceiling": "No confusable source-node pairs found on golden-reference (closest pair distance 108.5, clearly distinct peak magnitudes) -- current localization failures are not explained by fundamental physical unobservability.",
+    "neural_capacity": "4.18M-parameter model reproduces its documented controlled-eval range exactly; classified DISTRIBUTION-SHIFTED (not underfit) given strong validation/development-holdout numbers alongside the concrete construction-path and evidence-content defects found; oracle-perfect classical prior substitution only adds +0.10 top1 over an already-high full-trajectory baseline (0.90->1.0), showing limited headroom from that specific component."
+  },
+  "root_cause_ranking": [
+    {
+      "rank": "PRIMARY",
+      "cause": "Evidence sparsity / temporal-evidence mismatch (CAP-TEMPORAL-01)",
+      "evidence_strength": "Very high -- direct causal experiment (temporal ablation) plus independent confirmation-holdout replication, both showing top1 collapsing from ~0.95-1.0 (full trajectory) to 0.15-0.35 (last-reading-only) on the SAME frozen model/weights.",
+      "estimated_contribution_to_poor_live_utility": "Dominant driver of the raw top-1/top-3/MRR localization gap (controlled 0.72 vs LIVE 0.31).",
+      "remediation_cost": "LOW -- harness/product change only (send real recent history instead of one snapshot); no model or calibration change required.",
+      "regression_risk": "LOW.",
+      "likely_impact": "Very high -- this alone plausibly recovers most of the raw localization gap."
+    },
+    {
+      "rank": "PRIMARY",
+      "cause": "Network-identity construction mismatch cascading into calibration and OOD suppression (CAP-DATA-01 / CAP-CAL-01 / CAP-OOD-01)",
+      "evidence_strength": "Very high -- one root cause verified three independent ways (two independent subagent investigations converging + this session's direct hand-verification), cross-checked exactly against the real 264-run LIVE dataset (golden-reference 0% calibrated, loop-grid 100%; all 12 nominal LIVE records show OOD=CAUTION never NORMAL), and replicated on a fresh confirmation holdout.",
+      "estimated_contribution_to_poor_live_utility": "Dominant driver of the near-zero planning-eligible rate (0.012) -- affects 87.5% of the real LIVE campaign (every golden-reference incident) via two independent suppression gates simultaneously.",
+      "remediation_cost": "LOW -- use the same network-construction path (file-loaded .inp, matching what V4PipelineFactory already does in production) consistently at corpus-generation/calibration-fit time too, or normalize/round floats before hashing.",
+      "regression_risk": "LOW-MEDIUM -- requires re-fitting calibration/signature artifacts against the corrected hash, but does not touch model weights or fusion logic.",
+      "likely_impact": "Very high -- this alone plausibly recovers the overwhelming majority of the planning-eligibility gap for the single most-tested network."
+    },
+    {
+      "rank": "SECONDARY",
+      "cause": "Train/serve construction-path defects (CAP-PARITY-01 health-channel bug, CAP-PARITY-02 window_steps default)",
+      "evidence_strength": "High -- confirmed via direct tensor-level diffing against real production code on 20 fresh scenarios; CAP-PARITY-01 traced to a specific missing check in real, currently-deployed code.",
+      "estimated_contribution_to_poor_live_utility": "Modest today (small cell counts, CAP-PARITY-02 rarely binds while evidence is already sparse) but would compound significantly if CAP-TEMPORAL-01 is fixed and incidents start carrying richer real evidence.",
+      "remediation_cost": "LOW -- both are small, localized code fixes.",
+      "regression_risk": "LOW.",
+      "likely_impact": "Low today, MEDIUM after CAP-TEMPORAL-01 is remediated -- should be fixed in the same remediation pass to avoid re-discovering it later."
+    },
+    {
+      "rank": "SECONDARY",
+      "cause": "Calibration Mondrian-key mismatch (CAP-CAL-02) and active-sampling observation-model mismatch (CAP-SAMPLE-01)",
+      "evidence_strength": "Medium-high -- both confirmed by direct source inspection and (for CAP-SAMPLE-01) a real empirical demonstration (recommended samples returning exactly 0.0 mg/L).",
+      "estimated_contribution_to_poor_live_utility": "Secondary refinements: CAP-CAL-02 affects candidate-set precision only for the small fraction of incidents that already pass calibration; CAP-SAMPLE-01 affects the marginal value of the sampling loop, not initial localization.",
+      "remediation_cost": "LOW-MEDIUM.",
+      "regression_risk": "LOW.",
+      "likely_impact": "Low-Medium -- worth fixing but not blocking."
+    },
+    {
+      "rank": "TERTIARY",
+      "cause": "Fusion policy interactions (fusion 'harms' the correct component in 12.9% of LIVE incidents, dominated by classical-was-right-fusion-wrong rather than the protocol's warned-against neural-good/hybrid-bad pattern)",
+      "evidence_strength": "Medium -- real, measured (33/255 cases), but overall fusion regret vs best single component is small (-0.012) and classical-only performs far worse than neural-only in this LIVE dataset (0.176 vs 0.318), so fusion is not badly miscalibrated given how weak the classical branch already is under CAP-TEMPORAL-01/CAP-DATA-01's degraded evidence.",
+      "estimated_contribution_to_poor_live_utility": "Small, and likely to shrink substantially once the two PRIMARY causes are fixed (classical localization quality is itself a downstream victim of sparse/mismatched evidence, not an independent fusion-logic defect).",
+      "remediation_cost": "MEDIUM if attempted now (risk of overfitting a fusion adjustment to symptoms of the primary causes).",
+      "regression_risk": "MEDIUM -- do not tune fusion before fixing CAP-TEMPORAL-01/CAP-DATA-01, or any tuning will be fit to the wrong regime.",
+      "likely_impact": "Low as an independent fix; re-evaluate AFTER primary fixes land."
+    },
+    {
+      "rank": "NOT SUPPORTED",
+      "cause": "Neural model capacity (hypothesis O)",
+      "evidence_strength": "High confidence this is NOT the primary bottleneck -- controlled reproduction exactly matches documented range, tensor forward passes are deterministic, oracle-prior substitution shows limited headroom (+0.10 top1) over an already-high full-trajectory baseline, and the LIVE gap is fully explained (with real causal experiments, not correlational ones) by evidence-content and construction-path issues that have nothing to do with parameter count.",
+      "estimated_contribution_to_poor_live_utility": "Not supported by this diagnostic's evidence.",
+      "remediation_cost": "N/A -- no capacity-scaling pilot was run; per diagnostic.txt Section 40's own stated preconditions (train/serve parity must pass, evidence semantics must be matched, calibration/fusion must not be the main loss, neural-only must remain weak, capacity/underfitting must be indicated), NONE of the preconditions held after Sections 5-38, so running it would not have been diagnostically justified.",
+      "regression_risk": "N/A.",
+      "likely_impact": "Not supported; do not pursue before the PRIMARY/SECONDARY causes above are remediated and re-measured."
+    }
+  ],
+  "optional_pilots": {
+    "section_40_capacity_scaling_pilot": {
+      "run": false,
+      "justification": "diagnostic.txt Section 40 explicitly requires NOT running this automatically, only if diagnostics support a capacity bottleneck. Preconditions checked against real evidence: train/serve parity does NOT pass (CAP-PARITY-01/02 found); input/evidence semantics are NOT matched (CAP-TEMPORAL-01, CAP-DATA-01); calibration/fusion clearly ARE a large part of the performance loss (CAP-CAL-01/CAP-OOD-01 explain the suppression gap almost entirely); the model is not classified as underfit (model-capacity-diagnostics.json: DISTRIBUTION-SHIFTED). Zero of five stated preconditions were met -- skipped with justification, not fabricated."
+    },
+    "section_41_data_diversity_pilot": {
+      "run": false,
+      "justification": "Requires 'topology transfer poor but in-topology performance good'. topology-analysis.json found the OPPOSITE pattern on a small sample (N=8/condition): branched-loop (a TRAINED family) scored top1=0.625, actually WORSE than coastal-branch (an UNTRAINED, unseen family) at top1=0.75 -- the precondition does not hold, and the small-sample noise plus the network-identity confound (CAP-DATA-01 likely also affects non-golden-reference topologies to a lesser degree, not fully characterized) make this an unreliable basis for a data-diversity pilot right now. Skipped with justification; flagged as worth re-checking AFTER CAP-DATA-01 is fixed, since the current topology comparison itself may be confounded by the same construction-path issue."
+    }
+  }
+}

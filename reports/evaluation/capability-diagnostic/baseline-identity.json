@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-08-13T00:00:00Z",
+  "purpose": "Section 0 baseline identity record for the capability diagnostic (docs/evaluation/CAPABILITY_DIAGNOSTIC_PROTOCOL.md). Captured before any diagnostic experiments were run.",
+  "git": {
+    "main_sha_expected": "f06642421f8bbeefe5615812b143d14cf10bcda8",
+    "main_sha_actual": "f06642421f8bbeefe5615812b143d14cf10bcda8",
+    "main_sha_match": true,
+    "diagnostic_branch": "diag/capability-bottleneck",
+    "diagnostic_branch_base_sha": "f06642421f8bbeefe5615812b143d14cf10bcda8"
+  },
+  "model": {
+    "architecture_version": "hydrocore-v4",
+    "variant": "small (HydroCore-S)",
+    "model_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+    "checkpoint_identity_fingerprint": "a94069adba25230f58f24f57901b855fab3a702aabd5e30cf0bc105e002e90a1",
+    "bundle_dir": "models/hydrocore-v4-release",
+    "parameter_count_actual_bundle": 4182612,
+    "parameter_count_documented_readme": "4.18M (4,182,612)",
+    "parameter_report": {
+      "total": 4182612,
+      "trainable": 4182612,
+      "backbone": 2989248,
+      "encoders": 941376,
+      "adapters": 0,
+      "heads": 251987
+    },
+    "note_selftest_parameter_count_discrepancy": "hydroswarm self-test's top-level `model_parameters` field (observed: 24416119) is computed from a freshly-constructed default-config HydroCore() instance (src/hydroswarm/cli.py line ~77-78), used only to smoke-test forward-pass wiring -- it is NOT the deployed checkpoint's parameter count. The actual served model (loaded via V4PipelineFactory from models/hydrocore-v4-release, confirmed by direct load in this session) has 4,182,612 parameters, matching README/MODEL_CARD/FINAL_SYSTEM docs exactly. Logged as a minor self-test reporting artifact, not a capability defect; flagged for the taxonomy pass (CAP-HARNESS candidate)."
+  },
+  "calibration": {
+    "artifact_path": "experiments/runs/v4-checkpoint-identity/no_adapters-seed20260810/calibration.json",
+    "artifact_hash": "829c167b267b3ce32f55559f3aec4b4933e337f3358e22e1f792a26b402f68fa",
+    "status": "FITTED",
+    "alpha": 0.1,
+    "coverage_target": 0.9,
+    "empirical_coverage": 0.9143258426966292,
+    "mean_candidate_set_size": 2.800561797752809,
+    "expected_calibration_error": 0.0878951730544455
+  },
+  "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "feature_schema_version": "hydroswarm-features-v2",
+  "target_schema_hash": "2f00d174369d48e09c413c76da0c97fddf78630e8e1260d16cf07c43b9034cb1",
+  "normalization": {
+    "normalization_hash": "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114",
+    "node_normalization_sha256": "4dcf22a68839a8630e83b0e90f47ac3400b176b576e76d8bee5662221d238691",
+    "edge_normalization_sha256": "3e715d707475d81eba90de6609246f51bb0eee8a94c58eab4958f4370fca514d",
+    "source": "data/learning-v2/cycle-b2/normalization (train-split-fit, committed, not none)"
+  },
+  "fusion_configuration": {
+    "fusion_policy_hash": "fuse_source_probabilities-v1",
+    "fusion_policy_name": "DYNAMIC_TRUST_FUSION_CONFIG"
+  },
+  "signature_policy": {
+    "signature_policy_version": "hydroswarm-signature-policy-v1",
+    "signature_policy_hash": "06e31d922261509c3aaae558262d3b5748b42a3a7bb26c4218a6e56acb686811",
+    "signature_artifact_policy_version": "topology-wide-v1",
+    "modes": ["GOVERNED_KNOWN_NETWORK (3 known topologies)", "RUNTIME_GENERATED_IMPORTED_NETWORK"]
+  },
+  "thresholds": {
+    "calibration_alpha": 0.1,
+    "disagreement_threshold": 0.50,
+    "evidence_threshold": 0.55,
+    "maximum_planning_candidates": 3,
+    "ood_caution_threshold": 0.45,
+    "ood_outside_threshold": 0.75,
+    "source_module": "src/hydroswarm/inference/pipeline.py (HybridInferencePipeline defaults), src/hydroswarm/inference/ood.py (OODReference defaults)"
+  },
+  "environment": {
+    "wntr_version": "1.5.0",
+    "python_version": "3.12.13",
+    "torch_version": "2.13.0+cu130",
+    "torch_cuda_available": false,
+    "platform": "Linux aa0ee0daedaa 6.17.0-1022-gcp #25-Ubuntu SMP aarch64 GNU/Linux"
+  },
+  "locked_test_opened_before": false,
+  "architecture_freeze_manifest": "reports/results/v4/architecture-freeze.json",
+  "architecture_freeze_status": "FROZEN",
+  "prior_measured_context_from_architecture_freeze": {
+    "learned_scout_sampling": "disabled -- negative realized entropy reduction vs. random/fixed-order, a direct measured fail of its own promotion requirement (relevant prior evidence for diagnostic Section 30-31)",
+    "learned_strategist_prescreen": "disabled -- does not beat deterministic heuristic ordering at same exact-simulator budget (relevant prior evidence for diagnostic Section 14/23)",
+    "learned_ood_category": "present but untrained (near-chance macro F1 0.095), excluded from every governance set",
+    "authoritative_gates": "source localization is CALIBRATED_ADVISORY at best; conformal calibration + deterministic disagreement/OOD gating control planning eligibility (directly relevant to diagnostic Section 27 suppression decomposition)"
+  }
+}
