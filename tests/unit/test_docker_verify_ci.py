@@ -126,6 +126,33 @@ def test_verify_script_covers_the_full_real_production_lifecycle() -> None:
         assert endpoint in text
 
 
+def test_live_fixture_does_not_fabricate_a_recommendation_when_sampler_stops() -> None:
+    module = _load_verify_script_module()
+    signatures = {"J1": 0.0, "J2": 0.2, "J8": 1.0}
+
+    node_id, origin = module._sample_node_for_live_fixture(
+        409,
+        {"detail": "marginal_value_below_threshold"},
+        signatures=signatures,
+        observed_node="J1",
+    )
+
+    assert (node_id, origin) == ("J8", "OPERATOR_GRAB_SAMPLE")
+
+
+def test_live_fixture_preserves_a_valid_sampler_recommendation() -> None:
+    module = _load_verify_script_module()
+
+    node_id, origin = module._sample_node_for_live_fixture(
+        200,
+        {"node_id": "J2"},
+        signatures={"J1": 0.0, "J2": 0.2},
+        observed_node="J1",
+    )
+
+    assert (node_id, origin) == ("J2", "SAMPLER_RECOMMENDATION")
+
+
 def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> None:
     """A verified plan creates the sole current approval boundary for the CI run."""
     module = _load_verify_script_module()
@@ -139,7 +166,7 @@ def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> 
             return 200, {
                 "network_filename": "network.inp",
                 "network_inp_text": "[TITLE]",
-                "candidate_signatures_mg_l": {"J1": 1.0},
+                "candidate_signatures_mg_l": {"J1": 1.0, "J2": 0.5},
                 "initial_observation": {
                     "sensor_id": "S-J1",
                     "node_id": "J1",
@@ -153,7 +180,7 @@ def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> 
         if path == "/api/incidents":
             return 201, {"incident_id": incident_id}
         if path.endswith("/samples/recommend"):
-            return 200, {"node_id": "J1"}
+                return 200, {"node_id": "J2"}
         if path.endswith("/plans/generate"):
             return 200, [{"plan_id": first_plan_id}, {"plan_id": second_plan_id}]
         if path.endswith(f"/plans/{first_plan_id}/verify"):

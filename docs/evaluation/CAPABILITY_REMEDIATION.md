@@ -92,7 +92,8 @@ The final local validation record is published in `validation.json`:
 1,136 Python tests passed with one documented historical skip in 657.36
 seconds; the strict self-test passed; and frontend lint, typecheck, format,
 test (29 files/162 tests), and build gates all passed. The focused remediation
-suite also passed 31 tests.
+suite also passed 31 tests. Following the Docker CI regression, its focused
+helper/authority regression set passed 24 tests.
 
 ## Remaining limitation and next step
 

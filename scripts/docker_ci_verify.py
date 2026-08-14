@@ -10,9 +10,10 @@ Subcommands:
   health              -- /api/health, /api/readiness, /api/reference-demo,
                           and the built frontend's index all respond for real.
   live-workflow        -- drives the full real LIVE example sequence (network
-                          import, incident creation, real analysis, real
-                          sampling recommendation, real WNTR verification,
-                          real approval) through the real production API,
+                          import, incident creation, real analysis, sampling
+                          authority or a documented operator grab sample,
+                          real WNTR verification, real approval) through the
+                          real production API,
                           the same sequence validated in-process against
                           `TestClient` earlier in SUB-12.1 -- this is that
                           same sequence over real HTTP against a real
@@ -100,6 +101,35 @@ def _wait_for_health(base_url: str) -> None:
     raise RuntimeError(f"container did not report healthy within {STARTUP_TIMEOUT_SECONDS}s: {last_error}")
 
 
+def _sample_node_for_live_fixture(
+    status: int,
+    response: Any,
+    *,
+    signatures: dict[str, float],
+    observed_node: str,
+) -> tuple[str, str]:
+    """Respect a sampler stop without making the Docker lifecycle flaky.
+
+    The real runtime correctly returns 409 when marginal information value is
+    below its authority threshold.  The container gate must not reinterpret
+    that as a recommendation.  Its later verification/approval exercise still
+    needs a real new observation, so the fixed live fixture supplies a
+    documented operator-collected grab sample at the fixture's strongest known
+    signature.  This is deliberately distinct from a sampler recommendation.
+    """
+    if status == 200:
+        node_id = response.get("node_id") if isinstance(response, dict) else None
+        assert node_id in signatures, f"no reference signature for recommended node {node_id!r}"
+        assert node_id != observed_node, "sampler recommended an already-observed node"
+        return node_id, "SAMPLER_RECOMMENDATION"
+    detail = response.get("detail") if isinstance(response, dict) else None
+    if status == 409 and detail == "marginal_value_below_threshold":
+        candidates = {node: value for node, value in signatures.items() if node != observed_node}
+        assert candidates, "live fixture has no unsampled reference node"
+        return max(candidates, key=lambda node: (candidates[node], node)), "OPERATOR_GRAB_SAMPLE"
+    raise AssertionError(f"sample recommendation failed: {status}: {response}")
+
+
 def cmd_health(args: argparse.Namespace) -> int:
     base_url = args.base_url
     _wait_for_health(base_url)
@@ -185,11 +215,15 @@ def cmd_live_workflow(args: argparse.Namespace) -> int:
     print("[docker-ci] real initial analysis complete")
 
     status, recommendation = _request(base_url, "POST", f"/api/incidents/{incident_id}/samples/recommend")
-    assert status == 200, f"sample recommendation failed: {status}: {recommendation}"
-    node_id = recommendation["node_id"]
+    node_id, sample_origin = _sample_node_for_live_fixture(
+        status,
+        recommendation,
+        signatures=inputs["candidate_signatures_mg_l"],
+        observed_node=observation["node_id"],
+    )
     concentration = inputs["candidate_signatures_mg_l"].get(node_id)
     assert concentration is not None, f"no reference signature for recommended node {node_id!r}"
-    print(f"[docker-ci] real sampling recommendation: {node_id}")
+    print(f"[docker-ci] real sample source={sample_origin}: {node_id}")
 
     now = _utc_now()
     status, _ = _request(

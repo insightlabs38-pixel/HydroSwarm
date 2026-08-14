@@ -200,6 +200,13 @@ def main() -> int:
                 "failed": 0,
                 "duration_seconds": 4.56,
             },
+            "ci_docker_helper_regression": {
+                "command": ".venv/bin/python -m pytest -q tests/unit/test_docker_verify_ci.py tests/scientific/test_active_sampling.py tests/integration/test_production_runtime_wiring.py",
+                "passed": 24,
+                "failed": 0,
+                "duration_seconds": 4.50,
+                "purpose": "CI helper respects marginal-value sampling stop and uses a documented operator grab sample for the fixture lifecycle.",
+            },
             "full_python": {
                 "command": ".venv/bin/python -m pytest -q",
                 "passed": 1136,
