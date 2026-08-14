@@ -116,14 +116,14 @@ def _evaluate_checkpoint_at_depth(
                 ranks.append(rank)
 
             if "evidence_sufficiency" in targets and "evidence_sufficiency" in output:
-                truth_es = targets["evidence_sufficiency"].bool().tolist()
-                pred_es = (output["evidence_sufficiency"].squeeze(-1) >= 0.5).tolist() if output["evidence_sufficiency"].dim() > 1 else (output["evidence_sufficiency"] >= 0.5).tolist()
+                truth_es = targets["evidence_sufficiency"].bool().reshape(-1).tolist()
+                pred_es = (output["evidence_sufficiency"].reshape(-1) >= 0.5).tolist()
                 evidence_suff_truth.extend(truth_es)
                 evidence_suff_pred_correct.extend(p == t for p, t in zip(pred_es, truth_es, strict=True))
 
             if "event_presence" in targets and "event_presence_logits" in output:
-                pred_presence = (torch.sigmoid(output["event_presence_logits"]).squeeze(-1) >= 0.5).tolist()
-                truth_presence = targets["event_presence"].bool().tolist()
+                pred_presence = (torch.sigmoid(output["event_presence_logits"]).reshape(-1) >= 0.5).tolist()
+                truth_presence = targets["event_presence"].bool().reshape(-1).tolist()
                 event_presence_correct.extend(p == t for p, t in zip(pred_presence, truth_presence, strict=True))
 
             if "event_cause" in targets and "event_cause_logits" in output:
