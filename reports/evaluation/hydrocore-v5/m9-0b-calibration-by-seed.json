@@ -1,0 +1,100 @@
+{
+  "alpha": 0.1,
+  "checkpoint_provenance": {
+    "20260814": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+    "20260815": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+    "31874": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe"
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "schemes": {
+    "BROAD_FALLBACK_CONTROL": {
+      "per_seed": {
+        "20260814": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "20260815": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "31874": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        }
+      }
+    },
+    "CURRENT_FAMILY_DEPTH": {
+      "per_seed": {
+        "20260814": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "20260815": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "31874": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        }
+      }
+    },
+    "HIERARCHICAL_CONSERVATIVE": {
+      "per_seed": {
+        "20260814": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "20260815": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "31874": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        }
+      }
+    },
+    "POOLED_DEPTH_AWARE": {
+      "per_seed": {
+        "20260814": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "20260815": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        },
+        "31874": {
+          "alpha": 0.1,
+          "checkpoint_sha256": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe",
+          "n_calibration_rows": 1050,
+          "n_development_rows": 336
+        }
+      }
+    }
+  }
+}
