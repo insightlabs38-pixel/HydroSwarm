@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "purpose": "HydroCore-v5 Milestone 9.1 preflight correction: machine-readable record of the two implementation fixes (ODE/SDE first-valid-evidence initial state; GRAPH_CDE mask-aware control path) applied against the already-frozen M9.1 preflight protocol, before any scientific M9.1 evaluation.",
+  "correction_doc": "docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md",
+  "original_protocol_modified": false,
+  "starting_sha": "9c7fc06926b2bfa5eb7feedf46345dd1298a2ac3",
+  "development_holdout_inspected": false,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "issue_1_ode_sde_initial_state": {
+    "original_behavior": "_PooledEvidenceInitialState masked-mean-pooled the ENTIRE causally-available prefix (all valid temporal/quality steps) into h0, for both GRAPH_ODE and GRAPH_SDE.",
+    "corrected_behavior": "_FirstValidEvidenceInitialState: h0 is built from ONLY each modality's own first causally-valid observation, per batch item / node, independently for temporal and quality; a modality with no valid observation gets a deterministic zero vector.",
+    "helper_used": "_FirstValidEvidenceInitialState (shared by GraphODEDynamics and GraphSDEDynamics)",
+    "parameter_shape_unchanged": true,
+    "tests_added": [
+      "test_first_valid_selects_first_valid_step_not_array_position_zero",
+      "test_first_valid_all_missing_modality_gives_deterministic_zero",
+      "test_initial_state_later_values_do_not_change_h0",
+      "test_initial_state_temporal_and_quality_first_valid_may_differ",
+      "test_ode_initial_state_uses_first_valid_evidence_end_to_end",
+      "test_sde_shares_first_valid_initial_state_semantics_with_ode"
+    ],
+    "all_tests_passed": true
+  },
+  "issue_2_cde_missingness": {
+    "original_behavior": "GraphCDEDynamics._build_path_values accepted sensor_mask/quality_mask but never used them; a genuinely observed zero and a missing zero-filled position were structurally identical in the control path X_t.",
+    "corrected_behavior": "X_t gains two explicit validity channels, sensor_valid and quality_valid (0.0/1.0 per [batch,time,node], via the existing _valid_mask convention). input_channels = 1 (relative_time) + temporal_feature_dim + quality_feature_dim + 2.",
+    "sensor_valid_represented": true,
+    "quality_valid_represented": true,
+    "observed_zero_vs_missing_zero_distinguished": true,
+    "tests_added": [
+      "test_cde_control_path_includes_sensor_and_quality_valid_channels",
+      "test_cde_observed_zero_differs_from_missing_zero",
+      "test_cde_missing_intermediate_report_stays_finite_and_causal",
+      "test_cde_depth_one_preserves_evidence_and_validity_exactly"
+    ],
+    "all_tests_passed": true,
+    "causality_gate": {
+      "future_evidence_cannot_affect_earlier_cutoff_max_diff": "<=1e-6",
+      "non_vacuousness_check_passed": true,
+      "retested_after_correction": true,
+      "passed": true
+    },
+    "depth_one_behavior": {
+      "finite": true,
+      "deterministic": true,
+      "validity_channel_preserved_exactly": true
+    }
+  },
+  "parameter_matching": {
+    "baseline_total_params": 4182612,
+    "original": {
+      "GRAPH_ODE": {"mlp_width": 574, "total_params": 4184118, "delta_percent": 0.036006208560583675},
+      "GRAPH_CDE": {"mlp_width": 242, "total_params": 4183082, "delta_percent": 0.011236997359544705},
+      "GRAPH_SDE": {"mlp_width": 464, "total_params": 4183540, "delta_percent": 0.022187092658845716}
+    },
+    "corrected": {
+      "GRAPH_ODE": {"mlp_width": 574, "total_params": 4184118, "delta_percent": 0.036006208560583675, "changed": false},
+      "GRAPH_CDE": {"mlp_width": 214, "total_params": 4182894, "delta_percent": 0.006742198415726823, "changed": true},
+      "GRAPH_SDE": {"mlp_width": 464, "total_params": 4183540, "delta_percent": 0.022187092658845716, "changed": false}
+    },
+    "every_novel_arm_within_5_percent": true
+  },
+  "physical_time_and_structural_retests": {
+    "ode_timestamp_origin_invariance_pass": true,
+    "cde_timestamp_origin_invariance_pass": true,
+    "sde_timestamp_origin_invariance_same_brownian_seed_pass": true,
+    "ode_physical_gap_plumbing_pass": true,
+    "ode_zero_duration_depth_one_identity_pass": true,
+    "ode_node_permutation_invariance_pass": true,
+    "cde_node_permutation_invariance_pass": true,
+    "sde_drift_diffusion_permutation_equivariance_pass": true,
+    "sde_explicit_noise_permuted_full_path_equivariance_pass": true
+  },
+  "sde_retests": {
+    "fixed_seed_reproducibility_pass": true,
+    "different_seed_stochasticity_pass": true,
+    "zero_diffusion_collapse_pass": true,
+    "diffusion_scale_changed": false,
+    "dt_changed": false,
+    "solver_method_changed": false
+  },
+  "baseline_equivalence": {
+    "hydrocore_default_construction_unaffected_pass": true,
+    "current_wrapper_matches_vanilla_hydrocore_pass": true
+  },
+  "forward_backward_finiteness": {
+    "CURRENT": {"forward_finite": true, "backward_finite": true, "loss_finite": true, "mini_overfit_initial_loss": 0.6828044056892395, "mini_overfit_final_loss": 0.005647639278322458},
+    "GRAPH_ODE": {"forward_finite": true, "backward_finite": true, "loss_finite": true, "mini_overfit_initial_loss": 0.5543771386146545, "mini_overfit_final_loss": 0.0023399314377456903},
+    "GRAPH_CDE": {"forward_finite": true, "backward_finite": true, "loss_finite": true, "mini_overfit_initial_loss": 0.6900171637535095, "mini_overfit_final_loss": 0.0021429231856018305},
+    "GRAPH_SDE": {"forward_finite": true, "backward_finite": true, "loss_finite": true, "mini_overfit_initial_loss": 0.9198444485664368, "mini_overfit_final_loss": 0.0029339834582060575}
+  },
+  "latency_refresh": {
+    "CURRENT": {"forward_median_seconds": 0.016068234006525017, "ratio_to_current": 1.0},
+    "GRAPH_ODE": {"forward_median_seconds": 0.026918560994090512, "ratio_to_current": 1.675265681540322, "feasibility_classification": "PRACTICAL"},
+    "GRAPH_CDE": {"forward_median_seconds": 0.12157331900380086, "ratio_to_current": 7.566066000434905, "feasibility_classification": "EXPENSIVE_BUT_TESTABLE"},
+    "GRAPH_SDE": {"forward_median_seconds": 0.056853125992347486, "ratio_to_current": 3.5382311440859318, "feasibility_classification": "EXPENSIVE_BUT_TESTABLE"},
+    "thresholds_source": "docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_PROTOCOL.md Section 11 (unchanged, not redefined for this correction)"
+  },
+  "sde_mc_policy": {
+    "reopened": false,
+    "mc_1_mean_latent_summary": 0.28891175985336304,
+    "mc_4_mean_latent_summary": 0.28884029388427734,
+    "mc_8_mean_latent_summary": 0.2887909710407257,
+    "recommended_full_experiment_count": 4,
+    "full_m9_1_brownian_seed_schedule_requirement_recorded": "brownian_seed = stable_hash(predictor_training_seed, incident_id, prefix_depth, mc_index) -- not implemented here, requires development-scoped incident identifiers, out of correction scope"
+  },
+  "arm_verdicts": {
+    "CURRENT": "BASELINE_VALID",
+    "GRAPH_ODE": "PREFLIGHT_PASS",
+    "GRAPH_CDE": "PREFLIGHT_PASS",
+    "GRAPH_SDE": "PREFLIGHT_PASS"
+  },
+  "validation": {
+    "correction_targeted_tests_passed": "10/10",
+    "full_m9_1_preflight_tests_passed": "47/47",
+    "ruff_changed_files_clean": true,
+    "ruff_repo_wide_pre_existing_unrelated_errors": 8,
+    "pyright_repo_wide": "0 errors, 0 warnings, 0 informations"
+  },
+  "final_decision": {
+    "m9_1_preflight_corrected": true,
+    "m9_1_full_experiment_ready": true,
+    "m9_1_arms": ["CURRENT", "GRAPH_ODE", "GRAPH_CDE", "GRAPH_SDE"],
+    "blockers": [],
+    "recommended_next_step": "write and freeze the scientific M9.1 comparison protocol (arms/promotion gates/statistical procedure, including the deterministic Brownian seed schedule requirement recorded above), then begin M9.1 screening as a separate, explicitly-instructed milestone"
+  }
+}

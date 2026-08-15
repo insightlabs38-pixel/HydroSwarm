@@ -20,6 +20,7 @@ from hydroswarm.model.continuous_time import (
     GraphCDEDynamics,
     GraphODEDynamics,
     GraphSDEDynamics,
+    _FirstValidEvidenceInitialState,
     _physical_delta,
     compute_relative_physical_time,
 )
@@ -219,6 +220,111 @@ def test_ode_forward_backward_finite_and_gradients_flow():
 
 
 # ---------------------------------------------------------------------------
+# Preflight correction Issue 1: first-valid-evidence initial state
+# (docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md Section 4 /
+# milestone Section 22 items 1-7)
+# ---------------------------------------------------------------------------
+
+
+def test_first_valid_selects_first_valid_step_not_array_position_zero():
+    # node 0: step 0 invalid -> must use step 1 (11.0), never step 0's 10.0.
+    # node 1: step 0 valid -> must use step 0 (20.0) directly.
+    values = torch.tensor([[[[10.0], [20.0]], [[11.0], [21.0]], [[12.0], [22.0]]]])  # [1,3,2,1]
+    valid = torch.tensor([[[False, True], [True, True], [True, True]]])  # [1,3,2]
+    out = _FirstValidEvidenceInitialState._first_valid(values, valid)
+    assert torch.allclose(out, torch.tensor([[[11.0], [20.0]]]))
+
+
+def test_first_valid_all_missing_modality_gives_deterministic_zero():
+    values = torch.tensor([[[[5.0]], [[6.0]], [[7.0]]]])  # [1,3,1,1]
+    valid = torch.zeros(1, 3, 1, dtype=torch.bool)
+    out = _FirstValidEvidenceInitialState._first_valid(values, valid)
+    assert torch.equal(out, torch.zeros(1, 1, 1))
+    assert torch.isfinite(out).all()
+
+
+def test_initial_state_later_values_do_not_change_h0():
+    state = _FirstValidEvidenceInitialState(TEMPORAL_FEATURE_DIM, QUALITY_FEATURE_DIM, D_MODEL)
+    batch = _make_batch(1, 4, seed=9)
+    sensor_mask = torch.zeros(1, 4, NODES, dtype=torch.bool)
+    sensor_mask[:, 1:] = True  # first-valid temporal step = index 1
+    quality_mask = torch.zeros(1, 4, NODES, dtype=torch.bool)
+    quality_mask[:, 2:] = True  # first-valid quality step = index 2
+    h0_a = state(batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask)
+
+    perturbed_temporal = batch["temporal_features"].clone()
+    perturbed_temporal[:, 0] += 1000.0  # invalid step -- must not matter
+    perturbed_temporal[:, 2] += 1000.0  # valid but not first-valid -- must not matter
+    perturbed_quality = batch["quality_features"].clone()
+    perturbed_quality[:, 3] += 1000.0  # valid but not first-valid -- must not matter
+    h0_b = state(perturbed_temporal, perturbed_quality, sensor_mask, quality_mask)
+    assert torch.allclose(h0_a, h0_b, atol=1e-6)
+
+    # Sanity: perturbing the FIRST-VALID step itself DOES change h0 -- proves
+    # the test is not vacuously passing because h0 ignores evidence entirely.
+    perturbed_first = batch["temporal_features"].clone()
+    perturbed_first[:, 1] += 1000.0
+    h0_c = state(perturbed_first, batch["quality_features"], sensor_mask, quality_mask)
+    assert not torch.allclose(h0_a, h0_c, atol=1e-3)
+
+
+def test_initial_state_temporal_and_quality_first_valid_may_differ():
+    # Temporal first-valid at step 1, quality first-valid at step 3 --
+    # each modality must resolve its OWN earliest valid index independently.
+    state = _FirstValidEvidenceInitialState(TEMPORAL_FEATURE_DIM, QUALITY_FEATURE_DIM, D_MODEL)
+    batch = _make_batch(1, 4, seed=21)
+    sensor_mask = torch.zeros(1, 4, NODES, dtype=torch.bool)
+    sensor_mask[:, 1:] = True
+    quality_mask = torch.zeros(1, 4, NODES, dtype=torch.bool)
+    quality_mask[:, 3:] = True
+    h0 = state(batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask)
+    assert torch.isfinite(h0).all()
+
+    # Changing quality at step 1/2 (invalid for quality) must not move h0;
+    # changing quality at step 3 (quality's own first-valid) must.
+    perturbed = batch["quality_features"].clone()
+    perturbed[:, 1] += 1000.0
+    perturbed[:, 2] += 1000.0
+    h0_unaffected = state(batch["temporal_features"], perturbed, sensor_mask, quality_mask)
+    assert torch.allclose(h0, h0_unaffected, atol=1e-6)
+
+    perturbed_first = batch["quality_features"].clone()
+    perturbed_first[:, 3] += 1000.0
+    h0_affected = state(batch["temporal_features"], perturbed_first, sensor_mask, quality_mask)
+    assert not torch.allclose(h0, h0_affected, atol=1e-3)
+
+
+def test_ode_initial_state_uses_first_valid_evidence_end_to_end():
+    ode = _ode()
+    batch = _make_batch(1, 3, seed=31)
+    sensor_mask = torch.zeros(1, 3, NODES, dtype=torch.bool)
+    sensor_mask[:, 1:] = True
+    quality_mask = torch.ones(1, 3, NODES, dtype=torch.bool)
+    h0_a = ode.initial_state(batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask)
+    perturbed = batch["temporal_features"].clone()
+    perturbed[:, 0] += 1000.0  # invalid leading step -- must not affect h0
+    h0_b = ode.initial_state(perturbed, batch["quality_features"], sensor_mask, quality_mask)
+    assert torch.allclose(h0_a, h0_b, atol=1e-6)
+
+
+def test_sde_shares_first_valid_initial_state_semantics_with_ode():
+    ode = _ode()
+    sde = _sde()
+    assert isinstance(ode.initial_state, _FirstValidEvidenceInitialState)
+    assert isinstance(sde.initial_state, _FirstValidEvidenceInitialState)
+    # Same class, same construction signature -- the two arms share
+    # identical initial-state semantics (only their post-h0 evolution
+    # mechanism differs), per the preflight correction's Issue 1 fix.
+    batch = _make_batch(1, 3, seed=44)
+    sensor_mask = torch.zeros(1, 3, NODES, dtype=torch.bool)
+    sensor_mask[:, 1:] = True
+    quality_mask = torch.ones(1, 3, NODES, dtype=torch.bool)
+    for module in (ode.initial_state, sde.initial_state):
+        h0 = module(batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask)
+        assert torch.isfinite(h0).all()
+
+
+# ---------------------------------------------------------------------------
 # Section 9.4: GRAPH_CDE causality (MANDATORY GATE)
 # ---------------------------------------------------------------------------
 
@@ -274,6 +380,126 @@ def test_cde_forward_backward_finite_and_gradients_flow():
     loss.backward()
     field_grad = sum(p.grad.abs().sum().item() for p in cde.field.parameters() if p.grad is not None)
     assert field_grad > 0.0
+
+
+# ---------------------------------------------------------------------------
+# Preflight correction Issue 2: GRAPH_CDE mask-aware control path
+# (docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md Section 5-9 /
+# milestone Section 22 items 8-11, 13)
+# ---------------------------------------------------------------------------
+
+
+def test_cde_control_path_includes_sensor_and_quality_valid_channels():
+    cde = _cde()
+    batch = _make_batch(1, 3, seed=51)
+    sensor_mask = torch.tensor([[True, False, True]])[:, :, None].expand(1, 3, NODES).clone()
+    quality_mask = torch.tensor([[False, True, True]])[:, :, None].expand(1, 3, NODES).clone()
+    path = cde._build_path_values(
+        batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask, batch["timestamps"]
+    )
+    assert path.shape[-1] == 1 + TEMPORAL_FEATURE_DIM + QUALITY_FEATURE_DIM + 2
+    sensor_valid_channel = path[..., -2]
+    quality_valid_channel = path[..., -1]
+    assert torch.equal(sensor_valid_channel, sensor_mask.float())
+    assert torch.equal(quality_valid_channel, quality_mask.float())
+
+
+def test_cde_observed_zero_differs_from_missing_zero():
+    cde = _cde()
+    batch = _make_batch(1, 3, seed=52)
+    # CASE A: target knot's temporal feature is a genuine observed zero.
+    temporal_a = batch["temporal_features"].clone()
+    temporal_a[:, 1] = 0.0
+    sensor_mask_a = torch.ones(1, 3, NODES, dtype=torch.bool)
+
+    # CASE B: identical feature values (still 0.0 at the same knot), but
+    # that knot is MISSING, not observed.
+    temporal_b = temporal_a.clone()
+    sensor_mask_b = sensor_mask_a.clone()
+    sensor_mask_b[:, 1] = False
+
+    path_a = cde._build_path_values(
+        temporal_a, batch["quality_features"], sensor_mask_a, batch["quality_mask"], batch["timestamps"]
+    )
+    path_b = cde._build_path_values(
+        temporal_b, batch["quality_features"], sensor_mask_b, batch["quality_mask"], batch["timestamps"]
+    )
+    # The feature channels are numerically identical (both 0.0 at that
+    # knot); only the validity channel differs -- proving the control path
+    # actually carries the observed-zero-vs-missing distinction rather than
+    # collapsing it.
+    assert torch.equal(path_a[..., 1 : 1 + TEMPORAL_FEATURE_DIM], path_b[..., 1 : 1 + TEMPORAL_FEATURE_DIM])
+    assert not torch.equal(path_a[..., -2], path_b[..., -2])
+
+    out_a = _run_dynamics(cde, {**batch, "temporal_features": temporal_a, "sensor_mask": sensor_mask_a})
+    out_b = _run_dynamics(cde, {**batch, "temporal_features": temporal_b, "sensor_mask": sensor_mask_b})
+    diff = (out_a[0] - out_b[0]).abs().max().item()
+    assert 0.0 < diff < float("inf"), "CDE output did not distinguish observed-zero from missing-zero"
+
+
+def test_cde_missing_intermediate_report_stays_finite_and_causal():
+    cde = _cde()
+    cde.train()
+    batch = _make_batch(1, 3, seed=53)
+    sensor_mask = torch.tensor([[True, False, True]])[:, :, None].expand(1, 3, NODES).clone()
+    quality_mask = torch.tensor([[True, False, True]])[:, :, None].expand(1, 3, NODES).clone()
+
+    path = cde._build_path_values(
+        batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask, batch["timestamps"]
+    )
+    assert torch.isfinite(path).all()
+    assert torch.equal(path[..., -2], sensor_mask.float())
+    assert torch.equal(path[..., -1], quality_mask.float())
+
+    out_temporal, out_quality = cde(
+        batch["temporal_features"], batch["quality_features"], sensor_mask, quality_mask,
+        batch["timestamps"], batch["node_mask"], batch["edge_index"], batch["edge_features"], batch["edge_mask"],
+    )
+    loss = out_temporal.sum() + out_quality.sum()
+    assert torch.isfinite(loss)
+    loss.backward()
+    for p in cde.parameters():
+        if p.grad is not None:
+            assert torch.isfinite(p.grad).all()
+
+    # Causality still holds with a missing intermediate report present: a
+    # future observation appended after the (already-missing-containing)
+    # prefix must not change the T-cutoff output.
+    cde.eval()
+    future_temporal = torch.randn(1, 1, NODES, TEMPORAL_FEATURE_DIM)
+    future_quality = torch.randn(1, 1, NODES, QUALITY_FEATURE_DIM)
+    future_time = batch["timestamps"][:, -1:] + 7200.0
+    extended = {
+        **batch,
+        "temporal_features": torch.cat([batch["temporal_features"], future_temporal], dim=1),
+        "quality_features": torch.cat([batch["quality_features"], future_quality], dim=1),
+        "timestamps": torch.cat([batch["timestamps"], future_time], dim=1),
+        "sensor_mask": torch.cat([sensor_mask, torch.ones(1, 1, NODES, dtype=torch.bool)], dim=1),
+        "quality_mask": torch.cat([quality_mask, torch.ones(1, 1, NODES, dtype=torch.bool)], dim=1),
+    }
+    cutoff = batch["temporal_features"].shape[1] - 1
+    out_p = _run_dynamics(cde, {**batch, "sensor_mask": sensor_mask, "quality_mask": quality_mask}, cutoff_index=cutoff)
+    out_p_plus_future = _run_dynamics(cde, extended, cutoff_index=cutoff)
+    max_diff = max((a - b).abs().max().item() for a, b in zip(out_p, out_p_plus_future))
+    assert max_diff <= 1e-6
+
+
+def test_cde_depth_one_preserves_evidence_and_validity_exactly():
+    cde = _cde()
+    # An invalid single observation must not be silently promoted to valid
+    # by the depth-1 synthetic two-point expansion.
+    batch = _make_batch(1, 1, seed=54)
+    invalid_mask = torch.zeros(1, 1, NODES, dtype=torch.bool)
+    out_temporal, out_quality = _run_dynamics(cde, {**batch, "sensor_mask": invalid_mask, "quality_mask": invalid_mask})
+    assert torch.isfinite(out_temporal).all()
+    assert torch.isfinite(out_quality).all()
+
+    path = cde._build_path_values(
+        batch["temporal_features"], batch["quality_features"], invalid_mask, invalid_mask, batch["timestamps"]
+    )
+    kept = path[:, :1].expand(1, 2, NODES, path.shape[-1])
+    assert torch.equal(kept[..., -2], torch.zeros(1, 2, NODES))
+    assert torch.equal(kept[..., -1], torch.zeros(1, 2, NODES))
 
 
 # ---------------------------------------------------------------------------

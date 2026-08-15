@@ -8,9 +8,9 @@
       "delta_percent": 0.036006208560583675
     },
     "GRAPH_CDE": {
-      "mlp_width": 242,
-      "total_params": 4183082,
-      "delta_percent": 0.011236997359544705
+      "mlp_width": 214,
+      "total_params": 4182894,
+      "delta_percent": 0.006742198415726823
     },
     "GRAPH_SDE": {
       "mlp_width": 464,

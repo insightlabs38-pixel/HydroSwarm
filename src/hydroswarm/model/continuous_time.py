@@ -96,14 +96,6 @@ def _valid_mask(values: Tensor, supplied_mask: Tensor | None) -> Tensor:
     return finite & supplied
 
 
-def _masked_mean_over_steps(values: Tensor, mask: Tensor) -> Tensor:
-    """values: [batch, steps, nodes, features], mask: [batch, steps, nodes]
-    bool -> [batch, nodes, features], masked mean over the step axis."""
-
-    weights = mask.to(values.dtype).unsqueeze(-1)
-    return (values * weights).sum(dim=1) / weights.sum(dim=1).clamp_min(1.0)
-
-
 def _aggregate_edge_mean(
     h: Tensor,
     edge_index: Tensor | None,
@@ -276,24 +268,53 @@ class GraphVectorField(nn.Module):
         return self.mlp(combined)
 
 
-class _PooledEvidenceInitialState(nn.Module):
-    """Shared initial-condition construction for GRAPH_ODE/GRAPH_SDE: masked-
-    mean-pool temporal_features and quality_features over their own valid
-    steps (the same masked-mean primitive encoders._masked_temporal_mean
-    already uses, just without the transformer pass in between), concatenate,
-    and project to d_model. This is the ODE/SDE arms' entire dependence on
-    the raw evidence values -- after t_0 they evolve purely under the
-    graph-aware drift (+diffusion for SDE) through the actual physical
-    elapsed duration, never re-reading evidence mid-trajectory. This is the
-    deliberate ODE/SDE-vs-CDE distinction the preflight protocol Section 6 of
-    the milestone instructions draws ("ODE: latent dynamics evolve
-    continuously" vs. "CDE: latent dynamics are continuously controlled by
+class _FirstValidEvidenceInitialState(nn.Module):
+    """Shared initial-condition construction for GRAPH_ODE/GRAPH_SDE
+    (preflight correction Issue 1, docs/evaluation/
+    HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md): for each batch item / node /
+    modality independently, uses ONLY that modality's own first causally
+    valid observation (earliest step index where sensor_mask/quality_mask is
+    True) to build h0 -- never a pooled/averaged combination of the whole
+    prefix (that was the corrected Issue-1 defect, `_PooledEvidenceInitialState`,
+    removed), never array position 0 blindly (a node's earliest ARRAY
+    position may itself be invalid/missing). The two modalities' first-valid
+    indices may differ and are resolved independently. A node with no valid
+    observation in a modality gets a deterministic zero vector for that
+    modality's component (no learned missing-state token -- kept minimal per
+    the correction's own scope). This is what makes GRAPH_ODE/GRAPH_SDE's
+    entire dependence on raw evidence values happen at a single point t_0 --
+    after that they evolve purely under the graph-aware drift (+diffusion
+    for SDE) through the actual physical elapsed duration, never re-reading
+    evidence mid-trajectory. This is the deliberate ODE/SDE-vs-CDE
+    distinction the preflight protocol Section 6 of the milestone
+    instructions draws ("ODE: latent dynamics evolve continuously" from a
+    point condition vs. "CDE: latent dynamics are continuously controlled by
     the observed evidence path") -- GRAPH_CDE (below) instead stays
     continuously driven by evidence throughout via its control path."""
 
     def __init__(self, temporal_feature_dim: int, quality_feature_dim: int, d_model: int) -> None:
         super().__init__()
         self.projection = nn.Linear(temporal_feature_dim + quality_feature_dim, d_model)
+
+    @staticmethod
+    def _first_valid(values: Tensor, valid: Tensor) -> Tensor:
+        """values: [batch, steps, nodes, features], valid: [batch, steps,
+        nodes] bool -> [batch, nodes, features]: each node's feature vector
+        at its OWN earliest valid step (never array position 0 unless that
+        position is itself the earliest valid one), or an exact zero vector
+        for a node with no valid step at all."""
+
+        batch, _steps, nodes, features = values.shape
+        any_valid = valid.any(dim=1)  # [batch, nodes]
+        # torch.argmax returns the index of the FIRST occurrence of the max
+        # value along the given dim (documented tie-breaking behavior) --
+        # over a 0.0/1.0-valued mask this is exactly the first True index;
+        # when no step is valid it returns 0, which `any_valid` below then
+        # zeroes out rather than treating as real evidence.
+        first_index = valid.to(values.dtype).argmax(dim=1)  # [batch, nodes]
+        index = first_index[:, None, :, None].expand(batch, 1, nodes, features)
+        gathered = torch.gather(values, 1, index).squeeze(1)  # [batch, nodes, features]
+        return gathered * any_valid.unsqueeze(-1).to(values.dtype)
 
     def forward(
         self,
@@ -306,9 +327,9 @@ class _PooledEvidenceInitialState(nn.Module):
         quality_valid = _valid_mask(quality_features, quality_mask)
         temporal_clean = torch.nan_to_num(temporal_features.float())
         quality_clean = torch.nan_to_num(quality_features.float())
-        temporal_pooled = _masked_mean_over_steps(temporal_clean, temporal_valid)
-        quality_pooled = _masked_mean_over_steps(quality_clean, quality_valid)
-        return self.projection(torch.cat((temporal_pooled, quality_pooled), dim=-1))
+        temporal_first = self._first_valid(temporal_clean, temporal_valid)
+        quality_first = self._first_valid(quality_clean, quality_valid)
+        return self.projection(torch.cat((temporal_first, quality_first), dim=-1))
 
 
 def _physical_delta(timestamps: Tensor | None, batch: int, device: torch.device, dtype: torch.dtype) -> Tensor:
@@ -358,7 +379,7 @@ class GraphODEDynamics(TemporalDynamicsBase):
         super().__init__()
         _require(torchdiffeq, _TORCHDIFFEQ_IMPORT_ERROR, "torchdiffeq")
         self.d_model = d_model
-        self.initial_state = _PooledEvidenceInitialState(
+        self.initial_state = _FirstValidEvidenceInitialState(
             temporal_feature_dim, quality_feature_dim, d_model
         )
         self.field = GraphVectorField(d_model, edge_feature_dim, mlp_width=mlp_width)
@@ -470,7 +491,7 @@ class GraphCDEDynamics(TemporalDynamicsBase):
     X_t built by concatenating relative physical time with
     temporal_features/quality_features per node, per causally-available step
     -- so X_t itself carries evidence continuously, unlike GRAPH_ODE/SDE's
-    pooled-then-evolved initial condition. Interpolation: LINEAR
+    first-valid-then-evolved initial condition. Interpolation: LINEAR
     (torchcde.linear_interpolation_coeffs), chosen for strictly local support
     (a future knot cannot alter the interpolant's value or derivative at an
     earlier query point), which is what makes the mandatory causality gate
@@ -478,6 +499,18 @@ class GraphCDEDynamics(TemporalDynamicsBase):
     approximately true. Solved via torchcde.cdeint(method="rk4"), a
     fixed-step solver (the standard pairing for a kinked linear-interpolation
     path), with `step_size` frozen below.
+
+    Mask-aware control path (preflight correction Issue 2, docs/evaluation/
+    HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md): HydraulicFeatureBuilder/
+    pad_graph_batch NaN-replace-with-zero every invalid temporal/quality
+    position at corpus-generation time, so a bare feature value of 0.0 is
+    structurally ambiguous between "genuinely observed zero" and "missing,
+    zero-filled" -- sensor_mask/quality_mask are the only remaining signal
+    distinguishing them. X_t therefore includes two explicit validity
+    channels, `sensor_valid`/`quality_valid` (0.0/1.0 per [batch,time,node],
+    via the same `_valid_mask` convention used elsewhere in this module),
+    alongside relative_time/temporal_features/quality_features --
+    `input_channels = 1 + temporal_feature_dim + quality_feature_dim + 2`.
 
     Causal cutoff: `cutoff_index` (0-indexed, inclusive) selects which
     leading steps of the ALREADY globally-ordered step axis are used to
@@ -488,7 +521,11 @@ class GraphCDEDynamics(TemporalDynamicsBase):
     "evaluate now" semantics) when not explicitly supplied; the mandatory
     causality test (preflight protocol Section 9.4) supplies it explicitly
     so a prefix P and P-plus-future-observation can both be evaluated at the
-    identical cutoff and compared."""
+    identical cutoff and compared. The depth-1 degenerate-control expansion
+    (below) duplicates the ENTIRE per-step vector, including the two
+    validity channels, across the synthetic two-point path -- an invalid
+    single observation's validity channel stays 0.0 in both duplicated
+    points, never silently promoted to valid."""
 
     #: Fixed rk4 step count per unit of the interpolation's own index axis
     #: (which advances by exactly 1 per real observation step) -- frozen at
@@ -510,7 +547,8 @@ class GraphCDEDynamics(TemporalDynamicsBase):
         super().__init__()
         _require(torchcde, _TORCHCDE_IMPORT_ERROR, "torchcde")
         self.d_model = d_model
-        self.input_channels = 1 + temporal_feature_dim + quality_feature_dim
+        # +2: sensor_valid, quality_valid (preflight correction Issue 2).
+        self.input_channels = 1 + temporal_feature_dim + quality_feature_dim + 2
         self.initial_projection = nn.Linear(self.input_channels, d_model)
         self.field = GraphCDEField(
             d_model, self.input_channels, edge_feature_dim, mlp_width=mlp_width
@@ -527,12 +565,16 @@ class GraphCDEDynamics(TemporalDynamicsBase):
         quality_mask: Tensor | None,
         timestamps: Tensor | None,
     ) -> Tensor:
-        """[batch, steps, nodes, 1 + temporal + quality] -- NaN-safe (missing/
-        invalid entries filled 0.0, matching every other feature builder in
-        this codebase's own nan_to_num convention; validity is expressed
-        structurally by the causal-prefix truncation upstream and by the
-        cutoff_index filter below, not by a per-step mask channel, since
-        linear interpolation requires real numeric knot values)."""
+        """[batch, steps, nodes, 1 + temporal + quality + 2] -- NaN-safe
+        (missing/invalid feature entries filled 0.0, matching every other
+        feature builder in this codebase's own nan_to_num convention) PLUS
+        two explicit 0.0/1.0 validity channels (preflight correction Issue
+        2) so a genuinely observed zero reading (feature=0.0, valid=1.0)
+        stays distinguishable from a missing, zero-filled position
+        (feature=0.0, valid=0.0) -- linear interpolation still requires real
+        numeric knot values for every channel, including the validity
+        channels themselves, which is exactly why they are represented as
+        an explicit 0.0/1.0 channel rather than left implicit."""
 
         batch, steps, nodes, _ = temporal_features.shape
         if timestamps is None:
@@ -543,7 +585,11 @@ class GraphCDEDynamics(TemporalDynamicsBase):
         time_channel = relative_time[:, :, None, None].expand(batch, steps, nodes, 1)
         temporal_clean = torch.nan_to_num(temporal_features.float())
         quality_clean = torch.nan_to_num(quality_features.float())
-        return torch.cat((time_channel, temporal_clean, quality_clean), dim=-1)
+        sensor_valid = _valid_mask(temporal_features, sensor_mask).to(temporal_clean.dtype).unsqueeze(-1)
+        quality_valid = _valid_mask(quality_features, quality_mask).to(quality_clean.dtype).unsqueeze(-1)
+        return torch.cat(
+            (time_channel, temporal_clean, quality_clean, sensor_valid, quality_valid), dim=-1
+        )
 
     def forward(
         self,
@@ -714,7 +760,7 @@ class GraphSDEDynamics(TemporalDynamicsBase):
         super().__init__()
         _require(torchsde, _TORCHSDE_IMPORT_ERROR, "torchsde")
         self.d_model = d_model
-        self.initial_state = _PooledEvidenceInitialState(
+        self.initial_state = _FirstValidEvidenceInitialState(
             temporal_feature_dim, quality_feature_dim, d_model
         )
         self.field = GraphVectorField(d_model, edge_feature_dim, mlp_width=mlp_width)
