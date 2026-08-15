@@ -293,6 +293,30 @@ restores safety-valid coverage, closing the calibration question one way or
 the other before Milestone 9.1 (continuous-time architecture trial) begins.
 See `reports/evaluation/hydrocore-v5/m9-0b-summary.md` for the outcome.
 
+## 8.9. Amendment: Milestone 9.1 preflight (continuous-time architecture feasibility)
+
+M9.0b closed `INTERLEAVED_PREDICTOR_CALIBRATION_NOT_RESOLVED`; its own recorded
+M9.1 recipe (representation `AGE_FIX_ONLY`, topology training
+`SINGLE_FAMILY_CURRENT_TRAINING`, calibration `B_DEPTH_AWARE`, `alpha=0.1`)
+leaves `M9_1_SCIENTIFICALLY_UNBLOCKED: YES`.
+
+Before Milestone 9.1's own scientific comparison of CURRENT HydroCore against
+Graph Neural ODE/CDE/Stable Graph Neural SDE candidates begins, a separate
+PREFLIGHT milestone
+(`docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_PROTOCOL.md`, its own frozen
+sub-protocol) establishes that the continuous-time architecture testbed
+itself -- interface, time semantics, causality, solver configuration,
+parameter matching, numerical stability -- is correct, independent of any
+predictive-performance signal. The preflight computes and reports zero
+localization/accuracy numbers for any candidate; it answers only "can we run
+the experiment correctly?", never "which architecture is best?". The frozen
+scientific M9.1 comparison protocol (arms, promotion gates, statistical
+procedure) is written and frozen separately, only after this preflight
+closes with `M9_1_FULL_EXPERIMENT_READY = YES` (or with an explicit,
+documented reduction in arms). See
+`reports/evaluation/hydrocore-v5/m9-1-preflight-summary.md` for the preflight
+outcome. This amendment does not alter M9.0b's own historical results.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model
