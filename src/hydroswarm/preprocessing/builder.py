@@ -67,6 +67,36 @@ class BuiltHydroBatch:
 #: "nobody remembered to check."
 NO_NORMALIZATION_SENTINEL = hashlib.sha256(b"hydroswarm-normalization-none-v1").hexdigest()
 
+#: Milestone 8.6 (reports/evaluation/hydrocore-v5/m8-6-summary.md) found
+#: ABSOLUTE_TIME_ORIGIN_LEAKAGE: for a node with NO sensor at all, the
+#: original `measurement_age` fallback used the incident's own raw
+#: elapsed `now` value, which is NOT invariant to the incident's
+#: timestamp origin (unlike every other temporal quantity in this
+#: builder, all computed as a genuine elapsed DIFFERENCE). Milestone 8.7
+#: Arm B/C's fix (`unobserved_age_sentinel="fixed"`) uses this fixed
+#: constant instead -- the SAME divisor `measurement_age` is later
+#: normalized by (see the node_values division array below), so the
+#: sentinel reads as exactly 1.0 post-normalization: "as stale as this
+#: scale considers a reading to be," not an arbitrary invented magnitude,
+#: and never a function of how long the incident has been running.
+#: `unobserved_age_sentinel` defaults to "incident_elapsed" (the ORIGINAL,
+#: still-buggy behavior) so every existing caller/checkpoint (including
+#: Milestone 8.7 Arm A, which must retain "CURRENT feature semantics") is
+#: completely unaffected unless this is explicitly opted into.
+NEVER_OBSERVED_MEASUREMENT_AGE_SENTINEL_SECONDS = 86_400.0
+
+#: Milestone 8.7 Arm C (AGE_FIX_PLUS_RELATIVE_TIME): a genuinely new
+#: per-timestep signal -- elapsed seconds since THIS SAME SENSOR's own
+#: previous report (0.0, an in-distribution "no previous report" sentinel,
+#: for a series' first point) -- distinct from `measurement_age` (elapsed
+#: since the WINDOW's latest reading) and from the explicit `timestamps`
+#: batch key's window-position encoding. Opt-in via
+#: `include_relative_gap_feature=True`; every existing caller is
+#: unaffected by default. Normalized by the SAME 86,400s divisor as every
+#: other age-like quantity in this builder for consistency, not a newly
+#: chosen scale.
+RELATIVE_GAP_FEATURE_DIVISOR_SECONDS = 86_400.0
+
 
 def _stable_category(value: str) -> float:
     return int(hashlib.sha256(value.encode()).hexdigest()[:8], 16) / 0xFFFFFFFF
@@ -129,9 +159,13 @@ class HydraulicFeatureBuilder:
         positive_consistency: Mapping[str, float] | None = None,
         negative_consistency: Mapping[str, float] | None = None,
         window_steps: int = 25,
+        unobserved_age_sentinel: str = "incident_elapsed",
+        include_relative_gap_feature: bool = False,
     ) -> BuiltHydroBatch:
         if window_steps < 1:
             raise ValueError("window_steps must be positive")
+        if unobserved_age_sentinel not in ("incident_elapsed", "fixed"):
+            raise ValueError("unobserved_age_sentinel must be 'incident_elapsed' or 'fixed'")
         node_ids = tuple(str(item) for item in canonical_node_order(network.node_name_list))
         positions = {node: index for index, node in enumerate(node_ids)}
         reservoirs = set(network.reservoir_name_list)
@@ -152,7 +186,12 @@ class HydraulicFeatureBuilder:
                 series.concentration_mg_l[-1] if series and series.concentration_mg_l[-1] is not None else 0.0
             )
             health = 0.0 if series is None or series.missing[-1] else series.health[-1]
-            age = now - series.timestamps_seconds[-1] if series else now
+            if series:
+                age = now - series.timestamps_seconds[-1]
+            elif unobserved_age_sentinel == "fixed":
+                age = NEVER_OBSERVED_MEASUREMENT_AGE_SENTINEL_SECONDS
+            else:
+                age = now
             missing = float(series is None or series.missing[-1])
             node_type = 2.0 if node_id in reservoirs else 3.0 if node_id in tanks else 1.0
             elevation = float(getattr(node, "elevation", getattr(node, "base_head", 0.0)))
@@ -228,8 +267,10 @@ class HydraulicFeatureBuilder:
 
         selected_times = sorted({time for item in sensor_series for time in item.timestamps_seconds})[-window_steps:]
         steps = len(selected_times)
-        temporal = np.zeros((steps, len(node_ids), 6), dtype=np.float32)
-        quality = np.zeros((steps, len(node_ids), 4), dtype=np.float32)
+        temporal_width = 7 if include_relative_gap_feature else 6
+        quality_width = 5 if include_relative_gap_feature else 4
+        temporal = np.zeros((steps, len(node_ids), temporal_width), dtype=np.float32)
+        quality = np.zeros((steps, len(node_ids), quality_width), dtype=np.float32)
         temporal[:] = np.nan
         quality[:] = np.nan
         for series in sensor_series:
@@ -242,17 +283,27 @@ class HydraulicFeatureBuilder:
                 concentration = series.concentration_mg_l[source_index]
                 pressure = series.pressure_m[source_index]
                 age = now - timestamp
-                temporal[time_index, node_index] = [
+                temporal_row = [
                     np.log1p(max(concentration, 0.0)) if concentration is not None else np.nan,
                     pressure / 100.0 if pressure is not None else np.nan,
                     age / 86_400.0, float(series.missing[source_index]), float(series.drift[source_index]),
                     float(series.delayed[source_index]),
                 ]
-                quality[time_index, node_index] = [
+                quality_row = [
                     0.0 if series.missing[source_index] else series.health[source_index],
                     float(series.missing[source_index]),
                     float(series.drift[source_index]), age / 86_400.0,
                 ]
+                if include_relative_gap_feature:
+                    gap = (
+                        series.timestamps_seconds[source_index] - series.timestamps_seconds[source_index - 1]
+                        if source_index > 0 else 0.0
+                    )
+                    relative_gap = gap / RELATIVE_GAP_FEATURE_DIVISOR_SECONDS
+                    temporal_row.append(relative_gap)
+                    quality_row.append(relative_gap)
+                temporal[time_index, node_index] = temporal_row
+                quality[time_index, node_index] = quality_row
         sample = GraphSample(
             node_features=torch.as_tensor(node_values, dtype=self.dtype, device=self.device),
             temporal_features=torch.as_tensor(temporal, dtype=self.dtype, device=self.device),

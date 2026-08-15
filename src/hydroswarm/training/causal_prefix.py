@@ -173,6 +173,12 @@ def scenario_to_prefix_example(
     feature_context: FeatureContext | None = None,
     node_normalization: NormalizationStats | None = None,
     edge_normalization: NormalizationStats | None = None,
+    # Milestone 8.7: threaded straight through to HydraulicFeatureBuilder.
+    # build (see that method's own docstring/module-level constants for
+    # what these change). Both default to the ORIGINAL/current behavior,
+    # so every existing caller/checkpoint (Arm A included) is unaffected.
+    unobserved_age_sentinel: str = "incident_elapsed",
+    include_relative_gap_feature: bool = False,
 ) -> ScenarioExample:
     """Depth-truncated counterpart of
     `hydroswarm.training.corpus.scenario_to_example`: identical target
@@ -206,6 +212,8 @@ def scenario_to_prefix_example(
         series,
         classical_prior=prior,
         window_steps=len(target_timestamps),
+        unobserved_age_sentinel=unobserved_age_sentinel,
+        include_relative_gap_feature=include_relative_gap_feature,
     )
     node_ids = built.node_ids
     positions = {node_id: index for index, node_id in enumerate(node_ids)}
@@ -365,6 +373,10 @@ class CausalPrefixDatasetView:
         depth_policy: DepthPolicy,
         base_seed: int,
         batch_size: int = 2,
+        # Milestone 8.7: see scenario_to_prefix_example's own docstring.
+        # Defaults preserve current/Arm-A behavior for every existing caller.
+        unobserved_age_sentinel: str = "incident_elapsed",
+        include_relative_gap_feature: bool = False,
     ) -> None:
         if not records:
             raise ValueError("causal-prefix dataset view cannot be empty")
@@ -377,6 +389,8 @@ class CausalPrefixDatasetView:
         self._depth_policy = depth_policy
         self._base_seed = base_seed
         self._batch_size = max(1, batch_size)
+        self._unobserved_age_sentinel = unobserved_age_sentinel
+        self._include_relative_gap_feature = include_relative_gap_feature
         self._draw = 0
         self._current_batch_index: int | None = None
         self._current_depth: int | None = None
@@ -405,6 +419,8 @@ class CausalPrefixDatasetView:
             self._signature_library,
             depth,
             feature_context=record.feature_context,
+            unobserved_age_sentinel=self._unobserved_age_sentinel,
+            include_relative_gap_feature=self._include_relative_gap_feature,
         )
 
     @property
@@ -434,6 +450,16 @@ class CausalPrefixDatasetView:
             depth_policy=self._depth_policy,
             base_seed=self._base_seed,
             batch_size=self._batch_size,
+            # Milestone 8.7: Trainer.fit() calls stages_through() every
+            # epoch and trains on ITS return value, never on the original
+            # view directly -- omitting these here silently reverted every
+            # epoch's actual training data to Arm-A/default feature
+            # semantics regardless of what the caller configured (caught
+            # empirically: AGE_FIX_PLUS_RELATIVE_TIME's dimension mismatch
+            # crashed loudly; AGE_FIX_ONLY's identical-shape silent
+            # reversion would not have).
+            unobserved_age_sentinel=self._unobserved_age_sentinel,
+            include_relative_gap_feature=self._include_relative_gap_feature,
         )
 
 

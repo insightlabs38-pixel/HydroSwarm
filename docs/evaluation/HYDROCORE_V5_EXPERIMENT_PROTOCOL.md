@@ -205,6 +205,28 @@ finding in `reports/evaluation/hydrocore-v5/m0-baseline.json`
 (`current_sampling_baseline`) that EIG did not beat random valid-unsampled
 selection pre-v5.
 
+## 8.5. Amendment: Milestone 8.7 (temporal representation correction)
+
+Milestone 8.6 (`reports/evaluation/hydrocore-v5/m8-6-summary.md`) audited
+the frozen Milestone-1 predictor's representation correctness and found:
+
+- `ABSOLUTE_TIME_ORIGIN_LEAKAGE`: `HydraulicFeatureBuilder.build`'s
+  never-observed-node `measurement_age` fallback depended on the incident's
+  own timestamp origin rather than representing an origin-independent
+  quantity.
+- `TEMPORAL_FEATURE_USAGE_WEAK_OR_PARTIAL`: the explicit timestamp/
+  positional-encoding pathway was measurably inert while the derived
+  age-feature pathway was measurably used.
+
+Milestone 8.7 (`docs/evaluation/HYDROCORE_V5_M8_7_PROTOCOL.md`, its own
+frozen sub-protocol) trains and evaluates three matched-size representation
+arms (CURRENT_CONTROL, AGE_FIX_ONLY, AGE_FIX_PLUS_RELATIVE_TIME) to
+determine which representation, if any, corrects these findings without
+materially regressing accuracy or calibration, and should become the
+candidate small-size recipe for Milestone 9. See
+`reports/evaluation/hydrocore-v5/m8-7-summary.md` for the outcome. This
+amendment does not alter any prior milestone's historical results.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model

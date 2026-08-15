@@ -29,6 +29,26 @@ def _masked_temporal_mean(values: Tensor, mask: Tensor) -> Tensor:
     return (values * weights).sum(dim=1) / weights.sum(dim=1).clamp_min(1.0)
 
 
+#: Milestone 8.7 Arm C (AGE_FIX_PLUS_RELATIVE_TIME): the "window_relative"
+#: elapsed-time normalization TemporalEncoder always used before this
+#: (`elapsed / elapsed.abs().amax(...)`) rescales every window to span
+#: [-1, 1] regardless of its actual physical duration -- two reports 10
+#: minutes apart and two reports 10 hours apart produce IDENTICAL
+#: normalized phase values, which Milestone 8.6's REPRESENTATION_
+#: SENSITIVITY_COUNTERFACTUAL empirically confirmed (near-zero posterior
+#: sensitivity to real elapsed-spacing changes on the golden-reference
+#: network). "fixed_scale" divides by this fixed constant instead,
+#: preserving actual elapsed MAGNITUDE (two windows of different physical
+#: duration produce different phase values) while staying origin-
+#: invariant (the subtraction against `elapsed[:, :1]` still happens
+#: first) and consistent with the SAME normalization scale
+#: `hydroswarm.preprocessing.builder.HydraulicFeatureBuilder` already uses
+#: for its own age-derived features (divided by 86,400s), rather than an
+#: arbitrarily chosen new constant.
+FIXED_ELAPSED_TIME_SCALE_SECONDS = 86_400.0
+ELAPSED_TIME_NORMALIZATION_MODES = ("window_relative", "fixed_scale")
+
+
 class GraphStructuralEncoder(nn.Module):
     feature_names = ("travel_time", "reservoir_reachability", "demand_centrality")
 
@@ -83,8 +103,12 @@ class TemporalEncoder(nn.Module):
         *,
         normalization: str = "rmsnorm",
         activation: str = "silu",
+        elapsed_time_normalization: str = "window_relative",
     ) -> None:
         super().__init__()
+        if elapsed_time_normalization not in ELAPSED_TIME_NORMALIZATION_MODES:
+            raise ValueError(f"elapsed_time_normalization must be one of {ELAPSED_TIME_NORMALIZATION_MODES}")
+        self.elapsed_time_normalization = elapsed_time_normalization
         self.input_projection = nn.Linear(input_dim, d_model)
         layer = nn.TransformerEncoderLayer(
             d_model=d_model,
@@ -133,7 +157,10 @@ class TemporalEncoder(nn.Module):
             if elapsed.shape != (batch, steps):
                 raise ValueError("timestamps must have shape [batch, time]")
             elapsed = elapsed - elapsed[:, :1]
-            elapsed = elapsed / elapsed.abs().amax(dim=1, keepdim=True).clamp_min(1.0)
+            if self.elapsed_time_normalization == "fixed_scale":
+                elapsed = elapsed / FIXED_ELAPSED_TIME_SCALE_SECONDS
+            else:
+                elapsed = elapsed / elapsed.abs().amax(dim=1, keepdim=True).clamp_min(1.0)
         elapsed = elapsed[:, None, :].expand(batch, nodes, steps).reshape(batch * nodes, steps)
         phase = elapsed[..., None] * self.frequency.to(sequence.dtype)
         position = torch.cat((phase.sin(), phase.cos()), dim=-1)

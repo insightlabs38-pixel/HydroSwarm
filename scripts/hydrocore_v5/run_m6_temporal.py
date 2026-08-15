@@ -466,6 +466,7 @@ def _grouped_paired_analysis(
 
 def _infer(
     model: HydroCore, network, feature_context, series: Sequence[SensorSeries], library, target_timestamps,
+    *, feature_kwargs: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """One forward pass: real live-serving classical_prior (nearest-time
     alignment onto the TRAIN library's own hourly grid -- correct for
@@ -473,13 +474,19 @@ def _infer(
     docstring and `run_m5_sampling.py`'s architecture note for why this is
     used instead of `_prefix_classical_prior`'s positional-grid assumption),
     real per-example window_steps (never padded to a fixed 25 regardless of
-    how much evidence actually exists)."""
+    how much evidence actually exists).
+
+    `feature_kwargs` (Milestone 8.7 addition): extra keyword arguments
+    forwarded to `HydraulicFeatureBuilder.build` (e.g.
+    `unobserved_age_sentinel`/`include_relative_gap_feature`). Defaults to
+    None (nothing forwarded), so every existing Milestone-6 call site and
+    its already-committed results are byte-for-byte unaffected."""
 
     classical_prior = model_input_classical_prior(library, list(library.node_ids), series, target_timestamps)
     window_steps = max(len(item.timestamps_seconds) for item in series)
     built = HydraulicFeatureBuilder().build(
         network, feature_context.graph, feature_context.state, series,
-        classical_prior=classical_prior, window_steps=window_steps,
+        classical_prior=classical_prior, window_steps=window_steps, **(feature_kwargs or {}),
     )
     started = time.perf_counter()
     with torch.no_grad():
@@ -520,11 +527,16 @@ def _candidate_set(calibrator: SplitConformalCalibrator, probs: list[float], *, 
     return calibrator.candidate_set(probs, condition=condition, network_id=f"{NETWORK_FAMILY}:{bucket}")
 
 
-def _fit_frozen_calibrator(model: HydroCore, library, calibration_records) -> SplitConformalCalibrator:
+def _fit_frozen_calibrator(
+    model: HydroCore, library, calibration_records, *, feature_kwargs: dict[str, Any] | None = None,
+) -> SplitConformalCalibrator:
     """Refits the frozen B_DEPTH_AWARE scheme (reports/evaluation/hydrocore-v5/
     m3-summary.md's decision) identically to run_m3_calibration.py/
     run_m5_sampling.py: same alpha, same network_id encoding
-    (f"{network_id}:{depth_bucket}"), same calibration split, no tuning."""
+    (f"{network_id}:{depth_bucket}"), same calibration split, no tuning.
+    `feature_kwargs` (Milestone 8.7 addition): forwarded to
+    scenario_to_prefix_example/HydraulicFeatureBuilder.build; defaults to
+    None (unchanged behavior)."""
 
     from hydroswarm.training.causal_prefix import scenario_to_prefix_example, truncate_causal_prefix
 
@@ -533,7 +545,10 @@ def _fit_frozen_calibrator(model: HydroCore, library, calibration_records) -> Sp
         for depth in CAUSAL_PREFIX_DEPTHS:
             for record in calibration_records:
                 scenario = record.scenario
-                example = scenario_to_prefix_example(scenario, record.network, library, depth, feature_context=record.feature_context)
+                example = scenario_to_prefix_example(
+                    scenario, record.network, library, depth, feature_context=record.feature_context,
+                    **(feature_kwargs or {}),
+                )
                 output = model({key: value.unsqueeze(0) for key, value in example.inputs.items()})
                 probs = torch.softmax(output["source_node_logits"][0], dim=-1).tolist()
                 truth = int(example.targets["source_node"].item())
@@ -604,7 +619,7 @@ def _generate_cadence_incident_pool(junctions: tuple[str, ...]) -> list[dict[str
 # ---------------------------------------------------------------------------
 
 
-def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict[str, Any]:
+def run_cadence_experiment(model, library, target_timestamps, incidents, *, feature_kwargs: dict[str, Any] | None = None) -> dict[str, Any]:
     """Milestone-6 correction: see this file's module-level "Milestone 6
     correction" note and `_cadence_evidence_up_to_checkpoint`/
     `_paired_prediction_analysis`'s docstrings for the specific bugs fixed
@@ -631,7 +646,7 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
                 first_timestamp = series[0].timestamps_seconds[0]
                 last_timestamp = series[0].timestamps_seconds[-1]
                 actual_elapsed_minutes = (last_timestamp - first_timestamp) / 60.0
-                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps)
+                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps, feature_kwargs=feature_kwargs)
                 metrics = _row_metrics(result["probs"], result["node_ids"], truth)
                 prediction = _prediction_fields(result["probs"], result["node_ids"])
                 depth_rows.append({
@@ -786,7 +801,7 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
                     continue  # fewer than n_reports post-onset positions available -- never fabricated.
                 first_timestamp = series[0].timestamps_seconds[0]
                 last_timestamp = series[0].timestamps_seconds[-1]
-                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps)
+                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps, feature_kwargs=feature_kwargs)
                 metrics = _row_metrics(result["probs"], result["node_ids"], truth)
                 prediction = _prediction_fields(result["probs"], result["node_ids"])
                 #: `actual_elapsed_minutes` is an alias for
@@ -866,7 +881,7 @@ def run_cadence_experiment(model, library, target_timestamps, incidents) -> dict
                     f"produced actual_elapsed_minutes={actual_elapsed_minutes} "
                     f"(tolerance={REPORTING_RESOLUTION_MINUTES}min)"
                 )
-                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps)
+                result = _infer(model, incident["network"], incident["feature_context"], series, library, target_timestamps, feature_kwargs=feature_kwargs)
                 metrics = _row_metrics(result["probs"], result["node_ids"], truth)
                 prediction = _prediction_fields(result["probs"], result["node_ids"])
                 checkpoint_rows.append({
@@ -1189,19 +1204,22 @@ STRESS_CASES = {
 }
 
 
-def run_irregular_telemetry_experiment(model, library, target_timestamps, incidents, *, n_incidents: int = 24, depth: int = 6) -> dict[str, Any]:
+def run_irregular_telemetry_experiment(
+    model, library, target_timestamps, incidents, *, n_incidents: int = 24, depth: int = 6,
+    feature_kwargs: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     subset = incidents[:n_incidents]
     rows = []
     for incident in subset:
         truth = incident["source"]
         clean_series = _clean_reference_series(incident, depth=depth)
-        clean_result = _infer(model, incident["network"], incident["feature_context"], clean_series, library, target_timestamps)
+        clean_result = _infer(model, incident["network"], incident["feature_context"], clean_series, library, target_timestamps, feature_kwargs=feature_kwargs)
         clean_metrics = _row_metrics(clean_result["probs"], clean_result["node_ids"], truth)
         rows.append({"stress": "CLEAN_BASELINE", "seed": incident["seed"], "source": truth, **clean_metrics})
         for stress_name, stress_fn in STRESS_CASES.items():
             rng = _seeded_rng("m6-stress", stress_name, incident["seed"])
             stressed_series = stress_fn(clean_series, rng=rng)
-            result = _infer(model, incident["network"], incident["feature_context"], stressed_series, library, target_timestamps)
+            result = _infer(model, incident["network"], incident["feature_context"], stressed_series, library, target_timestamps, feature_kwargs=feature_kwargs)
             metrics = _row_metrics(result["probs"], result["node_ids"], truth)
             rows.append({"stress": stress_name, "seed": incident["seed"], "source": truth, **metrics})
 

@@ -1,0 +1,69 @@
+{
+  "arms": {
+    "AGE_FIX_ONLY": {
+      "alpha": 0.1,
+      "by_maturity": {
+        "early": {
+          "coverage": 0.7916666666666666,
+          "mean_set_size": 2.511111111111111
+        },
+        "mature": {
+          "coverage": 1.0,
+          "mean_set_size": 1.3125
+        },
+        "mid": {
+          "coverage": 0.9583333333333334,
+          "mean_set_size": 1.45
+        }
+      },
+      "marginal_coverage": 0.8988095238095238,
+      "mean_candidate_set_size": 1.8654761904761905,
+      "representative_seed": 31874,
+      "singleton_rate": 0.5452380952380952
+    },
+    "AGE_FIX_PLUS_RELATIVE_TIME": {
+      "alpha": 0.1,
+      "by_maturity": {
+        "early": {
+          "coverage": 0.8,
+          "mean_set_size": 2.522222222222222
+        },
+        "mature": {
+          "coverage": 1.0,
+          "mean_set_size": 1.275
+        },
+        "mid": {
+          "coverage": 0.9625,
+          "mean_set_size": 1.3916666666666666
+        }
+      },
+      "marginal_coverage": 0.9035714285714286,
+      "mean_candidate_set_size": 1.8428571428571427,
+      "representative_seed": 31874,
+      "singleton_rate": 0.5833333333333334
+    },
+    "CURRENT_CONTROL": {
+      "alpha": 0.1,
+      "by_maturity": {
+        "early": {
+          "coverage": 0.7916666666666666,
+          "mean_set_size": 2.5083333333333333
+        },
+        "mature": {
+          "coverage": 1.0,
+          "mean_set_size": 1.3125
+        },
+        "mid": {
+          "coverage": 0.9583333333333334,
+          "mean_set_size": 1.4458333333333333
+        }
+      },
+      "marginal_coverage": 0.8988095238095238,
+      "mean_candidate_set_size": 1.8630952380952381,
+      "representative_seed": 31874,
+      "singleton_rate": 0.5464285714285714
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false
+}

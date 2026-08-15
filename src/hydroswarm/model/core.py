@@ -498,6 +498,12 @@ class HydroCore(nn.Module):
         plan_feature_dim: int = PLAN_FEATURE_DIM,
         ood_category_head: bool = OOD_CATEGORY_HEAD_DEFAULT,
         scout_control_heads: bool = SCOUT_CONTROL_HEADS_DEFAULT,
+        # Milestone 8.7 Arm C (AGE_FIX_PLUS_RELATIVE_TIME): see
+        # encoders.TemporalEncoder's own docstring/comment for what this
+        # changes. Defaults to "window_relative" -- every existing
+        # checkpoint/caller (Arms A/B included) is unaffected unless this
+        # is explicitly overridden.
+        elapsed_time_normalization: str = "window_relative",
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -576,6 +582,7 @@ class HydroCore(nn.Module):
         self.plan_feature_dim = plan_feature_dim
         self.ood_category_head_enabled = ood_category_head
         self.scout_control_heads = scout_control_heads
+        self.elapsed_time_normalization = elapsed_time_normalization
         # core-issues.txt repair item 9: set by from_variant() so a
         # checkpoint's own architecture_config() records which named
         # variant it was built from; a model constructed directly (e.g. the
@@ -596,6 +603,7 @@ class HydroCore(nn.Module):
             dropout=dropout,
             normalization=normalization,
             activation=activation,
+            elapsed_time_normalization=elapsed_time_normalization,
         )
         self.temporal_encoder = TemporalEncoder(temporal_feature_dim, **temporal_args)
         self.quality_encoder = QualityEncoder(quality_feature_dim, **temporal_args)
@@ -832,6 +840,7 @@ class HydroCore(nn.Module):
             "verifier_feature_dim": self.verifier_feature_dim,
             "residual_feature_dim": self.residual_feature_dim,
             "dropout": self.dropout_value,
+            "elapsed_time_normalization": self.elapsed_time_normalization,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
