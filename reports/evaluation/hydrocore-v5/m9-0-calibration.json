@@ -1,0 +1,94 @@
+{
+  "arms": {
+    "ARM_A": {
+      "alpha": 0.1,
+      "known_family": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.9583333333333334,
+            "mean_set_size": 3.4166666666666665
+          },
+          "MATURE": {
+            "coverage": 1.0,
+            "mean_set_size": 1.0
+          },
+          "MID": {
+            "coverage": 0.90625,
+            "mean_set_size": 1.1875
+          }
+        },
+        "calibration_applicability_rate": 1.0,
+        "marginal_coverage": 0.9553571428571429,
+        "mean_candidate_set_size": 2.0892857142857144,
+        "singleton_rate": 0.5803571428571429
+      },
+      "representative_seed": 31874,
+      "unseen_topology_calibration_transfer": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.625,
+            "mean_set_size": 2.875
+          },
+          "MATURE": {
+            "coverage": 0.8541666666666666,
+            "mean_set_size": 2.3958333333333335
+          },
+          "MID": {
+            "coverage": 0.8229166666666666,
+            "mean_set_size": 2.40625
+          }
+        },
+        "calibration_applicability_rate": 0.0,
+        "marginal_coverage": 0.7470238095238095,
+        "mean_candidate_set_size": 2.6041666666666665,
+        "singleton_rate": 0.39880952380952384
+      }
+    },
+    "ARM_B": {
+      "alpha": 0.1,
+      "known_family": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.7847222222222222,
+            "mean_set_size": 4.305555555555555
+          },
+          "MATURE": {
+            "coverage": 0.8958333333333334,
+            "mean_set_size": 2.7708333333333335
+          },
+          "MID": {
+            "coverage": 0.84375,
+            "mean_set_size": 2.9895833333333335
+          }
+        },
+        "calibration_applicability_rate": 1.0,
+        "marginal_coverage": 0.8333333333333334,
+        "mean_candidate_set_size": 3.4910714285714284,
+        "singleton_rate": 0.3898809523809524
+      },
+      "representative_seed": 31874,
+      "unseen_topology_calibration_transfer": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.7708333333333334,
+            "mean_set_size": 3.7847222222222223
+          },
+          "MATURE": {
+            "coverage": 0.8958333333333334,
+            "mean_set_size": 1.9895833333333333
+          },
+          "MID": {
+            "coverage": 0.84375,
+            "mean_set_size": 2.2708333333333335
+          }
+        },
+        "calibration_applicability_rate": 0.0,
+        "marginal_coverage": 0.8273809523809523,
+        "mean_candidate_set_size": 2.8392857142857144,
+        "singleton_rate": 0.3601190476190476
+      }
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false
+}

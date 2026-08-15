@@ -1,0 +1,432 @@
+{
+  "arms": {
+    "ARM_A": {
+      "known_network_localization": {
+        "20260814": {
+          "EARLY": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.5850694444444444,
+              "top1": 0.3541666666666667,
+              "top3": 0.7708333333333334
+            },
+            "hybrid": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.3958333333333333,
+              "top3": 0.7083333333333334
+            },
+            "n": 48,
+            "neural": {
+              "mrr": 0.59375,
+              "top1": 0.375,
+              "top3": 0.7083333333333334
+            },
+            "nll_neural": 2.437542489232175,
+            "posterior_entropy_neural": 0.8652300732765258
+          },
+          "MATURE": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "nll_neural": 0.00036885509778928943,
+            "posterior_entropy_neural": 0.004599991650588633
+          },
+          "MID": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.8151041666666666,
+              "top1": 0.6875,
+              "top3": 0.90625
+            },
+            "hybrid": {
+              "mrr": 0.9166666666666666,
+              "top1": 0.84375,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 0.9166666666666666,
+              "top1": 0.84375,
+              "top3": 1.0
+            },
+            "nll_neural": 0.4766311492433889,
+            "posterior_entropy_neural": 0.21875517236046227
+          }
+        },
+        "20260815": {
+          "EARLY": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.5850694444444444,
+              "top1": 0.3541666666666667,
+              "top3": 0.7708333333333334
+            },
+            "hybrid": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.3958333333333333,
+              "top3": 0.7083333333333334
+            },
+            "n": 48,
+            "neural": {
+              "mrr": 0.6128472222222222,
+              "top1": 0.3958333333333333,
+              "top3": 0.8125
+            },
+            "nll_neural": 2.0330687384315045,
+            "posterior_entropy_neural": 1.017829455064594
+          },
+          "MATURE": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "nll_neural": 0.00029255151388305536,
+            "posterior_entropy_neural": 0.003721047947734363
+          },
+          "MID": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.8151041666666666,
+              "top1": 0.6875,
+              "top3": 0.90625
+            },
+            "hybrid": {
+              "mrr": 0.9166666666666666,
+              "top1": 0.84375,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 0.9166666666666666,
+              "top1": 0.84375,
+              "top3": 1.0
+            },
+            "nll_neural": 0.6611022132568923,
+            "posterior_entropy_neural": 0.19327001808633043
+          }
+        },
+        "31874": {
+          "EARLY": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.5850694444444444,
+              "top1": 0.3541666666666667,
+              "top3": 0.7708333333333334
+            },
+            "hybrid": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.3958333333333333,
+              "top3": 0.7083333333333334
+            },
+            "n": 48,
+            "neural": {
+              "mrr": 0.579861111111111,
+              "top1": 0.3541666666666667,
+              "top3": 0.7083333333333334
+            },
+            "nll_neural": 2.198611331154679,
+            "posterior_entropy_neural": 0.9575450221566455
+          },
+          "MATURE": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "nll_neural": 0.00048089525764341334,
+            "posterior_entropy_neural": 0.005543405967720543
+          },
+          "MID": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.8151041666666666,
+              "top1": 0.6875,
+              "top3": 0.90625
+            },
+            "hybrid": {
+              "mrr": 0.9166666666666666,
+              "top1": 0.84375,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 0.9166666666666666,
+              "top1": 0.84375,
+              "top3": 1.0
+            },
+            "nll_neural": 0.5971200545310423,
+            "posterior_entropy_neural": 0.22222200581484955
+          }
+        }
+      },
+      "per_seed": {
+        "20260814": {
+          "checkpoint_sha256": "cac349504b9fad7372356e29cb3fe617ef87e8bae9fbb3255756f350cdca7265",
+          "n_rows": 448
+        },
+        "20260815": {
+          "checkpoint_sha256": "728484a261bf8e7d41138ba44501df153856a1a1448b84eeb1df090091f3b387",
+          "n_rows": 448
+        },
+        "31874": {
+          "checkpoint_sha256": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176",
+          "n_rows": 448
+        }
+      }
+    },
+    "ARM_B": {
+      "known_network_localization": {
+        "20260814": {
+          "EARLY": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.595486111111111,
+              "top1": 0.375,
+              "top3": 0.7708333333333334
+            },
+            "hybrid": {
+              "mrr": 0.5902777777777778,
+              "top1": 0.375,
+              "top3": 0.75
+            },
+            "n": 48,
+            "neural": {
+              "mrr": 0.6024305555555556,
+              "top1": 0.3958333333333333,
+              "top3": 0.7708333333333334
+            },
+            "nll_neural": 1.7884369469964392,
+            "posterior_entropy_neural": 1.1771262446256399
+          },
+          "MATURE": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "nll_neural": 0.002928157459292069,
+            "posterior_entropy_neural": 0.027660932871686642
+          },
+          "MID": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.8307291666666666,
+              "top1": 0.71875,
+              "top3": 0.90625
+            },
+            "hybrid": {
+              "mrr": 0.8697916666666666,
+              "top1": 0.8125,
+              "top3": 0.875
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 0.8671875,
+              "top1": 0.8125,
+              "top3": 0.84375
+            },
+            "nll_neural": 0.7678729965502246,
+            "posterior_entropy_neural": 0.34320237978004287
+          }
+        },
+        "20260815": {
+          "EARLY": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.595486111111111,
+              "top1": 0.375,
+              "top3": 0.7708333333333334
+            },
+            "hybrid": {
+              "mrr": 0.611111111111111,
+              "top1": 0.4166666666666667,
+              "top3": 0.7083333333333334
+            },
+            "n": 48,
+            "neural": {
+              "mrr": 0.6215277777777778,
+              "top1": 0.4375,
+              "top3": 0.7083333333333334
+            },
+            "nll_neural": 1.9735908439906664,
+            "posterior_entropy_neural": 1.0671732493233297
+          },
+          "MATURE": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "nll_neural": 0.00550338062279599,
+            "posterior_entropy_neural": 0.04471802877406613
+          },
+          "MID": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.8307291666666666,
+              "top1": 0.71875,
+              "top3": 0.90625
+            },
+            "hybrid": {
+              "mrr": 0.8723958333333334,
+              "top1": 0.8125,
+              "top3": 0.90625
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 0.8723958333333334,
+              "top1": 0.8125,
+              "top3": 0.90625
+            },
+            "nll_neural": 0.6491652045253057,
+            "posterior_entropy_neural": 0.3751512924499842
+          }
+        },
+        "31874": {
+          "EARLY": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.595486111111111,
+              "top1": 0.375,
+              "top3": 0.7708333333333334
+            },
+            "hybrid": {
+              "mrr": 0.5868055555555556,
+              "top1": 0.375,
+              "top3": 0.7083333333333334
+            },
+            "n": 48,
+            "neural": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.3958333333333333,
+              "top3": 0.7916666666666666
+            },
+            "nll_neural": 1.6953486149340635,
+            "posterior_entropy_neural": 1.1965300244554968
+          },
+          "MATURE": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "nll_neural": 0.002259883574506708,
+            "posterior_entropy_neural": 0.02244315856580752
+          },
+          "MID": {
+            "all_finite": true,
+            "classical": {
+              "mrr": 0.8307291666666666,
+              "top1": 0.71875,
+              "top3": 0.90625
+            },
+            "hybrid": {
+              "mrr": 0.8723958333333334,
+              "top1": 0.8125,
+              "top3": 0.90625
+            },
+            "n": 32,
+            "neural": {
+              "mrr": 0.8697916666666666,
+              "top1": 0.8125,
+              "top3": 0.875
+            },
+            "nll_neural": 0.6186308526901942,
+            "posterior_entropy_neural": 0.38273227942517274
+          }
+        }
+      },
+      "per_seed": {
+        "20260814": {
+          "checkpoint_sha256": "455bc088a522635aa1598b6a79fd00912922795e0d874c3b7a1f1827c3497f8d",
+          "n_rows": 672
+        },
+        "20260815": {
+          "checkpoint_sha256": "353c07efa10903466b5f52d9b6b51e9ff954bfbbce4054a68b78eb30837363c0",
+          "n_rows": 672
+        },
+        "31874": {
+          "checkpoint_sha256": "c4a04ff07ad2b9eda3dbdd93da05ce44201b6ce177ab924fb8fad359395c2d62",
+          "n_rows": 672
+        }
+      }
+    }
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false
+}
