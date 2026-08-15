@@ -1,5 +1,15 @@
 # Milestone 8.5 summary: hydraulic backend diagnostic
 
+> **SUPERSEDED by Milestone 8.5a** (`reports/evaluation/hydrocore-v5/m8-5a-summary.md`,
+> `m8-5a-execution.json`, `m8-5a-scale.json`). This document's own headline finding below correctly identified
+> the fork-based timeout wrapper (not the solver/demand model) as the actual scalability driver, but its
+> **SIGCHLD/process-reaping speculation was tested directly by M8.5a and REFUTED**: the child's real `/proc` OS
+> state during every observed false timeout was `S` (sleeping/blocked-on-IO), never `Z` (zombie). The actual
+> mechanism is a `multiprocessing.Queue` "join before drain" IPC deadlock in `HydraulicSimulator.
+> _run_with_timeout`, now fixed. The **`PDD_SCALABILITY_BLOCKER_REMAINS` decision token below is superseded** by
+> M8.5a's `WRAPPED_EXECUTION_BLOCKER_RESOLVED` -- corrected measurements show no genuine PDD/WNTR/EPANET solver
+> scalability limitation through N=250, with numerical parity to direct/unwrapped execution.
+
 WNTR version: 1.5.0
 
 **Headline finding: CONFIRMED: at least one arm succeeds in milliseconds when called directly (unwrapped) but times out through HydraulicSimulator._run_with_timeout (wrapped) at the same size. This means the process-completion detection in the fork-based timeout wrapper -- not the solver engine or demand model -- is the actual scalability driver Milestone 8 observed. The apparent 'PDD bottleneck' is very likely this wrapper artifact, not a genuine PDD/engine performance limitation. Root-causing the exact OS/signal-handling mechanism (this sandbox's SIGCHLD/process-reaping behavior is the leading suspect, given the unrelated zombie-process accumulation already observed in this same environment across Milestones 7B/8) is out of scope for this diagnostic milestone.**

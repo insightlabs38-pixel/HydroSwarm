@@ -10,6 +10,7 @@ import os
 import queue
 import sys
 import tempfile
+import time
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -442,6 +443,29 @@ FEATURE_SNAPSHOT_TIME_SECONDS = 3_600
 DEFAULT_MINIMUM_PRESSURE_M = 10.0
 DEFAULT_MINIMUM_SERVICE_AVAILABILITY = 0.90
 
+#: Milestone 8.5a root cause (reports/evaluation/hydrocore-v5/m8-5a-execution.json):
+#: _run_with_timeout used to call `process.join(timeout)` BEFORE ever reading
+#: `result_queue`. `multiprocessing.Queue.put()` only enqueues into an
+#: in-process buffer; a background feeder thread in the CHILD pickles the
+#: object and writes it through an OS pipe, and the child process cannot
+#: actually exit until that write completes (Python's own documented
+#: "joining processes that use queues" hazard). Once a result exceeds the
+#: OS pipe's buffer capacity (~64KiB on Linux; a real PDD hydraulics result
+#: crosses this around 25-49 grid junctions -- exactly M8's reported
+#: "PDD scalability ceiling"), the child blocks writing to a pipe nobody is
+#: draining (the parent is sitting in join(), not get()), `is_alive()`
+#: stays True for the full timeout, and a computation that actually
+#: finished in milliseconds is reported as SimulationTimeoutError. Diagnosed
+#: empirically (not assumed): the child's real /proc OS state during a false
+#: timeout is 'S' (sleeping/blocked-on-IO), never 'Z' (zombie) -- ruling out
+#: SIGCHLD/process-reaping as the mechanism. Fix: drain the queue WHILE
+#: waiting (poll result_queue.get(timeout=...) against the deadline, with a
+#: liveness check on Queue.Empty to still fail fast on a genuine crash-
+#: without-a-result), so the child's feeder thread is never left blocked
+#: with nobody reading -- then join() to reap, only after a result (or the
+#: deadline) is observed.
+_QUEUE_POLL_INTERVAL_SECONDS = 0.02
+
 
 def _multiprocessing_worker_entrypoint(
     function: Callable[..., Any],
@@ -636,7 +660,13 @@ class HydraulicSimulator:
         only start method Windows supports, so this falls back to it there
         (accepting its slower per-call startup cost, and the module-level-
         function/picklable-args requirement above, on that platform only;
-        POSIX production/CI behavior is unchanged)."""
+        POSIX production/CI behavior is unchanged).
+
+        Drains `result_queue` WHILE waiting rather than joining first --
+        see `_QUEUE_POLL_INTERVAL_SECONDS`'s module-level comment (Milestone
+        8.5a) for why joining before ever reading the queue can report a
+        false timeout on a child that already finished but whose result
+        exceeds the OS pipe's buffered capacity."""
 
         context = multiprocessing.get_context("spawn" if sys.platform == "win32" else "fork")
         result_queue: multiprocessing.Queue = context.Queue(maxsize=1)
@@ -647,25 +677,55 @@ class HydraulicSimulator:
             name=f"hydroswarm-{operation}",
             daemon=True,
         )
+        got_result = False
+        succeeded = False
+        value: Any = None
         try:
             process.start()
-            process.join(self.timeout_seconds)
+            deadline = time.monotonic() + self.timeout_seconds
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                try:
+                    succeeded, value = result_queue.get(timeout=min(remaining, _QUEUE_POLL_INTERVAL_SECONDS))
+                    got_result = True
+                    break
+                except queue.Empty:
+                    if not process.is_alive():
+                        # The process has genuinely exited (not merely
+                        # blocked flushing its feeder thread -- that state
+                        # still reports is_alive()=True) without ever
+                        # putting a result: a real crash, not a false
+                        # timeout, so fail fast rather than waiting out the
+                        # rest of the deadline.
+                        break
+                    continue
+            if not got_result:
+                if process.is_alive():
+                    process.terminate()
+                    process.join(5.0)
+                    if process.is_alive():
+                        process.kill()
+                        process.join()
+                    raise SimulationTimeoutError(
+                        f"{operation} exceeded the {self.timeout_seconds:g}-second timeout"
+                    )
+                raise SimulationError(
+                    f"{operation} worker exited without a result (exit code {process.exitcode})"
+                )
+            # The result has been read, which unblocks the child's feeder
+            # thread; it should exit almost immediately now. Reap it, still
+            # escalating to terminate/kill if it somehow does not (fail-
+            # closed rather than trusting a clean exit).
+            process.join(5.0)
             if process.is_alive():
                 process.terminate()
                 process.join(5.0)
                 if process.is_alive():
                     process.kill()
                     process.join()
-                raise SimulationTimeoutError(
-                    f"{operation} exceeded the {self.timeout_seconds:g}-second timeout"
-                )
-            try:
-                succeeded, value = result_queue.get_nowait()
-            except queue.Empty:
-                raise SimulationError(
-                    f"{operation} worker exited without a result (exit code {process.exitcode})"
-                ) from None
-            finally:
+            else:
                 process.join()
         finally:
             # Release the Queue's background feeder-thread/fd and the

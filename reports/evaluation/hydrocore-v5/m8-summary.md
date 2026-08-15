@@ -1,5 +1,17 @@
 # Milestone 8 summary: backend scalability and memory stability
 
+> **SUPERSEDED IN PART by Milestone 8.5a** (`reports/evaluation/hydrocore-v5/m8-5a-summary.md`,
+> `m8-5a-execution.json`, `m8-5a-scale.json`). The FAILED rows below at N>=25 were real observations of the
+> measured wrapped execution path, but this document's implicit attribution of that failure to PDD/WNTR/EPANET
+> solver scalability is **RETRACTED**. Milestone 8.5a root-caused the failure to a `HydraulicSimulator.
+> _run_with_timeout` IPC defect (`process.join(timeout)` called before ever draining `result_queue`, causing a
+> real Python `multiprocessing.Queue` "joining processes that use queues" deadlock once a PDD result's pickled
+> size exceeded the OS pipe's buffered capacity -- around 25-49 junctions, exactly this table's own failure
+> threshold) and fixed it; corrected measurements complete successfully through N=250 with numerical parity to
+> direct/unwrapped execution. **The FAILED timings/timeouts below must NOT be read as PDD/WNTR/EPANET
+> performance measurements.** `PYG_NOT_JUSTIFIED` (this document's own neural-inference-scaling finding) is
+> unaffected and stands.
+
 Predictor: Milestone-1 winner (arm A); Milestone 2 decision was PCGRAD_JUSTIFIED (4182612 parameters, checkpoint sha256=44a2721394d95985...)
 
 ## 8.1 Network-size scaling

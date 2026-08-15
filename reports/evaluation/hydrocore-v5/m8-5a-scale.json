@@ -1,0 +1,678 @@
+{
+  "branch": "exp/hydrocore-v5-causal",
+  "decision": {
+    "all_arms_completed_at_all_tested_sizes": true,
+    "large_network_experiments_reopened": true,
+    "largest_node_count_tested": 250,
+    "leaked_children_after_repeated_corrected_runs": 0,
+    "primary_scalability_decision": "WRAPPED_EXECUTION_BLOCKER_RESOLVED",
+    "rationale": "All four arms (direct/wrapped x WNTR-native/EPANET-backed PDD) completed successfully at every tested size up to N=250 with the corrected wrapper, and repeated runs left zero leaked children. Milestone 8's original PDD-scalability-blocker attribution is retracted: the corrected measurements show no genuine solver scaling limitation at the sizes actually tested; the original ceiling was the wrapped-execution IPC defect M8.5a fixed."
+  },
+  "extended_node_counts_attempted": [
+    100,
+    250
+  ],
+  "extended_status": {
+    "100": "ATTEMPTED",
+    "250": "ATTEMPTED"
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "numerical_parity": {
+    "overall_pass": true,
+    "results": {
+      "10": {
+        "max_abs_demand_diff_m3s": 0.0,
+        "max_abs_pressure_diff_m": 2.842170943040401e-14,
+        "max_relative_pressure_diff": 2.6680435749902553e-16,
+        "pass": true
+      },
+      "25": {
+        "max_abs_demand_diff_m3s": 0.0,
+        "max_abs_pressure_diff_m": 2.842170943040401e-14,
+        "max_relative_pressure_diff": 2.668466900041633e-16,
+        "pass": true
+      },
+      "50": {
+        "max_abs_demand_diff_m3s": 0.0,
+        "max_abs_pressure_diff_m": 2.842170943040401e-14,
+        "max_relative_pressure_diff": 2.6688597011997393e-16,
+        "pass": true
+      }
+    },
+    "sizes_tested": [
+      10,
+      25,
+      50
+    ],
+    "thresholds": {
+      "max_abs_demand_diff_m3s": 1e-09,
+      "max_abs_pressure_diff_m": 1e-06
+    }
+  },
+  "purpose": "Milestone 8.5a Phase 3/4: numerical parity gate and corrected-wrapper scale characterization.",
+  "repeated_leak_check_corrected_wrapper": {
+    "n_runs": 15,
+    "node_count": 50,
+    "runs_with_leaked_children": 0
+  },
+  "repeats_per_arm": 5,
+  "required_node_counts": [
+    10,
+    25,
+    50
+  ],
+  "scale_matrix": [
+    {
+      "actual_node_count": 10,
+      "corrected_wrapped_epanet_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 2.786874771118164,
+          "process_startup_ms": 12.796878814697266,
+          "solver_compute_ms": 14.679908752441406,
+          "status": "OK",
+          "termination_reaping_ms": 14.383792877197266,
+          "total_wall_ms": 44.64912414550781,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2148ad0a10>",
+          "wrapper_overhead_ms": 29.967546463012695
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 44.690855997032486
+          },
+          {
+            "status": "OK",
+            "wall_ms": 40.9315040014917
+          },
+          {
+            "status": "OK",
+            "wall_ms": 40.71632600243902
+          },
+          {
+            "status": "OK",
+            "wall_ms": 40.96234499593265
+          },
+          {
+            "status": "OK",
+            "wall_ms": 39.76739700010512
+          }
+        ]
+      },
+      "corrected_wrapped_wntr_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 2.7179718017578125,
+          "process_startup_ms": 8.420228958129883,
+          "solver_compute_ms": 20.336389541625977,
+          "status": "OK",
+          "termination_reaping_ms": 14.616012573242188,
+          "total_wall_ms": 46.09203338623047,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2148dd3bf0>",
+          "wrapper_overhead_ms": 25.754213333129883
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 52.21518100006506
+          },
+          {
+            "status": "OK",
+            "wall_ms": 48.415435005153995
+          },
+          {
+            "status": "OK",
+            "wall_ms": 47.81284699856769
+          },
+          {
+            "status": "OK",
+            "wall_ms": 48.46242699568393
+          },
+          {
+            "status": "OK",
+            "wall_ms": 47.8897830034839
+          }
+        ]
+      },
+      "direct_unwrapped_epanet_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 12.312818995269481
+          },
+          {
+            "status": "OK",
+            "wall_ms": 8.4414749944699
+          },
+          {
+            "status": "OK",
+            "wall_ms": 8.130757996696047
+          },
+          {
+            "status": "OK",
+            "wall_ms": 8.03933599672746
+          },
+          {
+            "status": "OK",
+            "wall_ms": 7.964753000123892
+          }
+        ]
+      },
+      "direct_unwrapped_wntr_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 18.551244000263978
+          },
+          {
+            "status": "OK",
+            "wall_ms": 18.75015499535948
+          },
+          {
+            "status": "OK",
+            "wall_ms": 17.94813000014983
+          },
+          {
+            "status": "OK",
+            "wall_ms": 18.670438999834005
+          },
+          {
+            "status": "OK",
+            "wall_ms": 18.823590995452832
+          }
+        ]
+      },
+      "target_node_count": 10
+    },
+    {
+      "actual_node_count": 25,
+      "corrected_wrapped_epanet_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 3.4034252166748047,
+          "process_startup_ms": 8.801460266113281,
+          "solver_compute_ms": 15.078544616699219,
+          "status": "OK",
+          "termination_reaping_ms": 14.769554138183594,
+          "total_wall_ms": 42.054176330566406,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2148d008f0>",
+          "wrapper_overhead_ms": 26.97443962097168
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 48.51666600006865
+          },
+          {
+            "status": "OK",
+            "wall_ms": 44.983218002016656
+          },
+          {
+            "status": "OK",
+            "wall_ms": 45.593268994707614
+          },
+          {
+            "status": "OK",
+            "wall_ms": 45.6704099997296
+          },
+          {
+            "status": "OK",
+            "wall_ms": 45.17287699854933
+          }
+        ]
+      },
+      "corrected_wrapped_wntr_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 3.063678741455078,
+          "process_startup_ms": 9.632110595703125,
+          "solver_compute_ms": 42.598724365234375,
+          "status": "OK",
+          "termination_reaping_ms": 14.818429946899414,
+          "total_wall_ms": 70.1146125793457,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed214850b6b0>",
+          "wrapper_overhead_ms": 27.514219284057617
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 75.0983389953035
+          },
+          {
+            "status": "OK",
+            "wall_ms": 71.4735869987635
+          },
+          {
+            "status": "OK",
+            "wall_ms": 72.05513599910773
+          },
+          {
+            "status": "OK",
+            "wall_ms": 72.07626699528191
+          },
+          {
+            "status": "OK",
+            "wall_ms": 75.5603669967968
+          }
+        ]
+      },
+      "direct_unwrapped_epanet_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 13.907675995142199
+          },
+          {
+            "status": "OK",
+            "wall_ms": 10.78084199980367
+          },
+          {
+            "status": "OK",
+            "wall_ms": 10.620471999573056
+          },
+          {
+            "status": "OK",
+            "wall_ms": 12.507723004091531
+          },
+          {
+            "status": "OK",
+            "wall_ms": 10.582677001366392
+          }
+        ]
+      },
+      "direct_unwrapped_wntr_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 40.537658001994714
+          },
+          {
+            "status": "OK",
+            "wall_ms": 38.57024000171805
+          },
+          {
+            "status": "OK",
+            "wall_ms": 39.57387500122422
+          },
+          {
+            "status": "OK",
+            "wall_ms": 38.83258300629677
+          },
+          {
+            "status": "OK",
+            "wall_ms": 39.00614599842811
+          }
+        ]
+      },
+      "target_node_count": 25
+    },
+    {
+      "actual_node_count": 50,
+      "corrected_wrapped_epanet_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 3.503561019897461,
+          "process_startup_ms": 9.287595748901367,
+          "solver_compute_ms": 17.195940017700195,
+          "status": "OK",
+          "termination_reaping_ms": 15.126705169677734,
+          "total_wall_ms": 45.11570930480957,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2148b7c4d0>",
+          "wrapper_overhead_ms": 27.917861938476562
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 56.295296002645046
+          },
+          {
+            "status": "OK",
+            "wall_ms": 51.81747499591438
+          },
+          {
+            "status": "OK",
+            "wall_ms": 51.95389300206443
+          },
+          {
+            "status": "OK",
+            "wall_ms": 51.43836299976101
+          },
+          {
+            "status": "OK",
+            "wall_ms": 51.83280500205001
+          }
+        ]
+      },
+      "corrected_wrapped_wntr_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 3.139972686767578,
+          "process_startup_ms": 9.567737579345703,
+          "solver_compute_ms": 240.53120613098145,
+          "status": "OK",
+          "termination_reaping_ms": 18.251657485961914,
+          "total_wall_ms": 271.49200439453125,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2148b96270>",
+          "wrapper_overhead_ms": 30.959367752075195
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 282.0634770032484
+          },
+          {
+            "status": "OK",
+            "wall_ms": 278.498989995569
+          },
+          {
+            "status": "OK",
+            "wall_ms": 276.3558929946157
+          },
+          {
+            "status": "OK",
+            "wall_ms": 278.5687430005055
+          },
+          {
+            "status": "OK",
+            "wall_ms": 282.226385003014
+          }
+        ]
+      },
+      "direct_unwrapped_epanet_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 20.409103002748452
+          },
+          {
+            "status": "OK",
+            "wall_ms": 14.9929230028647
+          },
+          {
+            "status": "OK",
+            "wall_ms": 15.087396001035813
+          },
+          {
+            "status": "OK",
+            "wall_ms": 14.916332998836879
+          },
+          {
+            "status": "OK",
+            "wall_ms": 14.889860001858324
+          }
+        ]
+      },
+      "direct_unwrapped_wntr_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 82.00052800384583
+          },
+          {
+            "status": "OK",
+            "wall_ms": 216.4485239991336
+          },
+          {
+            "status": "OK",
+            "wall_ms": 79.10691300639883
+          },
+          {
+            "status": "OK",
+            "wall_ms": 79.49638900026912
+          },
+          {
+            "status": "OK",
+            "wall_ms": 77.88772600179072
+          }
+        ]
+      },
+      "target_node_count": 50
+    },
+    {
+      "actual_node_count": 100,
+      "corrected_wrapped_epanet_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 3.6308765411376953,
+          "process_startup_ms": 9.915828704833984,
+          "solver_compute_ms": 21.12436294555664,
+          "status": "OK",
+          "termination_reaping_ms": 15.442848205566406,
+          "total_wall_ms": 50.11558532714844,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2147c313a0>",
+          "wrapper_overhead_ms": 28.989553451538086
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 63.362480999785475
+          },
+          {
+            "status": "OK",
+            "wall_ms": 61.56608199671609
+          },
+          {
+            "status": "OK",
+            "wall_ms": 68.09763399360236
+          },
+          {
+            "status": "OK",
+            "wall_ms": 62.26904600043781
+          },
+          {
+            "status": "OK",
+            "wall_ms": 61.00922799669206
+          }
+        ]
+      },
+      "corrected_wrapped_wntr_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 3.4279823303222656,
+          "process_startup_ms": 13.80777359008789,
+          "solver_compute_ms": 367.4163818359375,
+          "status": "OK",
+          "termination_reaping_ms": 18.81575584411621,
+          "total_wall_ms": 403.4700393676758,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2147d6c530>",
+          "wrapper_overhead_ms": 36.05151176452637
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 414.2984999998589
+          },
+          {
+            "status": "OK",
+            "wall_ms": 413.54439000133425
+          },
+          {
+            "status": "OK",
+            "wall_ms": 416.9141739985207
+          },
+          {
+            "status": "OK",
+            "wall_ms": 409.57272500236286
+          },
+          {
+            "status": "OK",
+            "wall_ms": 411.30952799721854
+          }
+        ]
+      },
+      "direct_unwrapped_epanet_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 27.499878000526223
+          },
+          {
+            "status": "OK",
+            "wall_ms": 23.25266499974532
+          },
+          {
+            "status": "OK",
+            "wall_ms": 22.557566000614315
+          },
+          {
+            "status": "OK",
+            "wall_ms": 24.752776997047476
+          },
+          {
+            "status": "OK",
+            "wall_ms": 22.63096100068651
+          }
+        ]
+      },
+      "direct_unwrapped_wntr_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 328.0809499992756
+          },
+          {
+            "status": "OK",
+            "wall_ms": 183.5462520029978
+          },
+          {
+            "status": "OK",
+            "wall_ms": 304.39181799738435
+          },
+          {
+            "status": "OK",
+            "wall_ms": 188.64684399886755
+          },
+          {
+            "status": "OK",
+            "wall_ms": 183.83289600024
+          }
+        ]
+      },
+      "target_node_count": 100
+    },
+    {
+      "actual_node_count": 250,
+      "corrected_wrapped_epanet_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 5.511999130249023,
+          "process_startup_ms": 14.292478561401367,
+          "solver_compute_ms": 35.51006317138672,
+          "status": "OK",
+          "termination_reaping_ms": 15.852689743041992,
+          "total_wall_ms": 71.16889953613281,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed20569b1850>",
+          "wrapper_overhead_ms": 35.65716743469238
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 92.64688899565954
+          },
+          {
+            "status": "OK",
+            "wall_ms": 91.84979199926602
+          },
+          {
+            "status": "OK",
+            "wall_ms": 94.16372299892828
+          },
+          {
+            "status": "OK",
+            "wall_ms": 92.89169999829028
+          },
+          {
+            "status": "OK",
+            "wall_ms": 91.56506500585238
+          }
+        ]
+      },
+      "corrected_wrapped_wntr_pdd": {
+        "decomposition_sample": {
+          "error": null,
+          "ipc_ms": 5.01251220703125,
+          "process_startup_ms": 15.212774276733398,
+          "solver_compute_ms": 828.5858631134033,
+          "status": "OK",
+          "termination_reaping_ms": 20.22719383239746,
+          "total_wall_ms": 869.0388202667236,
+          "value": "<wntr.sim.results.SimulationResults object at 0xed2146ea2630>",
+          "wrapper_overhead_ms": 40.45248031616211
+        },
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 930.5880530009745
+          },
+          {
+            "status": "OK",
+            "wall_ms": 928.8981970021268
+          },
+          {
+            "status": "OK",
+            "wall_ms": 1039.4685849969392
+          },
+          {
+            "status": "OK",
+            "wall_ms": 931.41428999661
+          },
+          {
+            "status": "OK",
+            "wall_ms": 1041.8559230020037
+          }
+        ]
+      },
+      "direct_unwrapped_epanet_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 52.912457002094015
+          },
+          {
+            "status": "OK",
+            "wall_ms": 47.17024900310207
+          },
+          {
+            "status": "OK",
+            "wall_ms": 47.01919900253415
+          },
+          {
+            "status": "OK",
+            "wall_ms": 46.64878900075564
+          },
+          {
+            "status": "OK",
+            "wall_ms": 47.29273399425438
+          }
+        ]
+      },
+      "direct_unwrapped_wntr_pdd": {
+        "repeats": [
+          {
+            "status": "OK",
+            "wall_ms": 788.0362209980376
+          },
+          {
+            "status": "OK",
+            "wall_ms": 657.4339250000776
+          },
+          {
+            "status": "OK",
+            "wall_ms": 954.345268997713
+          },
+          {
+            "status": "OK",
+            "wall_ms": 651.849066001887
+          },
+          {
+            "status": "OK",
+            "wall_ms": 859.0870139960316
+          }
+        ]
+      },
+      "target_node_count": 250
+    }
+  ],
+  "schema_version": 1
+}
