@@ -1,0 +1,93 @@
+{
+  "arm": "EXPANDED",
+  "final_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase3-loop-grid/20260814T234612Z-173cb86a/model-export.safetensors",
+  "locked_test_opened_after": false,
+  "phase_epoch_boundaries": [
+    7,
+    14,
+    20
+  ],
+  "phases": [
+    {
+      "epoch_boundary": 7,
+      "family": "golden-reference",
+      "phase": 1,
+      "signature_library_manifest_hash": "ebbaa9ec710d8976196a3024ecf407ab564859f49ea91dac7f841af5e416ed25",
+      "train_manifest_hash": "1848aad5f9eee075aabc6617668656755a032da10bd1fe773acab11161fceeaa",
+      "train_scenario_count": 200,
+      "training_summary": {
+        "best_epoch": 6,
+        "best_validation_loss": 2.03134390185861,
+        "epochs_completed": 7,
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase1-golden-reference/20260814T234007Z-ff79e581/model-export.safetensors",
+        "export_sha256": "9cb1bb70ad74ff0657f414f5c2141a34468704b45fed37b9ff1d7beb91ba3951",
+        "final_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase1-golden-reference/20260814T234007Z-ff79e581/checkpoints/checkpoint-0007",
+        "global_steps": 125,
+        "last_resumable_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase1-golden-reference/20260814T234007Z-ff79e581/checkpoints/checkpoint-0007",
+        "run_directory": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase1-golden-reference/20260814T234007Z-ff79e581",
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false
+      },
+      "validation_manifest_hash": "30b286e41155ff3aff8ae7012c16a3b796ab81aba4116e652f1a6cfd2d5bb633",
+      "validation_scenario_count": 33
+    },
+    {
+      "epoch_boundary": 14,
+      "family": "branched-loop",
+      "phase": 2,
+      "signature_library_manifest_hash": "5b8d076f5e44ef501b88e50b7b3d08cab4e5c3816549e0f25d0895ceb69a89f3",
+      "train_manifest_hash": "bf831d7fcec8df52be36018158e366d03ef0276901390b8b2655d94d5451e054",
+      "train_scenario_count": 200,
+      "training_summary": {
+        "best_epoch": -1,
+        "best_validation_loss": 2.03134390185861,
+        "epochs_completed": 14,
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase2-branched-loop/20260814T234235Z-a57a9f5a/model-export.safetensors",
+        "export_sha256": "ab276c2976abbba472ee53ca365be1995360b419ddd59efbc669f31222922719",
+        "final_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase2-branched-loop/20260814T234235Z-a57a9f5a/checkpoints/checkpoint-0014",
+        "global_steps": 300,
+        "last_resumable_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase2-branched-loop/20260814T234235Z-a57a9f5a/checkpoints/checkpoint-0014",
+        "run_directory": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase2-branched-loop/20260814T234235Z-a57a9f5a",
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false
+      },
+      "validation_manifest_hash": "c43c1071cb77989924e7fe815465ad5b33b7c331c507be4473559cffc721c44a",
+      "validation_scenario_count": 33
+    },
+    {
+      "epoch_boundary": 20,
+      "family": "loop-grid",
+      "phase": 3,
+      "signature_library_manifest_hash": "5e2ac4046374e39e352b2d3910aebda324777de50b9af7f607928b2a81d4e17e",
+      "train_manifest_hash": "3e914ccdbda6d73ca3168145bbfa22bb634e3928af3bc03d844761a523064abd",
+      "train_scenario_count": 200,
+      "training_summary": {
+        "best_epoch": -1,
+        "best_validation_loss": 2.03134390185861,
+        "epochs_completed": 20,
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase3-loop-grid/20260814T234612Z-173cb86a/model-export.safetensors",
+        "export_sha256": "2705799ecad18c8910e86a5ea1f66d3ecd32e6de0a6d6af29ad3a5719965a8b3",
+        "final_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase3-loop-grid/20260814T234612Z-173cb86a/checkpoints/checkpoint-0020",
+        "global_steps": 450,
+        "last_resumable_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase3-loop-grid/20260814T234612Z-173cb86a/checkpoints/checkpoint-0020",
+        "run_directory": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase3-loop-grid/20260814T234612Z-173cb86a",
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false
+      },
+      "validation_manifest_hash": "a406f348f64dfaddd0658bd3ca86cd37064bc07df1de2938bedc2ce846169cad",
+      "validation_scenario_count": 34
+    }
+  ],
+  "purpose": "Milestone 7 Part A: EXPANDED topology-family training arm (sequential curriculum).",
+  "schema_version": 1,
+  "seed": 20260814,
+  "total_calibration_scenarios": 150,
+  "total_train_scenarios": 600,
+  "total_validation_scenarios": 100,
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "wall_seconds": 548.9903447628021
+}

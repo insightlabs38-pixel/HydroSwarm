@@ -1,0 +1,623 @@
+{
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "novelty_trust_boost": 0.25,
+  "per_seed": [
+    {
+      "current": {
+        "gate_classical_transfers_better_on_unseen": false,
+        "known_family_fusion_sweep": {
+          "calibration_applicability_rate": 1.0,
+          "classical_only": {
+            "mrr": 0.8046875,
+            "top1": 0.6875,
+            "top3": 0.90625
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.8333333333333334,
+            "top1": 0.75,
+            "top3": 0.875
+          },
+          "mean_current_dynamic_trust": 0.7218164813574318,
+          "mean_novelty_aware_trust": 0.7218164813574318,
+          "n": 32,
+          "neural_only": {
+            "mrr": 0.8333333333333334,
+            "top1": 0.75,
+            "top3": 0.875
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.8333333333333334,
+            "top1": 0.75,
+            "top3": 0.875
+          }
+        },
+        "known_network_regression_pp": 0.0,
+        "model": "CURRENT",
+        "note": "Fusion sweep compares classical-only/neural-only/CURRENT_DYNAMIC (real fuse_source_probabilities)/NOVELTY_AWARE (this script's own local-only variant, never applied to src/hydroswarm/inference/fusion.py) purely offline over already-computed Part-A rows -- no new model inference this section. 'gate_classical_transfers_better_on_unseen'=False means the fusion sweep below is reported for completeness but the milestone's own Part B trigger condition ('If classical inference consistently transfers better on unseen topologies') did not hold for this model, so 'promoted' is forced False regardless of the sweep's own numbers.",
+        "novelty_aware_gain_pp_per_family": {
+          "coastal-branch": 0.0,
+          "dense-loop": 0.0,
+          "tree-branch": -3.125
+        },
+        "per_unseen_family_fusion_sweep": {
+          "coastal-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.5822916666666667,
+              "top1": 0.4375,
+              "top3": 0.5625
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.5947916666666667,
+              "top1": 0.40625,
+              "top3": 0.6875
+            },
+            "mean_current_dynamic_trust": 0.6266324337476822,
+            "mean_novelty_aware_trust": 0.8766324337476822,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.40625,
+              "top3": 0.75
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.5895833333333333,
+              "top1": 0.40625,
+              "top3": 0.6875
+            }
+          },
+          "dense-loop": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6208333333333333,
+              "top1": 0.4375,
+              "top3": 0.71875
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.659375,
+              "top1": 0.46875,
+              "top3": 0.78125
+            },
+            "mean_current_dynamic_trust": 0.6245609917031284,
+            "mean_novelty_aware_trust": 0.8735016183327536,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.6854166666666667,
+              "top1": 0.53125,
+              "top3": 0.78125
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.6494791666666667,
+              "top1": 0.46875,
+              "top3": 0.75
+            }
+          },
+          "tree-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6864583333333333,
+              "top1": 0.53125,
+              "top3": 0.75
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.796875,
+              "top1": 0.6875,
+              "top3": 0.84375
+            },
+            "mean_current_dynamic_trust": 0.6030641800450051,
+            "mean_novelty_aware_trust": 0.8530641800450051,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.8125,
+              "top1": 0.71875,
+              "top3": 0.84375
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.78125,
+              "top1": 0.65625,
+              "top3": 0.84375
+            }
+          }
+        },
+        "pooled_unseen_fusion_sweep": {
+          "calibration_applicability_rate": 0.0,
+          "classical_only": {
+            "mrr": 0.5746354166666666,
+            "top1": 0.39375,
+            "top3": 0.64375
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.6469122023809524,
+            "top1": 0.48125,
+            "top3": 0.71875
+          },
+          "mean_current_dynamic_trust": 0.6096337980973131,
+          "mean_novelty_aware_trust": 0.8586818424040233,
+          "n": 160,
+          "neural_only": {
+            "mrr": 0.661391369047619,
+            "top1": 0.50625,
+            "top3": 0.74375
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.6288318452380952,
+            "top1": 0.45625,
+            "top3": 0.70625
+          }
+        },
+        "promotion": {
+          "no_meaningful_known_network_regression": true,
+          "preserved_ood_truthfulness": true,
+          "promoted": false,
+          "repeated_unseen_family_gain": false
+        },
+        "unseen_calibration_applicability_rate": 0.0,
+        "unseen_classical_top1": 0.39375,
+        "unseen_neural_top1": 0.50625
+      },
+      "expanded": {
+        "gate_classical_transfers_better_on_unseen": false,
+        "known_family_fusion_sweep": {
+          "calibration_applicability_rate": 1.0,
+          "classical_only": {
+            "mrr": 0.6711309523809524,
+            "top1": 0.53125,
+            "top3": 0.7916666666666666
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.7013392857142856,
+            "top1": 0.5729166666666666,
+            "top3": 0.7916666666666666
+          },
+          "mean_current_dynamic_trust": 0.7159135475649617,
+          "mean_novelty_aware_trust": 0.7159135475649617,
+          "n": 96,
+          "neural_only": {
+            "mrr": 0.7010664682539683,
+            "top1": 0.5729166666666666,
+            "top3": 0.78125
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.7013392857142856,
+            "top1": 0.5729166666666666,
+            "top3": 0.7916666666666666
+          }
+        },
+        "known_network_regression_pp": 0.0,
+        "model": "EXPANDED",
+        "note": "Fusion sweep compares classical-only/neural-only/CURRENT_DYNAMIC (real fuse_source_probabilities)/NOVELTY_AWARE (this script's own local-only variant, never applied to src/hydroswarm/inference/fusion.py) purely offline over already-computed Part-A rows -- no new model inference this section. 'gate_classical_transfers_better_on_unseen'=False means the fusion sweep below is reported for completeness but the milestone's own Part B trigger condition ('If classical inference consistently transfers better on unseen topologies') did not hold for this model, so 'promoted' is forced False regardless of the sweep's own numbers.",
+        "novelty_aware_gain_pp_per_family": {
+          "coastal-branch": 0.0,
+          "dense-loop": 0.0,
+          "tree-branch": -3.125
+        },
+        "per_unseen_family_fusion_sweep": {
+          "coastal-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.5822916666666667,
+              "top1": 0.4375,
+              "top3": 0.5625
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.5744791666666667,
+              "top1": 0.40625,
+              "top3": 0.59375
+            },
+            "mean_current_dynamic_trust": 0.6533085748829333,
+            "mean_novelty_aware_trust": 0.895648452911935,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.5859375,
+              "top1": 0.40625,
+              "top3": 0.65625
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.5734375,
+              "top1": 0.40625,
+              "top3": 0.59375
+            }
+          },
+          "dense-loop": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6208333333333333,
+              "top1": 0.4375,
+              "top3": 0.71875
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.7083333333333334,
+              "top1": 0.5625,
+              "top3": 0.78125
+            },
+            "mean_current_dynamic_trust": 0.6466244911315377,
+            "mean_novelty_aware_trust": 0.8891096811644364,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.7213541666666666,
+              "top1": 0.5625,
+              "top3": 0.875
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.7057291666666666,
+              "top1": 0.5625,
+              "top3": 0.75
+            }
+          },
+          "tree-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6864583333333333,
+              "top1": 0.53125,
+              "top3": 0.75
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.76875,
+              "top1": 0.65625,
+              "top3": 0.84375
+            },
+            "mean_current_dynamic_trust": 0.6230324084213017,
+            "mean_novelty_aware_trust": 0.8689429464912749,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.7713541666666667,
+              "top1": 0.65625,
+              "top3": 0.875
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.7479166666666667,
+              "top1": 0.625,
+              "top3": 0.84375
+            }
+          }
+        },
+        "pooled_unseen_fusion_sweep": {
+          "calibration_applicability_rate": 0.0,
+          "classical_only": {
+            "mrr": 0.6298611111111111,
+            "top1": 0.46875,
+            "top3": 0.6770833333333334
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.6838541666666668,
+            "top1": 0.5416666666666666,
+            "top3": 0.7395833333333334
+          },
+          "mean_current_dynamic_trust": 0.6409884914785909,
+          "mean_novelty_aware_trust": 0.8845670268558821,
+          "n": 96,
+          "neural_only": {
+            "mrr": 0.6928819444444444,
+            "top1": 0.5416666666666666,
+            "top3": 0.8020833333333334
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.6756944444444444,
+            "top1": 0.53125,
+            "top3": 0.7291666666666666
+          }
+        },
+        "promotion": {
+          "no_meaningful_known_network_regression": true,
+          "preserved_ood_truthfulness": true,
+          "promoted": false,
+          "repeated_unseen_family_gain": false
+        },
+        "unseen_calibration_applicability_rate": 0.0,
+        "unseen_classical_top1": 0.46875,
+        "unseen_neural_top1": 0.5416666666666666
+      },
+      "seed": 20260814
+    },
+    {
+      "current": {
+        "gate_classical_transfers_better_on_unseen": false,
+        "known_family_fusion_sweep": {
+          "calibration_applicability_rate": 1.0,
+          "classical_only": {
+            "mrr": 0.8046875,
+            "top1": 0.6875,
+            "top3": 0.90625
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.8333333333333334,
+            "top1": 0.75,
+            "top3": 0.875
+          },
+          "mean_current_dynamic_trust": 0.7230897719929014,
+          "mean_novelty_aware_trust": 0.7230897719929014,
+          "n": 32,
+          "neural_only": {
+            "mrr": 0.8125,
+            "top1": 0.71875,
+            "top3": 0.875
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.8333333333333334,
+            "top1": 0.75,
+            "top3": 0.875
+          }
+        },
+        "known_network_regression_pp": 0.0,
+        "model": "CURRENT",
+        "note": "Fusion sweep compares classical-only/neural-only/CURRENT_DYNAMIC (real fuse_source_probabilities)/NOVELTY_AWARE (this script's own local-only variant, never applied to src/hydroswarm/inference/fusion.py) purely offline over already-computed Part-A rows -- no new model inference this section. 'gate_classical_transfers_better_on_unseen'=False means the fusion sweep below is reported for completeness but the milestone's own Part B trigger condition ('If classical inference consistently transfers better on unseen topologies') did not hold for this model, so 'promoted' is forced False regardless of the sweep's own numbers.",
+        "novelty_aware_gain_pp_per_family": {
+          "coastal-branch": 0.0,
+          "dense-loop": -6.25,
+          "tree-branch": 0.0
+        },
+        "per_unseen_family_fusion_sweep": {
+          "coastal-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.5822916666666667,
+              "top1": 0.4375,
+              "top3": 0.5625
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.5489583333333333,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "mean_current_dynamic_trust": 0.6305934341679437,
+            "mean_novelty_aware_trust": 0.8804900259829116,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.5645833333333333,
+              "top1": 0.375,
+              "top3": 0.65625
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.5458333333333333,
+              "top1": 0.375,
+              "top3": 0.5625
+            }
+          },
+          "dense-loop": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6208333333333333,
+              "top1": 0.4375,
+              "top3": 0.71875
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.6661458333333333,
+              "top1": 0.5,
+              "top3": 0.75
+            },
+            "mean_current_dynamic_trust": 0.6296025342801175,
+            "mean_novelty_aware_trust": 0.8775341070484359,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.6703125,
+              "top1": 0.5,
+              "top3": 0.78125
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.6348958333333333,
+              "top1": 0.4375,
+              "top3": 0.75
+            }
+          },
+          "tree-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6864583333333333,
+              "top1": 0.53125,
+              "top3": 0.75
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.8229166666666666,
+              "top1": 0.75,
+              "top3": 0.84375
+            },
+            "mean_current_dynamic_trust": 0.5977120538619783,
+            "mean_novelty_aware_trust": 0.8477120538619783,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.8385416666666666,
+              "top1": 0.78125,
+              "top3": 0.84375
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.828125,
+              "top1": 0.75,
+              "top3": 0.84375
+            }
+          }
+        },
+        "pooled_unseen_fusion_sweep": {
+          "calibration_applicability_rate": 0.0,
+          "classical_only": {
+            "mrr": 0.5746354166666666,
+            "top1": 0.39375,
+            "top3": 0.64375
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.6231175595238095,
+            "top1": 0.46875,
+            "top3": 0.65
+          },
+          "mean_current_dynamic_trust": 0.6145222601784798,
+          "mean_novelty_aware_trust": 0.8627777351314723,
+          "n": 160,
+          "neural_only": {
+            "mrr": 0.6377901785714286,
+            "top1": 0.48125,
+            "top3": 0.69375
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.6139508928571429,
+            "top1": 0.45,
+            "top3": 0.65
+          }
+        },
+        "promotion": {
+          "no_meaningful_known_network_regression": true,
+          "preserved_ood_truthfulness": true,
+          "promoted": false,
+          "repeated_unseen_family_gain": false
+        },
+        "unseen_calibration_applicability_rate": 0.0,
+        "unseen_classical_top1": 0.39375,
+        "unseen_neural_top1": 0.48125
+      },
+      "expanded": {
+        "gate_classical_transfers_better_on_unseen": false,
+        "known_family_fusion_sweep": {
+          "calibration_applicability_rate": 1.0,
+          "classical_only": {
+            "mrr": 0.6711309523809524,
+            "top1": 0.53125,
+            "top3": 0.7916666666666666
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.7050843253968254,
+            "top1": 0.5833333333333334,
+            "top3": 0.7916666666666666
+          },
+          "mean_current_dynamic_trust": 0.7157350640117341,
+          "mean_novelty_aware_trust": 0.7157350640117341,
+          "n": 96,
+          "neural_only": {
+            "mrr": 0.7060267857142857,
+            "top1": 0.5833333333333334,
+            "top3": 0.78125
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.7050843253968254,
+            "top1": 0.5833333333333334,
+            "top3": 0.7916666666666666
+          }
+        },
+        "known_network_regression_pp": 0.0,
+        "model": "EXPANDED",
+        "note": "Fusion sweep compares classical-only/neural-only/CURRENT_DYNAMIC (real fuse_source_probabilities)/NOVELTY_AWARE (this script's own local-only variant, never applied to src/hydroswarm/inference/fusion.py) purely offline over already-computed Part-A rows -- no new model inference this section. 'gate_classical_transfers_better_on_unseen'=False means the fusion sweep below is reported for completeness but the milestone's own Part B trigger condition ('If classical inference consistently transfers better on unseen topologies') did not hold for this model, so 'promoted' is forced False regardless of the sweep's own numbers.",
+        "novelty_aware_gain_pp_per_family": {
+          "coastal-branch": 0.0,
+          "dense-loop": -3.125,
+          "tree-branch": -3.125
+        },
+        "per_unseen_family_fusion_sweep": {
+          "coastal-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.5822916666666667,
+              "top1": 0.4375,
+              "top3": 0.5625
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.5807291666666666,
+              "top1": 0.40625,
+              "top3": 0.59375
+            },
+            "mean_current_dynamic_trust": 0.6533699611122109,
+            "mean_novelty_aware_trust": 0.8956742310838987,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.5807291666666666,
+              "top1": 0.40625,
+              "top3": 0.59375
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.5755208333333334,
+              "top1": 0.40625,
+              "top3": 0.59375
+            }
+          },
+          "dense-loop": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6208333333333333,
+              "top1": 0.4375,
+              "top3": 0.71875
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.7083333333333334,
+              "top1": 0.5625,
+              "top3": 0.78125
+            },
+            "mean_current_dynamic_trust": 0.6432081960590311,
+            "mean_novelty_aware_trust": 0.8858706739369414,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.71875,
+              "top1": 0.5625,
+              "top3": 0.84375
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.6927083333333334,
+              "top1": 0.53125,
+              "top3": 0.78125
+            }
+          },
+          "tree-branch": {
+            "calibration_applicability_rate": 0.0,
+            "classical_only": {
+              "mrr": 0.6864583333333333,
+              "top1": 0.53125,
+              "top3": 0.75
+            },
+            "current_dynamic_fusion": {
+              "mrr": 0.7895833333333333,
+              "top1": 0.6875,
+              "top3": 0.84375
+            },
+            "mean_current_dynamic_trust": 0.6192954040863095,
+            "mean_novelty_aware_trust": 0.8654193760105139,
+            "n": 32,
+            "neural_only": {
+              "mrr": 0.7895833333333333,
+              "top1": 0.6875,
+              "top3": 0.84375
+            },
+            "novelty_aware_fusion": {
+              "mrr": 0.7739583333333333,
+              "top1": 0.65625,
+              "top3": 0.84375
+            }
+          }
+        },
+        "pooled_unseen_fusion_sweep": {
+          "calibration_applicability_rate": 0.0,
+          "classical_only": {
+            "mrr": 0.6298611111111111,
+            "top1": 0.46875,
+            "top3": 0.6770833333333334
+          },
+          "current_dynamic_fusion": {
+            "mrr": 0.6928819444444444,
+            "top1": 0.5520833333333334,
+            "top3": 0.7395833333333334
+          },
+          "mean_current_dynamic_trust": 0.6386245204191838,
+          "mean_novelty_aware_trust": 0.8823214270104512,
+          "n": 96,
+          "neural_only": {
+            "mrr": 0.6963541666666666,
+            "top1": 0.5520833333333334,
+            "top3": 0.7604166666666666
+          },
+          "novelty_aware_fusion": {
+            "mrr": 0.6807291666666666,
+            "top1": 0.53125,
+            "top3": 0.7395833333333334
+          }
+        },
+        "promotion": {
+          "no_meaningful_known_network_regression": true,
+          "preserved_ood_truthfulness": true,
+          "promoted": false,
+          "repeated_unseen_family_gain": false
+        },
+        "unseen_calibration_applicability_rate": 0.0,
+        "unseen_classical_top1": 0.46875,
+        "unseen_neural_top1": 0.5520833333333334
+      },
+      "seed": 31874
+    }
+  ],
+  "schema_version": 1,
+  "section": "milestone_7_part_b_ood_aware_fusion"
+}
