@@ -182,6 +182,140 @@
             "overall_mrr": 0.8299603174603174
           }
         },
+        "20260815": {
+          "checkpoint_sha256": "728484a261bf8e7d41138ba44501df153856a1a1448b84eeb1df090091f3b387",
+          "origin_invariance_and_counterfactual": {
+            "golden-reference": {
+              "any_origin_invariance_failure": false,
+              "counterfactual": {
+                "N2": {
+                  "label": "REPRESENTATION_SENSITIVITY_COUNTERFACTUAL",
+                  "max_abs_diff": 0.02720421552658081
+                },
+                "N3": {
+                  "label": "REPRESENTATION_SENSITIVITY_COUNTERFACTUAL",
+                  "max_abs_diff": 0.06626059114933014
+                }
+              },
+              "network_label": "golden-reference",
+              "origin_invariance": {
+                "no_event": {
+                  "+1h": {
+                    "max_abs_diff": 0.0,
+                    "pass": true
+                  },
+                  "+24h": {
+                    "max_abs_diff": 0.0,
+                    "pass": true
+                  },
+                  "+7d": {
+                    "max_abs_diff": 0.0,
+                    "pass": true
+                  }
+                },
+                "sparse": {
+                  "+1h": {
+                    "max_abs_diff": 0.0,
+                    "pass": true
+                  },
+                  "+24h": {
+                    "max_abs_diff": 0.0,
+                    "pass": true
+                  },
+                  "+7d": {
+                    "max_abs_diff": 0.0,
+                    "pass": true
+                  }
+                }
+              },
+              "tolerance": 0.0001
+            }
+          },
+          "param_count": 4182612,
+          "standard_localization": {
+            "all_finite": true,
+            "by_depth": {
+              "1": {
+                "all_finite": true,
+                "mrr": 0.5215277777777778,
+                "n": 120,
+                "nll": 2.8252258094896794,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.5176597307125728,
+                "top1": 0.275,
+                "top3": 0.7416666666666667
+              },
+              "12": {
+                "all_finite": true,
+                "mrr": 0.9916666666666667,
+                "n": 120,
+                "nll": 0.035380988539738735,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.06186532851286301,
+                "top1": 0.9833333333333333,
+                "top3": 1.0
+              },
+              "2": {
+                "all_finite": true,
+                "mrr": 0.6756944444444444,
+                "n": 120,
+                "nll": 2.2738556719699523,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.48502826127354787,
+                "top1": 0.49166666666666664,
+                "top3": 0.8083333333333333
+              },
+              "25": {
+                "all_finite": true,
+                "mrr": 1.0,
+                "n": 120,
+                "nll": 0.02445013474404859,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.06256350912162816,
+                "top1": 1.0,
+                "top3": 1.0
+              },
+              "3": {
+                "all_finite": true,
+                "mrr": 0.7319444444444444,
+                "n": 120,
+                "nll": 1.8692850367170122,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.2786870109105924,
+                "top1": 0.5833333333333334,
+                "top3": 0.8666666666666667
+              },
+              "4": {
+                "all_finite": true,
+                "mrr": 0.8944444444444444,
+                "n": 120,
+                "nll": 0.7118828881910432,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.16079401677341895,
+                "top1": 0.825,
+                "top3": 0.9666666666666667
+              },
+              "6": {
+                "all_finite": true,
+                "mrr": 0.9875,
+                "n": 120,
+                "nll": 0.08210087292092307,
+                "ood_logits_finite": true,
+                "posterior_entropy": 0.07420648363778734,
+                "top1": 0.975,
+                "top3": 1.0
+              }
+            },
+            "early_mrr": 0.6430555555555556,
+            "early_top1": 0.45,
+            "mature_mrr": 0.9958333333333333,
+            "mature_top1": 0.9916666666666667,
+            "mid_mrr": 0.9409722222222222,
+            "mid_top1": 0.8999999999999999,
+            "ood_logits_finite": true,
+            "overall_mrr": 0.828968253968254
+          }
+        },
         "31874": {
           "checkpoint_sha256": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176",
           "origin_invariance_and_counterfactual": {
