@@ -227,6 +227,31 @@ candidate small-size recipe for Milestone 9. See
 `reports/evaluation/hydrocore-v5/m8-7-summary.md` for the outcome. This
 amendment does not alter any prior milestone's historical results.
 
+## 8.6. Amendment: Milestone 9.0 (interleaved topology-diversity training)
+
+Milestone 7 (`reports/evaluation/hydrocore-v5/m7-summary.md`) compared a
+golden-reference-only model against a model trained on golden-reference +
+branched-loop + loop-grid, but the latter used a SEQUENTIAL three-phase
+curriculum (one family per phase, chained via `Trainer.fit(resume_from=
+...)`) because `CausalPrefixDatasetView`/`collate_scenarios` cannot mix
+differently-shaped topology families within one micro-batch. M7 found no
+robust unseen-topology generalization gain, but that result is confounded
+by family recency/catastrophic forgetting/optimizer-state dominated by the
+last-trained family -- it establishes only that the TESTED SEQUENTIAL
+curriculum did not generalize, not that topology diversity itself cannot
+help.
+
+Milestone 9.0 (`docs/evaluation/HYDROCORE_V5_M9_0_PROTOCOL.md`, its own
+frozen sub-protocol) retests the same question with TRUE interleaving --
+family-pure micro-batches, cross-family gradient accumulation within one
+optimizer step -- at the current (~4.18M) model size and the Milestone-8.7
+`AGE_FIX_ONLY` representation, before any Milestone-9 capacity scaling
+begins. See `reports/evaluation/hydrocore-v5/m9-0-summary.md` for the
+outcome. This amendment does not alter Milestone 7's own historical
+results, and Milestone 9's own capacity-scaling scope (Section 6 above) is
+unchanged except that it now also inherits whichever topology-training
+recipe M9.0 selects.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model
