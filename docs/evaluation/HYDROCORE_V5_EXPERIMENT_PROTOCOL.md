@@ -276,6 +276,23 @@ amendment does not alter Milestone 9.0's own historical results, and
 Milestone 9's capacity-scaling scope (Section 6 above) now also inherits
 whichever topology-training recipe M9.0a's own decision freezes.
 
+## 8.8. Amendment: Milestone 9.0b (multi-topology calibration grouping study)
+
+Milestone 9.0a validated that `STEP_MATCHED_INTERLEAVED_MULTI_FAMILY`
+training gives a real, optimizer-step-parity-robust unseen-topology gain,
+but found its `B_DEPTH_AWARE` (`network_id = f"{family}:{depth_bucket}"`)
+calibration fails the frozen 0.85 known-family marginal-coverage floor on
+all three predictor seeds -- `CALIBRATION_SYSTEMATICALLY_INCOMPATIBLE`.
+
+Milestone 9.0b (`docs/evaluation/HYDROCORE_V5_M9_0B_PROTOCOL.md`, its own
+frozen sub-protocol) tests, at fixed alpha=0.1 and the frozen M9.0a `ARM_B2`
+predictor checkpoints (zero retraining), whether a different Mondrian
+grouping/fallback construction over the same conformal machinery
+(`hydroswarm.calibration.conformal.SplitConformalCalibrator`, unmodified)
+restores safety-valid coverage, closing the calibration question one way or
+the other before Milestone 9.1 (continuous-time architecture trial) begins.
+See `reports/evaluation/hydrocore-v5/m9-0b-summary.md` for the outcome.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model
