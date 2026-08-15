@@ -1,0 +1,80 @@
+{
+  "dependencies": {
+    "GRAPH_ODE": {
+      "package": "torchdiffeq",
+      "version": "0.2.5",
+      "license": "MIT",
+      "why_selected": "canonical differentiable ODE solver for PyTorch; avoids hand-rolling a numerical integrator",
+      "dependency_feasible": true
+    },
+    "GRAPH_CDE": {
+      "package": "torchcde",
+      "version": "0.2.5",
+      "license": "Apache-2.0",
+      "why_selected": "canonical differentiable CDE library (built on torchdiffeq); provides linear-interpolation control-path construction",
+      "dependency_feasible": true
+    },
+    "GRAPH_SDE": {
+      "package": "torchsde",
+      "version": "0.2.6",
+      "license": "Apache-2.0",
+      "why_selected": "canonical differentiable SDE solver library; provides seeded Brownian-path construction for reproducibility/stochasticity tests",
+      "dependency_feasible": true
+    }
+  },
+  "parameter_matching_summary": {
+    "GRAPH_ODE": {
+      "mlp_width": 574,
+      "total_params": 4184118,
+      "delta_percent": 0.036006208560583675
+    },
+    "GRAPH_CDE": {
+      "mlp_width": 242,
+      "total_params": 4183082,
+      "delta_percent": 0.011236997359544705
+    },
+    "GRAPH_SDE": {
+      "mlp_width": 464,
+      "total_params": 4183540,
+      "delta_percent": 0.022187092658845716
+    }
+  },
+  "every_novel_arm_within_5_percent": true,
+  "gate_checklists": {
+    "GRAPH_ODE": {
+      "parameter_count_within_5_percent": true,
+      "forward_finite": true,
+      "backward_finite": true,
+      "loss_finite": true,
+      "temporal_dynamics_gradient_nonzero": true,
+      "output_head_gradient_nonzero": true,
+      "mini_overfit_finite": true
+    },
+    "GRAPH_CDE": {
+      "parameter_count_within_5_percent": true,
+      "forward_finite": true,
+      "backward_finite": true,
+      "loss_finite": true,
+      "temporal_dynamics_gradient_nonzero": true,
+      "output_head_gradient_nonzero": true,
+      "mini_overfit_finite": true
+    },
+    "GRAPH_SDE": {
+      "parameter_count_within_5_percent": true,
+      "forward_finite": true,
+      "backward_finite": true,
+      "loss_finite": true,
+      "temporal_dynamics_gradient_nonzero": true,
+      "output_head_gradient_nonzero": true,
+      "mini_overfit_finite": true
+    }
+  },
+  "arm_verdicts": {
+    "CURRENT": "BASELINE_VALID",
+    "GRAPH_ODE": "PREFLIGHT_PASS",
+    "GRAPH_CDE": "PREFLIGHT_PASS",
+    "GRAPH_SDE": "PREFLIGHT_PASS"
+  },
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

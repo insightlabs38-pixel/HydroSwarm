@@ -1,0 +1,129 @@
+{
+  "arms": {
+    "CURRENT": {
+      "finiteness": {
+        "forward_finite": true,
+        "loss_finite": true,
+        "backward_grads_finite": true,
+        "temporal_dynamics_grad_nonzero": true,
+        "output_head_grad_nonzero": true
+      },
+      "mini_overfit_sanity": {
+        "optimizer_steps": 20,
+        "initial_loss": 0.7432988286018372,
+        "final_loss": 0.01170681044459343,
+        "all_finite": true
+      },
+      "latency": {
+        "forward": {
+          "median_seconds": 0.017503964001662098,
+          "p90_seconds": 0.03177588799735531
+        },
+        "forward_backward": {
+          "median_seconds": 0.04283288300212007,
+          "p90_seconds": 0.06709842299460433
+        }
+      }
+    },
+    "GRAPH_ODE": {
+      "finiteness": {
+        "forward_finite": true,
+        "loss_finite": true,
+        "backward_grads_finite": true,
+        "temporal_dynamics_grad_nonzero": true,
+        "output_head_grad_nonzero": true
+      },
+      "mini_overfit_sanity": {
+        "optimizer_steps": 20,
+        "initial_loss": 0.537693440914154,
+        "final_loss": 0.0022776604164391756,
+        "all_finite": true
+      },
+      "latency": {
+        "forward": {
+          "median_seconds": 0.029148504996555857,
+          "p90_seconds": 0.05915581400040537
+        },
+        "forward_backward": {
+          "median_seconds": 0.07913571900280658,
+          "p90_seconds": 0.15100057699601166
+        },
+        "ratio_to_current": 1.6652516534990616,
+        "feasibility_classification": "PRACTICAL"
+      }
+    },
+    "GRAPH_CDE": {
+      "finiteness": {
+        "forward_finite": true,
+        "loss_finite": true,
+        "backward_grads_finite": true,
+        "temporal_dynamics_grad_nonzero": true,
+        "output_head_grad_nonzero": true
+      },
+      "mini_overfit_sanity": {
+        "optimizer_steps": 20,
+        "initial_loss": 0.5939338207244873,
+        "final_loss": 0.0034931625705212355,
+        "all_finite": true
+      },
+      "latency": {
+        "forward": {
+          "median_seconds": 0.11941771098645404,
+          "p90_seconds": 0.14583537200815044
+        },
+        "forward_backward": {
+          "median_seconds": 0.38325901300413534,
+          "p90_seconds": 0.4452753549994668
+        },
+        "ratio_to_current": 6.822323844765372,
+        "feasibility_classification": "EXPENSIVE_BUT_TESTABLE"
+      }
+    },
+    "GRAPH_SDE": {
+      "finiteness": {
+        "forward_finite": true,
+        "loss_finite": true,
+        "backward_grads_finite": true,
+        "temporal_dynamics_grad_nonzero": true,
+        "output_head_grad_nonzero": true
+      },
+      "mini_overfit_sanity": {
+        "optimizer_steps": 20,
+        "initial_loss": 0.9322235584259033,
+        "final_loss": 0.004049964714795351,
+        "all_finite": true
+      },
+      "latency": {
+        "forward": {
+          "median_seconds": 0.05460028100060299,
+          "p90_seconds": 0.09263342400663532
+        },
+        "forward_backward": {
+          "median_seconds": 0.08947280200663954,
+          "p90_seconds": 0.12888432799081784
+        },
+        "ratio_to_current": 3.1193094887202917,
+        "feasibility_classification": "EXPENSIVE_BUT_TESTABLE"
+      },
+      "mc_stabilization": {
+        "mc_1": {
+          "runtime_seconds": 0.030855628996505402,
+          "mean_latent_summary": 0.15116259455680847,
+          "variance_estimate": 0.0
+        },
+        "mc_4": {
+          "runtime_seconds": 0.1121911399968667,
+          "mean_latent_summary": 0.15131062269210815,
+          "variance_estimate": 0.00013368233339861035
+        },
+        "mc_8": {
+          "runtime_seconds": 0.24720981299469713,
+          "mean_latent_summary": 0.15129663050174713,
+          "variance_estimate": 0.0001536401832709089
+        }
+      }
+    }
+  },
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}
