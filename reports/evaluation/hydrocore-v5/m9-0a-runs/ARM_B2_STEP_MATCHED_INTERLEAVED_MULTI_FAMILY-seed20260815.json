@@ -1,0 +1,277 @@
+{
+  "actual_optimizer_steps_per_epoch": [
+    15,
+    30,
+    45,
+    60,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75
+  ],
+  "actual_optimizer_steps_total": 1350,
+  "arm": "ARM_B2_STEP_MATCHED_INTERLEAVED_MULTI_FAMILY",
+  "arm_a_target_optimizer_steps_per_epoch": [
+    15,
+    30,
+    45,
+    60,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75
+  ],
+  "arm_a_target_optimizer_steps_total": 1350,
+  "combined_manifest_hash": "b65df104963b4f03288b75be65e0f15f7e7530be8df57627c8e57c491261398a",
+  "family_exposure_counts": {
+    "branched-loop": 3600,
+    "golden-reference": 3600,
+    "loop-grid": 3600
+  },
+  "family_weighting": {
+    "branched-loop": 0.3333333333333333,
+    "golden-reference": 0.3333333333333333,
+    "loop-grid": 0.3333333333333333
+  },
+  "feature_kwargs": {
+    "include_relative_gap_feature": false,
+    "unobserved_age_sentinel": "fixed"
+  },
+  "locked_test_opened_after": false,
+  "matches_arm_a_per_epoch_optimizer_steps": true,
+  "matches_arm_a_total_optimizer_steps": true,
+  "microbatches_per_optimizer_update": 4,
+  "model_architecture": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "param_count": 4182612,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned",
+    "use_adapters": false,
+    "variant": "small"
+  },
+  "per_epoch_family_microbatches": [
+    {
+      "branched-loop": 20,
+      "golden-reference": 20,
+      "loop-grid": 20
+    },
+    {
+      "branched-loop": 40,
+      "golden-reference": 40,
+      "loop-grid": 40
+    },
+    {
+      "branched-loop": 60,
+      "golden-reference": 60,
+      "loop-grid": 60
+    },
+    {
+      "branched-loop": 80,
+      "golden-reference": 80,
+      "loop-grid": 80
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    }
+  ],
+  "purpose": "Milestone 9.0a: STEP_MATCHED_INTERLEAVED_MULTI_FAMILY (Arm B2) training run under the frozen M9.0a protocol.",
+  "scheduler_total_steps": 1500,
+  "schema_version": 1,
+  "seed": 20260815,
+  "signature_library_manifest_hash_per_family": {
+    "branched-loop": "5b8d076f5e44ef501b88e50b7b3d08cab4e5c3816549e0f25d0895ceb69a89f3",
+    "golden-reference": "ebbaa9ec710d8976196a3024ecf407ab564859f49ea91dac7f841af5e416ed25",
+    "loop-grid": "5e2ac4046374e39e352b2d3910aebda324777de50b9af7f607928b2a81d4e17e"
+  },
+  "total_train_scenario_count": 600,
+  "train_manifest_hash_per_family": {
+    "branched-loop": "bf831d7fcec8df52be36018158e366d03ef0276901390b8b2655d94d5451e054",
+    "golden-reference": "1848aad5f9eee075aabc6617668656755a032da10bd1fe773acab11161fceeaa",
+    "loop-grid": "3e914ccdbda6d73ca3168145bbfa22bb634e3928af3bc03d844761a523064abd"
+  },
+  "train_scenario_count_per_family": 200,
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "training_config": {
+    "batch_size": 2,
+    "checkpoint_every_epochs": 1,
+    "deterministic": true,
+    "device": "cpu",
+    "early_stopping_patience": 5,
+    "epochs": 20,
+    "fp32": true,
+    "gradient_accumulation_steps": 4,
+    "gradient_clip_norm": 1.0,
+    "gradient_conflict_logging": true,
+    "gradnorm_log_every_n_batches": 5,
+    "gradnorm_logging": true,
+    "learning_rate": 0.0003,
+    "maximum_runtime_seconds": 28800,
+    "minimum_delta": 0.0,
+    "minimum_free_disk_gb": 1.0,
+    "num_workers": 0,
+    "pcgrad_enabled": false,
+    "profile_ordinal_weight": 0.0,
+    "scheduler": "cosine",
+    "seed": 20260815,
+    "task_weights": {
+      "action_template": 1.0,
+      "candidate_reduction": 0.5,
+      "containment_time_proxy": 0.3,
+      "duration": 0.5,
+      "event_cause": 1.0,
+      "event_presence": 1.0,
+      "evidence_sufficiency": 1.0,
+      "exposure_proxy": 0.3,
+      "future_concentration": 0.0,
+      "information_gain": 0.5,
+      "next_step": 1.0,
+      "ood_class": 1.0,
+      "plan_regret_proxy": 0.3,
+      "plan_validity": 1.0,
+      "plan_value": 0.5,
+      "pressure_risk_proxy": 0.3,
+      "relative_strength": 0.5,
+      "sample_node": 1.0,
+      "sensor_fault": 1.0,
+      "sensor_reconstruction": 0.25,
+      "service_loss_proxy": 0.3,
+      "should_continue_sampling": 0.5,
+      "source_node": 1.0,
+      "source_region": 0.5,
+      "start_time": 0.5,
+      "target_pointer": 1.0,
+      "travel_time": 0.1
+    },
+    "warmup_steps": 10,
+    "weight_decay": 0.01
+  },
+  "training_config_source": "configs/training-v5-causal.yaml",
+  "training_summary": {
+    "best_epoch": 19,
+    "best_validation_loss": 2.6146141617905863,
+    "epochs_completed": 20,
+    "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed20260815/20260815T193537Z-8bd68d62/model-export.safetensors",
+    "export_sha256": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+    "final_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed20260815/20260815T193537Z-8bd68d62/checkpoints/checkpoint-0020",
+    "global_steps": 1350,
+    "last_resumable_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed20260815/20260815T193537Z-8bd68d62/checkpoints/checkpoint-0020",
+    "run_directory": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed20260815/20260815T193537Z-8bd68d62",
+    "stop_reason": "maximum_epochs",
+    "stopped_early": false
+  },
+  "validation_manifest_hash_per_family": {
+    "branched-loop": "c43c1071cb77989924e7fe815465ad5b33b7c331c507be4473559cffc721c44a",
+    "golden-reference": "30b286e41155ff3aff8ae7012c16a3b796ab81aba4116e652f1a6cfd2d5bb633",
+    "loop-grid": "a406f348f64dfaddd0658bd3ca86cd37064bc07df1de2938bedc2ce846169cad"
+  },
+  "wall_seconds": 447.6037348890095
+}
