@@ -1,0 +1,253 @@
+{
+  "branch": "exp/hydrocore-v5-causal",
+  "caching_benchmark": {
+    "hydraulic_states": {
+      "cache_class": "hydroswarm.storage.cache.SimulationResultCache",
+      "cache_exists": true,
+      "cold_cache_hit": false,
+      "cold_ms": 53.278442999726394,
+      "speedup_ratio_warm_over_cold": 0.02867763984649554,
+      "verdict": "MATERIAL_IMPROVEMENT",
+      "warm_cache_hit": true,
+      "warm_ms": 1.527899999928195
+    },
+    "material_speedup_bar_warm_over_cold_ratio": 0.5,
+    "network_parsing": {
+      "cache_exists": false,
+      "cold_ms": 0.5725350019929465,
+      "note": "No deterministic network-parsing cache exists in this codebase; both calls below re-parse from disk (no cache layer to warm).",
+      "second_call_ms": 0.3915529996447731,
+      "verdict": "NO_CACHE_EXISTS"
+    },
+    "signature_libraries": {
+      "cache_class": "hydroswarm.classical.signatures.SignatureCache",
+      "cache_exists": true,
+      "cold_cache_hit": false,
+      "cold_ms": 216.92814200287103,
+      "speedup_ratio_warm_over_cold": 0.005652332565689881,
+      "verdict": "MATERIAL_IMPROVEMENT",
+      "warm_cache_hit": true,
+      "warm_ms": 1.2261500014574267
+    },
+    "static_features": {
+      "cache_class": "hydroswarm.simulation.context_cache.HydraulicContextCache",
+      "cache_exists": true,
+      "cold_ms": 72.08858000012697,
+      "hits": 1,
+      "misses": 1,
+      "speedup_ratio_warm_over_cold": 0.0017936405337111681,
+      "verdict": "MATERIAL_IMPROVEMENT",
+      "warm_ms": 0.12930099910590798
+    }
+  },
+  "framework_decision": {
+    "caching_materially_helps_anywhere": true,
+    "decision": "KEEP_CURRENT_IMPLEMENTATION_NO_MEASURED_PROBLEM",
+    "long_lived_memory_plateaus": true,
+    "measured_problem_found": false,
+    "most_pyg_relevant_component": "hydroswarm.model.layers.EdgeAwareGraphConv / DualChannelGraphConv (hand-rolled per-batch-item Python message-passing loop; no torch_geometric import exists anywhere in this codebase today).",
+    "neural_inference_scaling_ratio_largest_over_smallest": 9.442457694425828,
+    "node_count_ratio_largest_over_smallest": 200.0,
+    "primary_finding_relevant_to_pyg_decision": false,
+    "primary_scalability_finding": "HydraulicSimulator._prepared_network() hard-codes demand_model=PDD for every hydraulic/incident simulation; PDD convergence in WNTR's native solver becomes impractical (exceeds the timeout) around 25-49 junctions on ANY topology tested (line/tree/grid), while the same solver handles 500 nodes in ~1.3s under plain DDA. This is a classical-hydraulics-layer bottleneck, not a HydroCore/neural bottleneck.",
+    "rationale": "No measured problem with variable graph batching, graph-op scalability, custom message-passing performance, or memory stability was found at the tested scales (synthetic neural-inference-only sweep up to 2000 nodes, decoupled from the separate PDD hydraulics bottleneck above). Per experiments.txt 8.4/12, PyTorch Geometric is not justified on this evidence; no framework migration for cleaner code alone. The real scalability priority this milestone surfaced is the classical-hydraulics PDD bottleneck, not the neural/graph layer.",
+    "superlinear_neural_inference_scaling": false,
+    "synthetic_neural_node_counts_tested": [
+      10,
+      25,
+      50,
+      100,
+      250,
+      500,
+      1000,
+      2000
+    ]
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "long_lived_process_test": {
+    "full_sequential_incidents": {
+      "first_20_mean_mb": 1107.2943359375,
+      "gc_collections_after": [
+        2,
+        10,
+        33
+      ],
+      "gc_collections_before": [
+        208,
+        4,
+        0
+      ],
+      "label": "full_sequential_incidents",
+      "last_20_mean_mb": 778.191796875,
+      "n_iterations": 200,
+      "peak_mb": 1107.3671875,
+      "plateaus_after_warmup": true,
+      "post_warmup_slope_mb_per_iteration": -0.0005942233461274373,
+      "timeout_retries": 0
+    },
+    "long_lived_incidents": 200,
+    "network": "golden-reference (fixed; see module docstring for why the long-lived test uses many iterations on a small network rather than a large one)",
+    "repeated_import": {
+      "first_20_mean_mb": 782.878125,
+      "gc_collections_after": null,
+      "gc_collections_before": null,
+      "label": "repeated_import",
+      "last_20_mean_mb": 782.88671875,
+      "n_iterations": 200,
+      "peak_mb": 782.88671875,
+      "plateaus_after_warmup": true,
+      "post_warmup_slope_mb_per_iteration": 3.4968788453412796e-05
+    },
+    "repeated_neural_inference": {
+      "first_20_mean_mb": 782.4830078125,
+      "gc_collections_after": null,
+      "gc_collections_before": null,
+      "label": "repeated_neural_inference",
+      "last_20_mean_mb": 782.87109375,
+      "n_iterations": 200,
+      "peak_mb": 782.87109375,
+      "plateaus_after_warmup": true,
+      "post_warmup_slope_mb_per_iteration": 0.0005254874457959937
+    },
+    "repeated_sample_analysis": {
+      "first_20_mean_mb": 782.88671875,
+      "gc_collections_after": null,
+      "gc_collections_before": null,
+      "label": "repeated_sample_analysis",
+      "last_20_mean_mb": 782.88671875,
+      "n_iterations": 200,
+      "peak_mb": 782.88671875,
+      "plateaus_after_warmup": true,
+      "post_warmup_slope_mb_per_iteration": -3.128109123573094e-15
+    },
+    "repeated_stage_iterations": 200,
+    "repeated_wntr_simulation": {
+      "first_20_mean_mb": 782.87109375,
+      "gc_collections_after": null,
+      "gc_collections_before": null,
+      "label": "repeated_wntr_simulation",
+      "last_20_mean_mb": 782.875,
+      "n_iterations": 200,
+      "peak_mb": 782.875,
+      "plateaus_after_warmup": true,
+      "post_warmup_slope_mb_per_iteration": 6.9582796185638405e-06,
+      "timeout_retries": 0
+    },
+    "warmup_fraction": 0.2
+  },
+  "network_size_sweep": [
+    {
+      "actual_node_count": 10,
+      "one_time_setup_ms": {
+        "calibration_fit": 0.7731239966233261,
+        "classical_signature_library_build": 505.1037189987255,
+        "import": 67.35171899708803
+      },
+      "per_incident_ms": {
+        "belief_fusion": 0.13285600289236754,
+        "calibration_candidate_set": 0.04735500260721892,
+        "classical_localization": 0.6366730012814514,
+        "exact_wntr_verification": 131.23102499957895,
+        "feature_building": 2.980794000905007,
+        "neural_inference": 333.32128500114777,
+        "plan_generation": 0.20838800264755264,
+        "sampling_ranking": 0.9215700010827277,
+        "total_incident_latency_ms": 469.47994601214305
+      },
+      "rss_delta_mb": 53.19140625,
+      "rss_mb_after": 765.48046875,
+      "rss_mb_before": 712.2890625,
+      "status": "OK",
+      "target_node_count": 10,
+      "timeout_retries": 0,
+      "wall_seconds": 1.1909124209996662
+    },
+    {
+      "error": "SimulationTimeoutError: hydraulics exceeded the 60-second timeout",
+      "root_cause": "HydraulicSimulator._prepared_network() hard-codes demand_model=PDD for every hydraulic/incident simulation; PDD convergence in WNTR's native solver becomes impractical (exceeds the timeout) around 25-49 junctions on ANY topology tested (line/tree/grid), while the same solver handles 500 nodes in ~1.3s under plain DDA. This is a classical-hydraulics-layer bottleneck, not a HydroCore/neural bottleneck.",
+      "status": "FAILED",
+      "target_node_count": 25,
+      "wall_seconds": 60.09992298399811
+    },
+    {
+      "error": "SimulationTimeoutError: hydraulics exceeded the 60-second timeout",
+      "root_cause": "HydraulicSimulator._prepared_network() hard-codes demand_model=PDD for every hydraulic/incident simulation; PDD convergence in WNTR's native solver becomes impractical (exceeds the timeout) around 25-49 junctions on ANY topology tested (line/tree/grid), while the same solver handles 500 nodes in ~1.3s under plain DDA. This is a classical-hydraulics-layer bottleneck, not a HydroCore/neural bottleneck.",
+      "status": "FAILED",
+      "target_node_count": 50,
+      "wall_seconds": 60.09298147700247
+    },
+    {
+      "error": "SimulationTimeoutError: hydraulics exceeded the 60-second timeout",
+      "root_cause": "HydraulicSimulator._prepared_network() hard-codes demand_model=PDD for every hydraulic/incident simulation; PDD convergence in WNTR's native solver becomes impractical (exceeds the timeout) around 25-49 junctions on ANY topology tested (line/tree/grid), while the same solver handles 500 nodes in ~1.3s under plain DDA. This is a classical-hydraulics-layer bottleneck, not a HydroCore/neural bottleneck.",
+      "status": "FAILED",
+      "target_node_count": 100,
+      "wall_seconds": 60.119744448002166
+    },
+    {
+      "error": "SimulationTimeoutError: hydraulics exceeded the 60-second timeout",
+      "root_cause": "HydraulicSimulator._prepared_network() hard-codes demand_model=PDD for every hydraulic/incident simulation; PDD convergence in WNTR's native solver becomes impractical (exceeds the timeout) around 25-49 junctions on ANY topology tested (line/tree/grid), while the same solver handles 500 nodes in ~1.3s under plain DDA. This is a classical-hydraulics-layer bottleneck, not a HydroCore/neural bottleneck.",
+      "status": "FAILED",
+      "target_node_count": 250,
+      "wall_seconds": 60.16483734800204
+    },
+    {
+      "error": "SimulationTimeoutError: hydraulics exceeded the 60-second timeout",
+      "root_cause": "HydraulicSimulator._prepared_network() hard-codes demand_model=PDD for every hydraulic/incident simulation; PDD convergence in WNTR's native solver becomes impractical (exceeds the timeout) around 25-49 junctions on ANY topology tested (line/tree/grid), while the same solver handles 500 nodes in ~1.3s under plain DDA. This is a classical-hydraulics-layer bottleneck, not a HydroCore/neural bottleneck.",
+      "status": "FAILED",
+      "target_node_count": 500,
+      "wall_seconds": 60.17183234800177
+    }
+  ],
+  "node_count_targets": [
+    10,
+    25,
+    50,
+    100,
+    250,
+    500
+  ],
+  "predictor": {
+    "checkpoint_sha256": "44a2721394d95985c1baf957e0fbd66efe1e3cf2c4c6cc19abea8f4b027bd334",
+    "description": "Milestone-1 winner (arm A); Milestone 2 decision was PCGRAD_JUSTIFIED",
+    "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/A-seed31874/20260814T065947Z-44557eae/model-export.safetensors",
+    "parameter_count": 4182612,
+    "use_adapters": false
+  },
+  "purpose": "Milestone 8 (experiments.txt): backend scalability and memory stability.",
+  "schema_version": 1,
+  "synthetic_neural_inference_scaling": [
+    {
+      "n_nodes": 10,
+      "neural_inference_ms": 14.267138001741841
+    },
+    {
+      "n_nodes": 25,
+      "neural_inference_ms": 16.83044799938216
+    },
+    {
+      "n_nodes": 50,
+      "neural_inference_ms": 17.831229000876192
+    },
+    {
+      "n_nodes": 100,
+      "neural_inference_ms": 24.31022699965979
+    },
+    {
+      "n_nodes": 250,
+      "neural_inference_ms": 29.146267999749398
+    },
+    {
+      "n_nodes": 500,
+      "neural_inference_ms": 42.53426600189414
+    },
+    {
+      "n_nodes": 1000,
+      "neural_inference_ms": 100.60490700197988
+    },
+    {
+      "n_nodes": 2000,
+      "neural_inference_ms": 134.7168470019824
+    }
+  ]
+}
