@@ -252,6 +252,30 @@ results, and Milestone 9's own capacity-scaling scope (Section 6 above) is
 unchanged except that it now also inherits whichever topology-training
 recipe M9.0 selects.
 
+## 8.7. Amendment: Milestone 9.0a (optimizer-step-matched interleaved topology training)
+
+Milestone 9.0 found a strong pooled unseen-topology gain for
+`INTERLEAVED_MULTI_FAMILY` training but rejected it because known-family
+`B_DEPTH_AWARE` marginal coverage (0.833, representative seed 31874 only)
+fell below the frozen 0.85 guardrail, and because Arm B received
+approximately 33% more optimizer updates than Arm A (1800 vs 1350 real
+steps) with a correspondingly different scheduler trajectory -- so the
+observed gain could not yet be attributed solely to topology diversity
+rather than extra optimization budget, and the calibration rejection itself
+rested on a single predictor seed.
+
+Milestone 9.0a (`docs/evaluation/HYDROCORE_V5_M9_0A_PROTOCOL.md`, its own
+frozen sub-protocol) resolves both: Arm B2
+(`STEP_MATCHED_INTERLEAVED_MULTI_FAMILY`) uses 4 microbatches/optimizer-
+update (matching Arm A's `gradient_accumulation_steps=4`) in a fixed 3-update
+family rotation, achieving exact per-epoch and total optimizer-step and
+scheduler-trajectory parity with Arm A; calibration is fit/evaluated
+separately for all three predictor seeds for both arms. See
+`reports/evaluation/hydrocore-v5/m9-0a-summary.md` for the outcome. This
+amendment does not alter Milestone 9.0's own historical results, and
+Milestone 9's capacity-scaling scope (Section 6 above) now also inherits
+whichever topology-training recipe M9.0a's own decision freezes.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model
