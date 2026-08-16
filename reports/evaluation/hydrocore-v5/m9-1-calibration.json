@@ -1,0 +1,241 @@
+{
+  "CURRENT": {
+    "20260814": {
+      "alpha": 0.1,
+      "arm": "CURRENT",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9055555555555556,
+          "mean_normalized_set_size": 0.4949074074074074,
+          "mean_set_size": 2.9694444444444446,
+          "n": 360,
+          "singleton_rate": 0.2,
+          "wilson_95_ci": [
+            0.8709206039156303,
+            0.9316267499413182
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8791666666666667,
+          "mean_normalized_set_size": 0.14652777777777776,
+          "mean_set_size": 0.8791666666666667,
+          "n": 240,
+          "singleton_rate": 0.8791666666666667,
+          "wilson_95_ci": [
+            0.8318500890607975,
+            0.9145365216501871
+          ]
+        },
+        "MID": {
+          "coverage": 0.9208333333333333,
+          "mean_normalized_set_size": 0.19722222222222222,
+          "mean_set_size": 1.1833333333333333,
+          "n": 240,
+          "singleton_rate": 0.8416666666666667,
+          "wilson_95_ci": [
+            0.8796723592431944,
+            0.9487347581393268
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9988895106768764,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.027932623468880258,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.9277352614844875,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9023809523809524,
+        "mean_normalized_set_size": 0.31031746031746027,
+        "mean_set_size": 1.861904761904762,
+        "n": 840,
+        "singleton_rate": 0.5773809523809523,
+        "wilson_95_ci": [
+          0.8804402299751847,
+          0.9206581196422187
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 20260814
+    },
+    "20260815": {
+      "alpha": 0.1,
+      "arm": "CURRENT",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.8805555555555555,
+          "mean_normalized_set_size": 0.47962962962962963,
+          "mean_set_size": 2.8777777777777778,
+          "n": 360,
+          "singleton_rate": 0.2388888888888889,
+          "wilson_95_ci": [
+            0.8429725655387708,
+            0.9101026911626124
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8666666666666667,
+          "mean_normalized_set_size": 0.14444444444444443,
+          "mean_set_size": 0.8666666666666667,
+          "n": 240,
+          "singleton_rate": 0.8666666666666667,
+          "wilson_95_ci": [
+            0.8178342170098762,
+            0.9039462416996474
+          ]
+        },
+        "MID": {
+          "coverage": 0.9333333333333333,
+          "mean_normalized_set_size": 0.19791666666666666,
+          "mean_set_size": 1.1875,
+          "n": 240,
+          "singleton_rate": 0.8583333333333333,
+          "wilson_95_ci": [
+            0.8944621699310613,
+            0.958551099452921
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9977044734443755,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.024383064614192596,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.917743644439635,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.8916666666666667,
+        "mean_normalized_set_size": 0.30337301587301585,
+        "mean_set_size": 1.8202380952380952,
+        "n": 840,
+        "singleton_rate": 0.5952380952380952,
+        "wilson_95_ci": [
+          0.8688379250803571,
+          0.9109294033933877
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 20260815
+    },
+    "31874": {
+      "alpha": 0.1,
+      "arm": "CURRENT",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9027777777777778,
+          "mean_normalized_set_size": 0.4907407407407407,
+          "mean_set_size": 2.9444444444444446,
+          "n": 360,
+          "singleton_rate": 0.19722222222222222,
+          "wilson_95_ci": [
+            0.8677881892943748,
+            0.9292622648786221
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.875,
+          "mean_normalized_set_size": 0.14583333333333334,
+          "mean_set_size": 0.875,
+          "n": 240,
+          "singleton_rate": 0.875,
+          "wilson_95_ci": [
+            0.8271639346103987,
+            0.9110206254334322
+          ]
+        },
+        "MID": {
+          "coverage": 0.925,
+          "mean_normalized_set_size": 0.20138888888888887,
+          "mean_set_size": 1.2083333333333333,
+          "n": 240,
+          "singleton_rate": 0.8333333333333334,
+          "wilson_95_ci": [
+            0.8845739334081343,
+            0.9520352346415408
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9977582285724642,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.036264115807468134,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.928555866256586,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9011904761904762,
+        "mean_normalized_set_size": 0.30952380952380953,
+        "mean_set_size": 1.8571428571428572,
+        "n": 840,
+        "singleton_rate": 0.5726190476190476,
+        "wilson_95_ci": [
+          0.8791476703037279,
+          0.919580565853269
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 31874
+    }
+  }
+}
