@@ -371,6 +371,27 @@ def test_final_selection_zero_confirmed_arms_returns_none():
     assert "zero" in reason
 
 
+def test_confirmation_stage_ignores_non_arm_metadata_keys_in_screening_section(monkeypatch, tmp_path):
+    # Regression test: m9-1-guardrails.json's "screening" block carries
+    # top-level "_locked_test_opened_before"/"_after" boolean keys alongside
+    # per-arm dict entries (run_m9_1_decide.py's own main()) -- _confirmation
+    # must not choke on iterating those non-dict values when scanning for
+    # PROMOTION_CANDIDATE arms.
+    guardrails_path = tmp_path / "m9-1-guardrails.json"
+    guardrails_path.write_text(json.dumps({
+        "screening": {
+            "GRAPH_ODE": {"outcome": "GUARDRAILS_FAILED"},
+            "GRAPH_CDE": {"outcome": "GUARDRAILS_FAILED"},
+            "GRAPH_SDE": {"outcome": "GUARDRAILS_FAILED"},
+            "_locked_test_opened_before": False,
+            "_locked_test_opened_after": False,
+        }
+    }))
+    monkeypatch.setattr(common, "GUARDRAILS_PATH", guardrails_path)
+    result = decide._confirmation({}, {})
+    assert "_note" in result  # zero PROMOTION_CANDIDATE arms -> confirmation stage not run for any arm.
+
+
 # ---------------------------------------------------------------------------
 # Section 19(d) / 21(c): SHA and lock-state assertions.
 # ---------------------------------------------------------------------------

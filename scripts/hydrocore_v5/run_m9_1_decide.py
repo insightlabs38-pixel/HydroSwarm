@@ -160,7 +160,10 @@ def _confirmation(results: dict[str, Any], calibration: dict[str, Any]) -> dict[
     screening = guardrails.get("screening")
     if not screening:
         raise SystemExit("no screening section in m9-1-guardrails.json -- run --stage screening first")
-    candidates = [arm for arm, entry in screening.items() if entry["outcome"] == "PROMOTION_CANDIDATE"]
+    candidates = [
+        arm for arm, entry in screening.items()
+        if isinstance(entry, dict) and entry.get("outcome") == "PROMOTION_CANDIDATE"
+    ]
     out: dict[str, Any] = {}
     for arm in candidates:
         seeds = common.SCREENING_SEEDS + (common.CONFIRMATION_SEED,)
