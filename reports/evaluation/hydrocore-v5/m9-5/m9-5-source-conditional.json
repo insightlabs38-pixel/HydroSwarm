@@ -1,0 +1,870 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "J1": {
+          "EARLY_coverage": 0.9333333333333333,
+          "MATURE_coverage": 0.9,
+          "MID_coverage": 0.875,
+          "marginal_coverage": 0.9071428571428571,
+          "mean_candidate_set_size": 1.8642857142857143,
+          "mean_true_source_rank": 1.4785714285714286,
+          "mrr": 0.8386904761904762,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.75
+        },
+        "J2": {
+          "EARLY_coverage": 0.85,
+          "MATURE_coverage": 0.875,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 1.8071428571428572,
+          "mean_true_source_rank": 1.6357142857142857,
+          "mrr": 0.8071428571428572,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7071428571428572
+        },
+        "J3": {
+          "EARLY_coverage": 0.9166666666666666,
+          "MATURE_coverage": 0.9,
+          "MID_coverage": 0.85,
+          "marginal_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 1.792857142857143,
+          "mean_true_source_rank": 1.6642857142857144,
+          "mrr": 0.7922619047619048,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6714285714285714
+        },
+        "J4": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.825,
+          "MID_coverage": 0.9,
+          "marginal_coverage": 0.8785714285714286,
+          "mean_candidate_set_size": 1.8857142857142857,
+          "mean_true_source_rank": 1.542857142857143,
+          "mrr": 0.8095238095238095,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6857142857142857
+        }
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "J1": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.9,
+          "marginal_coverage": 0.9571428571428572,
+          "mean_candidate_set_size": 1.9,
+          "mean_true_source_rank": 1.3571428571428572,
+          "mrr": 0.8553571428571428,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7428571428571429
+        },
+        "J2": {
+          "EARLY_coverage": 0.8833333333333333,
+          "MATURE_coverage": 0.9,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.9142857142857143,
+          "mean_candidate_set_size": 1.8071428571428572,
+          "mean_true_source_rank": 1.6714285714285715,
+          "mrr": 0.8083333333333333,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7214285714285714
+        },
+        "J3": {
+          "EARLY_coverage": 0.85,
+          "MATURE_coverage": 0.875,
+          "MID_coverage": 0.825,
+          "marginal_coverage": 0.85,
+          "mean_candidate_set_size": 1.792857142857143,
+          "mean_true_source_rank": 1.7357142857142858,
+          "mrr": 0.7738095238095237,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.65
+        },
+        "J4": {
+          "EARLY_coverage": 0.9166666666666666,
+          "MATURE_coverage": 0.825,
+          "MID_coverage": 0.925,
+          "marginal_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 1.8785714285714286,
+          "mean_true_source_rank": 1.5142857142857142,
+          "mrr": 0.8208333333333334,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7071428571428572
+        }
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "J1": {
+          "EARLY_coverage": 0.95,
+          "MATURE_coverage": 0.975,
+          "MID_coverage": 0.875,
+          "marginal_coverage": 0.9357142857142857,
+          "mean_candidate_set_size": 1.8785714285714286,
+          "mean_true_source_rank": 1.4857142857142858,
+          "mrr": 0.8327380952380952,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7357142857142858
+        },
+        "J2": {
+          "EARLY_coverage": 0.85,
+          "MATURE_coverage": 0.85,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.8857142857142857,
+          "mean_candidate_set_size": 1.8071428571428572,
+          "mean_true_source_rank": 1.5142857142857142,
+          "mrr": 0.8238095238095238,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7214285714285714
+        },
+        "J3": {
+          "EARLY_coverage": 0.8666666666666667,
+          "MATURE_coverage": 0.875,
+          "MID_coverage": 0.85,
+          "marginal_coverage": 0.8642857142857143,
+          "mean_candidate_set_size": 1.7642857142857142,
+          "mean_true_source_rank": 1.65,
+          "mrr": 0.7970238095238095,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6785714285714286
+        },
+        "J4": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.9,
+          "marginal_coverage": 0.8714285714285714,
+          "mean_candidate_set_size": 1.9,
+          "mean_true_source_rank": 1.6428571428571428,
+          "mrr": 0.8023809523809523,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6928571428571428
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "JA": {
+          "EARLY_coverage": 0.4166666666666667,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.825,
+          "marginal_coverage": 0.6428571428571429,
+          "mean_candidate_set_size": 3.9214285714285713,
+          "mean_true_source_rank": 3.857142857142857,
+          "mrr": 0.5428741496598639,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.42857142857142855
+        },
+        "JB": {
+          "EARLY_coverage": 0.9666666666666667,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 0.9857142857142858,
+          "mean_candidate_set_size": 4.807142857142857,
+          "mean_true_source_rank": 2.757142857142857,
+          "mrr": 0.5784523809523809,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.39285714285714285
+        },
+        "JC": {
+          "EARLY_coverage": 0.9333333333333333,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9428571428571428,
+          "mean_candidate_set_size": 4.121428571428571,
+          "mean_true_source_rank": 2.7285714285714286,
+          "mrr": 0.5726360544217687,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.37857142857142856
+        },
+        "JD": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 4.7,
+          "mean_true_source_rank": 2.65,
+          "mrr": 0.5849659863945579,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.39285714285714285
+        },
+        "JE": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.5928571428571425,
+          "mean_true_source_rank": 2.142857142857143,
+          "mrr": 0.6601870748299319,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.4642857142857143
+        },
+        "JF": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 4.121428571428571,
+          "mean_true_source_rank": 1.6357142857142857,
+          "mrr": 0.8302380952380952,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7428571428571429
+        },
+        "JG": {
+          "EARLY_coverage": 0.9833333333333333,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 0.9928571428571429,
+          "mean_candidate_set_size": 4.764285714285714,
+          "mean_true_source_rank": 1.8857142857142857,
+          "mrr": 0.7074489795918367,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.5142857142857142
+        }
+      },
+      "golden-reference": {
+        "J1": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.825,
+          "MID_coverage": 0.9,
+          "marginal_coverage": 0.8785714285714286,
+          "mean_candidate_set_size": 1.8714285714285714,
+          "mean_true_source_rank": 1.542857142857143,
+          "mrr": 0.8291666666666666,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7357142857142858
+        },
+        "J2": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.775,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 1.9071428571428573,
+          "mean_true_source_rank": 1.3714285714285714,
+          "mrr": 0.8464285714285714,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7214285714285714
+        },
+        "J3": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.875,
+          "MID_coverage": 0.8,
+          "marginal_coverage": 0.8642857142857143,
+          "mean_candidate_set_size": 1.8142857142857143,
+          "mean_true_source_rank": 1.9857142857142858,
+          "mrr": 0.7339285714285714,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6285714285714286
+        },
+        "J4": {
+          "EARLY_coverage": 0.9333333333333333,
+          "MATURE_coverage": 0.85,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9142857142857143,
+          "mean_candidate_set_size": 1.85,
+          "mean_true_source_rank": 1.4857142857142858,
+          "mrr": 0.8261904761904763,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7142857142857143
+        }
+      },
+      "loop-grid": {
+        "J1": {
+          "EARLY_coverage": 0.48333333333333334,
+          "MATURE_coverage": 0.65,
+          "MID_coverage": 0.625,
+          "marginal_coverage": 0.5714285714285714,
+          "mean_candidate_set_size": 4.1571428571428575,
+          "mean_true_source_rank": 4.585714285714285,
+          "mrr": 0.5221513605442177,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.44285714285714284
+        },
+        "J2": {
+          "EARLY_coverage": 0.9333333333333333,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.95,
+          "mean_candidate_set_size": 3.9857142857142858,
+          "mean_true_source_rank": 2.807142857142857,
+          "mrr": 0.5853571428571429,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.38571428571428573
+        },
+        "J3": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 4.664285714285715,
+          "mean_true_source_rank": 2.1857142857142855,
+          "mrr": 0.6597619047619047,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.45
+        },
+        "J4": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 5.507142857142857,
+          "mean_true_source_rank": 2.557142857142857,
+          "mrr": 0.5793367346938776,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.37142857142857144
+        },
+        "J5": {
+          "EARLY_coverage": 0.8333333333333334,
+          "MATURE_coverage": 0.85,
+          "MID_coverage": 0.85,
+          "marginal_coverage": 0.8428571428571429,
+          "mean_candidate_set_size": 4.585714285714285,
+          "mean_true_source_rank": 3.6857142857142855,
+          "mrr": 0.44206632653061223,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.2357142857142857
+        },
+        "J6": {
+          "EARLY_coverage": 0.9666666666666667,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9571428571428572,
+          "mean_candidate_set_size": 4.992857142857143,
+          "mean_true_source_rank": 3.085714285714286,
+          "mrr": 0.5462840136054421,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.37857142857142856
+        },
+        "J7": {
+          "EARLY_coverage": 0.9833333333333333,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 5.3428571428571425,
+          "mean_true_source_rank": 3.092857142857143,
+          "mrr": 0.4750510204081632,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.22142857142857142
+        },
+        "J8": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 5.285714285714286,
+          "mean_true_source_rank": 2.25,
+          "mrr": 0.6950680272108843,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.5642857142857143
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "JA": {
+          "EARLY_coverage": 0.4,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.825,
+          "marginal_coverage": 0.6357142857142857,
+          "mean_candidate_set_size": 3.835714285714286,
+          "mean_true_source_rank": 4.035714285714286,
+          "mrr": 0.5197619047619048,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.39285714285714285
+        },
+        "JB": {
+          "EARLY_coverage": 0.9666666666666667,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.9785714285714285,
+          "mean_candidate_set_size": 4.764285714285714,
+          "mean_true_source_rank": 2.9785714285714286,
+          "mrr": 0.5648299319727891,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.4
+        },
+        "JC": {
+          "EARLY_coverage": 0.9666666666666667,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9571428571428572,
+          "mean_candidate_set_size": 4.2,
+          "mean_true_source_rank": 2.9714285714285715,
+          "mrr": 0.5590136054421768,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.39285714285714285
+        },
+        "JD": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.75,
+          "mean_true_source_rank": 2.592857142857143,
+          "mrr": 0.5866666666666667,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.38571428571428573
+        },
+        "JE": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.578571428571428,
+          "mean_true_source_rank": 2.2142857142857144,
+          "mrr": 0.6441836734693878,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.44285714285714284
+        },
+        "JF": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.9928571428571429,
+          "mean_candidate_set_size": 4.242857142857143,
+          "mean_true_source_rank": 1.4857142857142858,
+          "mrr": 0.8621428571428572,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7857142857142857
+        },
+        "JG": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 4.9071428571428575,
+          "mean_true_source_rank": 1.9214285714285715,
+          "mrr": 0.7082823129251701,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.5142857142857142
+        }
+      },
+      "golden-reference": {
+        "J1": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.85,
+          "MID_coverage": 0.9,
+          "marginal_coverage": 0.8857142857142857,
+          "mean_candidate_set_size": 1.957142857142857,
+          "mean_true_source_rank": 1.5928571428571427,
+          "mrr": 0.8136904761904762,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7142857142857143
+        },
+        "J2": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.825,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 0.9071428571428571,
+          "mean_candidate_set_size": 2.0142857142857142,
+          "mean_true_source_rank": 1.4071428571428573,
+          "mrr": 0.825595238095238,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6785714285714286
+        },
+        "J3": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.85,
+          "MID_coverage": 0.8,
+          "marginal_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 1.8142857142857143,
+          "mean_true_source_rank": 2.007142857142857,
+          "mrr": 0.7291666666666666,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6214285714285714
+        },
+        "J4": {
+          "EARLY_coverage": 0.9333333333333333,
+          "MATURE_coverage": 0.85,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9142857142857143,
+          "mean_candidate_set_size": 1.9428571428571428,
+          "mean_true_source_rank": 1.4928571428571429,
+          "mrr": 0.8196428571428571,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7
+        }
+      },
+      "loop-grid": {
+        "J1": {
+          "EARLY_coverage": 0.5,
+          "MATURE_coverage": 0.7,
+          "MID_coverage": 0.625,
+          "marginal_coverage": 0.5928571428571429,
+          "mean_candidate_set_size": 4.021428571428571,
+          "mean_true_source_rank": 4.621428571428571,
+          "mrr": 0.5218962585034014,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.44285714285714284
+        },
+        "J2": {
+          "EARLY_coverage": 0.9166666666666666,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.9571428571428572,
+          "mean_candidate_set_size": 3.9214285714285713,
+          "mean_true_source_rank": 2.857142857142857,
+          "mrr": 0.5997448979591836,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.42857142857142855
+        },
+        "J3": {
+          "EARLY_coverage": 0.9833333333333333,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 0.925,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.8,
+          "mean_true_source_rank": 2.5428571428571427,
+          "mrr": 0.5754591836734694,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.34285714285714286
+        },
+        "J4": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 5.464285714285714,
+          "mean_true_source_rank": 2.4214285714285713,
+          "mrr": 0.6062244897959184,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.4142857142857143
+        },
+        "J5": {
+          "EARLY_coverage": 0.8,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.825,
+          "marginal_coverage": 0.8071428571428572,
+          "mean_candidate_set_size": 4.55,
+          "mean_true_source_rank": 3.9785714285714286,
+          "mrr": 0.4347704081632653,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.24285714285714285
+        },
+        "J6": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.871428571428571,
+          "mean_true_source_rank": 3.257142857142857,
+          "mrr": 0.521921768707483,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.35714285714285715
+        },
+        "J7": {
+          "EARLY_coverage": 0.9833333333333333,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 5.392857142857143,
+          "mean_true_source_rank": 2.842857142857143,
+          "mrr": 0.5031802721088435,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.2642857142857143
+        },
+        "J8": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.9785714285714285,
+          "mean_candidate_set_size": 5.135714285714286,
+          "mean_true_source_rank": 1.8357142857142856,
+          "mrr": 0.7363095238095237,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.5785714285714286
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "JA": {
+          "EARLY_coverage": 0.4166666666666667,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.8,
+          "marginal_coverage": 0.6357142857142857,
+          "mean_candidate_set_size": 3.9,
+          "mean_true_source_rank": 4.042857142857143,
+          "mrr": 0.5280952380952382,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.42142857142857143
+        },
+        "JB": {
+          "EARLY_coverage": 0.95,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 0.9785714285714285,
+          "mean_candidate_set_size": 4.735714285714286,
+          "mean_true_source_rank": 2.7785714285714285,
+          "mrr": 0.595952380952381,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.42857142857142855
+        },
+        "JC": {
+          "EARLY_coverage": 0.9666666666666667,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9571428571428572,
+          "mean_candidate_set_size": 4.285714285714286,
+          "mean_true_source_rank": 2.7714285714285714,
+          "mrr": 0.5788095238095238,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.39285714285714285
+        },
+        "JD": {
+          "EARLY_coverage": 0.9666666666666667,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.975,
+          "marginal_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 4.614285714285714,
+          "mean_true_source_rank": 2.7214285714285715,
+          "mrr": 0.5843707482993197,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.4
+        },
+        "JE": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.664285714285715,
+          "mean_true_source_rank": 2.164285714285714,
+          "mrr": 0.6657993197278912,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.4714285714285714
+        },
+        "JF": {
+          "EARLY_coverage": 0.9833333333333333,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9785714285714285,
+          "mean_candidate_set_size": 4.0285714285714285,
+          "mean_true_source_rank": 1.9071428571428573,
+          "mrr": 0.7553571428571428,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6357142857142857
+        },
+        "JG": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 4.807142857142857,
+          "mean_true_source_rank": 1.8571428571428572,
+          "mrr": 0.724047619047619,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.5357142857142857
+        }
+      },
+      "golden-reference": {
+        "J1": {
+          "EARLY_coverage": 0.95,
+          "MATURE_coverage": 0.825,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9142857142857143,
+          "mean_candidate_set_size": 1.8642857142857143,
+          "mean_true_source_rank": 1.4785714285714286,
+          "mrr": 0.8380952380952381,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7428571428571429
+        },
+        "J2": {
+          "EARLY_coverage": 0.9,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 0.9,
+          "mean_candidate_set_size": 1.9357142857142857,
+          "mean_true_source_rank": 1.35,
+          "mrr": 0.8571428571428571,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.7428571428571429
+        },
+        "J3": {
+          "EARLY_coverage": 0.8166666666666667,
+          "MATURE_coverage": 0.7,
+          "MID_coverage": 0.8,
+          "marginal_coverage": 0.7785714285714286,
+          "mean_candidate_set_size": 1.7714285714285714,
+          "mean_true_source_rank": 2.0142857142857142,
+          "mrr": 0.7321428571428571,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6285714285714286
+        },
+        "J4": {
+          "EARLY_coverage": 0.9333333333333333,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9,
+          "mean_candidate_set_size": 1.85,
+          "mean_true_source_rank": 1.542857142857143,
+          "mrr": 0.800595238095238,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.6642857142857143
+        }
+      },
+      "loop-grid": {
+        "J1": {
+          "EARLY_coverage": 0.48333333333333334,
+          "MATURE_coverage": 0.8,
+          "MID_coverage": 0.7,
+          "marginal_coverage": 0.6357142857142857,
+          "mean_candidate_set_size": 4.171428571428572,
+          "mean_true_source_rank": 4.5928571428571425,
+          "mrr": 0.5231377551020409,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.44285714285714284
+        },
+        "J2": {
+          "EARLY_coverage": 0.8833333333333333,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.925,
+          "marginal_coverage": 0.9142857142857143,
+          "mean_candidate_set_size": 3.942857142857143,
+          "mean_true_source_rank": 2.6,
+          "mrr": 0.626938775510204,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.45
+        },
+        "J3": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.925,
+          "marginal_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 4.771428571428571,
+          "mean_true_source_rank": 2.2071428571428573,
+          "mrr": 0.6582482993197278,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.45
+        },
+        "J4": {
+          "EARLY_coverage": 0.95,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.95,
+          "mean_candidate_set_size": 5.435714285714286,
+          "mean_true_source_rank": 2.7642857142857142,
+          "mrr": 0.5733843537414965,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.4
+        },
+        "J5": {
+          "EARLY_coverage": 0.8166666666666667,
+          "MATURE_coverage": 0.75,
+          "MID_coverage": 0.8,
+          "marginal_coverage": 0.7928571428571428,
+          "mean_candidate_set_size": 4.5928571428571425,
+          "mean_true_source_rank": 3.7,
+          "mrr": 0.4417261904761905,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.21428571428571427
+        },
+        "J6": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9714285714285714,
+          "mean_candidate_set_size": 4.9714285714285715,
+          "mean_true_source_rank": 3.142857142857143,
+          "mrr": 0.541530612244898,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.37857142857142856
+        },
+        "J7": {
+          "EARLY_coverage": 0.9833333333333333,
+          "MATURE_coverage": 0.95,
+          "MID_coverage": 0.95,
+          "marginal_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 5.378571428571429,
+          "mean_true_source_rank": 3.092857142857143,
+          "mrr": 0.4721768707482993,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.22857142857142856
+        },
+        "J8": {
+          "EARLY_coverage": 1.0,
+          "MATURE_coverage": 1.0,
+          "MID_coverage": 1.0,
+          "marginal_coverage": 1.0,
+          "mean_candidate_set_size": 5.35,
+          "mean_true_source_rank": 2.3714285714285714,
+          "mrr": 0.6566836734693877,
+          "n_calibration_incidents": 20,
+          "n_development_incidents": 20,
+          "top1": 0.5071428571428571
+        }
+      }
+    }
+  }
+}

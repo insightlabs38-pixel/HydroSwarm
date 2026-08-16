@@ -1,0 +1,2274 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "12": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9,
+              "mean_set_size": 2.95
+            },
+            "MATURE": {
+              "coverage": 0.875,
+              "mean_set_size": 0.875
+            },
+            "MID": {
+              "coverage": 0.86875,
+              "mean_set_size": 0.93125
+            }
+          },
+          "full_set_rate": 0.24642857142857144,
+          "marginal_coverage": 0.8839285714285714,
+          "mean_candidate_set_size": 1.7803571428571427,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 336,
+          "n_independent_calibration_incidents": 48,
+          "normalized_mean_candidate_set_size": 0.4450892857142857,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 144,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9982720903109833
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.0022462976434818316
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.38338170319932474
+            }
+          },
+          "singleton_rate": 0.6303571428571428
+        }
+      },
+      "20": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9,
+              "mean_set_size": 2.95
+            },
+            "MATURE": {
+              "coverage": 0.875,
+              "mean_set_size": 0.875
+            },
+            "MID": {
+              "coverage": 0.9,
+              "mean_set_size": 1.13125
+            }
+          },
+          "full_set_rate": 0.24642857142857144,
+          "marginal_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 1.8375,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 560,
+          "n_independent_calibration_incidents": 80,
+          "normalized_mean_candidate_set_size": 0.459375,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 240,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9982720903109833
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.002333255443692006
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8549717805626157
+            }
+          },
+          "singleton_rate": 0.6178571428571429
+        }
+      },
+      "4": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9541666666666667,
+              "mean_set_size": 3.1625
+            },
+            "MATURE": {
+              "coverage": 0.875,
+              "mean_set_size": 0.875
+            },
+            "MID": {
+              "coverage": 0.89375,
+              "mean_set_size": 1.11875
+            }
+          },
+          "full_set_rate": 0.2714285714285714,
+          "marginal_coverage": 0.9142857142857143,
+          "mean_candidate_set_size": 1.925,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 112,
+          "n_independent_calibration_incidents": 16,
+          "normalized_mean_candidate_set_size": 0.48125,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 48,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9997176083449957
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.002333255443692006
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8005950895937981
+            }
+          },
+          "singleton_rate": 0.5821428571428572
+        }
+      },
+      "8": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9166666666666666,
+              "mean_set_size": 3.0208333333333335
+            },
+            "MATURE": {
+              "coverage": 0.8625,
+              "mean_set_size": 0.8625
+            },
+            "MID": {
+              "coverage": 0.80625,
+              "mean_set_size": 0.84375
+            }
+          },
+          "full_set_rate": 0.25,
+          "marginal_coverage": 0.8696428571428572,
+          "mean_candidate_set_size": 1.7821428571428573,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.4455357142857143,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9990103447790543
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.0017984414320026954
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.03167532938870743
+            }
+          },
+          "singleton_rate": 0.5910714285714286
+        }
+      }
+    },
+    "20260815": {
+      "12": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9125,
+              "mean_set_size": 2.9541666666666666
+            },
+            "MATURE": {
+              "coverage": 0.8875,
+              "mean_set_size": 0.8875
+            },
+            "MID": {
+              "coverage": 0.8625,
+              "mean_set_size": 0.93125
+            }
+          },
+          "full_set_rate": 0.22678571428571428,
+          "marginal_coverage": 0.8910714285714286,
+          "mean_candidate_set_size": 1.7857142857142858,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 336,
+          "n_independent_calibration_incidents": 48,
+          "normalized_mean_candidate_set_size": 0.44642857142857145,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 144,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9967517681653211
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.002698015996287051
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.5272338396958156
+            }
+          },
+          "singleton_rate": 0.625
+        }
+      },
+      "20": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9125,
+              "mean_set_size": 2.9541666666666666
+            },
+            "MATURE": {
+              "coverage": 0.8875,
+              "mean_set_size": 0.8875
+            },
+            "MID": {
+              "coverage": 0.90625,
+              "mean_set_size": 1.1375
+            }
+          },
+          "full_set_rate": 0.22678571428571428,
+          "marginal_coverage": 0.9035714285714286,
+          "mean_candidate_set_size": 1.8446428571428573,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 560,
+          "n_independent_calibration_incidents": 80,
+          "normalized_mean_candidate_set_size": 0.4611607142857143,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 240,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9967119532283812
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.002698015996287051
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8804659281201059
+            }
+          },
+          "singleton_rate": 0.6125
+        }
+      },
+      "4": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9458333333333333,
+              "mean_set_size": 3.15
+            },
+            "MATURE": {
+              "coverage": 0.88125,
+              "mean_set_size": 0.88125
+            },
+            "MID": {
+              "coverage": 0.89375,
+              "mean_set_size": 1.11875
+            }
+          },
+          "full_set_rate": 0.2732142857142857,
+          "marginal_coverage": 0.9125,
+          "mean_candidate_set_size": 1.9214285714285715,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 112,
+          "n_independent_calibration_incidents": 16,
+          "normalized_mean_candidate_set_size": 0.48035714285714287,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 48,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9992000054880166
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.002226826686853034
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8230810338720258
+            }
+          },
+          "singleton_rate": 0.5910714285714286
+        }
+      },
+      "8": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9125,
+              "mean_set_size": 2.9541666666666666
+            },
+            "MATURE": {
+              "coverage": 0.88125,
+              "mean_set_size": 0.88125
+            },
+            "MID": {
+              "coverage": 0.825,
+              "mean_set_size": 0.8625
+            }
+          },
+          "full_set_rate": 0.22678571428571428,
+          "marginal_coverage": 0.8785714285714286,
+          "mean_candidate_set_size": 1.7642857142857142,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.44107142857142856,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9967517681653211
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.002226826686853034
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.07026493428512237
+            }
+          },
+          "singleton_rate": 0.6035714285714285
+        }
+      }
+    },
+    "31874": {
+      "12": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8916666666666667,
+              "mean_set_size": 2.941666666666667
+            },
+            "MATURE": {
+              "coverage": 0.88125,
+              "mean_set_size": 0.88125
+            },
+            "MID": {
+              "coverage": 0.86875,
+              "mean_set_size": 0.9375
+            }
+          },
+          "full_set_rate": 0.22678571428571428,
+          "marginal_coverage": 0.8821428571428571,
+          "mean_candidate_set_size": 1.7803571428571427,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 336,
+          "n_independent_calibration_incidents": 48,
+          "normalized_mean_candidate_set_size": 0.4450892857142857,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 144,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9972839215036796
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.004413439493871074
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.3838068521518109
+            }
+          },
+          "singleton_rate": 0.6178571428571429
+        }
+      },
+      "20": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8916666666666667,
+              "mean_set_size": 2.941666666666667
+            },
+            "MATURE": {
+              "coverage": 0.875,
+              "mean_set_size": 0.875
+            },
+            "MID": {
+              "coverage": 0.9,
+              "mean_set_size": 1.14375
+            }
+          },
+          "full_set_rate": 0.22678571428571428,
+          "marginal_coverage": 0.8892857142857142,
+          "mean_candidate_set_size": 1.8375,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 560,
+          "n_independent_calibration_incidents": 80,
+          "normalized_mean_candidate_set_size": 0.459375,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 240,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9972839215036796
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.003656895028816831
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8564780161069662
+            }
+          },
+          "singleton_rate": 0.5982142857142857
+        }
+      },
+      "4": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9833333333333333,
+              "mean_set_size": 3.2958333333333334
+            },
+            "MATURE": {
+              "coverage": 0.89375,
+              "mean_set_size": 0.89375
+            },
+            "MID": {
+              "coverage": 0.89375,
+              "mean_set_size": 1.125
+            }
+          },
+          "full_set_rate": 0.28035714285714286,
+          "marginal_coverage": 0.9321428571428572,
+          "mean_candidate_set_size": 1.9892857142857143,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 112,
+          "n_independent_calibration_incidents": 16,
+          "normalized_mean_candidate_set_size": 0.4973214285714286,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 48,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9996120299749149
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.00552970374313011
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.7904879005958336
+            }
+          },
+          "singleton_rate": 0.5553571428571429
+        }
+      },
+      "8": {
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9333333333333333,
+              "mean_set_size": 3.1
+            },
+            "MATURE": {
+              "coverage": 0.88125,
+              "mean_set_size": 0.88125
+            },
+            "MID": {
+              "coverage": 0.78125,
+              "mean_set_size": 0.81875
+            }
+          },
+          "full_set_rate": 0.2517857142857143,
+          "marginal_coverage": 0.875,
+          "mean_candidate_set_size": 1.8142857142857143,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.45357142857142857,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9987567811099547
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.004413439493871074
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.027622788547691957
+            }
+          },
+          "singleton_rate": 0.5625
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "12": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9023809523809524,
+              "mean_set_size": 5.495238095238095
+            },
+            "MATURE": {
+              "coverage": 0.9714285714285714,
+              "mean_set_size": 3.7
+            },
+            "MID": {
+              "coverage": 0.9607142857142857,
+              "mean_set_size": 3.8464285714285715
+            }
+          },
+          "full_set_rate": 0.16122448979591836,
+          "marginal_coverage": 0.9387755102040817,
+          "mean_candidate_set_size": 4.511224489795918,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 588,
+          "n_independent_calibration_incidents": 84,
+          "normalized_mean_candidate_set_size": 0.6444606413994168,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 252,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9099625342336486
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9280818540551489
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9259668527963414
+            }
+          },
+          "singleton_rate": 0.19387755102040816
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9083333333333333,
+              "mean_set_size": 3.029166666666667
+            },
+            "MATURE": {
+              "coverage": 0.775,
+              "mean_set_size": 0.775
+            },
+            "MID": {
+              "coverage": 0.85,
+              "mean_set_size": 0.8875
+            }
+          },
+          "full_set_rate": 0.275,
+          "marginal_coverage": 0.8535714285714285,
+          "mean_candidate_set_size": 1.7732142857142856,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 336,
+          "n_independent_calibration_incidents": 48,
+          "normalized_mean_candidate_set_size": 0.4433035714285714,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 144,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9785774368144354
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.003993241385750523
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.4505001882109798
+            }
+          },
+          "singleton_rate": 0.5946428571428571
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9104166666666667,
+              "mean_set_size": 6.089583333333334
+            },
+            "MATURE": {
+              "coverage": 0.94375,
+              "mean_set_size": 4.16875
+            },
+            "MID": {
+              "coverage": 0.940625,
+              "mean_set_size": 4.315625
+            }
+          },
+          "full_set_rate": 0.16160714285714287,
+          "marginal_coverage": 0.9285714285714286,
+          "mean_candidate_set_size": 5.0339285714285715,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 672,
+          "n_independent_calibration_incidents": 96,
+          "normalized_mean_candidate_set_size": 0.6292410714285714,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 288,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9187117406149987
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9397998877382353
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9403336446794429
+            }
+          },
+          "singleton_rate": 0.17767857142857144
+        }
+      },
+      "20": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9,
+              "mean_set_size": 5.433333333333334
+            },
+            "MATURE": {
+              "coverage": 0.9571428571428572,
+              "mean_set_size": 3.585714285714286
+            },
+            "MID": {
+              "coverage": 0.9607142857142857,
+              "mean_set_size": 3.7785714285714285
+            }
+          },
+          "full_set_rate": 0.12653061224489795,
+          "marginal_coverage": 0.9336734693877551,
+          "mean_candidate_set_size": 4.43265306122449,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 980,
+          "n_independent_calibration_incidents": 140,
+          "normalized_mean_candidate_set_size": 0.6332361516034986,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 420,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9085439321384394
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 280,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9237684105844093
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 280,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9232687955851198
+            }
+          },
+          "singleton_rate": 0.2
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9083333333333333,
+              "mean_set_size": 3.0
+            },
+            "MATURE": {
+              "coverage": 0.83125,
+              "mean_set_size": 0.83125
+            },
+            "MID": {
+              "coverage": 0.9125,
+              "mean_set_size": 1.18125
+            }
+          },
+          "full_set_rate": 0.2732142857142857,
+          "marginal_coverage": 0.8875,
+          "mean_candidate_set_size": 1.8607142857142858,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 560,
+          "n_independent_calibration_incidents": 80,
+          "normalized_mean_candidate_set_size": 0.46517857142857144,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 240,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9741618970614643
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.006730506567554584
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8541975975179167
+            }
+          },
+          "singleton_rate": 0.6142857142857143
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9,
+              "mean_set_size": 6.0125
+            },
+            "MATURE": {
+              "coverage": 0.91875,
+              "mean_set_size": 3.85
+            },
+            "MID": {
+              "coverage": 0.91875,
+              "mean_set_size": 3.984375
+            }
+          },
+          "full_set_rate": 0.05892857142857143,
+          "marginal_coverage": 0.9107142857142857,
+          "mean_candidate_set_size": 4.8151785714285715,
+          "median_candidate_set_size": 6.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 1120,
+          "n_independent_calibration_incidents": 160,
+          "normalized_mean_candidate_set_size": 0.6018973214285714,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 480,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9167748671049223
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 320,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9283977520940194
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 320,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9274433742774628
+            }
+          },
+          "singleton_rate": 0.19017857142857142
+        }
+      },
+      "4": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9023809523809524,
+              "mean_set_size": 5.488095238095238
+            },
+            "MATURE": {
+              "coverage": 0.9428571428571428,
+              "mean_set_size": 3.4
+            },
+            "MID": {
+              "coverage": 0.95,
+              "mean_set_size": 3.607142857142857
+            }
+          },
+          "full_set_rate": 0.12551020408163266,
+          "marginal_coverage": 0.9275510204081633,
+          "mean_candidate_set_size": 4.354081632653061,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 196,
+          "n_independent_calibration_incidents": 28,
+          "normalized_mean_candidate_set_size": 0.6220116618075802,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 84,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9095239815257793
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 56,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9173050647170861
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 56,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9173050647170861
+            }
+          },
+          "singleton_rate": 0.20612244897959184
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9625,
+              "mean_set_size": 3.275
+            },
+            "MATURE": {
+              "coverage": 0.75625,
+              "mean_set_size": 0.75625
+            },
+            "MID": {
+              "coverage": 0.90625,
+              "mean_set_size": 1.125
+            }
+          },
+          "full_set_rate": 0.3,
+          "marginal_coverage": 0.8875,
+          "mean_candidate_set_size": 1.9410714285714286,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 112,
+          "n_independent_calibration_incidents": 16,
+          "normalized_mean_candidate_set_size": 0.48526785714285714,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 48,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9975937689283942
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.0035636198230508676
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.7893690773657421
+            }
+          },
+          "singleton_rate": 0.5410714285714285
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9541666666666667,
+              "mean_set_size": 6.491666666666666
+            },
+            "MATURE": {
+              "coverage": 0.9625,
+              "mean_set_size": 4.73125
+            },
+            "MID": {
+              "coverage": 0.96875,
+              "mean_set_size": 4.86875
+            }
+          },
+          "full_set_rate": 0.42232142857142857,
+          "marginal_coverage": 0.9607142857142857,
+          "mean_candidate_set_size": 5.525,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.690625,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9292995217024995
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.977763174330811
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.977763174330811
+            }
+          },
+          "singleton_rate": 0.1392857142857143
+        }
+      },
+      "8": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9023809523809524,
+              "mean_set_size": 5.5
+            },
+            "MATURE": {
+              "coverage": 0.9714285714285714,
+              "mean_set_size": 3.7142857142857144
+            },
+            "MID": {
+              "coverage": 0.9714285714285714,
+              "mean_set_size": 3.9107142857142856
+            }
+          },
+          "full_set_rate": 0.17551020408163265,
+          "marginal_coverage": 0.9418367346938775,
+          "mean_candidate_set_size": 4.535714285714286,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 392,
+          "n_independent_calibration_incidents": 56,
+          "normalized_mean_candidate_set_size": 0.6479591836734694,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.910070699673184
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 112,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9284883548678882
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 112,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9280818540551489
+            }
+          },
+          "singleton_rate": 0.19285714285714287
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9333333333333333,
+              "mean_set_size": 3.15
+            },
+            "MATURE": {
+              "coverage": 0.775,
+              "mean_set_size": 0.775
+            },
+            "MID": {
+              "coverage": 0.85,
+              "mean_set_size": 0.8875
+            }
+          },
+          "full_set_rate": 0.2892857142857143,
+          "marginal_coverage": 0.8642857142857143,
+          "mean_candidate_set_size": 1.825,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.45625,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9903955283806269
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.004079614219571592
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.31473543720833463
+            }
+          },
+          "singleton_rate": 0.575
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9104166666666667,
+              "mean_set_size": 6.089583333333334
+            },
+            "MATURE": {
+              "coverage": 0.95625,
+              "mean_set_size": 4.58125
+            },
+            "MID": {
+              "coverage": 0.95625,
+              "mean_set_size": 4.671875
+            }
+          },
+          "full_set_rate": 0.3080357142857143,
+          "marginal_coverage": 0.9366071428571429,
+          "mean_candidate_set_size": 5.253571428571429,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 448,
+          "n_independent_calibration_incidents": 64,
+          "normalized_mean_candidate_set_size": 0.6566964285714286,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9187117406149987
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 128,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9628755199759018
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 128,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9611610645810585
+            }
+          },
+          "singleton_rate": 0.15089285714285713
+        }
+      }
+    },
+    "20260815": {
+      "12": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9047619047619048,
+              "mean_set_size": 5.5285714285714285
+            },
+            "MATURE": {
+              "coverage": 0.95,
+              "mean_set_size": 3.585714285714286
+            },
+            "MID": {
+              "coverage": 0.9428571428571428,
+              "mean_set_size": 3.7464285714285714
+            }
+          },
+          "full_set_rate": 0.16326530612244897,
+          "marginal_coverage": 0.9285714285714286,
+          "mean_candidate_set_size": 4.464285714285714,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 588,
+          "n_independent_calibration_incidents": 84,
+          "normalized_mean_candidate_set_size": 0.6377551020408163,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 252,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9165542876977154
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.930458881800308
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9274281593816806
+            }
+          },
+          "singleton_rate": 0.22959183673469388
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9125,
+              "mean_set_size": 3.125
+            },
+            "MATURE": {
+              "coverage": 0.775,
+              "mean_set_size": 0.775
+            },
+            "MID": {
+              "coverage": 0.84375,
+              "mean_set_size": 0.99375
+            }
+          },
+          "full_set_rate": 0.28035714285714286,
+          "marginal_coverage": 0.8535714285714285,
+          "mean_candidate_set_size": 1.8446428571428573,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 336,
+          "n_independent_calibration_incidents": 48,
+          "normalized_mean_candidate_set_size": 0.4611607142857143,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 144,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9899079586446545
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.018973853989585843
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.563082046273728
+            }
+          },
+          "singleton_rate": 0.5910714285714286
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9083333333333333,
+              "mean_set_size": 6.110416666666667
+            },
+            "MATURE": {
+              "coverage": 0.94375,
+              "mean_set_size": 4.26875
+            },
+            "MID": {
+              "coverage": 0.93125,
+              "mean_set_size": 4.38125
+            }
+          },
+          "full_set_rate": 0.2642857142857143,
+          "marginal_coverage": 0.925,
+          "mean_candidate_set_size": 5.090178571428571,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 672,
+          "n_independent_calibration_incidents": 96,
+          "normalized_mean_candidate_set_size": 0.6362723214285714,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 288,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9228488235604456
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9592071373985119
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9564703234302575
+            }
+          },
+          "singleton_rate": 0.20089285714285715
+        }
+      },
+      "20": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9047619047619048,
+              "mean_set_size": 5.495238095238095
+            },
+            "MATURE": {
+              "coverage": 0.95,
+              "mean_set_size": 3.6214285714285714
+            },
+            "MID": {
+              "coverage": 0.9464285714285714,
+              "mean_set_size": 3.775
+            }
+          },
+          "full_set_rate": 0.1683673469387755,
+          "marginal_coverage": 0.9295918367346939,
+          "mean_candidate_set_size": 4.468367346938775,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 980,
+          "n_independent_calibration_incidents": 140,
+          "normalized_mean_candidate_set_size": 0.638338192419825,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 420,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9136262364513563
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 280,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9311804601901907
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 280,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9280365002767668
+            }
+          },
+          "singleton_rate": 0.22959183673469388
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9083333333333333,
+              "mean_set_size": 3.095833333333333
+            },
+            "MATURE": {
+              "coverage": 0.84375,
+              "mean_set_size": 0.84375
+            },
+            "MID": {
+              "coverage": 0.9125,
+              "mean_set_size": 1.275
+            }
+          },
+          "full_set_rate": 0.2767857142857143,
+          "marginal_coverage": 0.8910714285714286,
+          "mean_candidate_set_size": 1.9321428571428572,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 560,
+          "n_independent_calibration_incidents": 80,
+          "normalized_mean_candidate_set_size": 0.4830357142857143,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 240,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9879683819213669
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.037384493044323897
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8956476921624834
+            }
+          },
+          "singleton_rate": 0.5571428571428572
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8979166666666667,
+              "mean_set_size": 5.98125
+            },
+            "MATURE": {
+              "coverage": 0.91875,
+              "mean_set_size": 3.81875
+            },
+            "MID": {
+              "coverage": 0.903125,
+              "mean_set_size": 3.903125
+            }
+          },
+          "full_set_rate": 0.10535714285714286,
+          "marginal_coverage": 0.9053571428571429,
+          "mean_candidate_set_size": 4.769642857142857,
+          "median_candidate_set_size": 6.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 1120,
+          "n_independent_calibration_incidents": 160,
+          "normalized_mean_candidate_set_size": 0.5962053571428572,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 480,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9190980974209343
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 320,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9354543359035702
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 320,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9326586738889168
+            }
+          },
+          "singleton_rate": 0.22589285714285715
+        }
+      },
+      "4": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9214285714285714,
+              "mean_set_size": 5.616666666666666
+            },
+            "MATURE": {
+              "coverage": 0.9285714285714286,
+              "mean_set_size": 3.4571428571428573
+            },
+            "MID": {
+              "coverage": 0.9392857142857143,
+              "mean_set_size": 3.6964285714285716
+            }
+          },
+          "full_set_rate": 0.16938775510204082,
+          "marginal_coverage": 0.9285714285714286,
+          "mean_candidate_set_size": 4.451020408163266,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 196,
+          "n_independent_calibration_incidents": 28,
+          "normalized_mean_candidate_set_size": 0.6358600583090379,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 84,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9211766242323467
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 56,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.926083792146628
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 56,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9255989569217006
+            }
+          },
+          "singleton_rate": 0.22959183673469388
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9458333333333333,
+              "mean_set_size": 3.3333333333333335
+            },
+            "MATURE": {
+              "coverage": 0.8,
+              "mean_set_size": 0.8
+            },
+            "MID": {
+              "coverage": 0.88125,
+              "mean_set_size": 1.1625
+            }
+          },
+          "full_set_rate": 0.3107142857142857,
+          "marginal_coverage": 0.8857142857142857,
+          "mean_candidate_set_size": 1.9892857142857143,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 112,
+          "n_independent_calibration_incidents": 16,
+          "normalized_mean_candidate_set_size": 0.4973214285714286,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 48,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9975410566632803
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.023022444986521506
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.749996150611352
+            }
+          },
+          "singleton_rate": 0.5321428571428571
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9270833333333334,
+              "mean_set_size": 6.35625
+            },
+            "MATURE": {
+              "coverage": 0.94375,
+              "mean_set_size": 4.4125
+            },
+            "MID": {
+              "coverage": 0.94375,
+              "mean_set_size": 4.546875
+            }
+          },
+          "full_set_rate": 0.36607142857142855,
+          "marginal_coverage": 0.9366071428571429,
+          "mean_candidate_set_size": 5.2839285714285715,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.6604910714285714,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9322029108465586
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9693009927868843
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9693009927868843
+            }
+          },
+          "singleton_rate": 0.18571428571428572
+        }
+      },
+      "8": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.919047619047619,
+              "mean_set_size": 5.6
+            },
+            "MATURE": {
+              "coverage": 0.95,
+              "mean_set_size": 3.585714285714286
+            },
+            "MID": {
+              "coverage": 0.95,
+              "mean_set_size": 3.8285714285714287
+            }
+          },
+          "full_set_rate": 0.19285714285714287,
+          "marginal_coverage": 0.936734693877551,
+          "mean_candidate_set_size": 4.518367346938776,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 392,
+          "n_independent_calibration_incidents": 56,
+          "normalized_mean_candidate_set_size": 0.6454810495626823,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9205306956409229
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 112,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9305159354923865
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 112,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.930458881800308
+            }
+          },
+          "singleton_rate": 0.22857142857142856
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9416666666666667,
+              "mean_set_size": 3.3
+            },
+            "MATURE": {
+              "coverage": 0.7625,
+              "mean_set_size": 0.7625
+            },
+            "MID": {
+              "coverage": 0.85,
+              "mean_set_size": 1.025
+            }
+          },
+          "full_set_rate": 0.30178571428571427,
+          "marginal_coverage": 0.8642857142857143,
+          "mean_candidate_set_size": 1.925,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.48125,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9969018381694904
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.01777952253054893
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.6303348718785872
+            }
+          },
+          "singleton_rate": 0.5625
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.90625,
+              "mean_set_size": 6.045833333333333
+            },
+            "MATURE": {
+              "coverage": 0.94375,
+              "mean_set_size": 4.4125
+            },
+            "MID": {
+              "coverage": 0.940625,
+              "mean_set_size": 4.521875
+            }
+          },
+          "full_set_rate": 0.30714285714285716,
+          "marginal_coverage": 0.9267857142857143,
+          "mean_candidate_set_size": 5.14375,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 448,
+          "n_independent_calibration_incidents": 64,
+          "normalized_mean_candidate_set_size": 0.64296875,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9205910167274182
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 128,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9693009927868843
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 128,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9674639800590291
+            }
+          },
+          "singleton_rate": 0.18571428571428572
+        }
+      }
+    },
+    "31874": {
+      "12": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9023809523809524,
+              "mean_set_size": 5.488095238095238
+            },
+            "MATURE": {
+              "coverage": 0.95,
+              "mean_set_size": 3.585714285714286
+            },
+            "MID": {
+              "coverage": 0.9464285714285714,
+              "mean_set_size": 3.767857142857143
+            }
+          },
+          "full_set_rate": 0.2010204081632653,
+          "marginal_coverage": 0.9285714285714286,
+          "mean_candidate_set_size": 4.453061224489796,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 588,
+          "n_independent_calibration_incidents": 84,
+          "normalized_mean_candidate_set_size": 0.6361516034985423,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 252,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9198634406934423
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9360306765446269
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.934554143033471
+            }
+          },
+          "singleton_rate": 0.24591836734693878
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8875,
+              "mean_set_size": 2.975
+            },
+            "MATURE": {
+              "coverage": 0.75,
+              "mean_set_size": 0.75
+            },
+            "MID": {
+              "coverage": 0.85,
+              "mean_set_size": 0.89375
+            }
+          },
+          "full_set_rate": 0.2357142857142857,
+          "marginal_coverage": 0.8375,
+          "mean_candidate_set_size": 1.7446428571428572,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 336,
+          "n_independent_calibration_incidents": 48,
+          "normalized_mean_candidate_set_size": 0.4361607142857143,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 144,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9941403765497033
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.004248402591766287
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.3541626593406395
+            }
+          },
+          "singleton_rate": 0.5785714285714286
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.90625,
+              "mean_set_size": 6.175
+            },
+            "MATURE": {
+              "coverage": 0.94375,
+              "mean_set_size": 4.4
+            },
+            "MID": {
+              "coverage": 0.925,
+              "mean_set_size": 4.396875
+            }
+          },
+          "full_set_rate": 0.29285714285714287,
+          "marginal_coverage": 0.9223214285714286,
+          "mean_candidate_set_size": 5.159821428571429,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 672,
+          "n_independent_calibration_incidents": 96,
+          "normalized_mean_candidate_set_size": 0.6449776785714286,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 288,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.922149135792432
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9748387674819071
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9669027321093395
+            }
+          },
+          "singleton_rate": 0.19553571428571428
+        }
+      },
+      "20": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8976190476190476,
+              "mean_set_size": 5.438095238095238
+            },
+            "MATURE": {
+              "coverage": 0.95,
+              "mean_set_size": 3.592857142857143
+            },
+            "MID": {
+              "coverage": 0.9464285714285714,
+              "mean_set_size": 3.767857142857143
+            }
+          },
+          "full_set_rate": 0.19183673469387755,
+          "marginal_coverage": 0.926530612244898,
+          "mean_candidate_set_size": 4.433673469387755,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 980,
+          "n_independent_calibration_incidents": 140,
+          "normalized_mean_candidate_set_size": 0.6333819241982507,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 420,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.91662715561423
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 280,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9364785249268899
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 280,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9344414144028637
+            }
+          },
+          "singleton_rate": 0.24591836734693878
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9,
+              "mean_set_size": 3.0166666666666666
+            },
+            "MATURE": {
+              "coverage": 0.78125,
+              "mean_set_size": 0.78125
+            },
+            "MID": {
+              "coverage": 0.925,
+              "mean_set_size": 1.1875
+            }
+          },
+          "full_set_rate": 0.24107142857142858,
+          "marginal_coverage": 0.8732142857142857,
+          "mean_candidate_set_size": 1.855357142857143,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 560,
+          "n_independent_calibration_incidents": 80,
+          "normalized_mean_candidate_set_size": 0.46383928571428573,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 240,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.995038649578129
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.006758067645938004
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 160,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.8707144571072405
+            }
+          },
+          "singleton_rate": 0.5696428571428571
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8895833333333333,
+              "mean_set_size": 6.00625
+            },
+            "MATURE": {
+              "coverage": 0.9125,
+              "mean_set_size": 3.95
+            },
+            "MID": {
+              "coverage": 0.9,
+              "mean_set_size": 3.934375
+            }
+          },
+          "full_set_rate": 0.12857142857142856,
+          "marginal_coverage": 0.8991071428571429,
+          "mean_candidate_set_size": 4.826785714285714,
+          "median_candidate_set_size": 6.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 1120,
+          "n_independent_calibration_incidents": 160,
+          "normalized_mean_candidate_set_size": 0.6033482142857143,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 480,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9169351334293147
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 320,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.940884475766039
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 320,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9357853134715841
+            }
+          },
+          "singleton_rate": 0.23482142857142857
+        }
+      },
+      "4": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9095238095238095,
+              "mean_set_size": 5.535714285714286
+            },
+            "MATURE": {
+              "coverage": 0.9428571428571428,
+              "mean_set_size": 3.4857142857142858
+            },
+            "MID": {
+              "coverage": 0.9392857142857143,
+              "mean_set_size": 3.664285714285714
+            }
+          },
+          "full_set_rate": 0.18979591836734694,
+          "marginal_coverage": 0.9275510204081633,
+          "mean_candidate_set_size": 4.41530612244898,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 196,
+          "n_independent_calibration_incidents": 28,
+          "normalized_mean_candidate_set_size": 0.6307580174927114,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 84,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9226269624420095
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 56,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9312154815074322
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 56,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.928370386895758
+            }
+          },
+          "singleton_rate": 0.24591836734693878
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9708333333333333,
+              "mean_set_size": 3.3291666666666666
+            },
+            "MATURE": {
+              "coverage": 0.75,
+              "mean_set_size": 0.75
+            },
+            "MID": {
+              "coverage": 0.90625,
+              "mean_set_size": 1.1125
+            }
+          },
+          "full_set_rate": 0.3,
+          "marginal_coverage": 0.8892857142857142,
+          "mean_candidate_set_size": 1.9589285714285714,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 112,
+          "n_independent_calibration_incidents": 16,
+          "normalized_mean_candidate_set_size": 0.48973214285714284,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 48,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9992945852013125
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.004248402591766287
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 32,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.7728950502794568
+            }
+          },
+          "singleton_rate": 0.5160714285714286
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9333333333333333,
+              "mean_set_size": 6.472916666666666
+            },
+            "MATURE": {
+              "coverage": 0.96875,
+              "mean_set_size": 4.81875
+            },
+            "MID": {
+              "coverage": 0.965625,
+              "mean_set_size": 4.8625
+            }
+          },
+          "full_set_rate": 0.4205357142857143,
+          "marginal_coverage": 0.9526785714285714,
+          "mean_candidate_set_size": 5.540178571428571,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.6925223214285714,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9355933228791755
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9935168916040663
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9927099478913918
+            }
+          },
+          "singleton_rate": 0.11517857142857142
+        }
+      },
+      "8": {
+        "branched-loop": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9166666666666666,
+              "mean_set_size": 5.578571428571428
+            },
+            "MATURE": {
+              "coverage": 0.9642857142857143,
+              "mean_set_size": 3.8785714285714286
+            },
+            "MID": {
+              "coverage": 0.9571428571428572,
+              "mean_set_size": 4.057142857142857
+            }
+          },
+          "full_set_rate": 0.3438775510204082,
+          "marginal_coverage": 0.9418367346938775,
+          "mean_candidate_set_size": 4.658163265306122,
+          "median_candidate_set_size": 6.0,
+          "n": 980,
+          "n_calibration_depth_rows": 392,
+          "n_independent_calibration_incidents": 56,
+          "normalized_mean_candidate_set_size": 0.6654518950437317,
+          "p90_candidate_set_size": 7.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "branched-loop:EARLY",
+              "group_n": 168,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9255963070095962
+            },
+            "MATURE": {
+              "group_key": "branched-loop:MATURE",
+              "group_n": 112,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9447232762061574
+            },
+            "MID": {
+              "group_key": "branched-loop:MID",
+              "group_n": 112,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9445262377497362
+            }
+          },
+          "singleton_rate": 0.24591836734693878
+        },
+        "golden-reference": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.9458333333333333,
+              "mean_set_size": 3.158333333333333
+            },
+            "MATURE": {
+              "coverage": 0.775,
+              "mean_set_size": 0.775
+            },
+            "MID": {
+              "coverage": 0.85,
+              "mean_set_size": 0.89375
+            }
+          },
+          "full_set_rate": 0.2839285714285714,
+          "marginal_coverage": 0.8696428571428572,
+          "mean_candidate_set_size": 1.8303571428571428,
+          "median_candidate_set_size": 1.0,
+          "n": 560,
+          "n_calibration_depth_rows": 224,
+          "n_independent_calibration_incidents": 32,
+          "normalized_mean_candidate_set_size": 0.4575892857142857,
+          "p90_candidate_set_size": 4.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "golden-reference:EARLY",
+              "group_n": 96,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.997193175716136
+            },
+            "MATURE": {
+              "group_key": "golden-reference:MATURE",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.006134416419490973
+            },
+            "MID": {
+              "group_key": "golden-reference:MID",
+              "group_n": 64,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.3414186448877441
+            }
+          },
+          "singleton_rate": 0.5660714285714286
+        },
+        "loop-grid": {
+          "by_maturity": {
+            "EARLY": {
+              "coverage": 0.8979166666666667,
+              "mean_set_size": 6.05625
+            },
+            "MATURE": {
+              "coverage": 0.95,
+              "mean_set_size": 4.48125
+            },
+            "MID": {
+              "coverage": 0.953125,
+              "mean_set_size": 4.553125
+            }
+          },
+          "full_set_rate": 0.32142857142857145,
+          "marginal_coverage": 0.9285714285714286,
+          "mean_candidate_set_size": 5.176785714285714,
+          "median_candidate_set_size": 7.0,
+          "n": 1120,
+          "n_calibration_depth_rows": 448,
+          "n_independent_calibration_incidents": 64,
+          "normalized_mean_candidate_set_size": 0.6470982142857142,
+          "p90_candidate_set_size": 8.0,
+          "quantiles_by_bucket": {
+            "EARLY": {
+              "group_key": "loop-grid:EARLY",
+              "group_n": 192,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9185171306685682
+            },
+            "MATURE": {
+              "group_key": "loop-grid:MATURE",
+              "group_n": 128,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9779919693771615
+            },
+            "MID": {
+              "group_key": "loop-grid:MID",
+              "group_n": 128,
+              "group_source": "NETWORK_SPECIFIC",
+              "quantile": 0.9769491847144013
+            }
+          },
+          "singleton_rate": 0.18392857142857144
+        }
+      }
+    }
+  }
+}
