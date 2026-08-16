@@ -25,9 +25,9 @@
   },
   "decision_reason": "Representativeness audit passed, corrected sanity/implementation gate passed, CURRENT control passes all 3 seeds, INTERLEAVED passes all 9 trained-family/seed cells, and the candidate-set guard passes (no pathological full-set behavior) -- M9.5's favorable calibration evidence is independently confirmed under a fresh, disjoint population.",
   "development_repeats_per_source": 20,
-  "end_commit_note": "b6e41404eda87a22abeffad12968e89a8b1a8496 is the commit at decide-stage execution time, BEFORE this milestone's own code+artifact commit exists (a commit cannot embed its own SHA at authoring time -- see M9.4/M9.5's closure/manifest end_commit_note for the same issue). A metadata-only follow-up commit records the true final SHA after the initial M9.5R commit is made, mirroring M9.4/M9.5's fix.",
+  "end_commit_note": "b6e41404eda87a22abeffad12968e89a8b1a8496 was the commit at decide-stage execution time, BEFORE this milestone's own code+artifact commit existed (a commit cannot embed its own SHA at authoring time -- see M9.4/M9.5's closure/manifest end_commit_note for the same issue). This metadata-only follow-up commit records the true final SHA (9948f718434851c2dd57b7a0d064d983ffa21b9c, the commit that actually added this closure.json and the rest of the M9.5R artifacts), mirroring M9.4/M9.5's fix.",
   "evidence_against": "None identified against the primary confirmation question at this run.",
-  "execution_commit": "b6e41404eda87a22abeffad12968e89a8b1a8496",
+  "execution_commit": "9948f718434851c2dd57b7a0d064d983ffa21b9c",
   "interleaved": {
     "all_9_cells_pass": true,
     "per_family_seed_coverage": {
