@@ -1,0 +1,168 @@
+{
+  "M9_1_FINAL_DECISION": "CURRENT_HYDROCORE_RETAINED",
+  "code_under_test_commit": "5b49fef1358dc0bfb237437df27a63242d83efc2",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "per_arm_outcome": {
+    "GRAPH_CDE": {
+      "screening": {
+        "outcome": "GUARDRAILS_FAILED",
+        "step1": {
+          "checks": {
+            "candidate_set_ok": true,
+            "coverage_ok": true,
+            "early_regression_ok": true,
+            "instability_ok": true,
+            "mature_regression_ok": false,
+            "mrr_regression_ok": true,
+            "ood_safety_authority_ok": true
+          },
+          "early_regression_pp": 2.361111111111114,
+          "guardrails_passed": false,
+          "mature_regression_pp": 3.3333333333333326,
+          "mrr_regression": 0.01567460317460312,
+          "per_seed": {
+            "20260814": {
+              "by_maturity_coverage": {
+                "EARLY": 0.9055555555555556,
+                "MATURE": 0.9083333333333333,
+                "MID": 0.9291666666666667
+              },
+              "candidate_set_ok": true,
+              "coverage_ok": true,
+              "instability_ok": true,
+              "marginal_coverage": 0.9130952380952381,
+              "mean_normalized_set_size": 0.3234126984126984
+            },
+            "31874": {
+              "by_maturity_coverage": {
+                "EARLY": 0.9,
+                "MATURE": 0.8958333333333334,
+                "MID": 0.9458333333333333
+              },
+              "candidate_set_ok": true,
+              "coverage_ok": true,
+              "instability_ok": true,
+              "marginal_coverage": 0.9119047619047619,
+              "mean_normalized_set_size": 0.32896825396825397
+            }
+          },
+          "seeds": [
+            20260814,
+            31874
+          ]
+        }
+      },
+      "section_13_outcome": "C_GUARDRAILS_BLOCKED",
+      "status": "GUARDRAILS_FAILED"
+    },
+    "GRAPH_ODE": {
+      "screening": {
+        "outcome": "GUARDRAILS_FAILED",
+        "step1": {
+          "checks": {
+            "candidate_set_ok": true,
+            "coverage_ok": true,
+            "early_regression_ok": true,
+            "instability_ok": true,
+            "mature_regression_ok": false,
+            "mrr_regression_ok": true,
+            "ood_safety_authority_ok": true
+          },
+          "early_regression_pp": 0.1388888888888884,
+          "guardrails_passed": false,
+          "mature_regression_pp": 3.749999999999998,
+          "mrr_regression": 0.005654761904761885,
+          "per_seed": {
+            "20260814": {
+              "by_maturity_coverage": {
+                "EARLY": 0.9,
+                "MATURE": 0.8791666666666667,
+                "MID": 0.9333333333333333
+              },
+              "candidate_set_ok": true,
+              "coverage_ok": true,
+              "instability_ok": true,
+              "marginal_coverage": 0.9035714285714286,
+              "mean_normalized_set_size": 0.31210317460317455
+            },
+            "31874": {
+              "by_maturity_coverage": {
+                "EARLY": 0.9055555555555556,
+                "MATURE": 0.8958333333333334,
+                "MID": 0.9375
+              },
+              "candidate_set_ok": true,
+              "coverage_ok": true,
+              "instability_ok": true,
+              "marginal_coverage": 0.9119047619047619,
+              "mean_normalized_set_size": 0.3198412698412698
+            }
+          },
+          "seeds": [
+            20260814,
+            31874
+          ]
+        }
+      },
+      "section_13_outcome": "C_GUARDRAILS_BLOCKED",
+      "status": "GUARDRAILS_FAILED"
+    },
+    "GRAPH_SDE": {
+      "screening": {
+        "outcome": "GUARDRAILS_FAILED",
+        "step1": {
+          "checks": {
+            "candidate_set_ok": true,
+            "coverage_ok": true,
+            "early_regression_ok": true,
+            "instability_ok": true,
+            "mature_regression_ok": false,
+            "mrr_regression_ok": true,
+            "ood_safety_authority_ok": true
+          },
+          "early_regression_pp": 0.1388888888888884,
+          "guardrails_passed": false,
+          "mature_regression_pp": 4.166666666666674,
+          "mrr_regression": 0.006746031746031722,
+          "per_seed": {
+            "20260814": {
+              "by_maturity_coverage": {
+                "EARLY": 0.8972222222222223,
+                "MATURE": 0.8791666666666667,
+                "MID": 0.9291666666666667
+              },
+              "candidate_set_ok": true,
+              "coverage_ok": true,
+              "instability_ok": true,
+              "marginal_coverage": 0.9011904761904762,
+              "mean_normalized_set_size": 0.3192460317460317
+            },
+            "31874": {
+              "by_maturity_coverage": {
+                "EARLY": 0.9,
+                "MATURE": 0.8875,
+                "MID": 0.9375
+              },
+              "candidate_set_ok": true,
+              "coverage_ok": true,
+              "instability_ok": true,
+              "marginal_coverage": 0.9071428571428571,
+              "mean_normalized_set_size": 0.31765873015873014
+            }
+          },
+          "seeds": [
+            20260814,
+            31874
+          ]
+        }
+      },
+      "section_13_outcome": "C_GUARDRAILS_BLOCKED",
+      "status": "GUARDRAILS_FAILED"
+    }
+  },
+  "protocol_frozen_at_commit": "0f05be1d47258a8c3d19e3a0d0e1122e3e560069",
+  "schema_version": 1,
+  "selected_arm": null,
+  "selection_reason": "zero arms reached PROMOTION_CONFIRMED"
+}
