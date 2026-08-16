@@ -237,5 +237,165 @@
       "n_development_rows": 840,
       "seed": 31874
     }
+  },
+  "GRAPH_ODE": {
+    "20260814": {
+      "alpha": 0.1,
+      "arm": "GRAPH_ODE",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9,
+          "mean_normalized_set_size": 0.4986111111111111,
+          "mean_set_size": 2.9916666666666667,
+          "n": 360,
+          "singleton_rate": 0.07222222222222222,
+          "wilson_95_ci": [
+            0.8646631029127307,
+            0.9268904515763144
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8791666666666667,
+          "mean_normalized_set_size": 0.15069444444444444,
+          "mean_set_size": 0.9041666666666667,
+          "n": 240,
+          "singleton_rate": 0.9041666666666667,
+          "wilson_95_ci": [
+            0.8318500890607975,
+            0.9145365216501871
+          ]
+        },
+        "MID": {
+          "coverage": 0.9333333333333333,
+          "mean_normalized_set_size": 0.19375,
+          "mean_set_size": 1.1625,
+          "n": 240,
+          "singleton_rate": 0.8708333333333333,
+          "wilson_95_ci": [
+            0.8944621699310613,
+            0.958551099452921
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9984428119293575,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.1812908649563456,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.8907802265217455,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9035714285714286,
+        "mean_normalized_set_size": 0.31210317460317455,
+        "mean_set_size": 1.8726190476190476,
+        "n": 840,
+        "singleton_rate": 0.5380952380952381,
+        "wilson_95_ci": [
+          0.8817336885645479,
+          0.9217347745132619
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 20260814
+    },
+    "31874": {
+      "alpha": 0.1,
+      "arm": "GRAPH_ODE",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9055555555555556,
+          "mean_normalized_set_size": 0.5171296296296296,
+          "mean_set_size": 3.102777777777778,
+          "n": 360,
+          "singleton_rate": 0.030555555555555555,
+          "wilson_95_ci": [
+            0.8709206039156303,
+            0.9316267499413182
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8958333333333334,
+          "mean_normalized_set_size": 0.1534722222222222,
+          "mean_set_size": 0.9208333333333333,
+          "n": 240,
+          "singleton_rate": 0.9208333333333333,
+          "wilson_95_ci": [
+            0.8507518260304615,
+            0.9284429873491379
+          ]
+        },
+        "MID": {
+          "coverage": 0.9375,
+          "mean_normalized_set_size": 0.19027777777777777,
+          "mean_set_size": 1.1416666666666666,
+          "n": 240,
+          "singleton_rate": 0.8833333333333333,
+          "wilson_95_ci": [
+            0.8994534372476064,
+            0.9617618828035297
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9993276750194603,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.19924909771327937,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.858414482160683,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9119047619047619,
+        "mean_normalized_set_size": 0.3198412698412698,
+        "mean_set_size": 1.9190476190476191,
+        "n": 840,
+        "singleton_rate": 0.5285714285714286,
+        "wilson_95_ci": [
+          0.8908143621850917,
+          0.9292448951155637
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 31874
+    }
   }
 }
