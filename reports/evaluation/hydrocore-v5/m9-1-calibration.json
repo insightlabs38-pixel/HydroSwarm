@@ -238,6 +238,87 @@
       "seed": 31874
     }
   },
+  "GRAPH_CDE": {
+    "20260814": {
+      "alpha": 0.1,
+      "arm": "GRAPH_CDE",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9055555555555556,
+          "mean_normalized_set_size": 0.5203703703703704,
+          "mean_set_size": 3.1222222222222222,
+          "n": 360,
+          "singleton_rate": 0.013888888888888888,
+          "wilson_95_ci": [
+            0.8709206039156303,
+            0.9316267499413182
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.9083333333333333,
+          "mean_normalized_set_size": 0.15625,
+          "mean_set_size": 0.9375,
+          "n": 240,
+          "singleton_rate": 0.9375,
+          "wilson_95_ci": [
+            0.8651157819717393,
+            0.9386851834093211
+          ]
+        },
+        "MID": {
+          "coverage": 0.9291666666666667,
+          "mean_normalized_set_size": 0.19513888888888886,
+          "mean_set_size": 1.1708333333333334,
+          "n": 240,
+          "singleton_rate": 0.8583333333333333,
+          "wilson_95_ci": [
+            0.8895031557540064,
+            0.9553080629628223
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9975680888997137,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.29786679398821536,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.8227758345594791,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9130952380952381,
+        "mean_normalized_set_size": 0.3234126984126984,
+        "mean_set_size": 1.9404761904761905,
+        "n": 840,
+        "singleton_rate": 0.5190476190476191,
+        "wilson_95_ci": [
+          0.8921155816215646,
+          0.9303137891394974
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 20260814
+    }
+  },
   "GRAPH_ODE": {
     "20260814": {
       "alpha": 0.1,
