@@ -103,6 +103,8 @@
     20260815
   ],
   "start_commit": "009be2ea822417458596bfe643308a69992aa060",
+  "end_commit": "f2e7857f00be6e33420439f44b6ededa0e6c396f",
+  "end_commit_note": "f2e7857f00be6e33420439f44b6ededa0e6c396f is the commit that introduced the M9.4 code+artifacts; see m9-4-closure.json end_commit_note for why a metadata-only follow-up commit was required to record it.",
   "trained_families": [
     "golden-reference",
     "branched-loop",

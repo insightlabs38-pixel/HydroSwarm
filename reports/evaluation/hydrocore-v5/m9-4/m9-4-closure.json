@@ -248,7 +248,8 @@
       }
     }
   },
-  "end_commit": "009be2ea822417458596bfe643308a69992aa060",
+  "end_commit": "f2e7857f00be6e33420439f44b6ededa0e6c396f",
+  "end_commit_note": "f2e7857f00be6e33420439f44b6ededa0e6c396f is the commit that introduced the M9.4 code+artifacts (this file included); a commit cannot embed its own SHA at authoring time, so that value was a placeholder equal to start_commit until this metadata-only follow-up correction. This correction is itself a new commit on top of f2e7857f -- see git log for the true HEAD SHA at report time.",
   "evidence_against": "Known-family (trained-family) guardrail pass=True; calibration gate pass=False.",
   "kind": "SOURCE_REPRESENTATIVE_FROZEN_CHECKPOINT_REEVALUATION",
   "known_family_guardrails_passed": true,
