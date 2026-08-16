@@ -317,6 +317,85 @@
       "n_calibration_rows": 1050,
       "n_development_rows": 840,
       "seed": 20260814
+    },
+    "31874": {
+      "alpha": 0.1,
+      "arm": "GRAPH_CDE",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9,
+          "mean_normalized_set_size": 0.525,
+          "mean_set_size": 3.15,
+          "n": 360,
+          "singleton_rate": 0.08333333333333333,
+          "wilson_95_ci": [
+            0.8646631029127307,
+            0.9268904515763144
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8958333333333334,
+          "mean_normalized_set_size": 0.14930555555555552,
+          "mean_set_size": 0.8958333333333334,
+          "n": 240,
+          "singleton_rate": 0.8958333333333334,
+          "wilson_95_ci": [
+            0.8507518260304615,
+            0.9284429873491379
+          ]
+        },
+        "MID": {
+          "coverage": 0.9458333333333333,
+          "mean_normalized_set_size": 0.21458333333333332,
+          "mean_set_size": 1.2875,
+          "n": 240,
+          "singleton_rate": 0.7916666666666666,
+          "wilson_95_ci": [
+            0.90954460918174,
+            0.9680748122037034
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9983901595351973,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.030325285863406992,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.9791721555658278,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9119047619047619,
+        "mean_normalized_set_size": 0.32896825396825397,
+        "mean_set_size": 1.973809523809524,
+        "n": 840,
+        "singleton_rate": 0.5178571428571429,
+        "wilson_95_ci": [
+          0.8908143621850917,
+          0.9292448951155637
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 31874
     }
   },
   "GRAPH_ODE": {
