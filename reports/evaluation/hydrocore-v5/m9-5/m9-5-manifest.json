@@ -103,6 +103,8 @@
     20260815
   ],
   "start_commit": "3c575ba87bc3f495d33da68c2c5add1b2d257de2",
+  "end_commit": "ff79856620c74593e47c069277cb41936e2fc6eb",
+  "end_commit_note": "ff79856620c74593e47c069277cb41936e2fc6eb is the commit that introduced the M9.5 code+artifacts; see m9-5-closure.json end_commit_note for why a metadata-only follow-up commit was required to record it.",
   "support_levels_repeats_per_source": [
     4,
     8,

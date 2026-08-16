@@ -27,8 +27,8 @@
     }
   },
   "coverage_floor": 0.85,
-  "end_commit": "3c575ba87bc3f495d33da68c2c5add1b2d257de2",
-  "end_commit_note": "3c575ba87bc3f495d33da68c2c5add1b2d257de2 is the commit at decide-stage execution time, BEFORE this milestone's own code+artifact commit exists (a commit cannot embed its own SHA at authoring time -- see M9.4's closure/manifest end_commit_note for the same issue). A metadata-only follow-up commit records the true final SHA after the initial M9.5 commit is made, mirroring M9.4's fix.",
+  "end_commit": "ff79856620c74593e47c069277cb41936e2fc6eb",
+  "end_commit_note": "ff79856620c74593e47c069277cb41936e2fc6eb is the commit that introduced the M9.5 code+artifacts (this file included); a commit cannot embed its own SHA at authoring time, so that value was 3c575ba87bc3f495d33da68c2c5add1b2d257de2 (the start_commit) until this metadata-only follow-up correction, mirroring the fix applied to M9.4's closure/manifest.",
   "evidence_against": "The representativeness audit or the Section 12 reproduction/implementation-path-consistency sanity gate did not pass; the M9.5 support-level calibration results below cannot yet be scientifically interpreted.",
   "interleaved_calibration_gate": {
     "all_9_family_seed_cells_pass": true,
