@@ -397,5 +397,165 @@
       "n_development_rows": 840,
       "seed": 31874
     }
+  },
+  "GRAPH_SDE": {
+    "20260814": {
+      "alpha": 0.1,
+      "arm": "GRAPH_SDE",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.8972222222222223,
+          "mean_normalized_set_size": 0.5162037037037036,
+          "mean_set_size": 3.0972222222222223,
+          "n": 360,
+          "singleton_rate": 0.04722222222222222,
+          "wilson_95_ci": [
+            0.8615450817646821,
+            0.9245115730404113
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8791666666666667,
+          "mean_normalized_set_size": 0.15069444444444444,
+          "mean_set_size": 0.9041666666666667,
+          "n": 240,
+          "singleton_rate": 0.9041666666666667,
+          "wilson_95_ci": [
+            0.8318500890607975,
+            0.9145365216501871
+          ]
+        },
+        "MID": {
+          "coverage": 0.9291666666666667,
+          "mean_normalized_set_size": 0.1923611111111111,
+          "mean_set_size": 1.1541666666666666,
+          "n": 240,
+          "singleton_rate": 0.8833333333333333,
+          "wilson_95_ci": [
+            0.8895031557540064,
+            0.9553080629628223
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.999184033408439,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.15308869649629842,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.8773662282089405,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9011904761904762,
+        "mean_normalized_set_size": 0.3192460317460317,
+        "mean_set_size": 1.9154761904761906,
+        "n": 840,
+        "singleton_rate": 0.530952380952381,
+        "wilson_95_ci": [
+          0.8791476703037279,
+          0.919580565853269
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 20260814
+    },
+    "31874": {
+      "alpha": 0.1,
+      "arm": "GRAPH_SDE",
+      "by_maturity": {
+        "EARLY": {
+          "coverage": 0.9,
+          "mean_normalized_set_size": 0.5087962962962963,
+          "mean_set_size": 3.0527777777777776,
+          "n": 360,
+          "singleton_rate": 0.022222222222222223,
+          "wilson_95_ci": [
+            0.8646631029127307,
+            0.9268904515763144
+          ]
+        },
+        "MATURE": {
+          "coverage": 0.8875,
+          "mean_normalized_set_size": 0.15277777777777776,
+          "mean_set_size": 0.9166666666666666,
+          "n": 240,
+          "singleton_rate": 0.9166666666666666,
+          "wilson_95_ci": [
+            0.8412680944383406,
+            0.9215226176069512
+          ]
+        },
+        "MID": {
+          "coverage": 0.9375,
+          "mean_normalized_set_size": 0.19583333333333333,
+          "mean_set_size": 1.175,
+          "n": 240,
+          "singleton_rate": 0.8625,
+          "wilson_95_ci": [
+            0.8994534372476064,
+            0.9617618828035297
+          ]
+        }
+      },
+      "group_support": {
+        "global_n": 1050,
+        "network_groups": {
+          "golden-reference:EARLY": {
+            "meets_minimum_group_size": true,
+            "n": 450,
+            "quantile": 0.9989104178391358,
+            "quantile_rank": 406
+          },
+          "golden-reference:MATURE": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.20037067020273114,
+            "quantile_rank": 271
+          },
+          "golden-reference:MID": {
+            "meets_minimum_group_size": true,
+            "n": 300,
+            "quantile": 0.9072991918213016,
+            "quantile_rank": 271
+          }
+        }
+      },
+      "locked_test_opened_after": false,
+      "locked_test_opened_before": false,
+      "marginal": {
+        "coverage": 0.9071428571428571,
+        "mean_normalized_set_size": 0.31765873015873014,
+        "mean_set_size": 1.9059523809523808,
+        "n": 840,
+        "singleton_rate": 0.5178571428571429,
+        "wilson_95_ci": [
+          0.8856196070760453,
+          0.9249591963829841
+        ]
+      },
+      "minimum_group_size": 10,
+      "n_calibration_rows": 1050,
+      "n_development_rows": 840,
+      "seed": 31874
+    }
   }
 }
