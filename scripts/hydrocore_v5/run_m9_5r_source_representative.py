@@ -291,7 +291,14 @@ def main() -> int:
     assert m5r.M9_5R_PROTOCOL_PATH.exists(), "protocol freeze artifact must exist BEFORE inference -- run write_m9_5r_protocol.py first"
     protocol_freeze_sha256 = m5r.checkpoint_sha256(str(m5r.M9_5R_PROTOCOL_PATH))
     protocol = json.loads(m5r.M9_5R_PROTOCOL_PATH.read_text())
-    protocol_frozen_at_commit = protocol["start_commit"]
+    # NOTE: protocol["start_commit"] is the HEAD *before* the protocol-freeze
+    # commit existed (a commit cannot embed its own SHA at authoring time --
+    # same issue M9.4/M9.5's end_commit hit). The commit that actually
+    # CONTAINS the frozen protocol file is `start_commit` here (current HEAD
+    # at source-representative execution time), which is correct as long as
+    # no commits landed between freezing the protocol and running this
+    # script -- true for this milestone's governed sequence.
+    protocol_frozen_at_commit = start_commit
 
     print("verifying checkpoint SHA256 (before)...", flush=True)
     checkpoint_identities: dict[str, Any] = {"ARM_A": {}, "ARM_B2": {}}

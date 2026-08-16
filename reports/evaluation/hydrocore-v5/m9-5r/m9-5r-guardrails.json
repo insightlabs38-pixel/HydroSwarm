@@ -1,0 +1,187 @@
+{
+  "alpha_unchanged": true,
+  "candidate_set_analysis": {
+    "pathological_cells": [],
+    "pathological_full_set_behavior_detected": false,
+    "per_arm_seed_family": {
+      "ARM_A|20260814|golden-reference": {
+        "full_set_rate": 0.22142857142857142,
+        "mean_candidate_set_size": 1.7964285714285715,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.44910714285714287,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6375
+      },
+      "ARM_A|20260815|golden-reference": {
+        "full_set_rate": 0.19464285714285715,
+        "mean_candidate_set_size": 1.792857142857143,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.44821428571428573,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6517857142857143
+      },
+      "ARM_A|31874|golden-reference": {
+        "full_set_rate": 0.21607142857142858,
+        "mean_candidate_set_size": 1.8303571428571428,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.4575892857142857,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6303571428571428
+      },
+      "ARM_B2|20260814|branched-loop": {
+        "full_set_rate": 0.08877551020408163,
+        "mean_candidate_set_size": 4.03265306122449,
+        "median_candidate_set_size": 5.0,
+        "normalized_mean_candidate_set_size": 0.5760932944606415,
+        "p90_candidate_set_size": 6.0,
+        "singleton_rate": 0.20816326530612245
+      },
+      "ARM_B2|20260814|golden-reference": {
+        "full_set_rate": 0.25,
+        "mean_candidate_set_size": 1.8375,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.459375,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6446428571428572
+      },
+      "ARM_B2|20260814|loop-grid": {
+        "full_set_rate": 0.15535714285714286,
+        "mean_candidate_set_size": 5.078571428571428,
+        "median_candidate_set_size": 7.0,
+        "normalized_mean_candidate_set_size": 0.6348214285714285,
+        "p90_candidate_set_size": 8.0,
+        "singleton_rate": 0.16428571428571428
+      },
+      "ARM_B2|20260815|branched-loop": {
+        "full_set_rate": 0.13979591836734695,
+        "mean_candidate_set_size": 4.128571428571429,
+        "median_candidate_set_size": 5.0,
+        "normalized_mean_candidate_set_size": 0.589795918367347,
+        "p90_candidate_set_size": 7.0,
+        "singleton_rate": 0.2530612244897959
+      },
+      "ARM_B2|20260815|golden-reference": {
+        "full_set_rate": 0.26607142857142857,
+        "mean_candidate_set_size": 1.8821428571428571,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.4705357142857143,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6214285714285714
+      },
+      "ARM_B2|20260815|loop-grid": {
+        "full_set_rate": 0.2571428571428571,
+        "mean_candidate_set_size": 5.191964285714286,
+        "median_candidate_set_size": 7.0,
+        "normalized_mean_candidate_set_size": 0.6489955357142857,
+        "p90_candidate_set_size": 8.0,
+        "singleton_rate": 0.17857142857142858
+      },
+      "ARM_B2|31874|branched-loop": {
+        "full_set_rate": 0.1469387755102041,
+        "mean_candidate_set_size": 4.025510204081633,
+        "median_candidate_set_size": 5.0,
+        "normalized_mean_candidate_set_size": 0.5750728862973762,
+        "p90_candidate_set_size": 7.0,
+        "singleton_rate": 0.2612244897959184
+      },
+      "ARM_B2|31874|golden-reference": {
+        "full_set_rate": 0.22857142857142856,
+        "mean_candidate_set_size": 1.8267857142857142,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.45669642857142856,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6339285714285714
+      },
+      "ARM_B2|31874|loop-grid": {
+        "full_set_rate": 0.2642857142857143,
+        "mean_candidate_set_size": 5.2125,
+        "median_candidate_set_size": 7.0,
+        "normalized_mean_candidate_set_size": 0.6515625,
+        "p90_candidate_set_size": 8.0,
+        "singleton_rate": 0.18928571428571428
+      }
+    },
+    "threshold_used": 0.8
+  },
+  "coverage_floor_unchanged": true,
+  "current_control": {
+    "all_3_pass": true,
+    "per_seed_coverage": {
+      "20260814": {
+        "marginal_coverage": 0.9,
+        "passes_operational_floor_0_85": true
+      },
+      "20260815": {
+        "marginal_coverage": 0.9089285714285714,
+        "passes_operational_floor_0_85": true
+      },
+      "31874": {
+        "marginal_coverage": 0.9178571428571428,
+        "passes_operational_floor_0_85": true
+      }
+    }
+  },
+  "interleaved_confirmation_gate": {
+    "all_9_cells_pass": true,
+    "passed": true,
+    "per_family_seed_coverage": {
+      "ARM_B2|branched-loop|20260814": {
+        "marginal_coverage": 0.8969387755102041,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|branched-loop|20260815": {
+        "marginal_coverage": 0.9204081632653062,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|branched-loop|31874": {
+        "marginal_coverage": 0.9071428571428571,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|golden-reference|20260814": {
+        "marginal_coverage": 0.9071428571428571,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|golden-reference|20260815": {
+        "marginal_coverage": 0.9142857142857143,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|golden-reference|31874": {
+        "marginal_coverage": 0.9035714285714286,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|loop-grid|20260814": {
+        "marginal_coverage": 0.9142857142857143,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|loop-grid|20260815": {
+        "marginal_coverage": 0.9196428571428571,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|loop-grid|31874": {
+        "marginal_coverage": 0.9125,
+        "passes_operational_floor_0_85": true
+      }
+    }
+  },
+  "neural_outputs_never_bypass_deterministic_authority": true,
+  "no_safety_authority_regression": true,
+  "note": "M9.5R does not retest predictive generalization/known-family guardrails -- M9.4 remains authoritative. Section 18 metrics here are descriptive only.",
+  "sanity_gate": {
+    "M9_5R_SANITY_GATE": "PASS",
+    "checks": {
+      "A_checkpoint_sha_identity": true,
+      "B_calibrator_class_identity_matches_m9_5": true,
+      "C_alpha_equals_0_1": true,
+      "D_nonconformity_score_implementation_identity_matches": true,
+      "E_grouping_construction_identity_matches": true,
+      "F_maturity_depth_mapping_identity_matches": true,
+      "G_candidate_set_inclusion_rule_matches": true,
+      "H_source_node_ordering_correct": true,
+      "I_calibration_development_split_disjointness_passes": true,
+      "J_all_source_nodes_represented": true,
+      "K_all_outputs_finite": true,
+      "L_resubstitution_diagnostic_numerically_plausible": true
+    },
+    "note": "Corrected Section-11 sanity gate: checks ONLY implementation/provenance invariants. Does NOT require reproducing M9.4's or M9.5's coverage pattern, and does NOT require any particular performance direction or specific numerical calibration result."
+  }
+}
