@@ -1,0 +1,209 @@
+{
+  "artifacts_directory": "reports/evaluation/hydrocore-v5/m9-5r",
+  "branch": "exp/hydrocore-v5-causal",
+  "calibration_method_frozen": {
+    "alpha": 0.1,
+    "calibrator_class": "SplitConformalCalibrator",
+    "coverage_floor": 0.85,
+    "grouping": "B_DEPTH_AWARE / CURRENT_FAMILY_DEPTH",
+    "minimum_group_size": 10,
+    "nominal_coverage_target": 0.9,
+    "reused_from": "hydroswarm.calibration.conformal (unmodified; imported directly, not through m9_5_common)"
+  },
+  "candidate_set_guard": {
+    "rule": "pathological if full_set_rate > threshold at the primary support level (same rule M9.5 used)",
+    "threshold": 0.8
+  },
+  "corrected_sanity_gate": {
+    "must_not_require": [
+      "m9_4_like_bad_coverage",
+      "m9_5_like_good_coverage",
+      "any_particular_performance_direction",
+      "any_specific_numerical_calibration_result"
+    ],
+    "on_fail": "STOP before scientific interpretation -- M9_5R_DECISION = D",
+    "purpose": "Establish the intended pipeline was executed correctly, NOT that fresh stochastic data reproduces any previous numerical outcome.",
+    "required_checks": [
+      "A_checkpoint_sha_identity",
+      "B_calibrator_class_identity_matches_m9_5",
+      "C_alpha_equals_0_1",
+      "D_nonconformity_score_implementation_identity_matches",
+      "E_grouping_construction_identity_matches",
+      "F_maturity_depth_mapping_identity_matches",
+      "G_candidate_set_inclusion_rule_matches",
+      "H_source_node_ordering_correct",
+      "I_calibration_development_split_disjointness_passes",
+      "J_all_source_nodes_represented",
+      "K_all_outputs_finite",
+      "L_resubstitution_diagnostic_numerically_plausible"
+    ]
+  },
+  "current_control_gate": {
+    "n_required_cells": 3,
+    "required_cells": [
+      "golden-reference|20260814",
+      "golden-reference|31874",
+      "golden-reference|20260815"
+    ],
+    "rule": "marginal coverage >= coverage_floor in ALL cells"
+  },
+  "decision_logic": {
+    "anti_post_hoc_rule": "Decision logic, gates, thresholds, and seed ranges above are committed in this protocol artifact BEFORE any M9.5R inference is run. If a flaw is discovered after results, the result is preserved and the flaw is reported -- not silently patched and rerun.",
+    "codes": {
+      "A": "INDEPENDENT_CALIBRATION_CONFIRMATION_PASS",
+      "B": "INTERLEAVED_PARTIAL_CALIBRATION_FAILURE",
+      "C": "CONTROL_CALIBRATION_FAILURE",
+      "D": "REPRESENTATIVENESS_OR_IMPLEMENTATION_BLOCKER",
+      "E": "CANDIDATE_SET_GUARD_FAILURE",
+      "F": "INCONCLUSIVE"
+    },
+    "evaluation_order": [
+      "D if representativeness_audit FAILS or sanity_gate FAILS",
+      "C if CURRENT control does not pass 3/3 cells",
+      "B if INTERLEAVED does not pass 9/9 cells",
+      "E if coverage passes (C and B conditions clear) but candidate_set_guard is pathological",
+      "A if representativeness PASS, sanity PASS, CURRENT 3/3, INTERLEAVED 9/9, candidate_set_guard PASS, all finite, no safety issue",
+      "F only if a genuinely unforeseen statistical/engineering condition prevents interpretation despite valid execution"
+    ],
+    "frozen_before_data_generation": true
+  },
+  "expected_incident_counts": {
+    "branched-loop": {
+      "calibration_incidents": 140,
+      "development_incidents": 140,
+      "n_sources": 7
+    },
+    "golden-reference": {
+      "calibration_incidents": 80,
+      "development_incidents": 80,
+      "n_sources": 4
+    },
+    "loop-grid": {
+      "calibration_incidents": 160,
+      "development_incidents": 160,
+      "n_sources": 8
+    }
+  },
+  "frozen_predictors": {
+    "arm_a": "CURRENT / SINGLE_FAMILY HydroCore-S (AGE_FIX_ONLY export, M8.7)",
+    "arm_b2": "STEP_MATCHED_INTERLEAVED_MULTI_FAMILY HydroCore-S (M9.0a export)",
+    "checkpoint_verification": "SHA256 before and after inference; must be byte-identical; eval()+no_grad() only",
+    "seeds": [
+      20260814,
+      31874,
+      20260815
+    ]
+  },
+  "hard_non_goals": [
+    "no training of ARM_A or ARM_B2",
+    "no optimizer steps",
+    "no backward()",
+    "no fine-tuning",
+    "no architecture change",
+    "no AGE_FIX_ONLY change",
+    "no interleaved-recipe change",
+    "no alpha change",
+    "no coverage-floor weakening",
+    "no nonconformity-score change",
+    "no grouping/fallback/minimum_group_size change",
+    "no APS/RAPS/temperature/isotonic/Platt scaling",
+    "no source- or complexity-conditioned conformal extensions",
+    "no support-size sweep",
+    "no hyperparameter sweep",
+    "no tuning the calibrator on development data",
+    "no tuning trained-family calibration on unseen-topology data",
+    "no opening locked data",
+    "no omitting difficult source nodes",
+    "no dropping seeds",
+    "no rerolling an unfavorable draw"
+  ],
+  "interleaved_confirmation_gate": {
+    "n_required_cells": 9,
+    "required_cells": [
+      "golden-reference|20260814",
+      "golden-reference|31874",
+      "golden-reference|20260815",
+      "branched-loop|20260814",
+      "branched-loop|31874",
+      "branched-loop|20260815",
+      "loop-grid|20260814",
+      "loop-grid|31874",
+      "loop-grid|20260815"
+    ],
+    "rule": "marginal coverage >= coverage_floor in ALL cells, no averaging away failures"
+  },
+  "kind": "INDEPENDENT_CALIBRATION_CONFIRMATION",
+  "locked_test_opened_before_protocol_freeze": false,
+  "m9_5_decision_name_preserved": "REPRESENTATIVENESS_OR_IMPLEMENTATION_BLOCKER",
+  "m9_5_decision_preserved": "E",
+  "milestone": "M9.5R",
+  "not_reinterpretation_of_m9_5": true,
+  "primary_question": "Does the exact existing conformal calibration method, at 20 independent calibration incidents per source, independently reproduce valid calibration for the frozen INTERLEAVED HydroCore-S predictor on a fresh, source-representative development population?",
+  "primary_support_condition": {
+    "calibration_repeats_per_source": 20,
+    "development_repeats_per_source": 20,
+    "no_support_sweep": true,
+    "note": "Exactly one primary calibration-support condition: 20 independent physical incidents per source. No 4/8/12 levels exist in this milestone."
+  },
+  "provenance": {
+    "m9_4_closure_sha256": "8dcf43ceb0c04ac7185ecdba4c3752e6f65e613f10dfef761c73b4fde329ccba",
+    "m9_4_code_commit": "f2e7857f00be6e33420439f44b6ededa0e6c396f",
+    "m9_4_metadata_fix_commit": "3c575ba87bc3f495d33da68c2c5add1b2d257de2",
+    "m9_5_closure_sha256": "656b31c7e27947f2e7af551bcd5bc9136dd724b8705b1619447f50d6ecf2a0ec",
+    "m9_5_code_commit": "ff79856620c74593e47c069277cb41936e2fc6eb",
+    "m9_5_manifest_sha256": "9c0bc0f0d647227cfdc02c4f5e33f1996b067279e903939aee6f2c80638764d2",
+    "m9_5_metadata_fix_commit": "b7f4fdaf8474e444a8f7c6d49776fda4a1b6ef4b"
+  },
+  "representativeness_gate": {
+    "on_fail": "STOP -- do not calculate a model-selection conclusion",
+    "required_checks": [
+      "identical_complete_source_support_calibration_and_development",
+      "20_calibration_incidents_per_source",
+      "20_development_incidents_per_source",
+      "balanced_source_distribution",
+      "no_zero_support_source",
+      "no_incident_overlap",
+      "no_generator_seed_overlap",
+      "same_topology_definition",
+      "same_event_generation_mechanism",
+      "same_event_severity_distribution_policy",
+      "same_contamination_timing_policy",
+      "same_sensor_availability_mechanism",
+      "same_missingness_mechanism",
+      "same_noise_mechanism",
+      "same_cadence_timing_mechanism",
+      "same_physical_perturbation_mechanism"
+    ]
+  },
+  "secondary_question": "Does ARM_A/CURRENT also continue to calibrate normally on golden-reference under the same fresh population policy?",
+  "seed_namespace": {
+    "disjoint_from": [
+      "M7",
+      "M9.4 (calibration_m9_4/development_m9_4)",
+      "M9.5 (calibration_m9_5/development_m9_5)",
+      "locked_final_test",
+      "locked_topology_test"
+    ],
+    "roles": [
+      "calibration_m9_5r",
+      "development_m9_5r"
+    ],
+    "seed_base_floor": 997000000,
+    "seed_base_step": 100000,
+    "seed_bases": {
+      "branched-loop|calibration_m9_5r": 997200000,
+      "branched-loop|development_m9_5r": 997300000,
+      "golden-reference|calibration_m9_5r": 997000000,
+      "golden-reference|development_m9_5r": 997100000,
+      "loop-grid|calibration_m9_5r": 997400000,
+      "loop-grid|development_m9_5r": 997500000
+    },
+    "source_stride": 10000
+  },
+  "start_commit": "b7f4fdaf8474e444a8f7c6d49776fda4a1b6ef4b",
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ]
+}
