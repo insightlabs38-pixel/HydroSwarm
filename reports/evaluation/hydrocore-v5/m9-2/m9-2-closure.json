@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "milestone": "M9.2",
+  "kind": "DIAGNOSTIC_ANALYSIS_ONLY",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "3b6ee2a3529faffdcc2288cda294a4ef4d6f0765",
+  "m9_1_closure_commit": "3b6ee2a3529faffdcc2288cda294a4ef4d6f0765",
+  "m9_1_protocol_frozen_at_commit": "0f05be1d47258a8c3d19e3a0d0e1122e3e560069",
+  "m9_1_final_decision_preserved": "CURRENT_HYDROCORE_RETAINED",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "m9_1_aggregate_reproduction": "REPRODUCED_EXACTLY",
+  "inference_reconstruction_performed": true,
+  "inference_reconstruction_scope": "calibration-split forward passes only, per (arm, seed), to refit B_DEPTH_AWARE and derive per-development-row conformal candidate sets; verified byte-for-value equivalent to m9-1-calibration.json for all 8 (arm, seed) combinations before use; no development_holdout forward passes were performed.",
+  "seeds_used": [20260814, 31874],
+  "seed_excluded_from_pairing": 20260815,
+  "answers_to_the_four_scientific_questions": {
+    "Q1_divergence_depth": {
+      "finding": "EARLY depths (1-3) show near-zero, sign-MIXED deltas for all three arms (no robust divergence). Depth 4 is arm-specific: GRAPH_ODE and GRAPH_SDE show a small ROBUST *improvement* (+2.5 to +5.0pp); GRAPH_CDE shows a small ROBUST regression (-0.8 to -2.5pp). Starting at depth 6 (MID) and continuing through depths 12 and 25 (MATURE), all three arms show a ROBUST negative top1 delta of roughly -2 to -5pp per depth, on both screening seeds independently. The gap does not grow sharply from depth 12 to 25; it plateaus. Mechanistically this is CURRENT continuing to consolidate accuracy as evidence accrues (top1 rises from ~0.98 at depth 6 to ~0.996 at depth 25) while all three CT arms roughly plateau or mildly regress over the same range.",
+      "classification": "ROBUST (cross-seed consistent from depth 6 onward, for all three arms; see m9-2-depth-metrics.json[\"cross_seed_consistency_top1_delta\"])"
+    },
+    "Q2_complementary_or_subsumed": {
+      "finding": "At MATURE depths (12, 25), novel-only wins (paired 2x2 cell C: CURRENT wrong, novel correct) are essentially zero: 0 of 12 arm x seed x depth combinations except one (GRAPH_ODE, seed 20260814, depth 25, C=1, single incident, not reproduced at the other seed). CURRENT-only wins (cell B) are consistently 3-6 incidents per depth/seed for every arm. Net paired advantage (C-B) is negative in all 12 combinations, ranging -1 to -6. A single incident (incident_id 902004500) is lost by ALL THREE continuous-time arms while CURRENT wins it, reproduced at both screening seeds and both MATURE depths -- a shared structural blind spot for continuous-time dynamics, not seed noise. Zero incidents exist where all three CT arms win and CURRENT loses, at either MATURE depth, at either seed.",
+      "classification": "ROBUST (identical qualitative pattern -- near-zero unique CT wins, consistent CURRENT-only wins -- on both seeds, for all three arms, at both MATURE depths)"
+    },
+    "Q3_predictors_of_failure": {
+      "rank_movement": "At MATURE depths, the median rank_delta is 0 for every arm/seed; mean rank_delta is small (+0.017 to +0.067, i.e. typically nudging the true source from rank 1 to rank 2, not further). Large regressions (rank worsens by >=3) occur in only 1 of 24 arm x depth x seed combinations examined (GRAPH_CDE, depth 25, seed 31874) and 0 large improvements (<=-3) anywhere. CLASSIFICATION: ROBUST -- the MATURE regression is a narrow, near-miss error mode, not a catastrophic mislocalization, on both seeds.",
+      "topology": "When wrong, all arms (including CURRENT) land within 2 hops of the true source 100% of the time; within-1-hop accuracy when wrong ranges 50-83% with no consistent CURRENT-vs-CT ordering. LIMITATION: the golden-reference network has only 4 candidate junction source nodes and a maximum junction-junction graph distance of 2, so \"100% within 2 hops when wrong\" is largely a mechanical property of the network's small size, not strong evidence of a hydraulically-informed near-miss structure. CLASSIFICATION: EXPLORATORY, weak discriminating power given network size -- consistent with, but not strong confirmation of, H2.",
+      "missingness_irregularity": "No arm shows a robust, cross-seed advantage for continuous-time dynamics under high missingness or high gap-irregularity. The fraction_missing covariate is heavily right-skewed in development_holdout (quartile bins by construction: Q1=750, Q2=79, Q3=9, Q4=2 rows per seed) -- the two highest-missingness bins are too small (9 and 2 rows) to support any claim; the apparent large positive deltas there (+0.11, +0.5) are single- or few-incident artifacts, EXPLORATORY at most, and are exactly as likely to be single-incident noise as signal. gap_coefficient_of_variation and mean_gap_seconds are degenerate (most rows have zero valid-reading gap variance because development_holdout's missingness rate is low and evidence arrives on a mostly-regular grid) and provide no usable stratification. Stratifying instead by n_valid_observations (a better-populated, non-degenerate covariate, quartile bins 257/175/199/209 rows) shows NO monotonic CT advantage under sparse evidence: paired deltas in the lowest-evidence quartile are near zero and sign-mixed across arms/seeds, while the highest-evidence quartile (which overlaps MATURE depths) is consistently negative for all three arms on both seeds -- i.e. more evidence does not help the CT arms relative to CURRENT; it is where they fall behind. CLASSIFICATION: ROBUST NULL RESULT for the missingness/irregularity inductive-bias hypothesis specifically.",
+      "calibration": "Pooled over all depths, in CURRENT-correct/novel-wrong paired cases the novel arm is not merely edged out: its own mean probability on the true source is low (0.10-0.19) while CURRENT's is high (0.77-0.85) in the same incidents -- when a CT arm loses to CURRENT it is usually confidently wrong, not narrowly so, even though (per the rank-movement finding) the true source is usually still ranked #2. Spearman rank-probability correlation between CURRENT and each CT arm is consistently strong (0.77-0.82), meaning the two families broadly agree on relative source plausibility even where their Top-1 disagrees. CLASSIFICATION: ROBUST (consistent sign and rough magnitude across all three arms and both seeds), but this statistic pools all seven depths, not MATURE alone -- reported as a general finding, not a MATURE-specific one."
+    },
+    "Q4_followup_justified": {
+      "finding": "The evidence does not support H3 (complementary continuous-time signal): novel-only wins at MATURE depths are essentially zero and not reproduced across seeds; the missingness/irregularity inductive-bias story that would motivate H3 or a bounded CT-residual experiment shows a robust null result rather than a robust benefit. H2 (spatial/hydraulic discrimination bottleneck) receives weak, network-size-confounded support (100% within-2-hop is largely mechanical on a 4-junction topology) and is not established strongly enough here to itself justify a new experiment via M9.2 evidence alone. H1 (prefix-objective misalignment) is not directly tested by this milestone (M9.2 diagnosed continuous-time architecture substitution, not CURRENT's own training objective) and remains untested, not refuted.",
+      "recommendation": "D"
+    }
+  },
+  "M9_2_RECOMMENDATION": "D",
+  "recommendation_category_name": "STOP_ARCHITECTURE_OPTIMIZATION",
+  "recommendation_scope": "Applies specifically to the continuous-time temporal-dynamics substitution axis explored across M9.0-M9.1 (GRAPH_ODE/GRAPH_CDE/GRAPH_SDE replacing CURRENT's temporal_dynamics module). Does not evaluate, and makes no claim about, CURRENT's own training-objective design (H1) or a topology/hydraulic-aware discrimination objective (H2) -- both remain open, untested hypotheses for a possible SEPARATE future milestone, not authorized by this closure.",
+  "strongest_supporting_evidence": "Section 6 disagreement analysis: novel-only wins (C) at MATURE depths are 0 in 11 of 12 arm x seed x depth combinations (the 1 exception is a single incident, not reproduced at the paired seed), while CURRENT-only wins (B) are consistently 3-6 per combination -- net paired advantage strongly and robustly negative everywhere examined, with one incident (902004500) lost by all three CT arms at every seed x MATURE-depth combination while CURRENT solves it every time.",
+  "evidence_against_the_recommendation": "The MATURE regression itself is small in absolute rank terms (median rank_delta = 0, large (>=3) rank regressions in only 1/24 combinations) and errors remain graph-close to the true source, which is consistent with a narrow, potentially fixable discrimination gap rather than a fundamentally unsuitable architecture family. GRAPH_ODE and GRAPH_SDE show a small ROBUST *improvement* over CURRENT at depth 4, which this recommendation does not further investigate.",
+  "alternative_hypothesis": "H2 (spatial/hydraulic discrimination bottleneck) remains plausible but is not confirmable or refutable with this milestone's evidence because the golden-reference network's small size (4 candidate junctions, max graph distance 2) gives the topology-distance diagnostic very little discriminating power. A network-size-confounded diagnostic cannot itself justify a topology-aware follow-up experiment.",
+  "robust_across_both_seeds": true,
+  "next_experiment_if_any": "None authorized by this closure. If architecture-axis work resumes in the future, the strongest scientifically motivated next step suggested (but NOT authorized here) would be re-running this same M9.2 diagnostic protocol on a larger, higher-junction-count topology family, where topology-distance and missingness-quartile stratifications would have real statistical power -- not a new model variant.",
+  "governance_compliance": {
+    "no_training_performed": true,
+    "no_tuning_performed": true,
+    "no_checkpoint_modified": true,
+    "no_calibration_refit_used_for_promotion": true,
+    "locked_test_never_opened": true,
+    "m9_1_outcomes_unchanged": true,
+    "m9_1_raw_artifacts_unmodified": true,
+    "no_field_performance_claim_made": true,
+    "no_promotion_decision_made": true,
+    "no_m9_scaling_authorized": true
+  }
+}
