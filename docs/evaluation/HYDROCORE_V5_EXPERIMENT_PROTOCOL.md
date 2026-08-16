@@ -317,6 +317,32 @@ documented reduction in arms). See
 `reports/evaluation/hydrocore-v5/m9-1-preflight-summary.md` for the preflight
 outcome. This amendment does not alter M9.0b's own historical results.
 
+## 8.10. Amendment: Milestone 9.1 scientific protocol (frozen)
+
+The M9.1 preflight closed `M9_1_FULL_EXPERIMENT_READY = YES` for all four
+arms (CURRENT, GRAPH_ODE, GRAPH_CDE, GRAPH_SDE) after one correction pass
+(`docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md`, closing two
+implementation gaps against the preflight's own frozen design --
+`reports/evaluation/hydrocore-v5/m9-1-preflight-correction-summary.md`).
+
+Milestone 9.1's own scientific comparison protocol
+(`docs/evaluation/HYDROCORE_V5_M9_1_PROTOCOL.md`, its own frozen
+sub-protocol) is frozen after that closure, before any candidate is trained
+on the full recipe or evaluated on `development_holdout`: it locks the arms,
+splits/seeds (including a checkpoint-reuse rule for `CURRENT`, identical by
+construction to M8.7's own closed `AGE_FIX_ONLY` arm -- zero redundant
+retraining), architecture/solver configuration (taken verbatim from the
+corrected preflight, never re-tuned), one predeclared primary metric
+(pooled EARLY+MID neural top-1, chosen on M8.7's own pre-existing
+MATURE-saturation finding, not on any M9.1 result), guardrails, a
+statistical promotion procedure with a fully enumerated decision tree and
+numeric tie-break, and artifact/logging requirements. It was reviewed once
+for researcher degrees of freedom before commit (its own Section 20 records
+what was found and closed, including that an early draft left `CURRENT`'s
+retrain-vs-reuse question undecided). This amendment does not alter M9.0b's
+or the M9.1 preflight's own historical results, and does not itself
+authorize execution of the scientific run.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model
