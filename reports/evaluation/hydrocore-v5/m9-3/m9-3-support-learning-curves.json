@@ -1,0 +1,1122 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.9526041666666667,
+            "development_coverage_std": 0.021644369536646002,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.998516420533997,
+            "quantile_std": 0.0014143823889323451
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9577083333333334,
+            "development_coverage_std": 0.003553900439423335,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.9988264001561038,
+            "quantile_std": 0.00043149090124082435
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.9988149051231449,
+            "quantile_std": 0.0002505957827663626
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.9988895107526332,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.99984375,
+            "development_coverage_std": 0.002204177496822794,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.06498338758945466,
+            "quantile_std": 0.07315216496609143
+          },
+          "0.5": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.040533510744571684,
+            "quantile_std": 0.028043316954435297
+          },
+          "0.75": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.033580560386180874,
+            "quantile_std": 0.012740849548257138
+          },
+          "1.0": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.02793252468109131,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.946875,
+            "development_coverage_std": 0.04950931099298394,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9300094526889734,
+            "quantile_std": 0.11036647136331648
+          },
+          "0.5": {
+            "development_coverage_mean": 0.93,
+            "development_coverage_std": 0.039804208320226644,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.9228626155713573,
+            "quantile_std": 0.07207084055819987
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9378125,
+            "development_coverage_std": 0.033944750606684386,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.9403036198066548,
+            "quantile_std": 0.03313512178891827
+          },
+          "1.0": {
+            "development_coverage_mean": 0.90625,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.927735261619091,
+            "quantile_std": 0.0
+          }
+        }
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.9581250000000001,
+            "development_coverage_std": 0.0029389033290970652,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9976157146066543,
+            "quantile_std": 0.00109650679007718
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.9976249094441301,
+            "quantile_std": 0.0006029062938704706
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.997592211914598,
+            "quantile_std": 0.0004053941898139015
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.99770447332412,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.99921875,
+            "development_coverage_std": 0.004878904686248748,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.043065246939659116,
+            "quantile_std": 0.06570604624711335
+          },
+          "0.5": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.026988332569599153,
+            "quantile_std": 0.017063743163087855
+          },
+          "0.75": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.02857677102088928,
+            "quantile_std": 0.012066975881161348
+          },
+          "1.0": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.024383068084716797,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.8925,
+            "development_coverage_std": 0.038354839981415645,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.8809675190330017,
+            "quantile_std": 0.15982834568704304
+          },
+          "0.5": {
+            "development_coverage_mean": 0.88453125,
+            "development_coverage_std": 0.01880136194368642,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.9038755998108536,
+            "quantile_std": 0.09035308982111864
+          },
+          "0.75": {
+            "development_coverage_mean": 0.8840625,
+            "development_coverage_std": 0.014520325194361177,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.9239396484196186,
+            "quantile_std": 0.03284865864204056
+          },
+          "1.0": {
+            "development_coverage_mean": 0.875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.9177436381578445,
+            "quantile_std": 0.0
+          }
+        }
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9977146722510224,
+            "quantile_std": 0.0010744009740435922
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.9978148999239784,
+            "quantile_std": 0.0006885692428993463
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.9978337431047112,
+            "quantile_std": 0.00038253396791625117
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.9977582285646349,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.05477706283330917,
+            "quantile_std": 0.03920714036158903
+          },
+          "0.5": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.03677061915397644,
+            "quantile_std": 0.014408926180900002
+          },
+          "0.75": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.03649190187454224,
+            "quantile_std": 0.007996424788185666
+          },
+          "1.0": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.03626406192779541,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.911875,
+            "development_coverage_std": 0.04247701584386549,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9038061937643215,
+            "quantile_std": 0.14771662508049635
+          },
+          "0.5": {
+            "development_coverage_mean": 0.89984375,
+            "development_coverage_std": 0.027651835805918925,
+            "n_incidents_sampled": 75,
+            "quantile_mean": 0.9068209927016869,
+            "quantile_std": 0.09140669655513543
+          },
+          "0.75": {
+            "development_coverage_mean": 0.89578125,
+            "development_coverage_std": 0.017195310725238434,
+            "n_incidents_sampled": 112,
+            "quantile_mean": 0.9235008125193417,
+            "quantile_std": 0.03803237888078514
+          },
+          "1.0": {
+            "development_coverage_mean": 0.90625,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 150,
+            "quantile_mean": 0.9285558685660362,
+            "quantile_std": 0.0
+          }
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.8439583333333333,
+            "development_coverage_std": 0.11920581379138631,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9248959587886929,
+            "quantile_std": 0.013153641126931329
+          },
+          "0.5": {
+            "development_coverage_mean": 0.8241666666666667,
+            "development_coverage_std": 0.10128600182980205,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9226010551676154,
+            "quantile_std": 0.010098995391925982
+          },
+          "0.75": {
+            "development_coverage_mean": 0.8121875,
+            "development_coverage_std": 0.078767565831904,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.921243133880198,
+            "quantile_std": 0.007141389340070689
+          },
+          "1.0": {
+            "development_coverage_mean": 0.7708333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9166073575615883,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.9190625,
+            "development_coverage_std": 0.04873296978176069,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9543263765564188,
+            "quantile_std": 0.04067722240799167
+          },
+          "0.5": {
+            "development_coverage_mean": 0.91,
+            "development_coverage_std": 0.04906946606597631,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9242554869130254,
+            "quantile_std": 0.020342529669488407
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9284375,
+            "development_coverage_std": 0.022006302364322813,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9273683537170291,
+            "quantile_std": 0.007643775783521698
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9375,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9263976737856865,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.939375,
+            "development_coverage_std": 0.05918060281882907,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9481246964633465,
+            "quantile_std": 0.03629367425638393
+          },
+          "0.5": {
+            "development_coverage_mean": 0.938125,
+            "development_coverage_std": 0.045065057139650894,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9270551812462509,
+            "quantile_std": 0.014359336153207175
+          },
+          "0.75": {
+            "development_coverage_mean": 0.95609375,
+            "development_coverage_std": 0.03203658492157833,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9303147991001606,
+            "quantile_std": 0.007766394804830704
+          },
+          "1.0": {
+            "development_coverage_mean": 0.96875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9263976737856865,
+            "quantile_std": 0.0
+          }
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.9594791666666669,
+            "development_coverage_std": 0.045889998115965676,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9882204519706648,
+            "quantile_std": 0.01696345762839233
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9595833333333335,
+            "development_coverage_std": 0.007971302695712069,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9904268273361958,
+            "quantile_std": 0.007605542701381683
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9895998984877952,
+            "quantile_std": 0.005303060487293241
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9887682972475886,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.999375,
+            "development_coverage_std": 0.006218671481916374,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.706381866838783,
+            "quantile_std": 0.282560031493257
+          },
+          "0.5": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.421172392219305,
+            "quantile_std": 0.32434324145427407
+          },
+          "0.75": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.5192441247403622,
+            "quantile_std": 0.2705070875673802
+          },
+          "1.0": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.6382037997245789,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.93125,
+            "development_coverage_std": 0.09243874661093152,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.8556611905229511,
+            "quantile_std": 0.27670814886335965
+          },
+          "0.5": {
+            "development_coverage_mean": 0.89,
+            "development_coverage_std": 0.08970219827295205,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.7939804408699274,
+            "quantile_std": 0.2837670987277351
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9203125,
+            "development_coverage_std": 0.060333545550961945,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9110987611860036,
+            "quantile_std": 0.12982665152981393
+          },
+          "1.0": {
+            "development_coverage_mean": 0.875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9136131256818771,
+            "quantile_std": 0.0
+          }
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.676875,
+            "development_coverage_std": 0.07086365772461303,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9114557367004454,
+            "quantile_std": 0.009925033704833655
+          },
+          "0.5": {
+            "development_coverage_mean": 0.6901041666666665,
+            "development_coverage_std": 0.050472485456874855,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9104398387297988,
+            "quantile_std": 0.0058994658129914905
+          },
+          "0.75": {
+            "development_coverage_mean": 0.6883333333333332,
+            "development_coverage_std": 0.03299568574492397,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9088685638085008,
+            "quantile_std": 0.003491199390188159
+          },
+          "1.0": {
+            "development_coverage_mean": 0.7083333333333331,
+            "development_coverage_std": 2.220446049250313e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9100610166788101,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.8603125,
+            "development_coverage_std": 0.12701154905657203,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9522339077107609,
+            "quantile_std": 0.03956494748917117
+          },
+          "0.5": {
+            "development_coverage_mean": 0.7440625,
+            "development_coverage_std": 0.03622709405610669,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9172195051237941,
+            "quantile_std": 0.013964993637456263
+          },
+          "0.75": {
+            "development_coverage_mean": 0.745,
+            "development_coverage_std": 0.016955824957813167,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9188021471351385,
+            "quantile_std": 0.008729240026977544
+          },
+          "1.0": {
+            "development_coverage_mean": 0.75,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9247537329792976,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.83,
+            "development_coverage_std": 0.13659646316797516,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9501496819034219,
+            "quantile_std": 0.038120472436130044
+          },
+          "0.5": {
+            "development_coverage_mean": 0.71609375,
+            "development_coverage_std": 0.023547139389690202,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9231833508424461,
+            "quantile_std": 0.012828658311770345
+          },
+          "0.75": {
+            "development_coverage_mean": 0.718125,
+            "development_coverage_std": 0.006218671481916374,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.926051495783031,
+            "quantile_std": 0.009147924176177219
+          },
+          "1.0": {
+            "development_coverage_mean": 0.71875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9247537329792976,
+            "quantile_std": 0.0
+          }
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.7360416666666667,
+            "development_coverage_std": 0.1046677531127265,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9254718905314803,
+            "quantile_std": 0.013852738605480487
+          },
+          "0.5": {
+            "development_coverage_mean": 0.7105208333333334,
+            "development_coverage_std": 0.03998684136861635,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9246906722709537,
+            "quantile_std": 0.008187217920711701
+          },
+          "0.75": {
+            "development_coverage_mean": 0.710625,
+            "development_coverage_std": 0.021928505991061022,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9257360249757767,
+            "quantile_std": 0.00508229782076533
+          },
+          "1.0": {
+            "development_coverage_mean": 0.6875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9227942675352097,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.9159375,
+            "development_coverage_std": 0.06452879081270624,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9587172373298768,
+            "quantile_std": 0.03763850215085476
+          },
+          "0.5": {
+            "development_coverage_mean": 0.8840625,
+            "development_coverage_std": 0.046096663043543616,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9403194826468826,
+            "quantile_std": 0.02633487574947592
+          },
+          "0.75": {
+            "development_coverage_mean": 0.8909375,
+            "development_coverage_std": 0.03423123345352895,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9436857288703322,
+            "quantile_std": 0.01893164871797023
+          },
+          "1.0": {
+            "development_coverage_mean": 0.875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9393126890063286,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.91609375,
+            "development_coverage_std": 0.07325959168216474,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9534667520679068,
+            "quantile_std": 0.03396665891340844
+          },
+          "0.5": {
+            "development_coverage_mean": 0.90796875,
+            "development_coverage_std": 0.06004535232586699,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9420741824153811,
+            "quantile_std": 0.02062929158579629
+          },
+          "0.75": {
+            "development_coverage_mean": 0.92203125,
+            "development_coverage_std": 0.04363797040350869,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9418403655849397,
+            "quantile_std": 0.011063805819375806
+          },
+          "1.0": {
+            "development_coverage_mean": 0.875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.931830145418644,
+            "quantile_std": 0.0
+          }
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.9517708333333335,
+            "development_coverage_std": 0.05173120549076522,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9939110423603416,
+            "quantile_std": 0.009270808207025161
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9556250000000002,
+            "development_coverage_std": 0.010271910863017559,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9947489048734133,
+            "quantile_std": 0.004323293338539701
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9577083333333336,
+            "development_coverage_std": 0.0050646857421430165,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9943181471817661,
+            "quantile_std": 0.0027933014910249423
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9940300602465868,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.99859375,
+            "development_coverage_std": 0.010503673092661443,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.5933096744143405,
+            "quantile_std": 0.325772043638389
+          },
+          "0.5": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.43640525713562967,
+            "quantile_std": 0.24068292422512813
+          },
+          "0.75": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.5388602791726589,
+            "quantile_std": 0.1624226334126465
+          },
+          "1.0": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.5920789837837219,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.9296875,
+            "development_coverage_std": 0.08242835430693736,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.8832085383828963,
+            "quantile_std": 0.22542839211815116
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9103125,
+            "development_coverage_std": 0.06406707300751299,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.8960813182871789,
+            "quantile_std": 0.16834661961952285
+          },
+          "0.75": {
+            "development_coverage_mean": 0.91984375,
+            "development_coverage_std": 0.037575120072163445,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9481130457948893,
+            "quantile_std": 0.08165175184631876
+          },
+          "1.0": {
+            "development_coverage_mean": 0.90625,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9600530080497265,
+            "quantile_std": 0.0
+          }
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.6969791666666667,
+            "development_coverage_std": 0.05491460779524475,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9177236788719892,
+            "quantile_std": 0.01195329677213134
+          },
+          "0.5": {
+            "development_coverage_mean": 0.6960416666666666,
+            "development_coverage_std": 0.04183248256106996,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9143140346556902,
+            "quantile_std": 0.006640576625819029
+          },
+          "0.75": {
+            "development_coverage_mean": 0.70375,
+            "development_coverage_std": 0.028653218744923655,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9145323807001113,
+            "quantile_std": 0.00409863978350206
+          },
+          "1.0": {
+            "development_coverage_mean": 0.7083333333333331,
+            "development_coverage_std": 2.220446049250313e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9153923317790031,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.8321875,
+            "development_coverage_std": 0.11982694226988352,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9525418813782744,
+            "quantile_std": 0.040034571848558964
+          },
+          "0.5": {
+            "development_coverage_mean": 0.7428125,
+            "development_coverage_std": 0.020895480223005164,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9215068557485938,
+            "quantile_std": 0.014952250995536232
+          },
+          "0.75": {
+            "development_coverage_mean": 0.74875,
+            "development_coverage_std": 0.008749999999999999,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9247538400068879,
+            "quantile_std": 0.010153326363568188
+          },
+          "1.0": {
+            "development_coverage_mean": 0.75,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9213022142648697,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.788125,
+            "development_coverage_std": 0.14928736969348746,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9504894948482979,
+            "quantile_std": 0.03636404645265604
+          },
+          "0.5": {
+            "development_coverage_mean": 0.691875,
+            "development_coverage_std": 0.013272975363497063,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9318876237049699,
+            "quantile_std": 0.014704841869793438
+          },
+          "0.75": {
+            "development_coverage_mean": 0.6875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9342953827604652,
+            "quantile_std": 0.00901566676859466
+          },
+          "1.0": {
+            "development_coverage_mean": 0.6875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9325002580881119,
+            "quantile_std": 0.0
+          }
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.7902083333333333,
+            "development_coverage_std": 0.1212906217749565,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9276703198440372,
+            "quantile_std": 0.012823402139380801
+          },
+          "0.5": {
+            "development_coverage_mean": 0.7633333333333333,
+            "development_coverage_std": 0.08296899521307141,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9268572029471397,
+            "quantile_std": 0.009383057777988446
+          },
+          "0.75": {
+            "development_coverage_mean": 0.7403125,
+            "development_coverage_std": 0.05211988300889701,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9271173062175513,
+            "quantile_std": 0.0060506495896921995
+          },
+          "1.0": {
+            "development_coverage_mean": 0.7291666666666665,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9284785091876984,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.9253125,
+            "development_coverage_std": 0.0346283279086646,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9688755287489039,
+            "quantile_std": 0.033778188629386134
+          },
+          "0.5": {
+            "development_coverage_mean": 0.910625,
+            "development_coverage_std": 0.040749808281757595,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9404876204393804,
+            "quantile_std": 0.02784908268184061
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9296875,
+            "development_coverage_std": 0.020669932117692115,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9485310923215002,
+            "quantile_std": 0.017196410056634488
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9375,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9436572901904583,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.9346875,
+            "development_coverage_std": 0.061807886582134486,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9559818905266002,
+            "quantile_std": 0.035916485776321935
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9296875,
+            "development_coverage_std": 0.05844251315395326,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9424279910605401,
+            "quantile_std": 0.022058821440102863
+          },
+          "0.75": {
+            "development_coverage_mean": 0.956875,
+            "development_coverage_std": 0.036651867278489375,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9452451068162918,
+            "quantile_std": 0.009855995667340923
+          },
+          "1.0": {
+            "development_coverage_mean": 0.96875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9436572901904583,
+            "quantile_std": 0.0
+          }
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.9373958333333333,
+            "development_coverage_std": 0.06372063253308671,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9938669612360536,
+            "quantile_std": 0.008817713539029213
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9431250000000001,
+            "development_coverage_std": 0.0403279739896652,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9947180835201288,
+            "quantile_std": 0.005047600255214726
+          },
+          "0.75": {
+            "development_coverage_mean": 0.9527083333333334,
+            "development_coverage_std": 0.02488776891701358,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9958837332203985,
+            "quantile_std": 0.0028651535770881182
+          },
+          "1.0": {
+            "development_coverage_mean": 0.9583333333333335,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9964479703921825,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.99625,
+            "development_coverage_std": 0.016105123408406412,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.6026133862021379,
+            "quantile_std": 0.39292656678863863
+          },
+          "0.5": {
+            "development_coverage_mean": 0.999375,
+            "development_coverage_std": 0.0043749999999999995,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.284803716391325,
+            "quantile_std": 0.31762686377048327
+          },
+          "0.75": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.2990246506035328,
+            "quantile_std": 0.2723189524383909
+          },
+          "1.0": {
+            "development_coverage_mean": 1.0,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.17543280124664307,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.9265625,
+            "development_coverage_std": 0.10301841082423083,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.803744705611025,
+            "quantile_std": 0.34160460496503875
+          },
+          "0.5": {
+            "development_coverage_mean": 0.9109375,
+            "development_coverage_std": 0.09316221991102401,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.7996013730973937,
+            "quantile_std": 0.30238094368005153
+          },
+          "0.75": {
+            "development_coverage_mean": 0.930625,
+            "development_coverage_std": 0.07415935123098098,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.8833283602073788,
+            "quantile_std": 0.1873854615008809
+          },
+          "1.0": {
+            "development_coverage_mean": 0.875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.8711227178573608,
+            "quantile_std": 0.0
+          }
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "0.25": {
+            "development_coverage_mean": 0.7190625,
+            "development_coverage_std": 0.025767515280872535,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9128910049423575,
+            "quantile_std": 0.009611624261391453
+          },
+          "0.5": {
+            "development_coverage_mean": 0.7214583333333334,
+            "development_coverage_std": 0.012203070538006202,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9096281208842992,
+            "quantile_std": 0.004447065468329693
+          },
+          "0.75": {
+            "development_coverage_mean": 0.7230208333333333,
+            "development_coverage_std": 0.009500890857352942,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.908768549002707,
+            "quantile_std": 0.002704235348131104
+          },
+          "1.0": {
+            "development_coverage_mean": 0.7291666666666665,
+            "development_coverage_std": 1.1102230246251565e-16,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9092147201299667,
+            "quantile_std": 0.0
+          }
+        },
+        "MATURE": {
+          "0.25": {
+            "development_coverage_mean": 0.853125,
+            "development_coverage_std": 0.12573999711706693,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9531151527410838,
+            "quantile_std": 0.04024567358327776
+          },
+          "0.5": {
+            "development_coverage_mean": 0.7475,
+            "development_coverage_std": 0.01375,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9172881527245045,
+            "quantile_std": 0.014952331020259352
+          },
+          "0.75": {
+            "development_coverage_mean": 0.75,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9238527125865221,
+            "quantile_std": 0.011161832723443376
+          },
+          "1.0": {
+            "development_coverage_mean": 0.75,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9288161993026733,
+            "quantile_std": 0.0
+          }
+        },
+        "MID": {
+          "0.25": {
+            "development_coverage_mean": 0.8215625,
+            "development_coverage_std": 0.1398097898709171,
+            "n_incidents_sampled": 12,
+            "quantile_mean": 0.9494632056751289,
+            "quantile_std": 0.0383485845675145
+          },
+          "0.5": {
+            "development_coverage_mean": 0.725,
+            "development_coverage_std": 0.01875,
+            "n_incidents_sampled": 25,
+            "quantile_mean": 0.9271982354857028,
+            "quantile_std": 0.013196857451779532
+          },
+          "0.75": {
+            "development_coverage_mean": 0.71875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 38,
+            "quantile_mean": 0.9308226773142815,
+            "quantile_std": 0.007723896991687906
+          },
+          "1.0": {
+            "development_coverage_mean": 0.71875,
+            "development_coverage_std": 0.0,
+            "n_incidents_sampled": 50,
+            "quantile_mean": 0.9317420795559883,
+            "quantile_std": 0.0
+          }
+        }
+      }
+    }
+  }
+}

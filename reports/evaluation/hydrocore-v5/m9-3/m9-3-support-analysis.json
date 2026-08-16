@@ -1,0 +1,374 @@
+{
+  "fallback_frequency": {
+    "ARM_A": {
+      "20260814": {
+        "n": 112,
+        "selection_source_counts": {
+          "NETWORK_SPECIFIC": 112
+        }
+      },
+      "20260815": {
+        "n": 112,
+        "selection_source_counts": {
+          "NETWORK_SPECIFIC": 112
+        }
+      },
+      "31874": {
+        "n": 112,
+        "selection_source_counts": {
+          "NETWORK_SPECIFIC": 112
+        }
+      }
+    },
+    "ARM_B2": {
+      "20260814": {
+        "n": 336,
+        "selection_source_counts": {
+          "NETWORK_SPECIFIC": 336
+        }
+      },
+      "20260815": {
+        "n": 336,
+        "selection_source_counts": {
+          "NETWORK_SPECIFIC": 336
+        }
+      },
+      "31874": {
+        "n": 336,
+        "selection_source_counts": {
+          "NETWORK_SPECIFIC": 336
+        }
+      }
+    }
+  },
+  "group_support": {
+    "ARM_A": {
+      "20260814": {
+        "golden-reference": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 45,
+            "finite_sample_resolution": 0.0022172949002217295,
+            "n_calibration_rows": 450,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 406,
+            "resulting_quantile": 0.9988895107526332
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 30,
+            "finite_sample_resolution": 0.0033222591362126247,
+            "n_calibration_rows": 300,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 271,
+            "resulting_quantile": 0.02793252468109131
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 30,
+            "finite_sample_resolution": 0.0033222591362126247,
+            "n_calibration_rows": 300,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 271,
+            "resulting_quantile": 0.927735261619091
+          }
+        }
+      },
+      "20260815": {
+        "golden-reference": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 45,
+            "finite_sample_resolution": 0.0022172949002217295,
+            "n_calibration_rows": 450,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 406,
+            "resulting_quantile": 0.99770447332412
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 30,
+            "finite_sample_resolution": 0.0033222591362126247,
+            "n_calibration_rows": 300,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 271,
+            "resulting_quantile": 0.024383068084716797
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 30,
+            "finite_sample_resolution": 0.0033222591362126247,
+            "n_calibration_rows": 300,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 271,
+            "resulting_quantile": 0.9177436381578445
+          }
+        }
+      },
+      "31874": {
+        "golden-reference": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 45,
+            "finite_sample_resolution": 0.0022172949002217295,
+            "n_calibration_rows": 450,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 406,
+            "resulting_quantile": 0.9977582285646349
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 30,
+            "finite_sample_resolution": 0.0033222591362126247,
+            "n_calibration_rows": 300,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 271,
+            "resulting_quantile": 0.03626406192779541
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 30,
+            "finite_sample_resolution": 0.0033222591362126247,
+            "n_calibration_rows": 300,
+            "n_distinct_incidents": 150,
+            "quantile_rank": 271,
+            "resulting_quantile": 0.9285558685660362
+          }
+        }
+      }
+    },
+    "ARM_B2": {
+      "20260814": {
+        "branched-loop": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9166073575615883
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9263976737856865
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9263976737856865
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9887682972475886
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.6382037997245789
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9136131256818771
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9100610166788101
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9247537329792976
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9247537329792976
+          }
+        }
+      },
+      "20260815": {
+        "branched-loop": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9227942675352097
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9393126890063286
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.931830145418644
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9940300602465868
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.5920789837837219
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9600530080497265
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9153923317790031
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9213022142648697
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9325002580881119
+          }
+        }
+      },
+      "31874": {
+        "branched-loop": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9284785091876984
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9436572901904583
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9436572901904583
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9964479703921825
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.17543280124664307
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.8711227178573608
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "allowable_exceedances_at_alpha": 15,
+            "finite_sample_resolution": 0.006622516556291391,
+            "n_calibration_rows": 150,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 136,
+            "resulting_quantile": 0.9092147201299667
+          },
+          "MATURE": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9288161993026733
+          },
+          "MID": {
+            "allowable_exceedances_at_alpha": 10,
+            "finite_sample_resolution": 0.009900990099009901,
+            "n_calibration_rows": 100,
+            "n_distinct_incidents": 50,
+            "quantile_rank": 91,
+            "resulting_quantile": 0.9317420795559883
+          }
+        }
+      }
+    }
+  }
+}

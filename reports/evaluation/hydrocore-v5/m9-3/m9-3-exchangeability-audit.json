@@ -1,0 +1,258 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.4266666666666667,
+          "DEGRADED": 0.5733333333333334
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.375,
+          "DEGRADED": 0.625
+        },
+        "development_mean_healthy_sensor_fraction": 0.9469866071428571,
+        "development_mean_missing_rate": 0.05133928571428571,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 1050,
+        "n_development": 112
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.4266666666666667,
+          "DEGRADED": 0.5733333333333334
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.375,
+          "DEGRADED": 0.625
+        },
+        "development_mean_healthy_sensor_fraction": 0.9469866071428571,
+        "development_mean_missing_rate": 0.05133928571428571,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 1050,
+        "n_development": 112
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.4266666666666667,
+          "DEGRADED": 0.5733333333333334
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.375,
+          "DEGRADED": 0.625
+        },
+        "development_mean_healthy_sensor_fraction": 0.9469866071428571,
+        "development_mean_missing_rate": 0.05133928571428571,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 1050,
+        "n_development": 112
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.49714285714285716,
+          "DEGRADED": 0.5028571428571429
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.4732142857142857,
+          "DEGRADED": 0.5267857142857143
+        },
+        "development_mean_healthy_sensor_fraction": 0.9207589285714286,
+        "development_mean_missing_rate": 0.0625,
+        "development_source_node_distribution": {
+          "JA": 0.25,
+          "JB": 0.25,
+          "JC": 0.25,
+          "JD": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      },
+      "golden-reference": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.47714285714285715,
+          "DEGRADED": 0.5228571428571429
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.375,
+          "DEGRADED": 0.625
+        },
+        "development_mean_healthy_sensor_fraction": 0.9469866071428571,
+        "development_mean_missing_rate": 0.05133928571428571,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      },
+      "loop-grid": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.4228571428571429,
+          "DEGRADED": 0.5771428571428572
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.4107142857142857,
+          "DEGRADED": 0.5892857142857143
+        },
+        "development_mean_healthy_sensor_fraction": 0.9034598214285714,
+        "development_mean_missing_rate": 0.09151785714285714,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.49714285714285716,
+          "DEGRADED": 0.5028571428571429
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.4732142857142857,
+          "DEGRADED": 0.5267857142857143
+        },
+        "development_mean_healthy_sensor_fraction": 0.9207589285714286,
+        "development_mean_missing_rate": 0.0625,
+        "development_source_node_distribution": {
+          "JA": 0.25,
+          "JB": 0.25,
+          "JC": 0.25,
+          "JD": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      },
+      "golden-reference": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.47714285714285715,
+          "DEGRADED": 0.5228571428571429
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.375,
+          "DEGRADED": 0.625
+        },
+        "development_mean_healthy_sensor_fraction": 0.9469866071428571,
+        "development_mean_missing_rate": 0.05133928571428571,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      },
+      "loop-grid": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.4228571428571429,
+          "DEGRADED": 0.5771428571428572
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.4107142857142857,
+          "DEGRADED": 0.5892857142857143
+        },
+        "development_mean_healthy_sensor_fraction": 0.9034598214285714,
+        "development_mean_missing_rate": 0.09151785714285714,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.49714285714285716,
+          "DEGRADED": 0.5028571428571429
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.4732142857142857,
+          "DEGRADED": 0.5267857142857143
+        },
+        "development_mean_healthy_sensor_fraction": 0.9207589285714286,
+        "development_mean_missing_rate": 0.0625,
+        "development_source_node_distribution": {
+          "JA": 0.25,
+          "JB": 0.25,
+          "JC": 0.25,
+          "JD": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      },
+      "golden-reference": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.47714285714285715,
+          "DEGRADED": 0.5228571428571429
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.375,
+          "DEGRADED": 0.625
+        },
+        "development_mean_healthy_sensor_fraction": 0.9469866071428571,
+        "development_mean_missing_rate": 0.05133928571428571,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      },
+      "loop-grid": {
+        "calibration_condition_distribution": {
+          "CLEAN": 0.4228571428571429,
+          "DEGRADED": 0.5771428571428572
+        },
+        "development_condition_distribution": {
+          "CLEAN": 0.4107142857142857,
+          "DEGRADED": 0.5892857142857143
+        },
+        "development_mean_healthy_sensor_fraction": 0.9034598214285714,
+        "development_mean_missing_rate": 0.09151785714285714,
+        "development_source_node_distribution": {
+          "J1": 0.25,
+          "J2": 0.25,
+          "J3": 0.25,
+          "J4": 0.25
+        },
+        "n_calibration": 350,
+        "n_development": 112
+      }
+    }
+  }
+}

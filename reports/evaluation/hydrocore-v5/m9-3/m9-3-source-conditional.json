@@ -1,0 +1,426 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "J1": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.1785714285714284,
+          "mean_nonconformity_score": 0.38970207183488775,
+          "n_development": 28,
+          "top1_accuracy": 0.6071428571428571,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.0714285714285716,
+          "mean_nonconformity_score": 0.23565386555024556,
+          "n_development": 28,
+          "top1_accuracy": 0.7142857142857143,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 2.0714285714285716,
+          "mean_nonconformity_score": 0.4524546781581843,
+          "n_development": 28,
+          "top1_accuracy": 0.5357142857142857,
+          "true_source_degree": 2.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 1.8571428571428572,
+          "mean_nonconformity_score": 0.17944780487466364,
+          "n_development": 28,
+          "top1_accuracy": 0.8928571428571429,
+          "true_source_degree": 3.0
+        }
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "J1": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.1785714285714284,
+          "mean_nonconformity_score": 0.37838722286479815,
+          "n_development": 28,
+          "top1_accuracy": 0.6071428571428571,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.0357142857142856,
+          "mean_nonconformity_score": 0.2508759173963751,
+          "n_development": 28,
+          "top1_accuracy": 0.7142857142857143,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8214285714285714,
+          "mean_candidate_set_size": 2.0714285714285716,
+          "mean_nonconformity_score": 0.4666723689182878,
+          "n_development": 28,
+          "top1_accuracy": 0.5357142857142857,
+          "true_source_degree": 2.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 1.8571428571428572,
+          "mean_nonconformity_score": 0.1597328854573529,
+          "n_development": 28,
+          "top1_accuracy": 0.9285714285714286,
+          "true_source_degree": 3.0
+        }
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "J1": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.1785714285714284,
+          "mean_nonconformity_score": 0.3877036218930568,
+          "n_development": 28,
+          "top1_accuracy": 0.6071428571428571,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.0714285714285716,
+          "mean_nonconformity_score": 0.24158583475010736,
+          "n_development": 28,
+          "top1_accuracy": 0.7142857142857143,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 2.107142857142857,
+          "mean_nonconformity_score": 0.45411670063289683,
+          "n_development": 28,
+          "top1_accuracy": 0.5357142857142857,
+          "true_source_degree": 2.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 2.0,
+          "mean_nonconformity_score": 0.18610983478096646,
+          "n_development": 28,
+          "top1_accuracy": 0.8571428571428571,
+          "true_source_degree": 3.0
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "JA": {
+          "empirical_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 2.4642857142857144,
+          "mean_nonconformity_score": 0.31422724588108913,
+          "n_development": 28,
+          "top1_accuracy": 0.8928571428571429,
+          "true_source_degree": 3.0
+        },
+        "JB": {
+          "empirical_coverage": 0.9285714285714286,
+          "mean_candidate_set_size": 3.9285714285714284,
+          "mean_nonconformity_score": 0.6759910173714161,
+          "n_development": 28,
+          "top1_accuracy": 0.25,
+          "true_source_degree": 2.0
+        },
+        "JC": {
+          "empirical_coverage": 0.6785714285714286,
+          "mean_candidate_set_size": 3.9285714285714284,
+          "mean_nonconformity_score": 0.7991133438606214,
+          "n_development": 28,
+          "top1_accuracy": 0.10714285714285714,
+          "true_source_degree": 3.0
+        },
+        "JD": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 3.7142857142857144,
+          "mean_nonconformity_score": 0.4708089993468353,
+          "n_development": 28,
+          "top1_accuracy": 0.42857142857142855,
+          "true_source_degree": 2.0
+        }
+      },
+      "golden-reference": {
+        "J1": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.1785714285714284,
+          "mean_nonconformity_score": 0.3550320767930576,
+          "n_development": 28,
+          "top1_accuracy": 0.6071428571428571,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.0,
+          "mean_nonconformity_score": 0.17523190911327088,
+          "n_development": 28,
+          "top1_accuracy": 0.7857142857142857,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8214285714285714,
+          "mean_candidate_set_size": 2.2142857142857144,
+          "mean_nonconformity_score": 0.5116194176184113,
+          "n_development": 28,
+          "top1_accuracy": 0.5,
+          "true_source_degree": 2.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 2.0357142857142856,
+          "mean_nonconformity_score": 0.23498497760322476,
+          "n_development": 28,
+          "top1_accuracy": 0.8928571428571429,
+          "true_source_degree": 3.0
+        }
+      },
+      "loop-grid": {
+        "J1": {
+          "empirical_coverage": 0.21428571428571427,
+          "mean_candidate_set_size": 4.821428571428571,
+          "mean_nonconformity_score": 0.7574233983510307,
+          "n_development": 28,
+          "top1_accuracy": 0.21428571428571427,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 0.8214285714285714,
+          "mean_candidate_set_size": 3.607142857142857,
+          "mean_nonconformity_score": 0.4887273461957063,
+          "n_development": 28,
+          "top1_accuracy": 0.4642857142857143,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 4.5,
+          "mean_nonconformity_score": 0.7119750273746571,
+          "n_development": 28,
+          "top1_accuracy": 0.21428571428571427,
+          "true_source_degree": 3.0
+        },
+        "J4": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 4.75,
+          "mean_nonconformity_score": 0.6367333201425416,
+          "n_development": 28,
+          "top1_accuracy": 0.2857142857142857,
+          "true_source_degree": 2.0
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "JA": {
+          "empirical_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 2.4642857142857144,
+          "mean_nonconformity_score": 0.29458244756928514,
+          "n_development": 28,
+          "top1_accuracy": 0.8928571428571429,
+          "true_source_degree": 3.0
+        },
+        "JB": {
+          "empirical_coverage": 0.7857142857142857,
+          "mean_candidate_set_size": 3.8214285714285716,
+          "mean_nonconformity_score": 0.6477609443079148,
+          "n_development": 28,
+          "top1_accuracy": 0.25,
+          "true_source_degree": 2.0
+        },
+        "JC": {
+          "empirical_coverage": 0.5,
+          "mean_candidate_set_size": 3.6785714285714284,
+          "mean_nonconformity_score": 0.8027521093795907,
+          "n_development": 28,
+          "top1_accuracy": 0.14285714285714285,
+          "true_source_degree": 3.0
+        },
+        "JD": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 3.5,
+          "mean_nonconformity_score": 0.45348127984574865,
+          "n_development": 28,
+          "top1_accuracy": 0.42857142857142855,
+          "true_source_degree": 2.0
+        }
+      },
+      "golden-reference": {
+        "J1": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.1785714285714284,
+          "mean_nonconformity_score": 0.373262235495661,
+          "n_development": 28,
+          "top1_accuracy": 0.6071428571428571,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 1.9285714285714286,
+          "mean_nonconformity_score": 0.16098389348813466,
+          "n_development": 28,
+          "top1_accuracy": 0.7857142857142857,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 2.3214285714285716,
+          "mean_nonconformity_score": 0.5320721735801531,
+          "n_development": 28,
+          "top1_accuracy": 0.4642857142857143,
+          "true_source_degree": 2.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 2.142857142857143,
+          "mean_nonconformity_score": 0.23572103946727502,
+          "n_development": 28,
+          "top1_accuracy": 0.8928571428571429,
+          "true_source_degree": 3.0
+        }
+      },
+      "loop-grid": {
+        "J1": {
+          "empirical_coverage": 0.21428571428571427,
+          "mean_candidate_set_size": 4.642857142857143,
+          "mean_nonconformity_score": 0.7637801953990545,
+          "n_development": 28,
+          "top1_accuracy": 0.21428571428571427,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 0.8214285714285714,
+          "mean_candidate_set_size": 3.4285714285714284,
+          "mean_nonconformity_score": 0.4882712171279958,
+          "n_development": 28,
+          "top1_accuracy": 0.4642857142857143,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 4.714285714285714,
+          "mean_nonconformity_score": 0.7268705935982455,
+          "n_development": 28,
+          "top1_accuracy": 0.21428571428571427,
+          "true_source_degree": 3.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 4.714285714285714,
+          "mean_nonconformity_score": 0.6273319693282247,
+          "n_development": 28,
+          "top1_accuracy": 0.2857142857142857,
+          "true_source_degree": 2.0
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "JA": {
+          "empirical_coverage": 0.8928571428571429,
+          "mean_candidate_set_size": 4.142857142857143,
+          "mean_nonconformity_score": 0.35980579163879156,
+          "n_development": 28,
+          "top1_accuracy": 0.8928571428571429,
+          "true_source_degree": 3.0
+        },
+        "JB": {
+          "empirical_coverage": 0.8214285714285714,
+          "mean_candidate_set_size": 4.0,
+          "mean_nonconformity_score": 0.6460376501615558,
+          "n_development": 28,
+          "top1_accuracy": 0.25,
+          "true_source_degree": 2.0
+        },
+        "JC": {
+          "empirical_coverage": 0.7142857142857143,
+          "mean_candidate_set_size": 4.071428571428571,
+          "mean_nonconformity_score": 0.8033308221757969,
+          "n_development": 28,
+          "top1_accuracy": 0.14285714285714285,
+          "true_source_degree": 3.0
+        },
+        "JD": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 3.8214285714285716,
+          "mean_nonconformity_score": 0.4584487264177629,
+          "n_development": 28,
+          "top1_accuracy": 0.42857142857142855,
+          "true_source_degree": 2.0
+        }
+      },
+      "golden-reference": {
+        "J1": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 2.1785714285714284,
+          "mean_nonconformity_score": 0.3661573428128447,
+          "n_development": 28,
+          "top1_accuracy": 0.6071428571428571,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 1.9642857142857142,
+          "mean_nonconformity_score": 0.15120849226202285,
+          "n_development": 28,
+          "top1_accuracy": 1.0,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8214285714285714,
+          "mean_candidate_set_size": 2.25,
+          "mean_nonconformity_score": 0.5337247261029135,
+          "n_development": 28,
+          "top1_accuracy": 0.5,
+          "true_source_degree": 2.0
+        },
+        "J4": {
+          "empirical_coverage": 0.9642857142857143,
+          "mean_candidate_set_size": 1.9642857142857142,
+          "mean_nonconformity_score": 0.2197428459153993,
+          "n_development": 28,
+          "top1_accuracy": 0.6785714285714286,
+          "true_source_degree": 3.0
+        }
+      },
+      "loop-grid": {
+        "J1": {
+          "empirical_coverage": 0.21428571428571427,
+          "mean_candidate_set_size": 4.892857142857143,
+          "mean_nonconformity_score": 0.7624243622246597,
+          "n_development": 28,
+          "top1_accuracy": 0.21428571428571427,
+          "true_source_degree": 3.0
+        },
+        "J2": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 3.5714285714285716,
+          "mean_nonconformity_score": 0.4853809346178813,
+          "n_development": 28,
+          "top1_accuracy": 0.4642857142857143,
+          "true_source_degree": 3.0
+        },
+        "J3": {
+          "empirical_coverage": 0.8571428571428571,
+          "mean_candidate_set_size": 4.571428571428571,
+          "mean_nonconformity_score": 0.7056025019680549,
+          "n_development": 28,
+          "top1_accuracy": 0.21428571428571427,
+          "true_source_degree": 3.0
+        },
+        "J4": {
+          "empirical_coverage": 1.0,
+          "mean_candidate_set_size": 4.571428571428571,
+          "mean_nonconformity_score": 0.615338148283107,
+          "n_development": 28,
+          "top1_accuracy": 0.2857142857142857,
+          "true_source_degree": 2.0
+        }
+      }
+    }
+  }
+}

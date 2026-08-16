@@ -1,0 +1,882 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "1": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.375,
+          "mean_entropy": 0.3362687545576009,
+          "mean_nonconformity_score": 0.6886226509500375,
+          "mean_probability_true_source": 0.3113773490499625,
+          "n": 16,
+          "quantile_used": 0.9988895106768764,
+          "top1": 0.3125
+        },
+        "12": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0016702573596471828,
+          "mean_nonconformity_score": 0.00032471492886543274,
+          "mean_probability_true_source": 0.9996752850711346,
+          "n": 16,
+          "quantile_used": 0.027932623468880258,
+          "top1": 1.0
+        },
+        "2": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.5625,
+          "mean_entropy": 0.34954151391850585,
+          "mean_nonconformity_score": 0.6541245402186178,
+          "mean_probability_true_source": 0.34587545978138223,
+          "n": 16,
+          "quantile_used": 0.9988895106768764,
+          "top1": 0.3125
+        },
+        "25": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0018887348340982306,
+          "mean_nonconformity_score": 0.00041224434971809387,
+          "mean_probability_true_source": 0.9995877556502819,
+          "n": 16,
+          "quantile_used": 0.027932623468880258,
+          "top1": 1.0
+        },
+        "3": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.0,
+          "mean_entropy": 0.31833971941469785,
+          "mean_nonconformity_score": 0.5212900572660146,
+          "mean_probability_true_source": 0.47870994273398537,
+          "n": 16,
+          "quantile_used": 0.9988895106768764,
+          "top1": 0.5
+        },
+        "4": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 1.25,
+          "mean_entropy": 0.12251113500506894,
+          "mean_nonconformity_score": 0.14614922041073442,
+          "mean_probability_true_source": 0.8538507795892656,
+          "n": 16,
+          "quantile_used": 0.9277352614844875,
+          "top1": 0.875
+        },
+        "6": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 1.125,
+          "mean_entropy": 0.046740923855631396,
+          "mean_nonconformity_score": 0.1892788076074794,
+          "mean_probability_true_source": 0.8107211923925206,
+          "n": 16,
+          "quantile_used": 0.9277352614844875,
+          "top1": 0.8125
+        }
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "1": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.375,
+          "mean_entropy": 0.39845793932078594,
+          "mean_nonconformity_score": 0.6872470498187795,
+          "mean_probability_true_source": 0.3127529501812205,
+          "n": 16,
+          "quantile_used": 0.9977044734443755,
+          "top1": 0.3125
+        },
+        "12": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0017212854327333,
+          "mean_nonconformity_score": 0.00035659223794937134,
+          "mean_probability_true_source": 0.9996434077620506,
+          "n": 16,
+          "quantile_used": 0.024383064614192596,
+          "top1": 1.0
+        },
+        "2": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.625,
+          "mean_entropy": 0.4336064672145964,
+          "mean_nonconformity_score": 0.6440211072913371,
+          "mean_probability_true_source": 0.3559788927086629,
+          "n": 16,
+          "quantile_used": 0.9977044734443755,
+          "top1": 0.375
+        },
+        "25": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0011576496310338718,
+          "mean_nonconformity_score": 0.00022816285490989685,
+          "mean_probability_true_source": 0.9997718371450901,
+          "n": 16,
+          "quantile_used": 0.024383064614192596,
+          "top1": 1.0
+        },
+        "3": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.0,
+          "mean_entropy": 0.34918607163537224,
+          "mean_nonconformity_score": 0.5203385621134657,
+          "mean_probability_true_source": 0.47966143788653426,
+          "n": 16,
+          "quantile_used": 0.9977044734443755,
+          "top1": 0.5
+        },
+        "4": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 1.25,
+          "mean_entropy": 0.13527567849908134,
+          "mean_nonconformity_score": 0.15528164082206786,
+          "mean_probability_true_source": 0.8447183591779321,
+          "n": 16,
+          "quantile_used": 0.917743644439635,
+          "top1": 0.875
+        },
+        "6": {
+          "coverage": 0.8125,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.014258374111074012,
+          "mean_nonconformity_score": 0.18994657547591487,
+          "mean_probability_true_source": 0.8100534245240851,
+          "n": 16,
+          "quantile_used": 0.917743644439635,
+          "top1": 0.8125
+        }
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "1": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.375,
+          "mean_entropy": 0.37188713741830937,
+          "mean_nonconformity_score": 0.6891238049392996,
+          "mean_probability_true_source": 0.3108761950607004,
+          "n": 16,
+          "quantile_used": 0.9977582285724642,
+          "top1": 0.3125
+        },
+        "12": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0013925512093135725,
+          "mean_nonconformity_score": 0.000261601060628891,
+          "mean_probability_true_source": 0.9997383989393711,
+          "n": 16,
+          "quantile_used": 0.036264115807468134,
+          "top1": 1.0
+        },
+        "2": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.6875,
+          "mean_entropy": 0.39521540691220114,
+          "mean_nonconformity_score": 0.6518680865992792,
+          "mean_probability_true_source": 0.3481319134007208,
+          "n": 16,
+          "quantile_used": 0.9977582285724642,
+          "top1": 0.3125
+        },
+        "25": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.00289636391889543,
+          "mean_nonconformity_score": 0.0006988570094108582,
+          "mean_probability_true_source": 0.9993011429905891,
+          "n": 16,
+          "quantile_used": 0.036264115807468134,
+          "top1": 1.0
+        },
+        "3": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.1875,
+          "mean_entropy": 0.3441843225640381,
+          "mean_nonconformity_score": 0.5293666963698342,
+          "mean_probability_true_source": 0.47063330363016576,
+          "n": 16,
+          "quantile_used": 0.9977582285724642,
+          "top1": 0.4375
+        },
+        "4": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.375,
+          "mean_entropy": 0.14590285278349713,
+          "mean_nonconformity_score": 0.15839327638968825,
+          "mean_probability_true_source": 0.8416067236103117,
+          "n": 16,
+          "quantile_used": 0.928555866256586,
+          "top1": 0.875
+        },
+        "6": {
+          "coverage": 0.8125,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.026031527362817667,
+          "mean_nonconformity_score": 0.19194066373165697,
+          "mean_probability_true_source": 0.808059336268343,
+          "n": 16,
+          "quantile_used": 0.928555866256586,
+          "top1": 0.8125
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "1": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 4.8125,
+          "mean_entropy": 0.8147683462382048,
+          "mean_nonconformity_score": 0.8308116404805332,
+          "mean_probability_true_source": 0.16918835951946676,
+          "n": 16,
+          "quantile_used": 0.9166073578722501,
+          "top1": 0.125
+        },
+        "12": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 2.9375,
+          "mean_entropy": 0.42506479504493777,
+          "mean_nonconformity_score": 0.4479981552140089,
+          "mean_probability_true_source": 0.5520018447859911,
+          "n": 16,
+          "quantile_used": 0.9263976770759668,
+          "top1": 0.5625
+        },
+        "2": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 4.125,
+          "mean_entropy": 0.685753340554942,
+          "mean_nonconformity_score": 0.6758963386528194,
+          "mean_probability_true_source": 0.3241036613471806,
+          "n": 16,
+          "quantile_used": 0.9166073578722501,
+          "top1": 0.3125
+        },
+        "25": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 2.9375,
+          "mean_entropy": 0.42506479504493777,
+          "mean_nonconformity_score": 0.4479981552140089,
+          "mean_probability_true_source": 0.5520018447859911,
+          "n": 16,
+          "quantile_used": 0.9263976770759668,
+          "top1": 0.5625
+        },
+        "3": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.4375,
+          "mean_entropy": 0.5720905167579405,
+          "mean_nonconformity_score": 0.5512144439853728,
+          "mean_probability_true_source": 0.4487855560146272,
+          "n": 16,
+          "quantile_used": 0.9166073578722501,
+          "top1": 0.4375
+        },
+        "4": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.375,
+          "mean_entropy": 0.5253353490313595,
+          "mean_nonconformity_score": 0.5533291725441813,
+          "mean_probability_true_source": 0.44667082745581865,
+          "n": 16,
+          "quantile_used": 0.9263976770759668,
+          "top1": 0.375
+        },
+        "6": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 2.9375,
+          "mean_entropy": 0.42506479504493777,
+          "mean_nonconformity_score": 0.4479981552140089,
+          "mean_probability_true_source": 0.5520018447859911,
+          "n": 16,
+          "quantile_used": 0.9263976770759668,
+          "top1": 0.5625
+        }
+      },
+      "golden-reference": {
+        "1": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.25,
+          "mean_entropy": 0.4841195568356567,
+          "mean_nonconformity_score": 0.6842001630975574,
+          "mean_probability_true_source": 0.3157998369024426,
+          "n": 16,
+          "quantile_used": 0.9887682976660022,
+          "top1": 0.3125
+        },
+        "12": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.004346545327299884,
+          "mean_nonconformity_score": 0.0009309984743595123,
+          "mean_probability_true_source": 0.9990690015256405,
+          "n": 16,
+          "quantile_used": 0.6382037933047795,
+          "top1": 1.0
+        },
+        "2": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.6875,
+          "mean_entropy": 0.5465659821728537,
+          "mean_nonconformity_score": 0.6472591788042337,
+          "mean_probability_true_source": 0.35274082119576633,
+          "n": 16,
+          "quantile_used": 0.9887682976660022,
+          "top1": 0.4375
+        },
+        "25": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.004964237057478283,
+          "mean_nonconformity_score": 0.0010710470378398895,
+          "mean_probability_true_source": 0.9989289529621601,
+          "n": 16,
+          "quantile_used": 0.6382037933047795,
+          "top1": 1.0
+        },
+        "3": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.125,
+          "mean_entropy": 0.4261248071245749,
+          "mean_nonconformity_score": 0.5050517162308097,
+          "mean_probability_true_source": 0.4949482837691903,
+          "n": 16,
+          "quantile_used": 0.9887682976660022,
+          "top1": 0.5
+        },
+        "4": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 1.6875,
+          "mean_entropy": 0.23437370163003218,
+          "mean_nonconformity_score": 0.21261400636285543,
+          "mean_probability_true_source": 0.7873859936371446,
+          "n": 16,
+          "quantile_used": 0.913613117958288,
+          "top1": 0.8125
+        },
+        "6": {
+          "coverage": 0.8125,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.046543084192853586,
+          "mean_nonconformity_score": 0.18339255696628243,
+          "mean_probability_true_source": 0.8166074430337176,
+          "n": 16,
+          "quantile_used": 0.913613117958288,
+          "top1": 0.8125
+        }
+      },
+      "loop-grid": {
+        "1": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 5.6875,
+          "mean_entropy": 0.8985474966094744,
+          "mean_nonconformity_score": 0.8917331059928983,
+          "mean_probability_true_source": 0.10826689400710166,
+          "n": 16,
+          "quantile_used": 0.9100610183540542,
+          "top1": 0.0
+        },
+        "12": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.9375,
+          "mean_entropy": 0.5093832937739247,
+          "mean_nonconformity_score": 0.5384110466693528,
+          "mean_probability_true_source": 0.4615889533306472,
+          "n": 16,
+          "quantile_used": 0.9247537349414969,
+          "top1": 0.4375
+        },
+        "2": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 4.9375,
+          "mean_entropy": 0.7465000837832181,
+          "mean_nonconformity_score": 0.7283145138062537,
+          "mean_probability_true_source": 0.27168548619374633,
+          "n": 16,
+          "quantile_used": 0.9100610183540542,
+          "top1": 0.1875
+        },
+        "25": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.9375,
+          "mean_entropy": 0.5093832937739247,
+          "mean_nonconformity_score": 0.5384110466693528,
+          "mean_probability_true_source": 0.4615889533306472,
+          "n": 16,
+          "quantile_used": 0.9247537349414969,
+          "top1": 0.4375
+        },
+        "3": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 4.25,
+          "mean_entropy": 0.64986094753561,
+          "mean_nonconformity_score": 0.6659253966063261,
+          "mean_probability_true_source": 0.3340746033936739,
+          "n": 16,
+          "quantile_used": 0.9100610183540542,
+          "top1": 0.25
+        },
+        "4": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 4.25,
+          "mean_entropy": 0.5826877621479327,
+          "mean_nonconformity_score": 0.639797254698351,
+          "mean_probability_true_source": 0.360202745301649,
+          "n": 16,
+          "quantile_used": 0.9247537349414969,
+          "top1": 0.3125
+        },
+        "6": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.9375,
+          "mean_entropy": 0.5093832937739247,
+          "mean_nonconformity_score": 0.5384110466693528,
+          "mean_probability_true_source": 0.4615889533306472,
+          "n": 16,
+          "quantile_used": 0.9247537349414969,
+          "top1": 0.4375
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "1": {
+          "coverage": 0.625,
+          "mean_candidate_set_size": 4.4375,
+          "mean_entropy": 0.7889285076402953,
+          "mean_nonconformity_score": 0.8301372251007706,
+          "mean_probability_true_source": 0.1698627748992294,
+          "n": 16,
+          "quantile_used": 0.9227942663847546,
+          "top1": 0.125
+        },
+        "12": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.0625,
+          "mean_entropy": 0.37697911769508485,
+          "mean_nonconformity_score": 0.4242936742193706,
+          "mean_probability_true_source": 0.5757063257806294,
+          "n": 16,
+          "quantile_used": 0.9393126876498614,
+          "top1": 0.5625
+        },
+        "2": {
+          "coverage": 0.625,
+          "mean_candidate_set_size": 3.9375,
+          "mean_entropy": 0.6633338381950387,
+          "mean_nonconformity_score": 0.6687798607163131,
+          "mean_probability_true_source": 0.3312201392836869,
+          "n": 16,
+          "quantile_used": 0.9227942663847546,
+          "top1": 0.3125
+        },
+        "25": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.0625,
+          "mean_entropy": 0.37697911769508485,
+          "mean_nonconformity_score": 0.4242936742193706,
+          "mean_probability_true_source": 0.5757063257806294,
+          "n": 16,
+          "quantile_used": 0.9393126876498614,
+          "top1": 0.5625
+        },
+        "3": {
+          "coverage": 0.8125,
+          "mean_candidate_set_size": 3.125,
+          "mean_entropy": 0.5218462435876516,
+          "mean_nonconformity_score": 0.5346229795832187,
+          "mean_probability_true_source": 0.4653770204167813,
+          "n": 16,
+          "quantile_used": 0.9227942663847546,
+          "top1": 0.4375
+        },
+        "4": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.125,
+          "mean_entropy": 0.47533397972044417,
+          "mean_nonconformity_score": 0.5410882788710296,
+          "mean_probability_true_source": 0.4589117211289704,
+          "n": 16,
+          "quantile_used": 0.9318301426456264,
+          "top1": 0.4375
+        },
+        "6": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 2.8125,
+          "mean_entropy": 0.37697911769508485,
+          "mean_nonconformity_score": 0.4242936742193706,
+          "mean_probability_true_source": 0.5757063257806294,
+          "n": 16,
+          "quantile_used": 0.9318301426456264,
+          "top1": 0.5625
+        }
+      },
+      "golden-reference": {
+        "1": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.25,
+          "mean_entropy": 0.41300997415272345,
+          "mean_nonconformity_score": 0.6850946535068942,
+          "mean_probability_true_source": 0.31490534649310575,
+          "n": 16,
+          "quantile_used": 0.9940300600061194,
+          "top1": 0.3125
+        },
+        "12": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0164310512856375,
+          "mean_nonconformity_score": 0.004951693117618561,
+          "mean_probability_true_source": 0.9950483068823814,
+          "n": 16,
+          "quantile_used": 0.5920789904688069,
+          "top1": 1.0
+        },
+        "2": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.625,
+          "mean_entropy": 0.47142555989091806,
+          "mean_nonconformity_score": 0.650322760688141,
+          "mean_probability_true_source": 0.349677239311859,
+          "n": 16,
+          "quantile_used": 0.9940300600061194,
+          "top1": 0.4375
+        },
+        "25": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.017895488606997856,
+          "mean_nonconformity_score": 0.005547195672988892,
+          "mean_probability_true_source": 0.9944528043270111,
+          "n": 16,
+          "quantile_used": 0.5920789904688069,
+          "top1": 1.0
+        },
+        "3": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.125,
+          "mean_entropy": 0.3796425002130644,
+          "mean_nonconformity_score": 0.5153527490911074,
+          "mean_probability_true_source": 0.4846472509088926,
+          "n": 16,
+          "quantile_used": 0.9940300600061194,
+          "top1": 0.5
+        },
+        "4": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.9375,
+          "mean_entropy": 0.2284877112908668,
+          "mean_nonconformity_score": 0.2295524061191827,
+          "mean_probability_true_source": 0.7704475938808173,
+          "n": 16,
+          "quantile_used": 0.960053008644983,
+          "top1": 0.75
+        },
+        "6": {
+          "coverage": 0.8125,
+          "mean_candidate_set_size": 1.0625,
+          "mean_entropy": 0.0368847357014198,
+          "mean_nonconformity_score": 0.1877473903587088,
+          "mean_probability_true_source": 0.8122526096412912,
+          "n": 16,
+          "quantile_used": 0.960053008644983,
+          "top1": 0.8125
+        }
+      },
+      "loop-grid": {
+        "1": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 5.6875,
+          "mean_entropy": 0.8822953340919958,
+          "mean_nonconformity_score": 0.8937883334001526,
+          "mean_probability_true_source": 0.10621166659984738,
+          "n": 16,
+          "quantile_used": 0.9153923330397556,
+          "top1": 0.0
+        },
+        "12": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.8125,
+          "mean_entropy": 0.49428020055458777,
+          "mean_nonconformity_score": 0.5371183826064225,
+          "mean_probability_true_source": 0.46288161739357747,
+          "n": 16,
+          "quantile_used": 0.9213022145580418,
+          "top1": 0.4375
+        },
+        "2": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 4.9375,
+          "mean_entropy": 0.7306177485769321,
+          "mean_nonconformity_score": 0.7292446718784049,
+          "mean_probability_true_source": 0.2707553281215951,
+          "n": 16,
+          "quantile_used": 0.9153923330397556,
+          "top1": 0.1875
+        },
+        "25": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.8125,
+          "mean_entropy": 0.49428020055458777,
+          "mean_nonconformity_score": 0.5371183826064225,
+          "mean_probability_true_source": 0.46288161739357747,
+          "n": 16,
+          "quantile_used": 0.9213022145580418,
+          "top1": 0.4375
+        },
+        "3": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 4.3125,
+          "mean_entropy": 0.6474720663415598,
+          "mean_nonconformity_score": 0.6693409455474466,
+          "mean_probability_true_source": 0.3306590544525534,
+          "n": 16,
+          "quantile_used": 0.9153923330397556,
+          "top1": 0.25
+        },
+        "4": {
+          "coverage": 0.625,
+          "mean_candidate_set_size": 4.1875,
+          "mean_entropy": 0.5647365168537457,
+          "mean_nonconformity_score": 0.6572153583983891,
+          "mean_probability_true_source": 0.34278464160161093,
+          "n": 16,
+          "quantile_used": 0.9325002545677258,
+          "top1": 0.3125
+        },
+        "6": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.875,
+          "mean_entropy": 0.49428020055458777,
+          "mean_nonconformity_score": 0.5371183826064225,
+          "mean_probability_true_source": 0.46288161739357747,
+          "n": 16,
+          "quantile_used": 0.9325002545677258,
+          "top1": 0.4375
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "1": {
+          "coverage": 0.625,
+          "mean_candidate_set_size": 5.0625,
+          "mean_entropy": 0.805054337025882,
+          "mean_nonconformity_score": 0.8477451291400939,
+          "mean_probability_true_source": 0.15225487085990608,
+          "n": 16,
+          "quantile_used": 0.9284785145164642,
+          "top1": 0.125
+        },
+        "12": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 3.5,
+          "mean_entropy": 0.39923940642374367,
+          "mean_nonconformity_score": 0.4416567660673536,
+          "mean_probability_true_source": 0.5583432339326464,
+          "n": 16,
+          "quantile_used": 0.943657294178424,
+          "top1": 0.5625
+        },
+        "2": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 4.625,
+          "mean_entropy": 0.6756646772974506,
+          "mean_nonconformity_score": 0.6815333757549524,
+          "mean_probability_true_source": 0.31846662424504757,
+          "n": 16,
+          "quantile_used": 0.9284785145164642,
+          "top1": 0.3125
+        },
+        "25": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 3.5,
+          "mean_entropy": 0.39923940642374367,
+          "mean_nonconformity_score": 0.4416567660673536,
+          "mean_probability_true_source": 0.5583432339326464,
+          "n": 16,
+          "quantile_used": 0.943657294178424,
+          "top1": 0.5625
+        },
+        "3": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.8125,
+          "mean_entropy": 0.5486221192633682,
+          "mean_nonconformity_score": 0.5740777512546629,
+          "mean_probability_true_source": 0.42592224874533713,
+          "n": 16,
+          "quantile_used": 0.9284785145164642,
+          "top1": 0.4375
+        },
+        "4": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 4.0625,
+          "mean_entropy": 0.503029256851486,
+          "mean_nonconformity_score": 0.5400136788375676,
+          "mean_probability_true_source": 0.45998632116243243,
+          "n": 16,
+          "quantile_used": 0.943657294178424,
+          "top1": 0.4375
+        },
+        "6": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 3.5,
+          "mean_entropy": 0.39923940642374367,
+          "mean_nonconformity_score": 0.4416567660673536,
+          "mean_probability_true_source": 0.5583432339326464,
+          "n": 16,
+          "quantile_used": 0.943657294178424,
+          "top1": 0.5625
+        }
+      },
+      "golden-reference": {
+        "1": {
+          "coverage": 0.875,
+          "mean_candidate_set_size": 3.375,
+          "mean_entropy": 0.40762518774622525,
+          "mean_nonconformity_score": 0.6812799335693853,
+          "mean_probability_true_source": 0.3187200664306147,
+          "n": 16,
+          "quantile_used": 0.9964479704988682,
+          "top1": 0.3125
+        },
+        "12": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.0051134622731450205,
+          "mean_nonconformity_score": 0.0011204779148101807,
+          "mean_probability_true_source": 0.9988795220851898,
+          "n": 16,
+          "quantile_used": 0.17543282436577723,
+          "top1": 1.0
+        },
+        "2": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.625,
+          "mean_entropy": 0.443493199741417,
+          "mean_nonconformity_score": 0.6479940516874194,
+          "mean_probability_true_source": 0.3520059483125806,
+          "n": 16,
+          "quantile_used": 0.9964479704988682,
+          "top1": 0.375
+        },
+        "25": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.00665773476650289,
+          "mean_nonconformity_score": 0.0015726499259471893,
+          "mean_probability_true_source": 0.9984273500740528,
+          "n": 16,
+          "quantile_used": 0.17543282436577723,
+          "top1": 1.0
+        },
+        "3": {
+          "coverage": 1.0,
+          "mean_candidate_set_size": 3.125,
+          "mean_entropy": 0.3468291671415864,
+          "mean_nonconformity_score": 0.4999715366575401,
+          "mean_probability_true_source": 0.5000284633424599,
+          "n": 16,
+          "quantile_used": 0.9964479704988682,
+          "top1": 0.5
+        },
+        "4": {
+          "coverage": 0.9375,
+          "mean_candidate_set_size": 1.5,
+          "mean_entropy": 0.2033293231943811,
+          "mean_nonconformity_score": 0.2069337706780061,
+          "mean_probability_true_source": 0.7930662293219939,
+          "n": 16,
+          "quantile_used": 0.8711227146766632,
+          "top1": 0.875
+        },
+        "6": {
+          "coverage": 0.8125,
+          "mean_candidate_set_size": 1.0,
+          "mean_entropy": 0.05765336404333709,
+          "mean_nonconformity_score": 0.18508604197995737,
+          "mean_probability_true_source": 0.8149139580200426,
+          "n": 16,
+          "quantile_used": 0.8711227146766632,
+          "top1": 0.8125
+        }
+      },
+      "loop-grid": {
+        "1": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 5.6875,
+          "mean_entropy": 0.8904603391781687,
+          "mean_nonconformity_score": 0.8921198067255318,
+          "mean_probability_true_source": 0.10788019327446818,
+          "n": 16,
+          "quantile_used": 0.9092147197917653,
+          "top1": 0.0
+        },
+        "12": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.875,
+          "mean_entropy": 0.4806706946121045,
+          "mean_nonconformity_score": 0.5266147858346812,
+          "mean_probability_true_source": 0.47338521416531876,
+          "n": 16,
+          "quantile_used": 0.9288161987723127,
+          "top1": 0.4375
+        },
+        "2": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 4.9375,
+          "mean_entropy": 0.7316737089459534,
+          "mean_nonconformity_score": 0.7234328557970002,
+          "mean_probability_true_source": 0.27656714420299977,
+          "n": 16,
+          "quantile_used": 0.9092147197917653,
+          "top1": 0.1875
+        },
+        "25": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.875,
+          "mean_entropy": 0.4806706946121045,
+          "mean_nonconformity_score": 0.5266147858346812,
+          "mean_probability_true_source": 0.47338521416531876,
+          "n": 16,
+          "quantile_used": 0.9288161987723127,
+          "top1": 0.4375
+        },
+        "3": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 4.3125,
+          "mean_entropy": 0.6318164020360779,
+          "mean_nonconformity_score": 0.6726159692043439,
+          "mean_probability_true_source": 0.32738403079565614,
+          "n": 16,
+          "quantile_used": 0.9092147197917653,
+          "top1": 0.25
+        },
+        "4": {
+          "coverage": 0.6875,
+          "mean_candidate_set_size": 4.25,
+          "mean_entropy": 0.5527071698162516,
+          "mean_nonconformity_score": 0.6272924181830604,
+          "mean_probability_true_source": 0.37270758181693964,
+          "n": 16,
+          "quantile_used": 0.931742082607355,
+          "top1": 0.3125
+        },
+        "6": {
+          "coverage": 0.75,
+          "mean_candidate_set_size": 3.875,
+          "mean_entropy": 0.4806706946121045,
+          "mean_nonconformity_score": 0.5266147858346812,
+          "mean_probability_true_source": 0.47338521416531876,
+          "n": 16,
+          "quantile_used": 0.931742082607355,
+          "top1": 0.4375
+        }
+      }
+    }
+  }
+}

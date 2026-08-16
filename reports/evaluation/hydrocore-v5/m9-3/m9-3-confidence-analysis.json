@@ -1,0 +1,1051 @@
+{
+  "by_depth_correctness": {
+    "ARM_A": {
+      "20260814": {
+        "1": {
+          "correct": {
+            "mean_brier": 0.09578592531274772,
+            "mean_entropy": 0.25832652972880477,
+            "mean_max_probability": 0.817605721950531,
+            "mean_nll": 0.2174923462906157,
+            "mean_probability_true_source": 0.817605721950531,
+            "mean_top1_top2_margin": 0.6639416497637285,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.444009656402053,
+            "mean_entropy": 0.3716970385706901,
+            "mean_max_probability": 0.7143525427038019,
+            "mean_nll": 4.322736720396524,
+            "mean_probability_true_source": 0.08127354318606773,
+            "mean_top1_top2_margin": 0.4679168487246815,
+            "n": 11
+          }
+        },
+        "12": {
+          "correct": {
+            "mean_brier": 4.0177755717824275e-07,
+            "mean_entropy": 0.0016702573596471828,
+            "mean_max_probability": 0.9996752850711346,
+            "mean_nll": 0.00032485792967909826,
+            "mean_probability_true_source": 0.9996752850711346,
+            "mean_top1_top2_margin": 0.999513257592767,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "2": {
+          "correct": {
+            "mean_brier": 0.04351207200314686,
+            "mean_entropy": 0.17996893660097313,
+            "mean_max_probability": 0.8890898108482361,
+            "mean_nll": 0.12593822295311136,
+            "mean_probability_true_source": 0.8890898108482361,
+            "mean_top1_top2_margin": 0.7935139143373817,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.3494794269033852,
+            "mean_entropy": 0.42661995815374804,
+            "mean_max_probability": 0.6747509782964533,
+            "mean_nll": 3.4276259980286654,
+            "mean_probability_true_source": 0.09895984566008503,
+            "mean_top1_top2_margin": 0.397624398497018,
+            "n": 11
+          }
+        },
+        "25": {
+          "correct": {
+            "mean_brier": 1.8143800864207127e-06,
+            "mean_entropy": 0.0018887348340982306,
+            "mean_max_probability": 0.9995877556502819,
+            "mean_nll": 0.0004128522658994806,
+            "mean_probability_true_source": 0.9995877556502819,
+            "mean_top1_top2_margin": 0.9993656222050618,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "3": {
+          "correct": {
+            "mean_brier": 0.08860642768149321,
+            "mean_entropy": 0.1625036143994185,
+            "mean_max_probability": 0.8690149784088135,
+            "mean_nll": 0.171228307556794,
+            "mean_probability_true_source": 0.8690149784088135,
+            "mean_top1_top2_margin": 0.7641175923036485,
+            "n": 8
+          },
+          "incorrect": {
+            "mean_brier": 1.3174657677258323,
+            "mean_entropy": 0.4741758244299772,
+            "mean_max_probability": 0.6117300502955914,
+            "mean_nll": 3.582633784224291,
+            "mean_probability_true_source": 0.08840490705915727,
+            "mean_top1_top2_margin": 0.3081201370805502,
+            "n": 8
+          }
+        },
+        "4": {
+          "correct": {
+            "mean_brier": 0.019701489648819893,
+            "mean_entropy": 0.07637903497198682,
+            "mean_max_probability": 0.9529997748988015,
+            "mean_nll": 0.053706893926348476,
+            "mean_probability_true_source": 0.9529997748988015,
+            "mean_top1_top2_margin": 0.9108057042988743,
+            "n": 14
+          },
+          "incorrect": {
+            "mean_brier": 1.2138797935485837,
+            "mean_entropy": 0.44543583523664376,
+            "mean_max_probability": 0.6774625182151794,
+            "mean_nll": 2.1268302269258275,
+            "mean_probability_true_source": 0.15980781242251396,
+            "mean_top1_top2_margin": 0.4086378514766693,
+            "n": 2
+          }
+        },
+        "6": {
+          "correct": {
+            "mean_brier": 0.0020815627360077794,
+            "mean_entropy": 0.0322000631175096,
+            "mean_max_probability": 0.9849807895146884,
+            "mean_nll": 0.015577112532723631,
+            "mean_probability_true_source": 0.9849807895146884,
+            "mean_top1_top2_margin": 0.970341776939659,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 1.787261501210932,
+            "mean_entropy": 0.10975132038749252,
+            "mean_max_probability": 0.9443209568659464,
+            "mean_nll": 3.3480457813475013,
+            "mean_probability_true_source": 0.05559627152979374,
+            "mean_top1_top2_margin": 0.8887246853361527,
+            "n": 3
+          }
+        }
+      },
+      "20260815": {
+        "1": {
+          "correct": {
+            "mean_brier": 0.0980297504758643,
+            "mean_entropy": 0.2883884905787994,
+            "mean_max_probability": 0.8082349896430969,
+            "mean_nll": 0.23100405607822902,
+            "mean_probability_true_source": 0.8082349896430969,
+            "mean_top1_top2_margin": 0.6631517724395962,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.3662686741023917,
+            "mean_entropy": 0.4484895069307798,
+            "mean_max_probability": 0.6651472395116632,
+            "mean_nll": 3.731533895556237,
+            "mean_probability_true_source": 0.08753384133491306,
+            "mean_top1_top2_margin": 0.4029843869826767,
+            "n": 11
+          }
+        },
+        "12": {
+          "correct": {
+            "mean_brier": 7.772901446264906e-07,
+            "mean_entropy": 0.0017212854327333,
+            "mean_max_probability": 0.9996434077620506,
+            "mean_nll": 0.00035683768176353813,
+            "mean_probability_true_source": 0.9996434077620506,
+            "mean_top1_top2_margin": 0.9993735342015668,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "2": {
+          "correct": {
+            "mean_brier": 0.11799760700635054,
+            "mean_entropy": 0.3179275249772337,
+            "mean_max_probability": 0.7788658539454142,
+            "mean_nll": 0.26816250434422484,
+            "mean_probability_true_source": 0.7788658539454142,
+            "mean_top1_top2_margin": 0.6187507528617667,
+            "n": 6
+          },
+          "incorrect": {
+            "mean_brier": 1.2821979819393785,
+            "mean_entropy": 0.503013832557014,
+            "mean_max_probability": 0.6286850929260254,
+            "mean_nll": 2.875039158136901,
+            "mean_probability_true_source": 0.1022467159666121,
+            "mean_top1_top2_margin": 0.35165354013442995,
+            "n": 10
+          }
+        },
+        "25": {
+          "correct": {
+            "mean_brier": 3.313892264938223e-07,
+            "mean_entropy": 0.0011576496310338718,
+            "mean_max_probability": 0.9997718371450901,
+            "mean_nll": 0.00022826534600257258,
+            "mean_probability_true_source": 0.9997718371450901,
+            "mean_top1_top2_margin": 0.9995987663718608,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "3": {
+          "correct": {
+            "mean_brier": 0.08965346832171305,
+            "mean_entropy": 0.18908904946408028,
+            "mean_max_probability": 0.856698602437973,
+            "mean_nll": 0.181209239586779,
+            "mean_probability_true_source": 0.856698602437973,
+            "mean_top1_top2_margin": 0.7508640553147785,
+            "n": 8
+          },
+          "incorrect": {
+            "mean_brier": 1.2734936959583822,
+            "mean_entropy": 0.5092830938066641,
+            "mean_max_probability": 0.6176207922399044,
+            "mean_nll": 2.9470457236342336,
+            "mean_probability_true_source": 0.1026242733350955,
+            "mean_top1_top2_margin": 0.34239647164940834,
+            "n": 8
+          }
+        },
+        "4": {
+          "correct": {
+            "mean_brier": 0.03132507023316701,
+            "mean_entropy": 0.08366181352017509,
+            "mean_max_probability": 0.9435570154871259,
+            "mean_nll": 0.06839143406083335,
+            "mean_probability_true_source": 0.9435570154871259,
+            "mean_top1_top2_margin": 0.8975699336892181,
+            "n": 14
+          },
+          "incorrect": {
+            "mean_brier": 1.1987852148133729,
+            "mean_entropy": 0.49657273335142504,
+            "mean_max_probability": 0.6598907709121704,
+            "mean_nll": 2.1542937618664104,
+            "mean_probability_true_source": 0.15284776501357555,
+            "mean_top1_top2_margin": 0.4046116918325424,
+            "n": 2
+          }
+        },
+        "6": {
+          "correct": {
+            "mean_brier": 0.0002156935765300999,
+            "mean_entropy": 0.012521477248470995,
+            "mean_max_probability": 0.995471899326031,
+            "mean_nll": 0.0045830690848217065,
+            "mean_probability_true_source": 0.995471899326031,
+            "mean_top1_top2_margin": 0.9910157996754466,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 1.9737075067188483,
+            "mean_entropy": 0.021784927182353763,
+            "mean_max_probability": 0.9933710892995199,
+            "mean_nll": 5.276541108511128,
+            "mean_probability_true_source": 0.006573367048986256,
+            "mean_top1_top2_margin": 0.9867977222505336,
+            "n": 3
+          }
+        }
+      },
+      "31874": {
+        "1": {
+          "correct": {
+            "mean_brier": 0.1138812426715508,
+            "mean_entropy": 0.28411850615203493,
+            "mean_max_probability": 0.7973669290542602,
+            "mean_nll": 0.24716756582932903,
+            "mean_probability_true_source": 0.7973669290542602,
+            "mean_top1_top2_margin": 0.6349184367456473,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.3898267140370588,
+            "mean_entropy": 0.41178196981207055,
+            "mean_max_probability": 0.6781350834803148,
+            "mean_nll": 3.9295876015581612,
+            "mean_probability_true_source": 0.08974404324544594,
+            "mean_top1_top2_margin": 0.41086756920082157,
+            "n": 11
+          }
+        },
+        "12": {
+          "correct": {
+            "mean_brier": 1.6980544959072297e-07,
+            "mean_entropy": 0.0013925512093135725,
+            "mean_max_probability": 0.9997383989393711,
+            "mean_nll": 0.0002616514679602498,
+            "mean_probability_true_source": 0.9997383989393711,
+            "mean_top1_top2_margin": 0.9995394910799291,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "2": {
+          "correct": {
+            "mean_brier": 0.06633972796796225,
+            "mean_entropy": 0.22162222063650278,
+            "mean_max_probability": 0.8545755386352539,
+            "mean_nll": 0.16913759796708913,
+            "mean_probability_true_source": 0.8545755386352539,
+            "mean_top1_top2_margin": 0.7325350744184107,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.2657108041977283,
+            "mean_entropy": 0.4741214006738822,
+            "mean_max_probability": 0.6206957535310225,
+            "mean_nll": 3.0062090387806677,
+            "mean_probability_true_source": 0.11793026556684212,
+            "mean_top1_top2_margin": 0.3116942833770405,
+            "n": 11
+          }
+        },
+        "25": {
+          "correct": {
+            "mean_brier": 4.354932878266041e-06,
+            "mean_entropy": 0.00289636391889543,
+            "mean_max_probability": 0.9993011429905891,
+            "mean_nll": 0.0007001390473265768,
+            "mean_probability_true_source": 0.9993011429905891,
+            "mean_top1_top2_margin": 0.9987386710932924,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "3": {
+          "correct": {
+            "mean_brier": 0.04906532681180185,
+            "mean_entropy": 0.12174243101206995,
+            "mean_max_probability": 0.9112228325435093,
+            "mean_nll": 0.10655231090228166,
+            "mean_probability_true_source": 0.9112228325435093,
+            "mean_top1_top2_margin": 0.8325274975169512,
+            "n": 7
+          },
+          "incorrect": {
+            "mean_brier": 1.1992850396905546,
+            "mean_entropy": 0.5171946826600133,
+            "mean_max_probability": 0.5642610887686411,
+            "mean_nll": 2.9346876507110444,
+            "mean_probability_true_source": 0.1279525589197874,
+            "mean_top1_top2_margin": 0.24114417201942867,
+            "n": 9
+          }
+        },
+        "4": {
+          "correct": {
+            "mean_brier": 0.028764630092143632,
+            "mean_entropy": 0.09699053347631824,
+            "mean_max_probability": 0.9365664635385785,
+            "mean_nll": 0.07344961178654821,
+            "mean_probability_true_source": 0.9365664635385785,
+            "mean_top1_top2_margin": 0.8793782619519074,
+            "n": 14
+          },
+          "incorrect": {
+            "mean_brier": 1.141298936829843,
+            "mean_entropy": 0.4882890879337496,
+            "mean_max_probability": 0.6404618620872498,
+            "mean_nll": 1.9470475164550063,
+            "mean_probability_true_source": 0.17688854411244392,
+            "mean_top1_top2_margin": 0.35644863545894623,
+            "n": 2
+          }
+        },
+        "6": {
+          "correct": {
+            "mean_brier": 0.0005187096175671184,
+            "mean_entropy": 0.023116316591241855,
+            "mean_max_probability": 0.9914052394720224,
+            "mean_nll": 0.008728367173623063,
+            "mean_probability_true_source": 0.9914052394720224,
+            "mean_top1_top2_margin": 0.9829659631350995,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 1.946018440310775,
+            "mean_entropy": 0.038664107372979546,
+            "mean_max_probability": 0.9862778981526693,
+            "mean_nll": 4.690661124604856,
+            "mean_probability_true_source": 0.013560422385732332,
+            "mean_top1_top2_margin": 0.9727174757669369,
+            "n": 3
+          }
+        }
+      }
+    },
+    "ARM_B2": {
+      "20260814": {
+        "1": {
+          "correct": {
+            "mean_brier": 0.30280559926072587,
+            "mean_entropy": 0.38487703656249594,
+            "mean_max_probability": 0.6568697988986969,
+            "mean_nll": 0.5070922400891886,
+            "mean_probability_true_source": 0.6568697988986969,
+            "mean_top1_top2_margin": 0.4108882516644371,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.153251449949402,
+            "mean_entropy": 0.5292297933234569,
+            "mean_max_probability": 0.5428608195348219,
+            "mean_nll": 2.749852359867947,
+            "mean_probability_true_source": 0.16076803599505432,
+            "mean_top1_top2_margin": 0.2246042193675583,
+            "n": 11
+          }
+        },
+        "12": {
+          "correct": {
+            "mean_brier": 2.292102257825075e-06,
+            "mean_entropy": 0.004346545327299884,
+            "mean_max_probability": 0.9990690015256405,
+            "mean_nll": 0.0009317606123485078,
+            "mean_probability_true_source": 0.9990690015256405,
+            "mean_top1_top2_margin": 0.9984755256371045,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "2": {
+          "correct": {
+            "mean_brier": 0.2947833842686373,
+            "mean_entropy": 0.4215018036473284,
+            "mean_max_probability": 0.6454702189990452,
+            "mean_nll": 0.519677531038499,
+            "mean_probability_true_source": 0.6454702189990452,
+            "mean_top1_top2_margin": 0.40629483874155475,
+            "n": 7
+          },
+          "incorrect": {
+            "mean_brier": 1.1064176267491774,
+            "mean_entropy": 0.64383812102604,
+            "mean_max_probability": 0.43799011574851143,
+            "mean_nll": 2.3244474677154354,
+            "mean_probability_true_source": 0.12506240068210495,
+            "mean_top1_top2_margin": 0.063068644868003,
+            "n": 9
+          }
+        },
+        "25": {
+          "correct": {
+            "mean_brier": 2.9052983649388813e-06,
+            "mean_entropy": 0.004964237057478283,
+            "mean_max_probability": 0.9989289529621601,
+            "mean_nll": 0.0010720452098926876,
+            "mean_probability_true_source": 0.9989289529621601,
+            "mean_top1_top2_margin": 0.9982938267007739,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "3": {
+          "correct": {
+            "mean_brier": 0.12600620065257004,
+            "mean_entropy": 0.21522433648450123,
+            "mean_max_probability": 0.8289576880633831,
+            "mean_nll": 0.23582342146337973,
+            "mean_probability_true_source": 0.8289576880633831,
+            "mean_top1_top2_margin": 0.7005407748347352,
+            "n": 8
+          },
+          "incorrect": {
+            "mean_brier": 1.038960553778053,
+            "mean_entropy": 0.6370252777646487,
+            "mean_max_probability": 0.4343193881213665,
+            "mean_nll": 2.2073709351040582,
+            "mean_probability_true_source": 0.16093887947499752,
+            "mean_top1_top2_margin": 0.04505708068609238,
+            "n": 8
+          }
+        },
+        "4": {
+          "correct": {
+            "mean_brier": 0.06957325739840108,
+            "mean_entropy": 0.14241910123568202,
+            "mean_max_probability": 0.8992105584878188,
+            "mean_nll": 0.14665535700413423,
+            "mean_probability_true_source": 0.8992105584878188,
+            "mean_top1_top2_margin": 0.854547327725763,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 0.759284881325737,
+            "mean_entropy": 0.6328436366722161,
+            "mean_max_probability": 0.42201987902323407,
+            "mean_nll": 1.446812484531046,
+            "mean_probability_true_source": 0.3028128792842229,
+            "mean_top1_top2_margin": 0.0053311387697855634,
+            "n": 3
+          }
+        },
+        "6": {
+          "correct": {
+            "mean_brier": 7.080334622655775e-05,
+            "mean_entropy": 0.007146050476456971,
+            "mean_max_probability": 0.9978008453662579,
+            "mean_nll": 0.0022173765568593243,
+            "mean_probability_true_source": 0.9978008453662579,
+            "mean_top1_top2_margin": 0.9957433489163612,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 1.7721022820207057,
+            "mean_entropy": 0.21726356363057228,
+            "mean_max_probability": 0.9117667277654012,
+            "mean_nll": 3.5164223254350055,
+            "mean_probability_true_source": 0.03143603292604288,
+            "mean_top1_top2_margin": 0.876088147982955,
+            "n": 3
+          }
+        }
+      },
+      "20260815": {
+        "1": {
+          "correct": {
+            "mean_brier": 0.2873383307721477,
+            "mean_entropy": 0.33099141770483453,
+            "mean_max_probability": 0.6827398419380188,
+            "mean_nll": 0.45122714545896186,
+            "mean_probability_true_source": 0.6827398419380188,
+            "mean_top1_top2_margin": 0.41703670857496034,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.2395223440259229,
+            "mean_entropy": 0.4502911361744912,
+            "mean_max_probability": 0.5960866077379747,
+            "mean_nll": 3.3746517388447845,
+            "mean_probability_true_source": 0.14770784856359984,
+            "mean_top1_top2_margin": 0.2684661630932665,
+            "n": 11
+          }
+        },
+        "12": {
+          "correct": {
+            "mean_brier": 0.00013849287267792544,
+            "mean_entropy": 0.0164310512856375,
+            "mean_max_probability": 0.9950483068823814,
+            "mean_nll": 0.00499253553171498,
+            "mean_probability_true_source": 0.9950483068823814,
+            "mean_top1_top2_margin": 0.9914187272479467,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "2": {
+          "correct": {
+            "mean_brier": 0.2682197064938192,
+            "mean_entropy": 0.3605185109960014,
+            "mean_max_probability": 0.6811681645257133,
+            "mean_nll": 0.4445794809554762,
+            "mean_probability_true_source": 0.6811681645257133,
+            "mean_top1_top2_margin": 0.4186822570461248,
+            "n": 7
+          },
+          "incorrect": {
+            "mean_brier": 1.2411673373426462,
+            "mean_entropy": 0.5576865979202977,
+            "mean_max_probability": 0.5030326578352187,
+            "mean_nll": 2.8765242115571663,
+            "mean_probability_true_source": 0.09185096414552794,
+            "mean_top1_top2_margin": 0.1149156606859631,
+            "n": 9
+          }
+        },
+        "25": {
+          "correct": {
+            "mean_brier": 0.00017939334553479912,
+            "mean_entropy": 0.017895488606997856,
+            "mean_max_probability": 0.9944528043270111,
+            "mean_nll": 0.005601298748991975,
+            "mean_probability_true_source": 0.9944528043270111,
+            "mean_top1_top2_margin": 0.9902985285684736,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "3": {
+          "correct": {
+            "mean_brier": 0.13263474968892278,
+            "mean_entropy": 0.2046991633717313,
+            "mean_max_probability": 0.8260462917387486,
+            "mean_nll": 0.23441743736036663,
+            "mean_probability_true_source": 0.8260462917387486,
+            "mean_top1_top2_margin": 0.6801592146011899,
+            "n": 8
+          },
+          "incorrect": {
+            "mean_brier": 1.1356662385777003,
+            "mean_entropy": 0.5545858370543975,
+            "mean_max_probability": 0.48763660341501236,
+            "mean_nll": 2.6707903817106082,
+            "mean_probability_true_source": 0.14324821007903665,
+            "mean_top1_top2_margin": 0.07752061821520329,
+            "n": 8
+          }
+        },
+        "4": {
+          "correct": {
+            "mean_brier": 0.04374309358244071,
+            "mean_entropy": 0.10315362534018253,
+            "mean_max_probability": 0.928047018746535,
+            "mean_nll": 0.09347332276505073,
+            "mean_probability_true_source": 0.928047018746535,
+            "mean_top1_top2_margin": 0.8809723460193103,
+            "n": 12
+          },
+          "incorrect": {
+            "mean_brier": 0.7844332406188946,
+            "mean_entropy": 0.6044899691429197,
+            "mean_max_probability": 0.4135610833764076,
+            "mean_nll": 1.5403040586348584,
+            "mean_probability_true_source": 0.2976493192836642,
+            "mean_top1_top2_margin": 0.009684763848781586,
+            "n": 4
+          }
+        },
+        "6": {
+          "correct": {
+            "mean_brier": 5.438264614974524e-05,
+            "mean_entropy": 0.01149640833663939,
+            "mean_max_probability": 0.9967294977261469,
+            "mean_nll": 0.003285617845515315,
+            "mean_probability_true_source": 0.9967294977261469,
+            "mean_top1_top2_margin": 0.9939200980141043,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 1.869582131294781,
+            "mean_entropy": 0.14690082094880155,
+            "mean_max_probability": 0.9449796080589294,
+            "mean_nll": 4.574709541608726,
+            "mean_probability_true_source": 0.012852761273582777,
+            "mean_top1_top2_margin": 0.9211267847567797,
+            "n": 3
+          }
+        }
+      },
+      "31874": {
+        "1": {
+          "correct": {
+            "mean_brier": 0.2871034279451229,
+            "mean_entropy": 0.31561064287434004,
+            "mean_max_probability": 0.6866227328777313,
+            "mean_nll": 0.4431026163623394,
+            "mean_probability_true_source": 0.6866227328777313,
+            "mean_top1_top2_margin": 0.41648619545885596,
+            "n": 5
+          },
+          "incorrect": {
+            "mean_brier": 1.224614245745135,
+            "mean_entropy": 0.4494499808698095,
+            "mean_max_probability": 0.5941133336587385,
+            "mean_nll": 3.2842704964169274,
+            "mean_probability_true_source": 0.1514915816819253,
+            "mean_top1_top2_margin": 0.2576028620559638,
+            "n": 11
+          }
+        },
+        "12": {
+          "correct": {
+            "mean_brier": 3.7070380554808165e-06,
+            "mean_entropy": 0.0051134622731450205,
+            "mean_max_probability": 0.9988795220851898,
+            "mean_nll": 0.0011217746655863962,
+            "mean_probability_true_source": 0.9988795220851898,
+            "mean_top1_top2_margin": 0.9982263214374143,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "2": {
+          "correct": {
+            "mean_brier": 0.22678182790557386,
+            "mean_entropy": 0.29680208404811154,
+            "mean_max_probability": 0.7323195288578669,
+            "mean_nll": 0.37088098700024746,
+            "mean_probability_true_source": 0.7323195288578669,
+            "mean_top1_top2_margin": 0.5094397852080874,
+            "n": 6
+          },
+          "incorrect": {
+            "mean_brier": 1.1917011646106175,
+            "mean_entropy": 0.5315078691574002,
+            "mean_max_probability": 0.5100805938243866,
+            "mean_nll": 2.9229469279874194,
+            "mean_probability_true_source": 0.12381779998540879,
+            "mean_top1_top2_margin": 0.11038202345371247,
+            "n": 10
+          }
+        },
+        "25": {
+          "correct": {
+            "mean_brier": 1.24908572700984e-05,
+            "mean_entropy": 0.00665773476650289,
+            "mean_max_probability": 0.9984273500740528,
+            "mean_nll": 0.0015772309136395284,
+            "mean_probability_true_source": 0.9984273500740528,
+            "mean_top1_top2_margin": 0.9975460972432302,
+            "n": 16
+          },
+          "incorrect": {
+            "n": 0
+          }
+        },
+        "3": {
+          "correct": {
+            "mean_brier": 0.0999869269924905,
+            "mean_entropy": 0.1599830287284204,
+            "mean_max_probability": 0.8683349154889584,
+            "mean_nll": 0.17392432019010984,
+            "mean_probability_true_source": 0.8683349154889584,
+            "mean_top1_top2_margin": 0.7536405587998161,
+            "n": 8
+          },
+          "incorrect": {
+            "mean_brier": 1.1674736371930088,
+            "mean_entropy": 0.5336753055547523,
+            "mean_max_probability": 0.4965313784778118,
+            "mean_nll": 2.9441482429824823,
+            "mean_probability_true_source": 0.13172201119596139,
+            "mean_top1_top2_margin": 0.08756566047668457,
+            "n": 8
+          }
+        },
+        "4": {
+          "correct": {
+            "mean_brier": 0.10004811480675024,
+            "mean_entropy": 0.15761063787093973,
+            "mean_max_probability": 0.8743509714092527,
+            "mean_nll": 0.1876034957067811,
+            "mean_probability_true_source": 0.8743509714092527,
+            "mean_top1_top2_margin": 0.8046980527199464,
+            "n": 14
+          },
+          "incorrect": {
+            "mean_brier": 0.9878685320703334,
+            "mean_entropy": 0.5233601204584706,
+            "mean_max_probability": 0.49561938643455505,
+            "mean_nll": 2.4700083080587887,
+            "mean_probability_true_source": 0.22407303471118212,
+            "mean_top1_top2_margin": 0.0632232129573822,
+            "n": 2
+          }
+        },
+        "6": {
+          "correct": {
+            "mean_brier": 3.8404729177259365e-05,
+            "mean_entropy": 0.007388079517656757,
+            "mean_max_probability": 0.9979630296046917,
+            "mean_nll": 0.0020471734439199665,
+            "mean_probability_true_source": 0.9979630296046917,
+            "mean_top1_top2_margin": 0.9961476128239435,
+            "n": 13
+          },
+          "incorrect": {
+            "mean_brier": 1.7337875098219113,
+            "mean_entropy": 0.27546959698795187,
+            "mean_max_probability": 0.877991259098053,
+            "mean_nll": 3.8868326001224136,
+            "mean_probability_true_source": 0.021701314486563206,
+            "mean_top1_top2_margin": 0.8210177645087242,
+            "n": 3
+          }
+        }
+      }
+    }
+  },
+  "reliability_bins": {
+    "ARM_A": {
+      "20260814": [
+        {
+          "bin_hi": 0.5,
+          "bin_lo": 0.4,
+          "empirical_accuracy": 0.3333333333333333,
+          "mean_confidence": 0.4468429187933604,
+          "n": 3
+        },
+        {
+          "bin_hi": 0.6000000000000001,
+          "bin_lo": 0.5,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.5562577724456788,
+          "n": 5
+        },
+        {
+          "bin_hi": 0.7000000000000001,
+          "bin_lo": 0.6000000000000001,
+          "empirical_accuracy": 0.20833333333333334,
+          "mean_confidence": 0.6798913305004438,
+          "n": 24
+        },
+        {
+          "bin_hi": 0.8,
+          "bin_lo": 0.7000000000000001,
+          "empirical_accuracy": 0.4,
+          "mean_confidence": 0.730421245098114,
+          "n": 5
+        },
+        {
+          "bin_hi": 0.9,
+          "bin_lo": 0.8,
+          "empirical_accuracy": 0.6,
+          "mean_confidence": 0.8660705924034119,
+          "n": 5
+        },
+        {
+          "bin_hi": 1.0,
+          "bin_lo": 0.9,
+          "empirical_accuracy": 0.9428571428571428,
+          "mean_confidence": 0.9937250222478594,
+          "n": 70
+        }
+      ],
+      "20260815": [
+        {
+          "bin_hi": 0.5,
+          "bin_lo": 0.4,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.45129886269569397,
+          "n": 1
+        },
+        {
+          "bin_hi": 0.6000000000000001,
+          "bin_lo": 0.5,
+          "empirical_accuracy": 0.1111111111111111,
+          "mean_confidence": 0.5476899014578925,
+          "n": 9
+        },
+        {
+          "bin_hi": 0.7000000000000001,
+          "bin_lo": 0.6000000000000001,
+          "empirical_accuracy": 0.36666666666666664,
+          "mean_confidence": 0.6647361675898235,
+          "n": 30
+        },
+        {
+          "bin_hi": 0.8,
+          "bin_lo": 0.7000000000000001,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.7091020345687866,
+          "n": 2
+        },
+        {
+          "bin_hi": 1.0,
+          "bin_lo": 0.9,
+          "empirical_accuracy": 0.9428571428571428,
+          "mean_confidence": 0.9973295765263693,
+          "n": 70
+        }
+      ],
+      "31874": [
+        {
+          "bin_hi": 0.4,
+          "bin_lo": 0.30000000000000004,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.3777123987674713,
+          "n": 1
+        },
+        {
+          "bin_hi": 0.5,
+          "bin_lo": 0.4,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.46629249056180316,
+          "n": 3
+        },
+        {
+          "bin_hi": 0.6000000000000001,
+          "bin_lo": 0.5,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.5216421683629354,
+          "n": 6
+        },
+        {
+          "bin_hi": 0.7000000000000001,
+          "bin_lo": 0.6000000000000001,
+          "empirical_accuracy": 0.23076923076923078,
+          "mean_confidence": 0.6529809076052445,
+          "n": 26
+        },
+        {
+          "bin_hi": 0.8,
+          "bin_lo": 0.7000000000000001,
+          "empirical_accuracy": 1.0,
+          "mean_confidence": 0.7477618455886841,
+          "n": 3
+        },
+        {
+          "bin_hi": 0.9,
+          "bin_lo": 0.8,
+          "empirical_accuracy": 0.5,
+          "mean_confidence": 0.8514730334281921,
+          "n": 4
+        },
+        {
+          "bin_hi": 1.0,
+          "bin_lo": 0.9,
+          "empirical_accuracy": 0.9420289855072463,
+          "mean_confidence": 0.9955829813860465,
+          "n": 69
+        }
+      ]
+    },
+    "ARM_B2": {
+      "20260814": [
+        {
+          "bin_hi": 0.4,
+          "bin_lo": 0.30000000000000004,
+          "empirical_accuracy": 0.5,
+          "mean_confidence": 0.3788797010978063,
+          "n": 6
+        },
+        {
+          "bin_hi": 0.5,
+          "bin_lo": 0.4,
+          "empirical_accuracy": 0.20689655172413793,
+          "mean_confidence": 0.43355389196297217,
+          "n": 29
+        },
+        {
+          "bin_hi": 0.6000000000000001,
+          "bin_lo": 0.5,
+          "empirical_accuracy": 0.4,
+          "mean_confidence": 0.5226669788360596,
+          "n": 5
+        },
+        {
+          "bin_hi": 0.9,
+          "bin_lo": 0.8,
+          "empirical_accuracy": 0.75,
+          "mean_confidence": 0.8802811205387115,
+          "n": 4
+        },
+        {
+          "bin_hi": 1.0,
+          "bin_lo": 0.9,
+          "empirical_accuracy": 0.9411764705882353,
+          "mean_confidence": 0.9922340012648526,
+          "n": 68
+        }
+      ],
+      "20260815": [
+        {
+          "bin_hi": 0.30000000000000004,
+          "bin_lo": 0.2,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.270106703042984,
+          "n": 1
+        },
+        {
+          "bin_hi": 0.5,
+          "bin_lo": 0.4,
+          "empirical_accuracy": 0.25,
+          "mean_confidence": 0.4645884418860078,
+          "n": 32
+        },
+        {
+          "bin_hi": 0.6000000000000001,
+          "bin_lo": 0.5,
+          "empirical_accuracy": 1.0,
+          "mean_confidence": 0.5336072742938995,
+          "n": 2
+        },
+        {
+          "bin_hi": 0.7000000000000001,
+          "bin_lo": 0.6000000000000001,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.6418904781341552,
+          "n": 5
+        },
+        {
+          "bin_hi": 0.8,
+          "bin_lo": 0.7000000000000001,
+          "empirical_accuracy": 1.0,
+          "mean_confidence": 0.735794872045517,
+          "n": 2
+        },
+        {
+          "bin_hi": 1.0,
+          "bin_lo": 0.9,
+          "empirical_accuracy": 0.9285714285714286,
+          "mean_confidence": 0.990080589056015,
+          "n": 70
+        }
+      ],
+      "31874": [
+        {
+          "bin_hi": 0.30000000000000004,
+          "bin_lo": 0.2,
+          "empirical_accuracy": 1.0,
+          "mean_confidence": 0.29404473304748535,
+          "n": 1
+        },
+        {
+          "bin_hi": 0.5,
+          "bin_lo": 0.4,
+          "empirical_accuracy": 0.23333333333333334,
+          "mean_confidence": 0.4763381689786911,
+          "n": 30
+        },
+        {
+          "bin_hi": 0.6000000000000001,
+          "bin_lo": 0.5,
+          "empirical_accuracy": 0.75,
+          "mean_confidence": 0.5391016602516174,
+          "n": 4
+        },
+        {
+          "bin_hi": 0.7000000000000001,
+          "bin_lo": 0.6000000000000001,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.6553436517715454,
+          "n": 5
+        },
+        {
+          "bin_hi": 0.9,
+          "bin_lo": 0.8,
+          "empirical_accuracy": 0.0,
+          "mean_confidence": 0.872001032034556,
+          "n": 3
+        },
+        {
+          "bin_hi": 1.0,
+          "bin_lo": 0.9,
+          "empirical_accuracy": 0.9710144927536232,
+          "mean_confidence": 0.9934094418650088,
+          "n": 69
+        }
+      ]
+    }
+  }
+}
