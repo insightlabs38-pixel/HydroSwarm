@@ -375,6 +375,7 @@ class GraphODEDynamics(TemporalDynamicsBase):
         mlp_width: int,
         rtol: float = 1e-3,
         atol: float = 1e-4,
+        max_num_steps: int = 2000,
     ) -> None:
         super().__init__()
         _require(torchdiffeq, _TORCHDIFFEQ_IMPORT_ERROR, "torchdiffeq")
@@ -387,6 +388,17 @@ class GraphODEDynamics(TemporalDynamicsBase):
         self.quality_head = nn.Linear(d_model, d_model)
         self.rtol = rtol
         self.atol = atol
+        # M9.1 scientific protocol Section 7 (docs/evaluation/
+        # HYDROCORE_V5_M9_1_PROTOCOL.md): frozen engineering safety bound on
+        # worst-case dopri5 adaptive-solver step count during real training/
+        # evaluation -- the preflight's own smoke tests never ran enough
+        # steps to need this. Exceeding it raises inside torchdiffeq itself
+        # (the runner is responsible for catching that and recording
+        # SOLVER_STEP_LIMIT_EXCEEDED, per the protocol); this bound is never
+        # adjusted to change predictive output, only to correct a
+        # demonstrated non-convergence/pathological-runtime failure, and any
+        # such change must be logged as a dated protocol addendum first.
+        self.max_num_steps = max_num_steps
 
     def forward(
         self,
@@ -410,7 +422,8 @@ class GraphODEDynamics(TemporalDynamicsBase):
         eval_times = h0.new_tensor([0.0, 1.0])
         assert torchdiffeq is not None
         trajectory = torchdiffeq.odeint(
-            field_fn, h0, eval_times, method="dopri5", rtol=self.rtol, atol=self.atol
+            field_fn, h0, eval_times, method="dopri5", rtol=self.rtol, atol=self.atol,
+            options={"max_num_steps": self.max_num_steps},
         )
         h_final = trajectory[-1].masked_fill(~node_mask.unsqueeze(-1), 0.0)
         return self.temporal_head(h_final), self.quality_head(h_final)

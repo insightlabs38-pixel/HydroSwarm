@@ -10,18 +10,18 @@
       },
       "mini_overfit_sanity": {
         "optimizer_steps": 20,
-        "initial_loss": 0.6828044056892395,
-        "final_loss": 0.005647639278322458,
+        "initial_loss": 0.5953378677368164,
+        "final_loss": 0.006025739014148712,
         "all_finite": true
       },
       "latency": {
         "forward": {
-          "median_seconds": 0.016068234006525017,
-          "p90_seconds": 0.04558284400263801
+          "median_seconds": 0.022031200001947582,
+          "p90_seconds": 0.039806972999940626
         },
         "forward_backward": {
-          "median_seconds": 0.04231921800237615,
-          "p90_seconds": 0.06181063900294248
+          "median_seconds": 0.038780579998274334,
+          "p90_seconds": 0.07392129499930888
         }
       }
     },
@@ -41,14 +41,14 @@
       },
       "latency": {
         "forward": {
-          "median_seconds": 0.026918560994090512,
-          "p90_seconds": 0.04846773300960194
+          "median_seconds": 0.028247808004380204,
+          "p90_seconds": 0.07198154299112502
         },
         "forward_backward": {
-          "median_seconds": 0.0571483670064481,
-          "p90_seconds": 0.0709151990013197
+          "median_seconds": 0.06180880199826788,
+          "p90_seconds": 0.08083005300431978
         },
-        "ratio_to_current": 1.675265681540322,
+        "ratio_to_current": 1.282172918492096,
         "feasibility_classification": "PRACTICAL"
       }
     },
@@ -68,14 +68,14 @@
       },
       "latency": {
         "forward": {
-          "median_seconds": 0.12157331900380086,
-          "p90_seconds": 0.15065497798786964
+          "median_seconds": 0.11538599099731073,
+          "p90_seconds": 0.17561025499890093
         },
         "forward_backward": {
-          "median_seconds": 0.36761393399501685,
-          "p90_seconds": 0.3985073200019542
+          "median_seconds": 0.3660838049981976,
+          "p90_seconds": 0.43151019800279755
         },
-        "ratio_to_current": 7.566066000434905,
+        "ratio_to_current": 5.237390200584193,
         "feasibility_classification": "EXPENSIVE_BUT_TESTABLE"
       }
     },
@@ -95,29 +95,29 @@
       },
       "latency": {
         "forward": {
-          "median_seconds": 0.056853125992347486,
-          "p90_seconds": 0.11352032699505799
+          "median_seconds": 0.04557479098730255,
+          "p90_seconds": 0.08351086699985899
         },
         "forward_backward": {
-          "median_seconds": 0.10734807299741078,
-          "p90_seconds": 0.1779114929959178
+          "median_seconds": 0.08810969500336796,
+          "p90_seconds": 0.12207326899806503
         },
-        "ratio_to_current": 3.5382311440859318,
-        "feasibility_classification": "EXPENSIVE_BUT_TESTABLE"
+        "ratio_to_current": 2.06864768978874,
+        "feasibility_classification": "PRACTICAL"
       },
       "mc_stabilization": {
         "mc_1": {
-          "runtime_seconds": 0.023919324987218715,
+          "runtime_seconds": 0.06595283700153232,
           "mean_latent_summary": 0.28891175985336304,
           "variance_estimate": 0.0
         },
         "mc_4": {
-          "runtime_seconds": 0.13591422300669365,
+          "runtime_seconds": 0.12574626599962357,
           "mean_latent_summary": 0.28884029388427734,
           "variance_estimate": 0.0001333678956143558
         },
         "mc_8": {
-          "runtime_seconds": 0.21999002699158154,
+          "runtime_seconds": 0.37101304400130175,
           "mean_latent_summary": 0.2887909710407257,
           "variance_estimate": 0.00015318937948904932
         }
