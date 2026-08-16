@@ -1,4 +1,9 @@
 {
+  "confirmation": {
+    "_locked_test_opened_after": false,
+    "_locked_test_opened_before": false,
+    "_note": "no arm reached screening-stage PROMOTION_CANDIDATE; confirmation stage not run for any arm (Section 5, negative result)."
+  },
   "screening": {
     "GRAPH_CDE": {
       "outcome": "GUARDRAILS_FAILED",
