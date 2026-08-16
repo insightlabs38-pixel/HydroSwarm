@@ -1,0 +1,67 @@
+{
+  "M9_4_LEGACY_REPRODUCTION": "PASS",
+  "checks": {
+    "arm_a_coverage_within_tolerance": true,
+    "arm_b2_coverage_within_tolerance": true,
+    "per_seed_diffs_within_tolerance": true,
+    "pooled_gain_pp_within_tolerance": true
+  },
+  "eval_wall_seconds": 661.3672027587891,
+  "known_network_summary_reproduced": {
+    "ARM_A": {
+      "all_finite": true,
+      "early_top1": 0.375,
+      "hybrid_early_top1": 0.3958333333333333,
+      "hybrid_mature_top1": 1.0,
+      "mature_top1": 1.0,
+      "mid_top1": 0.84375,
+      "overall_mrr": 0.8373842592592592
+    },
+    "ARM_B2": {
+      "all_finite": true,
+      "early_top1": 0.40972222222222227,
+      "hybrid_early_top1": 0.40972222222222227,
+      "hybrid_mature_top1": 1.0,
+      "mature_top1": 1.0,
+      "mid_top1": 0.8125,
+      "overall_mrr": 0.830054012345679
+    }
+  },
+  "legacy_recorded": {
+    "arm_a_known_family_marginal_coverage": [
+      0.9554,
+      0.9554,
+      0.9464
+    ],
+    "arm_b2_known_family_marginal_coverage": [
+      0.8482,
+      0.8452,
+      0.8214
+    ],
+    "per_seed_pooled_mature_diff": [
+      0.0417,
+      0.0729,
+      0.0833
+    ],
+    "pooled_unseen_mature_neural_top1_gain_pp": 6.6
+  },
+  "reproduced": {
+    "arm_a_known_family_marginal_coverage": [
+      0.9553571428571429,
+      0.9553571428571429,
+      0.9464285714285714
+    ],
+    "arm_b2_known_family_marginal_coverage": [
+      0.8482142857142857,
+      0.8452380952380952,
+      0.8214285714285714
+    ],
+    "per_seed_pooled_mature_diff": [
+      0.04166666666666663,
+      0.07291666666666674,
+      0.08333333333333337
+    ],
+    "pooled_unseen_mature_neural_top1_gain_pp": 6.597222222222221
+  },
+  "reproduction_method": "Re-executed run_m9_0a_evaluate.main()/run_m9_0a_decide.main() UNMODIFIED (output-path globals monkeypatched to a scratch directory; historical reports/evaluation/hydrocore-v5/m9-0a-* artifacts were never written to)."
+}

@@ -1,0 +1,250 @@
+{
+  "families": {
+    "branched-loop": {
+      "complete_source_junction_set": [
+        "JA",
+        "JB",
+        "JC",
+        "JD",
+        "JE",
+        "JF",
+        "JG"
+      ],
+      "expected_incidents_per_role": 28,
+      "legacy_included_source_set": [
+        "JA",
+        "JB",
+        "JC",
+        "JD"
+      ],
+      "n_sources": 7,
+      "newly_included_source_set": [
+        "JE",
+        "JF",
+        "JG"
+      ],
+      "roles": {
+        "calibration_m9_4": {
+          "n_incidents": 28,
+          "seed_base": 990200000,
+          "seed_range": [
+            990200000,
+            990206003
+          ]
+        },
+        "development_m9_4": {
+          "n_incidents": 28,
+          "seed_base": 990300000,
+          "seed_range": [
+            990300000,
+            990306003
+          ]
+        }
+      },
+      "trained_or_unseen_development": "TRAINED_FAMILY"
+    },
+    "coastal-branch": {
+      "complete_source_junction_set": [
+        "CB1",
+        "CB2",
+        "CB3",
+        "CB4",
+        "CB5",
+        "CB6"
+      ],
+      "expected_incidents_per_role": 24,
+      "legacy_included_source_set": [
+        "CB1",
+        "CB2",
+        "CB3",
+        "CB4"
+      ],
+      "n_sources": 6,
+      "newly_included_source_set": [
+        "CB5",
+        "CB6"
+      ],
+      "roles": {
+        "calibration_m9_4": {
+          "n_incidents": 24,
+          "seed_base": 990600000,
+          "seed_range": [
+            990600000,
+            990605003
+          ]
+        },
+        "development_m9_4": {
+          "n_incidents": 24,
+          "seed_base": 990700000,
+          "seed_range": [
+            990700000,
+            990705003
+          ]
+        }
+      },
+      "trained_or_unseen_development": "UNSEEN_DEVELOPMENT_FAMILY"
+    },
+    "dense-loop": {
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6"
+      ],
+      "expected_incidents_per_role": 24,
+      "legacy_included_source_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "n_sources": 6,
+      "newly_included_source_set": [
+        "J5",
+        "J6"
+      ],
+      "roles": {
+        "calibration_m9_4": {
+          "n_incidents": 24,
+          "seed_base": 991000000,
+          "seed_range": [
+            991000000,
+            991005003
+          ]
+        },
+        "development_m9_4": {
+          "n_incidents": 24,
+          "seed_base": 991100000,
+          "seed_range": [
+            991100000,
+            991105003
+          ]
+        }
+      },
+      "trained_or_unseen_development": "UNSEEN_DEVELOPMENT_FAMILY"
+    },
+    "golden-reference": {
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "expected_incidents_per_role": 16,
+      "legacy_included_source_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "n_sources": 4,
+      "newly_included_source_set": [],
+      "roles": {
+        "calibration_m9_4": {
+          "n_incidents": 16,
+          "seed_base": 990000000,
+          "seed_range": [
+            990000000,
+            990003003
+          ]
+        },
+        "development_m9_4": {
+          "n_incidents": 16,
+          "seed_base": 990100000,
+          "seed_range": [
+            990100000,
+            990103003
+          ]
+        }
+      },
+      "trained_or_unseen_development": "TRAINED_FAMILY"
+    },
+    "loop-grid": {
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8"
+      ],
+      "expected_incidents_per_role": 32,
+      "legacy_included_source_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "n_sources": 8,
+      "newly_included_source_set": [
+        "J5",
+        "J6",
+        "J7",
+        "J8"
+      ],
+      "roles": {
+        "calibration_m9_4": {
+          "n_incidents": 32,
+          "seed_base": 990400000,
+          "seed_range": [
+            990400000,
+            990407003
+          ]
+        },
+        "development_m9_4": {
+          "n_incidents": 32,
+          "seed_base": 990500000,
+          "seed_range": [
+            990500000,
+            990507003
+          ]
+        }
+      },
+      "trained_or_unseen_development": "TRAINED_FAMILY"
+    },
+    "tree-branch": {
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5"
+      ],
+      "expected_incidents_per_role": 20,
+      "legacy_included_source_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "n_sources": 5,
+      "newly_included_source_set": [
+        "J5"
+      ],
+      "roles": {
+        "calibration_m9_4": {
+          "n_incidents": 20,
+          "seed_base": 990800000,
+          "seed_range": [
+            990800000,
+            990804003
+          ]
+        },
+        "development_m9_4": {
+          "n_incidents": 20,
+          "seed_base": 990900000,
+          "seed_range": [
+            990900000,
+            990904003
+          ]
+        }
+      },
+      "trained_or_unseen_development": "UNSEEN_DEVELOPMENT_FAMILY"
+    }
+  },
+  "repeats_per_source": 4
+}

@@ -1,0 +1,434 @@
+{
+  "checks": {
+    "all_families_pass": true
+  },
+  "families": {
+    "branched-loop": {
+      "calibration_m9_4": {
+        "n": 28,
+        "n_distinct_sources": 7,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 76.07142857142857,
+          "contamination_start_minute": 130.71428571428572,
+          "demand_regime": 1.05,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.1964285714285714,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "JA": 4,
+          "JB": 4,
+          "JC": 4,
+          "JD": 4,
+          "JE": 4,
+          "JF": 4,
+          "JG": 4
+        }
+      },
+      "checks": {
+        "all_sources_in_calibration": true,
+        "all_sources_in_development": true,
+        "equal_repeats_per_source_calibration": true,
+        "equal_repeats_per_source_development": true,
+        "no_first_n_truncation": true,
+        "no_scenario_id_overlap": true,
+        "no_zero_support_source": true,
+        "seed_disjoint_calibration_vs_development": true
+      },
+      "development_m9_4": {
+        "n": 28,
+        "n_distinct_sources": 7,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 69.64285714285714,
+          "contamination_start_minute": 120.0,
+          "demand_regime": 0.9928571428571429,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.3392857142857142,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "JA": 4,
+          "JB": 4,
+          "JC": 4,
+          "JD": 4,
+          "JE": 4,
+          "JF": 4,
+          "JG": 4
+        }
+      },
+      "family_pass": true
+    },
+    "coastal-branch": {
+      "calibration_m9_4": {
+        "n": 24,
+        "n_distinct_sources": 6,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 66.25,
+          "contamination_start_minute": 92.5,
+          "demand_regime": 1.0250000000000001,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.1458333333333333,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05000000000000001,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05000000000000001,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.10000000000000002,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "CB1": 4,
+          "CB2": 4,
+          "CB3": 4,
+          "CB4": 4,
+          "CB5": 4,
+          "CB6": 4
+        }
+      },
+      "checks": {
+        "all_sources_in_calibration": true,
+        "all_sources_in_development": true,
+        "equal_repeats_per_source_calibration": true,
+        "equal_repeats_per_source_development": true,
+        "no_first_n_truncation": true,
+        "no_scenario_id_overlap": true,
+        "no_zero_support_source": true,
+        "seed_disjoint_calibration_vs_development": true
+      },
+      "development_m9_4": {
+        "n": 24,
+        "n_distinct_sources": 6,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 83.75,
+          "contamination_start_minute": 130.0,
+          "demand_regime": 1.0250000000000001,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.125,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05000000000000001,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05000000000000001,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.10000000000000002,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "CB1": 4,
+          "CB2": 4,
+          "CB3": 4,
+          "CB4": 4,
+          "CB5": 4,
+          "CB6": 4
+        }
+      },
+      "family_pass": true
+    },
+    "dense-loop": {
+      "calibration_m9_4": {
+        "n": 24,
+        "n_distinct_sources": 6,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 67.5,
+          "contamination_start_minute": 77.5,
+          "demand_regime": 1.0083333333333333,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.0208333333333333,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05000000000000001,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05000000000000001,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.10000000000000002,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4,
+          "J5": 4,
+          "J6": 4
+        }
+      },
+      "checks": {
+        "all_sources_in_calibration": true,
+        "all_sources_in_development": true,
+        "equal_repeats_per_source_calibration": true,
+        "equal_repeats_per_source_development": true,
+        "no_first_n_truncation": true,
+        "no_scenario_id_overlap": true,
+        "no_zero_support_source": true,
+        "seed_disjoint_calibration_vs_development": true
+      },
+      "development_m9_4": {
+        "n": 24,
+        "n_distinct_sources": 6,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 80.0,
+          "contamination_start_minute": 97.5,
+          "demand_regime": 0.9916666666666667,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.1041666666666667,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05000000000000001,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05000000000000001,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.10000000000000002,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4,
+          "J5": 4,
+          "J6": 4
+        }
+      },
+      "family_pass": true
+    },
+    "golden-reference": {
+      "calibration_m9_4": {
+        "n": 16,
+        "n_distinct_sources": 4,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 75.0,
+          "contamination_start_minute": 97.5,
+          "demand_regime": 1.0,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.15625,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4
+        }
+      },
+      "checks": {
+        "all_sources_in_calibration": true,
+        "all_sources_in_development": true,
+        "equal_repeats_per_source_calibration": true,
+        "equal_repeats_per_source_development": true,
+        "no_first_n_truncation": true,
+        "no_scenario_id_overlap": true,
+        "no_zero_support_source": true,
+        "seed_disjoint_calibration_vs_development": true
+      },
+      "development_m9_4": {
+        "n": 16,
+        "n_distinct_sources": 4,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 61.875,
+          "contamination_start_minute": 82.5,
+          "demand_regime": 0.9125,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.625,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4
+        }
+      },
+      "family_pass": true
+    },
+    "loop-grid": {
+      "calibration_m9_4": {
+        "n": 32,
+        "n_distinct_sources": 8,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 73.125,
+          "contamination_start_minute": 114.375,
+          "demand_regime": 1.0,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.25,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4,
+          "J5": 4,
+          "J6": 4,
+          "J7": 4,
+          "J8": 4
+        }
+      },
+      "checks": {
+        "all_sources_in_calibration": true,
+        "all_sources_in_development": true,
+        "equal_repeats_per_source_calibration": true,
+        "equal_repeats_per_source_development": true,
+        "no_first_n_truncation": true,
+        "no_scenario_id_overlap": true,
+        "no_zero_support_source": true,
+        "seed_disjoint_calibration_vs_development": true
+      },
+      "development_m9_4": {
+        "n": 32,
+        "n_distinct_sources": 8,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 65.625,
+          "contamination_start_minute": 146.25,
+          "demand_regime": 1.03125,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.25,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4,
+          "J5": 4,
+          "J6": 4,
+          "J7": 4,
+          "J8": 4
+        }
+      },
+      "family_pass": true
+    },
+    "tree-branch": {
+      "calibration_m9_4": {
+        "n": 20,
+        "n_distinct_sources": 5,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 78.0,
+          "contamination_start_minute": 108.0,
+          "demand_regime": 1.02,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 1.25,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4,
+          "J5": 4
+        }
+      },
+      "checks": {
+        "all_sources_in_calibration": true,
+        "all_sources_in_development": true,
+        "equal_repeats_per_source_calibration": true,
+        "equal_repeats_per_source_development": true,
+        "no_first_n_truncation": true,
+        "no_scenario_id_overlap": true,
+        "no_zero_support_source": true,
+        "seed_disjoint_calibration_vs_development": true
+      },
+      "development_m9_4": {
+        "n": 20,
+        "n_distinct_sources": 5,
+        "numeric_means": {
+          "communication_outage_probability_config": 0.02,
+          "contamination_duration_minutes": 81.0,
+          "contamination_start_minute": 81.0,
+          "demand_regime": 1.03,
+          "drift_per_hour_config": 0.001,
+          "event_severity": 0.925,
+          "frozen_probability_config": 0.02,
+          "hydraulic_timestep_seconds": 3600.0,
+          "missing_probability_config": 0.05,
+          "pattern_timestep_seconds": 3600.0,
+          "pipe_outage_probability_config": 0.0,
+          "roughness_variation_fraction_config": 0.05,
+          "sensor_count": 4.0,
+          "tank_level_variation_fraction_config": 0.1,
+          "unit_mismatch_probability_config": 0.01
+        },
+        "source_node_counts": {
+          "J1": 4,
+          "J2": 4,
+          "J3": 4,
+          "J4": 4,
+          "J5": 4
+        }
+      },
+      "family_pass": true
+    }
+  },
+  "representativeness_audit_passed": true
+}

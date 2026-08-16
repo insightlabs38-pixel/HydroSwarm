@@ -1,0 +1,356 @@
+{
+  "M9_4_DECISION": "B",
+  "M9_4_DECISION_NAME": "INTERLEAVED_PREDICTIVE_GAIN_CONFIRMED_CALIBRATION_FAILS",
+  "calibration_gate": {
+    "alpha": 0.1,
+    "coverage_floor": 0.85,
+    "passed": false,
+    "per_family_seed_results": {
+      "ARM_A|golden-reference|20260814": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.6666666666666666,
+            "mean_set_size": 2.125
+          },
+          "MATURE": {
+            "coverage": 0.53125,
+            "mean_set_size": 0.53125
+          },
+          "MID": {
+            "coverage": 0.5625,
+            "mean_set_size": 0.5625
+          }
+        },
+        "marginal_coverage": 0.5982142857142857,
+        "mean_candidate_set_size": 1.2232142857142858,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.4642857142857143
+      },
+      "ARM_A|golden-reference|20260815": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.7083333333333334,
+            "mean_set_size": 2.1666666666666665
+          },
+          "MATURE": {
+            "coverage": 0.53125,
+            "mean_set_size": 0.53125
+          },
+          "MID": {
+            "coverage": 0.78125,
+            "mean_set_size": 0.78125
+          }
+        },
+        "marginal_coverage": 0.6785714285714286,
+        "mean_candidate_set_size": 1.3035714285714286,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.5535714285714286
+      },
+      "ARM_A|golden-reference|31874": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.6666666666666666,
+            "mean_set_size": 2.2708333333333335
+          },
+          "MATURE": {
+            "coverage": 0.59375,
+            "mean_set_size": 0.59375
+          },
+          "MID": {
+            "coverage": 0.71875,
+            "mean_set_size": 0.71875
+          }
+        },
+        "marginal_coverage": 0.6607142857142857,
+        "mean_candidate_set_size": 1.3482142857142858,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.5267857142857143
+      },
+      "ARM_B2|branched-loop|20260814": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.6904761904761905,
+            "mean_set_size": 4.25
+          },
+          "MATURE": {
+            "coverage": 0.9285714285714286,
+            "mean_set_size": 3.9642857142857144
+          },
+          "MID": {
+            "coverage": 0.9464285714285714,
+            "mean_set_size": 4.0
+          }
+        },
+        "marginal_coverage": 0.8316326530612245,
+        "mean_candidate_set_size": 4.096938775510204,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.24489795918367346
+      },
+      "ARM_B2|branched-loop|20260815": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.7738095238095238,
+            "mean_set_size": 4.5
+          },
+          "MATURE": {
+            "coverage": 0.8928571428571429,
+            "mean_set_size": 3.7142857142857144
+          },
+          "MID": {
+            "coverage": 0.875,
+            "mean_set_size": 3.75
+          }
+        },
+        "marginal_coverage": 0.8367346938775511,
+        "mean_candidate_set_size": 4.061224489795919,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.24489795918367346
+      },
+      "ARM_B2|branched-loop|31874": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.7023809523809523,
+            "mean_set_size": 4.7023809523809526
+          },
+          "MATURE": {
+            "coverage": 0.8928571428571429,
+            "mean_set_size": 3.642857142857143
+          },
+          "MID": {
+            "coverage": 0.875,
+            "mean_set_size": 3.6785714285714284
+          }
+        },
+        "marginal_coverage": 0.8061224489795918,
+        "mean_candidate_set_size": 4.107142857142857,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.27040816326530615
+      },
+      "ARM_B2|golden-reference|20260814": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.75,
+            "mean_set_size": 1.875
+          },
+          "MATURE": {
+            "coverage": 0.9375,
+            "mean_set_size": 0.9375
+          },
+          "MID": {
+            "coverage": 0.78125,
+            "mean_set_size": 0.78125
+          }
+        },
+        "marginal_coverage": 0.8125,
+        "mean_candidate_set_size": 1.2946428571428572,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.6964285714285714
+      },
+      "ARM_B2|golden-reference|20260815": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.7708333333333334,
+            "mean_set_size": 2.3958333333333335
+          },
+          "MATURE": {
+            "coverage": 0.9375,
+            "mean_set_size": 0.9375
+          },
+          "MID": {
+            "coverage": 0.78125,
+            "mean_set_size": 0.78125
+          }
+        },
+        "marginal_coverage": 0.8214285714285714,
+        "mean_candidate_set_size": 1.5178571428571428,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.6339285714285714
+      },
+      "ARM_B2|golden-reference|31874": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.75,
+            "mean_set_size": 2.0416666666666665
+          },
+          "MATURE": {
+            "coverage": 0.9375,
+            "mean_set_size": 0.9375
+          },
+          "MID": {
+            "coverage": 0.78125,
+            "mean_set_size": 0.78125
+          }
+        },
+        "marginal_coverage": 0.8125,
+        "mean_candidate_set_size": 1.3660714285714286,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.6875
+      },
+      "ARM_B2|loop-grid|20260814": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.8333333333333334,
+            "mean_set_size": 6.072916666666667
+          },
+          "MATURE": {
+            "coverage": 1.0,
+            "mean_set_size": 5.71875
+          },
+          "MID": {
+            "coverage": 0.984375,
+            "mean_set_size": 5.84375
+          }
+        },
+        "marginal_coverage": 0.9241071428571429,
+        "mean_candidate_set_size": 5.90625,
+        "passes_operational_floor_0_85": true,
+        "singleton_rate": 0.12053571428571429
+      },
+      "ARM_B2|loop-grid|20260815": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.84375,
+            "mean_set_size": 6.291666666666667
+          },
+          "MATURE": {
+            "coverage": 0.84375,
+            "mean_set_size": 3.875
+          },
+          "MID": {
+            "coverage": 0.828125,
+            "mean_set_size": 4.5
+          }
+        },
+        "marginal_coverage": 0.8392857142857143,
+        "mean_candidate_set_size": 5.089285714285714,
+        "passes_operational_floor_0_85": false,
+        "singleton_rate": 0.15178571428571427
+      },
+      "ARM_B2|loop-grid|31874": {
+        "by_maturity": {
+          "EARLY": {
+            "coverage": 0.875,
+            "mean_set_size": 6.395833333333333
+          },
+          "MATURE": {
+            "coverage": 0.90625,
+            "mean_set_size": 5.53125
+          },
+          "MID": {
+            "coverage": 0.921875,
+            "mean_set_size": 5.65625
+          }
+        },
+        "marginal_coverage": 0.8973214285714286,
+        "mean_candidate_set_size": 5.9375,
+        "passes_operational_floor_0_85": true,
+        "singleton_rate": 0.13392857142857142
+      }
+    }
+  },
+  "end_commit": "009be2ea822417458596bfe643308a69992aa060",
+  "evidence_against": "Known-family (trained-family) guardrail pass=True; calibration gate pass=False.",
+  "kind": "SOURCE_REPRESENTATIVE_FROZEN_CHECKPOINT_REEVALUATION",
+  "known_family_guardrails_passed": true,
+  "legacy_reproduction_passed": true,
+  "limitations": [
+    "EXPLORATORY, leading hypothesis for the calibration-gate failure: calibration_m9_4's effective sample size is the number of INDEPENDENT physical incidents (n_sources x REPEATS_PER_SOURCE=4), not the depth-multiplied example count -- CAUSAL_PREFIX_DEPTHS examples drawn from the SAME physical incident are correlated (an inherently 'easy' or 'hard' incident tends to score similarly at every depth), so golden-reference's calibration pool (16 incidents) has a much smaller effective n than M9.0a's legacy ARM_A calibration construction (`build_scenario_pool`, ~150 independent scenarios). A diagnostic resubstitution check confirms this is plausible: the ARM_A/seed20260814/golden-reference calibrator's coverage on ITS OWN calibration set is 0.9375 (near nominal, as expected), but drops to 0.68 on a held-out development_m9_4 set generated by the IDENTICAL policy through the IDENTICAL scoring pathway -- ruling out a two-pathway implementation artifact and pointing to small-n quantile-estimation variance instead. Coverage also degrades monotonically with pool size across trained families (golden-reference n=16 worst, branched-loop n=28 better, loop-grid n=32 best/only family with any seeds passing), consistent with this explanation. Per governing Section 5/16/19 rules, calibration_m9_4's pool size was predeclared before any results were seen and is NOT enlarged post-hoc here to fix this failure (that would be exactly the forbidden 'tune calibration against development' move) -- if this hypothesis is judged correct, enlarging calibration_m9_4's repeat count under a NEW, separately predeclared M9.5 protocol is the appropriate next step, not a same-milestone patch.",
+    "ARM_A was never evaluated on branched-loop/loop-grid (never trained there), matching M9.0a's own scope -- known-family guardrails compare CURRENT vs INTERLEAVED only on golden-reference; branched-loop/loop-grid are reported as ARM_B2-only retention figures.",
+    "Section 21's LEGACY_SUBSET/FULL_SOURCE/EXCLUDED_ONLY decomposition uses M9.4's own full-source development population filtered by legacy-source-set membership, not the literal old M9.0a generator output -- see m9-4-legacy-vs-full-source.json's _note and m9-4-legacy-reproduction.json for the separate literal-old-numbers bridge.",
+    "seed20260814's ARM_B2 checkpoint has 1200 optimizer steps vs 1350 for the other two seeds and vs ARM_A's 1350 (known M9.0a optimizer-step-parity gap, Section 22) -- preserved, not fixed, here.",
+    "Full repository test suite was not necessarily run to completion; see reported test commands/counts."
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M9.4",
+  "no_predictor_modified": true,
+  "no_training_performed": true,
+  "optimizer_parity_confirmation_required": false,
+  "predictive_generalization_gate": {
+    "bootstrap_ci90": [
+      0.028240740740740743,
+      0.10002314814814814
+    ],
+    "macro_mature_delta": 0.06342592592592593,
+    "max_family_regression_pp": 1.6666666666666667,
+    "passed": true,
+    "unseen_families_improved": [
+      "coastal-branch",
+      "tree-branch",
+      "dense-loop"
+    ]
+  },
+  "provisional_best_hydrocore_s_recipe": null,
+  "recommendation_reason": "Predictive generalization gate and known-family guardrails passed, but the B_DEPTH_AWARE/CURRENT_FAMILY_DEPTH calibration gate (marginal coverage >= 0.85 for every required trained-family/seed) still fails on the source-representative calibration/development population.",
+  "representativeness_audit_passed": true,
+  "source_coverage": {
+    "branched-loop": {
+      "n_sources": 7,
+      "sources": [
+        "JA",
+        "JB",
+        "JC",
+        "JD",
+        "JE",
+        "JF",
+        "JG"
+      ]
+    },
+    "coastal-branch": {
+      "n_sources": 6,
+      "sources": [
+        "CB1",
+        "CB2",
+        "CB3",
+        "CB4",
+        "CB5",
+        "CB6"
+      ]
+    },
+    "dense-loop": {
+      "n_sources": 6,
+      "sources": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6"
+      ]
+    },
+    "golden-reference": {
+      "n_sources": 4,
+      "sources": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ]
+    },
+    "loop-grid": {
+      "n_sources": 8,
+      "sources": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8"
+      ]
+    },
+    "tree-branch": {
+      "n_sources": 5,
+      "sources": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5"
+      ]
+    }
+  },
+  "start_commit": "009be2ea822417458596bfe643308a69992aa060",
+  "strongest_evidence": "Macro-family (equal-weight) MATURE neural Top-1 delta on the 3 UNSEEN_DEVELOPMENT families, full source population: 0.06342592592592593, 90% paired-bootstrap CI [0.028240740740740743, 0.10002314814814814]."
+}
