@@ -1,0 +1,258 @@
+{
+  "actual_optimizer_steps_per_epoch": [
+    15,
+    30,
+    45,
+    60,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75
+  ],
+  "actual_total_optimizer_steps": 1350,
+  "arm": "ARM_M_M9_8",
+  "best_epoch": 11,
+  "best_validation_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-8/ARM_M-seed20260815/20260817T022300Z-ee312867/model-export.safetensors",
+  "best_validation_export_sha256": "adee46e803a4d183e3c4534e18050099140319b03f34b174ba008b2286dbce75",
+  "best_validation_global_steps": 750,
+  "best_validation_note": "diagnostic-only, per M9.7A -- MUST NOT be used for any M9.8 promotion decision",
+  "canonical_checkpoint_policy": "FINAL_STEP_1350",
+  "canonical_epoch": 19,
+  "canonical_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-8/ARM_M-seed20260815/model-export-final-step.safetensors",
+  "canonical_export_sha256": "a834d926d10ff129d0f9d133e9d357ccc77711999866ca744ed73845ad2e4eab",
+  "canonical_global_step": 1350,
+  "combined_manifest_hash": "b65df104963b4f03288b75be65e0f15f7e7530be8df57627c8e57c491261398a",
+  "epochs_completed": 20,
+  "family_exposure_counts": {
+    "branched-loop": 3600,
+    "golden-reference": 3600,
+    "loop-grid": 3600
+  },
+  "family_weighting": {
+    "branched-loop": 0.3333333333333333,
+    "golden-reference": 0.3333333333333333,
+    "loop-grid": 0.3333333333333333
+  },
+  "feature_kwargs": {
+    "include_relative_gap_feature": false,
+    "unobserved_age_sentinel": "fixed"
+  },
+  "final_checkpoint": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-8/ARM_M-seed20260815/20260817T022300Z-ee312867/checkpoints/checkpoint-0020",
+  "locked_test_opened_after": false,
+  "manifest_hashes_match_m9_6_arm_b_reference": true,
+  "matches_required_per_epoch_optimizer_steps": true,
+  "matches_required_total_optimizer_steps": true,
+  "microbatches_per_optimizer_update": 4,
+  "milestone": "M9.8",
+  "model_architecture": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "param_count": 13919572,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned",
+    "use_adapters": false,
+    "variant": "small_v5_capacity_m"
+  },
+  "per_epoch_family_microbatches": [
+    {
+      "branched-loop": 20,
+      "golden-reference": 20,
+      "loop-grid": 20
+    },
+    {
+      "branched-loop": 40,
+      "golden-reference": 40,
+      "loop-grid": 40
+    },
+    {
+      "branched-loop": 60,
+      "golden-reference": 60,
+      "loop-grid": 60
+    },
+    {
+      "branched-loop": 80,
+      "golden-reference": 80,
+      "loop-grid": 80
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    },
+    {
+      "branched-loop": 100,
+      "golden-reference": 100,
+      "loop-grid": 100
+    }
+  ],
+  "purpose": "Milestone 9.8: ARM_M (HydroCore-M) training run under the exact frozen M9.6 ARM_B interleaved recipe, capacity-only difference from ARM_S.",
+  "scheduler_total_steps_required": 1500,
+  "schema_version": 1,
+  "seed": 20260815,
+  "signature_library_manifest_hash_per_family": {
+    "branched-loop": "5b8d076f5e44ef501b88e50b7b3d08cab4e5c3816549e0f25d0895ceb69a89f3",
+    "golden-reference": "ebbaa9ec710d8976196a3024ecf407ab564859f49ea91dac7f841af5e416ed25",
+    "loop-grid": "5e2ac4046374e39e352b2d3910aebda324777de50b9af7f607928b2a81d4e17e"
+  },
+  "stop_reason": "maximum_epochs",
+  "stopped_early": false,
+  "total_optimizer_steps_required": 1350,
+  "total_train_scenario_count": 600,
+  "train_manifest_hash_per_family": {
+    "branched-loop": "bf831d7fcec8df52be36018158e366d03ef0276901390b8b2655d94d5451e054",
+    "golden-reference": "1848aad5f9eee075aabc6617668656755a032da10bd1fe773acab11161fceeaa",
+    "loop-grid": "3e914ccdbda6d73ca3168145bbfa22bb634e3928af3bc03d844761a523064abd"
+  },
+  "train_scenario_count_per_family": 200,
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "training_config": {
+    "batch_size": 2,
+    "checkpoint_every_epochs": 1,
+    "deterministic": true,
+    "device": "cpu",
+    "early_stopping_patience": 0,
+    "epochs": 20,
+    "fp32": true,
+    "gradient_accumulation_steps": 4,
+    "gradient_clip_norm": 1.0,
+    "gradient_conflict_logging": true,
+    "gradnorm_log_every_n_batches": 5,
+    "gradnorm_logging": true,
+    "learning_rate": 0.0003,
+    "maximum_runtime_seconds": 28800,
+    "minimum_delta": 0.0,
+    "minimum_free_disk_gb": 1.0,
+    "num_workers": 0,
+    "pcgrad_enabled": false,
+    "profile_ordinal_weight": 0.0,
+    "scheduler": "cosine",
+    "seed": 20260815,
+    "task_weights": {
+      "action_template": 1.0,
+      "candidate_reduction": 0.5,
+      "containment_time_proxy": 0.3,
+      "duration": 0.5,
+      "event_cause": 1.0,
+      "event_presence": 1.0,
+      "evidence_sufficiency": 1.0,
+      "exposure_proxy": 0.3,
+      "future_concentration": 0.0,
+      "information_gain": 0.5,
+      "next_step": 1.0,
+      "ood_class": 1.0,
+      "plan_regret_proxy": 0.3,
+      "plan_validity": 1.0,
+      "plan_value": 0.5,
+      "pressure_risk_proxy": 0.3,
+      "relative_strength": 0.5,
+      "sample_node": 1.0,
+      "sensor_fault": 1.0,
+      "sensor_reconstruction": 0.25,
+      "service_loss_proxy": 0.3,
+      "should_continue_sampling": 0.5,
+      "source_node": 1.0,
+      "source_region": 0.5,
+      "start_time": 0.5,
+      "target_pointer": 1.0,
+      "travel_time": 0.1
+    },
+    "warmup_steps": 10,
+    "weight_decay": 0.01
+  },
+  "training_config_source": "configs/training-v5-causal.yaml",
+  "validation_manifest_hash_per_family": {
+    "branched-loop": "c43c1071cb77989924e7fe815465ad5b33b7c331c507be4473559cffc721c44a",
+    "golden-reference": "30b286e41155ff3aff8ae7012c16a3b796ab81aba4116e652f1a6cfd2d5bb633",
+    "loop-grid": "a406f348f64dfaddd0658bd3ca86cd37064bc07df1de2938bedc2ce846169cad"
+  },
+  "wall_seconds": 6696.294080340012
+}
