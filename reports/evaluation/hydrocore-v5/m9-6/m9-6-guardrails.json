@@ -1,0 +1,224 @@
+{
+  "alpha_unchanged": true,
+  "candidate_set_analysis": {
+    "pathological_cells": [],
+    "pathological_full_set_behavior_detected": false,
+    "per_arm_seed_family": {
+      "ARM_A_M9_6|20260814|golden-reference": {
+        "full_set_rate": 0.22321428571428573,
+        "mean_candidate_set_size": 1.8357142857142856,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.4589285714285714,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6035714285714285
+      },
+      "ARM_A_M9_6|20260815|golden-reference": {
+        "full_set_rate": 0.24821428571428572,
+        "mean_candidate_set_size": 1.8196428571428571,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.4549107142857143,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6571428571428571
+      },
+      "ARM_A_M9_6|31874|golden-reference": {
+        "full_set_rate": 0.22678571428571428,
+        "mean_candidate_set_size": 1.8142857142857143,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.45357142857142857,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6375
+      },
+      "ARM_B_M9_6|20260814|branched-loop": {
+        "full_set_rate": 0.3193877551020408,
+        "mean_candidate_set_size": 4.290816326530612,
+        "median_candidate_set_size": 5.0,
+        "normalized_mean_candidate_set_size": 0.6129737609329445,
+        "p90_candidate_set_size": 7.0,
+        "singleton_rate": 0.26326530612244897
+      },
+      "ARM_B_M9_6|20260814|golden-reference": {
+        "full_set_rate": 0.2517857142857143,
+        "mean_candidate_set_size": 1.8767857142857143,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.46919642857142857,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6
+      },
+      "ARM_B_M9_6|20260814|loop-grid": {
+        "full_set_rate": 0.30089285714285713,
+        "mean_candidate_set_size": 4.9089285714285715,
+        "median_candidate_set_size": 6.0,
+        "normalized_mean_candidate_set_size": 0.6136160714285714,
+        "p90_candidate_set_size": 8.0,
+        "singleton_rate": 0.18928571428571428
+      },
+      "ARM_B_M9_6|20260815|branched-loop": {
+        "full_set_rate": 0.20204081632653062,
+        "mean_candidate_set_size": 4.134693877551021,
+        "median_candidate_set_size": 5.0,
+        "normalized_mean_candidate_set_size": 0.5906705539358601,
+        "p90_candidate_set_size": 7.0,
+        "singleton_rate": 0.2693877551020408
+      },
+      "ARM_B_M9_6|20260815|golden-reference": {
+        "full_set_rate": 0.25,
+        "mean_candidate_set_size": 1.8875,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.471875,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.5803571428571429
+      },
+      "ARM_B_M9_6|20260815|loop-grid": {
+        "full_set_rate": 0.2125,
+        "mean_candidate_set_size": 4.8741071428571425,
+        "median_candidate_set_size": 6.0,
+        "normalized_mean_candidate_set_size": 0.6092633928571428,
+        "p90_candidate_set_size": 8.0,
+        "singleton_rate": 0.20982142857142858
+      },
+      "ARM_B_M9_6|31874|branched-loop": {
+        "full_set_rate": 0.25204081632653064,
+        "mean_candidate_set_size": 4.2,
+        "median_candidate_set_size": 5.0,
+        "normalized_mean_candidate_set_size": 0.6,
+        "p90_candidate_set_size": 7.0,
+        "singleton_rate": 0.28469387755102044
+      },
+      "ARM_B_M9_6|31874|golden-reference": {
+        "full_set_rate": 0.23214285714285715,
+        "mean_candidate_set_size": 1.8339285714285714,
+        "median_candidate_set_size": 1.0,
+        "normalized_mean_candidate_set_size": 0.45848214285714284,
+        "p90_candidate_set_size": 4.0,
+        "singleton_rate": 0.6285714285714286
+      },
+      "ARM_B_M9_6|31874|loop-grid": {
+        "full_set_rate": 0.3410714285714286,
+        "mean_candidate_set_size": 5.2160714285714285,
+        "median_candidate_set_size": 7.0,
+        "normalized_mean_candidate_set_size": 0.6520089285714286,
+        "p90_candidate_set_size": 8.0,
+        "singleton_rate": 0.17589285714285716
+      }
+    },
+    "threshold_used": 0.8
+  },
+  "coverage_floor_unchanged": true,
+  "current_control": {
+    "all_3_pass": true,
+    "per_seed_coverage": {
+      "20260814": {
+        "marginal_coverage": 0.9107142857142857,
+        "passes_operational_floor_0_85": true
+      },
+      "20260815": {
+        "marginal_coverage": 0.9142857142857143,
+        "passes_operational_floor_0_85": true
+      },
+      "31874": {
+        "marginal_coverage": 0.9125,
+        "passes_operational_floor_0_85": true
+      }
+    }
+  },
+  "interleaved_calibration_gate": {
+    "all_9_cells_pass": true,
+    "per_family_seed_coverage": {
+      "ARM_B_M9_6|branched-loop|20260814": {
+        "marginal_coverage": 0.9387755102040817,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|branched-loop|20260815": {
+        "marginal_coverage": 0.9316326530612244,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|branched-loop|31874": {
+        "marginal_coverage": 0.9326530612244898,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|golden-reference|20260814": {
+        "marginal_coverage": 0.9053571428571429,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|golden-reference|20260815": {
+        "marginal_coverage": 0.9,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|golden-reference|31874": {
+        "marginal_coverage": 0.9107142857142857,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|loop-grid|20260814": {
+        "marginal_coverage": 0.8705357142857143,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|loop-grid|20260815": {
+        "marginal_coverage": 0.8839285714285714,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B_M9_6|loop-grid|31874": {
+        "marginal_coverage": 0.9044642857142857,
+        "passes_operational_floor_0_85": true
+      }
+    }
+  },
+  "known_family_guardrails": {
+    "arm_b_retention_branched_loop_and_loop_grid": {
+      "branched-loop": {
+        "EARLY_top1_mean": 0.31507936507936507,
+        "MATURE_top1_mean": 0.6642857142857143
+      },
+      "golden-reference": {
+        "EARLY_top1_mean": 0.4236111111111111,
+        "MATURE_top1_mean": 0.9791666666666666
+      },
+      "loop-grid": {
+        "EARLY_top1_mean": 0.2652777777777778,
+        "MATURE_top1_mean": 0.5
+      }
+    },
+    "golden_reference_early_regression_pp": 4.1666666666666625,
+    "golden_reference_mature_regression_pp": 0.2083333333333437,
+    "golden_reference_mrr_regression": 0.01649305555555547,
+    "note": "golden-reference is the only family with a paired ARM_A comparison; branched-loop/loop-grid are reported as ARM_B-only retention figures, never blended into the regression comparison.",
+    "passed": true
+  },
+  "neural_outputs_never_bypass_deterministic_authority": true,
+  "no_safety_authority_regression": true,
+  "predictive_generalization_gate": {
+    "bootstrap_ci90": [
+      0.008787037037037029,
+      0.056296296296296296
+    ],
+    "criteria": {
+      "1_macro_family_mature_delta_positive": true,
+      "2_bootstrap_ci_lower_positive": true,
+      "3_improved_on_at_least_2_of_3_unseen_families": true,
+      "4_no_unseen_family_regresses_more_than_5pp": true,
+      "5_nonnegative_on_all_3_seeds": true,
+      "6_all_outputs_finite": true,
+      "7_no_safety_authority_regression": true
+    },
+    "families_improved": [
+      "coastal-branch",
+      "tree-branch",
+      "dense-loop"
+    ],
+    "macro_mature_delta": 0.03287037037037037,
+    "passed": true,
+    "per_family_mature_delta_pp": {
+      "coastal-branch": 1.111111111111111,
+      "dense-loop": 4.583333333333333,
+      "tree-branch": 4.166666666666667
+    },
+    "per_seed_macro_mature_delta": {
+      "31874": 0.022222222222222223,
+      "20260814": 0.017222222222222226,
+      "20260815": 0.059166666666666666
+    },
+    "worst_family_regression_pp": 1.111111111111111
+  },
+  "training_parity": {
+    "passed": true
+  }
+}

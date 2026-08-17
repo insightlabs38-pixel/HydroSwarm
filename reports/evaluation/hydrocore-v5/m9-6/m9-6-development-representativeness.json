@@ -1,0 +1,72 @@
+{
+  "all_families_pass": true,
+  "families": {
+    "branched-loop": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 140
+    },
+    "coastal-branch": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 120
+    },
+    "dense-loop": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 120
+    },
+    "golden-reference": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 80
+    },
+    "loop-grid": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 160
+    },
+    "tree-branch": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 100
+    }
+  },
+  "m9_6_development_representativeness_passed": true
+}

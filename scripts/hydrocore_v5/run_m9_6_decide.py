@@ -699,9 +699,22 @@ def main() -> int:
     locked_after = m6.assert_locked_test_closed()
     end_commit = m6.current_commit()
 
+    # protocol["start_commit"] is the HEAD *before* the protocol-freeze commit
+    # existed (a commit cannot embed its own SHA at authoring time -- same
+    # issue M9.4/M9.5/M9.5R's end_commit hit). The commit that actually
+    # CONTAINS the frozen protocol file is found via git log --follow (the
+    # first, and only, commit ever touching this path under the governed
+    # freeze-then-never-modify workflow), not protocol["start_commit"].
+    import subprocess
+    protocol_log = subprocess.run(
+        ["git", "log", "--follow", "--format=%H", "--", str(m6.M9_6_PROTOCOL_PATH.relative_to(m6.ROOT_PATH))],
+        cwd=m6.ROOT_PATH, capture_output=True, text=True, check=True,
+    ).stdout.strip().splitlines()
+    protocol_frozen_at_commit = protocol_log[-1] if protocol_log else protocol["start_commit"]
+
     closure = {
         "milestone": "M9.6", "kind": "EXACT_COMPUTE_PARITY_FINAL_HYDROCORE_S_CONFIRMATION",
-        "branch": manifest["branch"], "start_commit": manifest["start_commit"], "protocol_frozen_at_commit": protocol["start_commit"],
+        "branch": manifest["branch"], "start_commit": manifest["start_commit"], "protocol_frozen_at_commit": protocol_frozen_at_commit,
         "execution_commit": end_commit,
         "end_commit_note": (
             f"{end_commit} is the commit at decide-stage execution time, BEFORE this milestone's own artifact "

@@ -1,0 +1,227 @@
+{
+  "TRAINED_FAMILY_GOLDEN_REFERENCE_ONLY": {
+    "EARLY": {
+      "mrr": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.037384259259259256,
+        "ci_upper": 0.0008159722222222037,
+        "interval": 0.9,
+        "n_families": 1,
+        "n_incidents_per_family": {
+          "golden-reference": 80
+        },
+        "observed_macro_delta": -0.018055555555555564,
+        "observed_per_family_delta": {
+          "golden-reference": -0.018055555555555564
+        },
+        "resamples": 2000
+      },
+      "top1": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.07361111111111111,
+        "ci_upper": -0.011111111111111115,
+        "interval": 0.9,
+        "n_families": 1,
+        "n_incidents_per_family": {
+          "golden-reference": 80
+        },
+        "observed_macro_delta": -0.041666666666666664,
+        "observed_per_family_delta": {
+          "golden-reference": -0.041666666666666664
+        },
+        "resamples": 2000
+      }
+    },
+    "MATURE": {
+      "mrr": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.010763888888888889,
+        "ci_upper": 0.0020833333333333355,
+        "interval": 0.9,
+        "n_families": 1,
+        "n_incidents_per_family": {
+          "golden-reference": 80
+        },
+        "observed_macro_delta": -0.0038194444444444426,
+        "observed_per_family_delta": {
+          "golden-reference": -0.0038194444444444426
+        },
+        "resamples": 2000
+      },
+      "top1": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.010416666666666671,
+        "ci_upper": 0.006249999999999999,
+        "interval": 0.9,
+        "n_families": 1,
+        "n_incidents_per_family": {
+          "golden-reference": 80
+        },
+        "observed_macro_delta": -0.0020833333333333355,
+        "observed_per_family_delta": {
+          "golden-reference": -0.0020833333333333355
+        },
+        "resamples": 2000
+      }
+    },
+    "MID": {
+      "mrr": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.04393229166666667,
+        "ci_upper": -0.01354166666666667,
+        "interval": 0.9,
+        "n_families": 1,
+        "n_incidents_per_family": {
+          "golden-reference": 80
+        },
+        "observed_macro_delta": -0.02760416666666667,
+        "observed_per_family_delta": {
+          "golden-reference": -0.02760416666666667
+        },
+        "resamples": 2000
+      },
+      "top1": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.0625,
+        "ci_upper": -0.016666666666666666,
+        "interval": 0.9,
+        "n_families": 1,
+        "n_incidents_per_family": {
+          "golden-reference": 80
+        },
+        "observed_macro_delta": -0.0375,
+        "observed_per_family_delta": {
+          "golden-reference": -0.0375
+        },
+        "resamples": 2000
+      }
+    }
+  },
+  "UNSEEN_DEVELOPMENT_FAMILY_PRIMARY": {
+    "EARLY": {
+      "mrr": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.0170195987654321,
+        "ci_upper": 0.009378755144032917,
+        "interval": 0.9,
+        "n_families": 3,
+        "n_incidents_per_family": {
+          "coastal-branch": 120,
+          "dense-loop": 120,
+          "tree-branch": 100
+        },
+        "observed_macro_delta": -0.003780864197530863,
+        "observed_per_family_delta": {
+          "coastal-branch": 0.0034722222222222255,
+          "dense-loop": 0.0020370370370370373,
+          "tree-branch": -0.01685185185185185
+        },
+        "resamples": 2000
+      },
+      "top1": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": -0.019259259259259257,
+        "ci_upper": 0.017780864197530864,
+        "interval": 0.9,
+        "n_families": 3,
+        "n_incidents_per_family": {
+          "coastal-branch": 120,
+          "dense-loop": 120,
+          "tree-branch": 100
+        },
+        "observed_macro_delta": -0.0013580246913580231,
+        "observed_per_family_delta": {
+          "coastal-branch": 9.251858538542971e-19,
+          "dense-loop": 0.014814814814814815,
+          "tree-branch": -0.018888888888888886
+        },
+        "resamples": 2000
+      }
+    },
+    "MATURE": {
+      "mrr": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": 0.014640354938271604,
+        "ci_upper": 0.042825925925925934,
+        "interval": 0.9,
+        "n_families": 3,
+        "n_incidents_per_family": {
+          "coastal-branch": 120,
+          "dense-loop": 120,
+          "tree-branch": 100
+        },
+        "observed_macro_delta": 0.02922067901234568,
+        "observed_per_family_delta": {
+          "coastal-branch": 0.01537037037037037,
+          "dense-loop": 0.035902777777777777,
+          "tree-branch": 0.036388888888888894
+        },
+        "resamples": 2000
+      },
+      "top1": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": 0.008787037037037029,
+        "ci_upper": 0.056296296296296296,
+        "interval": 0.9,
+        "n_families": 3,
+        "n_incidents_per_family": {
+          "coastal-branch": 120,
+          "dense-loop": 120,
+          "tree-branch": 100
+        },
+        "observed_macro_delta": 0.03287037037037037,
+        "observed_per_family_delta": {
+          "coastal-branch": 0.01111111111111111,
+          "dense-loop": 0.04583333333333333,
+          "tree-branch": 0.04166666666666667
+        },
+        "resamples": 2000
+      }
+    },
+    "MID": {
+      "mrr": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": 0.0045405864197530935,
+        "ci_upper": 0.033559490740740744,
+        "interval": 0.9,
+        "n_families": 3,
+        "n_incidents_per_family": {
+          "coastal-branch": 120,
+          "dense-loop": 120,
+          "tree-branch": 100
+        },
+        "observed_macro_delta": 0.01921296296296297,
+        "observed_per_family_delta": {
+          "coastal-branch": 0.012314814814814822,
+          "dense-loop": 0.025740740740740745,
+          "tree-branch": 0.019583333333333338
+        },
+        "resamples": 2000
+      },
+      "top1": {
+        "bootstrap_seed": 20260818,
+        "ci_lower": 0.0021296296296296306,
+        "ci_upper": 0.052314814814814814,
+        "interval": 0.9,
+        "n_families": 3,
+        "n_incidents_per_family": {
+          "coastal-branch": 120,
+          "dense-loop": 120,
+          "tree-branch": 100
+        },
+        "observed_macro_delta": 0.027685185185185184,
+        "observed_per_family_delta": {
+          "coastal-branch": 0.015277777777777779,
+          "dense-loop": 0.03611111111111111,
+          "tree-branch": 0.03166666666666667
+        },
+        "resamples": 2000
+      }
+    }
+  },
+  "per_seed_macro_mature_top1_delta_unseen": {
+    "20260814": 0.017222222222222226,
+    "20260815": 0.059166666666666666,
+    "31874": 0.022222222222222223
+  }
+}

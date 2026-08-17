@@ -1,0 +1,232 @@
+{
+  "calibration_repeats_per_source": 20,
+  "development_repeats_per_source": 20,
+  "families": {
+    "branched-loop": {
+      "calibration": {
+        "expected": 140,
+        "n_incidents": 140,
+        "n_incidents_per_source": {
+          "JA": 20,
+          "JB": 20,
+          "JC": 20,
+          "JD": 20,
+          "JE": 20,
+          "JF": 20,
+          "JG": 20
+        },
+        "seed_base": 998200000,
+        "seed_range": [
+          998200000,
+          998260019
+        ]
+      },
+      "complete_source_junction_set": [
+        "JA",
+        "JB",
+        "JC",
+        "JD",
+        "JE",
+        "JF",
+        "JG"
+      ],
+      "development": {
+        "expected": 140,
+        "n_incidents": 140,
+        "n_incidents_per_source": {
+          "JA": 20,
+          "JB": 20,
+          "JC": 20,
+          "JD": 20,
+          "JE": 20,
+          "JF": 20,
+          "JG": 20
+        },
+        "seed_base": 998300000,
+        "seed_range": [
+          998300000,
+          998360019
+        ]
+      },
+      "n_sources": 7,
+      "trained_or_unseen_development": "TRAINED_FAMILY"
+    },
+    "coastal-branch": {
+      "complete_source_junction_set": [
+        "CB1",
+        "CB2",
+        "CB3",
+        "CB4",
+        "CB5",
+        "CB6"
+      ],
+      "development": {
+        "expected": 120,
+        "n_incidents": 120,
+        "n_incidents_per_source": {
+          "CB1": 20,
+          "CB2": 20,
+          "CB3": 20,
+          "CB4": 20,
+          "CB5": 20,
+          "CB6": 20
+        },
+        "seed_base": 998700000,
+        "seed_range": [
+          998700000,
+          998750019
+        ]
+      },
+      "n_sources": 6,
+      "trained_or_unseen_development": "UNSEEN_DEVELOPMENT_FAMILY"
+    },
+    "dense-loop": {
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6"
+      ],
+      "development": {
+        "expected": 120,
+        "n_incidents": 120,
+        "n_incidents_per_source": {
+          "J1": 20,
+          "J2": 20,
+          "J3": 20,
+          "J4": 20,
+          "J5": 20,
+          "J6": 20
+        },
+        "seed_base": 999100000,
+        "seed_range": [
+          999100000,
+          999150019
+        ]
+      },
+      "n_sources": 6,
+      "trained_or_unseen_development": "UNSEEN_DEVELOPMENT_FAMILY"
+    },
+    "golden-reference": {
+      "calibration": {
+        "expected": 80,
+        "n_incidents": 80,
+        "n_incidents_per_source": {
+          "J1": 20,
+          "J2": 20,
+          "J3": 20,
+          "J4": 20
+        },
+        "seed_base": 998000000,
+        "seed_range": [
+          998000000,
+          998030019
+        ]
+      },
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4"
+      ],
+      "development": {
+        "expected": 80,
+        "n_incidents": 80,
+        "n_incidents_per_source": {
+          "J1": 20,
+          "J2": 20,
+          "J3": 20,
+          "J4": 20
+        },
+        "seed_base": 998100000,
+        "seed_range": [
+          998100000,
+          998130019
+        ]
+      },
+      "n_sources": 4,
+      "trained_or_unseen_development": "TRAINED_FAMILY"
+    },
+    "loop-grid": {
+      "calibration": {
+        "expected": 160,
+        "n_incidents": 160,
+        "n_incidents_per_source": {
+          "J1": 20,
+          "J2": 20,
+          "J3": 20,
+          "J4": 20,
+          "J5": 20,
+          "J6": 20,
+          "J7": 20,
+          "J8": 20
+        },
+        "seed_base": 998400000,
+        "seed_range": [
+          998400000,
+          998470019
+        ]
+      },
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5",
+        "J6",
+        "J7",
+        "J8"
+      ],
+      "development": {
+        "expected": 160,
+        "n_incidents": 160,
+        "n_incidents_per_source": {
+          "J1": 20,
+          "J2": 20,
+          "J3": 20,
+          "J4": 20,
+          "J5": 20,
+          "J6": 20,
+          "J7": 20,
+          "J8": 20
+        },
+        "seed_base": 998500000,
+        "seed_range": [
+          998500000,
+          998570019
+        ]
+      },
+      "n_sources": 8,
+      "trained_or_unseen_development": "TRAINED_FAMILY"
+    },
+    "tree-branch": {
+      "complete_source_junction_set": [
+        "J1",
+        "J2",
+        "J3",
+        "J4",
+        "J5"
+      ],
+      "development": {
+        "expected": 100,
+        "n_incidents": 100,
+        "n_incidents_per_source": {
+          "J1": 20,
+          "J2": 20,
+          "J3": 20,
+          "J4": 20,
+          "J5": 20
+        },
+        "seed_base": 998900000,
+        "seed_range": [
+          998900000,
+          998940019
+        ]
+      },
+      "n_sources": 5,
+      "trained_or_unseen_development": "UNSEEN_DEVELOPMENT_FAMILY"
+    }
+  }
+}
