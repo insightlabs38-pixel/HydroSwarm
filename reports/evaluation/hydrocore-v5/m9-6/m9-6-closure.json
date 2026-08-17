@@ -14,9 +14,9 @@
     "representativeness_passed": true
   },
   "decision_reason": "Exact compute parity, representativeness, predictive generalization gate, known-family guardrails, and the full calibration gate (CURRENT control, INTERLEAVED 9/9, candidate-set guard) all passed. HydroCore-S architecture and interleaved training recipe are confirmed.",
-  "end_commit_note": "21717b208c4dd374829986aaeac14bd922af6767 is the commit at decide-stage execution time, BEFORE this milestone's own artifact commit exists (a commit cannot embed its own SHA at authoring time -- see M9.4/M9.5/M9.5R's closure/manifest end_commit_note for the same issue). A metadata-only follow-up commit records the true final SHA after the initial M9.6 artifact commit is made.",
+  "end_commit_note": "21717b208c4dd374829986aaeac14bd922af6767 was the commit at decide-stage execution time, BEFORE this milestone's own artifact commit existed (a commit cannot embed its own SHA at authoring time -- see M9.4/M9.5/M9.5R's closure/manifest end_commit_note for the same issue). This metadata-only follow-up commit records the true final SHA (8c99f87fc359be508c39e1a61d0f31861672f821, the commit that actually added this closure.json and the rest of the M9.6 evaluation/calibration artifacts).",
   "evidence_against": "None identified against confirmation at this run.",
-  "execution_commit": "21717b208c4dd374829986aaeac14bd922af6767",
+  "execution_commit": "8c99f87fc359be508c39e1a61d0f31861672f821",
   "hydrocore_s_status": "FROZEN",
   "kind": "EXACT_COMPUTE_PARITY_FINAL_HYDROCORE_S_CONFIRMATION",
   "known_family_guardrails": {
