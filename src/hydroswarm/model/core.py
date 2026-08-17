@@ -139,6 +139,23 @@ MODEL_VARIANTS: dict[str, ModelVariant] = {
     "small": ModelVariant(192, 6, 576, 4, 64),
     "medium": ModelVariant(256, 8, 768, 8, 64),
     "large": ModelVariant(360, 8, 1080, 8, 96),
+    # HydroCore-v5 Milestone 9.7: pure-capacity-scaled counterpart of
+    # "small" (the frozen M9.6 HydroCore-S recipe), used only by the
+    # governed M9.7/M9.8 capacity-preflight/experiment scripts -- never a
+    # replacement for "medium" above (which independently doubles
+    # num_layers, a depth/stage-count change "small_v5_capacity_m" does
+    # not make). d_model/nhead/dim_feedforward are widened while
+    # preserving "small"'s exact head_dim (192/6=32) and
+    # dim_feedforward/d_model (576/192=3.0) ratios and its num_layers=4,
+    # latent_tokens=64, modality_layers=1 verbatim -- selected
+    # deterministically, by parameter count only (13,919,572, nearest to
+    # the protocol's predeclared ~14M center of the 12-16M v5-M band),
+    # from the unique in-range point of a mechanically enumerated
+    # ratio-preserving width grid. See
+    # reports/evaluation/hydrocore-v5/m9-7/m9-7-capacity-candidates.json
+    # and m9-7-selected-m-architecture.json for the full enumeration and
+    # selection rule; this entry does not itself authorize any training.
+    "small_v5_capacity_m": ModelVariant(352, 11, 1056, 4, 64),
 }
 
 #: Bumped whenever a change could make a checkpoint silently produce
