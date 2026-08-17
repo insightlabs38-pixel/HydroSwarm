@@ -1,0 +1,108 @@
+{
+  "HYDROCORE_L_AUTHORIZED": false,
+  "M9_8_DECISION": "B",
+  "M9_8_DECISION_NAME": "HYDROCORE_M_NO_MEANINGFUL_CAPACITY_GAIN",
+  "branch": "exp/hydrocore-v5-causal",
+  "calibration": {
+    "M_all_required_cells_passed": true,
+    "S_control_passed": true,
+    "alpha": 0.1,
+    "candidate_set_guard_passed": true,
+    "coverage_floor": 0.85,
+    "representativeness_passed": true
+  },
+  "calibration_representativeness": {
+    "passed": true
+  },
+  "development_representativeness": {
+    "passed": true
+  },
+  "engineering_cost": {
+    "checkpoint_size_ratio_M_over_S": 3.324013732607496,
+    "latency_ratio_M_over_S": 1.590386668995203,
+    "parameter_ratio_M_over_S": 3.3279615704253707,
+    "training_time_ratio_M_over_S": null
+  },
+  "evidence_against": "See guardrails payload (m9-8-guardrails.json) for any individual guardrail failure detail.",
+  "execution_commit": "afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1",
+  "execution_manifest_commit": "afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1",
+  "guardrails": {
+    "A_primary_effect": false,
+    "B_family_consistency": true,
+    "C_seed_consistency": true,
+    "D_known_family_retention": true,
+    "E_calibration": true,
+    "F_engineering": true
+  },
+  "hydrocore_m": {
+    "checkpoint_policy": "FINAL_STEP_1350",
+    "checkpoint_sha256_per_seed": {
+      "20260814": "54ae9f44f2762f784e99b29d380eb7492b694036d675467eb8804798da6666c1",
+      "20260815": "a834d926d10ff129d0f9d133e9d357ccc77711999866ca744ed73845ad2e4eab",
+      "31874": "abe92774a7ad0773849c890a8955babd3f7963748d6802979ea412391bd3eaf4"
+    },
+    "optimizer_steps_per_seed": {
+      "20260814": 1350,
+      "20260815": 1350,
+      "31874": 1350
+    },
+    "parameter_count": 13919572
+  },
+  "hydrocore_s": {
+    "checkpoint_policy": "FINAL_STEP_1350",
+    "checkpoint_provenance_per_seed": {
+      "20260814": "REUSED_M9_6_CHECKPOINT",
+      "20260815": "REUSED_M9_6_CHECKPOINT",
+      "31874": "REUSED_M9_6_CHECKPOINT"
+    },
+    "parameter_count": 4182612
+  },
+  "kind": "HYDROCORE_S_VS_M_CAPACITY_COMPARISON",
+  "known_family_guardrails": {
+    "early_regression": 1.388888888888895,
+    "mature_regression": 0.6249999999999978,
+    "mrr_regression": 0.0019290123456788821,
+    "passed": true
+  },
+  "limitations": [
+    "This is a capacity-only comparison at exactly the frozen 12-16M HydroCore-M point; it does not characterize the full model-size response curve.",
+    "No field-performance, production-readiness, or locked-test claim is made.",
+    "HydroCore-L is not trained or evaluated in this milestone."
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M9.8",
+  "next_recommended_milestone": "close M9 scaling and proceed toward M10",
+  "per_seed_primary_deltas": {
+    "20260814": -0.0033333333333333335,
+    "20260815": 0.01,
+    "31874": -0.016944444444444446
+  },
+  "primary_endpoint": {
+    "M": null,
+    "S": null,
+    "bootstrap_ci90": [
+      -0.012777777777777779,
+      0.0062962962962962955
+    ],
+    "delta": -0.0034259259259259277,
+    "threshold": 0.02
+  },
+  "selected_predictor_after_m9_8": "S",
+  "start_commit": "afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1",
+  "strongest_evidence": "Macro-family (equal-weight) unseen-topology MATURE neural Top-1 delta (M-S): -0.0034259259259259277, 90% paired-bootstrap CI [-0.012777777777777779, 0.0062962962962962955], threshold +0.02. Training parity passed: True.",
+  "training_comparability": {
+    "passed": true,
+    "same_effective_batch": true,
+    "same_family_exposure_policy": true,
+    "same_optimizer_steps": true,
+    "same_scheduler": true,
+    "same_train_manifests": true,
+    "same_validation_manifests": true
+  },
+  "unseen_family_deltas": {
+    "coastal-branch": 0.2777777777777775,
+    "dense-loop": -1.8055555555555558,
+    "tree-branch": 0.49999999999999994
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "checkpoint_bytes": {
+    "M_mean": 55706960.0,
+    "M_per_seed": {
+      "31874": 55706960,
+      "20260814": 55706960,
+      "20260815": 55706960
+    },
+    "S": 16758944,
+    "ratio_M_over_S": 3.324013732607496
+  },
+  "inference_latency_ms_representative_seed": {
+    "M": {
+      "mean_latency_ms": 27.661823900416493,
+      "median_latency_ms": 23.043751003569923
+    },
+    "S": {
+      "mean_latency_ms": 22.680540604051203,
+      "median_latency_ms": 14.489401510218158
+    },
+    "ratio_median_M_over_S": 1.590386668995203
+  },
+  "note": "Descriptive only -- no post-hoc cost promotion threshold is applied (guardrail G).",
+  "parameter_count": {
+    "M": 13919572,
+    "S": 4182612,
+    "ratio_M_over_S": 3.3279615704253707
+  },
+  "training_wall_seconds": {
+    "M_mean": 6398.161340950338,
+    "M_per_seed": {
+      "31874": 6700.291640111012,
+      "20260814": 5797.89830239999,
+      "20260815": 6696.294080340012
+    },
+    "S_note": "S reused from M9.6 (no M9.8 training cost); M9.6 ARM_B_M9_6 wall_seconds available in m9-6-training-runs for historical reference only"
+  }
+}

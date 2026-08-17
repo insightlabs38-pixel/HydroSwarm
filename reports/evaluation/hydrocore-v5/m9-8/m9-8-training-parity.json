@@ -1,0 +1,75 @@
+{
+  "all_arm_seed_runs_pass": true,
+  "checkpoint_policy": "FINAL_STEP_1350",
+  "m_parameter_count_expected": 13919572,
+  "m_parameter_counts_observed": [
+    13919572
+  ],
+  "optimizer_steps_required": 1350,
+  "passed": true,
+  "per_run": {
+    "ARM_M|20260814": {
+      "actual_total_optimizer_steps": 1350,
+      "canonical_export_sha256": "54ae9f44f2762f784e99b29d380eb7492b694036d675467eb8804798da6666c1",
+      "canonical_global_step": 1350,
+      "param_count": 13919572,
+      "passed": true,
+      "train_manifests_match_m9_6": true,
+      "validation_manifests_match_m9_6": true,
+      "wall_seconds": 5797.89830239999
+    },
+    "ARM_M|20260815": {
+      "actual_total_optimizer_steps": 1350,
+      "canonical_export_sha256": "a834d926d10ff129d0f9d133e9d357ccc77711999866ca744ed73845ad2e4eab",
+      "canonical_global_step": 1350,
+      "param_count": 13919572,
+      "passed": true,
+      "train_manifests_match_m9_6": true,
+      "validation_manifests_match_m9_6": true,
+      "wall_seconds": 6696.294080340012
+    },
+    "ARM_M|31874": {
+      "actual_total_optimizer_steps": 1350,
+      "canonical_export_sha256": "abe92774a7ad0773849c890a8955babd3f7963748d6802979ea412391bd3eaf4",
+      "canonical_global_step": 1350,
+      "param_count": 13919572,
+      "passed": true,
+      "train_manifests_match_m9_6": true,
+      "validation_manifests_match_m9_6": true,
+      "wall_seconds": 6700.291640111012
+    },
+    "ARM_S|20260814": {
+      "canonical_export_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+      "canonical_global_step": 1350,
+      "checkpoint_provenance": "REUSED_M9_6_CHECKPOINT",
+      "param_count": 4182612,
+      "passed": true
+    },
+    "ARM_S|20260815": {
+      "canonical_export_sha256": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+      "canonical_global_step": 1350,
+      "checkpoint_provenance": "REUSED_M9_6_CHECKPOINT",
+      "param_count": 4182612,
+      "passed": true
+    },
+    "ARM_S|31874": {
+      "canonical_export_sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+      "canonical_global_step": 1350,
+      "checkpoint_provenance": "REUSED_M9_6_CHECKPOINT",
+      "param_count": 4182612,
+      "passed": true
+    }
+  },
+  "s_and_m_intentionally_different_parameter_counts": true,
+  "s_parameter_count_expected": 4182612,
+  "s_parameter_counts_observed": [
+    4182612
+  ],
+  "same_effective_batch": true,
+  "same_family_exposure_policy": true,
+  "same_optimizer_steps": true,
+  "same_scheduler": true,
+  "same_train_manifests": true,
+  "same_validation_manifests": true,
+  "scheduler_total_steps_required": 1500
+}

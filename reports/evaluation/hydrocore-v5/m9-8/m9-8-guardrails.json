@@ -1,0 +1,160 @@
+{
+  "A_primary_effect": {
+    "bootstrap_ci90": [
+      -0.012777777777777779,
+      0.0062962962962962955
+    ],
+    "borderline": false,
+    "clean_fail": true,
+    "macro_mature_delta": -0.0034259259259259277,
+    "passed": false,
+    "threshold": 0.02
+  },
+  "B_family_consistency": {
+    "families_improved": [
+      "coastal-branch",
+      "tree-branch"
+    ],
+    "max_allowed_regression_pp": 3.0,
+    "min_required_improved": 2,
+    "passed": true,
+    "per_family_mature_delta_pp": {
+      "coastal-branch": 0.2777777777777775,
+      "dense-loop": -1.8055555555555558,
+      "tree-branch": 0.49999999999999994
+    },
+    "worst_family_regression_pp": -1.8055555555555558
+  },
+  "C_seed_consistency": {
+    "classification_method": "Descriptive, not a separately preregistered numeric gate (per the governing prompt's explicit instruction not to invent a post-hoc reversal threshold): a seed is flagged as a reversal only if its delta's SIGN opposes the macro-family observed delta's sign AND its magnitude is at least as large as the frozen primary-effect threshold (0.02) -- i.e. large enough that it would itself have qualified as a 'meaningful' effect in the opposite direction, not merely noise around zero.",
+    "flagged_reversals": [],
+    "n_seeds_reported": 3,
+    "no_catastrophic_seed_reversal": true,
+    "no_seed_dropped": true,
+    "passed": true,
+    "per_seed_macro_mature_delta": {
+      "20260814": -0.0033333333333333335,
+      "20260815": 0.01,
+      "31874": -0.016944444444444446
+    }
+  },
+  "D_known_family_retention": {
+    "branched_loop_and_loop_grid_retention_both_arms": {
+      "branched-loop": {
+        "ARM_M_M9_8": {
+          "EARLY_top1_mean": 0.2976190476190476,
+          "MATURE_top1_mean": 0.5857142857142857
+        },
+        "ARM_S_M9_8": {
+          "EARLY_top1_mean": 0.3142857142857143,
+          "MATURE_top1_mean": 0.6071428571428572
+        }
+      },
+      "golden-reference": {
+        "ARM_M_M9_8": {
+          "EARLY_top1_mean": 0.4069444444444444,
+          "MATURE_top1_mean": 0.9833333333333334
+        },
+        "ARM_S_M9_8": {
+          "EARLY_top1_mean": 0.42083333333333334,
+          "MATURE_top1_mean": 0.9895833333333334
+        }
+      },
+      "loop-grid": {
+        "ARM_M_M9_8": {
+          "EARLY_top1_mean": 0.18541666666666667,
+          "MATURE_top1_mean": 0.3875
+        },
+        "ARM_S_M9_8": {
+          "EARLY_top1_mean": 0.18472222222222223,
+          "MATURE_top1_mean": 0.40208333333333335
+        }
+      }
+    },
+    "golden_reference_early_regression_pp": 1.388888888888895,
+    "golden_reference_mature_regression_pp": 0.6249999999999978,
+    "golden_reference_mrr_regression": 0.0019290123456788821,
+    "note": "golden-reference is the shared comparator with a frozen regression bound (Section 22); branched-loop/loop-grid are reported as retention figures for BOTH arms (both are trained on them), with no new post-hoc threshold invented.",
+    "passed": true
+  },
+  "E_calibration": {
+    "M_all_required_cells": {
+      "all_9_pass": true,
+      "n_required": 9,
+      "per_cell": {
+        "branched-loop|20260814": {
+          "marginal_coverage": 0.9306122448979591,
+          "passes_floor": true
+        },
+        "branched-loop|20260815": {
+          "marginal_coverage": 0.9295918367346939,
+          "passes_floor": true
+        },
+        "branched-loop|31874": {
+          "marginal_coverage": 0.923469387755102,
+          "passes_floor": true
+        },
+        "golden-reference|20260814": {
+          "marginal_coverage": 0.9375,
+          "passes_floor": true
+        },
+        "golden-reference|20260815": {
+          "marginal_coverage": 0.9517857142857142,
+          "passes_floor": true
+        },
+        "golden-reference|31874": {
+          "marginal_coverage": 0.9375,
+          "passes_floor": true
+        },
+        "loop-grid|20260814": {
+          "marginal_coverage": 0.8910714285714286,
+          "passes_floor": true
+        },
+        "loop-grid|20260815": {
+          "marginal_coverage": 0.8964285714285715,
+          "passes_floor": true
+        },
+        "loop-grid|31874": {
+          "marginal_coverage": 0.8901785714285714,
+          "passes_floor": true
+        }
+      }
+    },
+    "S_control": {
+      "all_3_pass": true,
+      "per_seed": {
+        "20260814": {
+          "marginal_coverage": 0.9535714285714286,
+          "passes_floor": true
+        },
+        "20260815": {
+          "marginal_coverage": 0.9375,
+          "passes_floor": true
+        },
+        "31874": {
+          "marginal_coverage": 0.9232142857142858,
+          "passes_floor": true
+        }
+      }
+    },
+    "alpha": 0.1,
+    "candidate_set_guard_passed": true,
+    "coverage_floor": 0.85,
+    "passed": true
+  },
+  "F_engineering": {
+    "no_causal_violation": true,
+    "no_checkpoint_resume_defect": true,
+    "no_nan_inf_instability": true,
+    "no_source_support_regression": true,
+    "passed": true
+  },
+  "summary": {
+    "A_primary_effect": false,
+    "B_family_consistency": true,
+    "C_seed_consistency": true,
+    "D_known_family_retention": true,
+    "E_calibration": true,
+    "F_engineering": true
+  }
+}

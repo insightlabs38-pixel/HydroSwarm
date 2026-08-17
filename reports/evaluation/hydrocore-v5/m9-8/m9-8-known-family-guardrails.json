@@ -1,0 +1,39 @@
+{
+  "branched_loop_and_loop_grid_retention_both_arms": {
+    "branched-loop": {
+      "ARM_M_M9_8": {
+        "EARLY_top1_mean": 0.2976190476190476,
+        "MATURE_top1_mean": 0.5857142857142857
+      },
+      "ARM_S_M9_8": {
+        "EARLY_top1_mean": 0.3142857142857143,
+        "MATURE_top1_mean": 0.6071428571428572
+      }
+    },
+    "golden-reference": {
+      "ARM_M_M9_8": {
+        "EARLY_top1_mean": 0.4069444444444444,
+        "MATURE_top1_mean": 0.9833333333333334
+      },
+      "ARM_S_M9_8": {
+        "EARLY_top1_mean": 0.42083333333333334,
+        "MATURE_top1_mean": 0.9895833333333334
+      }
+    },
+    "loop-grid": {
+      "ARM_M_M9_8": {
+        "EARLY_top1_mean": 0.18541666666666667,
+        "MATURE_top1_mean": 0.3875
+      },
+      "ARM_S_M9_8": {
+        "EARLY_top1_mean": 0.18472222222222223,
+        "MATURE_top1_mean": 0.40208333333333335
+      }
+    }
+  },
+  "golden_reference_early_regression_pp": 1.388888888888895,
+  "golden_reference_mature_regression_pp": 0.6249999999999978,
+  "golden_reference_mrr_regression": 0.0019290123456788821,
+  "note": "golden-reference is the shared comparator with a frozen regression bound (Section 22); branched-loop/loop-grid are reported as retention figures for BOTH arms (both are trained on them), with no new post-hoc threshold invented.",
+  "passed": true
+}
