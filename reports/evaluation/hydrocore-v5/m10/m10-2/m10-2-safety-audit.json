@@ -1,0 +1,14 @@
+{
+  "kind": "M10_2_TRUE_SAFETY_AUDIT",
+  "counters": {
+    "invalid_or_inaccessible_node_selected": 0,
+    "already_sampled_node_reselected": 0,
+    "sampling_budget_exceeded": 0,
+    "non_finite_scout_output": 0,
+    "fail_closed_selection_violations": 0
+  },
+  "all_hard_gates_passed": true,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "protocol_hash": "5dba094406aa6df7b85f50a6becdd4a092c171a7a766f75877584e7885548ad8"
+}

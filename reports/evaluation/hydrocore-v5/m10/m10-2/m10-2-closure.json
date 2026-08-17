@@ -1,0 +1,51 @@
+{
+  "kind": "M10_2_TRUE_CLOSURE",
+  "milestone": "M10.2-true",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "4185eab1f45d91b78559c6360ac4d9e5fd80484b",
+  "protocol_hash": "5dba094406aa6df7b85f50a6becdd4a092c171a7a766f75877584e7885548ad8",
+  "level_a_refit_checkpoint_sha256": {
+    "20260814": "7d8638f6a84afb570e02a6dc1be4c5e9438191226de15d7ce4d40d273c94004a",
+    "31874": "cecc125cd599d6d1469a9aa34724b13dc6e35497e9aeac445204efcc4fa0c819",
+    "20260815": "7e09704b817ad0167211f286406656c6a70d6fc24d1a3b0a9f97f240434c59a1"
+  },
+  "parent_m9_6_teacher_sha256_unchanged": {
+    "20260814": {
+      "expected": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+      "actual": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+      "unchanged": true,
+      "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260814/model-export-final-step.safetensors"
+    },
+    "31874": {
+      "expected": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+      "actual": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+      "unchanged": true,
+      "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors"
+    },
+    "20260815": {
+      "expected": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+      "actual": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+      "unchanged": true,
+      "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260815/model-export-final-step.safetensors"
+    }
+  },
+  "same_refit_predictor_used_in_both_arms": true,
+  "original_m9_6_scout_checkpoint_used_as_learned_policy": false,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "learned_scout_runtime_authority_unchanged": true,
+  "deterministic_scout_fallback_preserved": true,
+  "learned_ood_not_promoted": true,
+  "wntr_epanet_authority_unchanged": true,
+  "hard_gates_passed": true,
+  "safety_audit_counters": {
+    "invalid_or_inaccessible_node_selected": 0,
+    "already_sampled_node_reselected": 0,
+    "sampling_budget_exceeded": 0,
+    "non_finite_scout_output": 0,
+    "fail_closed_selection_violations": 0
+  },
+  "M10_2_RESULT": "M10_2_LEARNED_SCOUT_NOT_PROMOTED_DETERMINISTIC_RETAINED",
+  "decision_reason": "primary metric consistency bar not met (positive point estimate in 0/3 seeds, required 3; CI excludes zero in 0/3 seeds, required 2)",
+  "next_recommended": "None -- this milestone establishes scientific promotion eligibility only. Runtime promotion (enabling learned Scout in production) is a separate, later, explicitly authorized milestone regardless of this result. M10.3 (Strategist) requires its own separately authorized supervision/candidate-schema amendment before any scientific evaluation, per HYDROCORE_V5_M10_DOWNSTREAM_SUPERVISION_AMENDMENT.md."
+}
