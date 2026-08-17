@@ -319,3 +319,75 @@ def test_extreme_source_node_logits_cannot_move_the_result_when_disabled() -> No
     assert moderate.fused_belief == extreme.fused_belief
     assert moderate.neural_belief is None
     assert extreme.neural_belief is None
+
+
+# M10.1 readiness-review gap: the governed 11-category ood_category head
+# (checkpoint_identity.OOD_CATEGORY_NAMES / ood_labels.OODCategory) and the
+# deterministic 3-level OOD severity (hydroswarm.domain.OODLevel, produced
+# by OODDetector.evaluate() from classical/topology/sensor signals plus the
+# UNRELATED, separately-gated 3-logit "ood_logits" energy proxy -- never
+# ood_category_logits) are two independent authority tiers. The tests above
+# already prove an UNSUPPORTED category class never surfaces; these two
+# extend the same "mutate a disabled/enabled head to extreme values, assert
+# the DETERMINISTIC result is byte-identical" pattern used for
+# source_node/scout/strategist above to ood_category specifically, since no
+# such adversarial-mutation proof existed for it yet.
+
+
+class ExtremeOODCategoryModel(EventAwareModel):
+    """ood_category_logits pinned to an extreme, maximally-confident,
+    deliberately alarming SUPPORTED category (EXTREME_DEMAND, index 3 --
+    supported per ood_labels.SUPPORTED_OOD_CATEGORIES, so this is not
+    merely re-testing the separate unsupported-class suppression above) --
+    if this ever leaked into deterministic OOD severity or control, it
+    would force worst-case ABSTAIN/suppression behavior regardless of the
+    real classical/sensor evidence."""
+
+    def __call__(self, batch):
+        output = super().__call__(batch)
+        logits = torch.full((1, 11), -1_000.0)
+        logits[0, 3] = 1_000.0
+        output["ood_category_logits"] = logits
+        return output
+
+
+@pytest.mark.real_simulation
+def test_extreme_ood_category_logits_cannot_move_deterministic_ood_severity_when_disabled() -> None:
+    moderate = _analyze(EventAwareModel(), runtime_enabled_outputs=frozenset())
+    extreme = _analyze(ExtremeOODCategoryModel(), runtime_enabled_outputs=frozenset())
+
+    assert moderate.semantic_predictions.ood_category is None
+    assert extreme.semantic_predictions.ood_category is None
+    assert moderate.ood_level == extreme.ood_level
+    assert moderate.ood_components == extreme.ood_components
+    assert moderate.control_action == extreme.control_action
+    assert moderate.planning_allowed == extreme.planning_allowed
+    assert moderate.planning_suppression_reasons == extreme.planning_suppression_reasons
+    assert moderate.fused_belief == extreme.fused_belief
+
+
+@pytest.mark.real_simulation
+def test_extreme_ood_category_logits_cannot_move_deterministic_ood_severity_even_when_enabled() -> None:
+    """The stronger half of the same invariant: even when a v4 identity
+    DOES runtime-enable ood_category (so the advisory field legitimately
+    changes, proving the gate is a real two-way switch and not
+    accidentally always-off), deterministic OOD severity/control/fusion
+    must still be completely unaffected -- there is no code path from
+    ood_category into OODDetector.evaluate(), fuse_source_probabilities,
+    or uncertainty_control at all (unlike source_node, which IS wired into
+    fusion once enabled)."""
+
+    moderate = _analyze(EventAwareModel(), runtime_enabled_outputs=frozenset({"ood_category"}))
+    extreme = _analyze(ExtremeOODCategoryModel(), runtime_enabled_outputs=frozenset({"ood_category"}))
+
+    # The advisory field itself DOES move -- proves this is a live,
+    # governed switch, not a field that always reads None regardless.
+    assert moderate.semantic_predictions.ood_category == "UNSEEN_TOPOLOGY"
+    assert extreme.semantic_predictions.ood_category == "EXTREME_DEMAND"
+    # But nothing operationally authoritative moves at all.
+    assert moderate.ood_level == extreme.ood_level
+    assert moderate.ood_components == extreme.ood_components
+    assert moderate.control_action == extreme.control_action
+    assert moderate.planning_allowed == extreme.planning_allowed
+    assert moderate.planning_suppression_reasons == extreme.planning_suppression_reasons
+    assert moderate.fused_belief == extreme.fused_belief
