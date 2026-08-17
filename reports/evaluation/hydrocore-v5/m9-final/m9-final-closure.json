@@ -1,0 +1,58 @@
+{
+  "kind": "M9_FINAL_CLOSURE",
+  "M9_STATUS": "CLOSED",
+  "SELECTED_HYDROCORE_SIZE": "S",
+  "SELECTED_PARAMETER_COUNT": 4182612,
+  "SELECTED_VARIANT": "small",
+  "SELECTED_RECIPE": [
+    "CLASSICAL_HYDROCORE_S",
+    "AGE_FIX_ONLY",
+    "EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING",
+    "B_DEPTH_AWARE_CALIBRATION",
+    "ALPHA_0_1",
+    "SOURCE_REPRESENTATIVE_CALIBRATION_SUPPORT_20_PER_SOURCE"
+  ],
+  "SELECTED_CHECKPOINT_POLICY": "FINAL_STEP_1350",
+  "SELECTED_CHECKPOINTS": {
+    "20260814": "reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed20260814.json (canonical_export_path/canonical_export_sha256)",
+    "31874": "reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed31874.json (canonical_export_path/canonical_export_sha256)",
+    "20260815": "reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed20260815.json (canonical_export_path/canonical_export_sha256)"
+  },
+  "HYDROCORE_M_STATUS": "NOT_PROMOTED",
+  "HYDROCORE_M_PARAMETER_COUNT": 13919572,
+  "HYDROCORE_L_AUTHORIZED": false,
+  "CAPACITY_SCALING_RESULT": "NO_MEANINGFUL_CAPACITY_GAIN",
+  "CAPACITY_SCALING_EVIDENCE": {
+    "primary_endpoint": "unseen-topology MATURE macro-family neural Top-1, M-S",
+    "delta": -0.0034259259259259277,
+    "ci90": [-0.012777777777777779, 0.0062962962962962955],
+    "threshold": 0.02,
+    "source": "reports/evaluation/hydrocore-v5/m9-8/m9-8-closure.json"
+  },
+  "TEMPORAL_ARCHITECTURE_SEARCH": "CLOSED",
+  "TEMPORAL_ARCHITECTURE_SEARCH_EVIDENCE": "M9.1: CURRENT (classical/discrete-time) retained over GRAPH_ODE/GRAPH_CDE/GRAPH_SDE continuous-time arms -- see reports/evaluation/hydrocore-v5/m9-1-closure.json/m9-1-summary.md",
+  "S_SCALE_TRAINING_RECIPE_SEARCH": "CLOSED",
+  "S_SCALE_TRAINING_RECIPE_SEARCH_EVIDENCE": "AGE_FIX_ONLY selected in M8.7; multi-topology interleaved training validated across M9.0/M9.0a/M9.0b; exact-compute-parity final confirmation in M9.6 (M9_6_DECISION=A, HYDROCORE_S FROZEN)",
+  "MODEL_SIZE_SEARCH": "CLOSED",
+  "MODEL_SIZE_SEARCH_EVIDENCE": "M9.7/M9.7A preregistered and corrected the HydroCore-M capacity experiment; M9.8 executed it with a clean negative result (M9_8_DECISION=B)",
+  "LOCKED_FINAL_TEST_OPENED": false,
+  "LOCKED_TOPOLOGY_TEST_OPENED": false,
+  "evidence_chain": [
+    "AGE_FIX_ONLY selected (M8.7) -- corrected absolute-time-origin leakage and weak/partial temporal-feature usage without regressing accuracy/calibration",
+    "classical temporal architecture retained (M9.1) -- CURRENT outperformed GRAPH_ODE/GRAPH_CDE/GRAPH_SDE continuous-time arms on the frozen primary metric",
+    "multi-topology interleaved training validated (M9.0/M9.0a/M9.0b) -- ARM_B interleaved training across golden-reference/branched-loop/loop-grid confirmed over single-family ARM_A, with step-matched comparability and calibration-grouping study resolved",
+    "full-source evaluation defect corrected (M9.4/M9.5/M9.5R) -- source-representative calibration support issue identified and independently reconfirmed",
+    "calibration support issue resolved (M9.5R) -- independent confirmation under a disjoint population",
+    "exact compute parity confirmed (M9.6, M9_6_DECISION=A) -- HydroCore-S FROZEN at exactly 1350 optimizer steps, interleaved recipe, 4,182,612 parameters",
+    "S frozen (M9.6)",
+    "3.33x larger M produced no meaningful capacity gain (M9.7/M9.7A/M9.8, M9_8_DECISION=B) -- clean negative result, all guardrails except primary effect passed, reported honestly per the standing 'report negative results' rule",
+    "S retained as the selected predictor for M10"
+  ],
+  "m9_metadata_corrections_applied_before_closure": [
+    "M9.8 closure start_commit conflation (start_commit/execution_manifest_commit/execution_commit disambiguated) -- reports/evaluation/hydrocore-v5/m9-8/m9-8-closure.json, commit 8284e48",
+    "M9.1 provenance tripwire refresh after M9.7's audited additive core.py change -- reports/evaluation/hydrocore-v5/m9-1-provenance-refresh/, commit 0e27e61"
+  ],
+  "full_repository_suite_at_closure": {"passed": 1539, "skipped": 1, "failed": 0},
+  "branch": "exp/hydrocore-v5-causal",
+  "closure_commit_note": "a commit cannot embed its own SHA at authoring time -- see m9-8-closure.json's start_commit_note for the identical issue/convention. The commit that actually adds this closure is whatever `git rev-parse HEAD` shows after 'exp(v5): formally close Milestone 9' lands."
+}
