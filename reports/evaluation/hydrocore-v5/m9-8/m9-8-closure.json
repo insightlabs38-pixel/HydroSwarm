@@ -24,8 +24,8 @@
     "training_time_ratio_M_over_S": null
   },
   "evidence_against": "See guardrails payload (m9-8-guardrails.json) for any individual guardrail failure detail.",
-  "execution_commit": "afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1",
-  "execution_manifest_commit": "afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1",
+  "execution_commit": "e33d71804c517d712724488ce9f005093cd06cb5",
+  "execution_manifest_commit": "1fdc8fbb489e5f1c538b14d676f4b9275627dfc3",
   "guardrails": {
     "A_primary_effect": false,
     "B_family_consistency": true,
@@ -89,7 +89,8 @@
     "threshold": 0.02
   },
   "selected_predictor_after_m9_8": "S",
-  "start_commit": "afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1",
+  "start_commit": "e39412ce56aed4ba31d11bf2fbace55f191428c2",
+  "start_commit_note": "METADATA-ONLY CORRECTION: run_m9_8_decide.py's decide-stage `m8.current_commit()` call wrote the same HEAD value (afdd20b64cfbcdfb45beb6be6a4d93d6cec1bad1, the ARM_S-provenance/ARM_M-training commit) into start_commit, execution_manifest_commit, and execution_commit alike, conflating three distinct commits. start_commit now correctly records e39412ce56aed4ba31d11bf2fbace55f191428c2 -- the M9.7A closure commit, i.e. the actual pre-experiment scientific freeze point, matching m9-8-execution-manifest.json's own start_commit (frozen BEFORE any M9.8 training/development/calibration inference per that manifest's `purpose` field). execution_manifest_commit now records 1fdc8fbb489e5f1c538b14d676f4b9275627dfc3, the commit that actually froze/added m9-8-execution-manifest.json. execution_commit now records e33d71804c517d712724488ce9f005093cd06cb5, the true final SHA that added this closure.json and the rest of the M9.8 evaluation artifacts (mirroring the M9.4/M9.5/M9.5R/M9.6 execution_commit self-reference fix, since a commit cannot embed its own SHA at authoring time). No metric, decision (M9_8_DECISION=B), guardrail result, or checkpoint identity is altered by this correction.",
   "strongest_evidence": "Macro-family (equal-weight) unseen-topology MATURE neural Top-1 delta (M-S): -0.0034259259259259277, 90% paired-bootstrap CI [-0.012777777777777779, 0.0062962962962962955], threshold +0.02. Training parity passed: True.",
   "training_comparability": {
     "passed": true,
