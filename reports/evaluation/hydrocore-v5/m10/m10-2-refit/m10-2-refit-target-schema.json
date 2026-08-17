@@ -1,0 +1,16 @@
+{
+  "kind": "M10_2_REFIT_TARGET_SCHEMA",
+  "schema_version": "scout-target-v1",
+  "source_of_truth": "hydroswarm.training.scout_labels.generate_scout_label (real, offline, exact-simulation-derived classical EIG over a SignatureArtifact)",
+  "target_tensor_construction": "hydroswarm.training.scout_trajectory._scout_step_targets (reused unmodified)",
+  "targets": [
+    "sample_node",
+    "sample_node_mask",
+    "information_gain",
+    "information_gain_mask",
+    "candidate_reduction",
+    "candidate_reduction_mask",
+    "should_continue_sampling"
+  ],
+  "input_target_separation": "build_scout_training_state_batch has no label/target parameter (structural leakage guard); ScoutTrainingExample.label is offline-diagnostics-only and never enters .state.batch"
+}
