@@ -67,6 +67,7 @@ SELECTED_PARAMETER_COUNT = 4182612
 M10_DIR = ROOT / "reports" / "evaluation" / "hydrocore-v5" / "m10"
 M10_0_DIR = M10_DIR / "m10-0"
 M10_1_DIR = M10_DIR / "m10-1"
+M10_2_PREFLIGHT_DIR = M10_DIR / "m10-2-preflight"
 
 
 def canonical_s_checkpoint(seed: int) -> dict:

@@ -1,0 +1,36 @@
+{
+  "kind": "M10_2_PREFLIGHT_CLOSURE",
+  "milestone": "M10.2-preflight",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "eadf80647986e52523dc3d30adb5085971b0e727",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "scout_eval_state_schema_version": "scout-eval-state-v1",
+  "checkpoint_hashes_per_seed": {
+    "20260814": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "31874": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+    "20260815": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+  },
+  "checkpoint_weights_unchanged": true,
+  "historical_m9_m10_artifacts_unchanged": true,
+  "all_required_scout_outputs_present_in_forward_pass": true,
+  "deterministic_fallback_verified": true,
+  "leakage_tests_passed": true,
+  "candidate_mask_tests_passed": true,
+  "output_governance_status": "scout outputs correctly absent from trained/validated/runtime_enabled_outputs; SCOUT_OUTPUTS vocabulary unchanged",
+  "scout_heads_trained_in_selected_checkpoint": false,
+  "focused_tests": {
+    "tests/unit/test_scout_evaluation_state.py": "31 passed",
+    "tests/scientific/test_m10_2_scout_preflight.py": "3 passed (real_simulation)",
+    "tests/unit/test_scout_control_heads.py": "10 passed (pre-existing, unaffected)",
+    "tests/unit/test_scout_state_contract.py": "8 passed (pre-existing, unaffected)",
+    "tests/scientific/test_decision_certificates.py": "unaffected M10.0/M10.1 adversarial suite, still passing",
+    "tests/scientific/test_hybrid_pipeline_v4_gating.py": "unaffected M10.0/M10.1 adversarial suite, still passing",
+    "combined_focused_total": "52 passed, 0 failed"
+  },
+  "full_test_suite": "1576 passed, 1 skipped (pre-existing, unrelated: tests/evaluation/test_capability_diagnostic.py PR#12 CI-checkout-history exception), 0 failed, in 1321.33s. Prior baseline (this branch's last commit) was 1542 passed/1 skipped/0 failed; +34 is exactly this pass's own new tests (31 unit + 3 scientific).",
+  "pyright_result": "0 errors, 0 warnings, 0 informations",
+  "results_finalized": true,
+  "readiness": "M10_2_PREFLIGHT_BLOCKED",
+  "next_recommended": "M10.2 scientific Scout comparison remains BLOCKED until a separately authorized amendment adds real Scout-target wiring to the M9.6-equivalent training corpus and retrains (frozen-backbone, head-only, matching scripts/train_scout_heads.py's precedent) -- explicitly out of scope for this preflight."
+}
