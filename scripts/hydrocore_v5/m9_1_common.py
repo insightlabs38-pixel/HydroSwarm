@@ -86,10 +86,38 @@ from run_m8_7_arm import ARM_DEFINITIONS as M8_7_ARM_DEFINITIONS  # noqa: E402
 # ---------------------------------------------------------------------------
 
 PROTOCOL_FROZEN_AT_COMMIT = "0f05be1d47258a8c3d19e3a0d0e1122e3e560069"
-#: Section 21(a): superseding pin. `assert_code_under_test_commit` accepts
-#: this commit OR a later commit on the same branch that changes nothing
-#: under the three paths below (the header's own re-preflight-trigger rule).
-CODE_UNDER_TEST_COMMIT_FLOOR = "154605180f2a950d86452cfc8ec7202990aba8cf"
+#: Section 21(a): first superseding pin (dated 2026-08-16) -- added the
+#: frozen GRAPH_ODE max_num_steps bound, no other model change.
+CODE_UNDER_TEST_COMMIT_FLOOR_V1 = "154605180f2a950d86452cfc8ec7202990aba8cf"
+#: Section 21 (dated 2026-08-17): second superseding pin. M9.7 commit
+#: 475874d ("feat(v5-causal): add governed HydroCore-M capacity config")
+#: registers MODEL_VARIANTS["small_v5_capacity_m"] in
+#: src/hydroswarm/model/core.py -- the ONLY commit touching any
+#: FROZEN_UNCHANGED_PATHS file between CODE_UNDER_TEST_COMMIT_FLOOR_V1 and
+#: this pin (verified: `git log CODE_UNDER_TEST_COMMIT_FLOOR_V1..475874d --
+#: <FROZEN_UNCHANGED_PATHS>` lists exactly this one commit). Audited and
+#: proven additive-only before being accepted as the new floor -- see
+#: reports/evaluation/hydrocore-v5/m9-1-provenance-refresh/ and this
+#: document's own 2026-08-17 amendment (Section 21):
+#:   - `MODEL_VARIANTS["small"]` line is byte-identical (git diff of the
+#:     hunk adds exactly one new dict entry, changes zero existing lines);
+#:   - continuous_time.py and training-v5-causal.yaml have a literal empty
+#:     diff between the two pins (nothing to audit there at all);
+#:   - MODEL_VARIANTS is looked up strictly by key
+#:     (`MODEL_VARIANTS[variant.lower()]`, core.py), never iterated, so an
+#:     added key cannot change "small"'s resolved configuration or any
+#:     GRAPH_ODE/CDE/SDE construction path;
+#:   - mechanically confirmed: constructing "small" at this commit with
+#:     M9.1's own frozen `SHARED_MODEL_CONFIG`/`CURRENT_MODEL_KWARGS`
+#:     yields exactly `CURRENT_BASELINE_TOTAL_PARAMS` (4,182,612) trainable
+#:     parameters, unchanged.
+#: `assert_code_under_test_commit` accepts this commit OR a later commit on
+#: the same branch that changes nothing under the three paths below (the
+#: header's own re-preflight-trigger rule) -- ANY future change to those
+#: paths beyond this pin still trips the guard exactly as before; this is a
+#: narrow, audited exception for one specific historical commit, not a
+#: relaxation of the rule itself.
+CODE_UNDER_TEST_COMMIT_FLOOR = "475874d8977d0952e8fc3626eb2bd6580cc3c2f7"
 FROZEN_UNCHANGED_PATHS = (
     "src/hydroswarm/model/continuous_time.py",
     "src/hydroswarm/model/core.py",

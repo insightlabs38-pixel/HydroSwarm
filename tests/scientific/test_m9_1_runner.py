@@ -422,6 +422,60 @@ def test_assert_locked_test_closed_passes_currently():
     assert common.assert_locked_test_closed() is False
 
 
+def test_code_under_test_commit_floor_v2_audit_is_additive_only():
+    # 2026-08-17 Section-21 amendment: CODE_UNDER_TEST_COMMIT_FLOOR was
+    # re-superseded from CODE_UNDER_TEST_COMMIT_FLOOR_V1
+    # (154605180f2a950d86452cfc8ec7202990aba8cf) to M9.7 commit
+    # 475874d8977d0952e8fc3626eb2bd6580cc3c2f7. Mechanically re-prove, on
+    # every run, that the ONLY frozen-path change in between is the single
+    # additive MODEL_VARIANTS["small_v5_capacity_m"] registration and that
+    # it does not touch the existing "small" line -- if a future rebase or
+    # history rewrite ever changes what that commit range actually
+    # contains, this test (not just the amendment prose) catches it.
+    assert common.CODE_UNDER_TEST_COMMIT_FLOOR_V1 == "154605180f2a950d86452cfc8ec7202990aba8cf"
+    assert common.CODE_UNDER_TEST_COMMIT_FLOOR == "475874d8977d0952e8fc3626eb2bd6580cc3c2f7"
+
+    touching = subprocess.run(
+        ["git", "log", "--format=%H",
+         f"{common.CODE_UNDER_TEST_COMMIT_FLOOR_V1}..{common.CODE_UNDER_TEST_COMMIT_FLOOR}",
+         "--", *common.FROZEN_UNCHANGED_PATHS],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.split()
+    assert touching == [common.CODE_UNDER_TEST_COMMIT_FLOOR]
+
+    diff = subprocess.run(
+        ["git", "diff", common.CODE_UNDER_TEST_COMMIT_FLOOR_V1, common.CODE_UNDER_TEST_COMMIT_FLOOR,
+         "--", "src/hydroswarm/model/core.py"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout
+    assert '+    "small_v5_capacity_m": ModelVariant(352, 11, 1056, 4, 64),' in diff
+    added = [ln for ln in diff.splitlines() if ln.startswith("+") and not ln.startswith("+++")]
+    removed = [ln for ln in diff.splitlines() if ln.startswith("-") and not ln.startswith("---")]
+    # Pure addition -- matches 475874d's own "17 insertions(+)"; zero removed
+    # lines proves the existing "small"/"medium"/"large" entries (which
+    # appear only as unchanged context in the unified diff above) were not
+    # touched, only a new dict entry appended after them.
+    assert len(added) == 17 and len(removed) == 0
+
+    for path in ("src/hydroswarm/model/continuous_time.py", "configs/training-v5-causal.yaml"):
+        empty_diff = subprocess.run(
+            ["git", "diff", common.CODE_UNDER_TEST_COMMIT_FLOOR_V1, common.CODE_UNDER_TEST_COMMIT_FLOOR, "--", path],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout
+        assert empty_diff == ""
+
+
+def test_frozen_small_variant_param_count_unchanged_at_current_head():
+    # The M9.7 additive MODEL_VARIANTS["small_v5_capacity_m"] entry must not
+    # change "small"'s own resolved configuration or trainable parameter
+    # count under M9.1's exact frozen construction recipe.
+    from hydroswarm.model.core import HydroCore
+
+    model = HydroCore.from_variant("small", use_adapters=False, **common.SHARED_MODEL_CONFIG, **common.CURRENT_MODEL_KWARGS)
+    n = sum(p.numel() for p in model.parameters())
+    assert n == common.CURRENT_BASELINE_TOTAL_PARAMS == 4182612
+
+
 # ---------------------------------------------------------------------------
 # Artifact merge safety: never silently drops an unrelated prior entry.
 # ---------------------------------------------------------------------------
