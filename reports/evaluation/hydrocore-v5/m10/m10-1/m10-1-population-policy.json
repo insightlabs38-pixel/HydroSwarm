@@ -1,0 +1,10 @@
+{
+  "kind": "M10_1_POPULATION_POLICY",
+  "seed_namespace_role": "ood_development_m10_1",
+  "seed_base": 1100000000,
+  "source_stride": 10000,
+  "disjoint_from_all_prior_milestones": true,
+  "uses_locked_final_test": false,
+  "uses_locked_topology_test": false,
+  "split_discipline": "physical scenarios split (by source_index/seed) before any causal-prefix truncation; derived depth-truncated variants of one scenario share the same scenario_id and remain together"
+}

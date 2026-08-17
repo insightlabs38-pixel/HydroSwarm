@@ -1,0 +1,19 @@
+{
+  "kind": "M10_1_OOD_CONDITIONS",
+  "conditions": ["IN_DISTRIBUTION", "SENSOR_DROPOUT", "SEVERITY_SHIFT"],
+  "condition_construction": {
+    "IN_DISTRIBUTION": {"description": "clean OPERATIONAL-stage generation, no overrides -- matches M9.8's own generation policy", "overrides": {}},
+    "SENSOR_DROPOUT": {"description": "elevated sensor missingness/communication outage", "overrides": {"missing_probability": 0.35, "communication_outage_probability": 0.15}, "defaults": {"missing_probability": 0.05, "communication_outage_probability": 0.02}},
+    "SEVERITY_SHIFT": {"description": "contamination-strength tail, outside the default training-time strength distribution", "overrides": {"strength_bins": [2.0, 3.0, 4.0]}, "defaults": {"strength_bins": [0.5, 1.0, 2.0]}}
+  },
+  "topology_shift_handling": "not a separate generated condition -- evaluated as the existing TRAINED_FAMILIES-vs-UNSEEN_FAMILIES cross-cut on the IN_DISTRIBUTION population across all six families, exactly as M9.8 did (see m10-1-predictive-metrics.json by_family breakdown and m10-1-canonical-results.jsonl's known_family field)",
+  "conditions_in_protocol_not_executed_in_this_pass": [
+    "noise (explicit sensor-noise-std sweep beyond SENSOR_DROPOUT's missingness/outage channels)",
+    "cadence/timing perturbation",
+    "source-location difficulty (candidate-set-size / calibration-coverage-miss stratification, beyond what calibration.json's mean_set_size already reports)",
+    "invalid/unavailable calibration as its own generated condition (covered instead via the fail-closed OUTSIDE_VALIDATED_RANGE smoke check in m10-1-calibration.json)"
+  ],
+  "disclosure": "M10.1 executed a reduced condition/depth grid relative to the full Section 5 table (3 of ~9 listed conditions, 2 of 7 depths) to keep this characterization milestone's runtime bounded. The decision (LEARNED_OOD_NOT_PROMOTED_DETERMINISTIC_RETAINED) rests on the executed subset; the deferred conditions are candidates for a follow-up pass if a future milestone needs finer-grained OOD characterization, not a gap that changes this milestone's own conclusion (the neural ood_category head's AUROC is chance-level under every executed condition, not marginal).",
+  "locked_topology_test_used": false,
+  "locked_final_test_used": false
+}

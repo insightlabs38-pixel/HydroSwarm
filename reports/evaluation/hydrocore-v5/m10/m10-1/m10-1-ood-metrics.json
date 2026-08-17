@@ -1,0 +1,14 @@
+{
+  "classical_ood_auroc": 0.5801866818523629,
+  "neural_ood_category_auroc": 0.5078465514597981,
+  "classical_tpr_at_caution_threshold": 0.0,
+  "classical_fpr_at_caution_threshold": 0.0,
+  "in_distribution_false_positive_rate": 0.0,
+  "ood_miss_rate": 1.0,
+  "label_definition": "OOD-positive := condition != IN_DISTRIBUTION OR family not in TRAINED_FAMILIES (pseudo-label, no ground-truth OOD annotation exists in this synthetic corpus)",
+  "uncertainty": {
+    "mean_neural_entropy": 0.5014706636037919,
+    "false_confidence_rate": 0.06481481481481481,
+    "mean_true_source_rank": 2.575617283950617
+  }
+}

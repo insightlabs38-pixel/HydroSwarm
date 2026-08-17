@@ -1,0 +1,62 @@
+{
+  "kind": "M10_1_EVALUATION_MANIFEST",
+  "milestone": "M10.1",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "dd094325ce4b6017af334859e0baadc136a9dfec",
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid",
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ],
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "conditions": [
+    "IN_DISTRIBUTION",
+    "SENSOR_DROPOUT",
+    "SEVERITY_SHIFT"
+  ],
+  "condition_overrides": {
+    "IN_DISTRIBUTION": {},
+    "SENSOR_DROPOUT": {
+      "missing_probability": 0.35,
+      "communication_outage_probability": 0.15
+    },
+    "SEVERITY_SHIFT": {
+      "strength_bins": [
+        2.0,
+        3.0,
+        4.0
+      ]
+    }
+  },
+  "depths": [
+    2,
+    12
+  ],
+  "repeats_per_source": 3,
+  "n_rows": 1944,
+  "n_scenarios": 324,
+  "seed_base": 1100000000,
+  "source_stride": 10000,
+  "demand_shift_channel_disclosure": "OODDetector.evaluate()'s demand_shift always reads the documented .get('demand', 0.0) fallback -- no HydraulicStateEstimator reconciliation performed in M10.1 (out of scope, disclosed not fabricated).",
+  "latent_distance_channel_disclosure": "always 0.0 -- no v5 latent reference (OODReference.latent_center) has ever been fit; OODDetector's own default-empty-tuple graceful degradation, not a bug.",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "wall_seconds": 386.9161162376404,
+  "environment": {
+    "python_version": "3.12.13",
+    "torch_version": "2.13.0+cu130",
+    "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41"
+  }
+}

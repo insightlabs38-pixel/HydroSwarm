@@ -1,0 +1,9 @@
+{
+  "no_in_distribution_regression": true,
+  "measurable_ood_detection_improvement": false,
+  "no_unsafe_confidence_increase": true,
+  "no_invalid_calibration_acceptance_increase": true,
+  "deterministic_fail_safe_available": true,
+  "all_outputs_finite": true,
+  "no_authority_boundary_regression": true
+}

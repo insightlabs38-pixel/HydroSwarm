@@ -1,0 +1,28 @@
+{
+  "classical": {
+    "coverage": 0.7731481481481481,
+    "mean_set_size": 4.054012345679013,
+    "n": 1944,
+    "alpha": 0.1,
+    "coverage_floor": 0.85,
+    "interpretable_against_frozen_calibrator": false
+  },
+  "neural": {
+    "coverage": 0.9099794238683128,
+    "mean_set_size": 3.8924897119341564,
+    "n": 1944,
+    "alpha": 0.1,
+    "coverage_floor": 0.85,
+    "interpretable_against_frozen_calibrator": true
+  },
+  "fused": {
+    "coverage": 0.7438271604938271,
+    "mean_set_size": 2.7391975308641974,
+    "n": 1944,
+    "alpha": 0.1,
+    "coverage_floor": 0.85,
+    "interpretable_against_frozen_calibrator": false
+  },
+  "disclosure": "The frozen M9.6 calibrator was fit exclusively on neural probabilities (run_m9_6_evaluate.py:328). Only calibration_report['neural'] is a valid coverage measurement against that fit; 'classical' and 'fused' entries apply the SAME neural-fit nonconformity thresholds to a different probability distribution and are not meaningful coverage claims -- reported only for descriptive transparency, never used in any guardrail.",
+  "invalid_calibration_fail_closed_verified": true
+}

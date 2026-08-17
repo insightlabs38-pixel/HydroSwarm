@@ -1,0 +1,38 @@
+{
+  "kind": "M10_1_CLOSURE",
+  "milestone": "M10.1",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "dd094325ce4b6017af334859e0baadc136a9dfec",
+  "n_rows": 1944,
+  "guardrails": {
+    "no_in_distribution_regression": true,
+    "measurable_ood_detection_improvement": false,
+    "no_unsafe_confidence_increase": true,
+    "no_invalid_calibration_acceptance_increase": true,
+    "deterministic_fail_safe_available": true,
+    "all_outputs_finite": true,
+    "no_authority_boundary_regression": true
+  },
+  "all_guardrails_passed": false,
+  "fused_vs_neural_delta_top1": {
+    "delta": 0.00205761316872428,
+    "ci90": [
+      -0.00257201646090535,
+      0.006687242798353909
+    ],
+    "n": 1944
+  },
+  "fused_vs_classical_delta_top1": {
+    "delta": 0.027777777777777776,
+    "ci90": [
+      0.014917695473251029,
+      0.040123456790123455
+    ],
+    "n": 1944
+  },
+  "classical_ood_auroc": 0.5801866818523629,
+  "neural_ood_category_auroc": 0.5078465514597981,
+  "M10_1_DECISION": "LEARNED_OOD_NOT_PROMOTED_DETERMINISTIC_RETAINED",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}
