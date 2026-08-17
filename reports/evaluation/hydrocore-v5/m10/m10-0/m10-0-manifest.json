@@ -1,0 +1,21 @@
+{
+  "kind": "M10_0_PREFLIGHT_MANIFEST",
+  "milestone": "M10.0",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "8284e48095acd14270be962250d1aebe9ce5cbcf",
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "no_training_performed": true,
+  "no_tuning_performed": true,
+  "no_calibration_refit_performed": true,
+  "environment": {
+    "python_version": "3.12.13",
+    "torch_version": "2.13.0+cu130",
+    "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "scout_deterministic_fallback_reachable": true,
+  "scout_deterministic_fallback_output_finite": true,
+  "strategist_deterministic_fallback_reachable": true,
+  "deterministic_ood_detector_callable": true,
+  "deterministic_ood_topology_novelty_smoke_value": 0.0,
+  "high_ood_forces_abstain": true,
+  "low_ood_single_candidate_generates_plans": true,
+  "learned_ood_category_in_OOD_CONTROL_OUTPUTS_vocabulary": true,
+  "learned_ood_category_advisory_only_per_pipeline_comment": true,
+  "scout_outputs_vocabulary": [
+    "candidate_reduction",
+    "information_gain",
+    "sample_node",
+    "should_continue_sampling"
+  ],
+  "strategist_outputs_vocabulary": [
+    "containment_time_proxy",
+    "exposure_proxy",
+    "plan_regret_proxy",
+    "plan_validity",
+    "plan_value",
+    "pressure_risk_proxy",
+    "service_loss_proxy"
+  ],
+  "no_learned_component_autonomously_actuates": true,
+  "wntr_epanet_remains_downstream_authority": true
+}
