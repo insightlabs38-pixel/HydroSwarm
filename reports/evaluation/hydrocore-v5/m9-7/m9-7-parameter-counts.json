@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7: raw parameter_report() breakdown for S and M, computed directly from live model instances.",
+  "milestone": "M9.7",
+  "hydrocore_s": {
+    "variant": "small",
+    "total": 4182612,
+    "trainable": 4182612,
+    "backbone": 2989248,
+    "encoders": 941376,
+    "adapters": 0,
+    "heads": 251987
+  },
+  "hydrocore_m": {
+    "variant": "small_v5_capacity_m",
+    "total": 13919572,
+    "trainable": 13919572,
+    "backbone": 9985888,
+    "encoders": 3133856,
+    "adapters": 0,
+    "heads": 799827
+  },
+  "deltas": {
+    "total": 9736960,
+    "backbone": 6996640,
+    "encoders": 2192480,
+    "adapters": 0,
+    "heads": 547840
+  },
+  "ratios": {
+    "total": 3.3279615704253707,
+    "backbone": 3.34060205108442,
+    "encoders": 3.3290162485553063,
+    "heads": 3.1740804089099837
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Sections 6/7/8: full preregistration of the M9.8 HydroCore-S vs HydroCore-M capacity comparison, frozen BEFORE any HydroCore-M development-performance number is observed.",
+  "milestone": "M9.7 (governs future M9.8)",
+  "arms": {
+    "ARM_S": "frozen HydroCore-S architecture (variant='small', 4,182,612 params) + frozen M9.6 ARM_B_M9_6 interleaved recipe -- reuse M9.6's own trained checkpoints where available (zero redundant retraining), matching the M9.1/M9.0b checkpoint-reuse convention: read m9-6-training-runs/ARM_B_M9_6-seed{seed}.json's export_path/export_sha256, verify SHA-256 on disk, load if present; if the checkpoint blob is physically absent, retrain from scratch using the exact frozen M9.6 ARM_B recipe/config/seed and record REGENERATED_NOT_ORIGINAL_M9_6_CHECKPOINT (vs REUSED_M9_6_CHECKPOINT) transparently, per M9.1 protocol Section 2's precedent.",
+    "ARM_M": "HydroCore-M (variant='small_v5_capacity_m', 13,919,572 params, m9-7-selected-m-architecture.json) + IDENTICAL recipe to ARM_S except capacity -- always trained fresh (no prior M checkpoint exists)."
+  },
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "causal_depths_evaluated": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "maturity_buckets": {
+    "EARLY": [
+      1,
+      2,
+      3
+    ],
+    "MID": [
+      4,
+      6
+    ],
+    "MATURE": [
+      12,
+      25
+    ]
+  },
+  "primary_endpoint": {
+    "name": "unseen-topology MATURE neural Top-1, macro-averaged equally across unseen topology families",
+    "unseen_families": [
+      "coastal-branch",
+      "tree-branch",
+      "dense-loop"
+    ],
+    "definition": "for each unseen family, mean neural source_node argmax top-1 accuracy at MATURE depths (12,25) over that family's development-representative incidents; macro-average (equal weight per family, NOT incident-weighted) across the 3 families -- IDENTICAL construction to M9.6's own primary metric (m9-6-summary.md 'Predictive generalization (unseen macro-family MATURE Top-1, ARM_B - ARM_A)'), applied here as ARM_M - ARM_S instead of ARM_B - ARM_A.",
+    "posterior_used": "neural predictor's own source_node posterior only (softmax(source_node_logits)) -- never the classical or hybrid-fused posterior, matching M9.1 Section 11.1's standing convention."
+  },
+  "statistical_procedure": {
+    "method": "paired bootstrap, family-stratified / matched-incident, consistent with the corrected source-representative M9.4-M9.6 methodology",
+    "resamples": 2000,
+    "confidence_interval": 0.9,
+    "resampling_unit": "incidents (matching M8.7 Section 10 / M9.1 Section 14's own convention)",
+    "bootstrap_seed": 20260819,
+    "bootstrap_seed_provenance": "Deterministic, unused, chronologically-next 8-digit v5 seed: verified absent from every existing .py/.json/.md artifact in this repository at M9.7 freeze time (grep -rn '\\b20260819\\b' returned zero hits before this document was written). Distinct from M9.6's own bootstrap seed (20260818) and the standing confirmation seed (20260815).",
+    "representative_seed_convention": "seed 31874 remains the standing representative seed for any screening-stage/representative-seed reporting, matching M8.7/M9.0b/M9.1's established convention."
+  },
+  "secondary_metrics": [
+    "Top-3",
+    "MRR",
+    "NLL",
+    "Brier",
+    "posterior entropy",
+    "true-source rank",
+    "EARLY and MID accuracy",
+    "per-family results",
+    "per-source results",
+    "candidate-set coverage",
+    "candidate-set size",
+    "calibration by family/seed/bucket",
+    "latency",
+    "peak memory/RSS",
+    "checkpoint size",
+    "training wall time",
+    "inference wall time"
+  ],
+  "practical_effect_threshold": {
+    "historical_precedent_search": "Searched the master protocol (docs/evaluation/HYDROCORE_V5_EXPERIMENT_PROTOCOL.md Section 6, which cites 'Milestone 9.2's worked examples') and the original /workspace/experiments.txt Milestone 9.2 'Promotion philosophy' section. No exact numeric threshold is preregistered anywhere in this repository -- experiments.txt Milestone 9.2 gives only QUALITATIVE worked examples: a +10pp gain (4M 67% -> 16M 77%) is judged meaningful (select the larger model); a +1-2pp gain (4M 67% -> 16M 68%) is judged NOT meaningful (retain the 4M model). No repo artifact under reports/evaluation/hydrocore-v5/ names a specific pp threshold for this decision -- M9.2 and M9.3 as actually executed in this branch's history are unrelated diagnostic-only studies (reports/evaluation/hydrocore-v5/m9-2/m9-2-summary.md, m9-3-summary.md), not the capacity-scaling 'Milestone 9.2' the master protocol's Section 6 prose originally anticipated under the pre-renumbering experiments.txt plan.",
+    "no_more_authoritative_numeric_threshold_found": true,
+    "adopted_rule_note": "Since no repo-preregistered NUMERIC threshold exists to inherit, the quantitative floor proposed in this M9.7 task prompt (+0.02 absolute primary-metric gain with a 90% CI lower bound > 0) is adopted as the FROZEN M9.8 promotion rule. This value sits consistently with, and does not contradict, experiments.txt's own qualitative precedent: its own 'not meaningful' worked example is a +1pp gain, and this frozen floor (+2pp) sits just above that -- not below it -- so it does not lower the bar experiments.txt's own example already set as insufficient.",
+    "rules": {
+      "A_primary_effect": {
+        "condition": "M - S >= +0.02 absolute on the primary endpoint AND paired-bootstrap 90% CI lower bound > 0"
+      },
+      "B_family_consistency": {
+        "condition": "M improves at least 2 of the 3 unseen families AND no unseen family regresses by more than 0.03 absolute"
+      },
+      "C_seed_consistency": {
+        "condition": "no catastrophic seed reversal; all three seed deltas individually reported (never collapsed to a mean before being recorded)"
+      },
+      "D_known_family_retention": {
+        "condition": "relative to S: EARLY Top-1 regression <= 0.05 absolute; MATURE Top-1 regression <= 0.03 absolute; MRR regression <= 0.03"
+      },
+      "E_calibration": {
+        "condition": "alpha remains 0.1; required coverage >= 0.85 for every predeclared required seed/family bucket per the corrected M9.6 calibration policy; candidate-set-size guard passes"
+      },
+      "F_engineering": {
+        "condition": "no NaN/Inf/instability; no causal violation; no checkpoint/resume defect; no source-support regression"
+      },
+      "G_capacity_cost": {
+        "condition": "latency and memory reported (m9-7-latency-memory.json baseline + M9.8's own re-measurement if code changed materially); no post-hoc cost threshold invented -- none exists in the repository/master protocol to inherit, so none is imposed"
+      }
+    },
+    "all_required_for_promotion": [
+      "A_primary_effect",
+      "B_family_consistency",
+      "C_seed_consistency",
+      "D_known_family_retention",
+      "E_calibration",
+      "F_engineering"
+    ],
+    "G_reported_not_gating": true
+  },
+  "predeclared_decisions": {
+    "A": "HYDROCORE_M_MEANINGFUL_CAPACITY_GAIN_VALIDATED -- all of A-F pass.",
+    "B": "HYDROCORE_M_NO_MEANINGFUL_CAPACITY_GAIN -- A fails (no significant/practical primary-effect gain); retain HydroCore-S; do not authorize HydroCore-L.",
+    "C": "HYDROCORE_M_PREDICTIVE_GAIN_BUT_GUARDRAIL_FAILURE -- A passes but one or more of B-F fails; retain HydroCore-S; no L.",
+    "D": "HYDROCORE_M_INCONCLUSIVE -- ambiguous/borderline result not cleanly matching A/B/C (e.g. CI straddling the +0.02 floor); retain HydroCore-S unless a separately governed confirmation is justified; no automatic L.",
+    "E": "ENGINEERING_OR_COMPARABILITY_BLOCKER -- an engineering or compute-comparability problem prevents a fair M9.8 comparison from being run at all."
+  },
+  "hydrocore_l_policy": {
+    "HYDROCORE_L_AUTHORIZED": false,
+    "m9_8_must_not_train_l": true,
+    "future_l_preconditions": [
+      "M produces a meaningful validated gain over S (M9.8 Decision A)",
+      "M still demonstrates measurable unresolved capacity-related headroom",
+      "the remaining error is plausibly capacity-limited rather than data-limited, topology-limited, source-identifiability-limited, calibration-limited, or irreducible hydraulic ambiguity",
+      "a separate protocol is frozen before any L experiment begins"
+    ],
+    "no_automatic_s_to_m_to_l": true
+  },
+  "no_execution_authorized_by_this_document": true
+}

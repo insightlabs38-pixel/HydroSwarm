@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Section 9: engineering-only preflight checklist status (no development accuracy used anywhere).",
+  "milestone": "M9.7",
+  "test_file": "tests/scientific/test_m9_7_capacity_preflight.py",
+  "checklist": {
+    "1_hydrocore_m_instantiates_successfully": "PASS -- test_hydrocore_m_instantiates_successfully, test_hydrocore_m_registered_in_model_variants",
+    "2_parameter_count_in_frozen_range": "PASS -- test_hydrocore_m_parameter_count_in_frozen_range (13,919,572, within [12,000,000, 16,000,000])",
+    "3_s_output_shapes_eq_m_output_shapes": "PASS -- test_s_and_m_accept_identical_batch_schema_and_produce_identical_output_shapes",
+    "4_same_feature_schema_accepted": "PASS -- test_s_and_m_accept_identical_batch_schema_and_produce_identical_output_shapes (identical HydroBatch dict fed to both)",
+    "5_variable_topology_still_works": "PASS -- test_variable_topology_still_works[_build_s], test_variable_topology_still_works[_build_m]",
+    "6_node_permutation_invariance_equivariance_preserved": "PASS -- test_hydrocore_m_graph_permutation_equivariance, test_hydrocore_m_source_region_logits_invariant_under_permutation",
+    "7_causality_preserved": "PASS -- test_causal_masking_ignores_content_beyond_the_valid_window[_build_s], [_build_m]",
+    "8_age_fix_only_preserved": "PASS -- test_age_fix_only_model_side_config_identical_for_s_and_m",
+    "9_all_supervised_heads_receive_gradients": "PASS -- test_all_supervised_heads_receive_gradients (with documented, config-inactive-by-construction exclusions: plan_query_tokens under strategist_mode=candidate_conditioned, prior_logit_scale under prior_mode=feature_only)",
+    "10_no_head_accidentally_changed_dimension_or_semantics": "PASS -- test_incident_level_head_widths_are_class_counts_not_d_model",
+    "11_interleaved_topology_microbatching_works": "PASS -- test_interleaved_microbatching_and_gradient_accumulation_work_for_hydrocore_m (real step_matched_interleaved_optimizer_step, unmodified, against HydroCore-M)",
+    "12_gradient_accumulation_correct_effective_batch_update": "PASS -- same test as #11 (single optimizer.step() after 4 accumulated microbatches, gradient_norm finite)",
+    "13_exactly_1350_step_configuration_representable": "PASS -- test_1350_step_budget_representable_for_both_s_and_m",
+    "14_scheduler_totals_match": "PASS -- test_scheduler_trajectory_is_identical_for_s_and_m (1350-step LR trajectory byte-identical for S and M optimizers under the same TrainingConfig)",
+    "15_checkpoint_save_load_works": "PASS -- test_hydrocore_m_checkpoint_save_load_round_trip",
+    "16_resume_does_not_alter_architecture_identity": "PASS -- same test as #15 (architecture_config() identical before/after reload)",
+    "17_calibration_interface_accepts_m_outputs_unmodified": "PASS -- test_calibration_interface_accepts_hydrocore_m_posteriors_unmodified (unmodified SplitConformalCalibrator.fit)",
+    "18_b_depth_aware_behavior_unchanged": "PASS -- same test as #17 (network_id=f'{family}:{depth_bucket}' convention used verbatim)",
+    "19_alpha_remains_0_1": "PASS -- same test as #17 (calibrator.artifact.alpha == 0.1 asserted)",
+    "20_source_representative_calibration_manifest_policy_compatible": "PASS -- m9-7-training-parity-plan.json.calibration (unchanged CALIBRATION_REPEATS_PER_SOURCE=20; not independently re-tested here since it is a manifest-generation-side policy, not a model-interface concern -- see limitations)",
+    "21_locked_final_test_unopened_before": "PASS -- test_locked_test_unopened_before_module",
+    "22_locked_topology_test_unopened_after": "PASS -- test_locked_test_unopened_after_module (both locked_final_test and locked_topology_test share the single locked_test_opened flag file checked here, per the codebase's own existing convention -- reports/results/v4/architecture-freeze.json)"
+  },
+  "pyright": "0 errors, 0 warnings, 0 informations on src/hydroswarm/model/core.py, tests/scientific/test_m9_7_capacity_preflight.py, scripts/hydrocore_v5/run_m9_7_latency_memory.py",
+  "all_checks_green": true,
+  "limitations": [
+    "Checks 11/12 (interleaved microbatching/gradient accumulation) use synthetic single-example micro-batches per family slot rather than the real build_wntr_network-derived multi-topology pools -- sufficient to prove the model is a correct drop-in replacement for step_matched_interleaved_optimizer_step's model argument, not a full training-loop rehearsal (that is M9.8's own job).",
+    "Check 20 (source-representative calibration manifest policy) is verified by config-value equality (m9-7-training-parity-plan.json) rather than an end-to-end manifest-generation test, since that policy lives in M9.4/M9.5/M9.5R's own generator scripts and is entirely model-agnostic (operates on which/how-many calibration examples to draw per source, never on model architecture)."
+  ]
+}

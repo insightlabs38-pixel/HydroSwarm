@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Section 2: machine-readable reconstruction of the frozen M9.6 HydroCore-S architecture/recipe, verified against source code (src/hydroswarm/model/core.py, encoders.py, layers.py, adapters.py, candidate_plan_encoder.py) and the actual M9.6 training scripts/config (scripts/hydrocore_v5/run_m9_6_train_arm_a.py, run_m9_6_train_arm_b.py, run_m8_7_arm.py's ARM_DEFINITIONS/SHARED_MODEL_CONFIG), not prose documentation alone.",
+  "milestone": "M9.7",
+  "source_of_truth": {
+    "model_class": "hydroswarm.model.core.HydroCore",
+    "variant": "small",
+    "variant_definition": "MODEL_VARIANTS['small'] = ModelVariant(d_model=192, nhead=6, dim_feedforward=576, num_layers=4, latent_tokens=64, modality_layers=1)",
+    "construction_call": "HydroCore.from_variant('small', use_adapters=False, **AGE_FIX_ONLY_model_kwargs, **SHARED_MODEL_CONFIG)",
+    "training_scripts_verified": [
+      "scripts/hydrocore_v5/run_m9_6_train_arm_a.py",
+      "scripts/hydrocore_v5/run_m9_6_train_arm_b.py",
+      "scripts/hydrocore_v5/run_m8_7_arm.py"
+    ],
+    "m9_6_recipe": "CLASSICAL_HYDROCORE_S + AGE_FIX_ONLY + EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING + B_DEPTH_AWARE_CALIBRATION + ALPHA_0_1 + SOURCE_REPRESENTATIVE_CALIBRATION_SUPPORT_20_PER_SOURCE"
+  },
+  "graph_encoder_configuration": {
+    "module": "hydroswarm.model.encoders.GraphStructuralEncoder",
+    "inputs": [
+      "travel_time",
+      "reservoir_reachability",
+      "demand_centrality",
+      "log1p(travel_time)"
+    ],
+    "hidden_dim": "d_model (default None -> d_model)",
+    "structure": "Linear(4, hidden_dim) -> activation -> norm -> Linear(hidden_dim, d_model)",
+    "normalization": "rmsnorm",
+    "activation": "silu"
+  },
+  "temporal_encoder_configuration": {
+    "module": "hydroswarm.model.encoders.TemporalEncoder (and QualityEncoder subclass)",
+    "input_projection": "Linear(temporal_feature_dim, d_model)",
+    "core": "nn.TransformerEncoder(nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward, dropout, activation=silu, batch_first=True, norm_first=True), num_layers=modality_layers)",
+    "positional_encoding": "learned sinusoidal frequency parameter (d_model//2), phase = elapsed_time * frequency",
+    "elapsed_time_normalization": "window_relative (AGE_FIX_ONLY does not change this; AGE_FIX_ONLY changes unobserved_age_sentinel in the FEATURE BUILDER, not this encoder arg)",
+    "pooling": "masked temporal mean over valid (finite & sensor-observed) timesteps",
+    "quality_encoder": "identical TemporalEncoder subclass, separate instance, input_dim=quality_feature_dim"
+  },
+  "hidden_widths": {
+    "d_model": 192,
+    "dim_feedforward": 576,
+    "ratio_dim_feedforward_over_d_model": 3.0
+  },
+  "num_layers": {
+    "backbone_blocks": 4,
+    "temporal/quality modality_layers": 1
+  },
+  "attention_heads": {
+    "nhead": 6,
+    "head_dim": 32
+  },
+  "pooling": {
+    "incident_pooling": "mean (default; IncidentPooling='mean' -- unconditional global mean pool over valid nodes)",
+    "backbone_latent_pooling": "bounded global_latents (latent_tokens=64) cross-attend to/from node states each backbone block (LatentHydraulicBlock: to_latent, latent_self, to_node MultiheadAttention)"
+  },
+  "residual_paths": {
+    "backbone": "hidden = hidden + node_update (post cross-attention), hidden = hidden + feed_forward(hidden); EdgeAwareGraphConv: hidden + dropout(update)",
+    "optional_residual_features": "hidden = hidden + residual_projection(residual_features) when residual_features is supplied"
+  },
+  "normalization": "rmsnorm (nn.RMSNorm) throughout; RoleHead/BottleneckAdapter internals use nn.LayerNorm explicitly",
+  "dropout": 0.1,
+  "every_output_head": {
+    "sentinel": "RoleHead(d_model, 2) via adapters['sentinel']",
+    "scout": "RoleHead(d_model, 2) via adapters['scout']",
+    "strategist": "RoleHead(d_model, 3) via adapters['strategist']",
+    "source_node_head": "RoleHead(d_model, 1) -- per-node source localization logit",
+    "source_region_head": "RoleHead(d_model, 3) -- incident-level 3-way region classification",
+    "sensor_fault_head": "RoleHead(d_model, 1)",
+    "sample_node_head": "RoleHead(d_model, 1)",
+    "information_gain_head": "Linear(d_model,1) + Softplus (per-node, bits-valued)",
+    "candidate_reduction_head": "Linear(d_model,1) + Sigmoid (scout_control_heads=True)",
+    "should_continue_sampling_head": "RoleHead(d_model, 1) (scout_control_heads=True)",
+    "profile_heads": {
+      "start_time": 12,
+      "duration": 8,
+      "relative_strength": 4
+    },
+    "evidence_head": "Linear(d_model,1) + Sigmoid",
+    "uncertainty_head": "Linear(d_model,1) + Softplus",
+    "ood_head": "RoleHead(d_model, 3) -- deterministic-severity-adjacent, NOT the governed ood_class target",
+    "ood_category_head": "RoleHead(d_model, 11) (ood_category_head=True)",
+    "event_presence_head": "RoleHead(d_model, 1) (event_control_heads=True)",
+    "event_cause_head": "RoleHead(d_model, 5) (event_control_heads=True)",
+    "next_step_head": "RoleHead(d_model, 4) (event_control_heads=True)",
+    "action_head": "RoleHead(d_model, action_vocabulary_size=9)",
+    "plan_value_head": "RoleHead(d_model, 1)",
+    "plan_validity_head": "RoleHead(d_model, 2)",
+    "consequence_proxy_heads": "5x RoleHead(d_model,1) (consequence_prescreening_heads=True): exposure/pressure_risk/service_loss/containment_time/plan_regret",
+    "pointer_query": "Linear(d_model, d_model, bias=False)",
+    "auxiliary_heads": "DISABLED (auxiliary_heads=False, not part of the frozen S recipe)"
+  },
+  "input_feature_dimensions": {
+    "node_feature_dim": 19,
+    "edge_feature_dim": 13,
+    "temporal_feature_dim": 6,
+    "quality_feature_dim": 4,
+    "role_feature_dim": 8,
+    "action_feature_dim": 8,
+    "verifier_feature_dim": 8,
+    "residual_feature_dim": 4
+  },
+  "topology_dependent_behavior": "Fully variable-topology: node_features/edge_index/edge_features/node_mask/edge_mask are all per-batch tensors with no fixed node-count assumption anywhere in the forward pass; EdgeAwareGraphConv aggregates via index_add_ over the supplied edge_index; global_latents (count=latent_tokens, fixed=64 regardless of topology) provide the only fixed-size internal state, cross-attending to a variable number of node positions via key_padding_mask=~node_mask.",
+  "classical_prior_interface": {
+    "prior_mode": "feature_only (SHARED_MODEL_CONFIG)",
+    "behavior": "hidden = hidden + prior_projection(classical_prior.unsqueeze(-1)) when prior_mode in ('feature_only','feature_and_logit'); prior_logit_scale parameter exists but is unused in feature_only mode (present for checkpoint-shape compatibility across prior_mode values only)"
+  },
+  "parameter_count": {
+    "total": 4182612,
+    "trainable": 4182612,
+    "backbone": 2989248,
+    "encoders": 941376,
+    "adapters": 0,
+    "heads": 251987
+  },
+  "feature_schema": {
+    "HydroBatch_required": [
+      "node_features",
+      "temporal_features",
+      "quality_features"
+    ],
+    "feature_schema_version": "hydroswarm-features-v2 (per tests/unit/test_permutation.py TopologyMetadata)"
+  },
+  "AGE_FIX_ONLY_behavior": {
+    "feature_builder_kwarg": "unobserved_age_sentinel='fixed' (HydraulicFeatureBuilder.build, NOT a HydroCore constructor arg)",
+    "model_constructor_kwarg": "elapsed_time_normalization='window_relative' (unchanged from CURRENT_CONTROL; AGE_FIX_ONLY's fix is entirely in the feature builder, not the model)",
+    "effect": "never-observed-node measurement_age fallback uses a fixed sentinel (86,400s) independent of the incident's own timestamp origin, restoring timestamp-origin invariance (M8.7 finding)."
+  },
+  "candidate_conditioned_behavior": {
+    "strategist_mode": "candidate_conditioned",
+    "module": "hydroswarm.model.candidate_plan_encoder.CandidatePlanEncoder",
+    "inputs": [
+      "plan_template_ids",
+      "plan_target_type",
+      "plan_target_node_index/link_index (gathered externally)",
+      "plan_features",
+      "plan_mask",
+      "incident_context"
+    ],
+    "leakage_rule": "restricted to pre-WNTR-verification information only, by construction (module docstring)"
+  },
+  "optional_disabled_heads": {
+    "auxiliary_heads": false,
+    "use_adapters": false
+  },
+  "inference_interface": {
+    "forward_signature": "HydroCore.forward(batch: HydroBatch) -> HydroOutput",
+    "eval_mode": "torch.no_grad(), model.eval() for all M9.x inference (M9.1 protocol Section 2 convention, inherited)"
+  },
+  "checkpoint_compatibility_semantics": {
+    "architecture_version": "hydrocore-v3 (ARCHITECTURE_VERSION)",
+    "verify_architecture_compatibility": "checks architecture_version/use_adapters/prior_mode/incident_pooling/message_direction/event_control_heads/auxiliary_heads/consequence_prescreening_heads/strategist_mode/ood_category_head/scout_control_heads against checkpoint metadata before/after load_state_dict",
+    "export_model": "hydroswarm.training.checkpoint.export_model -- safetensors export with metadata dict",
+    "load_state_dict_with_v2_migration": "narrow, explicit v2->v3 source_region_head migration path; not otherwise relevant to S (S was always trained under v3)"
+  },
+  "legitimate_capacity_scaling_dimensions": [
+    "d_model",
+    "nhead (must divide d_model)",
+    "dim_feedforward",
+    "num_layers",
+    "latent_tokens (bounded [64,96] by HydroCore.__init__ validation)",
+    "modality_layers"
+  ],
+  "frozen_semantics_not_to_change_for_capacity_scaling": [
+    "AGE_FIX_ONLY representation (unobserved_age_sentinel='fixed', elapsed_time_normalization='window_relative')",
+    "causal-prefix semantics (CausalPrefixDatasetView, ARM_POLICIES)",
+    "topology-training policy (EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING)",
+    "conformal alpha=0.1",
+    "source-representative calibration policy (20 per source)",
+    "WNTR/EPANET deterministic authority",
+    "prior_mode, incident_pooling, message_direction, strategist_mode, event_control_heads, scout_control_heads, consequence_prescreening_heads, ood_category_head (all SHARED_MODEL_CONFIG values)",
+    "use_adapters=False",
+    "normalization='rmsnorm', activation='silu'",
+    "input feature dims (node/edge/temporal/quality/role/action/verifier/residual)",
+    "output head identities and class counts"
+  ],
+  "verification_method": "Direct instantiation via HydroCore.from_variant('small', use_adapters=False, **AGE_FIX_ONLY_model_kwargs, **SHARED_MODEL_CONFIG) in this environment; parameter_report()/architecture_config() called on the live instance (not estimated) -- total=4,182,612, matching every M8.7/M9.0-line/M9.6 historical record verbatim."
+}
