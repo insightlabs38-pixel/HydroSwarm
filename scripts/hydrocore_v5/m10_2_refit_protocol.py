@@ -105,3 +105,32 @@ def protocol_hash() -> str:
 
 def to_json_doc() -> dict[str, object]:
     return {"kind": "M10_2_REFIT_PROTOCOL", "milestone": "M10.2-refit", **_payload(), "protocol_hash": protocol_hash()}
+
+
+# ---------------------------------------------------------------------------
+# Amendment 1 (additive, dated, NOT a silent edit of the frozen values above):
+# the first real Level-A training run (corpus built under the ORIGINAL
+# VALIDATION_COUNT=100) produced only 17 validation examples with a real
+# Scout recommendation (sample_node_mask=True) -- below Section 8 criterion
+# 2's own predeclared minimum support of GATE_MIN_SUPPORT=20. This was
+# discovered from corpus SIZE statistics alone (n_train_examples,
+# n_validation_examples, n_..._with_real_recommendation), BEFORE any
+# competence metric (top-1 accuracy, regression MSE, rank correlation,
+# should_continue_sampling accuracy) was computed or inspected for either
+# split -- i.e. before Section 8's actual gate criteria 3-6 were evaluated
+# at all. Enlarging N to meet a predeclared statistical-power target is a
+# resourcing/sizing correction, not a change to family scope, depth,
+# parameter allowlist, optimizer, or (most importantly) the gate's own
+# criteria/thresholds -- none of which changes here. The ORIGINAL
+# VALIDATION_COUNT=100 above is left untouched (never silently edited) for
+# the historical record; this amendment defines a second, explicitly-named
+# constant the gate-evaluation script uses instead. TRAIN_COUNT is
+# unaffected (79 real-recommendation train examples was already adequate).
+# ---------------------------------------------------------------------------
+
+VALIDATION_COUNT_AMENDMENT_1 = 300
+VALIDATION_COUNT_AMENDMENT_1_REASON = (
+    "original VALIDATION_COUNT=100 produced only 17 validation examples with sample_node_mask=True, "
+    "below GATE_MIN_SUPPORT=20; discovered from corpus size statistics only, before any competence metric "
+    "was computed for either split"
+)

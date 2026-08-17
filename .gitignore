@@ -65,3 +65,13 @@ experiments/jobs/*/job.pid
 /reports/submission-readiness/jobs/final-head-playwright.log
 /reports/submission-readiness/jobs/final-head-pytest.log
 /reports/submission-readiness/jobs/release-path-validation.log
+
+# M10.2 Scout refit (Level A): development-only, not-yet-promoted candidate
+# checkpoints, deterministically regenerable from the frozen, hashed protocol
+# (m10_2_refit_protocol.py) plus the committed training script under the
+# exact commit each checkpoint_identity.json records. Per this milestone's
+# "large raw checkpoints should not be committed unless the repository's
+# existing artifact/LFS policy explicitly requires them" rule -- it does not
+# here (unlike models/hydrocore-v4-release/model.safetensors, this is not a
+# release artifact). checkpoint_identity.json (hash/provenance) stays tracked.
+/reports/evaluation/hydrocore-v5/m10/m10-2-refit/checkpoints/*/model.safetensors
