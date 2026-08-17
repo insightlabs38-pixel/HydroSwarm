@@ -75,3 +75,10 @@ experiments/jobs/*/job.pid
 # here (unlike models/hydrocore-v4-release/model.safetensors, this is not a
 # release artifact). checkpoint_identity.json (hash/provenance) stays tracked.
 /reports/evaluation/hydrocore-v5/m10/m10-2-refit/checkpoints/*/model.safetensors
+
+# M10.3A Strategist refit (Level A/B): same rationale/convention as the
+# M10.2 Scout refit entry above -- development-only, not-yet-promoted
+# candidate checkpoints, deterministically regenerable from the frozen,
+# hashed protocol (m10_3_refit_protocol.py) plus the committed training
+# scripts. checkpoint_identity.json stays tracked.
+/reports/evaluation/hydrocore-v5/m10/m10-3-refit/checkpoints/*/model.safetensors

@@ -1,0 +1,59 @@
+{
+  "kind": "M10_3_REFIT_CLOSURE",
+  "milestone": "M10.3A-refit",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "8d14bef1f428c388fc4ebd82f662c90a6bc7a39e",
+  "protocol_hash": "f73accbf548e9b8987b8b1258efd7d3e61e052f802714ace3bb5f8b1b8d0f587",
+  "parent_m9_6_teacher_sha256": {
+    "20260814": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "31874": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+    "20260815": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+  },
+  "level_a_all_seeds_pass_competence_gate": false,
+  "level_b_triggered": true,
+  "level_b_per_seed_summary": {
+    "20260814": {
+      "level_b_gradient_coverage_passed": true,
+      "level_b_support_ok": true,
+      "level_b_all_finite": true,
+      "level_b_mechanically_valid": true,
+      "level_b_gate_criteria_passed": false,
+      "criterion_a_materially_improves_over_level_a": false,
+      "criterion_b_m9_preservation_passed": false,
+      "calibration_below_floor": true,
+      "level_b_promotable": false
+    },
+    "31874": {
+      "level_b_gradient_coverage_passed": true,
+      "level_b_support_ok": true,
+      "level_b_all_finite": true,
+      "level_b_mechanically_valid": true,
+      "level_b_gate_criteria_passed": false,
+      "criterion_a_materially_improves_over_level_a": false,
+      "criterion_b_m9_preservation_passed": false,
+      "calibration_below_floor": true,
+      "level_b_promotable": false
+    },
+    "20260815": {
+      "level_b_gradient_coverage_passed": true,
+      "level_b_support_ok": true,
+      "level_b_all_finite": true,
+      "level_b_mechanically_valid": true,
+      "level_b_gate_criteria_passed": false,
+      "criterion_a_materially_improves_over_level_a": false,
+      "criterion_b_m9_preservation_passed": false,
+      "calibration_below_floor": true,
+      "level_b_promotable": false
+    }
+  },
+  "level_b_mechanically_valid_all_seeds": true,
+  "level_b_materially_improves_all_seeds": false,
+  "level_b_preserves_m9_all_seeds": false,
+  "level_b_promotable_all_seeds": false,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "M10_3_REFIT_RESULT": "M10_3_STRATEGIST_REFIT_BLOCKED_FULL_RETRAIN_REQUIRED",
+  "decision_reason": "Level A showed genuine (non-target-imbalance-degenerate) Strategist-competence gaps (plan_value/exposure_proxy/plan_regret_proxy/pairwise-ranking discrimination). Level B (the one predeclared, bounded backbone[3]+final_norm unfreeze) was executed per the frozen escalation trigger. Level B damages M9 preservation for at least one seed (calibration coverage drops below the frozen 0.85 floor and/or at least one of the nine Sentinel tasks shows a CI-confident paired-bootstrap regression against the unmodified M9.6 teacher on the same development population). Per the frozen protocol, Level B is rejected regardless of its own Strategist-competence result. Level B does not materially improve over Level A's own validation point estimates for every criterion Level A failed, for at least one seed. Per the frozen protocol, broader/full joint retraining would be required to resolve this safely, which this task is not authorized to perform. Level A's own checkpoint (never Level B's) is retained as the task's best available, NOT-PROMOTED artifact.",
+  "best_available_checkpoint": "Level A (not promoted -- Level B rejected)",
+  "next_recommended": "No Strategist refit checkpoint from this task is promoted for true M10.3 use. A future, separately authorized amendment would need to determine whether broader shared-representation retraining (out of this task's scope) is scientifically warranted, or whether the underlying population's low target variance for plan_value/exposure_proxy (Part 4's own disclosed finding) makes this objective inherently hard to learn regardless of capacity."
+}

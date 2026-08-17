@@ -1,0 +1,364 @@
+{
+  "kind": "M10_3_REFIT_LEVEL_B_PRESERVATION",
+  "protocol_hash": "f73accbf548e9b8987b8b1258efd7d3e61e052f802714ace3bb5f8b1b8d0f587",
+  "n_examples": 300,
+  "per_seed": {
+    "20260814": {
+      "teacher_metrics": {
+        "source_node_correct": 0.9566666666666667,
+        "source_region_correct": 0.99,
+        "start_time_correct": 0.4666666666666667,
+        "duration_correct": 0.42333333333333334,
+        "relative_strength_correct": 0.41333333333333333,
+        "event_presence_correct": 1.0,
+        "event_cause_correct": 1.0,
+        "sensor_fault_correct": 1.0,
+        "evidence_sufficiency_abs_error": 0.0011877296368281046,
+        "n_per_metric": {
+          "source_node_correct": 300,
+          "source_region_correct": 300,
+          "start_time_correct": 300,
+          "duration_correct": 300,
+          "relative_strength_correct": 300,
+          "event_presence_correct": 300,
+          "event_cause_correct": 300,
+          "sensor_fault_correct": 1100,
+          "evidence_sufficiency_abs_error": 300
+        }
+      },
+      "level_b_metrics": {
+        "source_node_correct": 0.9666666666666667,
+        "source_region_correct": 0.94,
+        "start_time_correct": 0.39666666666666667,
+        "duration_correct": 0.39,
+        "relative_strength_correct": 0.4266666666666667,
+        "event_presence_correct": 0.9766666666666667,
+        "event_cause_correct": 0.9766666666666667,
+        "sensor_fault_correct": 1.0,
+        "evidence_sufficiency_abs_error": 0.03653547286987305,
+        "n_per_metric": {
+          "source_node_correct": 300,
+          "source_region_correct": 300,
+          "start_time_correct": 300,
+          "duration_correct": 300,
+          "relative_strength_correct": 300,
+          "event_presence_correct": 300,
+          "event_cause_correct": 300,
+          "sensor_fault_correct": 1100,
+          "evidence_sufficiency_abs_error": 300
+        }
+      },
+      "teacher_calibration_coverage": 0.86,
+      "level_b_calibration_coverage": 0.8233333333333334,
+      "calibration_coverage_floor": 0.85,
+      "calibration_below_floor": true,
+      "per_metric_regression": {
+        "source_node_correct": {
+          "comparable": true,
+          "teacher_mean": 0.9566666666666667,
+          "level_b_mean": 0.9666666666666667,
+          "diff_ci_lower": 0.0,
+          "diff_ci_upper": 0.020000000000000018,
+          "ci_confident_regression": false
+        },
+        "source_region_correct": {
+          "comparable": true,
+          "teacher_mean": 0.99,
+          "level_b_mean": 0.94,
+          "diff_ci_lower": -0.07666666666666666,
+          "diff_ci_upper": -0.026666666666666616,
+          "ci_confident_regression": true
+        },
+        "start_time_correct": {
+          "comparable": true,
+          "teacher_mean": 0.4666666666666667,
+          "level_b_mean": 0.39666666666666667,
+          "diff_ci_lower": -0.11666666666666664,
+          "diff_ci_upper": -0.023333333333333373,
+          "ci_confident_regression": true
+        },
+        "duration_correct": {
+          "comparable": true,
+          "teacher_mean": 0.42333333333333334,
+          "level_b_mean": 0.39,
+          "diff_ci_lower": -0.07333333333333336,
+          "diff_ci_upper": 0.006666666666666654,
+          "ci_confident_regression": false
+        },
+        "relative_strength_correct": {
+          "comparable": true,
+          "teacher_mean": 0.41333333333333333,
+          "level_b_mean": 0.4266666666666667,
+          "diff_ci_lower": -0.020000000000000018,
+          "diff_ci_upper": 0.046666666666666634,
+          "ci_confident_regression": false
+        },
+        "event_presence_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 0.9766666666666667,
+          "diff_ci_lower": -0.036666666666666625,
+          "diff_ci_upper": -0.010000000000000009,
+          "ci_confident_regression": true
+        },
+        "event_cause_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 0.9766666666666667,
+          "diff_ci_lower": -0.036666666666666625,
+          "diff_ci_upper": -0.010000000000000009,
+          "ci_confident_regression": true
+        },
+        "sensor_fault_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 1.0,
+          "diff_ci_lower": 0.0,
+          "diff_ci_upper": 0.0,
+          "ci_confident_regression": false
+        }
+      },
+      "any_ci_confident_regression": true,
+      "m9_preservation_passed": false
+    },
+    "31874": {
+      "teacher_metrics": {
+        "source_node_correct": 0.9533333333333334,
+        "source_region_correct": 0.99,
+        "start_time_correct": 0.45666666666666667,
+        "duration_correct": 0.42,
+        "relative_strength_correct": 0.4,
+        "event_presence_correct": 1.0,
+        "event_cause_correct": 1.0,
+        "sensor_fault_correct": 1.0,
+        "evidence_sufficiency_abs_error": 0.0017887558539708456,
+        "n_per_metric": {
+          "source_node_correct": 300,
+          "source_region_correct": 300,
+          "start_time_correct": 300,
+          "duration_correct": 300,
+          "relative_strength_correct": 300,
+          "event_presence_correct": 300,
+          "event_cause_correct": 300,
+          "sensor_fault_correct": 1100,
+          "evidence_sufficiency_abs_error": 300
+        }
+      },
+      "level_b_metrics": {
+        "source_node_correct": 0.9633333333333334,
+        "source_region_correct": 0.84,
+        "start_time_correct": 0.3333333333333333,
+        "duration_correct": 0.43333333333333335,
+        "relative_strength_correct": 0.42333333333333334,
+        "event_presence_correct": 0.9766666666666667,
+        "event_cause_correct": 0.9733333333333334,
+        "sensor_fault_correct": 0.9972727272727273,
+        "evidence_sufficiency_abs_error": 0.0644139109303554,
+        "n_per_metric": {
+          "source_node_correct": 300,
+          "source_region_correct": 300,
+          "start_time_correct": 300,
+          "duration_correct": 300,
+          "relative_strength_correct": 300,
+          "event_presence_correct": 300,
+          "event_cause_correct": 300,
+          "sensor_fault_correct": 1100,
+          "evidence_sufficiency_abs_error": 300
+        }
+      },
+      "teacher_calibration_coverage": 0.8466666666666667,
+      "level_b_calibration_coverage": 0.7766666666666666,
+      "calibration_coverage_floor": 0.85,
+      "calibration_below_floor": true,
+      "per_metric_regression": {
+        "source_node_correct": {
+          "comparable": true,
+          "teacher_mean": 0.9533333333333334,
+          "level_b_mean": 0.9633333333333334,
+          "diff_ci_lower": 0.0,
+          "diff_ci_upper": 0.020000000000000018,
+          "ci_confident_regression": false
+        },
+        "source_region_correct": {
+          "comparable": true,
+          "teacher_mean": 0.99,
+          "level_b_mean": 0.84,
+          "diff_ci_lower": -0.18666666666666665,
+          "diff_ci_upper": -0.1133333333333334,
+          "ci_confident_regression": true
+        },
+        "start_time_correct": {
+          "comparable": true,
+          "teacher_mean": 0.45666666666666667,
+          "level_b_mean": 0.3333333333333333,
+          "diff_ci_lower": -0.16999999999999998,
+          "diff_ci_upper": -0.07666666666666666,
+          "ci_confident_regression": true
+        },
+        "duration_correct": {
+          "comparable": true,
+          "teacher_mean": 0.42,
+          "level_b_mean": 0.43333333333333335,
+          "diff_ci_lower": -0.043333333333333335,
+          "diff_ci_upper": 0.0733333333333333,
+          "ci_confident_regression": false
+        },
+        "relative_strength_correct": {
+          "comparable": true,
+          "teacher_mean": 0.4,
+          "level_b_mean": 0.42333333333333334,
+          "diff_ci_lower": -0.026666666666666672,
+          "diff_ci_upper": 0.0733333333333333,
+          "ci_confident_regression": false
+        },
+        "event_presence_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 0.9766666666666667,
+          "diff_ci_lower": -0.040000000000000036,
+          "diff_ci_upper": -0.010000000000000009,
+          "ci_confident_regression": true
+        },
+        "event_cause_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 0.9733333333333334,
+          "diff_ci_lower": -0.043333333333333335,
+          "diff_ci_upper": -0.013333333333333308,
+          "ci_confident_regression": true
+        },
+        "sensor_fault_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 0.9972727272727273,
+          "diff_ci_lower": -0.00545454545454549,
+          "diff_ci_upper": -0.0009090909090908594,
+          "ci_confident_regression": true
+        }
+      },
+      "any_ci_confident_regression": true,
+      "m9_preservation_passed": false
+    },
+    "20260815": {
+      "teacher_metrics": {
+        "source_node_correct": 0.9566666666666667,
+        "source_region_correct": 0.99,
+        "start_time_correct": 0.5,
+        "duration_correct": 0.4766666666666667,
+        "relative_strength_correct": 0.45666666666666667,
+        "event_presence_correct": 1.0,
+        "event_cause_correct": 1.0,
+        "sensor_fault_correct": 1.0,
+        "evidence_sufficiency_abs_error": 0.0017074185609817505,
+        "n_per_metric": {
+          "source_node_correct": 300,
+          "source_region_correct": 300,
+          "start_time_correct": 300,
+          "duration_correct": 300,
+          "relative_strength_correct": 300,
+          "event_presence_correct": 300,
+          "event_cause_correct": 300,
+          "sensor_fault_correct": 1100,
+          "evidence_sufficiency_abs_error": 300
+        }
+      },
+      "level_b_metrics": {
+        "source_node_correct": 0.96,
+        "source_region_correct": 0.99,
+        "start_time_correct": 0.37666666666666665,
+        "duration_correct": 0.39,
+        "relative_strength_correct": 0.39666666666666667,
+        "event_presence_correct": 1.0,
+        "event_cause_correct": 0.9966666666666667,
+        "sensor_fault_correct": 1.0,
+        "evidence_sufficiency_abs_error": 0.08539036313692729,
+        "n_per_metric": {
+          "source_node_correct": 300,
+          "source_region_correct": 300,
+          "start_time_correct": 300,
+          "duration_correct": 300,
+          "relative_strength_correct": 300,
+          "event_presence_correct": 300,
+          "event_cause_correct": 300,
+          "sensor_fault_correct": 1100,
+          "evidence_sufficiency_abs_error": 300
+        }
+      },
+      "teacher_calibration_coverage": 0.8033333333333333,
+      "level_b_calibration_coverage": 0.6666666666666666,
+      "calibration_coverage_floor": 0.85,
+      "calibration_below_floor": true,
+      "per_metric_regression": {
+        "source_node_correct": {
+          "comparable": true,
+          "teacher_mean": 0.9566666666666667,
+          "level_b_mean": 0.96,
+          "diff_ci_lower": 0.0,
+          "diff_ci_upper": 0.010000000000000009,
+          "ci_confident_regression": false
+        },
+        "source_region_correct": {
+          "comparable": true,
+          "teacher_mean": 0.99,
+          "level_b_mean": 0.99,
+          "diff_ci_lower": -0.010000000000000009,
+          "diff_ci_upper": 0.010000000000000009,
+          "ci_confident_regression": false
+        },
+        "start_time_correct": {
+          "comparable": true,
+          "teacher_mean": 0.5,
+          "level_b_mean": 0.37666666666666665,
+          "diff_ci_lower": -0.17666666666666664,
+          "diff_ci_upper": -0.07,
+          "ci_confident_regression": true
+        },
+        "duration_correct": {
+          "comparable": true,
+          "teacher_mean": 0.4766666666666667,
+          "level_b_mean": 0.39,
+          "diff_ci_lower": -0.13666666666666666,
+          "diff_ci_upper": -0.036666666666666625,
+          "ci_confident_regression": true
+        },
+        "relative_strength_correct": {
+          "comparable": true,
+          "teacher_mean": 0.45666666666666667,
+          "level_b_mean": 0.39666666666666667,
+          "diff_ci_lower": -0.10666666666666663,
+          "diff_ci_upper": -0.013333333333333308,
+          "ci_confident_regression": true
+        },
+        "event_presence_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 1.0,
+          "diff_ci_lower": 0.0,
+          "diff_ci_upper": 0.0,
+          "ci_confident_regression": false
+        },
+        "event_cause_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 0.9966666666666667,
+          "diff_ci_lower": -0.010000000000000009,
+          "diff_ci_upper": 0.0,
+          "ci_confident_regression": false
+        },
+        "sensor_fault_correct": {
+          "comparable": true,
+          "teacher_mean": 1.0,
+          "level_b_mean": 1.0,
+          "diff_ci_lower": 0.0,
+          "diff_ci_upper": 0.0,
+          "ci_confident_regression": false
+        }
+      },
+      "any_ci_confident_regression": true,
+      "m9_preservation_passed": false
+    }
+  },
+  "all_seeds_preserve_m9": false,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

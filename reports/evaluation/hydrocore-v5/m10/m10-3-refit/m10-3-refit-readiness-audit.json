@@ -1,0 +1,115 @@
+{
+  "kind": "M10_3_REFIT_READINESS_AUDIT",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "8d14bef1f428c388fc4ebd82f662c90a6bc7a39e",
+  "teacher_checkpoint_sha256": {
+    "20260814": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "31874": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+    "20260815": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+  },
+  "expected_teacher_checkpoint_sha256": {
+    "20260814": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "31874": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+    "20260815": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+  },
+  "teacher_hashes_match_expected": true,
+  "model_construction_audit": {
+    "strategist_mode": "candidate_conditioned",
+    "consequence_prescreening_heads": true,
+    "matches_task_stated_construction": true
+  },
+  "legacy_head_governance_audit": {
+    "action_template_marked_v3_legacy_in_config": true,
+    "target_pointer_marked_v3_legacy_in_config": true
+  },
+  "grep_audit_training_corpus_source": {
+    "hydroswarm.training.causal_prefix": [],
+    "hydroswarm.training.corpus": []
+  },
+  "real_m9_6_batch_audit": {
+    "example_input_keys": [
+      "classical_prior",
+      "demand_centrality",
+      "edge_features",
+      "edge_index",
+      "edge_mask",
+      "node_features",
+      "node_mask",
+      "quality_features",
+      "quality_mask",
+      "reservoir_reachability",
+      "sensor_mask",
+      "source_candidate_mask",
+      "temporal_features",
+      "timestamps",
+      "travel_time"
+    ],
+    "example_target_keys": [
+      "duration",
+      "duration_mask",
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "relative_strength",
+      "relative_strength_mask",
+      "sensor_fault",
+      "sensor_fault_mask",
+      "source_node",
+      "source_node_mask",
+      "source_region",
+      "source_region_mask",
+      "start_time",
+      "start_time_mask"
+    ],
+    "present_plan_input_fields": [],
+    "present_plan_target_fields": [],
+    "plan_fields_absent_from_real_m9_6_input": true,
+    "plan_fields_absent_from_real_m9_6_targets": true
+  },
+  "frozen_checkpoint_forward_without_plan_tensors": [
+    {
+      "seed": 20260814,
+      "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+      "candidate_plan_output_keys_present_without_plan_tensors": [],
+      "confirms_plan_hidden_was_none": true
+    },
+    {
+      "seed": 31874,
+      "checkpoint_sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+      "candidate_plan_output_keys_present_without_plan_tensors": [],
+      "confirms_plan_hidden_was_none": true
+    },
+    {
+      "seed": 20260815,
+      "checkpoint_sha256": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+      "candidate_plan_output_keys_present_without_plan_tensors": [],
+      "confirms_plan_hidden_was_none": true
+    }
+  ],
+  "frozen_checkpoint_forward_with_plan_tensors": {
+    "seed": 20260814,
+    "candidate_plan_output_keys_present_with_plan_tensors": [
+      "action_logits",
+      "action_pointer_logits",
+      "plan_value",
+      "plan_validity_logits",
+      "exposure_proxy",
+      "pressure_risk_proxy",
+      "service_loss_proxy",
+      "containment_time_proxy",
+      "plan_regret_proxy"
+    ],
+    "all_present_outputs_finite": true,
+    "confirms_candidate_conditioned_path_structurally_executes": true
+  },
+  "deterministic_strategist_fallback_audit": {
+    "uses_candidate_plan_encoder": false,
+    "uses_generate_response_plans": false,
+    "structurally_independent_of_candidate_conditioned_path": true
+  },
+  "readiness_defect_confirmed": true,
+  "readiness_defect_summary": "CONFIRMED: strategist_mode=candidate_conditioned and consequence_prescreening_heads=True construct CandidatePlanEncoder/plan_value_head/plan_validity_head/consequence_proxy_heads as real parameters in every canonical M9.6 checkpoint, but the real M9.6 training corpus path (scenario_to_prefix_example) never populates any of the four required plan input fields, so plan_hidden was always None during M9.6 training and none of those modules ever received a gradient. The SAME frozen checkpoints, forwarded with real plan tensors (this task's own new corpus builder), DO structurally execute the candidate-conditioned path and produce finite output -- confirming the architecture is real and load-bearing, only unsupervised.",
+  "readiness_decision": "M10_3A_REFIT_READY",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}
