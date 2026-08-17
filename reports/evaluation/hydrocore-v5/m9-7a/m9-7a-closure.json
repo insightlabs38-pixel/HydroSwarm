@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "milestone": "M9.7A",
+  "kind": "M9_7A_PROTOCOL_CONSISTENCY_AMENDMENT_CLOSURE",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "21c329f1d3358d2952d583b12d7359a8fdc183ce",
+  "end_commit_note": "This closure.json is committed in the same commit that adds it -- following the standing M9.4/M9.5/M9.5R/M9.6/M9.7 convention, `execution_commit` records the LAST commit before this closure commit; the true final SHA is whatever `git rev-parse HEAD` shows after this amendment's commit lands.",
+  "amends": "M9.7 (reports/evaluation/hydrocore-v5/m9-7/, docs/evaluation/HYDROCORE_V5_M9_7_PROTOCOL.md Section 5, additively -- no M9.6/M9.7 artifact edited)",
+  "problem_fixed": "M9.7's checkpoint_selection.policy ('validation only') and ARM_S reuse description were ambiguous about which of M9.6's two recorded per-seed checkpoints (best-validation vs. canonical FINAL_STEP_1350) M9.8 should use -- while M9.6 itself was frozen on the canonical FINAL_STEP_1350 checkpoint throughout (m9_6_common.CANONICAL_CHECKPOINT_POLICY, run_m9_6_evaluate._canonical_model).",
+  "correction_summary": "M9.8 ARM_S and ARM_M both use the canonical FINAL_STEP_1350 checkpoint as promotion-authoritative. ARM_S: M9.6's own canonical_export_path/canonical_export_sha256 (SHA-verified). ARM_M: identical Section-14 procedure -- train exactly 1350 steps, then export the final epoch-20 checkpoint separately as canonical. Best-validation checkpoints may be saved/reported diagnostically for either arm but never determine a guardrail, bootstrap comparison, or promotion decision.",
+  "unchanged_confirmed": [
+    "HydroCore-M architecture / parameter count (13,919,572, d_model=352/nhead=11/dim_feedforward=1056/num_layers=4/latent_tokens=64)",
+    "seeds (20260814, 31874, 20260815)",
+    "1350-optimizer-step budget for both S and M",
+    "optimizer/scheduler/batch/exposure policy",
+    "dataset/source policy (trained + unseen development families, source-representative calibration support)",
+    "primary endpoint (unseen-topology MATURE macro Top-1, ARM_M - ARM_S)",
+    "bootstrap procedure (2000 resamples, 90% CI, resampling unit=incidents, bootstrap_seed=20260819)",
+    "practical-effect threshold (+0.02 absolute AND CI lower bound > 0)",
+    "calibration policy (B_DEPTH_AWARE, alpha=0.1, minimum_group_size=10)",
+    "promotion guardrails A-F",
+    "HYDROCORE_L_AUTHORIZED = FALSE",
+    "all M9.6/M9.7 historical artifacts (byte-identical, verified by SHA-256 snapshot)"
+  ],
+  "artifacts": {
+    "amendment": "reports/evaluation/hydrocore-v5/m9-7a/m9-7a-amendment.json",
+    "summary": "reports/evaluation/hydrocore-v5/m9-7a/m9-7a-summary.md",
+    "closure": "reports/evaluation/hydrocore-v5/m9-7a/m9-7a-closure.json",
+    "protocol_amendment": "docs/evaluation/HYDROCORE_V5_M9_7_PROTOCOL.md Section 10 (Amendment log, 2026-08-17 entry)",
+    "tests": "tests/scientific/test_m9_7a_checkpoint_policy.py"
+  },
+  "tests_run": {
+    "m9_7a_checkpoint_policy_tests": "18 passed in 1.58s (.venv/bin/python -m pytest tests/scientific/test_m9_7a_checkpoint_policy.py -v)",
+    "m9_7_m9_6_regression_suites": "78 passed in 4.19s (.venv/bin/python -m pytest tests/scientific/test_m9_7_capacity_preflight.py tests/scientific/test_m9_7a_checkpoint_policy.py tests/scientific/test_m9_6_exact_compute_parity.py -q)",
+    "pyright": "0 errors, 0 warnings, 0 informations (tests/scientific/test_m9_7a_checkpoint_policy.py)"
+  },
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "known_limitations": [
+    "This amendment does not itself write or run any M9.8 training script -- it freezes the corrected policy that M9.8's own ARM_M training script (to be written in M9.8) must implement, mirroring M9.6's own Section-14 procedure exactly."
+  ],
+  "blockers": [],
+  "M9_7A_DECISION": "CHECKPOINT_POLICY_CONSISTENCY_FIXED",
+  "M9_8_CAPACITY_EXPERIMENT_READY": true,
+  "next_recommended_milestone": "M9.8 (HydroCore-S vs HydroCore-M capacity comparison), NOT started by this document."
+}

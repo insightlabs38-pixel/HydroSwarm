@@ -101,3 +101,17 @@ Synthetic/tiny-batch smoke tests only, never development accuracy, per `tests/sc
 ## 9. Closure
 
 Final M9.7 decision record: `reports/evaluation/hydrocore-v5/m9-7/m9-7-closure.json`. M9.7 ends once the M architecture and the M9.8 comparison design above are frozen and the engineering preflight is green -- it does not itself execute M9.8.
+
+## 10. Amendment log
+
+This document is immutable except via a dated, explicit entry in this section (matching `HYDROCORE_V5_M9_1_PROTOCOL.md` Section 21's own established convention).
+
+### 2026-08-17 -- M9.7A: checkpoint-selection consistency correction
+
+Section 5's line "Checkpoint selection: validation only, unchanged." is AMBIGUOUS about which of M9.6's two recorded per-seed checkpoints (best-validation vs. the canonical `FINAL_STEP_1350` export) that refers to -- and M9.6 itself was **not** frozen on best-validation: `m9_6_common.CANONICAL_CHECKPOINT_POLICY = "FINAL_STEP_1350"`, and `run_m9_6_evaluate.py`'s `_canonical_model` loads `canonical_export_path` (never `best_validation_export_path`) for every number M9.6's own `M9_6_DECISION=A` rested on. Left as originally worded, a future M9.8 executor could legally checkpoint ARM_M at best-validation while ARM_S (reused from M9.6) is actually the canonical FINAL_STEP_1350 checkpoint -- a real, already-demonstrated divergence risk (`reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed20260814.json` records `best_epoch=12` vs. `canonical_epoch=19`, genuinely different checkpoints).
+
+**Clarification (supersedes Section 5's checkpoint-selection line for M9.8 execution purposes; the line itself is left as originally written, not edited):** both ARM_S and ARM_M's promotion-authoritative M9.8 checkpoint MUST be the canonical `FINAL_STEP_1350` export -- ARM_S via M9.6's own `canonical_export_path`/`canonical_export_sha256` (SHA-verified, REUSED/REGENERATED transparency unchanged), ARM_M via the identical Section-14 procedure M9.6's own training scripts already use (reload the final epoch-20/step-1350 checkpoint into a fresh model instance, export it separately as canonical). Best-validation checkpoints may still be saved/reported diagnostically for either arm but MUST NOT determine any M9.8 guardrail, bootstrap comparison, or promotion decision.
+
+No other section of this document, and no M9.7 artifact under `reports/evaluation/hydrocore-v5/m9-7/`, is altered by this entry -- all remain byte-identical to their M9.7-closure state (verified: `reports/evaluation/hydrocore-v5/m9-7a/m9-7a-amendment.json`'s `m9_7_artifacts_hash_snapshot`). Full machine-readable amendment: `reports/evaluation/hydrocore-v5/m9-7a/m9-7a-amendment.json`, `m9-7a-summary.md`, `m9-7a-closure.json`.
+
+`M9_7A_DECISION = CHECKPOINT_POLICY_CONSISTENCY_FIXED`. `M9_8_CAPACITY_EXPERIMENT_READY = true`. M9.8 itself is not started by this amendment.
