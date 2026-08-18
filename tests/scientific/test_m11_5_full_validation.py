@@ -1,0 +1,43 @@
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts/hydrocore_v5"))
+
+import run_m11_5_full_validation as m115  # noqa: E402
+
+
+def _passing_software() -> dict:
+    return {"kind": "M11_5_SOFTWARE_GATES", "all_required_pass": True, "gates": []}
+
+
+def test_m11_5_preflight_requires_frozen_parent_and_unopened_lock() -> None:
+    preflight = m115.preflight()
+    assert preflight["all_checks_pass"] is True
+    assert all(preflight["checks"].values())
+
+
+def test_m11_5_matrix_covers_all_required_domains_without_fake_m11_3_or_m11_4() -> None:
+    definition = m115.matrix_definition()
+    assert [row["row_id"] for row in definition["rows"]] == list("ABCDEFGHIJKLMN")
+    assert definition["m11_3_m11_4"] == "UNUSED_RESERVED_SUBSUMED_BY_M10_M11_2"
+    assert definition["rows"][-2]["hard_gating"] is False
+
+
+def test_m11_5_closed_evidence_has_the_required_frozen_gate_outcomes() -> None:
+    results = m115.reused_results()
+    assert all(results[key]["pass"] for key in ("predictive", "calibration", "robustness", "ood", "scout", "planning", "end_to_end", "fail_closed"))
+    assert all(value == 0 for value in results["safety"].values())
+
+
+def test_m11_5_artifact_synthesis_requires_every_hard_gate(tmp_path: Path) -> None:
+    records = m115.build_artifacts(_passing_software(), tmp_path)
+    matrix = records["m11-5-matrix.json"]
+    readiness = records["m11-5-readiness.json"]
+    assert matrix["matrix_green"] is True
+    assert all(row["finalist_identity_verified"] for row in matrix["rows"])
+    assert readiness["m11_6_preconditions_satisfied"] is True
+    assert readiness["locked_evaluation_authorized"] is False
+    assert records["m11-5-closure.json"]["closure_state"] == "M11_5_FULL_VALIDATION_PASS"
