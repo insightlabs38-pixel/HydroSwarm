@@ -1,0 +1,187 @@
+{
+  "kind": "M10_3B_TARGET_IDENTIFIABILITY",
+  "manifest": {
+    "train_scenario_ids_sha256": "872bb9a30b07555db9b38e8950b549e6104db8ab613f462b6e31d4be1c1e59c1",
+    "validation_scenario_ids_sha256": "0d965ce92eddc10e3c03c68465a5de9fccdbe3409714fa9c506a8041bd9fbf52",
+    "n_train_examples": 250,
+    "n_validation_examples": 300
+  },
+  "train": {
+    "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+    "split": "train",
+    "per_target": {
+      "plan_validity": {
+        "n_candidates": 2250,
+        "fraction_valid": 0.6444444444444445,
+        "fraction_incidents_with_mixed_validity": 0.976
+      },
+      "plan_value": {
+        "n": 1450,
+        "mean": 0.9840743541717529,
+        "std": 0.06586086004972458,
+        "min": 0.2865760922431946,
+        "max": 1.0,
+        "q25": 0.999196469783783,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.000803530216217041,
+        "n_unique_rounded_6dp": 124,
+        "fraction_exactly_constant": 0.6172413793103448
+      },
+      "exposure_proxy": {
+        "n": 1450,
+        "mean": 0.9997309446334839,
+        "std": 0.045835528522729874,
+        "min": 0.5179948806762695,
+        "max": 1.7394745349884033,
+        "q25": 1.0,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 121,
+        "fraction_exactly_constant": 0.9096551724137931
+      },
+      "pressure_risk_proxy": {
+        "n": 1450,
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 1,
+        "fraction_exactly_constant": 1.0
+      },
+      "service_loss_proxy": {
+        "n": 1450,
+        "mean": 5.473297596397808e-13,
+        "std": 5.754476322533675e-12,
+        "min": 0.0,
+        "max": 6.105693728386541e-11,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 1,
+        "fraction_exactly_constant": 0.9910344827586207
+      },
+      "containment_time_proxy": {
+        "n": 1450,
+        "mean": 2.0013792514801025,
+        "std": 0.9091479182243347,
+        "min": 0.5,
+        "max": 3.75,
+        "q25": 1.0,
+        "q50": 2.25,
+        "q75": 2.75,
+        "iqr": 1.75,
+        "n_unique_rounded_6dp": 14,
+        "fraction_exactly_constant": 0.1703448275862069
+      },
+      "plan_regret_proxy": {
+        "n": 1450,
+        "mean": 0.024660149589180946,
+        "std": 0.13672518730163574,
+        "min": 0.0,
+        "max": 2.4894745349884033,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0008041477994993329,
+        "iqr": 0.0008041477994993329,
+        "n_unique_rounded_6dp": 122,
+        "fraction_exactly_constant": 0.6172413793103448
+      }
+    }
+  },
+  "validation": {
+    "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+    "split": "validation",
+    "per_target": {
+      "plan_validity": {
+        "n_candidates": 2700,
+        "fraction_valid": 0.6422222222222222,
+        "fraction_incidents_with_mixed_validity": 0.97
+      },
+      "plan_value": {
+        "n": 1734,
+        "mean": 0.9770399332046509,
+        "std": 0.07818833738565445,
+        "min": 0.2563587725162506,
+        "max": 1.0,
+        "q25": 0.9991859793663025,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0008140206336975098,
+        "n_unique_rounded_6dp": 150,
+        "fraction_exactly_constant": 0.5853517877739332
+      },
+      "exposure_proxy": {
+        "n": 1734,
+        "mean": 0.9990493655204773,
+        "std": 0.05637101083993912,
+        "min": 0.5179948806762695,
+        "max": 1.7985422611236572,
+        "q25": 1.0,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 147,
+        "fraction_exactly_constant": 0.9036908881199539
+      },
+      "pressure_risk_proxy": {
+        "n": 1734,
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 1,
+        "fraction_exactly_constant": 1.0
+      },
+      "service_loss_proxy": {
+        "n": 1734,
+        "mean": 5.985041563912052e-13,
+        "std": 6.014892143385575e-12,
+        "min": 0.0,
+        "max": 6.106015693063682e-11,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 1,
+        "fraction_exactly_constant": 0.9901960784313726
+      },
+      "containment_time_proxy": {
+        "n": 1734,
+        "mean": 1.9531430006027222,
+        "std": 0.9177556037902832,
+        "min": 0.5,
+        "max": 3.75,
+        "q25": 1.0,
+        "q50": 2.25,
+        "q75": 2.75,
+        "iqr": 1.75,
+        "n_unique_rounded_6dp": 14,
+        "fraction_exactly_constant": 0.05536332179930796
+      },
+      "plan_regret_proxy": {
+        "n": 1734,
+        "mean": 0.03594522923231125,
+        "std": 0.17180253565311432,
+        "min": 0.0,
+        "max": 2.900783061981201,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0008146939217112958,
+        "iqr": 0.0008146939217112958,
+        "n_unique_rounded_6dp": 147,
+        "fraction_exactly_constant": 0.5853517877739332
+      }
+    }
+  }
+}

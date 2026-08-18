@@ -1,0 +1,673 @@
+{
+  "kind": "M10_3B_WITHIN_INCIDENT_VARIANCE_COMBINED",
+  "manifest": {
+    "train_scenario_ids_sha256": "872bb9a30b07555db9b38e8950b549e6104db8ab613f462b6e31d4be1c1e59c1",
+    "validation_scenario_ids_sha256": "0d965ce92eddc10e3c03c68465a5de9fccdbe3409714fa9c506a8041bd9fbf52",
+    "n_train_examples": 250,
+    "n_validation_examples": 300
+  },
+  "train": {
+    "kind": "M10_3B_WITHIN_INCIDENT_VARIANCE",
+    "split": "train",
+    "tolerance_definitions": {
+      "exposure_proxy": 0.01,
+      "pressure_risk_proxy": 0.016666666666666666,
+      "service_loss_proxy": 0.02,
+      "containment_time_proxy": 0.004166666666666667,
+      "plan_value": 0.05,
+      "plan_regret_proxy": 0.05
+    },
+    "per_target": {
+      "plan_value": {
+        "near_tie_tolerance": 0.05,
+        "n_incidents_with_2plus_valid_candidates": 244,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.11885245901639344,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.8811475409836066,
+        "per_incident_range_distribution": {
+          "n": 244,
+          "mean": 0.03812316988335281,
+          "median": 0.0001380443572998047,
+          "q25": 0.0,
+          "q75": 0.00587056577205658,
+          "max": 0.7134239077568054,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 244,
+          "mean": 0.00202359603001145,
+          "median": 2.64698840624078e-09,
+          "q25": 0.0,
+          "q75": 4.79153175092506e-06,
+          "max": 0.07069077342748642,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 244,
+          "mean": 0.014129163300404783,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0008167624473571777,
+          "max": 0.32523852586746216,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 244,
+          "mean": 0.03812316988335281,
+          "median": 0.0001380443572998047,
+          "q25": 0.0,
+          "q75": 0.00587056577205658,
+          "max": 0.7134239077568054,
+          "min": 0.0
+        }
+      },
+      "exposure_proxy": {
+        "near_tie_tolerance": 0.01,
+        "n_incidents_with_2plus_valid_candidates": 244,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.19672131147540983,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.8032786885245902,
+        "per_incident_range_distribution": {
+          "n": 244,
+          "mean": 0.03548755582238807,
+          "median": 0.0001380443572998047,
+          "q25": 0.0,
+          "q75": 0.0059053003787994385,
+          "max": 0.7394745349884033,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 244,
+          "mean": 0.0017340640112572902,
+          "median": 2.64698840624078e-09,
+          "q25": 0.0,
+          "q75": 4.848460207540484e-06,
+          "max": 0.07594757527112961,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 244,
+          "mean": 0.018543294951563975,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0008174777030944824,
+          "max": 0.48200511932373047,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 244,
+          "mean": 0.03548755582238807,
+          "median": 0.0001380443572998047,
+          "q25": 0.0,
+          "q75": 0.0059053003787994385,
+          "max": 0.7394745349884033,
+          "min": 0.0
+        }
+      },
+      "pressure_risk_proxy": {
+        "near_tie_tolerance": 0.016666666666666666,
+        "n_incidents_with_2plus_valid_candidates": 244,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.0,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 1.0,
+        "per_incident_range_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        }
+      },
+      "service_loss_proxy": {
+        "near_tie_tolerance": 0.02,
+        "n_incidents_with_2plus_valid_candidates": 244,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.0,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 1.0,
+        "per_incident_range_distribution": {
+          "n": 244,
+          "mean": 7.506754780625543e-13,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 6.105693728386541e-11,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 244,
+          "mean": 6.365617325072065e-24,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 5.177707357862091e-22,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 244,
+          "mean": 7.506754780625543e-13,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 6.105693728386541e-11,
+          "min": 0.0
+        }
+      },
+      "containment_time_proxy": {
+        "near_tie_tolerance": 0.004166666666666667,
+        "n_incidents_with_2plus_valid_candidates": 244,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.028688524590163935,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.9713114754098361,
+        "per_incident_range_distribution": {
+          "n": 244,
+          "mean": 0.036885245901639344,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 2.0,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 244,
+          "mean": 0.008040186655173292,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.5555555820465088,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 244,
+          "mean": 0.036885245901639344,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 2.0,
+          "min": 0.0
+        }
+      },
+      "plan_regret_proxy": {
+        "near_tie_tolerance": 0.05,
+        "n_incidents_with_2plus_valid_candidates": 244,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.12704918032786885,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.8729508196721312,
+        "per_incident_range_distribution": {
+          "n": 244,
+          "mean": 0.07237280098751563,
+          "median": 0.00013804982881993055,
+          "q25": 0.0,
+          "q75": 0.005905281286686659,
+          "max": 2.4894745349884033,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 244,
+          "mean": 0.012506110950952354,
+          "median": 2.6471949077233603e-09,
+          "q25": 0.0,
+          "q75": 4.84842996684165e-06,
+          "max": 0.8607617020606995,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 244,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 244,
+          "mean": 0.018543294718584236,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0008174561080522835,
+          "max": 0.48200511932373047,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 244,
+          "mean": 0.07237280098751563,
+          "median": 0.00013804982881993055,
+          "q25": 0.0,
+          "q75": 0.005905281286686659,
+          "max": 2.4894745349884033,
+          "min": 0.0
+        }
+      }
+    },
+    "plan_value_plan_regret_proxy_redundancy": {
+      "spearman_correlation": -0.9999991958621123,
+      "expected": -1.0,
+      "max_abs_reconstruction_error_plan_value_from_1_over_1_plus_regret": 2.962127565453443e-08,
+      "conclusion": "plan_value and plan_regret_proxy are exact deterministic bijective (monotone-decreasing) transforms of one another -- confirmed empirically here, matching the formula audit's code-level finding. They carry identical ranking information; training/evaluating both as if independently informative double-counts one real signal."
+    }
+  },
+  "validation": {
+    "kind": "M10_3B_WITHIN_INCIDENT_VARIANCE",
+    "split": "validation",
+    "tolerance_definitions": {
+      "exposure_proxy": 0.01,
+      "pressure_risk_proxy": 0.016666666666666666,
+      "service_loss_proxy": 0.02,
+      "containment_time_proxy": 0.004166666666666667,
+      "plan_value": 0.05,
+      "plan_regret_proxy": 0.05
+    },
+    "per_target": {
+      "plan_value": {
+        "near_tie_tolerance": 0.05,
+        "n_incidents_with_2plus_valid_candidates": 291,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.17525773195876287,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.8247422680412371,
+        "per_incident_range_distribution": {
+          "n": 291,
+          "mean": 0.04948076349763116,
+          "median": 0.00020962953567504883,
+          "q25": 0.0,
+          "q75": 0.00776904821395874,
+          "max": 0.7436412572860718,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 291,
+          "mean": 0.002680929676111462,
+          "median": 6.1034111098479116e-09,
+          "q25": 0.0,
+          "q75": 8.385194632865023e-06,
+          "max": 0.07680588215589523,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 291,
+          "mean": 0.02183323709415816,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0011331140995025635,
+          "max": 0.3351839780807495,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 291,
+          "mean": 0.04948076349763116,
+          "median": 0.00020962953567504883,
+          "q25": 0.0,
+          "q75": 0.00776904821395874,
+          "max": 0.7436412572860718,
+          "min": 0.0
+        }
+      },
+      "exposure_proxy": {
+        "near_tie_tolerance": 0.01,
+        "n_incidents_with_2plus_valid_candidates": 291,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.23024054982817868,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.7697594501718213,
+        "per_incident_range_distribution": {
+          "n": 291,
+          "mean": 0.0472371508575387,
+          "median": 0.00020968914031982422,
+          "q25": 0.0,
+          "q75": 0.007647126913070679,
+          "max": 0.7985422611236572,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 291,
+          "mean": 0.0026306238179846053,
+          "median": 6.10688033475526e-09,
+          "q25": 0.0,
+          "q75": 8.12247571957414e-06,
+          "max": 0.08856523782014847,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 291,
+          "mean": 0.026450890036383037,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0008453726768493652,
+          "max": 0.48200511932373047,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 291,
+          "mean": 0.0472371508575387,
+          "median": 0.00020968914031982422,
+          "q25": 0.0,
+          "q75": 0.007647126913070679,
+          "max": 0.7985422611236572,
+          "min": 0.0
+        }
+      },
+      "pressure_risk_proxy": {
+        "near_tie_tolerance": 0.016666666666666666,
+        "n_incidents_with_2plus_valid_candidates": 291,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.0,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 1.0,
+        "per_incident_range_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        }
+      },
+      "service_loss_proxy": {
+        "near_tie_tolerance": 0.02,
+        "n_incidents_with_2plus_valid_candidates": 291,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.0,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 1.0,
+        "per_incident_range_distribution": {
+          "n": 291,
+          "mean": 4.196555283496953e-13,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 6.106015693063682e-11,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 291,
+          "mean": 3.558904757955444e-24,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 5.17825312339076e-22,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 291,
+          "mean": 4.196555283496953e-13,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 6.106015693063682e-11,
+          "min": 0.0
+        }
+      },
+      "containment_time_proxy": {
+        "near_tie_tolerance": 0.004166666666666667,
+        "n_incidents_with_2plus_valid_candidates": 291,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.05154639175257732,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.9484536082474226,
+        "per_incident_range_distribution": {
+          "n": 291,
+          "mean": 0.05154639175257732,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 2.25,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 291,
+          "mean": 0.010738831797544285,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.703125,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 291,
+          "mean": 0.002577319587628866,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.5,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 291,
+          "mean": 0.05154639175257732,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 2.25,
+          "min": 0.0
+        }
+      },
+      "plan_regret_proxy": {
+        "near_tie_tolerance": 0.05,
+        "n_incidents_with_2plus_valid_candidates": 291,
+        "fraction_incidents_with_2plus_meaningfully_distinguishable": 0.17525773195876287,
+        "fraction_incidents_with_3plus_meaningfully_distinguishable_clusters": 0.0,
+        "fraction_incidents_all_candidates_effectively_tied": 0.8247422680412371,
+        "per_incident_range_distribution": {
+          "n": 291,
+          "mean": 0.09854778127333265,
+          "median": 0.00020967340969946235,
+          "q25": 0.0,
+          "q75": 0.00782988453283906,
+          "max": 2.900783061981201,
+          "min": 0.0
+        },
+        "per_incident_variance_distribution": {
+          "n": 291,
+          "mean": 0.01996972222248382,
+          "median": 6.10596329053692e-09,
+          "q25": 0.0,
+          "q75": 8.517064088664483e-06,
+          "max": 1.1686866283416748,
+          "min": 0.0
+        },
+        "per_incident_iqr_distribution": {
+          "n": 291,
+          "mean": 0.0,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0,
+          "max": 0.0,
+          "min": 0.0
+        },
+        "best_vs_second_best_margin_distribution": {
+          "n": 291,
+          "mean": 0.028910329785674094,
+          "median": 0.0,
+          "q25": 0.0,
+          "q75": 0.0011344645463395864,
+          "max": 0.5041754841804504,
+          "min": 0.0
+        },
+        "best_vs_worst_margin_distribution": {
+          "n": 291,
+          "mean": 0.09854778127333265,
+          "median": 0.00020967340969946235,
+          "q25": 0.0,
+          "q75": 0.00782988453283906,
+          "max": 2.900783061981201,
+          "min": 0.0
+        }
+      }
+    },
+    "plan_value_plan_regret_proxy_redundancy": {
+      "spearman_correlation": -0.9999991002905252,
+      "expected": -1.0,
+      "max_abs_reconstruction_error_plan_value_from_1_over_1_plus_regret": 3.186118580078556e-08,
+      "conclusion": "plan_value and plan_regret_proxy are exact deterministic bijective (monotone-decreasing) transforms of one another -- confirmed empirically here, matching the formula audit's code-level finding. They carry identical ranking information; training/evaluating both as if independently informative double-counts one real signal."
+    }
+  }
+}

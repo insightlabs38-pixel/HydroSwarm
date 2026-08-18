@@ -1,0 +1,14 @@
+{
+  "kind": "M10_3B_DIAGNOSIS_RUN_SUMMARY",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "29e5e5719a8c0e27792a42d639b382e20f625332",
+  "final_commit_at_analysis_time": "29e5e5719a8c0e27792a42d639b382e20f625332",
+  "manifest": {
+    "train_scenario_ids_sha256": "872bb9a30b07555db9b38e8950b549e6104db8ab613f462b6e31d4be1c1e59c1",
+    "validation_scenario_ids_sha256": "0d965ce92eddc10e3c03c68465a5de9fccdbe3409714fa9c506a8041bd9fbf52",
+    "n_train_examples": 250,
+    "n_validation_examples": 300
+  },
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

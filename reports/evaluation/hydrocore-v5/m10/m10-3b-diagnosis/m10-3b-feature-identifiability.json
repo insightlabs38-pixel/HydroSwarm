@@ -1,0 +1,181 @@
+{
+  "kind": "M10_3B_FEATURE_IDENTIFIABILITY_COMBINED",
+  "manifest": {
+    "train_scenario_ids_sha256": "872bb9a30b07555db9b38e8950b549e6104db8ab613f462b6e31d4be1c1e59c1",
+    "validation_scenario_ids_sha256": "0d965ce92eddc10e3c03c68465a5de9fccdbe3409714fa9c506a8041bd9fbf52",
+    "n_train_examples": 250,
+    "n_validation_examples": 300
+  },
+  "train": {
+    "kind": "M10_3B_FEATURE_IDENTIFIABILITY",
+    "split": "train",
+    "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- not a model, not a proposal for any runtime path",
+    "stratified_means_by_template": {
+      "NO_ACTION": {
+        "plan_value": {
+          "n": 244,
+          "mean": 0.9858708366995952,
+          "std": 0.05457977957274423
+        },
+        "exposure_proxy": {
+          "n": 244,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "FLUSH_DOWNSTREAM": {
+        "plan_value": {
+          "n": 230,
+          "mean": 0.9745454889276753,
+          "std": 0.10694278375763036
+        },
+        "exposure_proxy": {
+          "n": 230,
+          "mean": 0.9983036334099977,
+          "std": 0.11507543520739966
+        }
+      },
+      "PROTECT_CRITICAL": {
+        "plan_value": {
+          "n": 244,
+          "mean": 0.9858708366995952,
+          "std": 0.05457977957274423
+        },
+        "exposure_proxy": {
+          "n": 244,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "INCREASE_MONITORING": {
+        "plan_value": {
+          "n": 244,
+          "mean": 0.9858708366995952,
+          "std": 0.05457977957274423
+        },
+        "exposure_proxy": {
+          "n": 244,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "REQUEST_SAMPLE": {
+        "plan_value": {
+          "n": 244,
+          "mean": 0.9858708366995952,
+          "std": 0.05457977957274423
+        },
+        "exposure_proxy": {
+          "n": 244,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "WAIT_OBSERVE": {
+        "plan_value": {
+          "n": 244,
+          "mean": 0.9858708366995952,
+          "std": 0.05457977957274423
+        },
+        "exposure_proxy": {
+          "n": 244,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      }
+    },
+    "template_identity_explains_plan_value_variance": {
+      "n": 1450,
+      "total_sum_of_squares": 6.2895976212232725,
+      "between_template_sum_of_squares": 0.024821199106671257,
+      "fraction_of_plan_value_variance_explained_by_template_identity_alone": 0.003946389038134326
+    },
+    "conclusion": "If a large fraction of plan_value's total variance is explained by template identity alone (a legal, pre-verification, decision-time input the model already embeds via candidate_plan_encoder.template_embedding), the model has access to real predictive signal for the BETWEEN-template ranking question. Ranking failure would then be concentrated in the WITHIN-template-choice-of-target discrimination instead, which requires the richer target_embedding/plan_features signal, not template identity. See the fraction_of_plan_value_variance_explained_by_template_identity_alone figure."
+  },
+  "validation": {
+    "kind": "M10_3B_FEATURE_IDENTIFIABILITY",
+    "split": "validation",
+    "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- not a model, not a proposal for any runtime path",
+    "stratified_means_by_template": {
+      "NO_ACTION": {
+        "plan_value": {
+          "n": 291,
+          "mean": 0.9781667629058418,
+          "std": 0.0677499098822096
+        },
+        "exposure_proxy": {
+          "n": 291,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "FLUSH_DOWNSTREAM": {
+        "plan_value": {
+          "n": 279,
+          "mean": 0.9711633325691291,
+          "std": 0.11839213924463245
+        },
+        "exposure_proxy": {
+          "n": 279,
+          "mean": 0.9940917308185263,
+          "std": 0.14042873131215697
+        }
+      },
+      "PROTECT_CRITICAL": {
+        "plan_value": {
+          "n": 291,
+          "mean": 0.9781667629058418,
+          "std": 0.0677499098822096
+        },
+        "exposure_proxy": {
+          "n": 291,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "INCREASE_MONITORING": {
+        "plan_value": {
+          "n": 291,
+          "mean": 0.9781667629058418,
+          "std": 0.0677499098822096
+        },
+        "exposure_proxy": {
+          "n": 291,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "REQUEST_SAMPLE": {
+        "plan_value": {
+          "n": 291,
+          "mean": 0.9781667629058418,
+          "std": 0.0677499098822096
+        },
+        "exposure_proxy": {
+          "n": 291,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      },
+      "WAIT_OBSERVE": {
+        "plan_value": {
+          "n": 291,
+          "mean": 0.9781667629058418,
+          "std": 0.0677499098822096
+        },
+        "exposure_proxy": {
+          "n": 291,
+          "mean": 1.0,
+          "std": 0.0
+        }
+      }
+    },
+    "template_identity_explains_plan_value_variance": {
+      "n": 1734,
+      "total_sum_of_squares": 10.600664676309803,
+      "between_template_sum_of_squares": 0.011482586602857964,
+      "fraction_of_plan_value_variance_explained_by_template_identity_alone": 0.00108319496498357
+    },
+    "conclusion": "If a large fraction of plan_value's total variance is explained by template identity alone (a legal, pre-verification, decision-time input the model already embeds via candidate_plan_encoder.template_embedding), the model has access to real predictive signal for the BETWEEN-template ranking question. Ranking failure would then be concentrated in the WITHIN-template-choice-of-target discrimination instead, which requires the richer target_embedding/plan_features signal, not template identity. See the fraction_of_plan_value_variance_explained_by_template_identity_alone figure."
+  }
+}

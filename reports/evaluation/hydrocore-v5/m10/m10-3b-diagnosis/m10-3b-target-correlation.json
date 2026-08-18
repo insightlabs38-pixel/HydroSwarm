@@ -1,0 +1,193 @@
+{
+  "kind": "M10_3B_TARGET_CORRELATION_COMBINED",
+  "manifest": {
+    "train_scenario_ids_sha256": "872bb9a30b07555db9b38e8950b549e6104db8ab613f462b6e31d4be1c1e59c1",
+    "validation_scenario_ids_sha256": "0d965ce92eddc10e3c03c68465a5de9fccdbe3409714fa9c506a8041bd9fbf52",
+    "n_train_examples": 250,
+    "n_validation_examples": 300
+  },
+  "train": {
+    "kind": "M10_3B_TARGET_CORRELATION",
+    "split": "train",
+    "pooled_correlation": {
+      "plan_value__vs__exposure_proxy": {
+        "n": 1450,
+        "spearman": -0.2858832836414347
+      },
+      "plan_value__vs__pressure_risk_proxy": {
+        "n": 1450,
+        "spearman": null,
+        "note": "zero variance in at least one side"
+      },
+      "plan_value__vs__service_loss_proxy": {
+        "n": 1450,
+        "spearman": 0.05356647635214105
+      },
+      "plan_value__vs__containment_time_proxy": {
+        "n": 1450,
+        "spearman": 0.14161824104324383
+      },
+      "plan_value__vs__plan_regret_proxy": {
+        "n": 1450,
+        "spearman": -0.9999991958621123
+      },
+      "exposure_proxy__vs__containment_time_proxy": {
+        "n": 1450,
+        "spearman": 0.037855719684487414
+      },
+      "pressure_risk_proxy__vs__service_loss_proxy": {
+        "n": 1450,
+        "spearman": null,
+        "note": "zero variance in at least one side"
+      },
+      "exposure_proxy__vs__service_loss_proxy": {
+        "n": 1450,
+        "spearman": -0.007331030962406685
+      },
+      "exposure_proxy__vs__pressure_risk_proxy": {
+        "n": 1450,
+        "spearman": null,
+        "note": "zero variance in at least one side"
+      },
+      "containment_time_proxy__vs__service_loss_proxy": {
+        "n": 1450,
+        "spearman": 0.067141617137171
+      }
+    },
+    "within_incident_correlation": {
+      "plan_value__vs__exposure_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 131,
+        "mean_within_incident_spearman": -1.0
+      },
+      "plan_value__vs__pressure_risk_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      },
+      "plan_value__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 3,
+        "mean_within_incident_spearman": 0.3333333333333333
+      },
+      "plan_value__vs__containment_time_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 7,
+        "mean_within_incident_spearman": -1.0
+      },
+      "plan_value__vs__plan_regret_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 131,
+        "mean_within_incident_spearman": -1.0
+      },
+      "exposure_proxy__vs__containment_time_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 7,
+        "mean_within_incident_spearman": 1.0
+      },
+      "pressure_risk_proxy__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      },
+      "exposure_proxy__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 3,
+        "mean_within_incident_spearman": -0.3333333333333333
+      },
+      "exposure_proxy__vs__pressure_risk_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      },
+      "containment_time_proxy__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      }
+    },
+    "conclusion": "plan_value/plan_regret_proxy are exactly redundant (see within-incident-variance artifact). pressure_risk_proxy has zero pooled variance among valid candidates (see target-formula audit's STRUCTURAL_DEGENERACY_FINDING) so its correlation with anything is undefined (reported as null with n and a zero-variance note, never silently 0.0 or 1.0)."
+  },
+  "validation": {
+    "kind": "M10_3B_TARGET_CORRELATION",
+    "split": "validation",
+    "pooled_correlation": {
+      "plan_value__vs__exposure_proxy": {
+        "n": 1734,
+        "spearman": -0.2957055144901131
+      },
+      "plan_value__vs__pressure_risk_proxy": {
+        "n": 1734,
+        "spearman": null,
+        "note": "zero variance in at least one side"
+      },
+      "plan_value__vs__service_loss_proxy": {
+        "n": 1734,
+        "spearman": 0.07992500954750253
+      },
+      "plan_value__vs__containment_time_proxy": {
+        "n": 1734,
+        "spearman": 0.08362456355500823
+      },
+      "plan_value__vs__plan_regret_proxy": {
+        "n": 1734,
+        "spearman": -0.9999991002905252
+      },
+      "exposure_proxy__vs__containment_time_proxy": {
+        "n": 1734,
+        "spearman": 0.03363833391048976
+      },
+      "pressure_risk_proxy__vs__service_loss_proxy": {
+        "n": 1734,
+        "spearman": null,
+        "note": "zero variance in at least one side"
+      },
+      "exposure_proxy__vs__service_loss_proxy": {
+        "n": 1734,
+        "spearman": -0.01696654347178145
+      },
+      "exposure_proxy__vs__pressure_risk_proxy": {
+        "n": 1734,
+        "spearman": null,
+        "note": "zero variance in at least one side"
+      },
+      "containment_time_proxy__vs__service_loss_proxy": {
+        "n": 1734,
+        "spearman": 0.036307191648681826
+      }
+    },
+    "within_incident_correlation": {
+      "plan_value__vs__exposure_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 167,
+        "mean_within_incident_spearman": -0.9880239520958084
+      },
+      "plan_value__vs__pressure_risk_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      },
+      "plan_value__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 2,
+        "mean_within_incident_spearman": 1.0
+      },
+      "plan_value__vs__containment_time_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 15,
+        "mean_within_incident_spearman": -1.0
+      },
+      "plan_value__vs__plan_regret_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 167,
+        "mean_within_incident_spearman": -1.0
+      },
+      "exposure_proxy__vs__containment_time_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 15,
+        "mean_within_incident_spearman": 0.8666666666666667
+      },
+      "pressure_risk_proxy__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      },
+      "exposure_proxy__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 2,
+        "mean_within_incident_spearman": -1.0
+      },
+      "exposure_proxy__vs__pressure_risk_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      },
+      "containment_time_proxy__vs__service_loss_proxy": {
+        "n_incidents_with_meaningful_within_incident_variance": 0,
+        "mean_within_incident_spearman": null
+      }
+    },
+    "conclusion": "plan_value/plan_regret_proxy are exactly redundant (see within-incident-variance artifact). pressure_risk_proxy has zero pooled variance among valid candidates (see target-formula audit's STRUCTURAL_DEGENERACY_FINDING) so its correlation with anything is undefined (reported as null with n and a zero-variance note, never silently 0.0 or 1.0)."
+  }
+}

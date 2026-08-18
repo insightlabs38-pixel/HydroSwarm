@@ -1,0 +1,131 @@
+{
+  "kind": "M10_3B_TARGET_FORMULA_AUDIT",
+  "plan_value_policy_version": "plan-value-policy-v1",
+  "formulas": {
+    "plan_validity": {
+      "definition": "PlanVerifier.verify(...).decision == PlanDecision.VERIFIED",
+      "physical_quantity": "boolean acceptance of the plan by exact WNTR/EPANET simulation plus prescreen",
+      "raw_units": "boolean (1=valid)",
+      "normalization": "none",
+      "clipping": "none",
+      "transform": "none",
+      "higher_is_better": true,
+      "masking": "never masked (plan_validity_mask always True)",
+      "invalid_plan_handling": "n/a -- this IS the validity signal",
+      "reference_baseline_plan": "none",
+      "relationship_to_ranking": "gates which candidates enter the plan_value/proxy pool at all",
+      "per_plan_or_per_incident": "per-plan",
+      "source_code": "src/hydroswarm/training/strategist_labels.py:180 (is_valid), src/hydroswarm/simulation/verifier.py:180-181/231"
+    },
+    "exposure_proxy": {
+      "definition": "contaminant_mass_consumed_mg / max(no_response.contaminant_mass_consumed_mg, 1e-9)",
+      "physical_quantity": "ratio of this plan's contaminant mass consumed to the no-action baseline's own",
+      "raw_units": "dimensionless ratio",
+      "normalization": "ratio to no-response baseline (per-incident, not per-pool)",
+      "clipping": "none (can exceed 1.0 if a plan is worse than doing nothing)",
+      "transform": "none",
+      "higher_is_better": false,
+      "masking": "masked when candidate invalid, or consequences/no_response/valid_pool unavailable",
+      "invalid_plan_handling": "target fully masked (0.0 placeholder, mask=False), never imputed",
+      "reference_baseline_plan": "NO_ACTION plan's own exact WNTR consequences, this SAME incident",
+      "relationship_to_ranking": "one of 4 additive components of cost -> regret -> plan_value",
+      "per_plan_or_per_incident": "per-plan (numerator), but scaled by a per-incident constant (denominator)",
+      "source_code": "src/hydroswarm/planning/plan_value_policy.py:75"
+    },
+    "pressure_risk_proxy": {
+      "definition": "pressure_violation_minutes / 60.0",
+      "physical_quantity": "total simulated minutes any node's pressure fell below minimum_pressure_m (10.0m default)",
+      "raw_units": "minutes / 60.0 (dimensionless, 1.0 = 60 minutes of violation)",
+      "normalization": "fixed train-owned scale (60.0), not pool-relative",
+      "clipping": "none",
+      "transform": "none",
+      "higher_is_better": false,
+      "masking": "same as exposure_proxy",
+      "invalid_plan_handling": "target fully masked, never imputed",
+      "reference_baseline_plan": "none (absolute quantity, not baseline-relative)",
+      "relationship_to_ranking": "one of 4 additive cost components",
+      "per_plan_or_per_incident": "per-plan",
+      "source_code": "src/hydroswarm/planning/plan_value_policy.py:76",
+      "STRUCTURAL_DEGENERACY_FINDING": "MATHEMATICALLY GUARANTEED ZERO for every VALID candidate: PlanVerifier.verify() rejects (PlanDecision.REJECTED, hence plan_validity=False, hence this target is MASKED not merely zero) whenever minimum_pressure_m < the SAME minimum_pressure_m threshold used to compute pressure_violation_minutes itself (src/hydroswarm/simulation/wrapper.py:1341/1349 for the hydraulic-only path, 1477 for the exposure-aware path actually used by strategist label generation). pressure_violation_minutes > 0 at any timestep implies minimum_pressure < threshold at that timestep, which implies the simulation-wide minimum_pressure_m also falls below threshold, which implies PRESSURE_BELOW_MINIMUM fires and the plan is REJECTED. Therefore pressure_risk_proxy == 0.0 for EVERY plan whose plan_validity target is True, by construction of the safety gate -- not a bug, not a population artifact, not fixable without weakening the safety threshold (forbidden)."
+    },
+    "service_loss_proxy": {
+      "definition": "1.0 - service_availability",
+      "physical_quantity": "fraction of REQUESTED demand not delivered, aggregated over the simulation window",
+      "raw_units": "fraction in [0, 1]",
+      "normalization": "none (already a fraction)",
+      "clipping": "service_availability itself clipped to [0,1] upstream",
+      "transform": "none",
+      "higher_is_better": false,
+      "masking": "same as exposure_proxy",
+      "invalid_plan_handling": "target fully masked, never imputed",
+      "reference_baseline_plan": "the plan's own requested-vs-delivered demand (baseline_requested_demand)",
+      "relationship_to_ranking": "one of 4 additive cost components",
+      "per_plan_or_per_incident": "per-plan",
+      "source_code": "src/hydroswarm/planning/plan_value_policy.py:77",
+      "STRUCTURAL_BOUND_FINDING": "BOUNDED (not mathematically forced to exactly 0, unlike pressure_risk_proxy) to [0, 0.10] for every VALID candidate by the SAME verifier safety gate: SERVICE_BELOW_MINIMUM fires (REJECTED) whenever service_availability < minimum_service_availability (0.90 default, src/hydroswarm/simulation/wrapper.py:444). Empirically near-zero in this population (see identifiability artifact) because the generated candidates on this network/scenario population rarely cause even mild service disruption, not because it is mathematically forced to exactly 0 -- a candidate/population characteristic, not a verifier-gate mathematical necessity."
+    },
+    "containment_time_proxy": {
+      "definition": "(240.0 if containment_time_minutes is None else containment_time_minutes) / 240.0",
+      "physical_quantity": "minutes until contamination is no longer detected above threshold anywhere",
+      "raw_units": "minutes / 240.0 (dimensionless, 1.0 = 240 minutes OR never contained in-window)",
+      "normalization": "fixed train-owned scale (240.0)",
+      "clipping": "none (can exceed 1.0 if containment takes > 240 min)",
+      "transform": "None -> worst-case (1.0) substitution, an explicit design choice (not an accidental default)",
+      "higher_is_better": false,
+      "masking": "same as exposure_proxy",
+      "invalid_plan_handling": "target fully masked, never imputed",
+      "reference_baseline_plan": "none (absolute quantity)",
+      "relationship_to_ranking": "one of 4 additive cost components",
+      "per_plan_or_per_incident": "per-plan",
+      "source_code": "src/hydroswarm/planning/plan_value_policy.py:78-81"
+    },
+    "plan_regret_proxy": {
+      "definition": "max(0.0, cost - best_cost) where cost = exposure_proxy + pressure_risk_proxy + service_loss_proxy + containment_time_proxy, best_cost = min(cost) over every exactly-verified valid candidate for this SAME incident (including no-response)",
+      "physical_quantity": "additive cost gap to the best available verified plan in this incident's own candidate pool",
+      "raw_units": "same dimensionless cost scale as the 4 components summed",
+      "normalization": "per-incident (best_cost is a per-incident pool minimum)",
+      "clipping": "clamped at 0.0 from below only (never negative)",
+      "transform": "none",
+      "higher_is_better": false,
+      "masking": "masked wherever plan_value itself is masked (same is_valid/consequences/no_response/pool gate)",
+      "invalid_plan_handling": "target fully masked, never imputed",
+      "reference_baseline_plan": "the pool minimum-cost candidate for this incident (may or may not be no-response)",
+      "relationship_to_ranking": "== regret, the quantity plan_value is a monotone transform of",
+      "per_plan_or_per_incident": "per-plan value, but references a per-incident pool minimum",
+      "source_code": "src/hydroswarm/planning/plan_value_policy.py:126-127"
+    },
+    "plan_value": {
+      "definition": "1.0 / (1.0 + regret)",
+      "physical_quantity": "bounded, monotone-decreasing transform of plan_regret_proxy",
+      "raw_units": "dimensionless value score in (0, 1]",
+      "normalization": "n/a (already bounded by construction)",
+      "clipping": "none needed -- 1/(1+regret) is bounded in (0,1] for any regret>=0",
+      "transform": "1/(1+x) applied to regret",
+      "higher_is_better": true,
+      "masking": "same as plan_regret_proxy",
+      "invalid_plan_handling": "target fully masked, never imputed",
+      "reference_baseline_plan": "same pool minimum as plan_regret_proxy",
+      "relationship_to_ranking": "THE ranking target (pairwise-ranking gate criterion is computed on this key)",
+      "per_plan_or_per_incident": "per-plan",
+      "source_code": "src/hydroswarm/planning/plan_value_policy.py:136",
+      "REDUNDANCY_FINDING": "plan_value and plan_regret_proxy are EXACT, DETERMINISTIC, BIJECTIVE (monotone decreasing) functions of one another by construction: plan_value = 1/(1+regret), plan_regret_proxy = regret, computed from the SAME `regret` local variable in the SAME evaluate_plan_value() call (plan_value_policy.py:127/136/145). They are never independently informative -- a model that learns one exactly determines the other. Empirically verified below (target-correlation artifact): Spearman correlation between the two should equal exactly -1.0 up to floating-point roundoff."
+    }
+  },
+  "synthetic_monotonicity_check": {
+    "description": "Controlled synthetic pool: A (clearly best) > B (intermediate) > C (clearly worst) > no_response, verified end to end through the real evaluate_plan_value() implementation.",
+    "plan_values": {
+      "no_response": 0.3603603603603604,
+      "A": 1.0,
+      "B": 0.5988023952095809,
+      "C": 0.36585365853658536
+    },
+    "regrets": {
+      "no_response": 1.775,
+      "A": 0.0,
+      "B": 0.67,
+      "C": 1.7333333333333334
+    },
+    "plan_value_monotonic_A_gt_B_gt_C": true,
+    "regret_monotonic_A_lt_B_lt_C": true
+  }
+}
