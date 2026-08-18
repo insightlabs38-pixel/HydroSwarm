@@ -1,0 +1,116 @@
+{
+  "all_required_pass": false,
+  "gates": [
+    {
+      "command": [
+        "/workspace/HydroSwarm/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-q"
+      ],
+      "duration_seconds": 1332.804,
+      "exit_code": 1,
+      "name": "full_pytest",
+      "output_tail": "tests/adversarial/test_adversarial_validation.py: 2 warnings\ntests/e2e/test_golden_scenario.py: 4 warnings\ntests/e2e/test_reference_demo.py: 4 warnings\ntests/e2e/test_swarm_controller.py: 4 warnings\ntests/integration/test_incident_view_contract.py: 17 warnings\ntests/integration/test_live_example_endpoint.py: 4 warnings\ntests/integration/test_live_exposure_verification.py: 3 warnings\ntests/integration/test_network_import.py: 3 warnings\ntests/integration/test_production_runtime_wiring.py: 5 warnings\ntests/integration/test_v4_release_bundle.py: 1 warning\ntests/scientific/test_auxiliary_labels.py: 29 warnings\ntests/scientific/test_bundle_f_topologies.py: 32 warnings\ntests/scientific/test_corpus_sentinel_labels.py: 74 warnings\ntests/scientific/test_decision_certificates.py: 6 warnings\ntests/scientific/test_evidence_certificate.py: 13 warnings\ntests/scientific/test_exposure_aware_plan_evaluation.py: 28 warnings\ntests/scientific/test_feature_builder.py: 1 warning\ntests/scientific/test_fit_dynamic_fusion_calibration.py: 1836 warnings\ntests/scientific/test_full_trajectory.py: 165 warnings\ntests/scientific/test_generate_ood_extension_corpus.py: 135 warnings\ntests/scientific/test_generate_trajectory_corpus.py: 2724 warnings\ntests/scientific/test_hybrid_pipeline.py: 14 warnings\ntests/scientific/test_hybrid_pipeline_v4_gating.py: 21 warnings\ntests/scientific/test_interleaved_topology_m9_0.py: 678 warnings\ntests/scientific/test_m10_2_scout_preflight.py: 45 warnings\ntests/scientific/test_m10_2_scout_refit_corpus.py: 89 warnings\ntests/scientific/test_m10_2_true_evaluation_real.py: 89 warnings\ntests/scientific/test_m10_3_strategist_refit_corpus.py: 225 warnings\ntests/scientific/test_m10_4_full_trajectory.py: 115 warnings\ntests/scientific/test_m9_2_diagnostics.py: 360 warnings\ntests/scientific/test_m9_4_source_representative.py: 180 warnings\ntests/scientific/test_m9_5_source_representative.py: 516 warnings\ntests/scientific/test_m9_5r_source_representative.py: 840 warnings\ntests/scientific/test_merge_trajectory_targets.py: 822 warnings\ntests/scientific/test_ood_labels.py: 76 warnings\ntests/scientific/test_run_corpus_gates.py: 341 warnings\ntests/scientific/test_scenario_generation.py: 50 warnings\ntests/scientific/test_scenario_reconstruction.py: 48 warnings\ntests/scientific/test_scout_labels.py: 58 warnings\ntests/scientific/test_scout_trajectory.py: 107 warnings\ntests/scientific/test_second_pass_control_labels.py: 17 warnings\ntests/scientific/test_simulator_extended.py: 37 warnings\ntests/scientific/test_step_matched_interleaving_m9_0a.py: 2523 warnings\ntests/scientific/test_strategist_labels.py: 222 warnings\ntests/scientific/test_strategist_trajectory.py: 279 warnings\ntests/scientific/test_temporal_representation_m8_7.py: 1808 warnings\ntests/scientific/test_train_serve_parity_gate.py: 109 warnings\ntests/scientific/test_windows_simulator_smoke.py: 13 warnings\ntests/unit/test_sharded_data.py: 2 warnings\ntests/unit/test_verifier.py: 10 warnings\n  /usr/local/lib/python3.12/multiprocessing/popen_fork.py:66: DeprecationWarning: This process (pid=559877) is multi-threaded, use of fork() may lead to deadlocks in the child.\n    self.pid = os.fork()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n=========================== short test summary info ============================\nSKIPPED [1] tests/evaluation/test_capability_diagnostic.py:74: Temporary PR #12 exception: this diagnostic branch needs a CI checkout-history fix; restore before merging.\nSKIPPED [1] tests/scientific/test_m10_3_strategist_refit_corpus.py:90: this incident's candidate set already fills the maximum -- no padding to inspect\nSKIPPED [1] tests/scientific/test_m10_3_strategist_refit_corpus.py:100: this incident's candidate set already fills the maximum -- no padding to inspect\nFAILED tests/scientific/test_m11_2_finalist_freeze.py::test_m11_2_artifacts_freeze_without_authorizing_locked_evaluation\n1 failed, 1758 passed, 3 skipped, 14812 warnings in 1327.99s (0:22:07)\n",
+      "passed": false
+    },
+    {
+      "command": [
+        "/workspace/HydroSwarm/.venv/bin/pyright"
+      ],
+      "duration_seconds": 16.453,
+      "exit_code": 0,
+      "name": "pyright",
+      "output_tail": "0 errors, 0 warnings, 0 informations\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "/workspace/HydroSwarm/.venv/bin/ruff",
+        "check",
+        "scripts/hydrocore_v5/run_m11_5_full_validation.py",
+        "tests/scientific/test_m11_5_full_validation.py"
+      ],
+      "duration_seconds": 0.005,
+      "exit_code": 0,
+      "name": "ruff_changed_m11_5",
+      "output_tail": "All checks passed!\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "/workspace/HydroSwarm/.venv/bin/hydroswarm",
+        "self-test",
+        "--strict"
+      ],
+      "duration_seconds": 5.756,
+      "exit_code": 0,
+      "name": "strict_self_test",
+      "output_tail": "{\n  \"dependencies\": {\n    \"fastapi\": \"0.141.1\",\n    \"networkx\": \"3.6.1\",\n    \"numpy\": \"2.4.6\",\n    \"pydantic\": \"2.13.4\",\n    \"torch\": \"2.13.0\",\n    \"wntr\": \"1.5.0\"\n  },\n  \"frontend_assets\": \"built\",\n  \"inference_run\": true,\n  \"inference_sha256\": \"dd469fa30e1c02ca8a251f8e3f42f95a42086274f800b5957bb963b8ee87c103\",\n  \"model_parameters\": 24416119,\n  \"network\": {\n    \"links\": 7,\n    \"nodes\": 6,\n    \"reservoirs\": 1,\n    \"tanks\": 1\n  },\n  \"network_sha256\": \"cbc0947c2eeeef3209fb1d387310c3728922e4d5ed44d290591489f7c1dbcece\",\n  \"offline_ready\": true,\n  \"ok\": true,\n  \"reference_artifact\": {\n    \"path\": \"/workspace/HydroSwarm/artifacts/reference-demo/reference-incident-v1.json\",\n    \"present\": true\n  },\n  \"resources\": {\n    \"available_ram_gb\": 60.24,\n    \"free_disk_gb\": 133.06,\n    \"port_8765_available\": true,\n    \"warnings\": []\n  },\n  \"simulation_run\": true,\n  \"simulation_sha256\": \"4c5bc9c87b09130b3afd4029f2ef7ba27c62727099377a54593605c7db12cbad\",\n  \"sqlite\": \"ok\",\n  \"trained_assets\": {\n    \"architecture_version\": \"hydroswarm-v5-release-v1\",\n    \"bundle_dir\": \"/workspace/HydroSwarm/models/hydrocore-v5-release\",\n    \"calibration_status\": \"FITTED\",\n    \"fallback_reason\": null,\n    \"model_sha256\": \"de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5\",\n    \"normalization_hash\": \"NO_NORMALIZATION_SENTINEL\",\n    \"ready\": true\n  }\n}\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "duration_seconds": 4.013,
+      "exit_code": 0,
+      "name": "frontend_lint",
+      "output_tail": "\n> hydroswarm-operator-console@0.1.0 lint\n> eslint . --max-warnings 0\n\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "duration_seconds": 4.348,
+      "exit_code": 0,
+      "name": "frontend_typecheck",
+      "output_tail": "\n> hydroswarm-operator-console@0.1.0 typecheck\n> tsc -b\n\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "test"
+      ],
+      "duration_seconds": 11.041,
+      "exit_code": 0,
+      "name": "frontend_test",
+      "output_tail": " act(...).\n\nWhen testing, code that causes React state updates should be wrapped into act(...):\n\nact(() => {\n  /* fire events that update state */\n});\n/* assert on the output */\n\nThis ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act\nAn update to TechnicalDock inside a test was not wrapped in act(...).\n\nWhen testing, code that causes React state updates should be wrapped into act(...):\n\nact(() => {\n  /* fire events that update state */\n});\n/* assert on the output */\n\nThis ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act\n\nstderr | tests/App-gateway.test.tsx > clicking Run Reference Incident on the gateway shows the REFERENCE banner\nA suspended resource finished loading inside a test, but the event was not wrapped in act(...).\n\nWhen testing, code that resolves suspended data should be wrapped into act(...):\n\nact(() => {\n  /* finish loading suspended data */\n});\n/* assert on the output */\n\nThis ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act\n\n \u2713 tests/FinalUiConsistency.test.tsx (4 tests) 244ms\n \u2713 tests/NetworkWorkspace.test.tsx (3 tests) 296ms\n \u2713 tests/liveExample-useLiveExampleFlow.test.tsx (5 tests) 448ms\n \u2713 tests/reference-useReferenceIncident.test.tsx (6 tests) 512ms\n \u2713 tests/IdentifierIndependence.test.tsx (1 test) 412ms\n   \u2713 no hard-coded incident identifiers leak through when the underlying data uses different IDs  411ms\n \u2713 tests/ApprovalWorkspace.test.tsx (6 tests) 524ms\n \u2713 tests/App-gateway.test.tsx (6 tests) 648ms\n \u2713 tests/api-planning.test.ts (4 tests) 29ms\n \u2713 tests/api-replay.test.ts (3 tests) 30ms\n \u2713 tests/NullVsZeroTruthfulness.test.tsx (3 tests) 698ms\n   \u2713 a null disagreement renders \"not measured\", never a fabricated 0.0%  413ms\n \u2713 tests/ReducedMotionCharts.test.tsx (2 tests) 43ms\n \u2713 tests/api-networks.test.ts (6 tests) 31ms\n \u2713 tests/api-sampling.test.ts (3 tests) 48ms\n \u2713 tests/incidentSelection.test.ts (9 tests) 24ms\n \u2713 tests/api-authority.test.ts (3 tests) 16ms\n \u2713 tests/api-approval.test.ts (3 tests) 14ms\n \u2713 tests/reference-mapMilestone.test.ts (9 tests) 6ms\n \u2713 tests/geometry.test.ts (6 tests) 5ms\n \u2713 tests/workflow.test.ts (9 tests) 4ms\n \u2713 tests/calibrationDisplay.test.ts (6 tests) 3ms\n \u2713 tests/store.test.ts (3 tests) 4ms\n \u2713 tests/displayId.test.ts (1 test) 2ms\n \u2713 tests/App.test.tsx (19 tests) 7049ms\n   \u2713 passes the 30-second comprehension test in fallback mode  1027ms\n   \u2713 workflow rail navigates to Validation and Benchmarks, and derives stage state from real data (no OOD/CAUTION for this fixture)  747ms\n   \u2713 Network workspace honestly reports the network list as unavailable when the backend is unreachable, never a fabricated empty success  408ms\n   \u2713 Model & Authority workspace renders the real DEMO_FALLBACK decision certificates as a governance table, including plan-specific certificates  409ms\n   \u2713 Replay workspace renders the real event ledger, disables hash-chain verification in DEMO_FALLBACK, and lists every failure-injection category as a real link  424ms\n   \u2713 Approval workspace never performs a real approval mutation in DEMO_FALLBACK mode  403ms\n   \u2713 Sampling workspace renders the real evidence certificate, never an empty card, for the DEMO_FALLBACK fixture  393ms\n   \u2713 Source workspace renders real candidate ranking and the DEMO_FALLBACK authority certificate, never a placeholder  394ms\n   \u2713 overview has no automated accessibility violations  369ms\n   \u2713 Source workspace has no automated accessibility violations  346ms\n   \u2713 Sampling workspace has no automated accessibility violations  301ms\n   \u2713 Response workspace has no automated accessibility violations  453ms\n\n Test Files  29 passed (29)\n      Tests  162 passed (162)\n   Start at  15:15:53\n   Duration  10.06s (transform 1.95s, setup 5.89s, collect 6.68s, tests 12.00s, environment 26.62s, prepare 2.14s)\n\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "duration_seconds": 12.142,
+      "exit_code": 0,
+      "name": "frontend_build",
+      "output_tail": "\n> hydroswarm-operator-console@0.1.0 build\n> tsc -b && vite build\n\nvite v7.3.6 building client environment for production...\ntransforming...\n\u2713 728 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                                   0.46 kB \u2502 gzip:   0.30 kB\ndist/assets/index-D3D1f5xh.css                  100.59 kB \u2502 gzip:  16.83 kB\ndist/assets/Panel-DgfWjwnh.js                     0.44 kB \u2502 gzip:   0.26 kB\ndist/assets/PlanActionSequence-CIw5TYQ0.js        0.84 kB \u2502 gzip:   0.51 kB\ndist/assets/ModelGovernanceTable-BXKRkS3V.js      1.67 kB \u2502 gzip:   0.75 kB\ndist/assets/BenchmarkPage-CT5zg60W.js             1.93 kB \u2502 gzip:   0.79 kB\ndist/assets/useMutation-BV97q5B0.js               2.21 kB \u2502 gzip:   0.92 kB\ndist/assets/AuthorityWorkspace-53hoyKid.js        2.82 kB \u2502 gzip:   1.23 kB\ndist/assets/ValidationPage-C9XD85OK.js            3.21 kB \u2502 gzip:   1.25 kB\ndist/assets/ReplayWorkspace-D932lfld.js           3.33 kB \u2502 gzip:   1.48 kB\ndist/assets/SourceWorkspace-Cge4znok.js           3.42 kB \u2502 gzip:   1.47 kB\ndist/assets/Overview-CXIKpD7D.js                  4.35 kB \u2502 gzip:   1.64 kB\ndist/assets/SamplingWorkspace-BtByIWDt.js         5.29 kB \u2502 gzip:   1.93 kB\ndist/assets/ApprovalWorkspace-BJ6WPB2V.js         7.93 kB \u2502 gzip:   2.80 kB\ndist/assets/ResponseWorkspace-DAzwMk7H.js        18.60 kB \u2502 gzip:   6.39 kB\ndist/assets/NetworkWorkspace-DTKpBYYB.js        449.47 kB \u2502 gzip: 143.70 kB\ndist/assets/index-B1n2yKCB.js                   848.87 kB \u2502 gzip: 279.00 kB\ndist/assets/OperationalMap--6NKSvZS.js        1,064.07 kB \u2502 gzip: 286.77 kB\n\u2713 built in 7.95s\n",
+      "passed": true
+    },
+    {
+      "command": [
+        "docker",
+        "build",
+        "-t",
+        "hydroswarm-m11-5-validation:local",
+        "."
+      ],
+      "duration_seconds": 0.753,
+      "exit_code": 1,
+      "name": "docker_build_strict_self_test",
+      "output_tail": "ERROR: failed to connect to the docker API at unix:///var/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /var/run/docker.sock: connect: no such file or directory\n",
+      "passed": false
+    }
+  ],
+  "kind": "M11_5_SOFTWARE_GATES"
+}

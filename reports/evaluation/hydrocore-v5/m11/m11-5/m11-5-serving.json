@@ -1,0 +1,32 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "calibration_artifact": true,
+    "checkpoint": true,
+    "clean_process_loaded": true,
+    "feature_schema": true,
+    "fusion": true,
+    "outputs": true,
+    "trained_tasks": true
+  },
+  "kind": "M11_2_REPRODUCIBILITY",
+  "method": "fresh Python process release load; no calibration fit or performance metric",
+  "observed": {
+    "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+    "fallback_reason": null,
+    "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "fusion_config_hash": "fuse_source_probabilities-v1",
+    "model_hash": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "outputs": [
+      "event_cause",
+      "event_presence",
+      "evidence_sufficiency",
+      "relative_strength",
+      "source_node"
+    ],
+    "ready": true,
+    "trained_tasks": [
+      "sentinel"
+    ]
+  }
+}

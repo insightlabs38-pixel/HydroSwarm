@@ -1,0 +1,10 @@
+{
+  "kind": "M11_2_LIMITATIONS",
+  "limitations": [
+    "M10.4 selected-plan-vs-NO_ACTION Gate E was vacuous because NO_ACTION was absent from the bounded candidate set.",
+    "Deterministic active sampling modestly improved localization but did not change the final approved action in M10.4.",
+    "Development unseen-topology evidence is limited; unsupported topology suppresses calibration/actionability.",
+    "M9.6 fixed-age versus M10.4 incident-elapsed unobserved-age behavior remains unresolved and frozen.",
+    "Learned OOD, Scout, and Strategist were not promoted."
+  ]
+}

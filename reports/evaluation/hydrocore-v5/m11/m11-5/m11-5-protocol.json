@@ -1,0 +1,11 @@
+{
+  "kind": "M11_5_PROTOCOL",
+  "locked_test_prohibition": true,
+  "m11_3_m11_4": "UNUSED_RESERVED_SUBSUMED_BY_M10_M11_2",
+  "milestone": "M11.5",
+  "no_tuning": true,
+  "parent_freeze_path": "reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json",
+  "parent_freeze_sha256": "6b778b14149920247a48a77e45a016b4d4d569c5a194596a0c14466d07ea3a24",
+  "protocol_path": "docs/evaluation/HYDROCORE_V5_M11_5_FULL_VALIDATION_PROTOCOL.md",
+  "protocol_sha256": "00ac3d7f280b59f6b83bce3ef50799201457cfbcefba46095f41b97833a731f5"
+}

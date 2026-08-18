@@ -1,0 +1,119 @@
+{
+  "fresh_seed_namespace": null,
+  "kind": "M11_5_MATRIX_DEFINITION",
+  "m11_3_m11_4": "UNUSED_RESERVED_SUBSUMED_BY_M10_M11_2",
+  "rows": [
+    {
+      "domain": "Finalist identity / reproducibility",
+      "evidence_mode": "FRESH_FROZEN_FINALIST_RUN",
+      "gate_source": "M11.2 freeze invariants",
+      "hard_gating": true,
+      "row_id": "A",
+      "scope": "exact parity; clean load; no fallback"
+    },
+    {
+      "domain": "Predictive / source localization",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "M9 final/M10.4 frozen gates",
+      "hard_gating": true,
+      "row_id": "B",
+      "scope": "M9 selected predictor and M10.4 trajectory"
+    },
+    {
+      "domain": "Calibration / actionability",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "M9 coverage floor and M10 fail-closed invariant",
+      "hard_gating": true,
+      "row_id": "C",
+      "scope": "B_DEPTH_AWARE artifact and M10.4 behavior"
+    },
+    {
+      "domain": "Robustness / sensor quality",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "finite output and authority invariants",
+      "hard_gating": true,
+      "row_id": "D",
+      "scope": "M10.1 development conditions"
+    },
+    {
+      "domain": "Development OOD / topology",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "deterministic OOD and fail-closed invariants",
+      "hard_gating": true,
+      "row_id": "E",
+      "scope": "M10.1 development-only OOD"
+    },
+    {
+      "domain": "Scout / active sampling",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "zero Scout safety counters",
+      "hard_gating": true,
+      "row_id": "F",
+      "scope": "M10.2 and M10.4 trajectories"
+    },
+    {
+      "domain": "Planning / physical verification",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "WNTR verification and zero unsafe-plan counters",
+      "hard_gating": true,
+      "row_id": "G",
+      "scope": "M10.4 physical/safety evidence"
+    },
+    {
+      "domain": "Human approval / actuation safety",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "zero bypass/actuation counters",
+      "hard_gating": true,
+      "row_id": "H",
+      "scope": "M10.4 safety evidence"
+    },
+    {
+      "domain": "End-to-end incident trajectory",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "M10_4_FULL_TRAJECTORY_PASS",
+      "hard_gating": true,
+      "row_id": "I",
+      "scope": "M10.4 full trajectory"
+    },
+    {
+      "domain": "Serving / release parity",
+      "evidence_mode": "FRESH_FROZEN_FINALIST_RUN",
+      "gate_source": "exact parity/no-v4 fallback",
+      "hard_gating": true,
+      "row_id": "J",
+      "scope": "M11.2 clean load plus M10.5 serving freeze"
+    },
+    {
+      "domain": "Fail-closed matrix",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "classical-safe failure/no v4 fallback",
+      "hard_gating": true,
+      "row_id": "K",
+      "scope": "M10.5 failure matrix"
+    },
+    {
+      "domain": "Output governance",
+      "evidence_mode": "FRESH_FROZEN_FINALIST_RUN",
+      "gate_source": "exact allowlist and non-authority",
+      "hard_gating": true,
+      "row_id": "L",
+      "scope": "M11.2 output freeze"
+    },
+    {
+      "domain": "Known limitations",
+      "evidence_mode": "CLOSED_EVIDENCE_REUSE",
+      "gate_source": "descriptive only",
+      "hard_gating": false,
+      "row_id": "M",
+      "scope": "M11.2 limitations"
+    },
+    {
+      "domain": "Software / release quality",
+      "evidence_mode": "FRESH_FROZEN_FINALIST_RUN",
+      "gate_source": "established release gates",
+      "hard_gating": true,
+      "row_id": "N",
+      "scope": "full pytest, strict self-test, Docker, frontend, static checks"
+    }
+  ]
+}

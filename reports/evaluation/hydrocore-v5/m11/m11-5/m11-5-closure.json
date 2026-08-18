@@ -1,0 +1,11 @@
+{
+  "closure_state": "M11_5_FULL_VALIDATION_FAIL",
+  "code_under_test_commit": "34ecd78ccc568a94f2d1d811daa11793b1fa625b",
+  "kind": "M11_5_CLOSURE",
+  "locked_evaluation_authorized": false,
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "matrix_green": false,
+  "milestone": "M11.5",
+  "next_action": "DO_NOT_PROCEED_TO_M11_6"
+}
