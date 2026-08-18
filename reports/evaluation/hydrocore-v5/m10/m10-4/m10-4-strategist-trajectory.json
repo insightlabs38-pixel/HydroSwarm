@@ -1,0 +1,26 @@
+{
+  "kind": "M10_4_STRATEGIST_TRAJECTORY",
+  "protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "n_incidents": 360,
+  "mean_candidates_generated": 0.6555555555555556,
+  "mean_candidates_wntr_verified": 0.5833333333333334,
+  "mean_candidates_rejected": 0.0,
+  "no_safe_plan_rate": {
+    "n": 360,
+    "rate": 0.03611111111111111,
+    "wilson_90_lo": 0.0230907709777573,
+    "wilson_90_hi": 0.0560520598175168
+  },
+  "no_action_available_rate": {
+    "n": 360,
+    "rate": 0.0,
+    "wilson_90_lo": 0.0,
+    "wilson_90_hi": 0.00745933858173257
+  },
+  "human_approved_rate": {
+    "n": 360,
+    "rate": 0.5833333333333334,
+    "wilson_90_lo": 0.5401274514027392,
+    "wilson_90_hi": 0.6252959921669722
+  }
+}

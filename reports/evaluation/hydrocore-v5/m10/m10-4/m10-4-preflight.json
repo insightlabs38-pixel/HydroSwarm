@@ -1,0 +1,177 @@
+{
+  "kind": "M10_4_PREFLIGHT",
+  "milestone": "M10.4",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "57787d0d08633a7d3870de1152b5088d5db06bb0",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "checks": [
+    {
+      "check": "canonical_checkpoints_hash_verified",
+      "pass": true,
+      "detail": {
+        "20260814": {
+          "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260814/model-export-final-step.safetensors",
+          "exists": true,
+          "expected_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+          "actual_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+          "matches": true,
+          "policy": "FINAL_STEP_1350"
+        },
+        "31874": {
+          "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors",
+          "exists": true,
+          "expected_sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+          "actual_sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+          "matches": true,
+          "policy": "FINAL_STEP_1350"
+        },
+        "20260815": {
+          "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260815/model-export-final-step.safetensors",
+          "exists": true,
+          "expected_sha256": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+          "actual_sha256": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+          "matches": true,
+          "policy": "FINAL_STEP_1350"
+        }
+      }
+    },
+    {
+      "check": "no_m10_2_m10_3_experimental_checkpoint_used",
+      "pass": true,
+      "detail": [
+        "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260814/model-export-final-step.safetensors",
+        "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors",
+        "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260815/model-export-final-step.safetensors"
+      ]
+    },
+    {
+      "check": "trained_tasks_excludes_ood_scout_strategist",
+      "pass": true,
+      "detail": [
+        "sentinel"
+      ]
+    },
+    {
+      "check": "source_confirms_ood_gated_by_trained_tasks",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "source_confirms_scout_gated_by_trained_tasks",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "source_confirms_strategist_gated_by_trained_tasks",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "calibration_identity_correct_reaches_calibrated_true",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "already_sampled_and_budget_guards_hold",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "provenance_events_recorded",
+      "pass": true,
+      "detail": [
+        "HYBRID_ANALYSIS_COMPLETED",
+        "INCIDENT_CREATED",
+        "PLANS_GENERATED",
+        "PLAN_APPROVED",
+        "PLAN_VERIFIED"
+      ]
+    },
+    {
+      "check": "stale_restart_reanalysis_guard_present_in_source",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "forward_pass_completed_without_crash",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "production_scout_path_is_rank_sample_locations_not_deterministic_fallback",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "production_strategist_path_is_generate_response_plans_plus_wntr_verify",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "wntr_rejected_plans_cannot_become_actionable",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "no_unverified_plan_surfaced_as_actionable",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "human_approval_endpoint_present_and_required",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "no_autonomous_actuation_endpoint_exists",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "deterministic_fallback_path_structurally_available",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "planning_simulation_inference_modules_unmodified_by_m10_4",
+      "pass": true,
+      "detail": "verified by git diff at closure"
+    },
+    {
+      "check": "causal_evidence_availability_guard_present_in_source",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "check": "locked_test_unopened_before_and_after",
+      "pass": true,
+      "detail": {
+        "before": false,
+        "after": false
+      }
+    },
+    {
+      "check": "scout_accessibility_and_stop_machinery_present",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "disclosed_findings": [
+    {
+      "id": "M10-4-DISCLOSED-01",
+      "severity": "LOW",
+      "blocking": false,
+      "summary": "hydroswarm.inference.pipeline.HybridInferencePipeline.analyze() calls feature_builder.build(...) with a hard-coded window_steps=25 and does not pass unobserved_age_sentinel/include_relative_gap_feature through at all, so it always uses HydraulicFeatureBuilder.build()'s own defaults (unobserved_age_sentinel='incident_elapsed'), NOT M9.6's recorded training feature_kwargs (unobserved_age_sentinel='fixed'). M10.0's own closed, immutable preflight exercised this exact checkpoint through the same unremarked defaults and was accepted as SYSTEM_PREFLIGHT_PASS; M10.4 follows that same established precedent rather than editing shared production feature-construction code (which would be an undisclosed model-input change, out of scope). Non-blocking: this governs only the age encoding of never-yet-sampled nodes."
+    },
+    {
+      "id": "M10-4-DISCLOSED-02",
+      "severity": "LOW",
+      "blocking": false,
+      "summary": "The module-level production hydroswarm.api.app `app` object still serves the OLDER, pre-M9 hydrocore-v4 architecture-freeze checkpoint (models/hydrocore-v4-release, seed 20260810) via hydroswarm.runtime.v4_defaults.V4PipelineFactory(DEFAULT_V4_RELEASE_BUNDLE_DIR) -- NOT the M9-selected canonical HydroCore-S. No M9/M10 milestone has promoted the M9.6 checkpoint into that serving directory (that is M10.5's job, out of scope here). M10.4 does not modify that module-level default; it drives the SAME create_app()/HybridInferencePipeline/Scout/Strategist/PlanVerifier production code through an M10.4-only pipeline_factory (m10_4_common.M10_4_PipelineFactory) built around the canonical M9.6 checkpoint instead, exactly mirroring how hydroswarm.evaluation.live_robustness already swaps pipeline_factory for its own (different) evaluation purpose. Non-blocking: this is wiring, not a scientific policy change, and does not touch models/hydrocore-v4-release, architecture-freeze.json, or runtime_enabled_outputs."
+    }
+  ],
+  "all_checks_pass": true,
+  "material_blocker": null,
+  "result": "M10_4_PREFLIGHT_PASS"
+}

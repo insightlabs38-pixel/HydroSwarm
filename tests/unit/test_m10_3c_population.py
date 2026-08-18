@@ -119,6 +119,16 @@ def test_seed_bases_never_appear_elsewhere_in_the_repository_before_this_protoco
     excluded_substrings = (
         "m10_3c_population_protocol.py", "run_m10_3c_population.py", "test_m10_3c_population.py",
         "/m10-3c-population/", "HYDROCORE_V5_M10_3C_STRATEGIST_POPULATION_AMENDMENT.md",
+        # M10.4 (a later, separately-frozen milestone) legitimately and
+        # necessarily cites M10.3C's own seed range while MECHANICALLY
+        # PROVING its own fresh seed namespace is disjoint from every prior
+        # milestone's, including M10.3C's -- a real, disclosed, intended
+        # downstream reference, not an accidental collision. Does not
+        # touch, weaken, or re-open M10.3C's own finding/closure/protocol
+        # in any way; only widens this regression guard's own allowlist.
+        "scripts/hydrocore_v5/m10_4_common.py",
+        "docs/evaluation/HYDROCORE_V5_M10_4_FULL_TRAJECTORY_PROTOCOL.md",
+        "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-seed-disjointness.json",
     )
     hits = [line for line in result.stdout.splitlines() if not any(s in line for s in excluded_substrings)]
     assert hits == [], f"unexpected pre-existing hits for the M10.3C seed bases: {hits}"

@@ -1,0 +1,2554 @@
+{
+  "kind": "M10_4_POPULATION_MANIFEST",
+  "protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "model_seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "unseen_families": [
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ],
+  "condition_kinds": [
+    "NOMINAL",
+    "LOW_COVERAGE_ACTIVE_SAMPLING",
+    "SENSOR_DROPOUT",
+    "SENSOR_HEALTH_DEGRADED",
+    "MEASUREMENT_NOISE",
+    "SEVERITY_SHIFT",
+    "AMBIGUITY_DISAGREEMENT"
+  ],
+  "incidents_per_cell": 5,
+  "n_physical_incidents_per_seed": 120,
+  "n_physical_incidents_total": 360,
+  "n_api_incidents_total": 720,
+  "rows": [
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1500000000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1500000001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1500000002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1500000003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1500000004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1500010000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1500010001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1500010002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1500010003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1500010004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1500020000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1500020001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1500020002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1500020003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1500020004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1500030000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1500030001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1500030002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1500030003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1500030004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1500040000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1500040001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1500040002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1500040003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1500040004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1500050000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1500050001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1500050002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1500050003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1500050004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1500060000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1500060001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1500060002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1500060003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1500060004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1501000000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1501000001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1501000002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1501000003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1501000004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1501010000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1501010001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1501010002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1501010003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1501010004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1501020000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1501020001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1501020002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1501020003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1501020004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1501030000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1501030001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1501030002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1501030003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1501030004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1501040000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1501040001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1501040002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1501040003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1501040004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1501050000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1501050001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1501050002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1501050003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1501050004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1501060000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1501060001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1501060002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1501060003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1501060004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1502000000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1502000001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1502000002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1502000003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1502000004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1502010000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1502010001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1502010002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1502010003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1502010004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1502020000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1502020001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1502020002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1502020003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1502020004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1502030000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1502030001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1502030002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1502030003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1502030004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1502040000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1502040001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1502040002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1502040003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1502040004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1502050000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1502050001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1502050002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1502050003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1502050004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1502060000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1502060001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1502060002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1502060003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1502060004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1503000000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1503000001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1503000002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1503000003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1503000004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1504000000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1504000001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1504000002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1504000003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1504000004
+    },
+    {
+      "model_seed": 20260814,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1505000000
+    },
+    {
+      "model_seed": 20260814,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1505000001
+    },
+    {
+      "model_seed": 20260814,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1505000002
+    },
+    {
+      "model_seed": 20260814,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1505000003
+    },
+    {
+      "model_seed": 20260814,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1505000004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1500000000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1500000001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1500000002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1500000003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1500000004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1500010000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1500010001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1500010002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1500010003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1500010004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1500020000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1500020001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1500020002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1500020003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1500020004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1500030000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1500030001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1500030002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1500030003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1500030004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1500040000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1500040001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1500040002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1500040003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1500040004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1500050000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1500050001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1500050002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1500050003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1500050004
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1500060000
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1500060001
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1500060002
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1500060003
+    },
+    {
+      "model_seed": 31874,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1500060004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1501000000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1501000001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1501000002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1501000003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1501000004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1501010000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1501010001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1501010002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1501010003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1501010004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1501020000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1501020001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1501020002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1501020003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1501020004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1501030000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1501030001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1501030002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1501030003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1501030004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1501040000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1501040001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1501040002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1501040003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1501040004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1501050000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1501050001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1501050002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1501050003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1501050004
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1501060000
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1501060001
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1501060002
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1501060003
+    },
+    {
+      "model_seed": 31874,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1501060004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1502000000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1502000001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1502000002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1502000003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1502000004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1502010000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1502010001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1502010002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1502010003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1502010004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1502020000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1502020001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1502020002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1502020003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1502020004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1502030000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1502030001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1502030002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1502030003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1502030004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1502040000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1502040001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1502040002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1502040003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1502040004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1502050000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1502050001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1502050002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1502050003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1502050004
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1502060000
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1502060001
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1502060002
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1502060003
+    },
+    {
+      "model_seed": 31874,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1502060004
+    },
+    {
+      "model_seed": 31874,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1503000000
+    },
+    {
+      "model_seed": 31874,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1503000001
+    },
+    {
+      "model_seed": 31874,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1503000002
+    },
+    {
+      "model_seed": 31874,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1503000003
+    },
+    {
+      "model_seed": 31874,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1503000004
+    },
+    {
+      "model_seed": 31874,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1504000000
+    },
+    {
+      "model_seed": 31874,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1504000001
+    },
+    {
+      "model_seed": 31874,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1504000002
+    },
+    {
+      "model_seed": 31874,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1504000003
+    },
+    {
+      "model_seed": 31874,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1504000004
+    },
+    {
+      "model_seed": 31874,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1505000000
+    },
+    {
+      "model_seed": 31874,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1505000001
+    },
+    {
+      "model_seed": 31874,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1505000002
+    },
+    {
+      "model_seed": 31874,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1505000003
+    },
+    {
+      "model_seed": 31874,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1505000004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1500000000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1500000001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1500000002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1500000003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1500000004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1500010000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1500010001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1500010002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1500010003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1500010004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1500020000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1500020001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1500020002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1500020003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1500020004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1500030000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1500030001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1500030002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1500030003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1500030004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1500040000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1500040001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1500040002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1500040003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1500040004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1500050000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1500050001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1500050002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1500050003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1500050004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1500060000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1500060001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1500060002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1500060003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "golden-reference",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1500060004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1501000000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1501000001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1501000002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1501000003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1501000004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1501010000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1501010001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1501010002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1501010003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1501010004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1501020000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1501020001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1501020002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1501020003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1501020004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1501030000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1501030001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1501030002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1501030003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1501030004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1501040000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1501040001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1501040002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1501040003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1501040004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1501050000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1501050001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1501050002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1501050003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1501050004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1501060000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1501060001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1501060002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1501060003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "branched-loop",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1501060004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1502000000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1502000001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1502000002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1502000003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1502000004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 0,
+      "physical_seed": 1502010000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 1,
+      "physical_seed": 1502010001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 2,
+      "physical_seed": 1502010002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 3,
+      "physical_seed": 1502010003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "incident_index": 4,
+      "physical_seed": 1502010004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 0,
+      "physical_seed": 1502020000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 1,
+      "physical_seed": 1502020001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 2,
+      "physical_seed": 1502020002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 3,
+      "physical_seed": 1502020003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_DROPOUT",
+      "incident_index": 4,
+      "physical_seed": 1502020004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 0,
+      "physical_seed": 1502030000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 1,
+      "physical_seed": 1502030001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 2,
+      "physical_seed": 1502030002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 3,
+      "physical_seed": 1502030003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SENSOR_HEALTH_DEGRADED",
+      "incident_index": 4,
+      "physical_seed": 1502030004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 0,
+      "physical_seed": 1502040000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 1,
+      "physical_seed": 1502040001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 2,
+      "physical_seed": 1502040002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 3,
+      "physical_seed": 1502040003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "MEASUREMENT_NOISE",
+      "incident_index": 4,
+      "physical_seed": 1502040004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 0,
+      "physical_seed": 1502050000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 1,
+      "physical_seed": 1502050001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 2,
+      "physical_seed": 1502050002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 3,
+      "physical_seed": 1502050003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "SEVERITY_SHIFT",
+      "incident_index": 4,
+      "physical_seed": 1502050004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 0,
+      "physical_seed": 1502060000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 1,
+      "physical_seed": 1502060001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 2,
+      "physical_seed": 1502060002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 3,
+      "physical_seed": 1502060003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "loop-grid",
+      "condition_kind": "AMBIGUITY_DISAGREEMENT",
+      "incident_index": 4,
+      "physical_seed": 1502060004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1503000000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1503000001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1503000002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1503000003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "coastal-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1503000004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1504000000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1504000001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1504000002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1504000003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "tree-branch",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1504000004
+    },
+    {
+      "model_seed": 20260815,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 0,
+      "physical_seed": 1505000000
+    },
+    {
+      "model_seed": 20260815,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 1,
+      "physical_seed": 1505000001
+    },
+    {
+      "model_seed": 20260815,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 2,
+      "physical_seed": 1505000002
+    },
+    {
+      "model_seed": 20260815,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 3,
+      "physical_seed": 1505000003
+    },
+    {
+      "model_seed": 20260815,
+      "family": "dense-loop",
+      "condition_kind": "NOMINAL",
+      "incident_index": 4,
+      "physical_seed": 1505000004
+    }
+  ]
+}

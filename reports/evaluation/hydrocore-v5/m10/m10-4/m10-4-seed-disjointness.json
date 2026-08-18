@@ -1,0 +1,56 @@
+{
+  "m10_4_range": [
+    1500000000,
+    1599999999
+  ],
+  "prior_ranges": {
+    "m9_4_floor_and_up": [
+      990000000,
+      1099999999
+    ],
+    "m10_1": [
+      1100000000,
+      1199999999
+    ],
+    "m10_2_refit_train": [
+      1200000000,
+      1200099999
+    ],
+    "m10_2_refit_validation": [
+      1200100000,
+      1200199999
+    ],
+    "m10_2_true_eval": [
+      1200200000,
+      1299999999
+    ],
+    "m10_3_refit_train": [
+      1300000000,
+      1300099999
+    ],
+    "m10_3_refit_validation": [
+      1300100000,
+      1399999999
+    ],
+    "m10_3c_population": [
+      1400000000,
+      1449999999
+    ],
+    "m10_3d_reserved_unused": [
+      1450000000,
+      1499999999
+    ]
+  },
+  "overlaps": {
+    "m9_4_floor_and_up": false,
+    "m10_1": false,
+    "m10_2_refit_train": false,
+    "m10_2_refit_validation": false,
+    "m10_2_true_eval": false,
+    "m10_3_refit_train": false,
+    "m10_3_refit_validation": false,
+    "m10_3c_population": false,
+    "m10_3d_reserved_unused": false
+  },
+  "disjoint": true
+}
