@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -48,7 +47,8 @@ def audit() -> dict:
 
 
 def write() -> dict:
-    a = audit(); assert DOC.exists() and a["orders_identical"] and a["checkpoint_sha_matches"] and a["all_peers_use_final_step"]
+    a = audit()
+    assert DOC.exists() and a["orders_identical"] and a["checkpoint_sha_matches"] and a["all_peers_use_final_step"]
     protocol_hash = digest(DOC)
     closure = {"kind":"M10_5A_CLOSURE", "closure_state":"M10_5A_DEPLOYMENT_SELECTION_FROZEN", "start_commit":START_COMMIT, "protocol_hash":protocol_hash, "selected_seed":SELECTED_SEED, "selected_checkpoint_sha256":EXPECTED_SHA, "m10_4_performance_used":False}
     payloads = {
@@ -60,8 +60,10 @@ def write() -> dict:
       "m10-5a-closure.json": closure,
     }
     OUT.mkdir(parents=True, exist_ok=True)
-    for name, payload in payloads.items(): (OUT/name).write_text(json.dumps(payload, indent=2, sort_keys=True)+"\n")
+    for name, payload in payloads.items():
+        (OUT / name).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
     return closure
 
 
-if __name__ == "__main__": print(json.dumps(write(), indent=2, sort_keys=True))
+if __name__ == "__main__":
+    print(json.dumps(write(), indent=2, sort_keys=True))
