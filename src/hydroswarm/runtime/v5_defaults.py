@@ -48,6 +48,7 @@ class V5PipelineFactory:
         self._model: HydroCore | None = None
         self._model_hash: str | None = None
         self._calibrator: SplitConformalCalibrator | None = None
+        self._manifest: dict[str, Any] | None = None
         self.fallback_reason: str | None = None
         self.signature_mode = None
         self.signature_policy_hash: str | None = None
@@ -61,6 +62,11 @@ class V5PipelineFactory:
     def trained_assets_ready(self) -> bool:
         self._load_assets()
         return self._model is not None and self._calibrator is not None
+
+    @property
+    def manifest(self) -> dict[str, Any] | None:
+        self._load_assets()
+        return self._manifest
 
     def _load_assets(self) -> None:
         if self._load_attempted:
@@ -101,9 +107,10 @@ class V5PipelineFactory:
             model = HydroCore.from_variant("small", use_adapters=False, **config)
             model.load_state_dict(load_file(self.bundle_dir / "model.safetensors", device="cpu"), strict=True)
             model.eval()
-            self._model, self._model_hash, self._calibrator = model, model_hash, calibrator
+            self._model, self._model_hash, self._calibrator, self._manifest = model, model_hash, calibrator, manifest
         except (OSError, TypeError, ValueError, RuntimeError, json.JSONDecodeError, V5InferenceBundleError) as error:
             self._model = self._model_hash = self._calibrator = None  # type: ignore[assignment]
+            self._manifest = None
             self.fallback_reason = f"v5_trained_assets_unavailable:{type(error).__name__}"
 
     def __call__(self, _network_record: Any, network_path: str | Path) -> HybridInferencePipeline:

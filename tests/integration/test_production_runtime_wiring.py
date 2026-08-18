@@ -22,36 +22,35 @@ from fastapi.testclient import TestClient
 
 from hydroswarm.api import create_app
 from hydroswarm.domain import ActionType, OperationalAction, OperationalPlan
-from hydroswarm.runtime import DefaultPipelineFactory, V4PipelineFactory
+from hydroswarm.runtime import DefaultPipelineFactory, V4PipelineFactory, V5PipelineFactory
 from hydroswarm.simulation import HydraulicSimulator, PlanVerifier
 
-FROZEN_MODEL_SHA256 = "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7"
-FROZEN_CALIBRATION_HASH = "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1"
-FROZEN_NORMALIZATION_HASH = "e0808f21579b693f66e4edb5900e561bcf9c521e850d5c9d2428cb0db0fa1114"
-FROZEN_ARCHITECTURE_VERSION = "hydrocore-v4"
+FROZEN_MODEL_SHA256 = "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+FROZEN_ARCHITECTURE_VERSION = "hydroswarm-v5-release-v1"
 FROZEN_RUNTIME_ENABLED_OUTPUTS = frozenset(
-    {"event_cause", "event_presence", "evidence_sufficiency", "next_step", "relative_strength", "source_node"}
+    {"event_cause", "event_presence", "evidence_sufficiency", "relative_strength", "source_node"}
 )
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 V4_RELEASE_BUNDLE_DIR = PROJECT_ROOT / "models" / "hydrocore-v4-release"
+V5_RELEASE_BUNDLE_DIR = PROJECT_ROOT / "models" / "hydrocore-v5-release"
 
 
-def test_module_level_production_app_is_wired_to_v4_pipeline_factory() -> None:
+def test_module_level_production_app_is_wired_to_v5_pipeline_factory() -> None:
     """The real module-level `app` object -- exactly what
     `uvicorn hydroswarm.api.app:app` (started by start_hydroswarm.sh/.bat via
     `hydroswarm.cli start`) serves -- must resolve to V4PipelineFactory, not
     DefaultPipelineFactory."""
 
-    from hydroswarm.api.app import DEFAULT_V4_RELEASE_BUNDLE_DIR, app
+    from hydroswarm.api.app import DEFAULT_V5_RELEASE_BUNDLE_DIR, app
 
-    assert DEFAULT_V4_RELEASE_BUNDLE_DIR == V4_RELEASE_BUNDLE_DIR
+    assert DEFAULT_V5_RELEASE_BUNDLE_DIR == V5_RELEASE_BUNDLE_DIR
     factory = app.state.runtime.pipeline_factory
-    assert isinstance(factory, V4PipelineFactory)
+    assert isinstance(factory, V5PipelineFactory)
     assert not isinstance(factory, DefaultPipelineFactory)
 
 
-def test_production_app_resolves_the_frozen_v4_checkpoint_identity() -> None:
+def test_production_app_resolves_the_frozen_v5_checkpoint_identity() -> None:
     """Confirms the production app doesn't merely construct a V4PipelineFactory
     object -- it actually loads and resolves to the exact frozen identity."""
 
@@ -62,12 +61,9 @@ def test_production_app_resolves_the_frozen_v4_checkpoint_identity() -> None:
     assert factory.fallback_reason is None
     assert factory.model_hash == FROZEN_MODEL_SHA256
 
-    identity = factory.identity
-    assert identity is not None
-    assert identity.architecture_version == FROZEN_ARCHITECTURE_VERSION
-    assert identity.normalization_hash == FROZEN_NORMALIZATION_HASH
-    assert identity.use_adapters is False
-    assert identity.prior_mode == "feature_only"
+    assert factory.manifest is not None
+    assert factory.manifest["release_schema_version"] == FROZEN_ARCHITECTURE_VERSION
+    assert factory.manifest["model_config"]["prior_mode"] == "feature_only"
 
 
 def test_runtime_enabled_output_governance_matches_the_frozen_declaration() -> None:
@@ -80,7 +76,7 @@ def test_runtime_enabled_output_governance_matches_the_frozen_declaration() -> N
     from hydroswarm.api.app import app
 
     factory = app.state.runtime.pipeline_factory
-    assert factory.identity.runtime_enabled_outputs == FROZEN_RUNTIME_ENABLED_OUTPUTS
+    assert set(factory.manifest["runtime_enabled_outputs"]) == FROZEN_RUNTIME_ENABLED_OUTPUTS
 
 
 @pytest.mark.real_simulation
@@ -102,8 +98,7 @@ def test_self_test_reports_the_same_frozen_identity_the_production_app_serves() 
     assert trained_assets["ready"] is True
     assert trained_assets["fallback_reason"] is None
     assert trained_assets["model_sha256"] == production_factory.model_hash
-    assert trained_assets["architecture_version"] == production_factory.identity.architecture_version
-    assert trained_assets["normalization_hash"] == production_factory.identity.normalization_hash
+    assert trained_assets["architecture_version"] == FROZEN_ARCHITECTURE_VERSION
     assert trained_assets["model_sha256"] == FROZEN_MODEL_SHA256
 
 

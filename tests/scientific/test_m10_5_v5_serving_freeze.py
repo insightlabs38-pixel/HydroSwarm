@@ -4,6 +4,8 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
+
 from hydroswarm.runtime.v5_defaults import V5PipelineFactory, V5_RUNTIME_ENABLED_OUTPUTS, V5_TRAINED_TASKS
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -38,3 +40,41 @@ def test_v5_loader_does_not_reconstruct_calibration() -> None:
     assert "SplitConformalCalibrator.fit" not in source
     assert "rank_sample_locations" in (ROOT / "models/hydrocore-v5-release/runtime_manifest.json").read_text()
     assert "generate_response_plans" in (ROOT / "models/hydrocore-v5-release/runtime_manifest.json").read_text()
+
+
+@pytest.mark.parametrize("failure", [
+    "missing_checkpoint", "corrupt_checkpoint", "checkpoint_sha_mismatch",
+    "missing_calibration", "corrupt_calibration", "calibration_sha_mismatch",
+    "feature_schema_mismatch", "fusion_mismatch", "manifest_corrupt",
+])
+def test_v5_identity_failure_matrix_is_fail_closed_without_v4_fallback(tmp_path: Path, failure: str) -> None:
+    broken = tmp_path / failure
+    shutil.copytree(BUNDLE, broken)
+    manifest_path = broken / "runtime_manifest.json"
+    if failure == "missing_checkpoint":
+        (broken / "model.safetensors").unlink()
+    elif failure == "corrupt_checkpoint":
+        with (broken / "model.safetensors").open("ab") as handle:
+            handle.write(b"corrupt")
+    elif failure == "checkpoint_sha_mismatch":
+        manifest = json.loads(manifest_path.read_text())
+        manifest["model_sha256"] = "0" * 64
+        manifest_path.write_text(json.dumps(manifest))
+    elif failure == "missing_calibration":
+        (broken / "calibration.json").unlink()
+    elif failure == "corrupt_calibration":
+        with (broken / "calibration.json").open("a") as handle:
+            handle.write("corrupt")
+    elif failure == "calibration_sha_mismatch":
+        (broken / "calibration.json.sha256").write_text("0" * 64)
+    elif failure in {"feature_schema_mismatch", "fusion_mismatch"}:
+        manifest = json.loads(manifest_path.read_text())
+        manifest["feature_schema_hash" if failure == "feature_schema_mismatch" else "fusion_config_hash"] = "mismatch"
+        manifest_path.write_text(json.dumps(manifest))
+    else:
+        manifest_path.write_text("not-json")
+    factory = V5PipelineFactory(broken, project_root=ROOT)
+    assert factory.trained_assets_ready is False
+    assert factory.model_hash is None
+    assert factory.fallback_reason and factory.fallback_reason.startswith("v5_trained_assets_unavailable:")
+    assert "v4" not in factory.fallback_reason.lower()
