@@ -1,0 +1,10 @@
+{
+  "forbidden_selection_input": "M10.4 performance",
+  "frozen_action_on_unresolved_selection": "M10_5_SERVING_FREEZE_BLOCKED_SELECTION_IDENTITY",
+  "kind": "M10_5_PROTOCOL",
+  "m10_4_parent_closure": "M10_4_FULL_TRAJECTORY_PASS",
+  "m10_4_parent_protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "protocol_hash": "1a8e8e9a86752e9d4bb3f7d066833db263b41e2b4f09c82e64ff7b3673c8a908",
+  "selection_rule_required": true,
+  "start_commit": "8a4752bf39f82542735c21dd44981f164ed2b849"
+}

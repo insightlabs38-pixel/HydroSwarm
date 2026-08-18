@@ -1,0 +1,13 @@
+{
+  "closure_state": "M10_5_SERVING_FREEZE_BLOCKED_SELECTION_IDENTITY",
+  "kind": "M10_5_CLOSURE",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "m10_4_parent_protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "m10_5_complete": false,
+  "milestone": "M10.5",
+  "next_required_action": "A separately frozen, non-M10.4-result-based deployment selection or ensemble rule.",
+  "protocol_hash": "1a8e8e9a86752e9d4bb3f7d066833db263b41e2b4f09c82e64ff7b3673c8a908",
+  "reason": "M9.6 freezes only the export-within-each-seed policy; its authoritative records name all three canonical checkpoints but no deployment seed, deterministic selector, or governed ensemble. Choosing now would be post-hoc, particularly because M10.4 evaluated all three.",
+  "start_commit": "8a4752bf39f82542735c21dd44981f164ed2b849"
+}

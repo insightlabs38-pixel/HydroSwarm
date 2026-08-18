@@ -1,0 +1,31 @@
+{
+  "kind": "M10_5_OUTPUT_GOVERNANCE_AUDIT",
+  "known_supervised_m9_6_outputs": [
+    "duration",
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "sensor_fault",
+    "source_node",
+    "source_region",
+    "start_time"
+  ],
+  "m10_4_runtime_enabled_outputs_observed": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "next_step",
+    "relative_strength",
+    "source_node"
+  ],
+  "next_step_disposition": "MUST_BE_SUPPRESSED_IN_ANY_FUTURE_V5_RELEASE",
+  "outputs_not_supported_by_m9_6_supervision_record": [
+    "next_step"
+  ],
+  "reason": "No release identity exists, so no serving allowlist may be frozen. next_step is not supervised M9.6 output.",
+  "release_allowlist_frozen": false,
+  "trained_tasks": [
+    "sentinel"
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "kind": "M10_5_REGRESSION_SMOKE",
+  "reason": "Parity/release corruption tests require a uniquely governed serving identity and must not choose one implicitly.",
+  "status": "NOT_EXECUTED_DUE_TO_SELECTION_IDENTITY_BLOCKER"
+}
