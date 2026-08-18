@@ -1,0 +1,29 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "calibration_artifact_identity": true,
+    "calibration_file_identity": true,
+    "default_runtime_v5": true,
+    "deterministic_authority": true,
+    "feature_semantics_unchanged": true,
+    "learned_ood_non_authoritative": true,
+    "learned_scout_non_authoritative": true,
+    "learned_strategist_non_authoritative": true,
+    "locked_test_unopened": true,
+    "m10_5_completion_pass": true,
+    "m10_5a_selection_frozen": true,
+    "m10_5b_calibration_materialized": true,
+    "m10_complete": true,
+    "next_step_suppressed": true,
+    "no_silent_v4_fallback": true,
+    "release_manifest_identity": true,
+    "runtime_enabled_output_allowlist": true,
+    "selected_checkpoint_identity": true,
+    "v5_bundle_exists": true
+  },
+  "code_under_test_commit": "095edfea93f2972760797b2ea7886ef5ebc904e9",
+  "kind": "M11_1_PREFLIGHT",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M11.1"
+}

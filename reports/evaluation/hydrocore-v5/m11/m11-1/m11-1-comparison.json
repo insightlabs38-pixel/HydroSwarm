@@ -1,0 +1,38 @@
+{
+  "decision_reason": "Both frozen system candidates clear the safety/reproducibility gates. The frozen tie-break selects v5 because M9 selected its predictor and M10.0-M10.5 supplied the complete, closed, non-locked system-level development validation and immutable current serving identity. No M11.1 metric, tuning, or locked evidence was used.",
+  "gates": {
+    "A_predictive_incident_intelligence": {
+      "v4": "PASS: frozen historical calibrated incident-intelligence evidence.",
+      "v5": "PASS: M9 final selected causal predictor; M10.4 source trajectory closed PASS."
+    },
+    "B_robustness_fail_closed": {
+      "v4": "PASS: frozen v4 deterministic fallback and release self-test evidence.",
+      "v5": "PASS: M10 release corruption/mismatch fail-closed evidence; development topology/OOD evidence retained."
+    },
+    "C_end_to_end_decision_utility": {
+      "v4": "PASS: historical end-to-end authority evidence; no v5-era trajectory matrix.",
+      "v5": "PASS: M10.4 full trajectory PASS with exact verification and deterministic sampling/planning."
+    },
+    "D_safety_authority": {
+      "v4": "PASS: same deterministic authority boundary.",
+      "v5": "PASS: deterministic authorities, WNTR/EPANET, human approval, no actuation."
+    },
+    "E_release_readiness": {
+      "v4": "PASS: reproducible incumbent bundle, but not the current normal serving identity.",
+      "v5": "PASS: M10.5 current default immutable bundle and no-v4-fallback matrix."
+    },
+    "F_complexity_scientific_justification": {
+      "v4": "PASS: simpler historical incumbent; retained as reference.",
+      "v5": "PASS: selected S model; capacity/learned-component negative results retained rather than bypassing deterministic controls."
+    },
+    "G_known_limitations": {
+      "v4": "DISCLOSED: historical calibration/provenance limitations remain in v4 freeze record.",
+      "v5": "DISCLOSED: retained M10 limitations listed in m11-1-limitations.json."
+    }
+  },
+  "kind": "M11_1_COMPARISON",
+  "not_selected": "HydroCore-v4 frozen incumbent",
+  "selected": "HydroCore-v5 M10 frozen release",
+  "selection_method": "frozen gate-based rubric; no weighted score",
+  "tie_break_applied": "Most recent complete non-locked system-level governed development evidence on normal serving identity."
+}

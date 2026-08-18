@@ -1,0 +1,63 @@
+{
+  "candidate_set_is_system_level": true,
+  "eligible_candidates": [
+    {
+      "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+      "calibration_file_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+      "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+      "disqualification_reason": null,
+      "eligibility_reason": "Complete M10-selected, materialized, default-serving v5 identity with reproducible release bytes.",
+      "eligible": true,
+      "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+      "name": "HydroCore-v5 M10 frozen release",
+      "release_bundle": "models/hydrocore-v5-release",
+      "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+      "runtime_authority": "deterministic OOD/Scout/planning; WNTR/EPANET verification; human approval; no autonomous actuation",
+      "upstream_closure": "M10_5_SERVING_FREEZE_PASS",
+      "version": "hydrocore-v5-release-v1"
+    },
+    {
+      "calibration_artifact_hash": "cf06c2000ead772d7de2d8cdcf00b7cb45e59b325f44be61114982531a4fa4d1",
+      "calibration_file_sha256": "cfde52de72ef89c467fc59fbdbc93f5633acae52f36c67a8921f22165d494843",
+      "checkpoint_sha256": "a501ad87bc39943c48c1a0ea5fc9b6d0807491b684b4423542acbdba712d16c7",
+      "disqualification_reason": null,
+      "eligibility_reason": "Historical frozen incumbent has a selected checkpoint, calibration, authority policy, and tracked reproducible release bundle.",
+      "eligible": true,
+      "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+      "name": "HydroCore-v4 frozen incumbent",
+      "release_bundle": "models/hydrocore-v4-release",
+      "release_manifest_sha256": "a4ce87326848542da313b2d64e88e2d0b48ea1e0ad890bb89e15756a583dcec6",
+      "runtime_authority": "deterministic OOD/Scout/planning; WNTR/EPANET verification; human approval; no autonomous actuation",
+      "upstream_closure": "FROZEN",
+      "version": "hydrocore-v4"
+    }
+  ],
+  "excluded_candidates": [
+    {
+      "name": "HydroCore-M capacity variant",
+      "reason": "M9 final closure: NOT_PROMOTED; no meaningful capacity gain."
+    },
+    {
+      "name": "HydroCore-L capacity variant",
+      "reason": "M9 final closure: unauthorized."
+    },
+    {
+      "name": "Continuous-time variants",
+      "reason": "M9 final closure: temporal architecture search closed with classical model retained."
+    },
+    {
+      "name": "M10.2 Scout-refit checkpoints",
+      "reason": "M10.2 closure: learned Scout not promoted; runtime authority unchanged."
+    },
+    {
+      "name": "M10.3 Strategist-refit checkpoints",
+      "reason": "M10.3 closure: blocked/rejected; broader retraining would be required."
+    },
+    {
+      "name": "Learned OOD/fusion variants",
+      "reason": "M10.1 closure: learned OOD not promoted; deterministic OOD retained."
+    }
+  ],
+  "experimental_checkpoint_promotion_forbidden": true,
+  "kind": "M11_1_CANDIDATE_ELIGIBILITY"
+}

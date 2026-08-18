@@ -1,0 +1,50 @@
+{
+  "authority_policy": "deterministic OOD/Scout/planning; WNTR/EPANET verification; human approval; no autonomous actuation",
+  "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "calibration_file_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+  "candidate_eligibility_decisions": [
+    {
+      "eligible": true,
+      "name": "HydroCore-v5 M10 frozen release",
+      "reason": "Complete M10-selected, materialized, default-serving v5 identity with reproducible release bytes."
+    },
+    {
+      "eligible": true,
+      "name": "HydroCore-v4 frozen incumbent",
+      "reason": "Historical frozen incumbent has a selected checkpoint, calibration, authority policy, and tracked reproducible release bundle."
+    }
+  ],
+  "candidate_eligibility_path": "m11-1-candidate-eligibility.json",
+  "candidate_set": [
+    "HydroCore-v5 M10 frozen release",
+    "HydroCore-v4 frozen incumbent"
+  ],
+  "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "finalist_frozen": false,
+  "finalist_selected": true,
+  "kind": "HYDROCORE_V5_FINAL_SELECTION",
+  "known_limitations_path": "m11-1-limitations.json",
+  "locked_evaluation_authorized": false,
+  "locked_test_opened": false,
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "m10_parent_identity": "M10_5_SERVING_FREEZE_PASS",
+  "milestone": "M11.1",
+  "protocol_sha256": "52d911b86b37c7de095643cf02415601e5e1b198cf17c849239b97da8e94264d",
+  "release_bundle_path": "models/hydrocore-v5-release",
+  "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "schema_version": 1,
+  "selected_finalist_system": "HydroCore-v5 M10 frozen release",
+  "selection_evidence_manifest_path": "m11-1-evidence-manifest.json",
+  "source_commit": "095edfea93f2972760797b2ea7886ef5ebc904e9",
+  "trained_tasks": [
+    "sentinel"
+  ]
+}
