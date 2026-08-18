@@ -205,7 +205,7 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     if strict:
         failures: list[str] = []
         if not trained_assets_ready:
-            failures.append(f"frozen V4 bundle not ready: {trained_factory.fallback_reason}")
+            failures.append(f"frozen V5 bundle not ready: {trained_factory.fallback_reason}")
         if calibration_status != "FITTED":
             failures.append(f"calibration status is {calibration_status!r}, not FITTED")
         if report["frontend_assets"] != "built":
