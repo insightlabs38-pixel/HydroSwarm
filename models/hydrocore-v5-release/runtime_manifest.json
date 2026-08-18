@@ -1,0 +1,53 @@
+{
+  "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "calibration_file_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+  "deterministic_authority": {
+    "autonomous_actuation": false,
+    "human_approval_required": true,
+    "ood": "OODDetector",
+    "physical_verification": "WNTR/EPANET",
+    "planner": "generate_response_plans",
+    "scout": "rank_sample_locations"
+  },
+  "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+  "feature_semantics": "M10.4-tested default builder; unobserved_age_sentinel=incident_elapsed retained despite M9.6 fixed-age training record",
+  "files": {
+    "calibration.json": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+    "calibration.json.sha256": "1a60f8a014bd5d6816f6653923d7ef2c67340da34aa9584e320446dc29bc36cc",
+    "model.safetensors": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+  },
+  "fusion_config_hash": "fuse_source_probabilities-v1",
+  "m10_4_protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "m10_5_protocol_hash": "a2c0a85074237898c7cc922a029d23e10e04763438a89f0050f1890c142f9ce7",
+  "m10_5a_selection_commit": "6829c676bf9aa074dbc9e62150b256efd0475335",
+  "m10_5b_artifact_identity": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "m10_5b_protocol_hash": "0bdb66e6c0ee224c3ba04ff9d892965b31ef1be18510d545145be4e89b874e15",
+  "model_config": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned"
+  },
+  "model_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "release_schema_version": "hydroswarm-v5-release-v1",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "selected_seed": 20260814,
+  "source_git_provenance": "a52735f14c2a58ab95ca14b2992fb0c5ce5a94a0",
+  "trained_tasks": [
+    "sentinel"
+  ],
+  "validated_topology_hashes": [
+    "35af6056fe885934bc8bda9b1e6ac178926ac24cac47bc8f2c00fb045730c2a9",
+    "5508d2721298ea31b9caa37db81fa90d66a5b7fb17587f78cd5b9bcf8f299c8c",
+    "9926474d1f8e7925d47ad3d77740cd27ff1b6d1d42f95d87acca52e244c01d46"
+  ]
+}
