@@ -1,0 +1,2417 @@
+{
+  "kind": "M10_3C_CANDIDATE_VERIFICATION_COMBINED",
+  "per_cell": {
+    "golden-reference:depth1": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference:depth1",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 28,
+          "n_rejected": 2,
+          "verification_rate": 0.9333333333333333,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 2
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "golden-reference:depth2": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference:depth2",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "golden-reference:depth3": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference:depth3",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 28,
+          "n_rejected": 2,
+          "verification_rate": 0.9333333333333333,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 2
+          }
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 26,
+          "n_rejected": 4,
+          "verification_rate": 0.8666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 4
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 28,
+          "n_rejected": 2,
+          "verification_rate": 0.9333333333333333,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 2
+          }
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 28,
+          "n_rejected": 2,
+          "verification_rate": 0.9333333333333333,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 2
+          }
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 28,
+          "n_rejected": 2,
+          "verification_rate": 0.9333333333333333,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 2
+          }
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 28,
+          "n_rejected": 2,
+          "verification_rate": 0.9333333333333333,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 2
+          }
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "golden-reference:depth4": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference:depth4",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 26,
+          "n_rejected": 4,
+          "verification_rate": 0.8666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 4
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "golden-reference:depth6": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference:depth6",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 27,
+          "n_rejected": 3,
+          "verification_rate": 0.9,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 3
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "golden-reference:depth25": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference:depth25",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 29,
+          "n_rejected": 1,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 1
+          }
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "branched-loop:depth1": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop:depth1",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "branched-loop:depth2": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop:depth2",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "branched-loop:depth3": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop:depth3",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "branched-loop:depth4": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop:depth4",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "branched-loop:depth6": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop:depth6",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "branched-loop:depth25": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop:depth25",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid:depth1": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid:depth1",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid:depth2": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid:depth2",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid:depth3": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid:depth3",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid:depth4": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid:depth4",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid:depth6": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid:depth6",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid:depth25": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid:depth25",
+      "n_incidents": 30,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 30,
+          "n_verified": 0,
+          "n_rejected": 30,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 30
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 30,
+          "n_verified": 30,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    }
+  },
+  "per_family": {
+    "golden-reference": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "golden-reference",
+      "n_incidents": 180,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 180,
+          "n_verified": 174,
+          "n_rejected": 6,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 6
+          }
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 180
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 180,
+          "n_verified": 165,
+          "n_rejected": 15,
+          "verification_rate": 0.9166666666666666,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 15
+          }
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 180
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 180,
+          "n_verified": 174,
+          "n_rejected": 6,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 6
+          }
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 180,
+          "n_verified": 174,
+          "n_rejected": 6,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 6
+          }
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 180,
+          "n_verified": 174,
+          "n_rejected": 6,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 6
+          }
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 180,
+          "n_verified": 174,
+          "n_rejected": 6,
+          "verification_rate": 0.9666666666666667,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 6
+          }
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 180
+          }
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        }
+      }
+    },
+    "branched-loop": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "branched-loop",
+      "n_incidents": 180,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    },
+    "loop-grid": {
+      "kind": "M10_3C_CANDIDATE_VERIFICATION",
+      "cell": "loop-grid",
+      "n_incidents": 180,
+      "per_template": {
+        "NO_ACTION": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_SOURCE": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          }
+        },
+        "FLUSH_DOWNSTREAM": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          }
+        },
+        "PROTECT_CRITICAL": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "INCREASE_MONITORING": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "REQUEST_SAMPLE": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "WAIT_OBSERVE": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {}
+        }
+      },
+      "isolation_template_summary": {
+        "ISOLATE_SOURCE": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ISOLATE_AND_FLUSH": {
+          "n_proposed": 180,
+          "n_verified": 0,
+          "n_rejected": 180,
+          "verification_rate": 0.0,
+          "rejection_code_frequency": {
+            "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 180
+          },
+          "ever_verified_on_this_cell": false
+        },
+        "ALTERNATE_VALVE_CUT": {
+          "n_proposed": 180,
+          "n_verified": 180,
+          "n_rejected": 0,
+          "verification_rate": 1.0,
+          "rejection_code_frequency": {},
+          "ever_verified_on_this_cell": true
+        }
+      }
+    }
+  },
+  "global": {
+    "kind": "M10_3C_CANDIDATE_VERIFICATION",
+    "cell": "GLOBAL",
+    "n_incidents": 540,
+    "per_template": {
+      "NO_ACTION": {
+        "n_proposed": 540,
+        "n_verified": 534,
+        "n_rejected": 6,
+        "verification_rate": 0.9888888888888889,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 6
+        }
+      },
+      "ISOLATE_SOURCE": {
+        "n_proposed": 540,
+        "n_verified": 0,
+        "n_rejected": 540,
+        "verification_rate": 0.0,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 180,
+          "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 360
+        }
+      },
+      "FLUSH_DOWNSTREAM": {
+        "n_proposed": 540,
+        "n_verified": 525,
+        "n_rejected": 15,
+        "verification_rate": 0.9722222222222222,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 15
+        }
+      },
+      "ISOLATE_AND_FLUSH": {
+        "n_proposed": 540,
+        "n_verified": 0,
+        "n_rejected": 540,
+        "verification_rate": 0.0,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 180,
+          "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 360
+        }
+      },
+      "PROTECT_CRITICAL": {
+        "n_proposed": 540,
+        "n_verified": 534,
+        "n_rejected": 6,
+        "verification_rate": 0.9888888888888889,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 6
+        }
+      },
+      "INCREASE_MONITORING": {
+        "n_proposed": 540,
+        "n_verified": 534,
+        "n_rejected": 6,
+        "verification_rate": 0.9888888888888889,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 6
+        }
+      },
+      "REQUEST_SAMPLE": {
+        "n_proposed": 540,
+        "n_verified": 534,
+        "n_rejected": 6,
+        "verification_rate": 0.9888888888888889,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 6
+        }
+      },
+      "WAIT_OBSERVE": {
+        "n_proposed": 540,
+        "n_verified": 534,
+        "n_rejected": 6,
+        "verification_rate": 0.9888888888888889,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 6
+        }
+      },
+      "ALTERNATE_VALVE_CUT": {
+        "n_proposed": 540,
+        "n_verified": 360,
+        "n_rejected": 180,
+        "verification_rate": 0.6666666666666666,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 180
+        }
+      }
+    },
+    "isolation_template_summary": {
+      "ISOLATE_SOURCE": {
+        "n_proposed": 540,
+        "n_verified": 0,
+        "n_rejected": 540,
+        "verification_rate": 0.0,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 180,
+          "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 360
+        },
+        "ever_verified_on_this_cell": false
+      },
+      "ISOLATE_AND_FLUSH": {
+        "n_proposed": 540,
+        "n_verified": 0,
+        "n_rejected": 540,
+        "verification_rate": 0.0,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 180,
+          "PRESSURE_BELOW_MINIMUM+SERVICE_BELOW_MINIMUM": 360
+        },
+        "ever_verified_on_this_cell": false
+      },
+      "ALTERNATE_VALVE_CUT": {
+        "n_proposed": 540,
+        "n_verified": 360,
+        "n_rejected": 180,
+        "verification_rate": 0.6666666666666666,
+        "rejection_code_frequency": {
+          "PRESSURE_BELOW_MINIMUM": 180
+        },
+        "ever_verified_on_this_cell": true
+      }
+    }
+  }
+}

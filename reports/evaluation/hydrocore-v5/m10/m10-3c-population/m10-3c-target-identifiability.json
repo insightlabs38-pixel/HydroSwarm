@@ -1,0 +1,1965 @@
+{
+  "kind": "M10_3C_TARGET_IDENTIFIABILITY_COMBINED",
+  "per_cell": {
+    "golden-reference:depth1": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference:depth1",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.6407407407407407,
+          "fraction_incidents_with_mixed_validity": 0.9666666666666667
+        },
+        "plan_value": {
+          "n": 173,
+          "mean": 0.9770867824554443,
+          "std": 0.07080446183681488,
+          "min": 0.7008973360061646,
+          "max": 1.0,
+          "q25": 0.9975907802581787,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.002409219741821289,
+          "n_unique_rounded_6dp": 15,
+          "fraction_exactly_constant": 0.028901734104046242
+        },
+        "exposure_proxy": {
+          "n": 173,
+          "mean": 0.9938927888870239,
+          "std": 0.045478031039237976,
+          "min": 0.5732575058937073,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 15,
+          "fraction_exactly_constant": 0.9190751445086706
+        },
+        "pressure_risk_proxy": {
+          "n": 173,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 173,
+          "mean": 3.5292450385748797e-13,
+          "std": 4.628560555663963e-12,
+          "min": 0.0,
+          "max": 6.105593808314325e-11,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 0.9942196531791907
+        },
+        "containment_time_proxy": {
+          "n": 173,
+          "mean": 1.8280346393585205,
+          "std": 0.8786863684654236,
+          "min": 0.5,
+          "max": 3.25,
+          "q25": 1.0,
+          "q50": 1.75,
+          "q75": 2.5,
+          "iqr": 1.5,
+          "n_unique_rounded_6dp": 12,
+          "fraction_exactly_constant": 0.10404624277456648
+        },
+        "plan_regret_proxy": {
+          "n": 173,
+          "mean": 0.030536146834492683,
+          "std": 0.09795556217432022,
+          "min": 0.0,
+          "max": 0.4267425239086151,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0024150321260094643,
+          "iqr": 0.0024150321260094643,
+          "n_unique_rounded_6dp": 15,
+          "fraction_exactly_constant": 0.028901734104046242
+        }
+      }
+    },
+    "golden-reference:depth2": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference:depth2",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.662962962962963,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 179,
+          "mean": 0.9916532039642334,
+          "std": 0.05432969704270363,
+          "min": 0.306500643491745,
+          "max": 1.0,
+          "q25": 0.9991912841796875,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0008087158203125,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.6145251396648045
+        },
+        "exposure_proxy": {
+          "n": 179,
+          "mean": 1.0051522254943848,
+          "std": 0.06050185486674309,
+          "min": 0.9649255871772766,
+          "max": 1.7626358270645142,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.9050279329608939
+        },
+        "pressure_risk_proxy": {
+          "n": 179,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 179,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 179,
+          "mean": 2.081005573272705,
+          "std": 0.8746920824050903,
+          "min": 0.5,
+          "max": 3.25,
+          "q25": 1.0,
+          "q50": 2.5,
+          "q75": 2.75,
+          "iqr": 1.75,
+          "n_unique_rounded_6dp": 10,
+          "fraction_exactly_constant": 0.1340782122905028
+        },
+        "plan_regret_proxy": {
+          "n": 179,
+          "mean": 0.017520977184176445,
+          "std": 0.16969047486782074,
+          "min": 0.0,
+          "max": 2.2626359462738037,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.00080939254257828,
+          "iqr": 0.00080939254257828,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.6145251396648045
+        }
+      }
+    },
+    "golden-reference:depth3": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference:depth3",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.6148148148148148,
+          "fraction_incidents_with_mixed_validity": 0.9333333333333333
+        },
+        "plan_value": {
+          "n": 166,
+          "mean": 0.9697806239128113,
+          "std": 0.06695038825273514,
+          "min": 0.723145067691803,
+          "max": 1.0,
+          "q25": 0.9921521544456482,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.007847845554351807,
+          "n_unique_rounded_6dp": 19,
+          "fraction_exactly_constant": 0.5542168674698795
+        },
+        "exposure_proxy": {
+          "n": 166,
+          "mean": 0.9953158497810364,
+          "std": 0.04077964648604393,
+          "min": 0.6171516180038452,
+          "max": 1.1224068403244019,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 19,
+          "fraction_exactly_constant": 0.891566265060241
+        },
+        "pressure_risk_proxy": {
+          "n": 166,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 166,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 166,
+          "mean": 1.8870482444763184,
+          "std": 0.8822023868560791,
+          "min": 0.5,
+          "max": 3.5,
+          "q25": 1.0,
+          "q50": 1.875,
+          "q75": 2.5,
+          "iqr": 1.5,
+          "n_unique_rounded_6dp": 13,
+          "fraction_exactly_constant": 0.10843373493975904
+        },
+        "plan_regret_proxy": {
+          "n": 166,
+          "mean": 0.03714250773191452,
+          "std": 0.08698190748691559,
+          "min": 0.0,
+          "max": 0.3828483819961548,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.007909916341304779,
+          "iqr": 0.007909916341304779,
+          "n_unique_rounded_6dp": 19,
+          "fraction_exactly_constant": 0.5542168674698795
+        }
+      }
+    },
+    "golden-reference:depth4": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference:depth4",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.6333333333333333,
+          "fraction_incidents_with_mixed_validity": 0.9666666666666667
+        },
+        "plan_value": {
+          "n": 171,
+          "mean": 0.9851645231246948,
+          "std": 0.09374230355024338,
+          "min": 0.2715130150318146,
+          "max": 1.0,
+          "q25": 0.9992116093635559,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0007883906364440918,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.6257309941520468
+        },
+        "exposure_proxy": {
+          "n": 171,
+          "mean": 1.0138554573059082,
+          "std": 0.09408295899629593,
+          "min": 0.9748074412345886,
+          "max": 1.7041772603988647,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.9064327485380117
+        },
+        "pressure_risk_proxy": {
+          "n": 171,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 171,
+          "mean": 1.7850081222153813e-12,
+          "std": 1.0285117375830044e-11,
+          "min": 0.0,
+          "max": 6.104727834355117e-11,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 0.9707602339181286
+        },
+        "containment_time_proxy": {
+          "n": 171,
+          "mean": 1.9064327478408813,
+          "std": 0.9543771743774414,
+          "min": 0.5,
+          "max": 3.25,
+          "q25": 0.75,
+          "q50": 2.0,
+          "q75": 2.75,
+          "iqr": 2.0,
+          "n_unique_rounded_6dp": 10,
+          "fraction_exactly_constant": 0.12280701754385964
+        },
+        "plan_regret_proxy": {
+          "n": 171,
+          "mean": 0.04441732168197632,
+          "std": 0.31176087260246277,
+          "min": 0.0,
+          "max": 2.6830644607543945,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0007890307460911572,
+          "iqr": 0.0007890307460911572,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.6257309941520468
+        }
+      }
+    },
+    "golden-reference:depth6": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference:depth6",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.6370370370370371,
+          "fraction_incidents_with_mixed_validity": 0.9666666666666667
+        },
+        "plan_value": {
+          "n": 172,
+          "mean": 0.9848765730857849,
+          "std": 0.05981575697660446,
+          "min": 0.6747614741325378,
+          "max": 1.0,
+          "q25": 0.9997233748435974,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0002766251564025879,
+          "n_unique_rounded_6dp": 12,
+          "fraction_exactly_constant": 0.7034883720930233
+        },
+        "exposure_proxy": {
+          "n": 172,
+          "mean": 0.996692419052124,
+          "std": 0.04002256318926811,
+          "min": 0.5179948806762695,
+          "max": 1.1146560907363892,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 12,
+          "fraction_exactly_constant": 0.936046511627907
+        },
+        "pressure_risk_proxy": {
+          "n": 172,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 172,
+          "mean": 1.774652798845755e-12,
+          "std": 1.0256204739655939e-11,
+          "min": 0.0,
+          "max": 6.104805549966841e-11,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 0.9709302325581395
+        },
+        "containment_time_proxy": {
+          "n": 172,
+          "mean": 1.8779069185256958,
+          "std": 1.0511927604675293,
+          "min": 0.5,
+          "max": 4.0,
+          "q25": 1.0,
+          "q50": 1.5,
+          "q75": 2.5,
+          "iqr": 1.5,
+          "n_unique_rounded_6dp": 12,
+          "fraction_exactly_constant": 0.13953488372093023
+        },
+        "plan_regret_proxy": {
+          "n": 172,
+          "mean": 0.0205376036465168,
+          "std": 0.0856517031788826,
+          "min": 0.0,
+          "max": 0.48200511932373047,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.00027671383577398956,
+          "iqr": 0.00027671383577398956,
+          "n_unique_rounded_6dp": 12,
+          "fraction_exactly_constant": 0.7034883720930233
+        }
+      }
+    },
+    "golden-reference:depth25": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference:depth25",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.6444444444444445,
+          "fraction_incidents_with_mixed_validity": 0.9666666666666667
+        },
+        "plan_value": {
+          "n": 174,
+          "mean": 0.9845020771026611,
+          "std": 0.08462543040513992,
+          "min": 0.25871142745018005,
+          "max": 1.0,
+          "q25": 0.9992295503616333,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0007704496383666992,
+          "n_unique_rounded_6dp": 20,
+          "fraction_exactly_constant": 0.6149425287356322
+        },
+        "exposure_proxy": {
+          "n": 174,
+          "mean": 1.0146416425704956,
+          "std": 0.09335920959711075,
+          "min": 0.9627014398574829,
+          "max": 1.8409184217453003,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 20,
+          "fraction_exactly_constant": 0.8908045977011494
+        },
+        "pressure_risk_proxy": {
+          "n": 174,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 174,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 174,
+          "mean": 1.9353448152542114,
+          "std": 0.7734276652336121,
+          "min": 0.5,
+          "max": 3.25,
+          "q25": 1.0,
+          "q50": 2.25,
+          "q75": 2.5,
+          "iqr": 1.5,
+          "n_unique_rounded_6dp": 10,
+          "fraction_exactly_constant": 0.034482758620689655
+        },
+        "plan_regret_proxy": {
+          "n": 174,
+          "mean": 0.039101339876651764,
+          "std": 0.28264471888542175,
+          "min": 0.0,
+          "max": 2.8653104305267334,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0007710538920946419,
+          "iqr": 0.0007710538920946419,
+          "n_unique_rounded_6dp": 20,
+          "fraction_exactly_constant": 0.6149425287356322
+        }
+      }
+    },
+    "branched-loop:depth1": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop:depth1",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9637490510940552,
+          "std": 0.0973505899310112,
+          "min": 0.41648513078689575,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.8095238095238095
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.6695887446403503,
+          "std": 0.47877633571624756,
+          "min": 0.0,
+          "max": 1.640292763710022,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.5904761904761905
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.949999988079071,
+          "std": 0.13540063798427582,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.8666666666666667
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.05389432981610298,
+          "std": 0.16586288809776306,
+          "min": 0.0,
+          "max": 1.4010461568832397,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.8095238095238095
+        }
+      }
+    },
+    "branched-loop:depth2": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop:depth2",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9437645077705383,
+          "std": 0.11190035939216614,
+          "min": 0.38936829566955566,
+          "max": 1.0,
+          "q25": 0.931744396686554,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.06825560331344604,
+          "n_unique_rounded_6dp": 23,
+          "fraction_exactly_constant": 0.7285714285714285
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.73482346534729,
+          "std": 0.45189914107322693,
+          "min": 0.0,
+          "max": 1.6535053253173828,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 24,
+          "fraction_exactly_constant": 0.26666666666666666
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9440476298332214,
+          "std": 0.1363653987646103,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.8380952380952381
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.08097343146800995,
+          "std": 0.18675224483013153,
+          "min": 0.0,
+          "max": 1.5682624578475952,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.07325572520494461,
+          "iqr": 0.07325572520494461,
+          "n_unique_rounded_6dp": 23,
+          "fraction_exactly_constant": 0.7285714285714285
+        }
+      }
+    },
+    "branched-loop:depth3": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop:depth3",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9439515471458435,
+          "std": 0.11422598361968994,
+          "min": 0.5500755310058594,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 16,
+          "fraction_exactly_constant": 0.7619047619047619
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.8584820032119751,
+          "std": 0.34235861897468567,
+          "min": 0.0,
+          "max": 1.301648736000061,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.13333333333333333
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9476190209388733,
+          "std": 0.1253340244293213,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.8333333333333334
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.08039658516645432,
+          "std": 0.17512297630310059,
+          "min": 0.0,
+          "max": 0.8179321885108948,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 16,
+          "fraction_exactly_constant": 0.7619047619047619
+        }
+      }
+    },
+    "branched-loop:depth4": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop:depth4",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9550609588623047,
+          "std": 0.09991259127855301,
+          "min": 0.5881012082099915,
+          "max": 1.0,
+          "q25": 0.9959985613822937,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.004001438617706299,
+          "n_unique_rounded_6dp": 22,
+          "fraction_exactly_constant": 0.7285714285714285
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.8388671875,
+          "std": 0.38606444001197815,
+          "min": 0.0,
+          "max": 1.6585075855255127,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 23,
+          "fraction_exactly_constant": 0.16666666666666666
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9059523940086365,
+          "std": 0.17361779510974884,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 0.8125,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.1875,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.7476190476190476
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.0631522610783577,
+          "std": 0.15539847314357758,
+          "min": 0.0,
+          "max": 0.7003875970840454,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.004017540719360113,
+          "iqr": 0.004017540719360113,
+          "n_unique_rounded_6dp": 22,
+          "fraction_exactly_constant": 0.7285714285714285
+        }
+      }
+    },
+    "branched-loop:depth6": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop:depth6",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9831928014755249,
+          "std": 0.05357835441827774,
+          "min": 0.5530675053596497,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.861904761904762
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.7397665977478027,
+          "std": 0.44854626059532166,
+          "min": 0.0,
+          "max": 1.3234736919403076,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.26666666666666666
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9928571581840515,
+          "std": 0.04164965823292732,
+          "min": 0.75,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 2,
+          "fraction_exactly_constant": 0.9714285714285714
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.02121066115796566,
+          "std": 0.07709552347660065,
+          "min": 0.0,
+          "max": 0.8080974817276001,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.861904761904762
+        }
+      }
+    },
+    "branched-loop:depth25": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop:depth25",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.970532238483429,
+          "std": 0.09022777527570724,
+          "min": 0.4750004708766937,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 16,
+          "fraction_exactly_constant": 0.8095238095238095
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.7715901732444763,
+          "std": 0.4284437596797943,
+          "min": 0.0,
+          "max": 1.6052610874176025,
+          "q25": 0.981825590133667,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.018174409866333008,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.6857142857142857
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9226190447807312,
+          "std": 0.1492849588394165,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.16666666666666666
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.043582115322351456,
+          "std": 0.14409807324409485,
+          "min": 0.0,
+          "max": 1.1052610874176025,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 16,
+          "fraction_exactly_constant": 0.8095238095238095
+        }
+      }
+    },
+    "loop-grid:depth1": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid:depth1",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9803357720375061,
+          "std": 0.04841093719005585,
+          "min": 0.7066819071769714,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.8285714285714286
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.7342320084571838,
+          "std": 0.4450327157974243,
+          "min": 0.0,
+          "max": 1.4150638580322266,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.26666666666666666
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.02295324020087719,
+          "std": 0.05886964127421379,
+          "min": 0.0,
+          "max": 0.41506385803222656,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 17,
+          "fraction_exactly_constant": 0.8285714285714286
+        }
+      }
+    },
+    "loop-grid:depth2": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid:depth2",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9543585777282715,
+          "std": 0.09521730244159698,
+          "min": 0.6661456823348999,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 18,
+          "fraction_exactly_constant": 0.7666666666666667
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.7950249314308167,
+          "std": 0.40187790989875793,
+          "min": 0.0,
+          "max": 1.2261804342269897,
+          "q25": 0.9999995231628418,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 4.76837158203125e-07,
+          "n_unique_rounded_6dp": 20,
+          "fraction_exactly_constant": 0.2
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9321428537368774,
+          "std": 0.14385069906711578,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.7952380952380952
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.06113231182098389,
+          "std": 0.13399332761764526,
+          "min": 0.0,
+          "max": 0.501173198223114,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 20,
+          "fraction_exactly_constant": 0.7666666666666667
+        }
+      }
+    },
+    "loop-grid:depth3": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid:depth3",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9904054999351501,
+          "std": 0.032611824572086334,
+          "min": 0.7713204622268677,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 14,
+          "fraction_exactly_constant": 0.8714285714285714
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.7688605785369873,
+          "std": 0.42504405975341797,
+          "min": 0.0,
+          "max": 1.296478033065796,
+          "q25": 0.999999463558197,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 5.364418029785156e-07,
+          "n_unique_rounded_6dp": 15,
+          "fraction_exactly_constant": 0.7047619047619048
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.01094035990536213,
+          "std": 0.0381297841668129,
+          "min": 0.0,
+          "max": 0.2964780330657959,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 14,
+          "fraction_exactly_constant": 0.8714285714285714
+        }
+      }
+    },
+    "loop-grid:depth4": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid:depth4",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9744793772697449,
+          "std": 0.08157587051391602,
+          "min": 0.6483861804008484,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 8,
+          "fraction_exactly_constant": 0.9
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.8293892741203308,
+          "std": 0.3749540150165558,
+          "min": 0.0,
+          "max": 1.293063998222351,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 10,
+          "fraction_exactly_constant": 0.7904761904761904
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9428571462631226,
+          "std": 0.13911771774291992,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.8380952380952381
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.0361347571015358,
+          "std": 0.11921105533838272,
+          "min": 0.0,
+          "max": 0.5422907471656799,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 9,
+          "fraction_exactly_constant": 0.9
+        }
+      }
+    },
+    "loop-grid:depth6": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid:depth6",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9762545824050903,
+          "std": 0.05112367868423462,
+          "min": 0.6742414832115173,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 23,
+          "fraction_exactly_constant": 0.7619047619047619
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.6690129637718201,
+          "std": 0.4748501777648926,
+          "min": 0.0,
+          "max": 1.3754000663757324,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 24,
+          "fraction_exactly_constant": 0.5619047619047619
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.9845238327980042,
+          "std": 0.06024562567472458,
+          "min": 0.75,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 2,
+          "fraction_exactly_constant": 0.9380952380952381
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.027644362300634384,
+          "std": 0.0638909712433815,
+          "min": 0.0,
+          "max": 0.48314815759658813,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 23,
+          "fraction_exactly_constant": 0.7619047619047619
+        }
+      }
+    },
+    "loop-grid:depth25": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid:depth25",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 270,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 210,
+          "mean": 0.9669118523597717,
+          "std": 0.09178759902715683,
+          "min": 0.6245608925819397,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 11,
+          "fraction_exactly_constant": 0.023809523809523808
+        },
+        "exposure_proxy": {
+          "n": 210,
+          "mean": 0.6597543358802795,
+          "std": 0.4704626500606537,
+          "min": 0.0,
+          "max": 1.2194300889968872,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 12,
+          "fraction_exactly_constant": 0.6190476190476191
+        },
+        "pressure_risk_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 210,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 210,
+          "mean": 0.949999988079071,
+          "std": 0.14999999105930328,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 2,
+          "fraction_exactly_constant": 0.9
+        },
+        "plan_regret_proxy": {
+          "n": 210,
+          "mean": 0.04726632311940193,
+          "std": 0.13803690671920776,
+          "min": 0.0,
+          "max": 0.6011248826980591,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 11,
+          "fraction_exactly_constant": 0.023809523809523808
+        }
+      }
+    }
+  },
+  "per_family": {
+    "golden-reference": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "golden-reference",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 1620,
+          "fraction_valid": 0.6388888888888888,
+          "fraction_incidents_with_mixed_validity": 0.9666666666666667
+        },
+        "plan_value": {
+          "n": 1035,
+          "mean": 0.9823099374771118,
+          "std": 0.07325208187103271,
+          "min": 0.25871142745018005,
+          "max": 1.0,
+          "q25": 0.9992059469223022,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0007940530776977539,
+          "n_unique_rounded_6dp": 95,
+          "fraction_exactly_constant": 0.004830917874396135
+        },
+        "exposure_proxy": {
+          "n": 1035,
+          "mean": 1.0033199787139893,
+          "std": 0.06717376410961151,
+          "min": 0.5179948806762695,
+          "max": 1.8409184217453003,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 95,
+          "fraction_exactly_constant": 0.9082125603864735
+        },
+        "pressure_risk_proxy": {
+          "n": 1035,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 1035,
+          "mean": 6.488237681498421e-13,
+          "std": 6.260087066778386e-12,
+          "min": 0.0,
+          "max": 6.105593808314325e-11,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 0.9893719806763285
+        },
+        "containment_time_proxy": {
+          "n": 1035,
+          "mean": 1.9205313920974731,
+          "std": 0.9095712900161743,
+          "min": 0.5,
+          "max": 4.0,
+          "q25": 1.0,
+          "q50": 2.25,
+          "q75": 2.5,
+          "iqr": 1.5,
+          "n_unique_rounded_6dp": 15,
+          "fraction_exactly_constant": 0.13140096618357489
+        },
+        "plan_regret_proxy": {
+          "n": 1035,
+          "mean": 0.031416550278663635,
+          "std": 0.19647261500358582,
+          "min": 0.0,
+          "max": 2.8653104305267334,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0007947116973809898,
+          "iqr": 0.0007947116973809898,
+          "n_unique_rounded_6dp": 95,
+          "fraction_exactly_constant": 0.004830917874396135
+        }
+      }
+    },
+    "branched-loop": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "branched-loop",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 1620,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 1260,
+          "mean": 0.9600418210029602,
+          "std": 0.09768063575029373,
+          "min": 0.38936829566955566,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 102,
+          "fraction_exactly_constant": 0.7833333333333333
+        },
+        "exposure_proxy": {
+          "n": 1260,
+          "mean": 0.7688530087471008,
+          "std": 0.42997148633003235,
+          "min": 0.0,
+          "max": 1.6585075855255127,
+          "q25": 0.8588023781776428,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.14119762182235718,
+          "n_unique_rounded_6dp": 103,
+          "fraction_exactly_constant": 0.6793650793650794
+        },
+        "pressure_risk_proxy": {
+          "n": 1260,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 1260,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 1260,
+          "mean": 0.9438492059707642,
+          "std": 0.13610170781612396,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.8365079365079365
+        },
+        "plan_regret_proxy": {
+          "n": 1260,
+          "mean": 0.0572015605866909,
+          "std": 0.15628068149089813,
+          "min": 0.0,
+          "max": 1.5682624578475952,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 102,
+          "fraction_exactly_constant": 0.7833333333333333
+        }
+      }
+    },
+    "loop-grid": {
+      "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+      "split": "loop-grid",
+      "per_target": {
+        "plan_validity": {
+          "n_candidates": 1620,
+          "fraction_valid": 0.7777777777777778,
+          "fraction_incidents_with_mixed_validity": 1.0
+        },
+        "plan_value": {
+          "n": 1260,
+          "mean": 0.9737909436225891,
+          "std": 0.07178331911563873,
+          "min": 0.6245608925819397,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 84,
+          "fraction_exactly_constant": 0.8293650793650794
+        },
+        "exposure_proxy": {
+          "n": 1260,
+          "mean": 0.7427123785018921,
+          "std": 0.43797820806503296,
+          "min": 0.0,
+          "max": 1.4150638580322266,
+          "q25": 0.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 1.0,
+          "n_unique_rounded_6dp": 86,
+          "fraction_exactly_constant": 0.25555555555555554
+        },
+        "pressure_risk_proxy": {
+          "n": 1260,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "service_loss_proxy": {
+          "n": 1260,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 1,
+          "fraction_exactly_constant": 1.0
+        },
+        "containment_time_proxy": {
+          "n": 1260,
+          "mean": 0.9682539701461792,
+          "std": 0.10858088731765747,
+          "min": 0.5,
+          "max": 1.0,
+          "q25": 1.0,
+          "q50": 1.0,
+          "q75": 1.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 3,
+          "fraction_exactly_constant": 0.9119047619047619
+        },
+        "plan_regret_proxy": {
+          "n": 1260,
+          "mean": 0.03434522822499275,
+          "std": 0.10151471197605133,
+          "min": 0.0,
+          "max": 0.6011248826980591,
+          "q25": 0.0,
+          "q50": 0.0,
+          "q75": 0.0,
+          "iqr": 0.0,
+          "n_unique_rounded_6dp": 87,
+          "fraction_exactly_constant": 0.8293650793650794
+        }
+      }
+    }
+  },
+  "global": {
+    "kind": "M10_3B_TARGET_IDENTIFIABILITY_GLOBAL",
+    "split": "GLOBAL",
+    "per_target": {
+      "plan_validity": {
+        "n_candidates": 4860,
+        "fraction_valid": 0.7314814814814815,
+        "fraction_incidents_with_mixed_validity": 0.9888888888888889
+      },
+      "plan_value": {
+        "n": 3555,
+        "mean": 0.9713980555534363,
+        "std": 0.08278129249811172,
+        "min": 0.25871142745018005,
+        "max": 1.0,
+        "q25": 1.0,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 279,
+        "fraction_exactly_constant": 0.0014064697609001407
+      },
+      "exposure_proxy": {
+        "n": 3555,
+        "mean": 0.8278505206108093,
+        "std": 0.3841803967952728,
+        "min": 0.0,
+        "max": 1.8409184217453003,
+        "q25": 1.0,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 281,
+        "fraction_exactly_constant": 0.7437412095639944
+      },
+      "pressure_risk_proxy": {
+        "n": 3555,
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 1,
+        "fraction_exactly_constant": 1.0
+      },
+      "service_loss_proxy": {
+        "n": 3555,
+        "mean": 1.8889806439967988e-13,
+        "std": 3.3906111425452412e-12,
+        "min": 0.0,
+        "max": 6.105593808314325e-11,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 1,
+        "fraction_exactly_constant": 0.9969057665260197
+      },
+      "containment_time_proxy": {
+        "n": 3555,
+        "mean": 1.2368495464324951,
+        "std": 0.6661016345024109,
+        "min": 0.5,
+        "max": 4.0,
+        "q25": 1.0,
+        "q50": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 15,
+        "fraction_exactly_constant": 0.03825597749648382
+      },
+      "plan_regret_proxy": {
+        "n": 3555,
+        "mean": 0.04159355163574219,
+        "std": 0.1538911908864975,
+        "min": 0.0,
+        "max": 2.8653104305267334,
+        "q25": 0.0,
+        "q50": 0.0,
+        "q75": 0.0,
+        "iqr": 0.0,
+        "n_unique_rounded_6dp": 282,
+        "fraction_exactly_constant": 0.0014064697609001407
+      }
+    }
+  }
+}

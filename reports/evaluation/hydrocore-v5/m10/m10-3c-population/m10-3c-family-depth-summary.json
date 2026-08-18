@@ -1,0 +1,314 @@
+{
+  "kind": "M10_3C_FAMILY_DEPTH_SUMMARY",
+  "grid": {
+    "golden-reference:depth1": {
+      "family": "golden-reference",
+      "depth": 1,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.10344827586206896,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.10344827586206896,
+      "oracle_mean_gain": 0.02733788613615365,
+      "no_action_near_optimal_fraction": 0.896551724137931,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "golden-reference:depth2": {
+      "family": "golden-reference",
+      "depth": 2,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.06666666666666667,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.0,
+      "oracle_mean_gain": 0.003874810536702474,
+      "no_action_near_optimal_fraction": 1.0,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "golden-reference:depth3": {
+      "family": "golden-reference",
+      "depth": 3,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.32142857142857145,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.21428571428571427,
+      "oracle_mean_gain": 0.03144758726869311,
+      "no_action_near_optimal_fraction": 0.7857142857142857,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "golden-reference:depth4": {
+      "family": "golden-reference",
+      "depth": 4,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.13793103448275862,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.0,
+      "oracle_mean_gain": 0.0012758908600642763,
+      "no_action_near_optimal_fraction": 1.0,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "golden-reference:depth6": {
+      "family": "golden-reference",
+      "depth": 6,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.10344827586206896,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.06896551724137931,
+      "oracle_mean_gain": 0.017230107866484542,
+      "no_action_near_optimal_fraction": 0.9310344827586207,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "golden-reference:depth25": {
+      "family": "golden-reference",
+      "depth": 25,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.1724137931034483,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.0,
+      "oracle_mean_gain": 0.002836809076111892,
+      "no_action_near_optimal_fraction": 1.0,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "branched-loop:depth1": {
+      "family": "branched-loop",
+      "depth": 1,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.26666666666666666,
+      "fraction_3plus_distinguishable_plan_value": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.16666666666666666,
+      "oracle_mean_gain": 0.036867499351501465,
+      "no_action_near_optimal_fraction": 0.8333333333333334,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "branched-loop:depth2": {
+      "family": "branched-loop",
+      "depth": 2,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.4,
+      "fraction_3plus_distinguishable_plan_value": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.26666666666666666,
+      "oracle_mean_gain": 0.05596585075060526,
+      "no_action_near_optimal_fraction": 0.7333333333333333,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "branched-loop:depth3": {
+      "family": "branched-loop",
+      "depth": 3,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.26666666666666666,
+      "fraction_3plus_distinguishable_plan_value": 0.16666666666666666,
+      "oracle_fraction_meaningfully_positive": 0.26666666666666666,
+      "oracle_mean_gain": 0.06397737661997477,
+      "no_action_near_optimal_fraction": 0.7333333333333333,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "branched-loop:depth4": {
+      "family": "branched-loop",
+      "depth": 4,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.4,
+      "fraction_3plus_distinguishable_plan_value": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.23333333333333334,
+      "oracle_mean_gain": 0.03848605950673421,
+      "no_action_near_optimal_fraction": 0.7666666666666667,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "branched-loop:depth6": {
+      "family": "branched-loop",
+      "depth": 6,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.26666666666666666,
+      "fraction_3plus_distinguishable_plan_value": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.1,
+      "oracle_mean_gain": 0.011617052555084228,
+      "no_action_near_optimal_fraction": 0.9,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "branched-loop:depth25": {
+      "family": "branched-loop",
+      "depth": 25,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.23333333333333334,
+      "fraction_3plus_distinguishable_plan_value": 0.03333333333333333,
+      "oracle_fraction_meaningfully_positive": 0.1,
+      "oracle_mean_gain": 0.028137967983881632,
+      "no_action_near_optimal_fraction": 0.9,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid:depth1": {
+      "family": "loop-grid",
+      "depth": 1,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.26666666666666666,
+      "fraction_3plus_distinguishable_plan_value": 0.06666666666666667,
+      "oracle_fraction_meaningfully_positive": 0.16666666666666666,
+      "oracle_mean_gain": 0.019321552912394204,
+      "no_action_near_optimal_fraction": 0.8333333333333334,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid:depth2": {
+      "family": "loop-grid",
+      "depth": 2,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.3333333333333333,
+      "fraction_3plus_distinguishable_plan_value": 0.13333333333333333,
+      "oracle_fraction_meaningfully_positive": 0.23333333333333334,
+      "oracle_mean_gain": 0.04971383213996887,
+      "no_action_near_optimal_fraction": 0.7666666666666667,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid:depth3": {
+      "family": "loop-grid",
+      "depth": 3,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.13333333333333333,
+      "fraction_3plus_distinguishable_plan_value": 0.03333333333333333,
+      "oracle_fraction_meaningfully_positive": 0.06666666666666667,
+      "oracle_mean_gain": 0.007720764478047689,
+      "no_action_near_optimal_fraction": 0.9333333333333333,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid:depth4": {
+      "family": "loop-grid",
+      "depth": 4,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.16666666666666666,
+      "fraction_3plus_distinguishable_plan_value": 0.06666666666666667,
+      "oracle_fraction_meaningfully_positive": 0.1,
+      "oracle_mean_gain": 0.02712547779083252,
+      "no_action_near_optimal_fraction": 0.9,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid:depth6": {
+      "family": "loop-grid",
+      "depth": 6,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.3,
+      "fraction_3plus_distinguishable_plan_value": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.2,
+      "oracle_mean_gain": 0.021534717082977294,
+      "no_action_near_optimal_fraction": 0.8,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid:depth25": {
+      "family": "loop-grid",
+      "depth": 25,
+      "n_incidents": 30,
+      "fraction_2plus_distinguishable_plan_value": 0.2,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.16666666666666666,
+      "oracle_mean_gain": 0.037800492842992146,
+      "no_action_near_optimal_fraction": 0.8333333333333334,
+      "isolation_ever_verified": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    }
+  },
+  "per_family_pooled": {
+    "golden-reference": {
+      "fraction_2plus_distinguishable_plan_value": 0.14942528735632185,
+      "fraction_3plus_distinguishable_plan_value": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.06321839080459771,
+      "oracle_mean_gain": 0.013842051056609756,
+      "no_action_near_optimal_fraction": 0.9367816091954023,
+      "isolation_ever_verified_any_cell": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": false
+      }
+    },
+    "branched-loop": {
+      "fraction_2plus_distinguishable_plan_value": 0.3055555555555556,
+      "fraction_3plus_distinguishable_plan_value": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.18888888888888888,
+      "oracle_mean_gain": 0.039175301127963594,
+      "no_action_near_optimal_fraction": 0.8111111111111111,
+      "isolation_ever_verified_any_cell": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    },
+    "loop-grid": {
+      "fraction_2plus_distinguishable_plan_value": 0.23333333333333334,
+      "fraction_3plus_distinguishable_plan_value": 0.06666666666666667,
+      "oracle_fraction_meaningfully_positive": 0.15555555555555556,
+      "oracle_mean_gain": 0.027202806207868788,
+      "no_action_near_optimal_fraction": 0.8444444444444444,
+      "isolation_ever_verified_any_cell": {
+        "ISOLATE_SOURCE": false,
+        "ISOLATE_AND_FLUSH": false,
+        "ALTERNATE_VALVE_CUT": true
+      }
+    }
+  },
+  "note": "depth cells within one family are expected to be statistically similar draws from the SAME distribution (see m10-3c-invariance-audit.json's depth_causal_independence_finding) -- the meaningful cross-cell comparison here is BETWEEN families, not between depths."
+}

@@ -1,0 +1,777 @@
+{
+  "kind": "M10_3C_ORACLE_UTILITY_COMBINED",
+  "per_cell": {
+    "golden-reference:depth1": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference:depth1",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 29,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 29,
+        "mean": 0.02733788613615365,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.004779338836669922,
+        "max": 0.29910266399383545,
+        "fraction_meaningfully_positive": 0.10344827586206896
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.027007812056048162,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.002409219741821289,
+        "max": 0.29910266399383545,
+        "fraction_meaningfully_positive": 0.10344827586206896
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.02733788613615365,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.004779338836669922,
+        "max": 0.29910266399383545,
+        "fraction_meaningfully_positive": 0.10344827586206896
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.896551724137931,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "golden-reference:depth2": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference:depth2",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.003874810536702474,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0008146613836288452,
+        "max": 0.0338858962059021,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.0030474464098612466,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0008050501346588135,
+        "max": 0.0338858962059021,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.003874810536702474,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0008146613836288452,
+        "max": 0.0338858962059021,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 1.0,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "golden-reference:depth3": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference:depth3",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 28,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 28,
+        "mean": 0.03144758726869311,
+        "median": 0.00015151500701904297,
+        "q25": 0.0,
+        "q75": 0.008874848484992981,
+        "max": 0.276854932308197,
+        "fraction_meaningfully_positive": 0.21428571428571427
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 28,
+        "mean": 0.03471563330718449,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.008874848484992981,
+        "max": 0.276854932308197,
+        "fraction_meaningfully_positive": 0.21428571428571427
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 28,
+        "mean": 0.03144758726869311,
+        "median": 0.00015151500701904297,
+        "q25": 0.0,
+        "q75": 0.008874848484992981,
+        "max": 0.276854932308197,
+        "fraction_meaningfully_positive": 0.21428571428571427
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.7857142857142857,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "golden-reference:depth4": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference:depth4",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 29,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 29,
+        "mean": 0.0012758908600642763,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0007883906364440918,
+        "max": 0.02457350492477417,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.025543910676035387,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0007883906364440918,
+        "max": 0.7284869849681854,
+        "fraction_meaningfully_positive": 0.034482758620689655
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.0012758908600642763,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0007883906364440918,
+        "max": 0.02457350492477417,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 1.0,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "golden-reference:depth6": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference:depth6",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 29,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 29,
+        "mean": 0.017230107866484542,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0005588531494140625,
+        "max": 0.32523852586746216,
+        "fraction_meaningfully_positive": 0.06896551724137931
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.02046007534553265,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0005588531494140625,
+        "max": 0.32523852586746216,
+        "fraction_meaningfully_positive": 0.10344827586206896
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.017230107866484542,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0005588531494140625,
+        "max": 0.32523852586746216,
+        "fraction_meaningfully_positive": 0.06896551724137931
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.9310344827586207,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "golden-reference:depth25": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference:depth25",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 29,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 29,
+        "mean": 0.002836809076111892,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0007704496383666992,
+        "max": 0.035957396030426025,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.0028354854419313626,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0007704496383666992,
+        "max": 0.035957396030426025,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 29,
+        "mean": 0.002836809076111892,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0007704496383666992,
+        "max": 0.035957396030426025,
+        "fraction_meaningfully_positive": 0.0
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 1.0,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop:depth1": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop:depth1",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.036867499351501465,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3446615934371948,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.03996488849322001,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3446615934371948,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.036867499351501465,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3446615934371948,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.8333333333333334,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop:depth2": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop:depth2",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.05596585075060526,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.051191702485084534,
+        "max": 0.39192020893096924,
+        "fraction_meaningfully_positive": 0.26666666666666666
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.06016777555147807,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.07501302659511566,
+        "max": 0.39192020893096924,
+        "fraction_meaningfully_positive": 0.3
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.05596585075060526,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.051191702485084534,
+        "max": 0.39192020893096924,
+        "fraction_meaningfully_positive": 0.26666666666666666
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.7333333333333333,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop:depth3": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop:depth3",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.06397737661997477,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.09166114032268524,
+        "max": 0.39192020893096924,
+        "fraction_meaningfully_positive": 0.26666666666666666
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.06397737661997477,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.09166114032268524,
+        "max": 0.39192020893096924,
+        "fraction_meaningfully_positive": 0.26666666666666666
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.06397737661997477,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.09166114032268524,
+        "max": 0.39192020893096924,
+        "fraction_meaningfully_positive": 0.26666666666666666
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.7333333333333333,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop:depth4": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop:depth4",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.03848605950673421,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.003001078963279724,
+        "max": 0.39526259899139404,
+        "fraction_meaningfully_positive": 0.23333333333333334
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.04511331121126811,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.41189879179000854,
+        "fraction_meaningfully_positive": 0.2
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.03848605950673421,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.003001078963279724,
+        "max": 0.39526259899139404,
+        "fraction_meaningfully_positive": 0.23333333333333334
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.7666666666666667,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop:depth6": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop:depth6",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.011617052555084228,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.19246608018875122,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.016790354251861574,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.19246608018875122,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.011617052555084228,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.19246608018875122,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.9,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop:depth25": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop:depth25",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.028137967983881632,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.34742581844329834,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.016887988646825156,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.34742581844329834,
+        "fraction_meaningfully_positive": 0.06666666666666667
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.028137967983881632,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.34742581844329834,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.9,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid:depth1": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid:depth1",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.019321552912394204,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.1711142659187317,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.0237773597240448,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.29331809282302856,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.019321552912394204,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.1711142659187317,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.8333333333333334,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid:depth2": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid:depth2",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.04971383213996887,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3338543176651001,
+        "fraction_meaningfully_positive": 0.23333333333333334
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.04492184122403463,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3338543176651001,
+        "fraction_meaningfully_positive": 0.2
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.04971383213996887,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3338543176651001,
+        "fraction_meaningfully_positive": 0.23333333333333334
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.7666666666666667,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid:depth3": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid:depth3",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.007720764478047689,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.12802034616470337,
+        "fraction_meaningfully_positive": 0.06666666666666667
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.01439042886098226,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.12802034616470337,
+        "fraction_meaningfully_positive": 0.13333333333333333
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.007720764478047689,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.12802034616470337,
+        "fraction_meaningfully_positive": 0.06666666666666667
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.9333333333333333,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid:depth4": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid:depth4",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.02712547779083252,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3516138195991516,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.0346802274386088,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3516138195991516,
+        "fraction_meaningfully_positive": 0.13333333333333333
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.02712547779083252,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3516138195991516,
+        "fraction_meaningfully_positive": 0.1
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.9,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid:depth6": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid:depth6",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.021534717082977294,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.15015995502471924,
+        "fraction_meaningfully_positive": 0.2
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.02794178525606791,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.041129663586616516,
+        "max": 0.15015995502471924,
+        "fraction_meaningfully_positive": 0.23333333333333334
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.021534717082977294,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.15015995502471924,
+        "fraction_meaningfully_positive": 0.2
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.8,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid:depth25": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid:depth25",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 30,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 30,
+        "mean": 0.037800492842992146,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3754391074180603,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.03522791663805644,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3754391074180603,
+        "fraction_meaningfully_positive": 0.13333333333333333
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 30,
+        "mean": 0.037800492842992146,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3754391074180603,
+        "fraction_meaningfully_positive": 0.16666666666666666
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.8333333333333334,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    }
+  },
+  "per_family": {
+    "golden-reference": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "golden-reference",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 174,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 174,
+        "mean": 0.013842051056609756,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0008079707622528076,
+        "max": 0.32523852586746216,
+        "fraction_meaningfully_positive": 0.06321839080459771
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 174,
+        "mean": 0.018212489526847314,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0008053034543991089,
+        "max": 0.693499356508255,
+        "fraction_meaningfully_positive": 0.06896551724137931
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 174,
+        "mean": 0.013842051056609756,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0008079707622528076,
+        "max": 0.32523852586746216,
+        "fraction_meaningfully_positive": 0.06321839080459771
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.9367816091954023,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "branched-loop": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "branched-loop",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 180,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 180,
+        "mean": 0.039175301127963594,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.39526259899139404,
+        "fraction_meaningfully_positive": 0.18888888888888888
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 180,
+        "mean": 0.04157284266418881,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.4499244689941406,
+        "fraction_meaningfully_positive": 0.18888888888888888
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 180,
+        "mean": 0.039175301127963594,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.39526259899139404,
+        "fraction_meaningfully_positive": 0.18888888888888888
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.8111111111111111,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    },
+    "loop-grid": {
+      "kind": "M10_3B_ORACLE_UTILITY",
+      "split": "loop-grid",
+      "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+      "n_incidents_considered": 180,
+      "best_vs_no_action_plan_value_gain": {
+        "n": 180,
+        "mean": 0.027202806207868788,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3754391074180603,
+        "fraction_meaningfully_positive": 0.15555555555555556
+      },
+      "best_vs_random_valid_candidate_plan_value_gain": {
+        "n": 180,
+        "mean": 0.028183466527197096,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3754391074180603,
+        "fraction_meaningfully_positive": 0.15
+      },
+      "best_vs_first_proposed_candidate_plan_value_gain": {
+        "n": 180,
+        "mean": 0.027202806207868788,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 0.0,
+        "max": 0.3754391074180603,
+        "fraction_meaningfully_positive": 0.15555555555555556
+      },
+      "fraction_incidents_where_no_action_is_already_near_optimal": 0.8444444444444444,
+      "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+    }
+  },
+  "global": {
+    "kind": "M10_3B_ORACLE_UTILITY",
+    "split": "GLOBAL",
+    "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- oracle uses exact WNTR-verified labels, never a deployable policy",
+    "n_incidents_considered": 534,
+    "best_vs_no_action_plan_value_gain": {
+      "n": 534,
+      "mean": 0.02688497416535567,
+      "median": 0.0,
+      "q25": 0.0,
+      "q75": 0.00010243058204650879,
+      "max": 0.39526259899139404,
+      "fraction_meaningfully_positive": 0.13670411985018727
+    },
+    "best_vs_random_valid_candidate_plan_value_gain": {
+      "n": 534,
+      "mean": 0.029183460532056258,
+      "median": 0.0,
+      "q25": 0.0,
+      "q75": 3.7670135498046875e-05,
+      "max": 0.693499356508255,
+      "fraction_meaningfully_positive": 0.1348314606741573
+    },
+    "best_vs_first_proposed_candidate_plan_value_gain": {
+      "n": 534,
+      "mean": 0.02688497416535567,
+      "median": 0.0,
+      "q25": 0.0,
+      "q75": 0.00010243058204650879,
+      "max": 0.39526259899139404,
+      "fraction_meaningfully_positive": 0.13670411985018727
+    },
+    "fraction_incidents_where_no_action_is_already_near_optimal": 0.8632958801498127,
+    "conclusion": "If fraction_incidents_where_no_action_is_already_near_optimal is high and the gain distributions are concentrated near the near_tie_tolerance floor, then even a perfect oracle Strategist would rarely outperform the trivial NO_ACTION/first-candidate policy on THIS population -- meaning low competence-gate scores reflect low available decision utility in the population, not necessarily a representation failure. A low fraction would instead indicate real, learnable decision value exists and is simply not yet being captured."
+  }
+}
