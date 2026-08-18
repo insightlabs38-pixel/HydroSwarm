@@ -57,5 +57,6 @@ def test_m11_2_artifacts_freeze_without_authorizing_locked_evaluation(tmp_path: 
     assert certificate["finalist_frozen"] is True
     assert certificate["tuning_closed"] is True
     assert certificate["locked_evaluation_authorized"] is False
+    assert certificate["finalist_identity_manifest_path"] == "m11-2-finalist-identity.json"
     assert records["m11-2-closure.json"]["closure_state"] == "M11_2_FINALIST_FROZEN"
     assert (tmp_path / "m11-current-status.json").is_file()

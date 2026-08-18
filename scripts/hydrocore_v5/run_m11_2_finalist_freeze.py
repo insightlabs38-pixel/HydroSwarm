@@ -222,9 +222,13 @@ def historical_immutability() -> dict[str, Any]:
     changed = subprocess.check_output(["git", "diff", "--name-only", base, "HEAD"], cwd=ROOT, text=True).splitlines()
     protected = ("reports/evaluation/hydrocore-v5/m10/", "reports/evaluation/hydrocore-v5/m9-", "reports/evaluation/hydrocore-v5/m11/m11-1/", "models/hydrocore-v5-release/", "models/hydrocore-v4-release/", "docs/evaluation/HYDROCORE_V5_M11_1_")
     violations = [path for path in changed if path.startswith(protected)]
+    allowed = (
+        "docs/evaluation/HYDROCORE_V5_M11_2_", "scripts/hydrocore_v5/run_m11_2_", "tests/scientific/test_m11_2_",
+        "reports/evaluation/hydrocore-v5/m11/m11-2/", "reports/evaluation/hydrocore-v5/m11/m11-current-status.json",
+    )
     return {"kind": "M11_2_HISTORICAL_IMMUTABILITY", "baseline_commit": base, "changed_since_baseline": changed,
             "protected_path_violations": violations, "historical_artifacts_unchanged": not violations,
-            "no_system_tuning_or_runtime_change": all(path.startswith(("docs/evaluation/HYDROCORE_V5_M11_2_", "scripts/hydrocore_v5/run_m11_2_", "tests/scientific/test_m11_2_")) for path in changed)}
+            "no_system_tuning_or_runtime_change": all(path.startswith(allowed) for path in changed)}
 
 
 def authority_freeze(identity: dict[str, Any]) -> dict[str, Any]:
@@ -273,6 +277,8 @@ def build_artifacts(output_dir: Path = REPORT_DIR) -> dict[str, dict[str, Any]]:
         "feature_semantics": identity["feature_semantics"], "fusion_config_hash": identity["fusion_config_hash"], "trained_tasks": identity["trained_tasks"],
         "runtime_enabled_outputs": identity["runtime_enabled_outputs"], "suppressed_untrained_outputs": ["next_step", "ood_category", "sample_node", "information_gain", "candidate_reduction", "should_continue_sampling", "plan_validity", "plan_value", "exposure_proxy", "pressure_risk_proxy", "service_loss_proxy", "containment_time_proxy", "plan_regret_proxy"],
         "authority": authority, "default_serving_identity": "V5PipelineFactory(resolve_v5_bundle_dir())", "no_v4_fallback": True,
+        "finalist_identity_manifest_path": "m11-2-finalist-identity.json", "authority_freeze_path": "m11-2-authority-freeze.json",
+        "output_governance_path": "m11-2-output-governance.json", "reproducibility_path": "m11-2-reproducibility.json",
         "known_limitations_path": "m11-2-limitations.json", "source_commit": current_commit(), "historical_artifacts_unchanged": True,
         "locked_test_opened": False, "finalist_selected": True, "finalist_frozen": True, "tuning_closed": True, "locked_evaluation_authorized": False}
     closure = {"kind": "M11_2_CLOSURE", "milestone": "M11.2", "closure_state": "M11_2_FINALIST_FROZEN", "finalist": EXPECTED["system"],
