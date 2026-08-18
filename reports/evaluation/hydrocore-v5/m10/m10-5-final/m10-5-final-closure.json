@@ -1,0 +1,12 @@
+{
+  "kind": "M10_5_FINAL_CLOSURE",
+  "closure_state": "M10_5_SERVING_FREEZE_BLOCKED_IMPLEMENTATION",
+  "protocol_hash": "c3e05f824016ead3427e257b274bff9ac270db3eeeb7e04a5685d44479cb6f7d",
+  "m10_5a_closure": "M10_5A_DEPLOYMENT_SELECTION_FROZEN",
+  "m10_complete": false,
+  "release_bundle_created": false,
+  "default_serving_changed": false,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "reason": "No immutable selected-seed calibration artifact can reproduce M10.4 without the forbidden SplitConformalCalibrator.fit reconstruction."
+}

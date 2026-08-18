@@ -1,0 +1,12 @@
+{
+  "kind": "M10_5_FINAL_PREFLIGHT",
+  "result": "M10_5_SERVING_FREEZE_BLOCKED_IMPLEMENTATION",
+  "checks": {
+    "m10_5a_selection_committed": true,
+    "selected_checkpoint_identity_verified": true,
+    "immutable_selected_seed_calibration_artifact_available": false,
+    "calibration_refit_forbidden": true,
+    "locked_test_opened": false
+  },
+  "blocker": "The exact M10.4 factory reconstructs calibration through SplitConformalCalibrator.fit and no immutable selected-seed artifact exists for release loading."
+}
