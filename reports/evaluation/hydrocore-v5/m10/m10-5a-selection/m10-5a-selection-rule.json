@@ -1,0 +1,7 @@
+{
+  "kind": "M10_5A_SELECTION_RULE",
+  "performance_independent": true,
+  "rule": "FIRST_CANONICAL_SEED_IN_PREEXISTING_FROZEN_SEED_ORDER",
+  "selected_seed": 20260814,
+  "unique": true
+}

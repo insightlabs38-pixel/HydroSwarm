@@ -1,0 +1,9 @@
+{
+  "closure_state": "M10_5A_DEPLOYMENT_SELECTION_FROZEN",
+  "kind": "M10_5A_CLOSURE",
+  "m10_4_performance_used": false,
+  "protocol_hash": "f11661d52c6f1d8324712ea6c530b6a195434e950afe3500b42abee3e3868752",
+  "selected_checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "selected_seed": 20260814,
+  "start_commit": "cecee4c8a8bd9bc3801d8038bfe9b858508bc8fd"
+}
