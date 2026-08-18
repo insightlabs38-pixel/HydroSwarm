@@ -1,0 +1,8 @@
+{
+  "artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "artifact_path": "reports/evaluation/hydrocore-v5/m10/m10-5b-calibration/calibration.json",
+  "closure_state": "M10_5B_CALIBRATION_ARTIFACT_MATERIALIZED",
+  "kind": "M10_5B_CLOSURE",
+  "locked_test_opened": false,
+  "protocol_hash": "0bdb66e6c0ee224c3ba04ff9d892965b31ef1be18510d545145be4e89b874e15"
+}
