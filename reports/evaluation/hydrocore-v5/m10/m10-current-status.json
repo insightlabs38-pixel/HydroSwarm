@@ -1,0 +1,20 @@
+{
+  "m10_complete": true,
+  "authoritative_m10_5_closure_path": "reports/evaluation/hydrocore-v5/m10/m10-5-completion/m10-5-completion-closure.json",
+  "authoritative_m10_5_state": "M10_5_SERVING_FREEZE_PASS",
+  "m10_5a_closure_path": "reports/evaluation/hydrocore-v5/m10/m10-5a-selection/m10-5a-closure.json",
+  "m10_5a_state": "M10_5A_DEPLOYMENT_SELECTION_FROZEN",
+  "m10_5b_closure_path": "reports/evaluation/hydrocore-v5/m10/m10-5b-calibration/m10-5b-closure.json",
+  "m10_5b_state": "M10_5B_CALIBRATION_ARTIFACT_MATERIALIZED",
+  "historical_blocked_closures": [
+    {"path": "reports/evaluation/hydrocore-v5/m10/m10-5/m10-5-closure.json", "state": "M10_5_SERVING_FREEZE_BLOCKED_SELECTION_IDENTITY"},
+    {"path": "reports/evaluation/hydrocore-v5/m10/m10-5-final/m10-5-final-closure.json", "state": "M10_5_SERVING_FREEZE_BLOCKED_IMPLEMENTATION"}
+  ],
+  "final_release_bundle": "models/hydrocore-v5-release",
+  "selected_seed": 20260814,
+  "selected_checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "calibration_file_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+  "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "locked_test_opened": false,
+  "next_authorized_milestone": "M11"
+}

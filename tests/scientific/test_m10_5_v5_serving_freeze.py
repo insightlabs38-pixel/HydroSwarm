@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
 
 import pytest
@@ -10,6 +11,8 @@ from hydroswarm.runtime.v5_defaults import V5PipelineFactory, V5_RUNTIME_ENABLED
 
 ROOT = Path(__file__).resolve().parents[2]
 BUNDLE = ROOT / "models/hydrocore-v5-release"
+sys.path.insert(0, str(ROOT / "scripts/hydrocore_v5"))
+import m10_4_common as m104  # noqa: E402
 
 
 def test_v5_bundle_loads_selected_model_and_m10_5b_calibration() -> None:
@@ -21,6 +24,18 @@ def test_v5_bundle_loads_selected_model_and_m10_5b_calibration() -> None:
     assert set(manifest["runtime_enabled_outputs"]) == V5_RUNTIME_ENABLED_OUTPUTS
     assert set(manifest["trained_tasks"]) == V5_TRAINED_TASKS
     assert "next_step" not in V5_RUNTIME_ENABLED_OUTPUTS
+
+
+def test_v5_release_matches_m10_4_authoritative_model_calibration_and_role_governance() -> None:
+    historical_model, historical_hash = m104.load_canonical_model(20260814)
+    historical = m104.fit_frozen_calibrator(model_hash=historical_hash, topology_hashes=m104.trained_family_topology_hashes())
+    release = V5PipelineFactory(BUNDLE, project_root=ROOT)
+    assert release.trained_assets_ready
+    assert historical_hash == release.model_hash
+    assert historical.artifact.artifact_hash == release._calibrator.artifact.artifact_hash
+    assert V5_TRAINED_TASKS == m104.M10_4_TRAINED_TASKS
+    assert V5_RUNTIME_ENABLED_OUTPUTS == m104.M10_4_RUNTIME_ENABLED_OUTPUTS - {"next_step"}
+    assert sum(parameter.numel() for parameter in historical_model.parameters()) == sum(parameter.numel() for parameter in release._model.parameters())
 
 
 def test_v5_bundle_failures_do_not_fall_back_to_v4(tmp_path: Path) -> None:
@@ -40,6 +55,15 @@ def test_v5_loader_does_not_reconstruct_calibration() -> None:
     assert "SplitConformalCalibrator.fit" not in source
     assert "rank_sample_locations" in (ROOT / "models/hydrocore-v5-release/runtime_manifest.json").read_text()
     assert "generate_response_plans" in (ROOT / "models/hydrocore-v5-release/runtime_manifest.json").read_text()
+
+
+def test_current_status_index_names_only_additive_completion() -> None:
+    status = json.loads((ROOT / "reports/evaluation/hydrocore-v5/m10/m10-current-status.json").read_text())
+    closure = json.loads((ROOT / status["authoritative_m10_5_closure_path"]).read_text())
+    assert status["m10_complete"] is True
+    assert closure["closure_state"] == status["authoritative_m10_5_state"]
+    assert status["m10_5b_state"] == "M10_5B_CALIBRATION_ARTIFACT_MATERIALIZED"
+    assert status["locked_test_opened"] is False
 
 
 @pytest.mark.parametrize("failure", [
