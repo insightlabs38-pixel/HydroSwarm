@@ -46,6 +46,7 @@ def test_m11_1_artifacts_select_without_freezing_or_authorizing_locked_eval(tmp_
     assert selection["finalist_frozen"] is False
     assert selection["locked_evaluation_authorized"] is False
     assert selection["locked_test_opened"] is False
+    assert all(decision["eligible"] for decision in selection["candidate_eligibility_decisions"])
     assert artifacts["m11-1-closure.json"]["closure_state"] == "M11_1_FINALIST_SELECTED"
     assert (tmp_path / "m11-1-protocol.json").is_file()
     assert json.loads((tmp_path / "m11-1-protocol.json").read_text())["protocol_sha256"] == m11.sha256(m11.PROTOCOL_DOC)

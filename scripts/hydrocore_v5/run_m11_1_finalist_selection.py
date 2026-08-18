@@ -207,6 +207,10 @@ def build_artifacts(output_dir: Path = REPORT_DIR) -> dict[str, dict[str, Any]]:
         "calibration_artifact_hash": selected["calibration_artifact_hash"], "release_manifest_sha256": selected["release_manifest_sha256"],
         "runtime_enabled_outputs": V5_OUTPUTS, "trained_tasks": ["sentinel"], "authority_policy": selected["runtime_authority"],
         "candidate_set": [candidate["name"] for candidate in eligibility["eligible_candidates"]], "candidate_eligibility_path": "m11-1-candidate-eligibility.json",
+        "candidate_eligibility_decisions": [
+            {"name": candidate["name"], "eligible": candidate["eligible"], "reason": candidate["eligibility_reason"]}
+            for candidate in eligibility["eligible_candidates"]
+        ],
         "selection_evidence_manifest_path": "m11-1-evidence-manifest.json", "protocol_sha256": protocol["protocol_sha256"],
         "known_limitations_path": "m11-1-limitations.json", "m10_parent_identity": "M10_5_SERVING_FREEZE_PASS", "source_commit": current_commit(),
         "locked_test_opened": False, "locked_test_opened_before": False, "locked_test_opened_after": False,
