@@ -1,0 +1,12 @@
+{
+  "baseline_commit": "330bff8be18433e441b9382e14860ff02a19b2f5",
+  "changed_since_baseline": [
+    "docs/evaluation/HYDROCORE_V5_M11_2_FINALIST_FREEZE_PROTOCOL.md",
+    "scripts/hydrocore_v5/run_m11_2_finalist_freeze.py",
+    "tests/scientific/test_m11_2_finalist_freeze.py"
+  ],
+  "historical_artifacts_unchanged": true,
+  "kind": "M11_2_HISTORICAL_IMMUTABILITY",
+  "no_system_tuning_or_runtime_change": true,
+  "protected_path_violations": []
+}

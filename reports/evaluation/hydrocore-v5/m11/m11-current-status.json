@@ -1,0 +1,13 @@
+{
+  "current_finalist": "HydroCore-v5 M10 frozen release",
+  "finalist_frozen": true,
+  "finalist_selected": true,
+  "freeze_certificate": "reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json",
+  "kind": "HYDROCORE_V5_M11_CURRENT_STATUS",
+  "locked_evaluation_authorized": false,
+  "locked_test_opened": false,
+  "m11_1_state": "M11_1_FINALIST_SELECTED",
+  "m11_2_state": "M11_2_FINALIST_FROZEN",
+  "next_authorized_milestone": "M11.5",
+  "tuning_closed": true
+}

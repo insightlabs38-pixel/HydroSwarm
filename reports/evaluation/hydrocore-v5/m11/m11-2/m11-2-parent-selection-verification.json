@@ -1,0 +1,21 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "calibration": true,
+    "calibration_artifact": true,
+    "checkpoint": true,
+    "locked_evaluation_not_authorized": true,
+    "m11_1_protocol": true,
+    "manifest": true,
+    "one_finalist_selected": true,
+    "parent_closure": true,
+    "parent_not_already_frozen": true,
+    "release_bundle": true,
+    "selected_system": true
+  },
+  "kind": "M11_2_PARENT_SELECTION_VERIFICATION",
+  "parent_closure_path": "reports/evaluation/hydrocore-v5/m11/m11-1/m11-1-closure.json",
+  "parent_closure_sha256": "966e4f2cd98d0b707d7378d5b6ce7979e9ebdd76e200fafc22fddaeb7492156f",
+  "parent_selection_path": "reports/evaluation/hydrocore-v5/m11/m11-1/final-selection.json",
+  "parent_selection_sha256": "d3086835415b16d62b05470b69c3c4add3b8d3962f0bc2055a059cc15daf2ac8"
+}

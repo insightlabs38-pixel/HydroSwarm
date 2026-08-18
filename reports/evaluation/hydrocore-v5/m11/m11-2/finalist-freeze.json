@@ -1,0 +1,90 @@
+{
+  "architecture": {
+    "model_config_sha256": "fd53af1b1c15d66db78307a79b24f41c666bcef4f56c4ea9da18d885f45a5cc0",
+    "parameter_count": 4182612,
+    "variant": "small"
+  },
+  "authority": {
+    "autonomous_actuation": false,
+    "deterministic_ood": "OODDetector",
+    "deterministic_planning": "generate_response_plans",
+    "deterministic_scout": "rank_sample_locations",
+    "human_approval_required": true,
+    "kind": "M11_2_AUTHORITY_FREEZE",
+    "learned_ood": "NON_AUTHORITATIVE",
+    "learned_scout": "NON_AUTHORITATIVE",
+    "learned_strategist": "NON_AUTHORITATIVE",
+    "matches_release_manifest": true,
+    "physical_authority": "WNTR/EPANET"
+  },
+  "authority_freeze_path": "m11-2-authority-freeze.json",
+  "calibration": {
+    "alpha": 0.1,
+    "artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+    "grouping": "B_DEPTH_AWARE",
+    "path": "models/hydrocore-v5-release/calibration.json",
+    "sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d"
+  },
+  "checkpoint_path": "models/hydrocore-v5-release/model.safetensors",
+  "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "default_serving_identity": "V5PipelineFactory(resolve_v5_bundle_dir())",
+  "feature_schema": {
+    "fingerprint": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "runtime_fingerprint": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09"
+  },
+  "feature_semantics": "M10.4-tested default builder; unobserved_age_sentinel=incident_elapsed retained despite M9.6 fixed-age training record",
+  "finalist_frozen": true,
+  "finalist_identity_manifest_path": "m11-2-finalist-identity.json",
+  "finalist_selected": true,
+  "finalist_system": "HydroCore-v5 M10 frozen release",
+  "fusion_config_hash": "fuse_source_probabilities-v1",
+  "historical_artifacts_unchanged": true,
+  "kind": "HYDROCORE_V5_FINALIST_FREEZE",
+  "known_limitations_path": "m11-2-limitations.json",
+  "locked_evaluation_authorized": false,
+  "locked_test_opened": false,
+  "m11_1_protocol_sha256": "52d911b86b37c7de095643cf02415601e5e1b198cf17c849239b97da8e94264d",
+  "m11_2_protocol_sha256": "1974f8d1b40d1318d3c80ec9763ef7ff20b8e6a90d607a917a2aca38162e9d1e",
+  "milestone": "M11.2",
+  "no_v4_fallback": true,
+  "output_governance_path": "m11-2-output-governance.json",
+  "parent_m11_1_selection_path": "reports/evaluation/hydrocore-v5/m11/m11-1/final-selection.json",
+  "parent_m11_1_selection_sha256": "d3086835415b16d62b05470b69c3c4add3b8d3962f0bc2055a059cc15daf2ac8",
+  "release_bundle": "models/hydrocore-v5-release",
+  "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+  "reproducibility_path": "m11-2-reproducibility.json",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "schema_version": 1,
+  "selected_seed": 20260814,
+  "source_commit": "7169e70010e8646cb27c27e09c3708a3b5ac6826",
+  "suppressed_untrained_outputs": [
+    "next_step",
+    "ood_category",
+    "sample_node",
+    "information_gain",
+    "candidate_reduction",
+    "should_continue_sampling",
+    "plan_validity",
+    "plan_value",
+    "exposure_proxy",
+    "pressure_risk_proxy",
+    "service_loss_proxy",
+    "containment_time_proxy",
+    "plan_regret_proxy"
+  ],
+  "trained_tasks": [
+    "sentinel"
+  ],
+  "training_recipe": [
+    "CLASSICAL_HYDROCORE_S",
+    "AGE_FIX_ONLY",
+    "EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING"
+  ],
+  "tuning_closed": true
+}

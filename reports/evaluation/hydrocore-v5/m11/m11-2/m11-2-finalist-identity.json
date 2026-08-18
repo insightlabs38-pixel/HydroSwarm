@@ -1,0 +1,79 @@
+{
+  "assets": {
+    "calibration": {
+      "alpha": 0.1,
+      "artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+      "grouping": "B_DEPTH_AWARE",
+      "path": "models/hydrocore-v5-release/calibration.json",
+      "sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d"
+    },
+    "calibration_checksum": {
+      "path": "models/hydrocore-v5-release/calibration.json.sha256",
+      "sha256": "1a60f8a014bd5d6816f6653923d7ef2c67340da34aa9584e320446dc29bc36cc"
+    },
+    "checkpoint": {
+      "path": "models/hydrocore-v5-release/model.safetensors",
+      "sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+    },
+    "release_manifest": {
+      "path": "models/hydrocore-v5-release/runtime_manifest.json",
+      "sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34"
+    }
+  },
+  "deterministic_authority": {
+    "autonomous_actuation": false,
+    "human_approval_required": true,
+    "ood": "OODDetector",
+    "physical_verification": "WNTR/EPANET",
+    "planner": "generate_response_plans",
+    "scout": "rank_sample_locations"
+  },
+  "feature_schema": {
+    "fingerprint": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "runtime_fingerprint": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09"
+  },
+  "feature_semantics": "M10.4-tested default builder; unobserved_age_sentinel=incident_elapsed retained despite M9.6 fixed-age training record",
+  "fusion_config_hash": "fuse_source_probabilities-v1",
+  "kind": "M11_2_FINALIST_IDENTITY",
+  "model_config": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned"
+  },
+  "model_config_sha256": "fd53af1b1c15d66db78307a79b24f41c666bcef4f56c4ea9da18d885f45a5cc0",
+  "model_variant": "small",
+  "parameter_count": 4182612,
+  "release_bundle": "models/hydrocore-v5-release",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "runtime_governance_source_hashes": {
+    "src/hydroswarm/agents/scout.py": "5c7f1d3be1bed42b69027214bd83391d66ec25cae772633df02d21b3492aebe8",
+    "src/hydroswarm/agents/strategist.py": "35f1029a0761f2ad1f6ab6895ea490c40a9d9e39993a7d8cc47076ef3a64d121",
+    "src/hydroswarm/api/app.py": "3d72fd618b74b6c87ecc4553380a7ccb808b5cf5f1c079fce82fde63625fa1d8",
+    "src/hydroswarm/inference/ood.py": "751288af9a3ccd750513374abc524ff20fbe49f5b7855945343bdc2bfb10e5ce",
+    "src/hydroswarm/inference/pipeline.py": "536d08bedccca5907fe893ae5bc32b8cbd9307556d7e6e5e6359df745897ebae",
+    "src/hydroswarm/runtime/paths.py": "0f1e01e98f6323a28bb5f14a69d7dc057922b59d75bc0c51bd3339ad5fe48691",
+    "src/hydroswarm/runtime/v5_defaults.py": "fbc356430b7d41c9c445fae7aa0d75e39a6b5dd176abaccbb952e22d18964e4a",
+    "src/hydroswarm/simulation/verifier.py": "8511371ea4bca43bd45189d7543f0845f1e88390e0b37a52641cc80f9b770205"
+  },
+  "schema_version": 1,
+  "selected_seed": 20260814,
+  "system": "HydroCore-v5 M10 frozen release",
+  "trained_tasks": [
+    "sentinel"
+  ],
+  "training_recipe": [
+    "CLASSICAL_HYDROCORE_S",
+    "AGE_FIX_ONLY",
+    "EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING"
+  ]
+}
