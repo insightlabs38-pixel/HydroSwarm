@@ -1,0 +1,48 @@
+{
+  "canonical_scenario_definition_hash": "SHA-256 over json.dumps(definition, sort_keys=True, separators=(',', ':')) of the frozen scenario-definition schema (SCENARIO_SCHEMA_VERSION).",
+  "collision_procedure": "If a canonical hash collision is detected against a prior scenario or within the same materialization, increment the scenario's derivation counter and re-derive deterministically. Never manually select another 'better' example, never call OS randomness, never preview candidate seeds. If retries exceed MAX_SCENARIO_COLLISION_RETRIES=100, BLOCK.",
+  "kind": "M11_6A_NONOVERLAP_SPEC",
+  "prior_seed_ranges": {
+    "m10_1": [
+      1100000000,
+      1199999999
+    ],
+    "m10_2": [
+      1200000000,
+      1299999999
+    ],
+    "m10_3": [
+      1300000000,
+      1399999999
+    ],
+    "m10_3c_population": [
+      1400000000,
+      1449999999
+    ],
+    "m10_3d_reserved_unused": [
+      1450000000,
+      1499999999
+    ],
+    "m10_4": [
+      1500000000,
+      1599999999
+    ],
+    "m1_split_seed_ranges": [
+      900000000,
+      903999999
+    ],
+    "m6": [
+      960000000,
+      969999999
+    ],
+    "m7_seed_bases": [
+      940000000,
+      989999999
+    ],
+    "m9_4_floor_and_up": [
+      990000000,
+      1099999999
+    ]
+  },
+  "rule": "Every locked scenario is identified by (split role, topology identity, seed, scenario_id, canonical scenario-definition hash). Non-overlap is guaranteed by: (1) derived seeds in [0, 2**62) are disjoint from every prior seed namespace (all < 2**31); (2) locked_final_test uses only the allowed known/trained families with fresh derived seeds; (3) locked_topology_test uses only novelty-verified procedural topologies; (4) the canonical scenario-definition hash is unique per scenario and is checked against every prior materialized scenario hash."
+}

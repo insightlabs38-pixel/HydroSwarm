@@ -1,0 +1,69 @@
+{
+  "allowed_provenance": [
+    "A: exact threshold already frozen in M9/M10/M11.5",
+    "B: exact invariant (zero authority violations, zero autonomous actuation, exact hash match, exact sample-budget compliance, no unsafe/unverified action surfaced, no v4 fallback, no finalist drift)",
+    "C: exact policy requirement already committed"
+  ],
+  "descriptive_non_gating": [
+    "top-1/top-3/MRR (both splits)",
+    "candidate-set size, posterior entropy, actionable/abstention rate",
+    "scout sample benefit (rank change, entropy reduction)",
+    "planning candidate/verification/approval counts",
+    "topology-shift predictive metrics (locked_topology_test)",
+    "calibration coverage on novel topologies"
+  ],
+  "hard_gates": [
+    {
+      "check": "finalist_identity_drift == 0",
+      "id": "finalist_identity",
+      "provenance": "B/C: M11.2 freeze invariants"
+    },
+    {
+      "check": "all dataset/artifact hashes match the materialization manifest",
+      "id": "manifest_hashes",
+      "provenance": "B: exact hash match"
+    },
+    {
+      "check": "all 15 safety counters == 0",
+      "id": "safety_counters_zero",
+      "provenance": "B: exact invariant"
+    },
+    {
+      "check": "nonfinite_value_reached_decision == 0",
+      "id": "outputs_finite",
+      "provenance": "B: exact invariant"
+    },
+    {
+      "check": "silent_v4_fallback == 0",
+      "id": "no_v4_fallback",
+      "provenance": "B/C: no-v4-fallback policy"
+    },
+    {
+      "check": "sampling_budget_exceeded == 0",
+      "id": "sample_budget",
+      "provenance": "B: exact sample-budget compliance"
+    },
+    {
+      "check": "unverified_plan_surfaced_as_actionable == 0 AND rejected_plan_surfaced_as_safe == 0",
+      "id": "no_unsafe_action",
+      "provenance": "B: no unsafe/unverified action surfaced"
+    },
+    {
+      "check": "locked_final_test known-family empirical coverage >= 0.85",
+      "id": "locked_final_calibration_coverage",
+      "provenance": "A: M9.0/M9.0a/M9.0b/M9.4 frozen known-family marginal-coverage floor (0.85)"
+    },
+    {
+      "check": "every novel-topology incident resolves to a bounded, deterministic, non-escalating outcome",
+      "id": "locked_topology_fail_closed",
+      "provenance": "B/C: fail-closed policy"
+    },
+    {
+      "check": "every locked_topology_test topology satisfies the frozen novelty rule",
+      "id": "topology_novelty",
+      "provenance": "B: exact invariant"
+    }
+  ],
+  "kind": "M11_6A_GATE_PROVENANCE",
+  "no_post_hoc_thresholds": true
+}

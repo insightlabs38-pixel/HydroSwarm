@@ -1,0 +1,57 @@
+{
+  "authorization_consumed": false,
+  "dataset_materialized": false,
+  "design_file_hashes": {
+    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "508a0e95baa8a9a0323d08ddb905f579c3a01de15ef074ea5d50f0ed78ab117b",
+    "scripts/hydrocore_v5/m11_6a_design.py": "5e2b69abda572758e78066c80d2fa134c5fecb77780199ef9be69bf9059319de",
+    "scripts/hydrocore_v5/m11_6a_topology.py": "bdae63f25d3db16adc9d322297049639c2875f4104f04a574ab8e083c9e82947",
+    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "f477fb5b634116e0ad5cd147e5295d8dec5cc409b29d3a2cba367399802fe67a",
+    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "3f1ab70b98e8bec5694463d9f202426f3efb2ac2a4b2416614f067a5fd0d3bff"
+  },
+  "design_frozen": true,
+  "design_hash": "1e074d8766882d56d6114efb3b3cca02de3c007c24e234f22e686f7446a86d89",
+  "does_not_claim_real_locked_manifest_hash": true,
+  "final_locked_seed_derived": false,
+  "finalist_evaluated_on_locked": false,
+  "finalist_identity": {
+    "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+    "calibration_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+    "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+    "seed": 20260814,
+    "system": "HydroCore-v5 M10 frozen release"
+  },
+  "kind": "M11_6A_DESIGN_FREEZE",
+  "locked_evaluation_authorized": false,
+  "locked_manifest_created": false,
+  "locked_open_count": 0,
+  "locked_test_opened": false,
+  "m11_6_blocker_closure_preserved": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "milestone": "M11.6A-1",
+  "next_action": "M11_6A_2_MATERIALIZE_FROM_FROZEN_DESIGN",
+  "preflight": {
+    "authorization_consumed": false,
+    "blocker_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+    "branch": "exp/hydrocore-v5-causal",
+    "design_hash": "1e074d8766882d56d6114efb3b3cca02de3c007c24e234f22e686f7446a86d89",
+    "expected_blocker_head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
+    "frozen_finalist_identity_verified": true,
+    "head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
+    "kind": "M11_6A_DESIGN_PREFLIGHT",
+    "locked_evaluation_authorized": false,
+    "locked_open_count_at_start": 0,
+    "locked_test_opened": false,
+    "m11_5_matrix_green": true,
+    "m11_5_state": "M11_5_FULL_VALIDATION_PASS",
+    "m11_6_preconditions_satisfied": true,
+    "repository": "insightlabs38-pixel/HydroSwarm",
+    "tuning_closed": true,
+    "worktree_clean": false
+  },
+  "schema_version": "hydroswarm-m11-6a-design-v1",
+  "seed_derivation_formula": {
+    "locked_final_master": "H(\"HYDROSWARM|M11.6|LOCKED_FINAL|v1|\" + DESIGN_FREEZE_COMMIT_SHA)",
+    "locked_topology_master": "H(\"HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|\" + DESIGN_FREEZE_COMMIT_SHA)"
+  },
+  "seed_derivation_rule_version": "v1"
+}

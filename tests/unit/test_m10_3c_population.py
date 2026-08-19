@@ -129,6 +129,14 @@ def test_seed_bases_never_appear_elsewhere_in_the_repository_before_this_protoco
         "scripts/hydrocore_v5/m10_4_common.py",
         "docs/evaluation/HYDROCORE_V5_M10_4_FULL_TRAJECTORY_PROTOCOL.md",
         "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-seed-disjointness.json",
+        # M11.6A-1 (a later, separately-frozen milestone) legitimately and
+        # necessarily inventories every prior seed namespace -- including
+        # M10.3C's -- to establish the formal NON-OVERLAP rule for the locked
+        # population. A real, disclosed, intended downstream reference, not an
+        # accidental collision; it neither touches nor re-opens M10.3C's own
+        # closure/protocol.
+        "scripts/hydrocore_v5/m11_6a_design.py",
+        "reports/evaluation/hydrocore-v5/m11/m11-6a/design-freeze/",
     )
     hits = [line for line in result.stdout.splitlines() if not any(s in line for s in excluded_substrings)]
     assert hits == [], f"unexpected pre-existing hits for the M10.3C seed bases: {hits}"

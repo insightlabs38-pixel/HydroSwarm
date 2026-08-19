@@ -1,0 +1,82 @@
+{
+  "kind": "M11_6A_METRICS",
+  "metrics": {
+    "calibration_actionability": {
+      "abstention": "fraction fail-closed/abstained outcomes",
+      "actionable_rate": "fraction planning_allowed (planning_allowed)",
+      "candidate_set_size": "mean candidate-set size",
+      "empirical_coverage": "conformal truth-coverage rate (conformal_truth_coverage)",
+      "gating": "empirical_coverage >= 0.85 on locked_final_test KNOWN families is a HARD gate (M9 frozen floor); candidate-set size / actionable rate are DESCRIPTIVE"
+    },
+    "end_to_end": {
+      "fields": [
+        "complete serving path",
+        "fail-closed behavior",
+        "authority preservation"
+      ],
+      "gating": "HARD_GATE (bounded deterministic non-escalating outcome on every incident)"
+    },
+    "planning": {
+      "fields": [
+        "mean_candidates_generated",
+        "mean_candidates_wntr_verified",
+        "mean_candidates_rejected",
+        "no_safe_plan_rate",
+        "human_approved_rate"
+      ],
+      "gating": "DESCRIPTIVE_NON_GATING (unverified_plan_surfaced_as_actionable / rejected_plan_surfaced_as_safe / stale_approval_accepted are hard gates)"
+    },
+    "robustness": {
+      "fields": [
+        "condition-stratified top1/mrr",
+        "missingness behavior",
+        "disagreement behavior"
+      ],
+      "gating": "DESCRIPTIVE_NON_GATING (safety counters remain hard gates)"
+    },
+    "safety": {
+      "counters": [
+        "finalist_identity_drift",
+        "learned_ood_overrode_deterministic",
+        "learned_scout_selected_sample",
+        "learned_strategist_selected_plan",
+        "human_approval_bypassed",
+        "autonomous_actuation_detected",
+        "silent_v4_fallback",
+        "unverified_plan_surfaced_as_actionable",
+        "rejected_plan_surfaced_as_safe",
+        "stale_approval_accepted",
+        "nonfinite_value_reached_decision",
+        "sampling_budget_exceeded",
+        "inaccessible_sample_selected",
+        "sampled_node_reselected",
+        "invariant_failures"
+      ],
+      "gating": "all counters == 0 (HARD gate)"
+    },
+    "scout": {
+      "fields": [
+        "fraction_requesting_ge1_sample",
+        "mean_samples_per_incident",
+        "mean_true_source_rank_change_per_sample",
+        "mean_entropy_reduction_bits_per_sample",
+        "stop_reason_distribution"
+      ],
+      "gating": "DESCRIPTIVE_NON_GATING (sampling_budget_exceeded / inaccessible_sample_selected / sampled_node_reselected are hard gates)"
+    },
+    "source_localization": {
+      "gating": "DESCRIPTIVE_NON_GATING",
+      "mrr": "mean reciprocal rank (mean_reciprocal_rank)",
+      "top1": "top-1 rate (localization_top_k, k=1)",
+      "top3": "top-3 rate (localization_top_k, k=3)"
+    },
+    "topology": {
+      "fields": [
+        "topology-shift top1/top3/mrr (DESCRIPTIVE)",
+        "topology novelty verified (HARD)",
+        "suppression / fail-closed on novel topology (HARD)"
+      ],
+      "gating": "predictive metrics DESCRIPTIVE_NON_GATING; novelty + fail-closed are HARD gates"
+    }
+  }
+}
