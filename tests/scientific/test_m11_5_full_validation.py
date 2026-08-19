@@ -13,15 +13,25 @@ def _passing_software() -> dict:
     return {"kind": "M11_5_SOFTWARE_GATES", "all_required_pass": True, "gates": []}
 
 
-def test_m11_5_preflight_preserves_frozen_parent_and_unopened_lock_after_closure() -> None:
+def test_m11_5_preflight_preserves_frozen_parent_and_refuses_post_m11_6_rerun(monkeypatch) -> None:
+    """Historical M11.5 PASS evidence stays immutable after M11.6 opens the lock.
+
+    The current preflight must therefore refuse any M11.5 rerun rather than
+    reinterpret the historical M11.5 closure as the repository's current state.
+    """
+    # The helper normally reads the historical pre-lock freeze fixture. Model
+    # the already-recorded terminal M11.6 opening here without changing that
+    # fixture or any production/preflight implementation.
+    monkeypatch.setattr(m115, "locked_test_opened", lambda _root: True)
     preflight = m115.preflight()
     assert preflight["checks"]["m10_complete"] is True
     assert preflight["checks"]["m11_1_selected"] is True
     assert preflight["checks"]["m11_2_frozen"] is True
-    assert preflight["checks"]["current_flags"] is True
     assert preflight["checks"]["finalist_identity"] is True
-    assert preflight["checks"]["locked_unopened"] is True
-    # M11.5 has already closed (currently PASS); it must not remain authorized for re-run.
+    # The repository is now post-lock: the historical M11.5 current flags and
+    # unopened-lock condition are intentionally no longer true.
+    assert preflight["checks"]["current_flags"] is False
+    assert preflight["checks"]["locked_unopened"] is False
     assert preflight["checks"]["next_authorized"] is False
     assert preflight["all_checks_pass"] is False
 
