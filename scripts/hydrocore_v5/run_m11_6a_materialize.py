@@ -174,7 +174,10 @@ def _overlap_audit(definitions: list[dict[str, Any]]) -> dict[str, Any]:
     unique = len(set(hashes))
     seeds = [definition["seed"] for definition in definitions]
     collisions = len(hashes) - unique
-    seed_out_of_range = [s for s in seeds if not (0 <= s < design.SEED_MODULUS)]
+    seed_out_of_range = [
+        s for s in seeds
+        if not (design.LOCKED_SEED_MIN <= s < design.LOCKED_SEED_MAX_EXCLUSIVE)
+    ]
     return {
         "result": "PASS" if (collisions == 0 and not seed_out_of_range) else "FAIL",
         "n_scenarios": len(definitions),
@@ -182,9 +185,10 @@ def _overlap_audit(definitions: list[dict[str, Any]]) -> dict[str, Any]:
         "collisions": collisions,
         "seeds_out_of_range": seed_out_of_range,
         "seed_namespace_note": (
-            "All derived seeds are in [0, 2**62); every prior seed namespace "
-            "is < 2**31, so derived seeds are disjoint from all prior "
-            "namespaces by construction."
+            "All derived seeds are in [2**31, 2**62); every prior seed "
+            "namespace is < 2**31, so derived seeds are disjoint from all "
+            "prior namespaces by construction (the interval [0, 2**31) is "
+            "entirely excluded)."
         ),
     }
 

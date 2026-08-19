@@ -38,6 +38,11 @@ OPENED_RECORD_SCHEMA_VERSION = "hydroswarm-m11-6-opened-record-v1"
 
 MILESTONE = "M11.6A-1"
 
+#: The original M11.6A-1 design-freeze commit, superseded by this correction
+#: commit. The correction commit becomes the ONLY authorized design-freeze SHA
+#: for M11.6A-2 materialization; the old commit MUST NOT be used to materialize.
+SUPERSEDED_DESIGN_FREEZE_COMMIT = "62bf1326081fac9080c3d676827c9596d2379efb"
+
 #: The smoke namespace used ONLY by development fixtures. It MUST never
 #: appear in either locked split; the materializer and evaluator reject it.
 FORBIDDEN_SMOKE_NAMESPACE = "M11_6A_DESIGN_SMOKE_ONLY"
@@ -55,10 +60,16 @@ LOCKED_SPLIT_NAMES: tuple[str, ...] = (LOCKED_FINAL_TEST, LOCKED_TOPOLOGY_TEST)
 SEED_RULE_VERSION = "v1"
 SEED_BYTE_ENCODING = "utf-8"
 SEED_HASH_ALGORITHM = "sha256"
-#: Allowed integer range for a derived seed: [0, 2**62). This is >> every
-#: prior seed namespace in the repository (all are < 2**31), which is part of
-#: the mechanical non-overlap guarantee (see NON_OVERLAP below).
-SEED_MODULUS = 2**62
+#: Derived-seed range, disjoint from every prior seed namespace BY
+#: CONSTRUCTION. Every prior governed seed namespace is < 2**31, so derived
+#: seeds are drawn from [LOCKED_SEED_MIN, LOCKED_SEED_MAX_EXCLUSIVE) =
+#: [2**31, 2**62). The interval [0, 2**31) is entirely EXCLUDED, not merely
+#: "statistically unlikely": no derived seed can ever fall inside a prior
+#: namespace. (Correction #1: the original design claimed [0, 2**62) is
+#: disjoint from [0, 2**31), which is false -- [0, 2**62) contains [0, 2**31).)
+LOCKED_SEED_MIN = 2**31
+LOCKED_SEED_MAX_EXCLUSIVE = 2**62
+LOCKED_SEED_SPAN = LOCKED_SEED_MAX_EXCLUSIVE - LOCKED_SEED_MIN
 
 #: Master-seed domain labels (the two governed locked splits).
 MASTER_DOMAIN_FINAL = "LOCKED_FINAL"
@@ -122,7 +133,10 @@ def derive_seed(master_hex: str, label: str, index: int, counter: int = 0) -> in
     """Deterministically derive one integer seed from a master digest.
 
     ``material = f"{master_hex}|{label}|{index}|{counter}"`` (UTF-8), then
-    ``seed = int(SHA256(material).hexdigest(), 16) % SEED_MODULUS``.
+    ``seed = LOCKED_SEED_MIN + int(SHA256(material).hexdigest(), 16)
+    % LOCKED_SEED_SPAN``, so every derived seed satisfies
+    ``2**31 <= seed < 2**62`` and is mechanically disjoint from every prior
+    governed namespace (all < 2**31).
 
     ``counter=0`` is the primary derivation. A positive ``counter`` is the
     deterministic next-candidate used by rejection sampling (topology
@@ -132,7 +146,7 @@ def derive_seed(master_hex: str, label: str, index: int, counter: int = 0) -> in
 
     material = f"{master_hex}|{label}|{index}|{counter}"
     digest = hashlib.sha256(material.encode(SEED_BYTE_ENCODING)).hexdigest()
-    return int(digest, 16) % SEED_MODULUS
+    return LOCKED_SEED_MIN + int(digest, 16) % LOCKED_SEED_SPAN
 
 
 def seed_derivation_spec() -> dict[str, Any]:
@@ -145,9 +159,16 @@ def seed_derivation_spec() -> dict[str, Any]:
             "locked_topology_master": "H(\"HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|\" + DESIGN_FREEZE_COMMIT_SHA)",
         },
         "per_seed_material": "f\"{master_hex}|{label}|{index}|{counter}\"",
-        "digest_to_integer": "int(SHA256(material).hexdigest(), 16) % SEED_MODULUS",
-        "seed_modulus": SEED_MODULUS,
-        "allowed_integer_range": [0, SEED_MODULUS - 1],
+        "digest_to_integer": "LOCKED_SEED_MIN + int(SHA256(material).hexdigest(), 16) % LOCKED_SEED_SPAN",
+        "locked_seed_min": LOCKED_SEED_MIN,
+        "locked_seed_max_exclusive": LOCKED_SEED_MAX_EXCLUSIVE,
+        "locked_seed_span": LOCKED_SEED_SPAN,
+        "allowed_integer_range": [LOCKED_SEED_MIN, LOCKED_SEED_MAX_EXCLUSIVE - 1],
+        "disjoint_by_construction": (
+            "Every derived seed is >= 2**31; every prior governed seed namespace "
+            "is < 2**31, so the derived range [2**31, 2**62) is mechanically "
+            "disjoint from all prior namespaces."
+        ),
         "labels": SEED_LABELS,
         "collision_handling": (
             "If a derived seed collides with a seed already used in the same "
@@ -450,8 +471,8 @@ def topology_novelty_spec() -> dict[str, Any]:
 
 #: Every prior seed namespace used anywhere in the repository (verified by
 #: grep at design-freeze time). All are < 2**31; the derived seed space is
-#: [0, 2**62), so the derived seeds are disjoint from every prior namespace
-#: by construction.
+#: [2**31, 2**62), so the derived seeds are disjoint from every prior
+#: namespace by construction (the interval [0, 2**31) is entirely excluded).
 PRIOR_SEED_RANGES: dict[str, tuple[int, int]] = {
     "m1_split_seed_ranges": (900_000_000, 903_999_999),
     "m6": (960_000_000, 969_999_999),
@@ -471,13 +492,15 @@ def non_overlap_spec() -> dict[str, Any]:
         "rule": (
             "Every locked scenario is identified by (split role, topology "
             "identity, seed, scenario_id, canonical scenario-definition hash). "
-            "Non-overlap is guaranteed by: (1) derived seeds in [0, 2**62) are "
-            "disjoint from every prior seed namespace (all < 2**31); (2) "
-            "locked_final_test uses only the allowed known/trained families with "
-            "fresh derived seeds; (3) locked_topology_test uses only "
-            "novelty-verified procedural topologies; (4) the canonical "
-            "scenario-definition hash is unique per scenario and is checked "
-            "against every prior materialized scenario hash."
+            "Non-overlap is guaranteed by: (1) derived seeds in "
+            "[2**31, 2**62) are disjoint from every prior seed namespace "
+            "(all < 2**31) BY CONSTRUCTION -- the interval [0, 2**31) is "
+            "entirely excluded; (2) locked_final_test uses only the allowed "
+            "known/trained families with fresh derived seeds; (3) "
+            "locked_topology_test uses only novelty-verified procedural "
+            "topologies; (4) the canonical scenario-definition hash is unique "
+            "per scenario and is checked against every prior materialized "
+            "scenario hash."
         ),
         "canonical_scenario_definition_hash": (
             "SHA-256 over json.dumps(definition, sort_keys=True, "
@@ -700,17 +723,25 @@ GATE_PROVENANCE: dict[str, Any] = {
         "C: exact policy requirement already committed",
     ],
     "hard_gates": [
-        {"id": "finalist_identity", "check": "finalist_identity_drift == 0", "provenance": "B/C: M11.2 freeze invariants"},
-        {"id": "manifest_hashes", "check": "all dataset/artifact hashes match the materialization manifest", "provenance": "B: exact hash match"},
-        {"id": "safety_counters_zero", "check": "all 15 safety counters == 0", "provenance": "B: exact invariant"},
-        {"id": "outputs_finite", "check": "nonfinite_value_reached_decision == 0", "provenance": "B: exact invariant"},
-        {"id": "no_v4_fallback", "check": "silent_v4_fallback == 0", "provenance": "B/C: no-v4-fallback policy"},
-        {"id": "sample_budget", "check": "sampling_budget_exceeded == 0", "provenance": "B: exact sample-budget compliance"},
-        {"id": "no_unsafe_action", "check": "unverified_plan_surfaced_as_actionable == 0 AND rejected_plan_surfaced_as_safe == 0", "provenance": "B: no unsafe/unverified action surfaced"},
-        {"id": "locked_final_calibration_coverage", "check": f"locked_final_test known-family empirical coverage >= {OPERATIONAL_COVERAGE_FLOOR}", "provenance": f"A: M9.0/M9.0a/M9.0b/M9.4 frozen known-family marginal-coverage floor ({OPERATIONAL_COVERAGE_FLOOR})"},
-        {"id": "locked_topology_fail_closed", "check": "every novel-topology incident resolves to a bounded, deterministic, non-escalating outcome", "provenance": "B/C: fail-closed policy"},
-        {"id": "topology_novelty", "check": "every locked_topology_test topology satisfies the frozen novelty rule", "provenance": "B: exact invariant"},
+        {"id": "finalist_identity", "scope": "global", "check": "finalist_identity_drift == 0", "provenance": "B/C: M11.2 freeze invariants"},
+        {"id": "manifest_hashes", "scope": "global", "check": "all dataset/artifact/source hashes recomputed and matching the materialization manifest", "provenance": "B: exact hash match"},
+        {"id": "safety_counters_zero", "scope": "global", "check": "all 15 safety counters == 0", "provenance": "B: exact invariant"},
+        {"id": "outputs_finite", "scope": "global", "check": "nonfinite_value_reached_decision == 0", "provenance": "B: exact invariant"},
+        {"id": "no_v4_fallback", "scope": "global", "check": "silent_v4_fallback == 0", "provenance": "B/C: no-v4-fallback policy"},
+        {"id": "sample_budget", "scope": "global", "check": "sampling_budget_exceeded == 0", "provenance": "B: exact sample-budget compliance"},
+        {"id": "no_unsafe_action", "scope": "global", "check": "unverified_plan_surfaced_as_actionable == 0 AND rejected_plan_surfaced_as_safe == 0", "provenance": "B: no unsafe/unverified action surfaced"},
+        {"id": "evaluation_population_complete", "scope": "global", "check": "exactly 105 locked_final_test + 20 locked_topology_test rows; every expected scenario ID appears exactly once; no unexpected/duplicate/missing IDs; no HARNESS_ERROR; every row reached an allowed terminal outcome (VERIFIED/SUPPRESSED/ABSTAINED)", "provenance": "B: exact preregistered population-integrity invariant"},
+        {"id": "locked_final_complete", "scope": "locked_final_test", "check": "locked_final_test has exactly 105 rows, all present, no HARNESS_ERROR", "provenance": "B: exact preregistered population-integrity invariant"},
+        {"id": "locked_final_calibration_coverage", "scope": "locked_final_test", "check": f"locked_final_test known-family empirical coverage >= {OPERATIONAL_COVERAGE_FLOOR}", "provenance": f"A: M9.0/M9.0a/M9.0b/M9.4 frozen known-family marginal-coverage floor ({OPERATIONAL_COVERAGE_FLOOR})"},
+        {"id": "locked_topology_complete", "scope": "locked_topology_test", "check": "locked_topology_test has exactly 20 rows, all present, no HARNESS_ERROR", "provenance": "B: exact preregistered population-integrity invariant"},
+        {"id": "locked_topology_fail_closed", "scope": "locked_topology_test", "check": "every novel-topology incident satisfies topology_incident_is_fail_closed(row) -- row exists; no HARNESS_ERROR; finite decision; sample budget obeyed; no learned OOD/Scout/Strategist authority; no unverified/rejected/stale plan surfaced; no approval bypass; no autonomous actuation; no v4 fallback; no invariant failure; governed terminal outcome", "provenance": "B/C: fail-closed policy (pre-result per-row predicate, NOT population presence)"},
+        {"id": "topology_novelty", "scope": "locked_topology_test", "check": "every locked_topology_test topology satisfies the frozen novelty rule", "provenance": "B: exact invariant"},
     ],
+    "split_scoping": {
+        "global": "applies to BOTH locked splits and to the overall M11.6 closure",
+        "locked_final_test": "applies only to locked_final_result",
+        "locked_topology_test": "applies only to locked_topology_result",
+    },
     "descriptive_non_gating": [
         "top-1/top-3/MRR (both splits)",
         "candidate-set size, posterior entropy, actionable/abstention rate",
@@ -726,6 +757,11 @@ GATE_PROVENANCE: dict[str, Any] = {
 # ---------------------------------------------------------------------------
 # Closure vocabulary (task Section 20).
 # ---------------------------------------------------------------------------
+
+#: The ONLY governed terminal outcomes a completed locked trajectory may
+#: reach. ``HARNESS_ERROR`` is a harness failure, NOT a valid terminal
+#: outcome; ``evaluation_population_complete`` hard-gates it out.
+ALLOWED_TERMINAL_OUTCOMES: tuple[str, ...] = ("VERIFIED", "SUPPRESSED", "ABSTAINED")
 
 CLOSURE_STATES: tuple[str, ...] = (
     "M11_6_LOCKED_EVALUATION_PASS",

@@ -86,8 +86,15 @@ def evaluator_contract() -> dict[str, Any]:
 # Authorization verification (task Section 15).
 # ---------------------------------------------------------------------------
 
-def verify_authorization(authorization: dict[str, Any], manifest: dict[str, Any]) -> list[str]:
-    """Return the list of authorization violations (empty == authorized)."""
+def verify_authorization(
+    authorization: dict[str, Any], manifest: dict[str, Any], manifest_path: str | Path,
+) -> list[str]:
+    """Return the list of authorization violations (empty == authorized).
+
+    Authorization binds to the immutable committed manifest FILE bytes
+    (``materialization_manifest_file_sha256``), never to a canonical-dict hash
+    (which could be re-serialized and silently differ).
+    """
     violations: list[str] = []
     if authorization.get("authorization_consumed") is not False:
         violations.append("authorization_consumed must be false (one-time authorization)")
@@ -97,17 +104,25 @@ def verify_authorization(authorization: dict[str, Any], manifest: dict[str, Any]
         violations.append("locked_evaluation_authorized must be explicitly true (new authorization after materialization)")
     if authorization.get("design_freeze_commit_sha") != manifest.get("design_freeze_commit_sha"):
         violations.append("authorization design_freeze_commit_sha does not match the manifest")
-    if authorization.get("manifest_sha256") != sha256_file_manifest(manifest):
-        violations.append("authorization manifest_sha256 does not match the materialization manifest")
+    if authorization.get("manifest_sha256") != manifest_file_sha256(manifest_path):
+        violations.append("authorization manifest_sha256 does not match the materialization manifest FILE (file-byte SHA-256)")
     if authorization.get("finalist_checkpoint_sha256") != FINALIST["checkpoint"]:
         violations.append("authorization finalist checkpoint does not match the M11.2 frozen finalist")
     return violations
 
 
-def sha256_file_manifest(manifest: dict[str, Any]) -> str:
-    """Canonical hash of a manifest dict (not a file)."""
+def manifest_canonical_hash(manifest: dict[str, Any]) -> str:
+    """SHA-256 of the canonicalized manifest DICT (sorted keys, compact
+    separators). This is a canonical-dict hash, NOT a file-byte hash; it is
+    recorded under a distinct name and is never the authorization binding."""
     payload = json.dumps(manifest, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
+
+
+def manifest_file_sha256(manifest_path: str | Path) -> str:
+    """SHA-256 of the exact committed manifest FILE bytes. This is the
+    authoritative ``materialization_manifest_file_sha256`` binding value."""
+    return sha256_file(manifest_path)
 
 
 # ---------------------------------------------------------------------------
@@ -201,28 +216,138 @@ def compute_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def compute_safety_counters(rows: list[dict[str, Any]], *, identity_ok: bool) -> dict[str, int]:
+def compute_safety_counters(
+    rows: list[dict[str, Any]], *, identity_ok: bool,
+    global_counters: dict[str, int] | None = None,
+) -> dict[str, int]:
+    """Aggregate safety counters exactly once (correction #6).
+
+    Per-incident counters live on each row and are summed once; truly global
+    counters (finalist identity drift, silent v4 fallback, etc.) are merged
+    once via ``global_counters``. The trajectory runner must NOT attach a
+    single shared aggregate counter object to every row (that would multiply a
+    real violation by the population size). ``invariant_failures`` is read only
+    from each row's per-incident safety counters (the trajectory runner already
+    records it there); the ``invariants`` diagnostic dict is not a second,
+    independent counting source.
+    """
     counters = design.zero_safety_counters()
     for row in rows:
+        per_row = row.get("safety_counters") or {}
         for name in design.SAFETY_COUNTERS_TEMPLATE:
-            counters[name] += int(row.get("safety_counters", {}).get(name, 0))
+            counters[name] += int(per_row.get(name, 0))
+    for name, value in (global_counters or {}).items():
+        if name in counters:
+            counters[name] += int(value)
+    # finalist_identity_drift is global and authoritative from the identity check.
     counters["finalist_identity_drift"] = 0 if identity_ok else 1
-    # invariant_failures are recorded per-row by the trajectory runner; also
-    # surface any hard invariant violation as a counter.
-    for row in rows:
-        if any(value is False for value in (row.get("invariants") or {}).values()):
-            counters["invariant_failures"] += 1
     return counters
+
+
+def topology_incident_is_fail_closed(row: dict[str, Any]) -> bool:
+    """Correction #3: the frozen pre-result per-row fail-closed predicate for
+    one ``locked_topology_test`` incident.
+
+    Population presence is NOT a fail-closed test. A topology incident counts
+    as bounded/fail-closed only if ALL applicable already-governed safety and
+    authority conditions hold. The predicate uses only fields the trajectory
+    runner actually produces (outcome, invariants, per-incident safety
+    counters, approval/verification state) -- never a model-performance
+    threshold.
+    """
+    if not isinstance(row, dict):
+        return False
+    if row.get("split") != design.LOCKED_TOPOLOGY_TEST:
+        return False
+    # Row must have reached a governed terminal outcome, never a harness error.
+    if row.get("outcome") not in design.ALLOWED_TERMINAL_OUTCOMES:
+        return False
+    # Every per-incident safety/authority counter must be zero.
+    safety = row.get("safety_counters") or {}
+    if any(int(safety.get(name, 0)) != 0 for name in design.SAFETY_COUNTERS_TEMPLATE):
+        return False
+    # No recorded invariant failure.
+    if any(value is False for value in (row.get("invariants") or {}).values()):
+        return False
+    # An approved plan must have passed WNTR verification; an unverified plan
+    # must never be surfaced as approved/actionable.
+    if row.get("human_approved") and not (row.get("plans_verified") or 0):
+        return False
+    return True
+
+
+def compute_population_completeness(
+    rows: list[dict[str, Any]], manifest: dict[str, Any],
+) -> dict[str, Any]:
+    """Correction #5: the exact preregistered population-integrity gate.
+
+    Requires exactly 105 locked_final_test rows and 20 locked_topology_test
+    rows; every expected scenario ID exactly once; no unexpected, duplicate, or
+    missing IDs; no HARNESS_ERROR; and every row in an allowed terminal outcome.
+    """
+    expected = manifest.get("scenarios") or []
+    expected_ids = [entry["scenario_id"] for entry in expected]
+    expected_final_ids = [entry["scenario_id"] for entry in expected if entry.get("split") == design.LOCKED_FINAL_TEST]
+    expected_topology_ids = [entry["scenario_id"] for entry in expected if entry.get("split") == design.LOCKED_TOPOLOGY_TEST]
+    actual_ids = [row.get("scenario_id") for row in rows]
+    problems: list[str] = []
+
+    if len(expected_final_ids) != design.LOCKED_FINAL_TOTAL:
+        problems.append(f"manifest expects {len(expected_final_ids)} locked_final_test scenarios, must be {design.LOCKED_FINAL_TOTAL}")
+    if len(expected_topology_ids) != design.LOCKED_TOPOLOGY_TOTAL:
+        problems.append(f"manifest expects {len(expected_topology_ids)} locked_topology_test scenarios, must be {design.LOCKED_TOPOLOGY_TOTAL}")
+    if len(set(expected_ids)) != len(expected_ids):
+        problems.append("manifest contains duplicate scenario IDs")
+
+    if len(rows) != design.LOCKED_FINAL_TOTAL + design.LOCKED_TOPOLOGY_TOTAL:
+        problems.append(f"expected {design.LOCKED_FINAL_TOTAL + design.LOCKED_TOPOLOGY_TOTAL} rows, got {len(rows)}")
+    if len(set(actual_ids)) != len(actual_ids):
+        problems.append("duplicate scenario IDs in rows")
+    if set(actual_ids) != set(expected_ids):
+        problems.append("row scenario IDs do not match the manifest scenario IDs")
+
+    final_rows = [row for row in rows if row.get("split") == design.LOCKED_FINAL_TEST]
+    topology_rows = [row for row in rows if row.get("split") == design.LOCKED_TOPOLOGY_TEST]
+    if len(final_rows) != design.LOCKED_FINAL_TOTAL:
+        problems.append(f"expected {design.LOCKED_FINAL_TOTAL} locked_final_test rows, got {len(final_rows)}")
+    if len(topology_rows) != design.LOCKED_TOPOLOGY_TOTAL:
+        problems.append(f"expected {design.LOCKED_TOPOLOGY_TOTAL} locked_topology_test rows, got {len(topology_rows)}")
+
+    harness_errors = [row for row in rows if row.get("outcome") == "HARNESS_ERROR"]
+    if harness_errors:
+        problems.append(f"{len(harness_errors)} HARNESS_ERROR rows (not a valid terminal outcome)")
+    bad_outcomes = [row for row in rows if row.get("outcome") not in design.ALLOWED_TERMINAL_OUTCOMES]
+    if bad_outcomes:
+        problems.append(f"{len(bad_outcomes)} rows outside the allowed terminal outcomes")
+
+    def _split_complete(subset: list[dict[str, Any]], expected_count: int) -> bool:
+        return (
+            len(subset) == expected_count
+            and all(row.get("outcome") in design.ALLOWED_TERMINAL_OUTCOMES for row in subset)
+        )
+
+    return {
+        "overall_complete": not problems,
+        "locked_final_complete": _split_complete(final_rows, design.LOCKED_FINAL_TOTAL),
+        "locked_topology_complete": _split_complete(topology_rows, design.LOCKED_TOPOLOGY_TOTAL),
+        "expected_final": design.LOCKED_FINAL_TOTAL,
+        "expected_topology": design.LOCKED_TOPOLOGY_TOTAL,
+        "problems": problems,
+    }
 
 
 def compute_gates(
     *, metrics: dict[str, Any], safety: dict[str, int], identity_ok: bool,
-    manifest_ok: bool, novelty_ok: bool,
+    manifest_ok: bool, novelty_ok: bool, rows: list[dict[str, Any]],
+    manifest: dict[str, Any],
 ) -> dict[str, Any]:
-    """Apply the frozen hard gates (task Section 17). No post-hoc thresholds."""
+    """Apply the frozen hard gates (task Section 17) with split-specific
+    scoping (correction #7). No post-hoc thresholds."""
+    completeness = compute_population_completeness(rows, manifest)
     final_coverage = metrics["locked_final_test"]["source"]["coverage"]["rate"]
-    topology_rows = metrics["locked_topology_test"]["source"]["n"]
-    checks: dict[str, Any] = {
+    topology_rows = [row for row in rows if row.get("split") == design.LOCKED_TOPOLOGY_TEST]
+
+    global_checks: dict[str, Any] = {
         "finalist_identity": identity_ok and safety["finalist_identity_drift"] == 0,
         "manifest_hashes": manifest_ok,
         "safety_counters_zero": all(safety[name] == 0 for name in design.SAFETY_COUNTERS_TEMPLATE),
@@ -230,23 +355,42 @@ def compute_gates(
         "no_v4_fallback": safety["silent_v4_fallback"] == 0,
         "sample_budget": safety["sampling_budget_exceeded"] == 0,
         "no_unsafe_action": safety["unverified_plan_surfaced_as_actionable"] == 0 and safety["rejected_plan_surfaced_as_safe"] == 0,
-        "locked_final_calibration_coverage": final_coverage is not None and final_coverage >= design.OPERATIONAL_COVERAGE_FLOOR,
-        "locked_topology_fail_closed": topology_rows > 0,
-        "topology_novelty": novelty_ok,
+        "evaluation_population_complete": completeness["overall_complete"],
     }
+    final_checks: dict[str, Any] = {
+        "locked_final_complete": completeness["locked_final_complete"],
+        "locked_final_calibration_coverage": final_coverage is not None and final_coverage >= design.OPERATIONAL_COVERAGE_FLOOR,
+    }
+    topology_checks: dict[str, Any] = {
+        "locked_topology_complete": completeness["locked_topology_complete"],
+        "topology_novelty": novelty_ok,
+        "locked_topology_fail_closed": bool(topology_rows) and all(topology_incident_is_fail_closed(row) for row in topology_rows),
+    }
+
+    checks: dict[str, Any] = {**global_checks, **final_checks, **topology_checks}
+    global_pass = all(global_checks.values())
+    final_pass = global_pass and all(final_checks.values())
+    topology_pass = global_pass and all(topology_checks.values())
     return {
         "kind": "M11_6_GATE",
         "checks": checks,
-        "all_checks_pass": all(checks.values()),
+        "global_pass": global_pass,
+        "locked_final_pass": final_pass,
+        "locked_topology_pass": topology_pass,
+        "all_checks_pass": final_pass and topology_pass,
         "coverage_floor": design.OPERATIONAL_COVERAGE_FLOOR,
         "descriptive_metrics": design.GATE_PROVENANCE["descriptive_non_gating"],
+        "completeness": completeness,
     }
 
 
 def compute_closure(
     *, gates: dict[str, Any], crashed_after_open: bool, opened: bool,
 ) -> dict[str, Any]:
-    """Frozen closure semantics (task Section 20)."""
+    """Frozen closure semantics (task Section 20) with split-specific results
+    (correction #7): locked_final_result and locked_topology_result are
+    computed independently from their own gates, never from the single overall
+    gate result."""
     if crashed_after_open:
         state = "M11_6_LOCKED_EVALUATION_CRASHED_AFTER_OPEN"
     elif not opened:
@@ -255,11 +399,19 @@ def compute_closure(
         state = "M11_6_LOCKED_EVALUATION_PASS"
     else:
         state = "M11_6_LOCKED_EVALUATION_FAIL"
+
+    if not opened or crashed_after_open:
+        final_result = "NOT_EVALUATED"
+        topology_result = "NOT_EVALUATED"
+    else:
+        final_result = "M11_6_LOCKED_FINAL_PASS" if gates["locked_final_pass"] else "M11_6_LOCKED_FINAL_FAIL"
+        topology_result = "M11_6_LOCKED_TOPOLOGY_PASS" if gates["locked_topology_pass"] else "M11_6_LOCKED_TOPOLOGY_FAIL"
+
     return {
         "kind": "M11_6_CLOSURE",
         "closure_state": state,
-        "locked_final_result": "M11_6_LOCKED_FINAL_PASS" if (opened and gates["all_checks_pass"]) else ("M11_6_LOCKED_FINAL_FAIL" if opened else "NOT_EVALUATED"),
-        "locked_topology_result": "M11_6_LOCKED_TOPOLOGY_PASS" if (opened and gates["all_checks_pass"]) else ("M11_6_LOCKED_TOPOLOGY_FAIL" if opened else "NOT_EVALUATED"),
+        "locked_final_result": final_result,
+        "locked_topology_result": topology_result,
         "no_retry_after_fail": True,
         "no_finalist_change_allowed": True,
     }
@@ -295,12 +447,127 @@ def result_schema() -> dict[str, Any]:
 # Locked execution path (guarded; NOT exercised in M11.6A-1).
 # ---------------------------------------------------------------------------
 
-def acquire_locked_open(*, authorization: dict[str, Any], manifest: dict[str, Any]) -> dict[str, Any]:
-    """Verify everything, then atomically create the one-time OPENED record.
+def verify_materialized_artifacts(
+    manifest: dict[str, Any], repo_root: Path, expected_design_freeze_sha: str,
+) -> list[str]:
+    """Correction #4: mechanically recompute every materialized artifact hash
+    BEFORE the locked test is opened (distinct from manifest schema validation).
+    Returns the list of violations (empty == verified). Never auto-repairs or
+    regenerates files.
+    """
+    violations: list[str] = []
+
+    # 15. manifest design-freeze SHA matches the expected frozen design SHA.
+    if manifest.get("design_freeze_commit_sha") != expected_design_freeze_sha:
+        violations.append("manifest design_freeze_commit_sha does not match the expected frozen design SHA")
+
+    # 1. every path in artifact_sha256 exists and its file SHA-256 matches.
+    for rel_path, expected_sha in (manifest.get("artifact_sha256") or {}).items():
+        path = repo_root / rel_path
+        if not path.exists():
+            violations.append(f"artifact missing: {rel_path}")
+            continue
+        if sha256_file(path) != expected_sha:
+            violations.append(f"artifact hash mismatch: {rel_path}")
+
+    # 2-5. topology files (procedural .inp + referenced known families) exist
+    # and match their recorded hashes.
+    for entry in manifest.get("topologies") or []:
+        rel_path = entry.get("file_path")
+        expected_sha = entry.get("file_sha256")
+        if not rel_path or not expected_sha:
+            violations.append(f"topology entry missing file_path/file_sha256: {entry.get('topology_id')}")
+            continue
+        path = repo_root / rel_path
+        if not path.exists():
+            violations.append(f"topology file missing: {rel_path}")
+            continue
+        if sha256_file(path) != expected_sha:
+            violations.append(f"topology file hash mismatch: {rel_path}")
+
+    # 6-9. scenario JSONL contents correspond exactly to manifest scenario IDs,
+    # with no duplicate IDs and matching split counts. The JSONL paths are
+    # located from artifact_sha256 (the authoritative content-addressed record),
+    # not hardcoded.
+    expected_by_split: dict[str, set[str]] = {split: set() for split in design.LOCKED_SPLIT_NAMES}
+    for entry in manifest.get("scenarios") or []:
+        expected_by_split.setdefault(entry.get("split"), set()).add(entry.get("scenario_id"))
+    for split in design.LOCKED_SPLIT_NAMES:
+        matching = [
+            rel for rel in (manifest.get("artifact_sha256") or {})
+            if rel.endswith(f"/{split}/scenarios.jsonl")
+        ]
+        if len(matching) != 1:
+            violations.append(f"expected exactly one scenario JSONL artifact for {split}, got {len(matching)}")
+            continue
+        jsonl = repo_root / matching[0]
+        if not jsonl.exists():
+            violations.append(f"scenario JSONL missing: {matching[0]}")
+            continue
+        actual_ids: list[str] = []
+        try:
+            for line in jsonl.read_text(encoding="utf-8").splitlines():
+                if not line.strip():
+                    continue
+                definition = json.loads(line)
+                actual_ids.append(design.scenario_definition_hash(definition))
+        except (OSError, json.JSONDecodeError) as error:
+            violations.append(f"scenario JSONL unreadable/invalid: {matching[0]}: {error}")
+            continue
+        if len(set(actual_ids)) != len(actual_ids):
+            violations.append(f"duplicate scenario IDs in {matching[0]}")
+        if set(actual_ids) != expected_by_split.get(split, set()):
+            violations.append(f"scenario IDs in {matching[0]} do not match the manifest for {split}")
+
+    # 8-9. expected split counts and expected topology count.
+    splits = manifest.get("splits") or {}
+    if (splits.get(design.LOCKED_FINAL_TEST) or {}).get("count") != design.LOCKED_FINAL_TOTAL:
+        violations.append(f"locked_final_test manifest count must be {design.LOCKED_FINAL_TOTAL}")
+    if (splits.get(design.LOCKED_TOPOLOGY_TEST) or {}).get("count") != design.LOCKED_TOPOLOGY_TOTAL:
+        violations.append(f"locked_topology_test manifest count must be {design.LOCKED_TOPOLOGY_TOTAL}")
+    procedural = [t for t in (manifest.get("topologies") or []) if str(t.get("topology_id", "")).startswith("locked-topology:")]
+    if len(procedural) != design.LOCKED_TOPOLOGY_INSTANCES:
+        violations.append(f"expected {design.LOCKED_TOPOLOGY_INSTANCES} procedural topologies, got {len(procedural)}")
+
+    # 10-14. design protocol + generator + materializer + topology-generator +
+    # evaluator source hashes match the frozen code on disk.
+    if manifest.get("design_protocol_sha256") != design.design_hash():
+        violations.append("design_protocol_sha256 does not match the frozen design code")
+    generator_sources = manifest.get("generator_source_sha256") or {}
+    source_files = {
+        "m11_6a_design.py": repo_root / "scripts/hydrocore_v5/m11_6a_design.py",
+        "m11_6a_topology.py": repo_root / "scripts/hydrocore_v5/m11_6a_topology.py",
+        "run_m11_6a_materialize.py": repo_root / "scripts/hydrocore_v5/run_m11_6a_materialize.py",
+    }
+    for name, path in source_files.items():
+        expected = generator_sources.get(name)
+        if expected is None:
+            violations.append(f"generator_source_sha256 missing {name}")
+        elif not path.exists() or sha256_file(path) != expected:
+            violations.append(f"generator source hash mismatch: {name}")
+    evaluator_sources = manifest.get("evaluator_source_sha256") or {}
+    evaluator_name = "run_m11_6_locked_evaluation.py"
+    evaluator_path = repo_root / "scripts/hydrocore_v5" / evaluator_name
+    expected_eval = evaluator_sources.get(evaluator_name)
+    if expected_eval is None:
+        violations.append(f"evaluator_source_sha256 missing {evaluator_name}")
+    elif not evaluator_path.exists() or sha256_file(evaluator_path) != expected_eval:
+        violations.append("evaluator source hash mismatch")
+
+    return violations
+
+
+def acquire_locked_open(
+    *, authorization: dict[str, Any], manifest: dict[str, Any],
+    manifest_path: str | Path,
+) -> dict[str, Any]:
+    """Verify everything (including on-disk materialization integrity), then
+    atomically create the one-time OPENED record.
 
     Raises ``design.LockedAlreadyOpened`` if the record already exists; raises
     ``RuntimeError`` on any pre-open verification failure (authorization,
-    identity, manifest, already-opened). There is no --force/--reset.
+    identity, manifest schema, materialized-artifact hashes, already-opened).
+    There is no --force/--reset.
     """
 
     state = design.LockedRunState(OPENED_RECORD_PATH)
@@ -318,7 +585,13 @@ def acquire_locked_open(*, authorization: dict[str, Any], manifest: dict[str, An
     if violations:
         raise RuntimeError(f"locked manifest failed validation: {violations}")
 
-    auth_violations = verify_authorization(authorization, manifest)
+    artifact_violations = verify_materialized_artifacts(
+        manifest, ROOT, authorization.get("design_freeze_commit_sha"),
+    )
+    if artifact_violations:
+        raise RuntimeError(f"materialized artifact verification failed: {artifact_violations}")
+
+    auth_violations = verify_authorization(authorization, manifest, manifest_path)
     if auth_violations:
         raise RuntimeError(f"authorization verification failed: {auth_violations}")
 
@@ -326,7 +599,7 @@ def acquire_locked_open(*, authorization: dict[str, Any], manifest: dict[str, An
         run_id=hashlib.sha256(json.dumps(manifest, sort_keys=True, default=str).encode()).hexdigest()[:32],
         code_under_test_sha=current_commit(),
         design_freeze_sha=manifest["design_freeze_commit_sha"],
-        materialization_manifest_sha=sha256_file_manifest(manifest),
+        materialization_manifest_sha=manifest_file_sha256(manifest_path),
         finalist_checkpoint_sha=FINALIST["checkpoint"],
         calibration_sha=FINALIST["calibration"],
         release_manifest_sha=FINALIST["manifest"],
@@ -374,7 +647,9 @@ def main() -> int:
 
     # Pre-open verification; atomically open (or refuse).
     try:
-        opened = acquire_locked_open(authorization=authorization, manifest=manifest)
+        opened = acquire_locked_open(
+            authorization=authorization, manifest=manifest, manifest_path=manifest_path,
+        )
     except (design.LockedAlreadyOpened, RuntimeError) as error:
         output_dir.mkdir(parents=True, exist_ok=True)
         closure = compute_closure(gates={"all_checks_pass": False}, crashed_after_open=False, opened=False)
@@ -403,10 +678,16 @@ def main() -> int:
     identity_ok = verify_finalist_identity()
     metrics = compute_metrics(rows)
     safety = compute_safety_counters(rows, identity_ok=identity_ok)
+    manifest_ok = (
+        not design.validate_manifest(manifest)
+        and not verify_materialized_artifacts(
+            manifest, ROOT, authorization.get("design_freeze_commit_sha"),
+        )
+    )
     gates = compute_gates(
         metrics=metrics, safety=safety, identity_ok=identity_ok,
-        manifest_ok=not design.validate_manifest(manifest),
-        novelty_ok=(manifest.get("novelty_audit") or {}).get("result") == "PASS",
+        manifest_ok=manifest_ok, novelty_ok=(manifest.get("novelty_audit") or {}).get("result") == "PASS",
+        rows=rows, manifest=manifest,
     )
     closure = compute_closure(gates=gates, crashed_after_open=crashed_after_open, opened=True)
 
@@ -442,7 +723,10 @@ def _reconstruct_scenario(definition: dict[str, Any], manifest: dict[str, Any]) 
         seed=definition["seed"],
         network_id=definition["network_family"],
         network_family=definition["network_family"],
-        split=DatasetSplit.DEVELOPMENT_HOLDOUT,
+        # Correction #2: locked scenario reconstruction uses the TEST split
+        # role (the locked final test), never DEVELOPMENT_HOLDOUT (the
+        # disposable development-iteration surface).
+        split=DatasetSplit.TEST,
         stage=CurriculumStage(generator_config.pop("stage", "operational")),
         event_type=EventType(definition.get("event_type", "contamination")),
         source_node=definition["source_node"],
@@ -594,7 +878,6 @@ def run_locked_trajectories(manifest: dict[str, Any], output_dir: Path) -> list[
                 definitions_by_hash[design.scenario_definition_hash(definition)] = definition
 
     factory = V5PipelineFactory(ROOT / FINALIST["release_bundle"], project_root=ROOT)
-    safety = design.zero_safety_counters()
     rows: list[dict[str, Any]] = []
     with tempfile.TemporaryDirectory(prefix="hydroswarm-m11-6-") as temporary:
         tmp = Path(temporary)
@@ -614,24 +897,33 @@ def run_locked_trajectories(manifest: dict[str, Any], output_dir: Path) -> list[
                 network_path = ROOT / topology_entry["file_path"]
                 imported = client.post("/api/networks/import", files={"file": (network_path.name, network_path.read_bytes(), "application/octet-stream")})
                 if imported.status_code != 201:
-                    rows.append({"split": definition["split"], "scenario_index": definition["scenario_index"], "outcome": "HARNESS_ERROR", "http_status": imported.status_code})
+                    rows.append({
+                        "split": definition["split"], "scenario_index": definition["scenario_index"],
+                        "scenario_id": scenario_entry["scenario_id"],
+                        "topology_id": definition["topology_id"], "network_family": definition["network_family"],
+                        "seed": definition["seed"], "condition_kind": definition["condition_kind"],
+                        "outcome": "HARNESS_ERROR", "http_status": imported.status_code,
+                        "safety_counters": design.zero_safety_counters(),
+                    })
                     continue
                 network_id = imported.json()["network_id"]
+                # Correction #6: a FRESH per-incident safety counter dict per
+                # row -- never one shared global aggregate object attached to
+                # every row (which would multiply a violation by population size).
+                row_safety = design.zero_safety_counters()
                 row = _run_single_incident(
                     client=client, network_path=network_path, network_id=network_id,
                     scenario=scenario, randomized=randomized, source_node=source_node,
-                    condition=condition, safety=safety, maximum_samples=design.MAXIMUM_SAMPLES,
+                    condition=condition, safety=row_safety, maximum_samples=design.MAXIMUM_SAMPLES,
                 )
                 row.update({
                     "split": definition["split"], "scenario_index": definition["scenario_index"],
+                    "scenario_id": scenario_entry["scenario_id"],
                     "topology_id": definition["topology_id"], "network_family": definition["network_family"],
                     "seed": definition["seed"], "condition_kind": definition["condition_kind"],
+                    "safety_counters": row_safety,
                 })
                 rows.append(row)
-    # Attach the global safety counters (identity drift / v4 fallback are
-    # global, not per-incident).
-    for row in rows:
-        row["safety_counters"] = dict(safety)
     return rows
 
 

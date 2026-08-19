@@ -2,14 +2,14 @@
   "authorization_consumed": false,
   "dataset_materialized": false,
   "design_file_hashes": {
-    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "508a0e95baa8a9a0323d08ddb905f579c3a01de15ef074ea5d50f0ed78ab117b",
-    "scripts/hydrocore_v5/m11_6a_design.py": "5e2b69abda572758e78066c80d2fa134c5fecb77780199ef9be69bf9059319de",
+    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "d4ef7b45d04a8af88de97b8f8de2d20eabcdb3af9cece5cf6a236f0f8ab979c9",
+    "scripts/hydrocore_v5/m11_6a_design.py": "5cc0521f8369a034210f43228d93fe0fe7f757132b2c42e60aa29b95d2aa80e5",
     "scripts/hydrocore_v5/m11_6a_topology.py": "bdae63f25d3db16adc9d322297049639c2875f4104f04a574ab8e083c9e82947",
-    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "f477fb5b634116e0ad5cd147e5295d8dec5cc409b29d3a2cba367399802fe67a",
-    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "3f1ab70b98e8bec5694463d9f202426f3efb2ac2a4b2416614f067a5fd0d3bff"
+    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "073af8bda7e914ec2942cf84a790de36befdd2b256b132691992263187a9ab49",
+    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "6c57c90dc66f0c931a6fffdfb35e0da0e3927285d69e985e5c67c9242f1f1193"
   },
   "design_frozen": true,
-  "design_hash": "1e074d8766882d56d6114efb3b3cca02de3c007c24e234f22e686f7446a86d89",
+  "design_hash": "aca43d76d483b04e4b598ffb5541ac152b2382161c9e9c71f0f5966afff6e901",
   "does_not_claim_real_locked_manifest_hash": true,
   "final_locked_seed_derived": false,
   "finalist_evaluated_on_locked": false,
@@ -27,16 +27,18 @@
   "locked_open_count": 0,
   "locked_test_opened": false,
   "m11_6_blocker_closure_preserved": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "manifest_file_sha256_binding": "Authorization binds to materialization_manifest_file_sha256 (SHA-256 of the exact committed manifest FILE bytes); the canonical-dict hash is recorded separately as manifest_canonical_hash and is never the authorization binding.",
+  "materialization_must_use_this_commit": true,
   "milestone": "M11.6A-1",
-  "next_action": "M11_6A_2_MATERIALIZE_FROM_FROZEN_DESIGN",
+  "next_action": "M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN",
   "preflight": {
     "authorization_consumed": false,
     "blocker_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
     "branch": "exp/hydrocore-v5-causal",
-    "design_hash": "1e074d8766882d56d6114efb3b3cca02de3c007c24e234f22e686f7446a86d89",
+    "design_hash": "aca43d76d483b04e4b598ffb5541ac152b2382161c9e9c71f0f5966afff6e901",
     "expected_blocker_head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
     "frozen_finalist_identity_verified": true,
-    "head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
+    "head": "62bf1326081fac9080c3d676827c9596d2379efb",
     "kind": "M11_6A_DESIGN_PREFLIGHT",
     "locked_evaluation_authorized": false,
     "locked_open_count_at_start": 0,
@@ -53,5 +55,6 @@
     "locked_final_master": "H(\"HYDROSWARM|M11.6|LOCKED_FINAL|v1|\" + DESIGN_FREEZE_COMMIT_SHA)",
     "locked_topology_master": "H(\"HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|\" + DESIGN_FREEZE_COMMIT_SHA)"
   },
-  "seed_derivation_rule_version": "v1"
+  "seed_derivation_rule_version": "v1",
+  "supersedes_design_freeze_commit": "62bf1326081fac9080c3d676827c9596d2379efb"
 }

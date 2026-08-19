@@ -124,12 +124,20 @@ def design_freeze_record(preflight: dict[str, Any]) -> dict[str, Any]:
         "locked_test_opened": False,
         "locked_evaluation_authorized": False,
         "authorization_consumed": False,
-        "next_action": "M11_6A_2_MATERIALIZE_FROM_FROZEN_DESIGN",
+        "next_action": "M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN",
         "design_hash": design.design_hash(),
         "seed_derivation_rule_version": design.SEED_RULE_VERSION,
         "seed_derivation_formula": design.seed_derivation_spec()["master_formula"],
         "design_file_hashes": {relative(path): sha256_file(path) for path in design_files},
         "m11_6_blocker_closure_preserved": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+        "supersedes_design_freeze_commit": design.SUPERSEDED_DESIGN_FREEZE_COMMIT,
+        "materialization_must_use_this_commit": True,
+        "manifest_file_sha256_binding": (
+            "Authorization binds to materialization_manifest_file_sha256 (SHA-256 "
+            "of the exact committed manifest FILE bytes); the canonical-dict hash "
+            "is recorded separately as manifest_canonical_hash and is never the "
+            "authorization binding."
+        ),
         "preflight": preflight,
         "finalist_identity": {
             "system": evaluator.FINALIST["system"],

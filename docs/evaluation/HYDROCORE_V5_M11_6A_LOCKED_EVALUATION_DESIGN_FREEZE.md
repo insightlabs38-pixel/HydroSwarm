@@ -1,9 +1,14 @@
-# HydroCore-v5 M11.6A-1 — Locked Evaluation Design Freeze
+# HydroCore-v5 M11.6A-1 — Locked Evaluation Design Freeze (CORRECTED)
 
 Status: FROZEN before any locked population exists. This document records the
 exact design that a DIFFERENT, fresh session will use to materialize the real
 locked population (M11.6A-2) and, later, to run the one-time M11.6 locked
 evaluation. It is NOT M11.6 execution.
+
+This document is the CORRECTED design freeze. It supersedes the original
+M11.6A-1 design-freeze commit `62bf1326081fac9080c3d676827c9596d2379efb`;
+the correction commit is the ONLY authorized design-freeze SHA for M11.6A-2
+materialization (`materialization_must_use_this_commit = true`).
 
 This task materializes nothing, derives no final seed, and never evaluates the
 finalist on locked data. The authoritative machine-readable payload is
@@ -50,7 +55,11 @@ v4 fallback.
 - `locked_topology_master = H("HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|" + DESIGN_FREEZE_COMMIT_SHA)`
 
 Per-item seeds: `material = f"{master_hex}|{label}|{index}|{counter}"` (UTF-8),
-`seed = int(SHA256(material).hexdigest(), 16) % 2**62` (range `[0, 2**62)`).
+`seed = 2**31 + int(SHA256(material).hexdigest(), 16) % (2**62 - 2**31)`
+(range `[2**31, 2**62)`). This range is disjoint from every prior seed
+namespace BY CONSTRUCTION (all prior namespaces are `< 2**31`; the interval
+`[0, 2**31)` is entirely excluded — the original `[0, 2**62)` range was
+incorrect because it CONTAINS `[0, 2**31)`).
 `counter=0` is the primary derivation; a positive counter is the deterministic
 next-candidate for rejection sampling and the frozen collision procedure.
 Domain labels: `FINAL_SCENARIO` and `TOPOLOGY_TEST_SCENARIO` /
@@ -121,12 +130,13 @@ mechanical rule (no vague "looks different" judgment).
 
 Every locked scenario is identified by (split role, topology identity, seed,
 scenario_id, canonical scenario-definition hash). Non-overlap is guaranteed by:
-(1) derived seeds in `[0, 2**62)` are disjoint from every prior seed namespace
-(all `< 2**31`); (2) locked_final_test uses only the allowed known families with
-fresh derived seeds; (3) locked_topology_test uses only novelty-verified
-procedural topologies; (4) the canonical scenario-definition hash is unique per
-scenario. A collision triggers only the preregistered deterministic collision
-procedure (increment counter, re-derive; max 100 retries; then BLOCK).
+(1) derived seeds in `[2**31, 2**62)` are disjoint from every prior seed
+namespace (all `< 2**31`) BY CONSTRUCTION; (2) locked_final_test uses only the
+allowed known families with fresh derived seeds; (3) locked_topology_test uses
+only novelty-verified procedural topologies; (4) the canonical
+scenario-definition hash is unique per scenario. A collision triggers only the
+preregistered deterministic collision procedure (increment counter, re-derive;
+max 100 retries; then BLOCK).
 
 ## 7. Simulator / ground-truth authority
 
@@ -183,15 +193,34 @@ evidence is recorded and the run stops for human review. There is no resume.
 Metrics reuse the M10.4 frozen vocabulary (top-1/top-3/MRR, coverage,
 candidate-set size, actionable/abstention, scout sample count/benefit, planning
 verification/approval, safety counters, topology-shift predictive metrics).
-Hard gates (with provenance) are: exact finalist identity; exact manifest/hash
-match; all 15 safety counters zero; finite outputs; no v4 fallback; sample-budget
-compliance; no unsafe/unverified action surfaced; locked_final_test known-family
-coverage ≥ the frozen M9 0.85 floor; locked_topology_test fail-closed; topology
-novelty verified. Everything else is `DESCRIPTIVE_NON_GATING`. Closure
+Hard gates (with provenance) are split-scoped:
+
+- **global** (both splits + overall closure): exact finalist identity; exact
+  manifest + recomputed artifact/source hash match; all 15 safety counters
+  zero; finite outputs; no v4 fallback; sample-budget compliance; no
+  unsafe/unverified action surfaced; and `evaluation_population_complete`
+  (exactly 105 + 20 rows; every expected scenario ID exactly once; no
+  HARNESS_ERROR; every row in an allowed terminal outcome
+  `VERIFIED`/`SUPPRESSED`/`ABSTAINED`).
+- **locked_final_test**: 105 complete rows; known-family empirical coverage ≥
+  the frozen M9 0.85 floor.
+- **locked_topology_test**: 20 complete rows; topology novelty verified; every
+  topology incident satisfies the per-row fail-closed predicate
+  `topology_incident_is_fail_closed(row)` (row exists, no HARNESS_ERROR, finite
+  decision, zero per-incident safety/authority counters, no invariant failure,
+  no approved-but-unverified plan). Population presence is NOT fail-closed.
+
+`locked_final_result` and `locked_topology_result` are computed independently
+from their own gates (plus the global gates); the overall M11.6 closure requires
+every applicable gate. Everything not gated is `DESCRIPTIVE_NON_GATING`. Closure
 vocabulary: `M11_6_LOCKED_EVALUATION_PASS`,
 `M11_6_LOCKED_EVALUATION_FAIL`,
 `M11_6_LOCKED_EVALUATION_CRASHED_AFTER_OPEN`, `M11_6_BLOCKED_PRE_OPEN`. No state
 permits changing the finalist and retrying.
+
+Authorization binds to `materialization_manifest_file_sha256` (SHA-256 of the
+exact committed manifest file bytes), never to a canonical-dict hash (which is
+recorded separately as `manifest_canonical_hash`).
 
 ## 12. Known limitations carried forward (not erased)
 
@@ -208,4 +237,24 @@ these.
 `finalist_evaluated_on_locked=false`, `locked_open_count=0`,
 `locked_test_opened=false`, `locked_evaluation_authorized=false`,
 `authorization_consumed=false`,
-`next_action = M11_6A_2_MATERIALIZE_FROM_FROZEN_DESIGN`.
+`supersedes_design_freeze_commit = 62bf1326081fac9080c3d676827c9596d2379efb`,
+`materialization_must_use_this_commit = true`,
+`next_action = M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN`.
+
+## 14. Corrections applied (pre-materialization integrity/governance only)
+
+1. Seed range made disjoint by construction: `[2**31, 2**62)` (was `[0, 2**62)`,
+   which contains `[0, 2**31)`).
+2. Locked scenario reconstruction uses `DatasetSplit.TEST` (was
+   `DEVELOPMENT_HOLDOUT`).
+3. Real per-row topology fail-closed predicate replaces "topology rows > 0".
+4. `verify_materialized_artifacts()` recomputes every artifact/source hash
+   before OPENED (was schema-only).
+5. `evaluation_population_complete` hard gate (exactly 105 + 20, no
+   HARNESS_ERROR, allowed terminal outcomes).
+6. Safety counters aggregated exactly once (per-incident summed once, global
+   merged once; no shared aggregate × population size).
+7. Split-specific `locked_final_result` / `locked_topology_result`.
+8. Manifest file-byte SHA (`materialization_manifest_file_sha256`) is the
+   authorization binding; canonical-dict hash recorded separately.
+9. The correction commit supersedes the original design-freeze commit.

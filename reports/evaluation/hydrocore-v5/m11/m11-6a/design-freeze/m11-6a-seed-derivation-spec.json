@@ -1,11 +1,12 @@
 {
   "allowed_integer_range": [
-    0,
+    2147483648,
     4611686018427387903
   ],
   "byte_encoding": "utf-8",
   "collision_handling": "If a derived seed collides with a seed already used in the same materialization (or a canonical scenario-definition hash collides with a prior hash), increment `counter` and re-derive deterministically. Never select a different example manually, never call OS randomness, and never preview candidate seeds.",
-  "digest_to_integer": "int(SHA256(material).hexdigest(), 16) % SEED_MODULUS",
+  "digest_to_integer": "LOCKED_SEED_MIN + int(SHA256(material).hexdigest(), 16) % LOCKED_SEED_SPAN",
+  "disjoint_by_construction": "Every derived seed is >= 2**31; every prior governed seed namespace is < 2**31, so the derived range [2**31, 2**62) is mechanically disjoint from all prior namespaces.",
   "hash_algorithm": "sha256",
   "kind": "M11_6A_SEED_DERIVATION_SPEC",
   "labels": {
@@ -35,12 +36,14 @@
       "split": "locked_topology_test"
     }
   },
+  "locked_seed_max_exclusive": 4611686018427387904,
+  "locked_seed_min": 2147483648,
+  "locked_seed_span": 4611686016279904256,
   "master_formula": {
     "locked_final_master": "H(\"HYDROSWARM|M11.6|LOCKED_FINAL|v1|\" + DESIGN_FREEZE_COMMIT_SHA)",
     "locked_topology_master": "H(\"HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|\" + DESIGN_FREEZE_COMMIT_SHA)"
   },
   "max_collision_retries": 100,
   "per_seed_material": "f\"{master_hex}|{label}|{index}|{counter}\"",
-  "rule_version": "v1",
-  "seed_modulus": 4611686018427387904
+  "rule_version": "v1"
 }

@@ -12,9 +12,9 @@
   "m11_5_state": "M11_5_FULL_VALIDATION_PASS",
   "m11_6_preconditions_satisfied": true,
   "m11_6_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
-  "m11_6a_design_state": "M11_6A_DESIGN_FROZEN",
+  "m11_6a_design_state": "M11_6A_DESIGN_FROZEN_CORRECTED",
   "m11_6a_design_freeze_path": "reports/evaluation/hydrocore-v5/m11/m11-6a/design-freeze/m11-6a-design-freeze.json",
-  "next_action": "M11_6A_2_MATERIALIZE_FROM_FROZEN_DESIGN",
+  "next_action": "M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN",
   "next_authorized_milestone": null,
   "tuning_closed": true
 }
