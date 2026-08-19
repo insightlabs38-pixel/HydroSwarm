@@ -18,7 +18,7 @@
   "m11_6_blocker_resolved_by_materialization": true,
   "m11_6_historical_blocker": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
   "m11_6_preconditions_satisfied": true,
-  "m11_6_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "m11_6_state": "M11_6_NOT_EXECUTED_AWAITING_AUTHORIZATION",
   "m11_6a_design_freeze_path": "reports/evaluation/hydrocore-v5/m11/m11-6a/design-freeze/m11-6a-design-freeze.json",
   "m11_6a_design_state": "M11_6A_DESIGN_FROZEN_CORRECTED",
   "m11_6a_materialization_evidence_path": "reports/evaluation/hydrocore-v5/m11/m11-6a/materialization/m11-6a-2-closure.json",
