@@ -1,0 +1,34 @@
+{
+  "kind": "M11_6_POST_RUN_GOVERNANCE",
+  "authorization_artifact": "reports/evaluation/hydrocore-v5/m11/m11-6/m11-6-execution-authorization.json",
+  "authorization_artifact_preserved_unchanged": true,
+  "authorization_consumed": true,
+  "authorized_openings": 1,
+  "locked_open_count": 1,
+  "locked_test_opened": true,
+  "m11_6_actual_evaluation_executed": true,
+  "m11_6_state": "M11_6_LOCKED_EVALUATION_PASS",
+  "locked_final_result": "M11_6_LOCKED_FINAL_PASS",
+  "locked_topology_result": "M11_6_LOCKED_TOPOLOGY_PASS",
+  "run_id": "21d4723a27d87320c54bbc089e751786",
+  "opened_record": "reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-opened-record.json",
+  "raw_row_counts": {
+    "locked_final_test": 105,
+    "locked_topology_test": 20,
+    "total": 125
+  },
+  "population_complete": true,
+  "terminal_evidence": [
+    "m11-6-opened-record.json",
+    "m11-6-raw-incidents.jsonl",
+    "m11-6-metrics.json",
+    "m11-6-gate.json",
+    "m11-6-safety-counters.json",
+    "m11-6-closure.json"
+  ],
+  "post_locked_tuning": false,
+  "locked_rerun": false,
+  "no_retry_or_resume": true,
+  "no_manifest_or_dataset_changes": true,
+  "no_code_or_evaluator_changes": true
+}

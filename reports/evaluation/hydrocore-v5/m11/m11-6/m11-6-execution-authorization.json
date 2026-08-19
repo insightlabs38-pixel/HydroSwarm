@@ -1,0 +1,22 @@
+{
+  "kind": "M11_6_EXECUTION_AUTHORIZATION",
+  "locked_evaluation_authorized": true,
+  "authorization_consumed": false,
+  "authorized_openings": 0,
+  "design_freeze_commit_sha": "3568ecdc49c41f765f92460574dae0433e47d684",
+  "materialization_commit_sha": "0612a4108aa0b92ff178491fd1d3bace9ae822b1",
+  "manifest_path": "data/locked/m11-6/m11-6-materialization-manifest.json",
+  "manifest_sha256": "62c21f3d75921068dd045cff07eb33729caf70192fd841502531ad201c9dbedb",
+  "finalist_system": "HydroCore-v5 M10 frozen release",
+  "finalist_seed": 20260814,
+  "finalist_checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+  "calibration_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+  "calibration_artifact_sha256": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "code_under_test_sha": "4a9d6b0ab38aa40e61797ed57fcfcddbdaca5f11",
+  "authorized_at_utc": "2026-08-19T22:28:49Z",
+  "human_authorization_statement": "I explicitly authorize one and only one execution of the frozen HydroCore-v5 M11.6 locked evaluation bound to the recorded code-under-test HEAD, design freeze, materialization manifest, and frozen finalist identities.",
+  "one_shot_no_rerun_policy": true,
+  "post_locked_tuning": false,
+  "locked_rerun": false
+}
