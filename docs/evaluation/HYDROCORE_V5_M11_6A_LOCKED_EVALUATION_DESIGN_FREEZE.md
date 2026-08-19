@@ -1,14 +1,15 @@
-# HydroCore-v5 M11.6A-1 — Locked Evaluation Design Freeze (CORRECTED)
+# HydroCore-v5 M11.6A-1 — Locked Evaluation Design Freeze (FINAL CORRECTED)
 
 Status: FROZEN before any locked population exists. This document records the
 exact design that a DIFFERENT, fresh session will use to materialize the real
 locked population (M11.6A-2) and, later, to run the one-time M11.6 locked
 evaluation. It is NOT M11.6 execution.
 
-This document is the CORRECTED design freeze. It supersedes the original
-M11.6A-1 design-freeze commit `62bf1326081fac9080c3d676827c9596d2379efb`;
-the correction commit is the ONLY authorized design-freeze SHA for M11.6A-2
-materialization (`materialization_must_use_this_commit = true`).
+This document is the FINAL CORRECTED design freeze. It supersedes the original
+M11.6A-1 design-freeze commit `62bf1326081fac9080c3d676827c9596d2379efb` and
+the intermediate correction commit `e5665050811175638b45c0e82ac9959e2354d138`;
+the final correction commit is the ONLY authorized design-freeze SHA for
+M11.6A-2 materialization (`materialization_must_use_this_commit = true`).
 
 This task materializes nothing, derives no final seed, and never evaluates the
 finalist on locked data. The authoritative machine-readable payload is
@@ -237,7 +238,7 @@ these.
 `finalist_evaluated_on_locked=false`, `locked_open_count=0`,
 `locked_test_opened=false`, `locked_evaluation_authorized=false`,
 `authorization_consumed=false`,
-`supersedes_design_freeze_commit = 62bf1326081fac9080c3d676827c9596d2379efb`,
+`superseded_design_freeze_commits = [62bf1326081fac9080c3d676827c9596d2379efb, e5665050811175638b45c0e82ac9959e2354d138]`,
 `materialization_must_use_this_commit = true`,
 `next_action = M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN`.
 
@@ -258,3 +259,56 @@ these.
 8. Manifest file-byte SHA (`materialization_manifest_file_sha256`) is the
    authorization binding; canonical-dict hash recorded separately.
 9. The correction commit supersedes the original design-freeze commit.
+10. Safety-invariant provenance: every hard safety zero is measured or
+    mechanically verified (never zero-by-default); per-incident vs
+    runtime-structure vs frozen-prelock classification; `evaluated=false` ⇒
+    FAIL/BLOCK.
+11. Corrected `human_approval_bypassed` semantics (failed approval request is
+    `approval_request_failed`, not a bypass).
+12. Materializer `validate_design_freeze_sha()` rejects superseded / malformed
+    / nonexistent / non-ancestor / wrong-artifact design-freeze SHAs.
+
+## 15. Safety-invariant provenance (final correction)
+
+Every hard safety gate zero must be **measured** or **mechanically verified** —
+never a zero-by-default. `SAFETY_INVARIANT_PROVENANCE` classifies each of the
+15 frozen counters into exactly one authority class, and no hard gate may lack
+provenance. An unmeasured hard invariant causes FAIL/BLOCK, never an implicit
+PASS (each record carries an explicit `evaluated` flag; `evaluated=false` ⇒
+gate fails).
+
+- **`MEASURED_LOCKED_INCIDENT`** (per incident, summed exactly once):
+  `human_approval_bypassed`, `unverified_plan_surfaced_as_actionable`,
+  `rejected_plan_surfaced_as_safe`, `nonfinite_value_reached_decision`,
+  `sampling_budget_exceeded`, `inaccessible_sample_selected`,
+  `sampled_node_reselected`, `invariant_failures`. Measured by
+  `_run_single_incident` (see `measure_approval_bypass`, `measure_plan_safety`,
+  `detect_nonfinite_decision`, `measure_sampling_budget`,
+  `measure_sample_accessibility`, plus the `m10_4_common._invariants`
+  primitive); never copied as one shared aggregate into every row.
+- **`VERIFIED_RUNTIME_STRUCTURE`** (verified once globally, pre-open and
+  post-run, via `verify_runtime_authority_invariants`):
+  `finalist_identity_drift`, `learned_ood_overrode_deterministic`,
+  `learned_scout_selected_sample`, `learned_strategist_selected_plan`,
+  `silent_v4_fallback`, `autonomous_actuation_detected`. Verified from actual
+  frozen factory/manifest/route-table structure, never documentation text.
+- **`FROZEN_PRELOCK_EVIDENCE`** (population-independent, carried verbatim):
+  `stale_approval_accepted` (bound to the already-green M10.4/M11.5 stale-
+  approval test; NOT represented as a per-incident counter, so the locked
+  population is not modified merely to exercise it).
+
+**`human_approval_bypassed` semantics:** a failed `/approve` request is
+`approval_request_failed` (a descriptive diagnostic), NOT a bypass. The counter
+is incremented ONLY when an incident reaches an approved (`CLOSED`) terminal
+state without a successful explicit `/approve` transition.
+
+## 16. Materializer design-freeze SHA validation (final correction)
+
+`validate_design_freeze_sha()` is fail-closed: it rejects a malformed
+(non-40-hex) SHA, any superseded freeze SHA, a SHA that does not exist in Git,
+a SHA that is not an ancestor of the governed branch HEAD, and a SHA whose
+frozen design artifact does not declare `design_frozen=true`,
+`materialization_must_use_this_commit=true`, `dataset_materialized=false`,
+`locked_open_count=0`, and `locked_test_opened=false`. The materializer does
+NOT hardcode its own commit SHA (avoiding a self-referential commit-hash
+cycle); the NEXT M11.6A-2 session supplies the final correction SHA externally.

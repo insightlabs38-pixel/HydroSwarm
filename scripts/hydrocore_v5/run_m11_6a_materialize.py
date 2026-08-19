@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 from typing import Any
@@ -346,14 +347,70 @@ def materialize(design_freeze_sha: str, output_root: Path) -> dict[str, Any]:
     return manifest
 
 
+def validate_design_freeze_sha(sha: str, repo_root: Path) -> list[str]:
+    """Fail-closed design-freeze SHA validation (final correction).
+
+    Rejects: any superseded freeze SHA, a malformed/nonexistent SHA, a SHA not
+    an ancestor of the governed branch HEAD, and a SHA whose frozen design
+    artifact does not declare the required materialization authority flags.
+    """
+    violations: list[str] = []
+    if len(sha) != 40 or any(char not in "0123456789abcdef" for char in sha):
+        violations.append("design-freeze SHA must be a full 40-hex git commit SHA")
+        return violations
+    if sha in design.SUPERSEDED_DESIGN_FREEZE_COMMITS:
+        violations.append(f"design-freeze SHA {sha} is superseded; materialize only from the final corrected freeze commit")
+    try:
+        subprocess.check_output(
+            ["git", "cat-file", "-e", f"{sha}^{{commit}}"],
+            cwd=repo_root, stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        violations.append(f"design-freeze SHA {sha} does not exist in git")
+        return violations
+    try:
+        subprocess.check_output(
+            ["git", "merge-base", "--is-ancestor", sha, "HEAD"],
+            cwd=repo_root, stderr=subprocess.DEVNULL,
+        )
+    except subprocess.CalledProcessError:
+        violations.append(f"design-freeze SHA {sha} is not an ancestor of HEAD")
+    artifact_path = "reports/evaluation/hydrocore-v5/m11/m11-6a/design-freeze/m11-6a-design-freeze.json"
+    try:
+        raw = subprocess.check_output(
+            ["git", "show", f"{sha}:{artifact_path}"], cwd=repo_root, text=True,
+        )
+        artifact = json.loads(raw)
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        violations.append(f"cannot read the frozen design artifact at {sha}")
+        return violations
+    if artifact.get("design_frozen") is not True:
+        violations.append("design artifact at SHA does not declare design_frozen=true")
+    if artifact.get("materialization_must_use_this_commit") is not True:
+        violations.append("design artifact at SHA does not declare materialization_must_use_this_commit=true")
+    if artifact.get("dataset_materialized") is not False:
+        violations.append("design artifact at SHA declares dataset_materialized != false")
+    if artifact.get("locked_open_count") != 0:
+        violations.append("design artifact at SHA declares locked_open_count != 0")
+    if artifact.get("locked_test_opened") is not False:
+        violations.append("design artifact at SHA declares locked_test_opened != false")
+    return violations
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="M11.6A-2 locked population materializer")
-    parser.add_argument("--design-freeze-sha", required=True, help="M11.6A-1 design-freeze commit SHA (full 40-hex)")
+    parser.add_argument("--design-freeze-sha", required=True, help="M11.6A-1 final corrected design-freeze commit SHA (full 40-hex)")
     parser.add_argument("--output-root", default="data/locked/m11-6")
     args = parser.parse_args()
     sha = args.design_freeze_sha.strip()
     if len(sha) != 40 or any(char not in "0123456789abcdef" for char in sha):
         print("error: --design-freeze-sha must be a full 40-hex git commit SHA", file=sys.stderr)
+        return 2
+    violations = validate_design_freeze_sha(sha, ROOT)
+    if violations:
+        print("error: design-freeze SHA validation failed:", file=sys.stderr)
+        for violation in violations:
+            print(f"  - {violation}", file=sys.stderr)
         return 2
     manifest = materialize(sha, ROOT / args.output_root)
     print(json.dumps({"materialized": True, "manifest": str((ROOT / args.output_root) / "m11-6-materialization-manifest.json"), "locked_test_opened": manifest["locked_test_opened"], "evaluated_by_finalist": manifest["evaluated_by_finalist"]}, indent=2, sort_keys=True))

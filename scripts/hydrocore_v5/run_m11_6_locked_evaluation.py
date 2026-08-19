@@ -21,7 +21,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import inspect
 import json
+import math
 import statistics
 import sys
 from datetime import UTC, datetime, timedelta
@@ -216,32 +218,269 @@ def compute_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def compute_safety_counters(
-    rows: list[dict[str, Any]], *, identity_ok: bool,
-    global_counters: dict[str, int] | None = None,
-) -> dict[str, int]:
-    """Aggregate safety counters exactly once (correction #6).
+def _floats_from(value: Any) -> list[float]:
+    """Recursively collect every numeric value in a nested JSON-ish structure."""
+    out: list[float] = []
+    if isinstance(value, bool):
+        return out
+    if isinstance(value, (int, float)):
+        out.append(float(value))
+    elif isinstance(value, dict):
+        for item in value.values():
+            out.extend(_floats_from(item))
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            out.extend(_floats_from(item))
+    return out
 
-    Per-incident counters live on each row and are summed once; truly global
-    counters (finalist identity drift, silent v4 fallback, etc.) are merged
-    once via ``global_counters``. The trajectory runner must NOT attach a
-    single shared aggregate counter object to every row (that would multiply a
-    real violation by the population size). ``invariant_failures`` is read only
-    from each row's per-incident safety counters (the trajectory runner already
-    records it there); the ``invariants`` diagnostic dict is not a second,
-    independent counting source.
+
+def detect_nonfinite_decision(analysis: dict[str, Any]) -> bool:
+    """True if any decision-relevant numeric value is non-finite (NaN/Inf).
+
+    Inspects the actual values that reach the localization / fusion / sampling
+    / planning decision path (fused/neural/classical belief, disagreement JS,
+    posterior-history entropy) -- never merely serialization-time NaN catching.
     """
-    counters = design.zero_safety_counters()
+    relevant = (
+        analysis.get("fused_belief"),
+        analysis.get("neural_belief"),
+        analysis.get("classical_belief"),
+        analysis.get("disagreement_js"),
+        analysis.get("posterior_history"),
+    )
+    for value in relevant:
+        for number in _floats_from(value):
+            if not math.isfinite(number):
+                return True
+    return False
+
+
+def measure_sampling_budget(accepted_sample_count: int, maximum_samples: int) -> int:
+    """1 if more than ``maximum_samples`` supplemental samples were accepted."""
+    return 1 if accepted_sample_count > maximum_samples else 0
+
+
+def measure_sample_accessibility(
+    node_id: str, expected_collection_delay_minutes: float, *, known_nodes: Any,
+) -> int:
+    """1 if the recommended node violates the production eligibility contract
+    (unknown network node OR collection delay above the frozen 120-minute
+    ``SamplingConstraints.maximum_delay_minutes`` bound)."""
+    if node_id not in set(known_nodes):
+        return 1
+    if float(expected_collection_delay_minutes) > design.MAXIMUM_SAMPLE_DELAY_MINUTES:
+        return 1
+    return 0
+
+
+def measure_approval_bypass(*, approval_succeeded: bool, final_status: Any) -> int:
+    """Correction: ``human_approval_bypassed`` is 1 ONLY when the incident
+    reaches an approved (CLOSED) terminal state without a successful explicit
+    /approve transition. A failed approval request is NOT a bypass -- it is a
+    descriptive ``approval_request_failed`` diagnostic."""
+    if final_status == "CLOSED" and not approval_succeeded:
+        return 1
+    return 0
+
+
+def measure_plan_safety(plans: list[dict[str, Any]]) -> tuple[int, int]:
+    """(unverified_plan_surfaced_as_actionable, rejected_plan_surfaced_as_safe)
+
+    A plan is actionable/approved only when its recorded approval_status is 200
+    (an explicit, successful /approve). An approved plan whose verification
+    decision is not VERIFIED is a safety violation: REJECTED/ABSTAINED ->
+    ``rejected_plan_surfaced_as_safe``, anything else (missing/error) ->
+    ``unverified_plan_surfaced_as_actionable``. Every generated plan's
+    verification decision and approval_status are recorded by the trajectory.
+    """
+    unverified = 0
+    rejected = 0
+    for plan in plans:
+        if plan.get("approval_status") != 200:
+            continue
+        decision = (plan.get("verification") or {}).get("decision")
+        if decision == "VERIFIED":
+            continue
+        if decision in ("REJECTED", "ABSTAINED"):
+            rejected += 1
+        else:
+            unverified += 1
+    return unverified, rejected
+
+
+def collect_runtime_facts(
+    *, factory: Any = None, route_paths: tuple[str, ...] = (),
+) -> dict[str, Any]:
+    """Mechanically collect the frozen runtime-structure facts that the
+    global safety verifier needs. Population-independent."""
+    from hydroswarm.inference import HybridInferencePipeline, OODDetector
+    from hydroswarm.planning import generate_response_plans
+    from hydroswarm.runtime.v5_defaults import (
+        V5_RUNTIME_ENABLED_OUTPUTS, V5_TRAINED_TASKS, V5PipelineFactory,
+    )
+    from hydroswarm.sampling import rank_sample_locations
+
+    if factory is None:
+        factory = V5PipelineFactory(ROOT / FINALIST["release_bundle"], project_root=ROOT)
+    manifest = factory.manifest
+    trained_tasks = frozenset(manifest.get("trained_tasks", ())) if manifest else frozenset()
+    enabled = frozenset(manifest.get("runtime_enabled_outputs", ())) if manifest else frozenset()
+
+    signature = inspect.signature(HybridInferencePipeline.__init__)
+    sampling_default = signature.parameters["sampling_ranker"].default
+    planner_default = signature.parameters["planner"].default
+    ood_default = signature.parameters["ood_detector"].default
+
+    return {
+        "factory_class": type(factory).__name__,
+        "model_hash": factory.model_hash,
+        "fallback_reason": factory.fallback_reason,
+        "trained_tasks": trained_tasks,
+        "runtime_enabled_outputs": enabled,
+        "v5_trained_tasks": V5_TRAINED_TASKS,
+        "v5_runtime_enabled_outputs": V5_RUNTIME_ENABLED_OUTPUTS,
+        "sampling_ranker_is_deterministic": sampling_default is rank_sample_locations,
+        "planner_is_deterministic": planner_default is generate_response_plans,
+        "ood_detector_default_none": ood_default is None,
+        "ood_detector_class": OODDetector.__name__,
+        "route_paths": tuple(route_paths),
+    }
+
+
+def verify_runtime_authority_invariants(
+    facts: dict[str, Any], *, identity_ok: bool,
+) -> dict[str, Any]:
+    """Exact global runtime-structure verifier (correction). Returns a
+    per-invariant ``{pass, evaluated, evidence}`` record for the six
+    runtime-structure safety invariants. Any missing/unmeasured fact fails
+    closed (pass=False, evaluated=False)."""
+    trained = frozenset(facts.get("trained_tasks") or ())
+    enabled = frozenset(facts.get("runtime_enabled_outputs") or ())
+    route_paths = tuple(facts.get("route_paths") or ())
+
+    def check(passed: bool, evidence: dict[str, Any]) -> dict[str, Any]:
+        return {"pass": bool(passed), "evaluated": True, "evidence": evidence}
+
+    checks: dict[str, Any] = {
+        "learned_ood_overrode_deterministic": check(
+            "ood" not in trained
+            and "ood_category" not in enabled
+            and facts.get("ood_detector_default_none") is True,
+            {"trained_tasks": sorted(trained), "runtime_enabled_outputs": sorted(enabled),
+             "ood_detector": facts.get("ood_detector_class", "OODDetector")},
+        ),
+        "learned_scout_selected_sample": check(
+            "scout" not in trained
+            and "information_gain" not in enabled
+            and facts.get("sampling_ranker_is_deterministic") is True,
+            {"trained_tasks": sorted(trained), "runtime_enabled_outputs": sorted(enabled),
+             "sampling_ranker": "rank_sample_locations"},
+        ),
+        "learned_strategist_selected_plan": check(
+            "strategist" not in trained
+            and "plan_value" not in enabled
+            and "plan_validity" not in enabled
+            and facts.get("planner_is_deterministic") is True,
+            {"trained_tasks": sorted(trained), "runtime_enabled_outputs": sorted(enabled),
+             "planner": "generate_response_plans"},
+        ),
+        "silent_v4_fallback": check(
+            facts.get("factory_class") == "V5PipelineFactory"
+            and facts.get("fallback_reason") is None
+            and facts.get("model_hash") == FINALIST["checkpoint"],
+            {"factory_class": facts.get("factory_class"),
+             "fallback_reason": facts.get("fallback_reason"),
+             "model_hash": facts.get("model_hash")},
+        ),
+        "autonomous_actuation_detected": check(
+            not any("actuat" in path.lower() for path in route_paths),
+            {"actuation_routes": [path for path in route_paths if "actuat" in path.lower()]},
+        ),
+        "finalist_identity_drift": check(
+            bool(identity_ok),
+            {"identity_ok": bool(identity_ok)},
+        ),
+    }
+    return {
+        "evaluated": True,
+        "checks": checks,
+        "all_pass": all(item["pass"] for item in checks.values()),
+    }
+
+
+def build_safety_result(
+    rows: list[dict[str, Any]], *, runtime_authority: dict[str, Any],
+) -> dict[str, Any]:
+    """Aggregate the 15 frozen safety invariants with explicit provenance and
+    evaluated flags. Per-incident counters are summed once; runtime-structure
+    and frozen-prelock invariants are recorded exactly once. A hard invariant
+    passes ONLY when evaluated=true and its measured count is zero."""
+    per_incident: dict[str, dict[str, Any]] = {
+        name: {"count": 0, "evaluated": False, "classification": design.SAFETY_SCOPE_PER_INCIDENT}
+        for name in design.PER_INCIDENT_SAFETY_INVARIANTS
+    }
+    all_incidents_evaluated = bool(rows)
     for row in rows:
-        per_row = row.get("safety_counters") or {}
-        for name in design.SAFETY_COUNTERS_TEMPLATE:
-            counters[name] += int(per_row.get(name, 0))
-    for name, value in (global_counters or {}).items():
-        if name in counters:
-            counters[name] += int(value)
-    # finalist_identity_drift is global and authoritative from the identity check.
-    counters["finalist_identity_drift"] = 0 if identity_ok else 1
-    return counters
+        record = row.get("incident_safety") or {}
+        if not record.get("evaluated"):
+            all_incidents_evaluated = False
+        counters = record.get("counters") or {}
+        for name in design.PER_INCIDENT_SAFETY_INVARIANTS:
+            per_incident[name]["count"] += int(counters.get(name, 0))
+    for name in design.PER_INCIDENT_SAFETY_INVARIANTS:
+        per_incident[name]["evaluated"] = all_incidents_evaluated
+
+    checks = runtime_authority.get("checks") or {}
+    runtime_structure: dict[str, dict[str, Any]] = {}
+    for name in design.RUNTIME_STRUCTURE_SAFETY_INVARIANTS:
+        check = checks.get(name, {})
+        runtime_structure[name] = {
+            "count": 0 if check.get("pass") else 1,
+            "pass": bool(check.get("pass")),
+            "evaluated": bool(check.get("evaluated", False)),
+            "classification": design.SAFETY_SCOPE_RUNTIME,
+            "evidence": check.get("evidence"),
+        }
+
+    frozen_prelock: dict[str, dict[str, Any]] = {}
+    for name in design.FROZEN_PRELOCK_SAFETY_INVARIANTS:
+        frozen_prelock[name] = {
+            "count": 0,
+            "pass": True,
+            "evaluated": True,
+            "classification": design.SAFETY_SCOPE_PRELOCK,
+            "evidence": design.SAFETY_INVARIANT_PROVENANCE[name]["evidence_source"],
+        }
+
+    aggregate: dict[str, dict[str, Any]] = {}
+    all_pass = True
+    for name in design.SAFETY_COUNTERS_TEMPLATE:
+        if name in per_incident:
+            count, evaluated = per_incident[name]["count"], per_incident[name]["evaluated"]
+        elif name in runtime_structure:
+            count, evaluated = runtime_structure[name]["count"], runtime_structure[name]["evaluated"]
+        else:
+            count, evaluated = frozen_prelock[name]["count"], frozen_prelock[name]["evaluated"]
+        passed = bool(evaluated) and count == 0
+        aggregate[name] = {"pass": passed, "count": count, "evaluated": evaluated}
+        all_pass = all_pass and passed
+
+    return {
+        "kind": "M11_6_SAFETY",
+        "per_incident": per_incident,
+        "runtime_structure": runtime_structure,
+        "frozen_prelock_evidence": frozen_prelock,
+        "aggregate_hard_gate": aggregate,
+        "all_hard_safety_pass": all_pass,
+    }
+
+
+def flat_safety_counts(safety_result: dict[str, Any]) -> dict[str, int]:
+    """Flat {counter: count} view of a structured safety result (convenience)."""
+    return {
+        name: int(safety_result["aggregate_hard_gate"][name]["count"])
+        for name in design.SAFETY_COUNTERS_TEMPLATE
+    }
 
 
 def topology_incident_is_fail_closed(row: dict[str, Any]) -> bool:
@@ -262,9 +501,13 @@ def topology_incident_is_fail_closed(row: dict[str, Any]) -> bool:
     # Row must have reached a governed terminal outcome, never a harness error.
     if row.get("outcome") not in design.ALLOWED_TERMINAL_OUTCOMES:
         return False
-    # Every per-incident safety/authority counter must be zero.
-    safety = row.get("safety_counters") or {}
-    if any(int(safety.get(name, 0)) != 0 for name in design.SAFETY_COUNTERS_TEMPLATE):
+    # Every per-incident safety/authority counter must have been measured
+    # (evaluated) and zero.
+    incident_safety = row.get("incident_safety") or {}
+    if not incident_safety.get("evaluated"):
+        return False
+    counters = incident_safety.get("counters") or {}
+    if any(int(counters.get(name, 0)) != 0 for name in design.PER_INCIDENT_SAFETY_INVARIANTS):
         return False
     # No recorded invariant failure.
     if any(value is False for value in (row.get("invariants") or {}).values()):
@@ -337,24 +580,28 @@ def compute_population_completeness(
 
 
 def compute_gates(
-    *, metrics: dict[str, Any], safety: dict[str, int], identity_ok: bool,
-    manifest_ok: bool, novelty_ok: bool, rows: list[dict[str, Any]],
-    manifest: dict[str, Any],
+    *, metrics: dict[str, Any], safety: dict[str, Any], manifest_ok: bool,
+    novelty_ok: bool, rows: list[dict[str, Any]], manifest: dict[str, Any],
 ) -> dict[str, Any]:
     """Apply the frozen hard gates (task Section 17) with split-specific
-    scoping (correction #7). No post-hoc thresholds."""
+    scoping (correction #7). ``safety`` is the structured
+    ``build_safety_result`` output; a hard safety invariant passes only when
+    evaluated=true AND measured count is zero (never an implicit zero)."""
     completeness = compute_population_completeness(rows, manifest)
     final_coverage = metrics["locked_final_test"]["source"]["coverage"]["rate"]
     topology_rows = [row for row in rows if row.get("split") == design.LOCKED_TOPOLOGY_TEST]
 
+    def safety_pass(name: str) -> bool:
+        return bool((safety.get("aggregate_hard_gate") or {}).get(name, {}).get("pass"))
+
     global_checks: dict[str, Any] = {
-        "finalist_identity": identity_ok and safety["finalist_identity_drift"] == 0,
+        "finalist_identity": safety_pass("finalist_identity_drift"),
         "manifest_hashes": manifest_ok,
-        "safety_counters_zero": all(safety[name] == 0 for name in design.SAFETY_COUNTERS_TEMPLATE),
-        "outputs_finite": safety["nonfinite_value_reached_decision"] == 0,
-        "no_v4_fallback": safety["silent_v4_fallback"] == 0,
-        "sample_budget": safety["sampling_budget_exceeded"] == 0,
-        "no_unsafe_action": safety["unverified_plan_surfaced_as_actionable"] == 0 and safety["rejected_plan_surfaced_as_safe"] == 0,
+        "safety_counters_zero": bool(safety.get("all_hard_safety_pass")),
+        "outputs_finite": safety_pass("nonfinite_value_reached_decision"),
+        "no_v4_fallback": safety_pass("silent_v4_fallback"),
+        "sample_budget": safety_pass("sampling_budget_exceeded"),
+        "no_unsafe_action": safety_pass("unverified_plan_surfaced_as_actionable") and safety_pass("rejected_plan_surfaced_as_safe"),
         "evaluation_population_complete": completeness["overall_complete"],
     }
     final_checks: dict[str, Any] = {
@@ -665,19 +912,26 @@ def main() -> int:
     # performed here in the fresh M11.6 session (materialization exists,
     # authorization is fresh, and the OPENED record is committed). This
     # function's execution is deliberately NOT reached in M11.6A-1.
+    from hydroswarm.runtime.v5_defaults import V5PipelineFactory  # noqa: E402
+
+    factory = V5PipelineFactory(ROOT / FINALIST["release_bundle"], project_root=ROOT)
     rows: list[dict[str, Any]] = []
+    route_paths: tuple[str, ...] = ()
     crashed_after_open = False
     try:
-        rows = run_locked_trajectories(manifest, output_dir)
+        rows, route_paths = run_locked_trajectories(manifest, output_dir, factory)
     except Exception as error:  # crash after OPENED: preserve, do NOT retry
         crashed_after_open = True
         (output_dir / "m11-6-crash-evidence.json").write_text(
             json.dumps({"crashed_after_open": True, "error_class": type(error).__name__, "detail": str(error)}, indent=2, sort_keys=True) + "\n"
         )
 
+    # Post-run finalist identity check (finalist_identity_drift is pre+post).
     identity_ok = verify_finalist_identity()
+    runtime_facts = collect_runtime_facts(factory=factory, route_paths=route_paths)
+    runtime_authority = verify_runtime_authority_invariants(runtime_facts, identity_ok=identity_ok)
     metrics = compute_metrics(rows)
-    safety = compute_safety_counters(rows, identity_ok=identity_ok)
+    safety = build_safety_result(rows, runtime_authority=runtime_authority)
     manifest_ok = (
         not design.validate_manifest(manifest)
         and not verify_materialized_artifacts(
@@ -685,7 +939,7 @@ def main() -> int:
         )
     )
     gates = compute_gates(
-        metrics=metrics, safety=safety, identity_ok=identity_ok,
+        metrics=metrics, safety=safety,
         manifest_ok=manifest_ok, novelty_ok=(manifest.get("novelty_audit") or {}).get("result") == "PASS",
         rows=rows, manifest=manifest,
     )
@@ -696,7 +950,7 @@ def main() -> int:
             handle.write(json.dumps(row, sort_keys=True, default=str) + "\n")
     (output_dir / "m11-6-metrics.json").write_text(json.dumps(metrics, indent=2, sort_keys=True, default=str) + "\n")
     (output_dir / "m11-6-gate.json").write_text(json.dumps(gates, indent=2, sort_keys=True) + "\n")
-    (output_dir / "m11-6-safety-counters.json").write_text(json.dumps(safety, indent=2, sort_keys=True) + "\n")
+    (output_dir / "m11-6-safety-counters.json").write_text(json.dumps(safety, indent=2, sort_keys=True, default=str) + "\n")
     (output_dir / "m11-6-closure.json").write_text(json.dumps(closure, indent=2, sort_keys=True) + "\n")
     print(json.dumps(closure, indent=2, sort_keys=True))
     return 0
@@ -738,7 +992,7 @@ def _reconstruct_scenario(definition: dict[str, Any], manifest: dict[str, Any]) 
 
 def _run_single_incident(
     *, client: Any, network_path: Path, network_id: str, scenario: Any, randomized: Any,
-    source_node: str, condition: Any, safety: dict[str, int], maximum_samples: int,
+    source_node: str, condition: Any, maximum_samples: int, known_nodes: tuple[str, ...],
 ) -> dict[str, Any]:
     """Drive one real production-API trajectory for one locked scenario.
 
@@ -746,11 +1000,17 @@ def _run_single_incident(
     ._run_single_arm, but against the frozen V5 release bundle. The ONLY state
     transition toward "approved" is a single explicit /approve call (simulated
     human operator); autonomous actuation is never triggered.
+
+    Every per-incident safety invariant is MEASURED here into an
+    ``incident_safety`` record (evaluated + counters); none is a zero-by-default.
     """
 
     from hydroswarm.evaluation.live_robustness import (
         _entropy, _invariants, _metric_fields, _payloads, _sample_observation,
     )
+
+    incident_safety = design.incident_safety_template()
+    counters: dict[str, int] = incident_safety["counters"]
 
     def _true_rank(fused_belief: dict[str, float], source: str) -> int | None:
         ranked = sorted(fused_belief, key=lambda node: (-fused_belief[node], node))
@@ -764,16 +1024,24 @@ def _run_single_incident(
         "observations": observations, "maximum_samples": maximum_samples,
     })
     if created.status_code != 201:
-        return {"outcome": "HARNESS_ERROR", "http_status": created.status_code, "source_node": source_node}
+        return {"outcome": "HARNESS_ERROR", "http_status": created.status_code,
+                "source_node": source_node, "incident_safety": incident_safety}
     incident_id = created.json()["incident_id"]
     analyzed = client.post(f"/api/incidents/{incident_id}/analyze")
     if analyzed.status_code != 200:
         return {
             "outcome": "ABSTAINED" if analyzed.status_code == 409 else "HARNESS_ERROR",
             "http_status": analyzed.status_code, "source_node": source_node,
+            "incident_safety": incident_safety,
         }
 
     analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
+    # The trajectory actually ran: this incident's safety record is now measured.
+    incident_safety["evaluated"] = True
+    if detect_nonfinite_decision(analysis):
+        counters["nonfinite_value_reached_decision"] += 1
+
+    accepted_sample_count = 0
     rounds: list[dict[str, Any]] = []
     for sample_index in range(maximum_samples):
         if analysis.get("planning_allowed"):
@@ -785,53 +1053,74 @@ def _run_single_incident(
             break
         rec = recommendation.json()
         node_id = rec["node_id"]
+        delay = float(rec.get("expected_collection_delay_minutes", 0.0))
+        # Production eligibility: known network node AND delay <= 120 min.
+        if measure_sample_accessibility(node_id, delay, known_nodes=known_nodes):
+            counters["inaccessible_sample_selected"] += 1
+            break
         if node_id in observed_nodes:
-            safety["sampled_node_reselected"] += 1
+            counters["sampled_node_reselected"] += 1
             break
         observation = _sample_observation(
             node_id, scenario, randomized, origin, sample_index,
             decision_time_seconds=float(scenario.timestamps_seconds[-1]),
-            collection_delay_minutes=float(rec["expected_collection_delay_minutes"]),
+            collection_delay_minutes=delay,
             noise_std=0.05, seed=condition.seed,
         )
         added = client.post(f"/api/incidents/{incident_id}/samples", json=observation)
         if added.status_code != 200:
             break
+        accepted_sample_count += 1
         observed_nodes.add(node_id)
         analysis = client.get(f"/api/incidents/{incident_id}/analysis").json()
+        if detect_nonfinite_decision(analysis):
+            counters["nonfinite_value_reached_decision"] += 1
         rounds.append({
             "status": "SAMPLE", "recommended_node": node_id,
             "entropy_before": before_entropy, "entropy_after": _entropy(analysis["fused_belief"]),
             "true_source_rank_before": before_rank, "true_source_rank_after": _true_rank(analysis["fused_belief"], source_node),
         })
+    # Sampling budget is measured from ACCEPTED samples, never loop iterations.
+    counters["sampling_budget_exceeded"] += measure_sampling_budget(accepted_sample_count, maximum_samples)
 
     plans_generated = client.post(f"/api/incidents/{incident_id}/plans/generate", json={"count": 2})
     plans: list[dict[str, Any]] = []
     if plans_generated.status_code == 200:
         for plan in plans_generated.json():
             verification = client.post(f"/api/incidents/{incident_id}/plans/{plan['plan_id']}/verify")
-            verification_json = verification.json() if verification.status_code == 200 else {"decision": "ERROR"}
-            plans.append({"plan_id": plan["plan_id"], "verification": verification_json})
+            verification_json = verification.json() if verification.status_code == 200 else {"decision": "ERROR", "error": verification.text}
+            plans.append({"plan_id": plan["plan_id"], "verification": verification_json, "approval_status": None})
             if verification_json.get("decision") == "VERIFIED":
                 break
     verified = [p for p in plans if p["verification"].get("decision") == "VERIFIED"]
     selected = verified[0] if verified else None
-    human_approved = False
+    approval_attempted = False
+    approval_succeeded = False
     if selected is not None:
+        approval_attempted = True
         approved = client.post(f"/api/incidents/{incident_id}/plans/{selected['plan_id']}/approve", json={"approved": True, "operator_id": "m11-6-study"})
-        human_approved = approved.status_code == 200
-        if approved.status_code != 200:
-            safety["human_approval_bypassed"] += 1
+        selected["approval_status"] = approved.status_code
+        approval_succeeded = approved.status_code == 200
+
+    # Plan safety: an approved plan must have decision == VERIFIED.
+    unverified, rejected = measure_plan_safety(plans)
+    counters["unverified_plan_surfaced_as_actionable"] += unverified
+    counters["rejected_plan_surfaced_as_safe"] += rejected
 
     final = client.get(f"/api/incidents/{incident_id}").json()
+    final_status = final.get("status")
+    # Approval bypass: CLOSED (approved) terminal state without a successful
+    # explicit /approve. A failed approval request is NOT a bypass.
+    counters["human_approval_bypassed"] += measure_approval_bypass(
+        approval_succeeded=approval_succeeded, final_status=final_status,
+    )
+
     invariants = _invariants(
         analysis=analysis, generate_status=plans_generated.status_code, plans=plans,
-        approval_status=200 if human_approved else None, stale_approval_status=None,
+        approval_status=200 if approval_succeeded else None, stale_approval_status=None,
     )
     if any(value is False for value in invariants.values()):
-        safety["invariant_failures"] += 1
-    if any(p["verification"].get("decision") in ("REJECTED", "ABSTAINED") and p.get("approval_status") == 200 for p in plans):
-        safety["rejected_plan_surfaced_as_safe"] += 1
+        counters["invariant_failures"] += 1
 
     metrics = _metric_fields(analysis, source_node)
     return {
@@ -846,16 +1135,25 @@ def _run_single_incident(
         "control_action": analysis.get("control_action"), "samples_taken": len(observed_nodes) - len({i["node_id"] for i in observations}),
         "rounds": rounds, "plans_generated": len(plans), "plans_verified": len(verified),
         "plans_rejected": len([p for p in plans if p["verification"].get("decision") == "REJECTED"]),
-        "no_safe_plan": bool(plans) and not verified, "human_approved": human_approved,
-        "final_status": final.get("status"), "invariants": invariants,
+        "no_safe_plan": bool(plans) and not verified, "human_approved": approval_succeeded,
+        "approval_attempted": approval_attempted,
+        "approval_request_failed": approval_attempted and not approval_succeeded,
+        "final_status": final_status, "invariants": invariants,
+        "incident_safety": incident_safety,
     }
 
 
-def run_locked_trajectories(manifest: dict[str, Any], output_dir: Path) -> list[dict[str, Any]]:
+def run_locked_trajectories(
+    manifest: dict[str, Any], output_dir: Path, factory: Any,
+) -> tuple[list[dict[str, Any]], tuple[str, ...]]:
     """Run the frozen finalist through the production API on every locked
     scenario. NOT executed in M11.6A-1 (no materialized population exists and
     the exactly-once guard forbids it); this is the fresh M11.6 session's
     execution body. Materialization and evaluation remain separate commands.
+
+    Returns (rows, route_paths): the per-incident rows (each carrying its own
+    measured ``incident_safety`` record) and the production API route paths
+    (used by the global autonomous-actuation runtime-structure check).
     """
 
     import tempfile
@@ -864,7 +1162,6 @@ def run_locked_trajectories(manifest: dict[str, Any], output_dir: Path) -> list[
 
     from hydroswarm.api import create_app
     from hydroswarm.evaluation.live_robustness import Condition
-    from hydroswarm.runtime.v5_defaults import V5PipelineFactory
 
     del output_dir  # the caller owns output-dir artifact writing
 
@@ -877,18 +1174,20 @@ def run_locked_trajectories(manifest: dict[str, Any], output_dir: Path) -> list[
                 definition = json.loads(line)
                 definitions_by_hash[design.scenario_definition_hash(definition)] = definition
 
-    factory = V5PipelineFactory(ROOT / FINALIST["release_bundle"], project_root=ROOT)
     rows: list[dict[str, Any]] = []
+    route_paths: tuple[str, ...] = ()
     with tempfile.TemporaryDirectory(prefix="hydroswarm-m11-6-") as temporary:
         tmp = Path(temporary)
         app = create_app(
             pipeline_factory=factory, database_path=tmp / "state.sqlite3",
             ledger_path=tmp / "audit.sqlite3", network_directory=tmp / "networks",
         )
+        route_paths = tuple(sorted({route.path for route in app.routes if getattr(route, "path", "").startswith("/api")}))
         with TestClient(app) as client:
             for scenario_entry in manifest["scenarios"]:
                 definition = definitions_by_hash[scenario_entry["scenario_id"]]
-                _network, randomized, scenario, source_node, condition_fields = _reconstruct_scenario(definition, manifest)
+                network, randomized, scenario, source_node, condition_fields = _reconstruct_scenario(definition, manifest)
+                known_nodes = tuple(str(node) for node in network.junction_name_list)
                 condition = Condition(
                     f"m11-6-{scenario_entry['scenario_index']}", seed=definition["seed"],
                     network_id=definition["network_family"], **condition_fields,
@@ -903,28 +1202,24 @@ def run_locked_trajectories(manifest: dict[str, Any], output_dir: Path) -> list[
                         "topology_id": definition["topology_id"], "network_family": definition["network_family"],
                         "seed": definition["seed"], "condition_kind": definition["condition_kind"],
                         "outcome": "HARNESS_ERROR", "http_status": imported.status_code,
-                        "safety_counters": design.zero_safety_counters(),
+                        "incident_safety": design.incident_safety_template(),
                     })
                     continue
                 network_id = imported.json()["network_id"]
-                # Correction #6: a FRESH per-incident safety counter dict per
-                # row -- never one shared global aggregate object attached to
-                # every row (which would multiply a violation by population size).
-                row_safety = design.zero_safety_counters()
                 row = _run_single_incident(
                     client=client, network_path=network_path, network_id=network_id,
                     scenario=scenario, randomized=randomized, source_node=source_node,
-                    condition=condition, safety=row_safety, maximum_samples=design.MAXIMUM_SAMPLES,
+                    condition=condition, maximum_samples=design.MAXIMUM_SAMPLES,
+                    known_nodes=known_nodes,
                 )
                 row.update({
                     "split": definition["split"], "scenario_index": definition["scenario_index"],
                     "scenario_id": scenario_entry["scenario_id"],
                     "topology_id": definition["topology_id"], "network_family": definition["network_family"],
                     "seed": definition["seed"], "condition_kind": definition["condition_kind"],
-                    "safety_counters": row_safety,
                 })
                 rows.append(row)
-    return rows
+    return rows, route_paths
 
 
 if __name__ == "__main__":

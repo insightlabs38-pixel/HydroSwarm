@@ -130,7 +130,7 @@ def design_freeze_record(preflight: dict[str, Any]) -> dict[str, Any]:
         "seed_derivation_formula": design.seed_derivation_spec()["master_formula"],
         "design_file_hashes": {relative(path): sha256_file(path) for path in design_files},
         "m11_6_blocker_closure_preserved": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
-        "supersedes_design_freeze_commit": design.SUPERSEDED_DESIGN_FREEZE_COMMIT,
+        "superseded_design_freeze_commits": list(design.SUPERSEDED_DESIGN_FREEZE_COMMITS),
         "materialization_must_use_this_commit": True,
         "manifest_file_sha256_binding": (
             "Authorization binds to materialization_manifest_file_sha256 (SHA-256 "

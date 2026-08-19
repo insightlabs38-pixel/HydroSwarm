@@ -2,14 +2,14 @@
   "authorization_consumed": false,
   "dataset_materialized": false,
   "design_file_hashes": {
-    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "d4ef7b45d04a8af88de97b8f8de2d20eabcdb3af9cece5cf6a236f0f8ab979c9",
-    "scripts/hydrocore_v5/m11_6a_design.py": "5cc0521f8369a034210f43228d93fe0fe7f757132b2c42e60aa29b95d2aa80e5",
+    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "2598ffaefbbc897ac2667afa68338305bdb9c10e3d93a932063efde6897eec71",
+    "scripts/hydrocore_v5/m11_6a_design.py": "d8f76e26815cb15fe58447ec1a7eb59286410cecb0b3491290fb96739019aa1d",
     "scripts/hydrocore_v5/m11_6a_topology.py": "bdae63f25d3db16adc9d322297049639c2875f4104f04a574ab8e083c9e82947",
-    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "073af8bda7e914ec2942cf84a790de36befdd2b256b132691992263187a9ab49",
-    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "6c57c90dc66f0c931a6fffdfb35e0da0e3927285d69e985e5c67c9242f1f1193"
+    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "0a095ec2773239466a55a0567229a0933a4faedeb79d92e17c9ab46052337206",
+    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "f739cf2d17e03c815a1ce7c612bae73b81f23c0fa868c574133cadd1388d1eed"
   },
   "design_frozen": true,
-  "design_hash": "aca43d76d483b04e4b598ffb5541ac152b2382161c9e9c71f0f5966afff6e901",
+  "design_hash": "7d63ebaadb03dfba2f051d0feb8d4e8330e984beda96b0908b87650cd2841b2d",
   "does_not_claim_real_locked_manifest_hash": true,
   "final_locked_seed_derived": false,
   "finalist_evaluated_on_locked": false,
@@ -35,10 +35,10 @@
     "authorization_consumed": false,
     "blocker_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
     "branch": "exp/hydrocore-v5-causal",
-    "design_hash": "aca43d76d483b04e4b598ffb5541ac152b2382161c9e9c71f0f5966afff6e901",
+    "design_hash": "7d63ebaadb03dfba2f051d0feb8d4e8330e984beda96b0908b87650cd2841b2d",
     "expected_blocker_head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
     "frozen_finalist_identity_verified": true,
-    "head": "62bf1326081fac9080c3d676827c9596d2379efb",
+    "head": "e5665050811175638b45c0e82ac9959e2354d138",
     "kind": "M11_6A_DESIGN_PREFLIGHT",
     "locked_evaluation_authorized": false,
     "locked_open_count_at_start": 0,
@@ -56,5 +56,8 @@
     "locked_topology_master": "H(\"HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|\" + DESIGN_FREEZE_COMMIT_SHA)"
   },
   "seed_derivation_rule_version": "v1",
-  "supersedes_design_freeze_commit": "62bf1326081fac9080c3d676827c9596d2379efb"
+  "superseded_design_freeze_commits": [
+    "62bf1326081fac9080c3d676827c9596d2379efb",
+    "e5665050811175638b45c0e82ac9959e2354d138"
+  ]
 }

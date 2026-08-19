@@ -38,10 +38,14 @@ OPENED_RECORD_SCHEMA_VERSION = "hydroswarm-m11-6-opened-record-v1"
 
 MILESTONE = "M11.6A-1"
 
-#: The original M11.6A-1 design-freeze commit, superseded by this correction
-#: commit. The correction commit becomes the ONLY authorized design-freeze SHA
-#: for M11.6A-2 materialization; the old commit MUST NOT be used to materialize.
-SUPERSEDED_DESIGN_FREEZE_COMMIT = "62bf1326081fac9080c3d676827c9596d2379efb"
+#: The M11.6A-1 design-freeze commits superseded by this final correction
+#: commit. The final correction commit becomes the ONLY authorized
+#: design-freeze SHA for M11.6A-2 materialization; every superseded commit
+#: MUST NOT be used to materialize (the materializer rejects them fail-closed).
+SUPERSEDED_DESIGN_FREEZE_COMMITS: tuple[str, ...] = (
+    "62bf1326081fac9080c3d676827c9596d2379efb",
+    "e5665050811175638b45c0e82ac9959e2354d138",
+)
 
 #: The smoke namespace used ONLY by development fixtures. It MUST never
 #: appear in either locked split; the materializer and evaluator reject it.
@@ -660,6 +664,203 @@ def zero_safety_counters() -> dict[str, int]:
 
 
 # ---------------------------------------------------------------------------
+# Safety-invariant provenance (final pre-materialization correction).
+#
+# A hard-gate zero is ONLY valid when it comes from (A) actual per-incident
+# measurement during the locked trajectory, (B) exact runtime-structure
+# verification performed mechanically, or (C) explicitly frozen pre-lock
+# evidence. It must NEVER mean "the counter started at zero and no code ever
+# checked it". Every hard invariant is classified below; no hard gate may lack
+# provenance.
+# ---------------------------------------------------------------------------
+
+SAFETY_SCOPE_PER_INCIDENT = "MEASURED_LOCKED_INCIDENT"
+SAFETY_SCOPE_RUNTIME = "VERIFIED_RUNTIME_STRUCTURE"
+SAFETY_SCOPE_PRELOCK = "FROZEN_PRELOCK_EVIDENCE"
+
+#: The frozen `SamplingConstraints.maximum_delay_minutes` default
+#: (hydroswarm.sampling.active.SamplingConstraints) -- the production
+#: accessibility eligibility bound used by `/samples/recommend`.
+MAXIMUM_SAMPLE_DELAY_MINUTES = 120.0
+
+SAFETY_INVARIANT_PROVENANCE: dict[str, dict[str, Any]] = {
+    "finalist_identity_drift": {
+        "classification": SAFETY_SCOPE_RUNTIME,
+        "scope": "runtime_structure",
+        "verifier": "verify_runtime_authority_invariants",
+        "evidence_source": "M11.2 frozen release/checkpoint/calibration SHA-256 re-verified pre-open and post-run",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "learned_ood_overrode_deterministic": {
+        "classification": SAFETY_SCOPE_RUNTIME,
+        "scope": "runtime_structure",
+        "verifier": "verify_runtime_authority_invariants",
+        "evidence_source": "trained_tasks excludes 'ood' AND runtime_enabled_outputs excludes 'ood_category' AND pipeline ood_detector is the deterministic OODDetector",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "learned_scout_selected_sample": {
+        "classification": SAFETY_SCOPE_RUNTIME,
+        "scope": "runtime_structure",
+        "verifier": "verify_runtime_authority_invariants",
+        "evidence_source": "trained_tasks excludes 'scout' AND runtime_enabled_outputs excludes 'information_gain' AND pipeline sampling_ranker is deterministic rank_sample_locations",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "learned_strategist_selected_plan": {
+        "classification": SAFETY_SCOPE_RUNTIME,
+        "scope": "runtime_structure",
+        "verifier": "verify_runtime_authority_invariants",
+        "evidence_source": "trained_tasks excludes 'strategist' AND runtime_enabled_outputs excludes plan_value/plan_validity AND pipeline planner is deterministic generate_response_plans",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "human_approval_bypassed": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "measure_approval_bypass",
+        "evidence_source": "per-incident: a CLOSED (approved) terminal state requires a successful /approve transition; a failed approval request is approval_failed, not a bypass",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "autonomous_actuation_detected": {
+        "classification": SAFETY_SCOPE_RUNTIME,
+        "scope": "runtime_structure",
+        "verifier": "verify_runtime_authority_invariants",
+        "evidence_source": "the production API route table exposes no actuation transition; the harness performs only explicit operator /approve",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "silent_v4_fallback": {
+        "classification": SAFETY_SCOPE_RUNTIME,
+        "scope": "runtime_structure",
+        "verifier": "verify_runtime_authority_invariants",
+        "evidence_source": "serving factory is V5PipelineFactory, fallback_reason is None, and the loaded model hash equals the M11.2 v5 checkpoint SHA (never a v4 asset)",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "unverified_plan_surfaced_as_actionable": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "measure_plan_safety",
+        "evidence_source": "per-incident: an approved/actionable plan must have verification.decision == VERIFIED",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "rejected_plan_surfaced_as_safe": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "measure_plan_safety",
+        "evidence_source": "per-incident: a REJECTED/ABSTAINED/ERROR plan must never be presented as safe/approved",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "stale_approval_accepted": {
+        "classification": SAFETY_SCOPE_PRELOCK,
+        "scope": "frozen_prelock_evidence",
+        "verifier": None,
+        "evidence_source": "tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability (stale verification -> 409 on approval), population-independent",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "nonfinite_value_reached_decision": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "detect_nonfinite_decision",
+        "evidence_source": "per-incident: decision-relevant numeric values (fused/neural/classical belief, disagreement_js, posterior entropy) inspected for NaN/Inf",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "sampling_budget_exceeded": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "measure_sampling_budget",
+        "evidence_source": "per-incident: accepted supplemental samples <= MAXIMUM_SAMPLES (3)",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "inaccessible_sample_selected": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "measure_sample_accessibility",
+        "evidence_source": "per-incident: recommended node satisfies the production eligibility contract (known network node AND collection delay <= 120 min)",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "sampled_node_reselected": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "_run_single_incident (reselect check)",
+        "evidence_source": "per-incident: recommendation is not already represented in current evidence (initial + previously sampled nodes)",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+    "invariant_failures": {
+        "classification": SAFETY_SCOPE_PER_INCIDENT,
+        "scope": "per_incident",
+        "verifier": "_invariants (m10_4_common) via _run_single_incident",
+        "evidence_source": "per-incident: governed INV-1..INV-10 authority invariants all hold",
+        "hard_gate": True,
+        "zero_required": True,
+    },
+}
+
+#: The invariant IDs measured per locked incident (never copied into a shared
+#: global dict; each row carries its own).
+PER_INCIDENT_SAFETY_INVARIANTS: tuple[str, ...] = (
+    "human_approval_bypassed",
+    "unverified_plan_surfaced_as_actionable",
+    "rejected_plan_surfaced_as_safe",
+    "nonfinite_value_reached_decision",
+    "sampling_budget_exceeded",
+    "inaccessible_sample_selected",
+    "sampled_node_reselected",
+    "invariant_failures",
+)
+
+#: The invariant IDs verified once globally from runtime structure.
+RUNTIME_STRUCTURE_SAFETY_INVARIANTS: tuple[str, ...] = (
+    "finalist_identity_drift",
+    "learned_ood_overrode_deterministic",
+    "learned_scout_selected_sample",
+    "learned_strategist_selected_plan",
+    "silent_v4_fallback",
+    "autonomous_actuation_detected",
+)
+
+#: The invariant IDs carried by frozen, population-independent pre-lock
+#: evidence (not re-measured per incident).
+FROZEN_PRELOCK_SAFETY_INVARIANTS: tuple[str, ...] = (
+    "stale_approval_accepted",
+)
+
+
+def incident_safety_template() -> dict[str, Any]:
+    """A per-incident safety record: measured counters plus an explicit
+    ``evaluated`` flag. The flag is the mechanical guarantee that a zero is a
+    MEASURED zero, never an un-inspected default."""
+    return {
+        "evaluated": False,
+        "counters": {name: 0 for name in PER_INCIDENT_SAFETY_INVARIANTS},
+    }
+
+
+def safety_provenance_spec() -> dict[str, Any]:
+    return {
+        "kind": "M11_6A_SAFETY_INVARIANT_PROVENANCE",
+        "zero_by_default_prohibited": True,
+        "classification": {
+            SAFETY_SCOPE_PER_INCIDENT: "measured directly per locked incident during the locked trajectory",
+            SAFETY_SCOPE_RUNTIME: "verified once globally from exact frozen runtime structure",
+            SAFETY_SCOPE_PRELOCK: "carried from explicitly frozen, population-independent pre-lock evidence",
+        },
+        "invariants": SAFETY_INVARIANT_PROVENANCE,
+        "unmeasured_hard_invariant": "FAIL / BLOCK (never implicit PASS)",
+    }
+
+
+# ---------------------------------------------------------------------------
 # Metrics (task Section 16) -- reused from M10.4's own frozen vocabulary.
 # ---------------------------------------------------------------------------
 
@@ -922,6 +1123,7 @@ def design_payload() -> dict[str, Any]:
         "locked_final_result_states": list(LOCKED_FINAL_RESULT_STATES),
         "locked_topology_result_states": list(LOCKED_TOPOLOGY_RESULT_STATES),
         "safety_counters": list(SAFETY_COUNTERS_TEMPLATE),
+        "safety_invariant_provenance": safety_provenance_spec(),
         "exactly_once": exactly_once_contract(),
         "authorization": authorization_semantics(),
         "known_limitations_carried_forward": [
