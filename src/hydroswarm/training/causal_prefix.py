@@ -30,7 +30,7 @@ import hashlib
 import json
 import random
 from dataclasses import dataclass
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Sequence
 
 import numpy as np
 import torch
