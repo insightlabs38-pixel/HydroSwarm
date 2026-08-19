@@ -252,6 +252,38 @@ def test_unrecognized_planning_suppression_fails_closed() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    ("state", "view", "message"),
+    [
+        ({"status": "SAMPLING", "approval_pending": True}, None, "approval boundary"),
+        ({"status": "SAMPLING", "approval_pending": False}, {"plans": [{"plan_id": "unsafe"}], "selected_plan_id": None, "recommended_plan_id": None}, "actionable plans"),
+    ],
+)
+def test_suppression_cannot_expose_plan_or_bypass_approval(monkeypatch, state, view, message) -> None:
+    module = _load_verify_script_module()
+
+    def request(_base_url, _method, path, **_kwargs):
+        if path == "/api/incidents/incident":
+            return 200, state
+        if path == "/api/incidents/incident/view":
+            return 200, view or {"plans": [], "selected_plan_id": None, "recommended_plan_id": None}
+        raise AssertionError(path)
+
+    monkeypatch.setattr(module, "_request", request)
+    with pytest.raises(AssertionError, match=message):
+        module._assert_governed_planning_suppression(
+            "http://test", "incident", 409,
+            {"detail": {"reason": "PLANNING_SUPPRESSED", "codes": ["HIGH_CLASSICAL_NEURAL_DISAGREEMENT"]}},
+        )
+
+
+def test_workflow_strict_self_test_rejects_wrong_or_fallback_model_identity() -> None:
+    text = WORKFLOW_PATH.read_text()
+    assert "hydroswarm self-test --strict" in text
+    assert "assert report['ok'] is True" in text
+    assert "report['trained_assets']['model_sha256']" in text
+
+
 def test_persistence_check_does_not_reanalyze_a_closed_incident(monkeypatch, tmp_path) -> None:
     """CLOSED is terminal, so restart validation reads durable state and audit history."""
     module = _load_verify_script_module()
