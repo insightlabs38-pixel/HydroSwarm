@@ -1,0 +1,30 @@
+{
+  "all_checks_pass": true,
+  "branch": "exp/hydrocore-v5-causal",
+  "checks": {
+    "autonomous_actuation_absent": true,
+    "branch_correct": true,
+    "calibration_hash_matches": true,
+    "deterministic_authority_boundaries_match": true,
+    "finalist_checkpoint_hash_matches": true,
+    "head_identified": true,
+    "human_approval_mandatory": true,
+    "locked_test_never_opened": true,
+    "m11_1_selected_one_finalist": true,
+    "m11_2_froze_finalist": true,
+    "m11_5_closure_exact_pass": true,
+    "m11_5_matrix_green": true,
+    "m11_6_preconditions_satisfied": true,
+    "no_change_after_m11_5_head": true,
+    "no_v4_fallback": true,
+    "output_allowlist_matches": true,
+    "release_manifest_matches": true,
+    "repository_correct": true,
+    "tuning_closed": true,
+    "worktree_clean": true
+  },
+  "code_under_test_commit": "cd77e9e41d0fb435fb738770976f2bf25aea9550",
+  "kind": "M11_6_PREFLIGHT",
+  "locked_test_opened_before": false,
+  "milestone": "M11.6"
+}

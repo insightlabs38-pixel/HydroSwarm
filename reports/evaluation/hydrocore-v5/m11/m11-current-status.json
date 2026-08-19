@@ -11,7 +11,8 @@
   "m11_5_matrix_green": true,
   "m11_5_state": "M11_5_FULL_VALIDATION_PASS",
   "m11_6_preconditions_satisfied": true,
-  "next_action": "M11_5_PASS_AWAIT_EXPLICIT_HUMAN_AUTHORIZATION_FOR_M11_6",
+  "m11_6_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "next_action": "M11_6_BLOCKED_NO_LOCKED_DATASET_AWAIT_DATASET",
   "next_authorized_milestone": null,
   "tuning_closed": true
 }

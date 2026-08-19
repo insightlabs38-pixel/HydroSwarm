@@ -1,0 +1,14 @@
+{
+  "kind": "M11_6_LIMITATIONS",
+  "limitations": [
+    "M10.4 plan-vs-NO_ACTION comparison had a vacuous Gate E because NO_ACTION was absent from the bounded candidate set.",
+    "Active sampling produced modest localization benefit and did not change the final approved action in the M10.4 population.",
+    "Development unseen-topology evidence was limited.",
+    "The M9.6 fixed versus production incident_elapsed unobserved-age train/serve semantic difference remains frozen.",
+    "Learned OOD was not promoted.",
+    "Learned Scout was not promoted.",
+    "Learned Strategist was not promoted."
+  ],
+  "milestone": "M11.6",
+  "note": "carried forward unchanged; M11.6 did not run, so no limitation was measured or erased"
+}

@@ -1,0 +1,29 @@
+{
+  "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+  "calibration_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+  "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+  "deterministic_authority": {
+    "autonomous_actuation": false,
+    "human_approval_required": true,
+    "ood": "OODDetector",
+    "physical_verification": "WNTR/EPANET",
+    "planner": "generate_response_plans",
+    "scout": "rank_sample_locations"
+  },
+  "finalist_system": "HydroCore-v5 M10 frozen release",
+  "identity_matches_freeze": true,
+  "kind": "M11_6_FINALIST_IDENTITY",
+  "next_step_disposition": "SUPPRESSED_UNSUPERVISED",
+  "no_v4_fallback": true,
+  "release_bundle": "models/hydrocore-v5-release",
+  "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "schema_version": 1,
+  "selected_seed": 20260814
+}
