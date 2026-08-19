@@ -9,7 +9,7 @@
     "m11_2_frozen": true,
     "next_authorized": true
   },
-  "code_under_test_commit": "34ecd78ccc568a94f2d1d811daa11793b1fa625b",
+  "code_under_test_commit": "dc715a16ffd98fab184ceeb2e666904ff30ec53a",
   "kind": "M11_5_PREFLIGHT",
   "locked_test_opened_after": false,
   "locked_test_opened_before": false,

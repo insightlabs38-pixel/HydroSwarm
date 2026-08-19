@@ -8,10 +8,10 @@
   "locked_test_opened": false,
   "m11_1_state": "M11_1_FINALIST_SELECTED",
   "m11_2_state": "M11_2_FINALIST_FROZEN",
-  "m11_5_matrix_green": false,
-  "m11_5_state": "M11_5_FULL_VALIDATION_FAIL",
-  "m11_6_preconditions_satisfied": false,
-  "next_action": "M11_5_FAILED_DO_NOT_PROCEED_TO_M11_6",
+  "m11_5_matrix_green": true,
+  "m11_5_state": "M11_5_FULL_VALIDATION_PASS",
+  "m11_6_preconditions_satisfied": true,
+  "next_action": "M11_5_PASS_AWAIT_EXPLICIT_HUMAN_AUTHORIZATION_FOR_M11_6",
   "next_authorized_milestone": null,
   "tuning_closed": true
 }

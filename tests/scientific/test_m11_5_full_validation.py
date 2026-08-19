@@ -21,7 +21,7 @@ def test_m11_5_preflight_preserves_frozen_parent_and_unopened_lock_after_closure
     assert preflight["checks"]["current_flags"] is True
     assert preflight["checks"]["finalist_identity"] is True
     assert preflight["checks"]["locked_unopened"] is True
-    # M11.5 has already closed FAIL pending software gates, so it must not remain authorized.
+    # M11.5 has already closed (currently PASS); it must not remain authorized for re-run.
     assert preflight["checks"]["next_authorized"] is False
     assert preflight["all_checks_pass"] is False
 

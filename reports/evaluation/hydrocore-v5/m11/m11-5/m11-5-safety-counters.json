@@ -3,7 +3,7 @@
   "finalist_identity_drift": 0,
   "human_approval_bypassed": 0,
   "inaccessible_sample_selected": 0,
-  "invariant_failures": 1,
+  "invariant_failures": 0,
   "learned_ood_overrode_deterministic": 0,
   "learned_scout_selected_sample": 0,
   "learned_strategist_selected_plan": 0,

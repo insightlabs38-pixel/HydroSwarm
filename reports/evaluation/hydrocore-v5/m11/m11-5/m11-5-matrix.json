@@ -1,6 +1,6 @@
 {
   "kind": "M11_5_MATRIX",
-  "matrix_green": false,
+  "matrix_green": true,
   "rows": [
     {
       "domain": "Finalist identity / reproducibility",
@@ -165,10 +165,10 @@
       "gate_source": "established release gates",
       "hard_gating": true,
       "limitation": null,
-      "result": "FAIL",
+      "result": "PASS",
       "row_id": "N",
       "scope": "full pytest, strict self-test, Docker, frontend, static checks",
-      "status": "FAIL"
+      "status": "PASS"
     }
   ]
 }

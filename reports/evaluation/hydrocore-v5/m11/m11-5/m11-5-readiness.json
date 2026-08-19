@@ -1,5 +1,5 @@
 {
-  "awaiting_explicit_human_authorization": false,
+  "awaiting_explicit_human_authorization": true,
   "final_selection_record_exists": true,
   "finalist_frozen": true,
   "finalist_selected": true,
@@ -7,7 +7,7 @@
   "locked_evaluation_authorized": false,
   "locked_test_opened": false,
   "locked_test_unopened": true,
-  "m11_5_matrix_green": false,
-  "m11_6_preconditions_satisfied": false,
+  "m11_5_matrix_green": true,
+  "m11_6_preconditions_satisfied": true,
   "tuning_closed": true
 }
