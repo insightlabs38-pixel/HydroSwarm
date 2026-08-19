@@ -40,6 +40,13 @@ from typing import Any
 DEFAULT_BASE_URL = "http://127.0.0.1:8765"
 STARTUP_TIMEOUT_SECONDS = 120
 POLL_INTERVAL_SECONDS = 2.0
+GOVERNED_SUPPRESSION_CODES = frozenset({
+    "HIGH_CLASSICAL_NEURAL_DISAGREEMENT",
+    "MODEL_EVIDENCE_INSUFFICIENT",
+    "CANDIDATE_REGION_TOO_BROAD",
+    "CALIBRATION_INVALID_OR_MISSING",
+    "ALL_SENSORS_FROZEN",
+})
 
 
 def _request(
@@ -128,6 +135,29 @@ def _sample_node_for_live_fixture(
         assert candidates, "live fixture has no unsampled reference node"
         return max(candidates, key=lambda node: (candidates[node], node)), "OPERATOR_GRAB_SAMPLE"
     raise AssertionError(f"sample recommendation failed: {status}: {response}")
+
+
+def _assert_governed_planning_suppression(
+    base_url: str, incident_id: str, status: int, response: Any,
+) -> dict[str, Any] | None:
+    """Accept only an explicit, safe, fail-closed terminal planning outcome."""
+    detail = response.get("detail") if isinstance(response, dict) else None
+    if status != 409 or not isinstance(detail, dict) or detail.get("reason") != "PLANNING_SUPPRESSED":
+        return None
+    codes = detail.get("codes")
+    assert isinstance(codes, list) and codes, f"suppression lacks explicit codes: {response}"
+    assert set(codes) <= GOVERNED_SUPPRESSION_CODES, f"unrecognized planning suppression: {codes}"
+    state_status, state = _request(base_url, "GET", f"/api/incidents/{incident_id}")
+    assert state_status == 200, f"suppressed incident state unavailable: {state_status}: {state}"
+    assert state.get("approval_pending") is False, f"suppression retained an approval boundary: {state}"
+    view_status, view = _request(base_url, "GET", f"/api/incidents/{incident_id}/view")
+    assert view_status == 200, f"suppressed incident view unavailable: {view_status}: {view}"
+    assert not view.get("plans"), f"suppression exposed actionable plans: {view}"
+    assert view.get("selected_plan_id") is None and view.get("recommended_plan_id") is None, (
+        f"suppression exposed selected/recommended plan: {view}"
+    )
+    return {"incident_id": incident_id, "runtime_mode": view.get("runtime_mode") or view.get("runtimeMode"),
+            "status": state.get("status"), "terminal_kind": "GOVERNED_PLANNING_SUPPRESSION", "codes": codes}
 
 
 def cmd_health(args: argparse.Namespace) -> int:
@@ -248,6 +278,13 @@ def cmd_live_workflow(args: argparse.Namespace) -> int:
     status, plans = _request(
         base_url, "POST", f"/api/incidents/{incident_id}/plans/generate", json_body={"count": 2}
     )
+    suppressed = _assert_governed_planning_suppression(base_url, incident_id, status, plans)
+    if suppressed is not None:
+        if args.state_file:
+            Path(args.state_file).write_text(json.dumps(suppressed))
+        print(f"[docker-ci] governed planning suppression accepted: {suppressed['codes']}")
+        print("[docker-ci] live-workflow PASSED")
+        return 0
     assert status == 200, f"plan generation failed: {status}: {plans}"
     print(f"[docker-ci] {len(plans)} real bounded response plan(s) generated")
 
@@ -308,6 +345,15 @@ def cmd_verify_persistence(args: argparse.Namespace) -> int:
 
     state = json.loads(Path(args.state_file).read_text())
     incident_id = state["incident_id"]
+
+    if state.get("terminal_kind") == "GOVERNED_PLANNING_SUPPRESSION":
+        status, replay = _request(base_url, "POST", f"/api/incidents/{incident_id}/replay")
+        assert status == 200 and replay.get("chain_valid") is True, "suppressed incident audit chain is invalid after restart"
+        event_types = {event.get("event_type") for event in replay.get("events", [])}
+        assert "PLAN_APPROVED" not in event_types, "suppressed incident bypassed human approval"
+        print(f"[docker-ci] suppressed incident {incident_id} survived restart without approval")
+        print("[docker-ci] verify-persistence PASSED")
+        return 0
 
     # Incident evidence, plans, verifications, approvals, and audit events
     # are durable; hybrid analysis is deliberately in-memory.  The workflow

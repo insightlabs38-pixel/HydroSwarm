@@ -17,6 +17,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import yaml
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_PATH = PROJECT_ROOT / ".github" / "workflows" / "docker-verify.yml"
@@ -204,6 +205,51 @@ def test_live_workflow_approves_the_first_current_verified_plan(monkeypatch) -> 
     assert f"/api/incidents/{incident_id}/plans/{second_plan_id}/verify" not in requested_paths
     assert f"/api/incidents/{incident_id}/plans/{first_plan_id}/approve" in requested_paths
     assert f"/api/incidents/{incident_id}" in requested_paths
+
+
+def test_live_workflow_accepts_only_explicit_safe_governed_planning_suppression(monkeypatch, tmp_path) -> None:
+    module = _load_verify_script_module()
+    incident_id = str(uuid4())
+    state_file = tmp_path / "state.json"
+
+    def request(_base_url, _method, path, **_kwargs):
+        if path == "/api/live-example-inputs":
+            return 200, {"network_filename": "network.inp", "network_inp_text": "[TITLE]", "candidate_signatures_mg_l": {"J1": 1.0, "J2": 0.5}, "initial_observation": {"sensor_id": "S-J1", "node_id": "J1", "concentration_mg_l": 1.0, "pressure_m": 25.0}, "contamination_threshold_mg_l": 0.1}
+        if path == "/api/networks/import":
+            return 201, {"network_id": "network-id"}
+        if path == "/api/incidents":
+            return 201, {"incident_id": incident_id}
+        if path.endswith("/samples/recommend"):
+            return 200, {"node_id": "J2"}
+        if path.endswith("/plans/generate"):
+            return 409, {"detail": {"reason": "PLANNING_SUPPRESSED", "codes": ["HIGH_CLASSICAL_NEURAL_DISAGREEMENT"]}}
+        if path == f"/api/incidents/{incident_id}":
+            return 200, {"status": "SAMPLING", "approval_pending": False}
+        if path.endswith("/view"):
+            return 200, {"runtime_mode": "LIVE", "plans": [], "selected_plan_id": None, "recommended_plan_id": None}
+        if path.endswith("/analyze") or path.endswith("/samples"):
+            return 200, {}
+        raise AssertionError(path)
+
+    monkeypatch.setattr(module, "_wait_for_health", lambda _base_url: None)
+    monkeypatch.setattr(module, "_request", request)
+    monkeypatch.setattr(module, "_utc_now", lambda: "2026-01-01T00:00:00+00:00")
+    assert module.cmd_live_workflow(argparse.Namespace(base_url="http://test", state_file=str(state_file))) == 0
+    assert 'GOVERNED_PLANNING_SUPPRESSION' in state_file.read_text()
+
+
+def test_internal_planning_failure_is_not_accepted() -> None:
+    module = _load_verify_script_module()
+    assert module._assert_governed_planning_suppression("http://test", "incident", 500, {"detail": "internal error"}) is None
+
+
+def test_unrecognized_planning_suppression_fails_closed() -> None:
+    module = _load_verify_script_module()
+    with pytest.raises(AssertionError, match="unrecognized"):
+        module._assert_governed_planning_suppression(
+            "http://test", "incident", 409,
+            {"detail": {"reason": "PLANNING_SUPPRESSED", "codes": ["UNKNOWN"]}},
+        )
 
 
 def test_persistence_check_does_not_reanalyze_a_closed_incident(monkeypatch, tmp_path) -> None:
