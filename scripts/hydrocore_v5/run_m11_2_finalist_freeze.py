@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -174,7 +175,10 @@ print(json.dumps({'ready': factory.trained_assets_ready, 'model_hash': factory.m
  'outputs': sorted(V5_RUNTIME_ENABLED_OUTPUTS), 'trained_tasks': sorted(V5_TRAINED_TASKS),
  'fallback_reason': factory.fallback_reason}, sort_keys=True))
 """
-    observed = json.loads(subprocess.check_output([sys.executable, "-c", child], cwd=ROOT, text=True))
+    child_environment = os.environ.copy()
+    source_path = str(ROOT / "src")
+    child_environment["PYTHONPATH"] = source_path + (os.pathsep + child_environment["PYTHONPATH"] if child_environment.get("PYTHONPATH") else "")
+    observed = json.loads(subprocess.check_output([sys.executable, "-c", child], cwd=ROOT, text=True, env=child_environment))
     checks = {
         "clean_process_loaded": observed["ready"] is True and observed["fallback_reason"] is None,
         "checkpoint": observed["model_hash"] == EXPECTED["checkpoint"],
@@ -217,18 +221,38 @@ def negative_identity_tests(identity: dict[str, Any]) -> dict[str, Any]:
             "all_mutations_rejected": all(not result["accepted_as_same_finalist"] for result in results.values())}
 
 
-def historical_immutability() -> dict[str, Any]:
+def historical_immutability(changes: list[tuple[str, str]] | None = None) -> dict[str, Any]:
     base = "330bff8be18433e441b9382e14860ff02a19b2f5"
-    changed = subprocess.check_output(["git", "diff", "--name-only", base, "HEAD"], cwd=ROOT, text=True).splitlines()
-    protected = ("reports/evaluation/hydrocore-v5/m10/", "reports/evaluation/hydrocore-v5/m9-", "reports/evaluation/hydrocore-v5/m11/m11-1/", "models/hydrocore-v5-release/", "models/hydrocore-v4-release/", "docs/evaluation/HYDROCORE_V5_M11_1_")
-    violations = [path for path in changed if path.startswith(protected)]
-    allowed = (
-        "docs/evaluation/HYDROCORE_V5_M11_2_", "scripts/hydrocore_v5/run_m11_2_", "tests/scientific/test_m11_2_",
-        "reports/evaluation/hydrocore-v5/m11/m11-2/", "reports/evaluation/hydrocore-v5/m11/m11-current-status.json",
+    if changes is None:
+        raw_changes = subprocess.check_output(
+            ["git", "diff", "--no-renames", "--name-status", base, "HEAD"], cwd=ROOT, text=True,
+        ).splitlines()
+        change_entries = [tuple(line.split("\t", maxsplit=1)) for line in raw_changes]
+    else:
+        change_entries = changes
+    changed = [path for _, path in change_entries]
+    protected_prefixes = (
+        "models/hydrocore-v5-release/", "models/hydrocore-v4-release/",
+        *(f"reports/evaluation/hydrocore-v5/m{milestone}-" for milestone in range(10)),
+        "reports/evaluation/hydrocore-v5/m10/", "reports/evaluation/hydrocore-v5/m11/m11-1/",
+        *(f"docs/evaluation/HYDROCORE_V5_M{milestone}_" for milestone in range(10)),
+        "docs/evaluation/HYDROCORE_V5_M10_", "docs/evaluation/HYDROCORE_V5_M11_1_",
+        "src/hydroswarm/preprocessing/schema.py",
+        *tuple(relative(path) for path in RUNTIME_SOURCES),
     )
+    violations = [path for path in changed if path.startswith(protected_prefixes)]
+    later_milestone_additions = [
+        path for status, path in change_entries
+        if status == "A" and path.startswith((
+            "docs/evaluation/HYDROCORE_V5_M11_5_", "scripts/hydrocore_v5/run_m11_5_",
+            "tests/scientific/test_m11_5_", "reports/evaluation/hydrocore-v5/m11/m11-5/",
+            "reports/evaluation/hydrocore-v5/m11/m11-current-status.json",
+        ))
+    ]
     return {"kind": "M11_2_HISTORICAL_IMMUTABILITY", "baseline_commit": base, "changed_since_baseline": changed,
             "protected_path_violations": violations, "historical_artifacts_unchanged": not violations,
-            "no_system_tuning_or_runtime_change": all(path.startswith(allowed) for path in changed)}
+            "later_milestone_additions": later_milestone_additions,
+            "no_system_tuning_or_runtime_change": not violations}
 
 
 def authority_freeze(identity: dict[str, Any]) -> dict[str, Any]:

@@ -13,10 +13,17 @@ def _passing_software() -> dict:
     return {"kind": "M11_5_SOFTWARE_GATES", "all_required_pass": True, "gates": []}
 
 
-def test_m11_5_preflight_requires_frozen_parent_and_unopened_lock() -> None:
+def test_m11_5_preflight_preserves_frozen_parent_and_unopened_lock_after_closure() -> None:
     preflight = m115.preflight()
-    assert preflight["all_checks_pass"] is True
-    assert all(preflight["checks"].values())
+    assert preflight["checks"]["m10_complete"] is True
+    assert preflight["checks"]["m11_1_selected"] is True
+    assert preflight["checks"]["m11_2_frozen"] is True
+    assert preflight["checks"]["current_flags"] is True
+    assert preflight["checks"]["finalist_identity"] is True
+    assert preflight["checks"]["locked_unopened"] is True
+    # M11.5 has already closed FAIL pending software gates, so it must not remain authorized.
+    assert preflight["checks"]["next_authorized"] is False
+    assert preflight["all_checks_pass"] is False
 
 
 def test_m11_5_matrix_covers_all_required_domains_without_fake_m11_3_or_m11_4() -> None:
@@ -32,7 +39,8 @@ def test_m11_5_closed_evidence_has_the_required_frozen_gate_outcomes() -> None:
     assert all(value == 0 for value in results["safety"].values())
 
 
-def test_m11_5_artifact_synthesis_requires_every_hard_gate(tmp_path: Path) -> None:
+def test_m11_5_artifact_synthesis_requires_every_hard_gate(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(m115, "preflight", lambda: {"all_checks_pass": True})
     records = m115.build_artifacts(_passing_software(), tmp_path)
     matrix = records["m11-5-matrix.json"]
     readiness = records["m11-5-readiness.json"]

@@ -49,6 +49,35 @@ def test_m11_2_clean_load_reproducibility() -> None:
     assert all(result["checks"].values())
 
 
+def test_m11_2_historical_immutability_allows_additive_m11_5_evidence() -> None:
+    history = m11.historical_immutability([
+        ("A", "docs/evaluation/HYDROCORE_V5_M11_5_FULL_VALIDATION_RESULTS.md"),
+        ("A", "scripts/hydrocore_v5/run_m11_5_full_validation.py"),
+        ("A", "tests/scientific/test_m11_5_full_validation.py"),
+        ("A", "reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-matrix.json"),
+    ])
+    assert history["historical_artifacts_unchanged"] is True
+    assert history["no_system_tuning_or_runtime_change"] is True
+    assert len(history["later_milestone_additions"]) == 4
+
+
+def test_m11_2_historical_immutability_rejects_protected_finalist_changes() -> None:
+    history = m11.historical_immutability([
+        ("M", "models/hydrocore-v5-release/runtime_manifest.json"),
+        ("M", "src/hydroswarm/runtime/v5_defaults.py"),
+        ("M", "reports/evaluation/hydrocore-v5/m10/m10-5/m10-5-closure.json"),
+        ("M", "reports/evaluation/hydrocore-v5/m11/m11-1/final-selection.json"),
+    ])
+    assert history["historical_artifacts_unchanged"] is False
+    assert history["no_system_tuning_or_runtime_change"] is False
+    assert history["protected_path_violations"] == [path for _, path in [
+        ("M", "models/hydrocore-v5-release/runtime_manifest.json"),
+        ("M", "src/hydroswarm/runtime/v5_defaults.py"),
+        ("M", "reports/evaluation/hydrocore-v5/m10/m10-5/m10-5-closure.json"),
+        ("M", "reports/evaluation/hydrocore-v5/m11/m11-1/final-selection.json"),
+    ]]
+
+
 def test_m11_2_artifacts_freeze_without_authorizing_locked_evaluation(tmp_path: Path) -> None:
     output_dir = tmp_path / "m11-2"
     records = m11.build_artifacts(output_dir)
