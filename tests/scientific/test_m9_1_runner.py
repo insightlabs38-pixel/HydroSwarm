@@ -404,6 +404,30 @@ def test_assert_code_under_test_commit_passes_at_current_head():
     assert len(head) == 40
 
 
+def test_expected_named_branch_is_accepted() -> None:
+    assert common._accepted_checkout_identity(head="h", branch=common.FROZEN_BRANCH, pr_ref=None, pr_head=None, is_ancestor=lambda *_: False)
+
+
+def test_verified_pr_detached_merge_is_accepted() -> None:
+    assert common._accepted_checkout_identity(head="merge", branch="", pr_ref=common.FROZEN_BRANCH, pr_head="pr-head", is_ancestor=lambda a, b: (a, b) == ("pr-head", "merge"))
+
+
+def test_unrelated_detached_commit_is_rejected() -> None:
+    assert not common._accepted_checkout_identity(head="other", branch="", pr_ref=common.FROZEN_BRANCH, pr_head="pr-head", is_ancestor=lambda *_: False)
+
+
+def test_frozen_path_changes_still_fail_even_for_detached_merge(monkeypatch) -> None:
+    monkeypatch.setattr(common, "_accepted_checkout_identity", lambda **_kwargs: True)
+    original = common._git
+    def fake_git(*args):
+        if args[:2] == ("diff", "--name-only"):
+            return "src/hydroswarm/model/core.py"
+        return original(*args)
+    monkeypatch.setattr(common, "_git", fake_git)
+    with pytest.raises(AssertionError, match="changes frozen paths"):
+        common.assert_code_under_test_commit()
+
+
 def test_frozen_paths_diff_mechanism_detects_a_real_prior_change():
     # 154605180f2a950d86452cfc8ec7202990aba8cf ("implement frozen GRAPH_ODE
     # max_num_steps bound") DID touch continuous_time.py relative to its

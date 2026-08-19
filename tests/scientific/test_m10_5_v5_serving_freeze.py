@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 from hydroswarm.runtime.v5_defaults import V5PipelineFactory, V5_RUNTIME_ENABLED_OUTPUTS, V5_TRAINED_TASKS
 
@@ -27,6 +28,8 @@ def test_v5_bundle_loads_selected_model_and_m10_5b_calibration() -> None:
 
 
 def test_v5_release_matches_m10_4_authoritative_model_calibration_and_role_governance() -> None:
+    record = m104.m10.canonical_s_checkpoint(20260814)
+    require_historical_artifact(record["canonical_export_path"], record["canonical_export_sha256"], repo_root=ROOT)
     historical_model, historical_hash = m104.load_canonical_model(20260814)
     historical = m104.fit_frozen_calibrator(model_hash=historical_hash, topology_hashes=m104.trained_family_topology_hashes())
     release = V5PipelineFactory(BUNDLE, project_root=ROOT)

@@ -46,6 +46,7 @@ from __future__ import annotations
 import functools
 import hashlib
 import json
+import os
 import statistics
 import subprocess
 import sys
@@ -266,6 +267,32 @@ def current_commit() -> str:
     return _git("rev-parse", "HEAD")
 
 
+def _github_pr_context() -> tuple[str | None, str | None]:
+    """Return the trusted PR source ref/SHA for a GitHub detached merge checkout."""
+    if os.environ.get("GITHUB_EVENT_NAME") != "pull_request":
+        return None, None
+    ref, sha = os.environ.get("GITHUB_HEAD_REF"), None
+    event_path = os.environ.get("GITHUB_EVENT_PATH")
+    if event_path:
+        try:
+            event = json.loads(Path(event_path).read_text())
+            head = event.get("pull_request", {}).get("head", {})
+            ref = head.get("ref", ref)
+            sha = head.get("sha")
+        except (OSError, json.JSONDecodeError):
+            return None, None
+    return ref, sha
+
+
+def _accepted_checkout_identity(
+    *, head: str, branch: str, pr_ref: str | None, pr_head: str | None,
+    is_ancestor: callable,
+) -> bool:
+    if branch:
+        return branch == FROZEN_BRANCH
+    return pr_ref == FROZEN_BRANCH and bool(pr_head) and is_ancestor(pr_head, head)
+
+
 def assert_code_under_test_commit() -> str:
     """Section header + Section 21(a): the executing commit must be
     `CODE_UNDER_TEST_COMMIT_FLOOR` or a later commit on `FROZEN_BRANCH` that
@@ -274,8 +301,15 @@ def assert_code_under_test_commit() -> str:
 
     head = current_commit()
     branch = _git("branch", "--show-current")
-    if branch != FROZEN_BRANCH:
-        raise AssertionError(f"must execute on {FROZEN_BRANCH!r}, got {branch!r}")
+    pr_ref, pr_head = _github_pr_context()
+    def is_ancestor(candidate: str, descendant: str) -> bool:
+        try:
+            _git("merge-base", "--is-ancestor", candidate, descendant)
+            return True
+        except subprocess.CalledProcessError:
+            return False
+    if not _accepted_checkout_identity(head=head, branch=branch, pr_ref=pr_ref, pr_head=pr_head, is_ancestor=is_ancestor):
+        raise AssertionError(f"must execute on {FROZEN_BRANCH!r} or its verified GitHub PR merge, got {branch!r}")
     merge_base = _git("merge-base", CODE_UNDER_TEST_COMMIT_FLOOR, head)
     if merge_base != CODE_UNDER_TEST_COMMIT_FLOOR:
         raise AssertionError(

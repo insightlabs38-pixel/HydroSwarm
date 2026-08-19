@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 import torch
+from tests.historical_artifact_portability import require_historical_artifact
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts" / "hydrocore_v5"
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -66,7 +67,13 @@ def _reconstruction_for(pool, network, index=0):
 
 def test_real_approved_checkpoints_load_and_produce_finite_scout_outputs() -> None:
     for seed in (20260814, 31874, 20260815):
-        model, sha256, path = ev.verify_and_load_checkpoint(seed)
+        expected = ev.proto.LEVEL_A_REFIT_CHECKPOINT_SHA256[seed]
+        path = require_historical_artifact(
+            ev.m10.M10_DIR / "m10-2-refit" / "checkpoints" / f"level-a-seed{seed}" / "model.safetensors",
+            expected,
+            repo_root=ROOT,
+        )
+        model, sha256, path = ev.verify_and_load_checkpoint(seed, checkpoint_path=path)
         assert sha256 == ev.proto.LEVEL_A_REFIT_CHECKPOINT_SHA256[seed]
 
 

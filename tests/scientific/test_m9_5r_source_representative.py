@@ -24,6 +24,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = ROOT / "scripts" / "hydrocore_v5"
@@ -208,14 +209,12 @@ def test_no_m9_4_or_m9_5_incident_reuse():
 def test_frozen_checkpoints_match_recorded_provenance_hashes():
     for seed in m5r.SEEDS:
         record = json.loads((m5r.RUNS_M8_7 / f"AGE_FIX_ONLY-seed{seed}.json").read_text())
-        path = Path(record["export_path"])
-        assert path.exists()
+        path = require_historical_artifact(record["export_path"], record["checkpoint_sha256"], repo_root=ROOT)
         assert _sha256_file(path) == record["checkpoint_sha256"]
     for seed in m5r.SEEDS:
         record = json.loads((m5r.RUNS_M9_0A / f"ARM_B2_STEP_MATCHED_INTERLEAVED_MULTI_FAMILY-seed{seed}.json").read_text())
         ts = record["training_summary"]
-        path = Path(ts["export_path"])
-        assert path.exists()
+        path = require_historical_artifact(ts["export_path"], ts["export_sha256"], repo_root=ROOT)
         assert _sha256_file(path) == ts["export_sha256"]
 
 

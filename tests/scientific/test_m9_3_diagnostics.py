@@ -18,6 +18,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = ROOT / "scripts" / "hydrocore_v5"
@@ -251,7 +252,7 @@ def test_predictor_checkpoints_unchanged_after_diagnostics():
     for arm in ("ARM_A", "ARM_B2"):
         for seed in m93.SEEDS:
             entry = manifest["checkpoint_sha256"][arm][str(seed)]
-            on_disk = _sha256_file(Path(entry["export_path"]))
+            on_disk = _sha256_file(require_historical_artifact(entry["export_path"], entry["sha256"], repo_root=ROOT))
             assert on_disk == entry["sha256"], f"{arm} seed{seed} checkpoint changed during/after M9.3 diagnostics"
 
 

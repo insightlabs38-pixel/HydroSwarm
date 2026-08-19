@@ -35,6 +35,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = ROOT / "scripts" / "hydrocore_v5"
@@ -238,8 +239,9 @@ def test_frozen_predictor_checkpoint_provenance_matches_and_fails_closed_on_tamp
         recorded_hash = run_record["training_summary"]["export_sha256"]
         cross_check_hash = results_record["arms"]["ARM_B2"]["per_seed"][str(seed)]["checkpoint_sha256"]
         assert recorded_hash == cross_check_hash, f"seed {seed}: provenance cross-check hash mismatch"
-        export_path = Path(run_record["training_summary"]["export_path"])
-        assert export_path.exists(), f"seed {seed}: frozen checkpoint file missing"
+        export_path = require_historical_artifact(
+            run_record["training_summary"]["export_path"], recorded_hash, repo_root=ROOT,
+        )
         on_disk_hash = hashlib.sha256(export_path.read_bytes()).hexdigest()
         assert on_disk_hash == recorded_hash, f"seed {seed}: on-disk checkpoint hash drifted from recorded provenance"
 

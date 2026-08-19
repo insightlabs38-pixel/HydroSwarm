@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts" / "hydrocore_v5"
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -102,7 +103,12 @@ def test_real_approved_checkpoint_hashes_verify() -> None:
     regression test, not just a one-off manual check."""
 
     for seed, expected in proto.LEVEL_A_REFIT_CHECKPOINT_SHA256.items():
-        model, actual_sha256, path = ev.verify_and_load_checkpoint(seed)
+        path = require_historical_artifact(
+            ev.m10.M10_DIR / "m10-2-refit" / "checkpoints" / f"level-a-seed{seed}" / "model.safetensors",
+            expected,
+            repo_root=ROOT,
+        )
+        model, actual_sha256, path = ev.verify_and_load_checkpoint(seed, checkpoint_path=path)
         assert actual_sha256 == expected
         assert isinstance(model, HydroCore)
 

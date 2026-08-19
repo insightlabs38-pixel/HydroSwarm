@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pytest
 import torch
+from tests.historical_artifact_portability import require_historical_artifact
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts" / "hydrocore_v5"
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -305,7 +306,10 @@ def test_refit_checkpoint_model_sha256_matches_recorded_identity() -> None:
         if not identity_path.exists():
             pytest.skip("Level-A refit checkpoint identity not present in this checkout")
         identity = json.loads(identity_path.read_text())
-        observed = hashlib.sha256((checkpoint_dir / "model.safetensors").read_bytes()).hexdigest()
+        model_path = require_historical_artifact(
+            checkpoint_dir / "model.safetensors", identity["model_sha256"], repo_root=ROOT,
+        )
+        observed = hashlib.sha256(model_path.read_bytes()).hexdigest()
         assert observed == identity["model_sha256"]
 
 
@@ -380,7 +384,10 @@ def test_level_b_checkpoint_sha256_matches_recorded_identity() -> None:
     for seed in proto.PARENT_M9_6_TEACHER_SHA256:
         checkpoint_dir = M10_3_REFIT_DIR / "checkpoints" / f"level-b-seed{seed}"
         identity = json.loads((checkpoint_dir / "checkpoint_identity.json").read_text())
-        observed = hashlib.sha256((checkpoint_dir / "model.safetensors").read_bytes()).hexdigest()
+        model_path = require_historical_artifact(
+            checkpoint_dir / "model.safetensors", identity["model_sha256"], repo_root=ROOT,
+        )
+        observed = hashlib.sha256(model_path.read_bytes()).hexdigest()
         assert observed == identity["model_sha256"]
 
 

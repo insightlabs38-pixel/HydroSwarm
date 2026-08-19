@@ -64,7 +64,7 @@ def current_commit() -> str:
 
 
 def relative(path: Path) -> str:
-    return str(path.relative_to(ROOT))
+    return path.relative_to(ROOT).as_posix()
 
 
 def canonical_hash(value: Any) -> str:

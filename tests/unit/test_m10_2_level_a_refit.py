@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 import torch
+from tests.historical_artifact_portability import require_historical_artifact
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts" / "hydrocore_v5"
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -153,7 +154,10 @@ def test_refit_checkpoint_model_sha256_matches_recorded_identity() -> None:
     for seed in proto.TEACHER_CHECKPOINT_SHA256:
         checkpoint_dir = M10_2_REFIT_DIR / "checkpoints" / f"level-a-seed{seed}"
         identity = json.loads((checkpoint_dir / "checkpoint_identity.json").read_text())
-        observed = hashlib.sha256((checkpoint_dir / "model.safetensors").read_bytes()).hexdigest()
+        model_path = require_historical_artifact(
+            checkpoint_dir / "model.safetensors", identity["model_sha256"], repo_root=ROOT,
+        )
+        observed = hashlib.sha256(model_path.read_bytes()).hexdigest()
         assert observed == identity["model_sha256"]
 
 

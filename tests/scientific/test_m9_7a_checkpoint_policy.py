@@ -30,6 +30,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 from hydroswarm.evaluation.live_robustness import locked_test_opened
 
@@ -92,6 +93,8 @@ def test_m9_6_evaluation_used_canonical_checkpoint_not_best_validation() -> None
     assert 'record["canonical_export_path"]' in source
     assert "best_validation_export_path" not in source
 
+    record = _load(M9_6_TRAINING_RUNS_DIR / "ARM_B_M9_6-seed20260814.json")
+    require_historical_artifact(record["canonical_export_path"], record["canonical_export_sha256"], repo_root=ROOT)
     # And empirically: the loaded model's checkpoint SHA matches the
     # canonical record, for the one seed where canonical != best-validation.
     _model, sha, record = m9_6_evaluate._canonical_model("ARM_B_M9_6", 20260814)

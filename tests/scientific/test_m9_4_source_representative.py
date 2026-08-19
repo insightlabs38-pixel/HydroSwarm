@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = ROOT / "scripts" / "hydrocore_v5"
@@ -208,14 +209,12 @@ def test_macro_family_bootstrap_resamples_incidents_not_depth_rows():
 def test_frozen_checkpoints_match_recorded_provenance_hashes():
     for seed in m4.SEEDS:
         record = json.loads((m4.RUNS_M8_7 / f"AGE_FIX_ONLY-seed{seed}.json").read_text())
-        path = Path(record["export_path"])
-        assert path.exists(), f"ARM_A seed{seed} checkpoint missing on disk"
+        path = require_historical_artifact(record["export_path"], record["checkpoint_sha256"], repo_root=ROOT)
         assert _sha256_file(path) == record["checkpoint_sha256"]
     for seed in m4.SEEDS:
         record = json.loads((m4.RUNS_M9_0A / f"ARM_B2_STEP_MATCHED_INTERLEAVED_MULTI_FAMILY-seed{seed}.json").read_text())
         ts = record["training_summary"]
-        path = Path(ts["export_path"])
-        assert path.exists(), f"ARM_B2 seed{seed} checkpoint missing on disk"
+        path = require_historical_artifact(ts["export_path"], ts["export_sha256"], repo_root=ROOT)
         assert _sha256_file(path) == ts["export_sha256"]
 
 

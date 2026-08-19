@@ -16,6 +16,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from tests.historical_artifact_portability import require_historical_artifact
 
 SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts" / "hydrocore_v5"
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -35,6 +36,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 @pytest.fixture(scope="module")
 def _client_seed0():
+    record = m10.canonical_s_checkpoint(m10.SEEDS[0])
+    require_historical_artifact(record["canonical_export_path"], record["canonical_export_sha256"], repo_root=ROOT)
     factory = m104.M10_4_PipelineFactory(seed=m10.SEEDS[0], project_root=m10.ROOT_PATH)
     tmp = tempfile.TemporaryDirectory(prefix="hydroswarm-m10-4-test-")
     tmp_path = Path(tmp.name)
@@ -60,7 +63,9 @@ def _client_seed0():
 def test_canonical_checkpoints_hash_verified():
     verification = m104.verify_canonical_checkpoints()
     assert set(verification) == set(m10.SEEDS)
-    for record in verification.values():
+    for seed, record in verification.items():
+        source = m10.canonical_s_checkpoint(seed)
+        require_historical_artifact(source["canonical_export_path"], source["canonical_export_sha256"], repo_root=ROOT)
         assert record["matches"], record
 
 
