@@ -39,6 +39,8 @@ def test_dockerignore_reincludes_the_v4_release_bundle() -> None:
     assert "models/*" in lines, ".dockerignore must exclude models/* (not bare `models`) so the re-include below can work"
     assert "!models/hydrocore-v4-release" in lines
     assert "!models/hydrocore-v4-release/**" in lines
+    assert "!models/hydrocore-v5-release" in lines
+    assert "!models/hydrocore-v5-release/**" in lines
 
 
 def test_dockerfile_copies_bundle_to_the_env_var_it_sets() -> None:
@@ -52,6 +54,11 @@ def test_dockerfile_copies_bundle_to_the_env_var_it_sets() -> None:
     # WORKDIR is /app, so the copied relative destination must match the
     # absolute path the env var points the runtime at.
     assert bundle_env_value == "/app/models/hydrocore-v4-release"
+
+    v5_env_match = re.search(r"HYDROSWARM_V5_BUNDLE_DIR=(\S+)", dockerfile)
+    assert v5_env_match is not None, "Dockerfile must set HYDROSWARM_V5_BUNDLE_DIR"
+    assert "COPY models/hydrocore-v5-release/ models/hydrocore-v5-release/" in dockerfile
+    assert v5_env_match.group(1) == "/app/models/hydrocore-v5-release"
 
 
 def test_dockerfile_copies_the_reference_demo_artifact_to_the_env_var_it_sets() -> None:

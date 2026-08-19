@@ -29,6 +29,8 @@ data/*
 models/*
 !models/hydrocore-v4-release
 !models/hydrocore-v4-release/**
+!models/hydrocore-v5-release
+!models/hydrocore-v5-release/**
 experiments
 reports
 frontend/node_modules
