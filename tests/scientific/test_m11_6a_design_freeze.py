@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -59,6 +60,11 @@ def _correct_runtime_facts() -> dict:
         "planner_is_deterministic": True,
         "ood_detector_default_none": True,
         "ood_detector_class": "OODDetector",
+        "factory_sampling_ranker_overridden": False,
+        "factory_planner_overridden": False,
+        "factory_ood_detector_explicitly_deterministic": True,
+        "factory_trained_tasks_explicit_sentinel": True,
+        "factory_runtime_enabled_outputs_explicit_frozen": True,
         "route_paths": ("/api/incidents", "/api/networks/import"),
     }
 
@@ -355,14 +361,23 @@ def _materialized_manifest(repo_root: Path) -> tuple[dict, dict]:
     topologies_dir.mkdir(parents=True, exist_ok=True)
     topology_entries = []
     for i in range(design.LOCKED_TOPOLOGY_INSTANCES):
-        inp = topologies_dir / f"locked-topology:{i}.inp"
+        topology_id = f"locked-topology:{i}"
+        inp = topologies_dir / design.topology_filename(topology_id)
         inp.write_text(f"[JUNCTIONS]\n topology {i}\n", encoding="utf-8")
         files[f"topo_inp_{i}"] = inp
-        topology_entries.append({"topology_id": f"locked-topology:{i}", "file_path": str(inp.relative_to(repo_root)), "file_sha256": evaluator.sha256_file(inp)})
+        topology_entries.append({
+            "topology_id": topology_id,
+            "file_path": design.repo_relative_manifest_path(inp, repo_root),
+            "file_sha256": evaluator.sha256_file(inp),
+        })
     known_inp = data_root / "golden_network.inp"
     known_inp.write_text("[JUNCTIONS]\n golden\n", encoding="utf-8")
     files["known_inp"] = known_inp
-    topology_entries.append({"topology_id": "locked-final:golden-reference", "file_path": str(known_inp.relative_to(repo_root)), "file_sha256": evaluator.sha256_file(known_inp)})
+    topology_entries.append({
+        "topology_id": "locked-final:golden-reference",
+        "file_path": design.repo_relative_manifest_path(known_inp, repo_root),
+        "file_sha256": evaluator.sha256_file(known_inp),
+    })
 
     scenarios = [{"scenario_id": sid, "scenario_index": i, "split": design.LOCKED_FINAL_TEST, "topology_id": "locked-final:golden-reference"} for i, sid in enumerate(final_ids)] + [
         {"scenario_id": sid, "scenario_index": i, "split": design.LOCKED_TOPOLOGY_TEST, "topology_id": f"locked-topology:{i}"} for i, sid in enumerate(topo_ids)
@@ -370,7 +385,7 @@ def _materialized_manifest(repo_root: Path) -> tuple[dict, dict]:
     artifact_sha256 = {}
     for label, path in files.items():
         if label in ("final_jsonl", "topo_jsonl") or label.startswith("topo_inp_"):
-            artifact_sha256[str(path.relative_to(repo_root))] = evaluator.sha256_file(path)
+            artifact_sha256[design.repo_relative_manifest_path(path, repo_root)] = evaluator.sha256_file(path)
 
     manifest = _valid_manifest()
     manifest.update({
@@ -575,23 +590,32 @@ def test_verified_successful_approval_passes():
 
 def test_unverified_plan_surfaced_as_actionable_detected():
     unverified, rejected = evaluator.measure_plan_safety([
-        {"approval_status": 200, "verification": {"decision": "ERROR"}},
+        {"approval_status": 200, "verification": {"decision": "ERROR", "verification_status": "CURRENT"}},
     ])
     assert unverified == 1 and rejected == 0
 
 
 def test_rejected_plan_surfaced_as_safe_detected():
     unverified, rejected = evaluator.measure_plan_safety([
-        {"approval_status": 200, "verification": {"decision": "REJECTED"}},
-        {"approval_status": 200, "verification": {"decision": "ABSTAINED"}},
+        {"approval_status": 200, "verification": {"decision": "REJECTED", "verification_status": "CURRENT"}},
+        {"approval_status": 200, "verification": {"decision": "ABSTAINED", "verification_status": "CURRENT"}},
     ])
     assert unverified == 0 and rejected == 2
 
 
+def test_stale_verification_approved_is_unverified():
+    # A plan approved while its verification is STALE (which the production
+    # /approve endpoint refuses with 409) must be caught as unverified.
+    unverified, rejected = evaluator.measure_plan_safety([
+        {"approval_status": 200, "verification": {"decision": "VERIFIED", "verification_status": "STALE"}},
+    ])
+    assert unverified == 1 and rejected == 0
+
+
 def test_verified_plan_is_valid():
     unverified, rejected = evaluator.measure_plan_safety([
-        {"approval_status": 200, "verification": {"decision": "VERIFIED"}},
-        {"approval_status": None, "verification": {"decision": "REJECTED"}},
+        {"approval_status": 200, "verification": {"decision": "VERIFIED", "verification_status": "CURRENT"}},
+        {"approval_status": None, "verification": {"decision": "REJECTED", "verification_status": "CURRENT"}},
     ])
     assert unverified == 0 and rejected == 0
 
@@ -760,3 +784,406 @@ def test_result_schema_distinguishes_required_categories():
     for name in ("m11-6-raw-incidents.jsonl", "m11-6-metrics.json", "m11-6-gate.json",
                  "m11-6-safety-counters.json", "m11-6-closure.json", "m11-6-opened-record.json"):
         assert name in schema["artifacts"]
+
+
+# ---------------------------------------------------------------------------
+# Canonical manifest paths (Sections 3 & 4).
+# ---------------------------------------------------------------------------
+
+def test_repo_relative_manifest_path_is_posix_and_no_backslash(tmp_path):
+    root = tmp_path / "repo"
+    root.mkdir()
+    target = root / "data" / "locked" / "m11-6" / "scenarios.jsonl"
+    target.parent.mkdir(parents=True)
+    target.write_text("x\n", encoding="utf-8")
+    rel = design.repo_relative_manifest_path(target, root)
+    assert rel == "data/locked/m11-6/scenarios.jsonl"
+    assert "\\" not in rel
+
+
+def test_repo_relative_manifest_path_rejects_escape(tmp_path):
+    root = tmp_path / "repo"
+    root.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("x\n", encoding="utf-8")
+    with pytest.raises(ValueError):
+        design.repo_relative_manifest_path(outside, root)
+
+
+@pytest.mark.parametrize("bad", [
+    "data\\locked\\m11-6\\scenarios.jsonl",
+    "/tmp/foo",
+    "C:/foo",
+    "C:\\foo",
+    "../outside",
+    "data/../../outside",
+    "./data/locked/foo",
+    "data//locked/foo",
+    "data/locked/\x00foo",
+])
+def test_validate_manifest_path_rejects_noncanonical(bad):
+    with pytest.raises(ValueError):
+        design.validate_manifest_path(bad)
+
+
+def test_validate_manifest_path_accepts_canonical():
+    assert design.validate_manifest_path("data/locked/m11-6/topologies/locked-topology-0.inp") == \
+        "data/locked/m11-6/topologies/locked-topology-0.inp"
+
+
+def test_validate_manifest_path_under_root_rejects_symlink_escape(tmp_path):
+    if os.name == "nt":
+        pytest.skip("symlink creation requires privileges on Windows")
+    root = tmp_path / "repo"
+    root.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("x\n", encoding="utf-8")
+    (root / "link.txt").symlink_to(outside)
+    with pytest.raises(ValueError):
+        design.validate_manifest_path_under_root("link.txt", root)
+
+
+# ---------------------------------------------------------------------------
+# Portable topology filenames (Section 5).
+# ---------------------------------------------------------------------------
+
+def test_topology_filename_maps_colon_to_dash():
+    assert design.topology_filename("locked-topology:0") == "locked-topology-0.inp"
+    assert design.topology_filename("locked-topology:3") == "locked-topology-3.inp"
+
+
+def test_topology_logical_id_unchanged_and_no_colon_in_filename():
+    assert ":" in "locked-topology:0"
+    for i in range(design.LOCKED_TOPOLOGY_INSTANCES):
+        assert ":" not in design.topology_filename(f"locked-topology:{i}")
+
+
+def test_topology_filename_rejects_nonportable():
+    with pytest.raises(ValueError):
+        design.topology_filename("locked-topology")
+    with pytest.raises(ValueError):
+        design.topology_filename("locked:topology:*")
+
+
+# ---------------------------------------------------------------------------
+# Design-freeze SHA code-identity binding (Sections 6 & 7).
+# ---------------------------------------------------------------------------
+
+def test_design_identity_violations_accepts_exact_current_code():
+    freeze = json.loads((REPO_ROOT / "reports/evaluation/hydrocore-v5/m11/m11-6a/design-freeze/m11-6a-design-freeze.json").read_text(encoding="utf-8"))
+    # Recompute the frozen artifact from current code: must be byte-identical.
+    freeze["design_hash"] = design.design_hash()
+    freeze["design_file_hashes"] = {
+        rel: evaluator.sha256_file(REPO_ROOT / rel) for rel in design.GOVERNED_DESIGN_FILES
+    }
+    assert materializer.design_identity_violations(freeze, REPO_ROOT) == []
+
+
+def test_design_identity_violations_rejects_wrong_design_hash():
+    freeze = {
+        "design_hash": "0" * 64,
+        "design_file_hashes": {rel: "0" * 64 for rel in design.GOVERNED_DESIGN_FILES},
+    }
+    assert any("design_hash" in v for v in materializer.design_identity_violations(freeze, REPO_ROOT))
+
+
+def test_design_identity_violations_rejects_changed_governed_file():
+    freeze = {
+        "design_hash": design.design_hash(),
+        "design_file_hashes": {
+            rel: evaluator.sha256_file(REPO_ROOT / rel) for rel in design.GOVERNED_DESIGN_FILES
+        },
+    }
+    freeze["design_file_hashes"]["scripts/hydrocore_v5/m11_6a_design.py"] = "0" * 64
+    violations = materializer.design_identity_violations(freeze, REPO_ROOT)
+    assert any("changed after freeze commit" in v for v in violations)
+
+
+def test_design_identity_violations_rejects_missing_governed_file():
+    freeze = {
+        "design_hash": design.design_hash(),
+        "design_file_hashes": {},
+    }
+    assert any("no design_file_hashes entry" in v for v in materializer.design_identity_violations(freeze, REPO_ROOT))
+
+
+def test_superseded_b561add_rejected_after_this_correction():
+    assert "b561add678ad7ef7c9ac4f153dce9b9d30dd3f55" in design.SUPERSEDED_DESIGN_FREEZE_COMMITS
+    violations = materializer.validate_design_freeze_sha("b561add678ad7ef7c9ac4f153dce9b9d30dd3f55", REPO_ROOT)
+    assert any("superseded" in v for v in violations)
+
+
+# ---------------------------------------------------------------------------
+# Abstention safety semantics (Section 8).
+# ---------------------------------------------------------------------------
+
+def test_abstained_incident_safety_is_fully_evaluated():
+    record = evaluator.abstained_incident_safety(409)
+    assert record["evaluated"] is True
+    assert set(record["counters"]) == set(design.PER_INCIDENT_SAFETY_INVARIANTS)
+    assert all(value == 0 for value in record["counters"].values())
+    assert record["applicability"]["nonfinite_value_reached_decision"].startswith("not_applicable")
+    assert record["applicability"]["sampling_budget_exceeded"].startswith("measured_zero")
+
+
+def test_abstained_row_is_fail_closed_and_measured():
+    row = _row(design.LOCKED_TOPOLOGY_TEST, 0, "topo-0", "ABSTAINED")
+    row["incident_safety"] = evaluator.abstained_incident_safety(409)
+    assert evaluator.topology_incident_is_fail_closed(row) is True
+
+
+def test_abstained_with_unmeasured_safety_fails():
+    row = _row(design.LOCKED_TOPOLOGY_TEST, 0, "topo-0", "ABSTAINED")
+    row["incident_safety"] = design.incident_safety_template()  # evaluated=False
+    assert evaluator.topology_incident_is_fail_closed(row) is False
+
+
+# ---------------------------------------------------------------------------
+# Pre-lock evidence binding (Section 9).
+# ---------------------------------------------------------------------------
+
+def _prelock_evidence(tmp_path, *, evidence_text, pass_json):
+    evidence_file = tmp_path / "evidence.py"
+    evidence_file.write_text(evidence_text, encoding="utf-8")
+    pass_file = tmp_path / "pass.json"
+    pass_file.write_text(json.dumps(pass_json) + "\n", encoding="utf-8")
+    return {
+        "counter": "stale_approval_accepted",
+        "test_identifier": "evidence.py::test_thing",
+        "evidence_file_path": "evidence.py",
+        "evidence_file_sha256": evaluator.sha256_file(evidence_file),
+        "pass_evidence_path": "pass.json",
+        "pass_evidence_sha256": evaluator.sha256_file(pass_file),
+        "expected_pass": {"stale_approval_accepted": 0},
+    }
+
+
+def test_prelock_evidence_exact_hash_and_pass_accepted(tmp_path, monkeypatch):
+    evidence = _prelock_evidence(tmp_path, evidence_text="def test_thing():\n    pass\n", pass_json={"stale_approval_accepted": 0})
+    monkeypatch.setattr(design, "PRE_LOCK_SAFETY_EVIDENCE", evidence)
+    result = evaluator.verify_prelock_safety_evidence(tmp_path)
+    assert result["stale_approval_accepted"]["pass"] is True
+    assert result["stale_approval_accepted"]["count"] == 0
+
+
+def test_prelock_evidence_real_repo_binding_verified():
+    result = evaluator.verify_prelock_safety_evidence(REPO_ROOT)
+    assert result["stale_approval_accepted"]["pass"] is True
+
+
+def test_prelock_evidence_missing_rejected(tmp_path, monkeypatch):
+    evidence = _prelock_evidence(tmp_path, evidence_text="def test_thing():\n    pass\n", pass_json={"stale_approval_accepted": 0})
+    (tmp_path / evidence["evidence_file_path"]).unlink()
+    monkeypatch.setattr(design, "PRE_LOCK_SAFETY_EVIDENCE", evidence)
+    result = evaluator.verify_prelock_safety_evidence(tmp_path)
+    assert result["stale_approval_accepted"]["pass"] is False
+
+
+def test_prelock_evidence_modified_rejected(tmp_path, monkeypatch):
+    evidence = _prelock_evidence(tmp_path, evidence_text="def test_thing():\n    pass\n", pass_json={"stale_approval_accepted": 0})
+    monkeypatch.setattr(design, "PRE_LOCK_SAFETY_EVIDENCE", evidence)
+    (tmp_path / evidence["evidence_file_path"]).write_text("changed\n", encoding="utf-8")
+    result = evaluator.verify_prelock_safety_evidence(tmp_path)
+    assert result["stale_approval_accepted"]["pass"] is False
+
+
+def test_prelock_evidence_expected_pass_absent_rejected(tmp_path, monkeypatch):
+    evidence = _prelock_evidence(tmp_path, evidence_text="def test_thing():\n    pass\n", pass_json={"stale_approval_accepted": 0})
+    evidence["expected_pass"] = {"stale_approval_accepted": 1}
+    monkeypatch.setattr(design, "PRE_LOCK_SAFETY_EVIDENCE", evidence)
+    result = evaluator.verify_prelock_safety_evidence(tmp_path)
+    assert result["stale_approval_accepted"]["pass"] is False
+
+
+def test_build_safety_result_blocks_on_failed_prelock_evidence():
+    rows, _manifest = _full_population()
+    bad_prelock = {
+        "stale_approval_accepted": {
+            "count": 1, "pass": False, "evaluated": True,
+            "classification": design.SAFETY_SCOPE_PRELOCK,
+            "evidence": {"verified": False},
+        }
+    }
+    safety = evaluator.build_safety_result(
+        rows, runtime_authority=_runtime_authority(), prelock_evidence=bad_prelock,
+    )
+    assert safety["aggregate_hard_gate"]["stale_approval_accepted"]["pass"] is False
+    assert safety["all_hard_safety_pass"] is False
+
+
+# ---------------------------------------------------------------------------
+# Truthful historical non-overlap + topology novelty (Sections 10 & 11).
+# ---------------------------------------------------------------------------
+
+def test_overlap_audit_is_truthful_about_no_historical_hash_comparison():
+    in_range = 2**31 + 5
+    audit = materializer._overlap_audit([{"scenario_index": 0, "seed": in_range}])
+    assert audit["result"] == "PASS"
+    assert audit["historical_canonical_hash_comparison_performed"] is False
+    assert audit["seed_namespace_disjoint"] is True
+    assert audit["within_set_unique"] is True
+
+
+def _novel_topology(index, network_sha, file_sha, junction_count):
+    return {
+        "topology_id": f"locked-topology:{index}",
+        "network_sha256": network_sha,
+        "graph_signature": design.graph_signature(
+            node_count=junction_count + 1, junction_count=junction_count,
+            link_count=junction_count + 2, cycle_rank=3, degree_profile=[1, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        ),
+        "file_sha256": file_sha,
+    }
+
+
+def test_novelty_audit_clean_pass():
+    entries = [
+        _novel_topology(i, f"{i:064x}", f"f{i:063x}", 9 + i)
+        for i in range(design.LOCKED_TOPOLOGY_INSTANCES)
+    ]
+    audit = materializer._novelty_audit(entries)
+    assert audit["result"] == "PASS"
+    assert audit["each_satisfies_frozen_novelty_rule"] is True
+
+
+def test_novelty_audit_rejects_duplicate_graph_signature():
+    entries = [
+        _novel_topology(0, "0" * 64, "f" + "0" * 63, 9),
+        _novel_topology(1, "1" * 64, "f" + "1" * 63, 9),  # same junction_count => same signature
+    ]
+    audit = materializer._novelty_audit(entries)
+    assert audit["result"] == "FAIL"
+
+
+def test_novelty_audit_rejects_duplicate_network_hash():
+    entries = [
+        _novel_topology(0, "a" * 64, "f" + "0" * 63, 9),
+        _novel_topology(1, "a" * 64, "f" + "1" * 63, 10),  # same network hash
+    ]
+    audit = materializer._novelty_audit(entries)
+    assert audit["result"] == "FAIL"
+
+
+def test_novelty_audit_rejects_prior_file_byte_hash():
+    prior_file_hash = next(iter(design.PRIOR_TOPOLOGY_FILE_HASHES))
+    entries = [
+        _novel_topology(0, "0" * 64, prior_file_hash, 9),
+    ]
+    audit = materializer._novelty_audit(entries)
+    assert audit["result"] == "FAIL"
+    assert audit["per_topology"][0]["file_byte_novel"] is False
+
+
+def test_novelty_audit_rejects_within_set_file_byte_duplicate():
+    entries = [
+        _novel_topology(0, "0" * 64, "f" + "0" * 63, 9),
+        _novel_topology(1, "1" * 64, "f" + "0" * 63, 10),  # same .inp file bytes
+    ]
+    audit = materializer._novelty_audit(entries)
+    assert audit["result"] == "FAIL"
+
+
+def test_novelty_audit_rejects_prior_network_hash():
+    prior_network_hash = next(iter(design.PRIOR_TOPOLOGY_NETWORK_HASHES))
+    entries = [
+        _novel_topology(0, prior_network_hash, "f" + "0" * 63, 9),
+    ]
+    audit = materializer._novelty_audit(entries)
+    assert audit["result"] == "FAIL"
+
+
+# ---------------------------------------------------------------------------
+# Pre-open runtime authority + actual V5 factory wiring (Sections 12 & 13).
+# ---------------------------------------------------------------------------
+
+def test_real_v5_factory_wiring_binds_deterministic_authority():
+    from hydroswarm.runtime.v5_defaults import V5PipelineFactory
+    factory = V5PipelineFactory(REPO_ROOT / evaluator.FINALIST["release_bundle"], project_root=REPO_ROOT)
+    wiring = evaluator._factory_wiring(factory)
+    assert "sampling_ranker" not in wiring
+    assert "planner" not in wiring
+    assert "ood_detector" in wiring and "OODDetector" in wiring["ood_detector"]
+    assert "trained_tasks" in wiring and "V5_TRAINED_TASKS" in wiring["trained_tasks"]
+    assert "runtime_enabled_outputs" in wiring and "V5_RUNTIME_ENABLED_OUTPUTS" in wiring["runtime_enabled_outputs"]
+
+
+def test_learned_ood_factory_override_detected():
+    authority = evaluator.verify_runtime_authority_invariants(
+        _facts(factory_ood_detector_explicitly_deterministic=False), identity_ok=True)
+    assert authority["checks"]["learned_ood_overrode_deterministic"]["pass"] is False
+
+
+def test_learned_scout_factory_override_detected():
+    authority = evaluator.verify_runtime_authority_invariants(
+        _facts(factory_sampling_ranker_overridden=True), identity_ok=True)
+    assert authority["checks"]["learned_scout_selected_sample"]["pass"] is False
+
+
+def test_learned_strategist_factory_override_detected():
+    authority = evaluator.verify_runtime_authority_invariants(
+        _facts(factory_planner_overridden=True), identity_ok=True)
+    assert authority["checks"]["learned_strategist_selected_plan"]["pass"] is False
+
+
+def test_pre_open_runtime_authority_blocks_on_wrong_finalist():
+    authority = evaluator.verify_runtime_authority_invariants(_facts(), identity_ok=False)
+    assert authority["all_pass"] is False
+    assert authority["checks"]["finalist_identity_drift"]["pass"] is False
+
+
+def test_build_safety_result_records_pre_and_post_authority():
+    rows, _manifest = _full_population()
+    pre = _runtime_authority()
+    post = _runtime_authority()
+    safety = evaluator.build_safety_result(
+        rows, runtime_authority=post, pre_open_runtime_authority=pre,
+    )
+    assert safety["pre_open_runtime_authority"]["all_pass"] is True
+    assert safety["post_run_runtime_authority"]["all_pass"] is True
+    assert safety["runtime_authority_drift"] is False
+
+
+def test_build_safety_result_detects_runtime_authority_drift():
+    rows, _manifest = _full_population()
+    pre = _runtime_authority()
+    post = evaluator.verify_runtime_authority_invariants(
+        _facts(factory_class="V4PipelineFactory"), identity_ok=True)
+    safety = evaluator.build_safety_result(
+        rows, runtime_authority=post, pre_open_runtime_authority=pre,
+    )
+    assert safety["runtime_authority_drift"] is True
+
+
+# ---------------------------------------------------------------------------
+# Canonical manifest verification (Section 15).
+# ---------------------------------------------------------------------------
+
+def test_verify_artifacts_rejects_backslash_manifest_path(tmp_path):
+    manifest, _files = _materialized_manifest(tmp_path)
+    manifest["artifact_sha256"]["data\\locked\\m11-6\\locked_final_test\\scenarios.jsonl"] = "0" * 64
+    assert any("not canonical" in v for v in evaluator.verify_materialized_artifacts(manifest, tmp_path, TEST_SHA))
+
+
+def test_verify_artifacts_rejects_absolute_and_traversal_paths(tmp_path):
+    manifest, _files = _materialized_manifest(tmp_path)
+    manifest["artifact_sha256"]["/tmp/foo"] = "0" * 64
+    assert any("not canonical" in v for v in evaluator.verify_materialized_artifacts(manifest, tmp_path, TEST_SHA))
+
+    manifest, _files = _materialized_manifest(tmp_path)
+    manifest["artifact_sha256"]["../outside"] = "0" * 64
+    assert any("not canonical" in v for v in evaluator.verify_materialized_artifacts(manifest, tmp_path, TEST_SHA))
+
+
+def test_verify_artifacts_requires_exact_canonical_jsonl_path(tmp_path):
+    manifest, _files = _materialized_manifest(tmp_path)
+    canonical = design.LOCKED_JSONL_PATHS[design.LOCKED_FINAL_TEST]
+    manifest["artifact_sha256"].pop(canonical)
+    violations = evaluator.verify_materialized_artifacts(manifest, tmp_path, TEST_SHA)
+    assert any("exactly one scenario JSONL" in v for v in violations)
+
+
+def test_verify_artifacts_rejects_noncanonical_topology_file_path(tmp_path):
+    manifest, _files = _materialized_manifest(tmp_path)
+    manifest["topologies"][0]["file_path"] = "data\\locked\\m11-6\\topologies\\locked-topology-0.inp"
+    violations = evaluator.verify_materialized_artifacts(manifest, tmp_path, TEST_SHA)
+    assert any("not canonical" in v for v in violations)

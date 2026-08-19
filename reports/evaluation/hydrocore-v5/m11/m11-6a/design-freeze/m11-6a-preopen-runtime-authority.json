@@ -1,0 +1,19 @@
+{
+  "block_without_opened_on_failure": true,
+  "kind": "M11_6A_PREOPEN_RUNTIME_AUTHORITY",
+  "must_not_use_locked_data": true,
+  "must_run_before_acquire": true,
+  "post_run_detects_drift": true,
+  "recorded_as": [
+    "pre_open_runtime_authority",
+    "post_run_runtime_authority"
+  ],
+  "structural_invariants": [
+    "finalist_identity_drift",
+    "learned_ood_overrode_deterministic",
+    "learned_scout_selected_sample",
+    "learned_strategist_selected_plan",
+    "silent_v4_fallback",
+    "autonomous_actuation_detected"
+  ]
+}

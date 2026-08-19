@@ -1,0 +1,14 @@
+{
+  "auditable": "manifest records both topology_id and file_path",
+  "deterministic": true,
+  "example": {
+    "filename": "locked-topology-0.inp",
+    "topology_id": "locked-topology:0"
+  },
+  "kind": "M11_6A_TOPOLOGY_FILENAME",
+  "logical_topology_id_unchanged": true,
+  "mapping": "topology_id.replace(':', '-') + '.inp'",
+  "model_outcome_independent": true,
+  "os_independent": true,
+  "portable_character_set": "[A-Za-z0-9._-]"
+}

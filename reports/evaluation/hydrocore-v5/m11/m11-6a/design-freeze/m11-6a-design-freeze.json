@@ -1,15 +1,32 @@
 {
+  "actionability_semantics": {
+    "actionable_definition": "successful /approve (HTTP 200) => decision == VERIFIED AND verification_status == CURRENT AND plan/network/context hashes match",
+    "exposed_fields": [
+      "verification.decision",
+      "verification.verification_status"
+    ],
+    "kind": "M11_6A_ACTIONABILITY_SEMANTICS",
+    "not_exposed": [
+      "actionable",
+      "safe",
+      "approvable",
+      "recommended",
+      "approval_allowed"
+    ],
+    "rejected_must_not_be_safe": true,
+    "unverified_must_not_be_actionable": true
+  },
   "authorization_consumed": false,
   "dataset_materialized": false,
   "design_file_hashes": {
-    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "2598ffaefbbc897ac2667afa68338305bdb9c10e3d93a932063efde6897eec71",
-    "scripts/hydrocore_v5/m11_6a_design.py": "d8f76e26815cb15fe58447ec1a7eb59286410cecb0b3491290fb96739019aa1d",
+    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "1161b1655469c44e3b64711f1d696face1367b39102fe4b63810c3f9b3bbdaa3",
+    "scripts/hydrocore_v5/m11_6a_design.py": "e97b05d46d2b49f1f3bab0d0d1b69248a774d70d9b7647e66c7bb785f79ea1a6",
     "scripts/hydrocore_v5/m11_6a_topology.py": "bdae63f25d3db16adc9d322297049639c2875f4104f04a574ab8e083c9e82947",
-    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "0a095ec2773239466a55a0567229a0933a4faedeb79d92e17c9ab46052337206",
-    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "f739cf2d17e03c815a1ce7c612bae73b81f23c0fa868c574133cadd1388d1eed"
+    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "08547d47d8d08af6ddc33274c1b7dc15bb2626244f8d575b177ffd71eb6fb27a",
+    "scripts/hydrocore_v5/run_m11_6a_materialize.py": "262d983297b7f7b10cdc402a0a04ad700f5f9f1e81240e09bef950abc43ec979"
   },
   "design_frozen": true,
-  "design_hash": "7d63ebaadb03dfba2f051d0feb8d4e8330e984beda96b0908b87650cd2841b2d",
+  "design_hash": "20064961f5ff5bb39490588960bdbf91964d0f72ca420246e50bb92234c20414",
   "does_not_claim_real_locked_manifest_hash": true,
   "final_locked_seed_derived": false,
   "finalist_evaluated_on_locked": false,
@@ -28,6 +45,24 @@
   "locked_test_opened": false,
   "m11_6_blocker_closure_preserved": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
   "manifest_file_sha256_binding": "Authorization binds to materialization_manifest_file_sha256 (SHA-256 of the exact committed manifest FILE bytes); the canonical-dict hash is recorded separately as manifest_canonical_hash and is never the authorization binding.",
+  "manifest_path_format": {
+    "forbidden": [
+      "backslash separators",
+      "leading '/' (absolute path)",
+      "Windows drive prefix / colon",
+      "'..' traversal segments",
+      "'.' segments",
+      "empty segments",
+      "NUL bytes",
+      "non-canonical POSIX representation",
+      "resolution outside the repository root"
+    ],
+    "format": "canonical POSIX repository-relative path (Path.resolve().relative_to(root.resolve()).as_posix())",
+    "helper": "repo_relative_manifest_path / validate_manifest_path / validate_manifest_path_under_root",
+    "kind": "M11_6A_MANIFEST_PATH_FORMAT",
+    "no_silent_normalization": true,
+    "separator": "/"
+  },
   "materialization_must_use_this_commit": true,
   "milestone": "M11.6A-1",
   "next_action": "M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN",
@@ -35,10 +70,10 @@
     "authorization_consumed": false,
     "blocker_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
     "branch": "exp/hydrocore-v5-causal",
-    "design_hash": "7d63ebaadb03dfba2f051d0feb8d4e8330e984beda96b0908b87650cd2841b2d",
+    "design_hash": "20064961f5ff5bb39490588960bdbf91964d0f72ca420246e50bb92234c20414",
     "expected_blocker_head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
     "frozen_finalist_identity_verified": true,
-    "head": "e5665050811175638b45c0e82ac9959e2354d138",
+    "head": "b561add678ad7ef7c9ac4f153dce9b9d30dd3f55",
     "kind": "M11_6A_DESIGN_PREFLIGHT",
     "locked_evaluation_authorized": false,
     "locked_open_count_at_start": 0,
@@ -50,6 +85,63 @@
     "tuning_closed": true,
     "worktree_clean": false
   },
+  "prelock_safety_evidence": {
+    "binding": {
+      "counter": "stale_approval_accepted",
+      "evidence_file_path": "tests/integration/test_api.py",
+      "evidence_file_sha256": "628821a0a9390a0d2080e7e0ab66b7984b37c3e15b91b0c814ef3a4f9bf5511f",
+      "expected_pass": {
+        "stale_approval_accepted": 0
+      },
+      "pass_evidence_path": "reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-safety-counters.json",
+      "pass_evidence_sha256": "3498565759246fa68b6bcd933ad9ace9ced049612c0025ed3b1a5ddae5b62a54",
+      "test_identifier": "tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability"
+    },
+    "kind": "M11_6A_PRELOCK_SAFETY_EVIDENCE",
+    "no_relock_reverification": true,
+    "verification": "At pre-open verification, recompute the SHA-256 of evidence_file_path and pass_evidence_path; verify both equal the frozen values; verify pass_evidence_path contains the expected_pass field/value; verify evidence_file_path contains the test_identifier. If any check fails (missing, changed, or PASS absent): BLOCK BEFORE OPENED. The evidence is never re-run/tuned against locked data."
+  },
+  "preopen_runtime_authority": {
+    "block_without_opened_on_failure": true,
+    "kind": "M11_6A_PREOPEN_RUNTIME_AUTHORITY",
+    "must_not_use_locked_data": true,
+    "must_run_before_acquire": true,
+    "post_run_detects_drift": true,
+    "recorded_as": [
+      "pre_open_runtime_authority",
+      "post_run_runtime_authority"
+    ],
+    "structural_invariants": [
+      "finalist_identity_drift",
+      "learned_ood_overrode_deterministic",
+      "learned_scout_selected_sample",
+      "learned_strategist_selected_plan",
+      "silent_v4_fallback",
+      "autonomous_actuation_detected"
+    ]
+  },
+  "prior_topology_files": [
+    {
+      "path": "data/frozen/golden_network.inp",
+      "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
+    },
+    {
+      "path": "data/topology-transfer/branched-loop.inp",
+      "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed"
+    },
+    {
+      "path": "data/topologies/loop-grid.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    },
+    {
+      "path": "data/topologies/coastal-branch.inp",
+      "sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f"
+    },
+    {
+      "path": "data/frozen/live_example_network.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    }
+  ],
   "schema_version": "hydroswarm-m11-6a-design-v1",
   "seed_derivation_formula": {
     "locked_final_master": "H(\"HYDROSWARM|M11.6|LOCKED_FINAL|v1|\" + DESIGN_FREEZE_COMMIT_SHA)",
@@ -58,6 +150,21 @@
   "seed_derivation_rule_version": "v1",
   "superseded_design_freeze_commits": [
     "62bf1326081fac9080c3d676827c9596d2379efb",
-    "e5665050811175638b45c0e82ac9959e2354d138"
-  ]
+    "e5665050811175638b45c0e82ac9959e2354d138",
+    "b561add678ad7ef7c9ac4f153dce9b9d30dd3f55"
+  ],
+  "topology_filename": {
+    "auditable": "manifest records both topology_id and file_path",
+    "deterministic": true,
+    "example": {
+      "filename": "locked-topology-0.inp",
+      "topology_id": "locked-topology:0"
+    },
+    "kind": "M11_6A_TOPOLOGY_FILENAME",
+    "logical_topology_id_unchanged": true,
+    "mapping": "topology_id.replace(':', '-') + '.inp'",
+    "model_outcome_independent": true,
+    "os_independent": true,
+    "portable_character_set": "[A-Za-z0-9._-]"
+  }
 }

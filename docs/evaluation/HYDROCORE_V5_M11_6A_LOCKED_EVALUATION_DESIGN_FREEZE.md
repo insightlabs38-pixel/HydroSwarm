@@ -6,10 +6,11 @@ locked population (M11.6A-2) and, later, to run the one-time M11.6 locked
 evaluation. It is NOT M11.6 execution.
 
 This document is the FINAL CORRECTED design freeze. It supersedes the original
-M11.6A-1 design-freeze commit `62bf1326081fac9080c3d676827c9596d2379efb` and
-the intermediate correction commit `e5665050811175638b45c0e82ac9959e2354d138`;
-the final correction commit is the ONLY authorized design-freeze SHA for
-M11.6A-2 materialization (`materialization_must_use_this_commit = true`).
+M11.6A-1 design-freeze commit `62bf1326081fac9080c3d676827c9596d2379efb`, the
+intermediate correction commit `e5665050811175638b45c0e82ac9959e2354d138`, and
+the safety-gates commit `b561add678ad7ef7c9ac4f153dce9b9d30dd3f55`; the final
+correction commit is the ONLY authorized design-freeze SHA for M11.6A-2
+materialization (`materialization_must_use_this_commit = true`).
 
 This task materializes nothing, derives no final seed, and never evaluates the
 finalist on locked data. The authoritative machine-readable payload is
@@ -117,15 +118,25 @@ ordering is the counter `0, 1, 2, …`; max 1000 attempts; exhaustion **BLOCKS**
 
 ## 5. Topology novelty rule
 
-A locked_topology_test candidate is "unseen" iff (a) its graph-structural
+Novelty is computed in TWO phases, and both must pass before the audit may
+report PASS (never a hard-coded `each_satisfies_frozen_novelty_rule=true`):
+
+(A) **pre-serialization graph/network novelty**: the graph-structural
 signature `{node_count, junction_count, link_count, cycle_rank, sorted degree
-profile}` matches no prior topology signature, (b) its `network_sha256` is not
-in the frozen prior-hash set, and (c) for any materialized `.inp`, its
-file-byte SHA-256 equals no prior committed topology file hash. Duplicates
-within the generated set are also rejected. All prior topologies have 4–8
-junctions; the generator is constrained to 9–12, so the node-count component is
-decisive by construction, with the full signature/hash checks as the frozen
-mechanical rule (no vague "looks different" judgment).
+profile}` matches no prior topology signature, and the `network_sha256` is not
+in the frozen prior-hash set, and both are unique within the generated set.
+
+(B) **post-serialization file-byte novelty**: after each procedural `.inp` is
+written, its exact file-byte SHA-256 is computed and must differ from every
+frozen prior-topology file hash (the immutable `PRIOR_TOPOLOGY_FILES` registry
+of the exact committed M9/M10/M11.5 `.inp` files, built at design-freeze time)
+and from every other generated `.inp` file. The audit records exact per-topology
+results for each of these components.
+
+All prior topologies have 4–8 junctions; the generator is constrained to 9–12,
+so the node-count component is decisive by construction, with the full
+signature/hash/file-byte checks as the frozen mechanical rule (no vague "looks
+different" judgment).
 
 ## 6. Non-overlap rule
 
@@ -135,9 +146,17 @@ scenario_id, canonical scenario-definition hash). Non-overlap is guaranteed by:
 namespace (all `< 2**31`) BY CONSTRUCTION; (2) locked_final_test uses only the
 allowed known families with fresh derived seeds; (3) locked_topology_test uses
 only novelty-verified procedural topologies; (4) the canonical
-scenario-definition hash is unique per scenario. A collision triggers only the
-preregistered deterministic collision procedure (increment counter, re-derive;
-max 100 retries; then BLOCK).
+scenario-definition hash is unique WITHIN the new 125-definition
+materialization. A within-set collision triggers only the preregistered
+deterministic collision procedure (increment counter, re-derive; max 100
+retries; then BLOCK).
+
+**Truthful historical-comparison limitation:** prior governed experiments
+(M0–M11.5) did not materialize a comparable canonical scenario-definition hash
+under `SCENARIO_SCHEMA_VERSION`, so NO direct canonical-hash comparison against
+historical scenarios is performed or claimed. The mechanical guarantee is seed-
+namespace disjointness BY CONSTRUCTION plus within-set uniqueness plus topology
+novelty. No audit field claims a comparison that was never performed.
 
 ## 7. Simulator / ground-truth authority
 
@@ -152,14 +171,29 @@ learned prediction influences which examples enter the locked population.
 `data/locked/m11-6/` (ordinary Git tracked text — definitions-only, no LFS;
 LFS is reserved for large binary tensor corpora). Layout: `topologies/*.inp`,
 `locked_final_test/scenarios.jsonl`, `locked_topology_test/scenarios.jsonl`,
-`m11-6-materialization-manifest.json`. The manifest (schema
-`hydroswarm-m11-6-materialization-manifest-v1`) records every field required by
-task Section 11 (design-freeze SHA, design/generator/evaluator source hashes,
-seed-derivation rule, derived master-seed identities, split names, exact
-counts, topology IDs + file/structural hashes, scenario IDs + canonical
-definition hashes, artifact hashes, simulator version, generation completion,
-overlap/novelty audit results, `evaluated_by_finalist=false`,
-`locked_test_opened=false`) and MUST NOT contain model performance metrics.
+`m11-6-materialization-manifest.json`.
+
+Every manifest path is a **canonical POSIX repository-relative string**
+(`path.resolve().relative_to(root.resolve()).as_posix()`), independent of host
+OS. Manifest paths are strictly validated (`validate_manifest_path` /
+`validate_manifest_path_under_root`): they must use `/` separators, be
+repository-relative, contain no Windows drive prefix/colon, no `..`/`.`/empty
+segments, no NUL, round-trip to the canonical POSIX representation, and resolve
+underneath the repository root. Non-canonical/malicious paths are REJECTED,
+never silently normalized.
+
+Procedural topology logical IDs (`locked-topology:0`) are UNCHANGED; only the
+on-disk `.inp` filename uses the portable, deterministic mapping
+`topology_filename()` (`locked-topology-0.inp`, colon-free for Windows).
+
+The manifest (schema `hydroswarm-m11-6-materialization-manifest-v1`) records
+every field required by task Section 11 (design-freeze SHA, design/generator/
+evaluator source hashes, seed-derivation rule, derived master-seed identities,
+split names, exact counts, topology IDs + file/structural/file-byte hashes,
+scenario IDs + canonical definition hashes, artifact hashes, simulator version,
+generation completion, overlap/novelty audit results,
+`evaluated_by_finalist=false`, `locked_test_opened=false`) and MUST NOT contain
+model performance metrics.
 
 ## 9. Evaluator contract
 
@@ -238,7 +272,7 @@ these.
 `finalist_evaluated_on_locked=false`, `locked_open_count=0`,
 `locked_test_opened=false`, `locked_evaluation_authorized=false`,
 `authorization_consumed=false`,
-`superseded_design_freeze_commits = [62bf1326081fac9080c3d676827c9596d2379efb, e5665050811175638b45c0e82ac9959e2354d138]`,
+`superseded_design_freeze_commits = [62bf1326081fac9080c3d676827c9596d2379efb, e5665050811175638b45c0e82ac9959e2354d138, b561add678ad7ef7c9ac4f153dce9b9d30dd3f55]`,
 `materialization_must_use_this_commit = true`,
 `next_action = M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN`.
 
@@ -267,6 +301,33 @@ these.
     `approval_request_failed`, not a bypass).
 12. Materializer `validate_design_freeze_sha()` rejects superseded / malformed
     / nonexistent / non-ancestor / wrong-artifact design-freeze SHAs.
+13. Canonical POSIX manifest paths on all hosts (was host-dependent `str()`
+    paths that produced `\` separators on Windows), used everywhere manifest
+    paths are written; strict manifest-path validation rejects backslash,
+    absolute, drive, traversal, and repo-escaping paths.
+14. Portable topology filenames: logical IDs keep `:`; only the `.inp` filename
+    uses the colon-free deterministic `topology_filename()` mapping.
+15. Design-freeze SHA is bound to code identity: the freeze artifact's
+    `design_hash` must equal the current `design.design_hash()` AND every
+    governed design/materializer/evaluator file must be byte-identical to the
+    `design_file_hashes` frozen at that commit ("SHA is an ancestor" alone is
+    rejected).
+16. Governed 409 abstention is a valid terminal trajectory whose applicable
+    safety invariants are explicitly evaluated (never `evaluated=false`);
+    inapplicable invariants record explicit applicability, not fictional zeroes.
+17. `stale_approval_accepted` is bound to mechanically recomputed pre-lock
+    evidence (exact evidence/test path + SHA-256 + test identifier + expected
+    PASS field/value), verified at pre-open; missing/changed/absent PASS
+    BLOCKS before OPENED.
+18. Historical non-overlap claims made truthful: no direct canonical-hash
+    comparison against prior M0-M11.5 scenarios is performed or claimed.
+19. Two-phase topology novelty (graph/network + materialized file-byte) with a
+    frozen prior-topology file-byte registry; the audit computes
+    `each_satisfies_frozen_novelty_rule` instead of hard-coding it true.
+20. Pre-open runtime-authority verification runs BEFORE `LockedRunState.acquire`
+    (blocks without OPENED on any false/unevaluated structural invariant), is
+    re-run post-run to detect drift, and binds to the actual V5 factory wiring
+    (not merely constructor defaults).
 
 ## 15. Safety-invariant provenance (final correction)
 
@@ -292,10 +353,15 @@ gate fails).
   `learned_scout_selected_sample`, `learned_strategist_selected_plan`,
   `silent_v4_fallback`, `autonomous_actuation_detected`. Verified from actual
   frozen factory/manifest/route-table structure, never documentation text.
-- **`FROZEN_PRELOCK_EVIDENCE`** (population-independent, carried verbatim):
-  `stale_approval_accepted` (bound to the already-green M10.4/M11.5 stale-
-  approval test; NOT represented as a per-incident counter, so the locked
-  population is not modified merely to exercise it).
+- **`FROZEN_PRELOCK_EVIDENCE`** (population-independent, mechanically bound):
+  `stale_approval_accepted` is bound to exact pre-lock evidence — the test
+  `tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability`
+  (exact file SHA-256) plus the M11.5 safety-counter PASS artifact
+  (`reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-safety-counters.json`,
+  `stale_approval_accepted == 0`, exact SHA-256). `verify_prelock_safety_evidence()`
+  recomputes both hashes and the PASS field/value at pre-open; a text string is
+  NEVER treated as mechanical evidence. NOT represented as a per-incident
+  counter, so the locked population is not modified merely to exercise it.
 
 **`human_approval_bypassed` semantics:** a failed `/approve` request is
 `approval_request_failed` (a descriptive diagnostic), NOT a bypass. The counter
@@ -309,6 +375,15 @@ state without a successful explicit `/approve` transition.
 a SHA that is not an ancestor of the governed branch HEAD, and a SHA whose
 frozen design artifact does not declare `design_frozen=true`,
 `materialization_must_use_this_commit=true`, `dataset_materialized=false`,
-`locked_open_count=0`, and `locked_test_opened=false`. The materializer does
-NOT hardcode its own commit SHA (avoiding a self-referential commit-hash
-cycle); the NEXT M11.6A-2 session supplies the final correction SHA externally.
+`locked_open_count=0`, and `locked_test_opened=false`.
+
+**Code-identity binding:** the supplied freeze commit's artifact must also
+record `design_hash == design.design_hash()` (the current frozen design code)
+AND every governed file in `GOVERNED_DESIGN_FILES` (the design-freeze markdown,
+`m11_6a_design.py`, `m11_6a_topology.py`, `run_m11_6a_materialize.py`,
+`run_m11_6_locked_evaluation.py`) must be byte-identical to the
+`design_file_hashes` frozen in that artifact. "SHA is an ancestor" alone is NOT
+sufficient: it is acceptable for unrelated later commits to exist only if every
+frozen governed file remains byte-identical. The materializer does NOT hardcode
+its own commit SHA (avoiding a self-referential commit-hash cycle); the NEXT
+M11.6A-2 session supplies the final correction SHA externally.

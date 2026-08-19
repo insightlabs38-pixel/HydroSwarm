@@ -61,6 +61,7 @@
       "graph_signature {node_count, junction_count, link_count, cycle_rank, sorted degree_profile}"
     ],
     "no_vague_manual_judgment": true,
+    "novelty_is_two_phase": "(A) pre-serialization graph/network novelty: graph_signature + network_sha256 checked against PRIOR_TOPOLOGY_SIGNATURES / PRIOR_TOPOLOGY_NETWORK_HASHES and against the in-progress generated set; (B) post-serialization file-byte novelty: the exact materialized .inp bytes are hashed and must differ from every PRIOR_TOPOLOGY_FILES hash and from every other generated .inp file. Both phases must be computed before the novelty audit may report PASS.",
     "prior_topologies": [
       {
         "cycle_rank": 2,
@@ -165,6 +166,28 @@
         "name": "dense-loop",
         "network_sha256": "7c0e5fecd6e93b0d4a2dc93a230e348f2efaf13c7a436af6501c588fbaf06fc8",
         "node_count": 7
+      }
+    ],
+    "prior_topology_files": [
+      {
+        "path": "data/frozen/golden_network.inp",
+        "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
+      },
+      {
+        "path": "data/topology-transfer/branched-loop.inp",
+        "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed"
+      },
+      {
+        "path": "data/topologies/loop-grid.inp",
+        "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+      },
+      {
+        "path": "data/topologies/coastal-branch.inp",
+        "sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f"
+      },
+      {
+        "path": "data/frozen/live_example_network.inp",
+        "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
       }
     ],
     "rule": "A locked_topology_test candidate is 'unseen' iff (a) its graph-structural signature (node/junction/link counts, cycle_rank, sorted degree profile) matches no prior topology signature, (b) its canonical network_sha256 is not in the frozen prior-hash set, and (c) for any materialized .inp file, its file-byte SHA-256 is not equal to any prior committed topology file hash. Duplicates WITHIN the generated locked_topology_test set are also rejected.",

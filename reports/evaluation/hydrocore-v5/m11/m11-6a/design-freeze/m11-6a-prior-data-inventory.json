@@ -24,6 +24,28 @@
   ],
   "no_relabeling": "data/frozen regression/golden fixtures and every M0-M11.5 development/validation/OOD population MUST NOT be relabeled as the final locked evaluation (task Section 0).",
   "note": "provenance/hashes/ranges only -- establishes the formal NON-OVERLAP rule; contains no historical outcome tables and no candidate locked examples",
+  "prior_topology_file_bytes": [
+    {
+      "path": "data/frozen/golden_network.inp",
+      "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
+    },
+    {
+      "path": "data/topology-transfer/branched-loop.inp",
+      "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed"
+    },
+    {
+      "path": "data/topologies/loop-grid.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    },
+    {
+      "path": "data/topologies/coastal-branch.inp",
+      "sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f"
+    },
+    {
+      "path": "data/frozen/live_example_network.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    }
+  ],
   "seed_namespaces": {
     "m10_1": [
       1100000000,

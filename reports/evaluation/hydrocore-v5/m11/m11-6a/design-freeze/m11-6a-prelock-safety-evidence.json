@@ -1,0 +1,16 @@
+{
+  "binding": {
+    "counter": "stale_approval_accepted",
+    "evidence_file_path": "tests/integration/test_api.py",
+    "evidence_file_sha256": "628821a0a9390a0d2080e7e0ab66b7984b37c3e15b91b0c814ef3a4f9bf5511f",
+    "expected_pass": {
+      "stale_approval_accepted": 0
+    },
+    "pass_evidence_path": "reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-safety-counters.json",
+    "pass_evidence_sha256": "3498565759246fa68b6bcd933ad9ace9ced049612c0025ed3b1a5ddae5b62a54",
+    "test_identifier": "tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability"
+  },
+  "kind": "M11_6A_PRELOCK_SAFETY_EVIDENCE",
+  "no_relock_reverification": true,
+  "verification": "At pre-open verification, recompute the SHA-256 of evidence_file_path and pass_evidence_path; verify both equal the frozen values; verify pass_evidence_path contains the expected_pass field/value; verify evidence_file_path contains the test_identifier. If any check fails (missing, changed, or PASS absent): BLOCK BEFORE OPENED. The evidence is never re-run/tuned against locked data."
+}

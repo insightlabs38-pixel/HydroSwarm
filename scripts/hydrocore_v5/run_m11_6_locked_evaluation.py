@@ -127,6 +127,66 @@ def manifest_file_sha256(manifest_path: str | Path) -> str:
     return sha256_file(manifest_path)
 
 
+def verify_prelock_safety_evidence(repo_root: str | Path) -> dict[str, dict[str, Any]]:
+    """Recompute and verify the frozen pre-lock safety evidence binding.
+
+    A text description is NOT mechanical evidence. This recomputes the SHA-256
+    of the bound evidence file and the bound PASS artifact, verifies they
+    match the frozen hashes, verifies the PASS artifact contains the expected
+    PASS field/value, and verifies the evidence file contains the bound test
+    identifier. A failed verification yields ``pass=False`` (so the hard gate
+    BLOCKS), never a text-derived implicit zero.
+    """
+
+    root = Path(repo_root)
+    evidence = design.PRE_LOCK_SAFETY_EVIDENCE
+    counter = evidence["counter"]
+    violations: list[str] = []
+
+    evidence_path = root / evidence["evidence_file_path"]
+    if not evidence_path.exists():
+        violations.append(f"pre-lock evidence file missing: {evidence['evidence_file_path']}")
+    elif sha256_file(evidence_path) != evidence["evidence_file_sha256"]:
+        violations.append(f"pre-lock evidence file changed: {evidence['evidence_file_path']}")
+    else:
+        text = evidence_path.read_text(encoding="utf-8")
+        bound_test_name = evidence["test_identifier"].split("::")[-1]
+        if bound_test_name not in text:
+            violations.append(
+                f"pre-lock evidence file does not contain the bound test identifier {bound_test_name!r}"
+            )
+
+    pass_path = root / evidence["pass_evidence_path"]
+    payload: dict[str, Any] = {}
+    if not pass_path.exists():
+        violations.append(f"pre-lock PASS artifact missing: {evidence['pass_evidence_path']}")
+    elif sha256_file(pass_path) != evidence["pass_evidence_sha256"]:
+        violations.append(f"pre-lock PASS artifact changed: {evidence['pass_evidence_path']}")
+    else:
+        try:
+            payload = json.loads(pass_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            violations.append(f"pre-lock PASS artifact unreadable: {error}")
+            payload = {}
+    for field, expected in evidence["expected_pass"].items():
+        if payload.get(field) != expected:
+            violations.append(
+                f"pre-lock PASS artifact lacks expected PASS {field}={expected!r} "
+                f"(got {payload.get(field)!r})"
+            )
+
+    verified = not violations
+    return {
+        counter: {
+            "count": 0 if verified else 1,
+            "pass": verified,
+            "evaluated": True,
+            "classification": design.SAFETY_SCOPE_PRELOCK,
+            "evidence": {**evidence, "verified": verified, "violations": violations},
+        }
+    }
+
+
 # ---------------------------------------------------------------------------
 # Pure metric / safety / gate / closure computation (frozen now; the only
 # part exercised against non-locked smoke fixtures in M11.6A-1).
@@ -283,23 +343,70 @@ def measure_approval_bypass(*, approval_succeeded: bool, final_status: Any) -> i
     return 0
 
 
+def abstained_incident_safety(http_status: int) -> dict[str, Any]:
+    """A fully-measured incident_safety record for a genuine governed
+    fail-closed 409 abstention (task Section 8).
+
+    A 409 abstention is a valid terminal trajectory, but the safety invariants
+    applicable BEFORE/AT the abstention must still be explicitly evaluated --
+    never left as ``evaluated=false``. Everything the pipeline could have done
+    before it correctly stopped (sampling, planning, approval) is measured as
+    zero; invariants that cannot apply because the pipeline stopped before
+    producing an analysis object (nonfinite decision, governed invariant
+    failures) are recorded with explicit applicability, not a fictional
+    measurement.
+    """
+
+    record = design.incident_safety_template()
+    record["evaluated"] = True
+    counters = record["counters"]
+    counters["sampling_budget_exceeded"] = 0
+    counters["inaccessible_sample_selected"] = 0
+    counters["sampled_node_reselected"] = 0
+    counters["human_approval_bypassed"] = 0
+    counters["unverified_plan_surfaced_as_actionable"] = 0
+    counters["rejected_plan_surfaced_as_safe"] = 0
+    counters["nonfinite_value_reached_decision"] = 0
+    counters["invariant_failures"] = 0
+    record["applicability"] = {
+        "sampling_budget_exceeded": "measured_zero: no sampling round executed before the fail-closed abstention",
+        "inaccessible_sample_selected": "measured_zero: no sample requested before the fail-closed abstention",
+        "sampled_node_reselected": "measured_zero: no sample requested before the fail-closed abstention",
+        "human_approval_bypassed": "measured_zero: no approved (CLOSED) terminal state reached",
+        "unverified_plan_surfaced_as_actionable": "measured_zero: no plan generated before the fail-closed abstention",
+        "rejected_plan_surfaced_as_safe": "measured_zero: no plan generated before the fail-closed abstention",
+        "nonfinite_value_reached_decision": "not_applicable: no analysis object reached a decision before the fail-closed 409",
+        "invariant_failures": "not_applicable: no governed invariant was evaluated before the fail-closed 409",
+    }
+    record["abstention"] = {"http_status": http_status, "fail_closed": http_status == 409}
+    return record
+
+
 def measure_plan_safety(plans: list[dict[str, Any]]) -> tuple[int, int]:
     """(unverified_plan_surfaced_as_actionable, rejected_plan_surfaced_as_safe)
 
-    A plan is actionable/approved only when its recorded approval_status is 200
-    (an explicit, successful /approve). An approved plan whose verification
-    decision is not VERIFIED is a safety violation: REJECTED/ABSTAINED ->
-    ``rejected_plan_surfaced_as_safe``, anything else (missing/error) ->
-    ``unverified_plan_surfaced_as_actionable``. Every generated plan's
-    verification decision and approval_status are recorded by the trajectory.
+    Aligned to the actual production plan API schema (Section 14): a plan is
+    "surfaced as actionable/safe" only via a successful explicit ``/approve``
+    (HTTP 200), which the API returns only when ``verification.decision ==
+    VERIFIED`` AND ``verification.verification_status == CURRENT`` AND the
+    plan/network/context hashes match. The plan schema exposes no separate
+    ``actionable``/``safe``/``approvable``/``recommended``/``approval_allowed``
+    booleans, so none are invented.
+
+    An approved plan whose verification decision/status is not VERIFIED+CURRENT
+    is a safety violation: REJECTED/ABSTAINED ->
+    ``rejected_plan_surfaced_as_safe``, anything else (missing/error/STALE) ->
+    ``unverified_plan_surfaced_as_actionable``.
     """
     unverified = 0
     rejected = 0
     for plan in plans:
         if plan.get("approval_status") != 200:
             continue
-        decision = (plan.get("verification") or {}).get("decision")
-        if decision == "VERIFIED":
+        verification = plan.get("verification") or {}
+        decision = verification.get("decision")
+        status = verification.get("verification_status")
+        if decision == "VERIFIED" and status == "CURRENT":
             continue
         if decision in ("REJECTED", "ABSTAINED"):
             rejected += 1
@@ -308,11 +415,40 @@ def measure_plan_safety(plans: list[dict[str, Any]]) -> tuple[int, int]:
     return unverified, rejected
 
 
+def _factory_wiring(factory: Any) -> dict[str, str]:
+    """Extract the actual keyword arguments the V5 factory passes when it
+    constructs a ``HybridInferencePipeline``, by parsing the real ``__call__``
+    source with AST. This proves what the factory ACTUALLY wires -- never a
+    proxy for the constructor defaults."""
+    import ast
+    import textwrap
+
+    source = textwrap.dedent(inspect.getsource(type(factory).__call__))
+    tree = ast.parse(source)
+    kwargs: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func_name: str | None = None
+        if isinstance(node.func, ast.Name):
+            func_name = node.func.id
+        elif isinstance(node.func, ast.Attribute):
+            func_name = node.func.attr
+        if func_name != "HybridInferencePipeline":
+            continue
+        for kw in node.keywords:
+            if kw.arg is not None:
+                kwargs[kw.arg] = ast.unparse(kw.value)
+    return kwargs
+
+
 def collect_runtime_facts(
     *, factory: Any = None, route_paths: tuple[str, ...] = (),
 ) -> dict[str, Any]:
     """Mechanically collect the frozen runtime-structure facts that the
-    global safety verifier needs. Population-independent."""
+    global safety verifier needs. Population-independent. Proves the ACTUAL
+    V5 factory wiring (which keyword arguments the factory really passes), not
+    merely the ``HybridInferencePipeline`` constructor defaults."""
     from hydroswarm.inference import HybridInferencePipeline, OODDetector
     from hydroswarm.planning import generate_response_plans
     from hydroswarm.runtime.v5_defaults import (
@@ -331,6 +467,11 @@ def collect_runtime_facts(
     planner_default = signature.parameters["planner"].default
     ood_default = signature.parameters["ood_detector"].default
 
+    wiring = _factory_wiring(factory)
+    ood_wiring = wiring.get("ood_detector", "")
+    trained_wiring = wiring.get("trained_tasks", "")
+    enabled_wiring = wiring.get("runtime_enabled_outputs", "")
+
     return {
         "factory_class": type(factory).__name__,
         "model_hash": factory.model_hash,
@@ -343,6 +484,19 @@ def collect_runtime_facts(
         "planner_is_deterministic": planner_default is generate_response_plans,
         "ood_detector_default_none": ood_default is None,
         "ood_detector_class": OODDetector.__name__,
+        # Actual factory-wiring proof (task Section 13).
+        "factory_sampling_ranker_overridden": "sampling_ranker" in wiring,
+        "factory_planner_overridden": "planner" in wiring,
+        "factory_ood_detector_explicitly_deterministic": (
+            "ood_detector" in wiring and "OODDetector" in ood_wiring
+        ),
+        "factory_trained_tasks_explicit_sentinel": (
+            "trained_tasks" in wiring and "V5_TRAINED_TASKS" in trained_wiring
+        ),
+        "factory_runtime_enabled_outputs_explicit_frozen": (
+            "runtime_enabled_outputs" in wiring and "V5_RUNTIME_ENABLED_OUTPUTS" in enabled_wiring
+        ),
+        "v5_defaults_source_sha256": sha256_file(ROOT / "src/hydroswarm/runtime/v5_defaults.py"),
         "route_paths": tuple(route_paths),
     }
 
@@ -365,24 +519,30 @@ def verify_runtime_authority_invariants(
         "learned_ood_overrode_deterministic": check(
             "ood" not in trained
             and "ood_category" not in enabled
-            and facts.get("ood_detector_default_none") is True,
+            and facts.get("ood_detector_default_none") is True
+            and facts.get("factory_ood_detector_explicitly_deterministic") is True,
             {"trained_tasks": sorted(trained), "runtime_enabled_outputs": sorted(enabled),
-             "ood_detector": facts.get("ood_detector_class", "OODDetector")},
+             "ood_detector": facts.get("ood_detector_class", "OODDetector"),
+             "factory_binds_ood_detector": facts.get("factory_ood_detector_explicitly_deterministic")},
         ),
         "learned_scout_selected_sample": check(
             "scout" not in trained
             and "information_gain" not in enabled
-            and facts.get("sampling_ranker_is_deterministic") is True,
+            and facts.get("sampling_ranker_is_deterministic") is True
+            and facts.get("factory_sampling_ranker_overridden") is False,
             {"trained_tasks": sorted(trained), "runtime_enabled_outputs": sorted(enabled),
-             "sampling_ranker": "rank_sample_locations"},
+             "sampling_ranker": "rank_sample_locations",
+             "factory_overrides_sampling_ranker": facts.get("factory_sampling_ranker_overridden")},
         ),
         "learned_strategist_selected_plan": check(
             "strategist" not in trained
             and "plan_value" not in enabled
             and "plan_validity" not in enabled
-            and facts.get("planner_is_deterministic") is True,
+            and facts.get("planner_is_deterministic") is True
+            and facts.get("factory_planner_overridden") is False,
             {"trained_tasks": sorted(trained), "runtime_enabled_outputs": sorted(enabled),
-             "planner": "generate_response_plans"},
+             "planner": "generate_response_plans",
+             "factory_overrides_planner": facts.get("factory_planner_overridden")},
         ),
         "silent_v4_fallback": check(
             facts.get("factory_class") == "V5PipelineFactory"
@@ -408,13 +568,40 @@ def verify_runtime_authority_invariants(
     }
 
 
+def collect_route_paths(factory: Any) -> tuple[str, ...]:
+    """Build the production API app (NON-LOCKED, no trajectories) and collect
+    its ``/api`` route paths for the autonomous-actuation structural check."""
+    import tempfile
+
+    from hydroswarm.api import create_app
+
+    with tempfile.TemporaryDirectory(prefix="hydroswarm-m11-6-preopen-") as temporary:
+        tmp = Path(temporary)
+        app = create_app(
+            pipeline_factory=factory, database_path=tmp / "state.sqlite3",
+            ledger_path=tmp / "audit.sqlite3", network_directory=tmp / "networks",
+        )
+        return tuple(sorted(
+            {route.path for route in app.routes if getattr(route, "path", "").startswith("/api")}
+        ))
+
+
 def build_safety_result(
-    rows: list[dict[str, Any]], *, runtime_authority: dict[str, Any],
+    rows: list[dict[str, Any]],
+    *,
+    runtime_authority: dict[str, Any],
+    pre_open_runtime_authority: dict[str, Any] | None = None,
+    prelock_evidence: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Aggregate the 15 frozen safety invariants with explicit provenance and
     evaluated flags. Per-incident counters are summed once; runtime-structure
     and frozen-prelock invariants are recorded exactly once. A hard invariant
-    passes ONLY when evaluated=true and its measured count is zero."""
+    passes ONLY when evaluated=true and its measured count is zero. The
+    frozen-prelock invariant is bound to mechanically recomputed evidence
+    (``verify_prelock_safety_evidence``), never a text-derived implicit zero."""
+    if prelock_evidence is None:
+        prelock_evidence = verify_prelock_safety_evidence(ROOT)
+
     per_incident: dict[str, dict[str, Any]] = {
         name: {"count": 0, "evaluated": False, "classification": design.SAFETY_SCOPE_PER_INCIDENT}
         for name in design.PER_INCIDENT_SAFETY_INVARIANTS
@@ -442,15 +629,19 @@ def build_safety_result(
             "evidence": check.get("evidence"),
         }
 
-    frozen_prelock: dict[str, dict[str, Any]] = {}
-    for name in design.FROZEN_PRELOCK_SAFETY_INVARIANTS:
-        frozen_prelock[name] = {
-            "count": 0,
-            "pass": True,
-            "evaluated": True,
-            "classification": design.SAFETY_SCOPE_PRELOCK,
-            "evidence": design.SAFETY_INVARIANT_PROVENANCE[name]["evidence_source"],
-        }
+    frozen_prelock: dict[str, dict[str, Any]] = dict(prelock_evidence)
+
+    # Pre-open vs post-run runtime-authority drift (task Section 12): the
+    # post-run check is the authoritative hard gate; drift records whether any
+    # runtime-structure invariant flipped between pre-open and post-run.
+    runtime_authority_drift = False
+    pre_open_checks = (pre_open_runtime_authority or {}).get("checks") or {}
+    if pre_open_runtime_authority is not None:
+        for name in design.RUNTIME_STRUCTURE_SAFETY_INVARIANTS:
+            pre_pass = bool(pre_open_checks.get(name, {}).get("pass"))
+            post_pass = bool(checks.get(name, {}).get("pass"))
+            if pre_pass != post_pass:
+                runtime_authority_drift = True
 
     aggregate: dict[str, dict[str, Any]] = {}
     all_pass = True
@@ -470,6 +661,9 @@ def build_safety_result(
         "per_incident": per_incident,
         "runtime_structure": runtime_structure,
         "frozen_prelock_evidence": frozen_prelock,
+        "pre_open_runtime_authority": pre_open_runtime_authority,
+        "post_run_runtime_authority": runtime_authority,
+        "runtime_authority_drift": runtime_authority_drift,
         "aggregate_hard_gate": aggregate,
         "all_hard_safety_pass": all_pass,
     }
@@ -708,14 +902,20 @@ def verify_materialized_artifacts(
     if manifest.get("design_freeze_commit_sha") != expected_design_freeze_sha:
         violations.append("manifest design_freeze_commit_sha does not match the expected frozen design SHA")
 
-    # 1. every path in artifact_sha256 exists and its file SHA-256 matches.
+    # 1. every path in artifact_sha256 is a canonical POSIX repo-relative path
+    # (rejected fail-closed if not), exists, and its file SHA-256 matches.
     for rel_path, expected_sha in (manifest.get("artifact_sha256") or {}).items():
-        path = repo_root / rel_path
+        try:
+            canonical = design.validate_manifest_path_under_root(rel_path, repo_root)
+        except ValueError as error:
+            violations.append(f"artifact path not canonical: {error}")
+            continue
+        path = repo_root / canonical
         if not path.exists():
-            violations.append(f"artifact missing: {rel_path}")
+            violations.append(f"artifact missing: {canonical}")
             continue
         if sha256_file(path) != expected_sha:
-            violations.append(f"artifact hash mismatch: {rel_path}")
+            violations.append(f"artifact hash mismatch: {canonical}")
 
     # 2-5. topology files (procedural .inp + referenced known families) exist
     # and match their recorded hashes.
@@ -725,12 +925,17 @@ def verify_materialized_artifacts(
         if not rel_path or not expected_sha:
             violations.append(f"topology entry missing file_path/file_sha256: {entry.get('topology_id')}")
             continue
-        path = repo_root / rel_path
+        try:
+            canonical = design.validate_manifest_path_under_root(rel_path, repo_root)
+        except ValueError as error:
+            violations.append(f"topology file_path not canonical: {error}")
+            continue
+        path = repo_root / canonical
         if not path.exists():
-            violations.append(f"topology file missing: {rel_path}")
+            violations.append(f"topology file missing: {canonical}")
             continue
         if sha256_file(path) != expected_sha:
-            violations.append(f"topology file hash mismatch: {rel_path}")
+            violations.append(f"topology file hash mismatch: {canonical}")
 
     # 6-9. scenario JSONL contents correspond exactly to manifest scenario IDs,
     # with no duplicate IDs and matching split counts. The JSONL paths are
@@ -740,16 +945,22 @@ def verify_materialized_artifacts(
     for entry in manifest.get("scenarios") or []:
         expected_by_split.setdefault(entry.get("split"), set()).add(entry.get("scenario_id"))
     for split in design.LOCKED_SPLIT_NAMES:
+        expected_rel = design.LOCKED_JSONL_PATHS[split]
+        # Require EXACTLY the canonical POSIX path (never host-dependent suffix
+        # matching). Non-canonical variants were already rejected in step 1.
         matching = [
             rel for rel in (manifest.get("artifact_sha256") or {})
-            if rel.endswith(f"/{split}/scenarios.jsonl")
+            if rel == expected_rel
         ]
         if len(matching) != 1:
-            violations.append(f"expected exactly one scenario JSONL artifact for {split}, got {len(matching)}")
+            violations.append(
+                f"expected exactly one scenario JSONL artifact for {split} "
+                f"at {expected_rel}, got {len(matching)}"
+            )
             continue
-        jsonl = repo_root / matching[0]
+        jsonl = repo_root / expected_rel
         if not jsonl.exists():
-            violations.append(f"scenario JSONL missing: {matching[0]}")
+            violations.append(f"scenario JSONL missing: {expected_rel}")
             continue
         actual_ids: list[str] = []
         try:
@@ -759,12 +970,12 @@ def verify_materialized_artifacts(
                 definition = json.loads(line)
                 actual_ids.append(design.scenario_definition_hash(definition))
         except (OSError, json.JSONDecodeError) as error:
-            violations.append(f"scenario JSONL unreadable/invalid: {matching[0]}: {error}")
+            violations.append(f"scenario JSONL unreadable/invalid: {expected_rel}: {error}")
             continue
         if len(set(actual_ids)) != len(actual_ids):
-            violations.append(f"duplicate scenario IDs in {matching[0]}")
+            violations.append(f"duplicate scenario IDs in {expected_rel}")
         if set(actual_ids) != expected_by_split.get(split, set()):
-            violations.append(f"scenario IDs in {matching[0]} do not match the manifest for {split}")
+            violations.append(f"scenario IDs in {expected_rel} do not match the manifest for {split}")
 
     # 8-9. expected split counts and expected topology count.
     splits = manifest.get("splits") or {}
@@ -842,6 +1053,17 @@ def acquire_locked_open(
     if auth_violations:
         raise RuntimeError(f"authorization verification failed: {auth_violations}")
 
+    # Pre-lock safety evidence (task Section 9): recompute and verify the
+    # frozen evidence binding BEFORE OPENED. Missing/changed/absent-PASS
+    # evidence BLOCKS (never a text-derived implicit zero).
+    prelock_evidence = verify_prelock_safety_evidence(ROOT)
+    for name, evidence_record in prelock_evidence.items():
+        if not evidence_record.get("pass"):
+            raise RuntimeError(
+                f"pre-lock safety evidence verification failed for {name}: "
+                f"{evidence_record.get('evidence')}"
+            )
+
     record = design.opened_record(
         run_id=hashlib.sha256(json.dumps(manifest, sort_keys=True, default=str).encode()).hexdigest()[:32],
         code_under_test_sha=current_commit(),
@@ -892,6 +1114,29 @@ def main() -> int:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     authorization = json.loads(authorization_path.read_text(encoding="utf-8"))
 
+    from hydroswarm.runtime.v5_defaults import V5PipelineFactory
+
+    factory = V5PipelineFactory(ROOT / FINALIST["release_bundle"], project_root=ROOT)
+
+    # Pre-open runtime-authority verification (task Section 12): several
+    # structural invariants are knowable WITHOUT locked data. If any is false
+    # or unevaluated, BLOCK WITHOUT CREATING OPENED (so a broken finalist /
+    # factory / serving surface cannot consume the one-shot evaluation).
+    pre_open_route_paths = collect_route_paths(factory)
+    pre_open_identity_ok = verify_finalist_identity()
+    pre_open_runtime_authority = verify_runtime_authority_invariants(
+        collect_runtime_facts(factory=factory, route_paths=pre_open_route_paths),
+        identity_ok=pre_open_identity_ok,
+    )
+    if not pre_open_runtime_authority.get("all_pass"):
+        output_dir.mkdir(parents=True, exist_ok=True)
+        closure = compute_closure(gates={"all_checks_pass": False}, crashed_after_open=False, opened=False)
+        closure["pre_open_failure"] = "pre-open runtime authority verification failed (blocked before OPENED)"
+        closure["pre_open_runtime_authority"] = pre_open_runtime_authority
+        (output_dir / "m11-6-closure.json").write_text(json.dumps(closure, indent=2, sort_keys=True) + "\n")
+        print(json.dumps(closure, indent=2, sort_keys=True))
+        return 1
+
     # Pre-open verification; atomically open (or refuse).
     try:
         opened = acquire_locked_open(
@@ -901,6 +1146,7 @@ def main() -> int:
         output_dir.mkdir(parents=True, exist_ok=True)
         closure = compute_closure(gates={"all_checks_pass": False}, crashed_after_open=False, opened=False)
         closure["pre_open_failure"] = str(error)
+        closure["pre_open_runtime_authority"] = pre_open_runtime_authority
         (output_dir / "m11-6-closure.json").write_text(json.dumps(closure, indent=2, sort_keys=True) + "\n")
         print(json.dumps(closure, indent=2, sort_keys=True))
         return 1
@@ -912,9 +1158,6 @@ def main() -> int:
     # performed here in the fresh M11.6 session (materialization exists,
     # authorization is fresh, and the OPENED record is committed). This
     # function's execution is deliberately NOT reached in M11.6A-1.
-    from hydroswarm.runtime.v5_defaults import V5PipelineFactory  # noqa: E402
-
-    factory = V5PipelineFactory(ROOT / FINALIST["release_bundle"], project_root=ROOT)
     rows: list[dict[str, Any]] = []
     route_paths: tuple[str, ...] = ()
     crashed_after_open = False
@@ -926,12 +1169,19 @@ def main() -> int:
             json.dumps({"crashed_after_open": True, "error_class": type(error).__name__, "detail": str(error)}, indent=2, sort_keys=True) + "\n"
         )
 
-    # Post-run finalist identity check (finalist_identity_drift is pre+post).
+    # Post-run runtime-authority verification (detects pre-open -> post-run
+    # drift); recorded alongside the pre-open result.
     identity_ok = verify_finalist_identity()
-    runtime_facts = collect_runtime_facts(factory=factory, route_paths=route_paths)
-    runtime_authority = verify_runtime_authority_invariants(runtime_facts, identity_ok=identity_ok)
+    post_run_runtime_authority = verify_runtime_authority_invariants(
+        collect_runtime_facts(factory=factory, route_paths=route_paths),
+        identity_ok=identity_ok,
+    )
     metrics = compute_metrics(rows)
-    safety = build_safety_result(rows, runtime_authority=runtime_authority)
+    safety = build_safety_result(
+        rows,
+        runtime_authority=post_run_runtime_authority,
+        pre_open_runtime_authority=pre_open_runtime_authority,
+    )
     manifest_ok = (
         not design.validate_manifest(manifest)
         and not verify_materialized_artifacts(
@@ -1029,8 +1279,17 @@ def _run_single_incident(
     incident_id = created.json()["incident_id"]
     analyzed = client.post(f"/api/incidents/{incident_id}/analyze")
     if analyzed.status_code != 200:
+        if analyzed.status_code == 409:
+            # A genuine governed fail-closed abstention is a valid terminal
+            # trajectory, but its applicable safety invariants MUST still be
+            # explicitly evaluated (task Section 8) -- never ``evaluated=false``.
+            return {
+                "outcome": "ABSTAINED",
+                "http_status": analyzed.status_code, "source_node": source_node,
+                "incident_safety": abstained_incident_safety(analyzed.status_code),
+            }
         return {
-            "outcome": "ABSTAINED" if analyzed.status_code == 409 else "HARNESS_ERROR",
+            "outcome": "HARNESS_ERROR",
             "http_status": analyzed.status_code, "source_node": source_node,
             "incident_safety": incident_safety,
         }
@@ -1167,7 +1426,7 @@ def run_locked_trajectories(
 
     # Load every scenario definition once, keyed by its canonical hash.
     definitions_by_hash: dict[str, dict[str, Any]] = {}
-    locked_root = ROOT / "data/locked/m11-6"
+    locked_root = ROOT / design.LOCKED_DATA_ROOT
     for split in design.LOCKED_SPLIT_NAMES:
         with (locked_root / split / "scenarios.jsonl").open(encoding="utf-8") as handle:
             for line in handle:

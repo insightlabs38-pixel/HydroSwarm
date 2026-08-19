@@ -66,6 +66,7 @@ def prior_data_inventory() -> dict[str, Any]:
             name: {"path": relative(path), "sha256": sha256_file(path)}
             for name, path in topology_files.items()
         },
+        "prior_topology_file_bytes": list(design.PRIOR_TOPOLOGY_FILES),
         "frozen_regression_fixtures": {
             name: {"path": relative(path), "sha256": sha256_file(path)}
             for name, path in frozen_files.items()
@@ -104,13 +105,7 @@ def design_preflight() -> dict[str, Any]:
 
 
 def design_freeze_record(preflight: dict[str, Any]) -> dict[str, Any]:
-    design_files = [
-        ROOT / "scripts/hydrocore_v5/m11_6a_design.py",
-        ROOT / "scripts/hydrocore_v5/m11_6a_topology.py",
-        ROOT / "scripts/hydrocore_v5/run_m11_6a_materialize.py",
-        ROOT / "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py",
-        ROOT / "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md",
-    ]
+    design_files = [ROOT / rel for rel in design.GOVERNED_DESIGN_FILES]
     return {
         "kind": "M11_6A_DESIGN_FREEZE",
         "milestone": "M11.6A-1",
@@ -138,6 +133,12 @@ def design_freeze_record(preflight: dict[str, Any]) -> dict[str, Any]:
             "is recorded separately as manifest_canonical_hash and is never the "
             "authorization binding."
         ),
+        "manifest_path_format": design.manifest_path_format_spec(),
+        "topology_filename": design.topology_filename_spec(),
+        "prior_topology_files": list(design.PRIOR_TOPOLOGY_FILES),
+        "prelock_safety_evidence": design.prelock_evidence_spec(),
+        "preopen_runtime_authority": design.preopen_runtime_authority_spec(),
+        "actionability_semantics": design.actionability_semantics(),
         "preflight": preflight,
         "finalist_identity": {
             "system": evaluator.FINALIST["system"],
@@ -178,6 +179,11 @@ def main() -> None:
         ("m11-6a-gate-provenance.json", {"kind": "M11_6A_GATE_PROVENANCE", **design.GATE_PROVENANCE}),
         ("m11-6a-evaluator-contract.json", evaluator.evaluator_contract()),
         ("m11-6a-exactly-once-contract.json", {"kind": "M11_6A_EXACTLY_ONCE_CONTRACT", **design.exactly_once_contract()}),
+        ("m11-6a-manifest-path-format.json", design.manifest_path_format_spec()),
+        ("m11-6a-topology-filename.json", design.topology_filename_spec()),
+        ("m11-6a-prelock-safety-evidence.json", design.prelock_evidence_spec()),
+        ("m11-6a-preopen-runtime-authority.json", design.preopen_runtime_authority_spec()),
+        ("m11-6a-actionability-semantics.json", design.actionability_semantics()),
         ("m11-6a-design-freeze.json", freeze),
     ]
     for name, payload in artifacts:

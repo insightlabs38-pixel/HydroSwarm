@@ -170,7 +170,15 @@ def build_locked_topology_definitions(
 
 
 def _overlap_audit(definitions: list[dict[str, Any]]) -> dict[str, Any]:
-    """Frozen non-overlap check (task Section 9)."""
+    """Frozen non-overlap check (task Section 9), truthfully scoped.
+
+    Prior governed experiments (M0-M11.5) did not materialize a comparable
+    canonical scenario-definition hash under SCENARIO_SCHEMA_VERSION, so NO
+    direct canonical-hash comparison against historical scenarios is claimed.
+    The mechanical guarantee is: derived seeds are disjoint from every prior
+    seed namespace BY CONSTRUCTION (all prior namespaces are < 2**31), plus
+    within-set canonical-hash uniqueness.
+    """
     hashes = [design.scenario_definition_hash(definition) for definition in definitions]
     unique = len(set(hashes))
     seeds = [definition["seed"] for definition in definitions]
@@ -179,12 +187,29 @@ def _overlap_audit(definitions: list[dict[str, Any]]) -> dict[str, Any]:
         s for s in seeds
         if not (design.LOCKED_SEED_MIN <= s < design.LOCKED_SEED_MAX_EXCLUSIVE)
     ]
+    prior_max = max(rng[1] for rng in design.PRIOR_SEED_RANGES.values())
+    seed_namespace_disjoint = bool(not seed_out_of_range and prior_max < design.LOCKED_SEED_MIN)
     return {
-        "result": "PASS" if (collisions == 0 and not seed_out_of_range) else "FAIL",
+        "result": (
+            "PASS" if (collisions == 0 and not seed_out_of_range and seed_namespace_disjoint) else "FAIL"
+        ),
         "n_scenarios": len(definitions),
         "unique_canonical_hashes": unique,
         "collisions": collisions,
+        "within_set_unique": collisions == 0,
         "seeds_out_of_range": seed_out_of_range,
+        "seed_namespace_disjoint": seed_namespace_disjoint,
+        "prior_seed_namespace_max": prior_max,
+        "derived_seed_min": design.LOCKED_SEED_MIN,
+        "historical_canonical_hash_comparison_performed": False,
+        "historical_comparison_note": (
+            "No direct canonical-scenario-hash comparison against historical "
+            "M0-M11.5 scenarios is performed or claimed: prior experiments used "
+            "a different scenario schema with no comparable canonical "
+            "definition hash. Non-overlap is guaranteed by seed-namespace "
+            "disjointness BY CONSTRUCTION plus within-set uniqueness plus "
+            "topology novelty."
+        ),
         "seed_namespace_note": (
             "All derived seeds are in [2**31, 2**62); every prior seed "
             "namespace is < 2**31, so derived seeds are disjoint from all "
@@ -195,13 +220,70 @@ def _overlap_audit(definitions: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def _novelty_audit(topologies: list[dict[str, Any]]) -> dict[str, Any]:
+    """Frozen two-phase topology-novelty audit (task Section 11).
+
+    (A) pre-serialization graph/network novelty: graph_signature + network_sha256
+    checked against the frozen prior inventory AND within the generated set;
+    (B) post-serialization file-byte novelty: the exact materialized .inp bytes
+    (file_sha256) must differ from every frozen prior topology file hash AND
+    from every other generated .inp file. ``each_satisfies_frozen_novelty_rule``
+    is COMPUTED, never hard-coded true.
+    """
+    per_topology: list[dict[str, Any]] = []
+    seen_network_hashes: list[str] = []
+    seen_signatures: list[dict[str, Any]] = []
+    seen_file_hashes: list[str] = []
+    all_ok = len(topologies) == design.LOCKED_TOPOLOGY_INSTANCES
+
+    for entry in topologies:
+        sha = entry.get("network_sha256")
+        signature = entry.get("graph_signature") or {}
+        file_sha = entry.get("file_sha256")
+
+        graph_signature_novel = not any(
+            design.signatures_equal(signature, prior) for prior in design.PRIOR_TOPOLOGY_SIGNATURES
+        )
+        network_hash_novel = bool(sha) and sha not in design.PRIOR_TOPOLOGY_NETWORK_HASHES
+        within_set_network_novel = bool(sha) and sha not in seen_network_hashes
+        within_set_signature_novel = not any(
+            design.signatures_equal(signature, existing) for existing in seen_signatures
+        )
+        file_byte_novel = bool(
+            file_sha
+            and file_sha not in design.PRIOR_TOPOLOGY_FILE_HASHES
+            and file_sha not in seen_file_hashes
+        )
+
+        entry_ok = bool(
+            graph_signature_novel
+            and network_hash_novel
+            and within_set_network_novel
+            and within_set_signature_novel
+            and file_byte_novel
+        )
+        all_ok = all_ok and entry_ok
+        per_topology.append({
+            "topology_id": entry.get("topology_id"),
+            "graph_signature_novel": graph_signature_novel,
+            "network_hash_novel": network_hash_novel,
+            "within_set_network_novel": within_set_network_novel,
+            "within_set_signature_novel": within_set_signature_novel,
+            "file_byte_novel": file_byte_novel,
+            "file_sha256": file_sha,
+        })
+        seen_network_hashes.append(sha)
+        seen_signatures.append(signature)
+        seen_file_hashes.append(file_sha)
+
     return {
-        "result": "PASS" if len(topologies) == design.LOCKED_TOPOLOGY_INSTANCES else "FAIL",
+        "result": "PASS" if all_ok else "FAIL",
         "n_topologies": len(topologies),
         "required": design.LOCKED_TOPOLOGY_INSTANCES,
-        "each_satisfies_frozen_novelty_rule": True,
+        "each_satisfies_frozen_novelty_rule": bool(all_ok),
+        "per_topology": per_topology,
         "prior_topology_junction_range": [4, 8],
         "generated_junction_range": [9, 12],
+        "prior_topology_file_hashes_checked": len(design.PRIOR_TOPOLOGY_FILE_HASHES),
     }
 
 
@@ -228,17 +310,18 @@ def materialize(design_freeze_sha: str, output_root: Path) -> dict[str, Any]:
     topologies_dir = output_root / "topologies"
     topologies_dir.mkdir(parents=True, exist_ok=True)
 
-    # Write the four procedural topology .inp files.
+    # Write the four procedural topology .inp files using the PORTABLE
+    # filename mapping (never the colon-bearing logical ID as a filename).
     topologies_doc: list[dict[str, Any]] = []
     for entry in topologies:
         topology_id = entry["topology_id"]
-        file_path = topologies_dir / f"{topology_id}.inp"
+        file_path = topologies_dir / design.topology_filename(topology_id)
         wntr.network.write_inpfile(
             topology.generate_locked_topology(locked_topology_master, entry["topology_index"])["network"],
             str(file_path),
         )
         entry.update({
-            "file_path": str(file_path.relative_to(ROOT)),
+            "file_path": design.repo_relative_manifest_path(file_path, ROOT),
             "file_sha256": _sha256_file(file_path),
         })
         topologies_doc.append(entry)
@@ -252,7 +335,7 @@ def materialize(design_freeze_sha: str, output_root: Path) -> dict[str, Any]:
             "split": design.LOCKED_FINAL_TEST,
             "network_family": family,
             "network_sha256": network_sha256(network),
-            "file_path": str(path.relative_to(ROOT)),
+            "file_path": design.repo_relative_manifest_path(path, ROOT),
             "file_sha256": _sha256_file(path),
             "graph_signature": topology.topology_graph_signature(network),
         })
@@ -327,16 +410,16 @@ def materialize(design_freeze_sha: str, output_root: Path) -> dict[str, Any]:
         "locked_test_opened": False,
     }
 
-    # artifact_sha256 for every materialized file.
+    # artifact_sha256 for every materialized file (canonical POSIX keys).
     artifact_files = [
-        topologies_dir / f"{entry['topology_id']}.inp" for entry in topologies
+        topologies_dir / design.topology_filename(entry["topology_id"]) for entry in topologies
     ]
     artifact_files += [
         output_root / design.LOCKED_FINAL_TEST / "scenarios.jsonl",
         output_root / design.LOCKED_TOPOLOGY_TEST / "scenarios.jsonl",
     ]
     for path in artifact_files:
-        manifest["artifact_sha256"][str(path.relative_to(ROOT))] = _sha256_file(path)
+        manifest["artifact_sha256"][design.repo_relative_manifest_path(path, ROOT)] = _sha256_file(path)
 
     violations = design.validate_manifest(manifest)
     if violations:
@@ -394,6 +477,45 @@ def validate_design_freeze_sha(sha: str, repo_root: Path) -> list[str]:
         violations.append("design artifact at SHA declares locked_open_count != 0")
     if artifact.get("locked_test_opened") is not False:
         violations.append("design artifact at SHA declares locked_test_opened != false")
+
+    violations.extend(design_identity_violations(artifact, repo_root))
+    return violations
+
+
+def design_identity_violations(artifact: dict[str, Any], repo_root: Path) -> list[str]:
+    """Code-identity binding (task Section 6): the freeze SHA's artifact must
+    record the SAME design hash as the current governed design code, AND every
+    governed design/materializer/evaluator file on disk must be byte-identical
+    to the hash frozen in that artifact.
+
+    "SHA is an ancestor" is NOT sufficient: a previously frozen ancestor stays
+    syntactically valid even if the governed code at HEAD changed, which would
+    silently rebind the seed to different evaluator/materializer code. An
+    unrelated later commit may only be accepted if every frozen governed file
+    remains byte-identical.
+    """
+    violations: list[str] = []
+    if artifact.get("design_hash") != design.design_hash():
+        violations.append(
+            "design artifact design_hash does not match the current frozen design code "
+            "(design.design_hash())"
+        )
+    frozen_file_hashes = artifact.get("design_file_hashes") or {}
+    for rel_path in design.GOVERNED_DESIGN_FILES:
+        expected = frozen_file_hashes.get(rel_path)
+        if not expected:
+            violations.append(f"design artifact has no design_file_hashes entry for {rel_path}")
+            continue
+        current_path = repo_root / rel_path
+        if not current_path.exists():
+            violations.append(f"governed design file missing at HEAD: {rel_path}")
+            continue
+        current = _sha256_file(current_path)
+        if current != expected:
+            violations.append(
+                f"governed design file changed after freeze commit: {rel_path} "
+                f"(artifact={expected} current={current})"
+            )
     return violations
 
 

@@ -23,6 +23,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import posixpath
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Sequence
@@ -38,6 +39,19 @@ OPENED_RECORD_SCHEMA_VERSION = "hydroswarm-m11-6-opened-record-v1"
 
 MILESTONE = "M11.6A-1"
 
+#: The governed design/materializer/evaluator files whose byte-identity is
+#: bound into the design freeze and mechanically re-verified at
+#: materialization preflight and at pre-open verification. If any of these
+#: files changed after the frozen design commit, the materialization seed
+#: anchor must be rejected ("SHA is an ancestor" is NOT sufficient).
+GOVERNED_DESIGN_FILES: tuple[str, ...] = (
+    "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md",
+    "scripts/hydrocore_v5/m11_6a_design.py",
+    "scripts/hydrocore_v5/m11_6a_topology.py",
+    "scripts/hydrocore_v5/run_m11_6a_materialize.py",
+    "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py",
+)
+
 #: The M11.6A-1 design-freeze commits superseded by this final correction
 #: commit. The final correction commit becomes the ONLY authorized
 #: design-freeze SHA for M11.6A-2 materialization; every superseded commit
@@ -45,6 +59,7 @@ MILESTONE = "M11.6A-1"
 SUPERSEDED_DESIGN_FREEZE_COMMITS: tuple[str, ...] = (
     "62bf1326081fac9080c3d676827c9596d2379efb",
     "e5665050811175638b45c0e82ac9959e2354d138",
+    "b561add678ad7ef7c9ac4f153dce9b9d30dd3f55",
 )
 
 #: The smoke namespace used ONLY by development fixtures. It MUST never
@@ -54,6 +69,152 @@ FORBIDDEN_SMOKE_NAMESPACE = "M11_6A_DESIGN_SMOKE_ONLY"
 LOCKED_FINAL_TEST = "locked_final_test"
 LOCKED_TOPOLOGY_TEST = "locked_topology_test"
 LOCKED_SPLIT_NAMES: tuple[str, ...] = (LOCKED_FINAL_TEST, LOCKED_TOPOLOGY_TEST)
+
+# ---------------------------------------------------------------------------
+# Portable manifest paths + topology filenames (cross-platform integrity).
+#
+# Every manifest path is a canonical POSIX repository-relative string,
+# independent of host OS. A manifest that records a Windows-style ``\`` path,
+# an absolute path, a drive prefix, or a ``..`` traversal segment is NOT
+# silently normalized into validity: it is rejected fail-closed.
+# ---------------------------------------------------------------------------
+
+#: Characters allowed in a materialized topology filename. Colons are
+#: excluded because they are not portable to Windows filesystems.
+PORTABLE_FILENAME_ALPHABET = frozenset(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-"
+)
+
+
+def repo_relative_manifest_path(path: str | Path, root: str | Path) -> str:
+    """Return the canonical POSIX repository-relative path for ``path``.
+
+    Fail-closed: if ``path`` does not resolve underneath ``root`` (for
+    example, it escapes via ``..`` or a symlink), a ``ValueError`` is raised
+    rather than a host-dependent or leaking path being recorded.
+    """
+
+    root_resolved = Path(root).resolve()
+    path_resolved = Path(path).resolve()
+    try:
+        relative = path_resolved.relative_to(root_resolved)
+    except ValueError as error:
+        raise ValueError(
+            f"path {path_resolved!s} does not resolve underneath repository root {root_resolved!s}"
+        ) from error
+    return relative.as_posix()
+
+
+def validate_manifest_path(path: str) -> str:
+    """Strictly validate a manifest path and return it unchanged.
+
+    A valid manifest path must be a non-empty string using only ``/``
+    separators, repository-relative (no leading ``/``), free of a Windows
+    drive prefix / colon, free of ``..``/``.``/empty segments, free of NUL,
+    and exactly equal to its canonical POSIX representation. Anything else is
+    rejected (``ValueError``) -- malicious or non-canonical paths are NEVER
+    silently normalized into validity.
+    """
+
+    if not isinstance(path, str) or not path:
+        raise ValueError("manifest path must be a non-empty string")
+    if "\x00" in path:
+        raise ValueError("manifest path must not contain NUL")
+    if "\\" in path:
+        raise ValueError("manifest path must use '/' separators, not '\\'")
+    if path.startswith("/"):
+        raise ValueError("manifest path must be repository-relative (no leading '/')")
+    if ":" in path:
+        raise ValueError("manifest path must not contain a Windows drive prefix / colon")
+    parts = path.split("/")
+    for part in parts:
+        if part == "":
+            raise ValueError("manifest path must not contain empty segments")
+        if part == ".":
+            raise ValueError("manifest path must not contain '.' segments")
+        if part == "..":
+            raise ValueError("manifest path must not contain '..' traversal segments")
+    if posixpath.normpath(path) != path:
+        raise ValueError(f"manifest path is not canonical POSIX: {path!r}")
+    return path
+
+
+def validate_manifest_path_under_root(path: str, root: str | Path) -> str:
+    """Validate ``path`` and confirm it resolves underneath ``root``.
+
+    Returns the canonical POSIX repository-relative representation. The
+    resolve step follows symlinks, so a path that lexically looks safe but
+    resolves outside the repository root is rejected.
+    """
+
+    validate_manifest_path(path)
+    root_resolved = Path(root).resolve()
+    resolved = (root_resolved / path).resolve()
+    try:
+        resolved.relative_to(root_resolved)
+    except ValueError as error:
+        raise ValueError(f"manifest path escapes repository root: {path!r}") from error
+    return resolved.relative_to(root_resolved).as_posix()
+
+
+def topology_filename(topology_id: str) -> str:
+    """Deterministic, reversible, portable materialized filename for a locked
+    procedural topology ID.
+
+    The logical topology ID (e.g. ``locked-topology:0``) is NEVER changed;
+    only the on-disk ``.inp`` filename is mapped to a portable form
+    (``locked-topology-0.inp``). The mapping is deterministic, OS-independent,
+    independent of model outcomes, and auditable because the manifest records
+    both ``topology_id`` and ``file_path``.
+    """
+
+    if not isinstance(topology_id, str) or not topology_id:
+        raise ValueError("topology_id must be a non-empty string")
+    if ":" not in topology_id:
+        raise ValueError(
+            f"topology_id must use the 'namespace:id' form to be mapped, got {topology_id!r}"
+        )
+    portable = topology_id.replace(":", "-")
+    if not portable or any(char not in PORTABLE_FILENAME_ALPHABET for char in portable):
+        raise ValueError(f"topology_id {topology_id!r} maps to a non-portable filename {portable!r}")
+    return f"{portable}.inp"
+
+
+def manifest_path_format_spec() -> dict[str, Any]:
+    """The frozen canonical manifest-path contract (cross-platform)."""
+    return {
+        "kind": "M11_6A_MANIFEST_PATH_FORMAT",
+        "format": "canonical POSIX repository-relative path (Path.resolve().relative_to(root.resolve()).as_posix())",
+        "separator": "/",
+        "forbidden": [
+            "backslash separators",
+            "leading '/' (absolute path)",
+            "Windows drive prefix / colon",
+            "'..' traversal segments",
+            "'.' segments",
+            "empty segments",
+            "NUL bytes",
+            "non-canonical POSIX representation",
+            "resolution outside the repository root",
+        ],
+        "no_silent_normalization": True,
+        "helper": "repo_relative_manifest_path / validate_manifest_path / validate_manifest_path_under_root",
+    }
+
+
+def topology_filename_spec() -> dict[str, Any]:
+    """The frozen portable topology filename mapping contract."""
+    return {
+        "kind": "M11_6A_TOPOLOGY_FILENAME",
+        "logical_topology_id_unchanged": True,
+        "mapping": "topology_id.replace(':', '-') + '.inp'",
+        "example": {"topology_id": "locked-topology:0", "filename": "locked-topology-0.inp"},
+        "deterministic": True,
+        "os_independent": True,
+        "model_outcome_independent": True,
+        "portable_character_set": "[A-Za-z0-9._-]",
+        "auditable": "manifest records both topology_id and file_path",
+    }
 
 # ---------------------------------------------------------------------------
 # Seed derivation (task Section 6). Frozen formula only -- the numeric
@@ -410,6 +571,25 @@ PRIOR_TOPOLOGY_NETWORK_HASHES: frozenset[str] = frozenset(
     item["network_sha256"] for item in PRIOR_TOPOLOGY_SIGNATURES
 )
 
+#: Frozen prior-topology MATERIALIZED .inp file-byte registry (measured from
+#: the exact committed topology files relevant to M9/M10/M11.5 at
+#: design-freeze time). A locked_topology_test candidate's serialized .inp
+#: file-byte SHA-256 must differ from EVERY hash here (and from every other
+#: generated file in the same materialization). These are repo-relative POSIX
+#: paths + exact file SHA-256; the registry is immutable and is mechanically
+#: verified at pre-open time (never re-derived after materialization).
+PRIOR_TOPOLOGY_FILES: tuple[dict[str, str], ...] = (
+    {"path": "data/frozen/golden_network.inp", "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"},
+    {"path": "data/topology-transfer/branched-loop.inp", "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed"},
+    {"path": "data/topologies/loop-grid.inp", "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"},
+    {"path": "data/topologies/coastal-branch.inp", "sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f"},
+    {"path": "data/frozen/live_example_network.inp", "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"},
+)
+
+PRIOR_TOPOLOGY_FILE_HASHES: frozenset[str] = frozenset(
+    item["sha256"] for item in PRIOR_TOPOLOGY_FILES
+)
+
 
 def graph_signature(
     node_count: int, junction_count: int, link_count: int, cycle_rank: int, degree_profile: Sequence[int],
@@ -458,6 +638,16 @@ def topology_novelty_spec() -> dict[str, Any]:
             "graph_signature {node_count, junction_count, link_count, cycle_rank, sorted degree_profile}",
         ],
         "prior_topologies": PRIOR_TOPOLOGY_SIGNATURES,
+        "prior_topology_files": list(PRIOR_TOPOLOGY_FILES),
+        "novelty_is_two_phase": (
+            "(A) pre-serialization graph/network novelty: graph_signature + "
+            "network_sha256 checked against PRIOR_TOPOLOGY_SIGNATURES / "
+            "PRIOR_TOPOLOGY_NETWORK_HASHES and against the in-progress generated "
+            "set; (B) post-serialization file-byte novelty: the exact materialized "
+            ".inp bytes are hashed and must differ from every "
+            "PRIOR_TOPOLOGY_FILES hash and from every other generated .inp file. "
+            "Both phases must be computed before the novelty audit may report PASS."
+        ),
         "no_vague_manual_judgment": True,
         "stronger_structural_novelty_note": (
             "All prior topologies have junction_count in [4, 8]; the frozen "
@@ -503,9 +693,22 @@ def non_overlap_spec() -> dict[str, Any]:
             "known/trained families with fresh derived seeds; (3) "
             "locked_topology_test uses only novelty-verified procedural "
             "topologies; (4) the canonical scenario-definition hash is unique "
-            "per scenario and is checked against every prior materialized "
-            "scenario hash."
+            "WITHIN the new 125-definition materialization (collision => "
+            "deterministic re-derivation, then BLOCK)."
         ),
+        "historical_identity_comparison": {
+            "performed": False,
+            "truthful_limitation": (
+                "Prior governed experiments (M0-M11.5) did not materialize a "
+                "comparable canonical scenario-definition hash under "
+                "SCENARIO_SCHEMA_VERSION; therefore NO direct canonical-hash "
+                "comparison against historical scenarios is claimed. The "
+                "mechanical non-overlap guarantee is seed-namespace "
+                "disjointness BY CONSTRUCTION plus within-set uniqueness plus "
+                "topology novelty. No audit field claims a comparison that was "
+                "never performed."
+            ),
+        },
         "canonical_scenario_definition_hash": (
             "SHA-256 over json.dumps(definition, sort_keys=True, "
             "separators=(',', ':')) of the frozen scenario-definition schema "
@@ -550,6 +753,16 @@ def scenario_definition_schema() -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Manifest schema + validation (task Section 11).
 # ---------------------------------------------------------------------------
+
+#: The canonical repository-relative storage root for the locked
+#: materialization, and the EXACT canonical scenario-JSONL manifest paths the
+#: evaluator requires (never host-dependent suffix matching).
+LOCKED_DATA_ROOT = "data/locked/m11-6"
+LOCKED_JSONL_PATHS: dict[str, str] = {
+    LOCKED_FINAL_TEST: "data/locked/m11-6/locked_final_test/scenarios.jsonl",
+    LOCKED_TOPOLOGY_TEST: "data/locked/m11-6/locked_topology_test/scenarios.jsonl",
+}
+
 
 MANIFEST_REQUIRED_FIELDS: tuple[str, ...] = (
     "schema_version",
@@ -683,6 +896,42 @@ SAFETY_SCOPE_PRELOCK = "FROZEN_PRELOCK_EVIDENCE"
 #: accessibility eligibility bound used by `/samples/recommend`.
 MAXIMUM_SAMPLE_DELAY_MINUTES = 120.0
 
+#: The frozen, population-independent pre-lock evidence binding for
+#: `stale_approval_accepted`. A text description is NOT mechanical evidence:
+#: the binding records the exact evidence file path + SHA-256, the exact test
+#: identifier, and the exact expected PASS field/value, and is recomputed at
+#: pre-open verification. If the evidence is missing, changed, or does not
+#: contain the required PASS, the evaluator BLOCKS BEFORE OPENED.
+PRE_LOCK_SAFETY_EVIDENCE: dict[str, Any] = {
+    "counter": "stale_approval_accepted",
+    "test_identifier": (
+        "tests/integration/test_api.py::"
+        "test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability"
+    ),
+    "evidence_file_path": "tests/integration/test_api.py",
+    "evidence_file_sha256": "628821a0a9390a0d2080e7e0ab66b7984b37c3e15b91b0c814ef3a4f9bf5511f",
+    "pass_evidence_path": "reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-safety-counters.json",
+    "pass_evidence_sha256": "3498565759246fa68b6bcd933ad9ace9ced049612c0025ed3b1a5ddae5b62a54",
+    "expected_pass": {"stale_approval_accepted": 0},
+}
+
+
+def prelock_evidence_spec() -> dict[str, Any]:
+    """The frozen pre-lock evidence binding contract (mechanical, not text)."""
+    return {
+        "kind": "M11_6A_PRELOCK_SAFETY_EVIDENCE",
+        "binding": PRE_LOCK_SAFETY_EVIDENCE,
+        "verification": (
+            "At pre-open verification, recompute the SHA-256 of "
+            "evidence_file_path and pass_evidence_path; verify both equal the "
+            "frozen values; verify pass_evidence_path contains the expected_pass "
+            "field/value; verify evidence_file_path contains the test_identifier. "
+            "If any check fails (missing, changed, or PASS absent): BLOCK BEFORE "
+            "OPENED. The evidence is never re-run/tuned against locked data."
+        ),
+        "no_relock_reverification": True,
+    }
+
 SAFETY_INVARIANT_PROVENANCE: dict[str, dict[str, Any]] = {
     "finalist_identity_drift": {
         "classification": SAFETY_SCOPE_RUNTIME,
@@ -759,8 +1008,15 @@ SAFETY_INVARIANT_PROVENANCE: dict[str, dict[str, Any]] = {
     "stale_approval_accepted": {
         "classification": SAFETY_SCOPE_PRELOCK,
         "scope": "frozen_prelock_evidence",
-        "verifier": None,
-        "evidence_source": "tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability (stale verification -> 409 on approval), population-independent",
+        "verifier": "verify_prelock_safety_evidence",
+        "evidence_source": (
+            "mechanically bound pre-lock evidence: "
+            "tests/integration/test_api.py::"
+            "test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability "
+            "(stale verification -> 409 on approval) + "
+            "reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-safety-counters.json "
+            "stale_approval_accepted == 0; exact file hashes recomputed at pre-open"
+        ),
         "hard_gate": True,
         "zero_required": True,
     },
@@ -1102,6 +1358,64 @@ def authorization_semantics() -> dict[str, Any]:
     }
 
 
+def preopen_runtime_authority_spec() -> dict[str, Any]:
+    """The frozen pre-open runtime-authority verification contract.
+
+    Several runtime-structure safety invariants are knowable WITHOUT seeing
+    locked data (finalist identity, sentinel-only learned authority,
+    deterministic OOD/Scout/Strategist authority, no v4 fallback, no
+    autonomous-actuation production surface). They MUST be verified from
+    immutable serving configuration/code/factory identity (and, if a concrete
+    pipeline object is required, a known NON-LOCKED fixture/network) BEFORE
+    ``LockedRunState.acquire(...)``. If any applicable structural invariant is
+    false or unevaluated, BLOCK WITHOUT CREATING OPENED. The verifier is then
+    re-run after the locked trajectories to detect drift.
+    """
+    return {
+        "kind": "M11_6A_PREOPEN_RUNTIME_AUTHORITY",
+        "must_run_before_acquire": True,
+        "must_not_use_locked_data": True,
+        "structural_invariants": [
+            "finalist_identity_drift",
+            "learned_ood_overrode_deterministic",
+            "learned_scout_selected_sample",
+            "learned_strategist_selected_plan",
+            "silent_v4_fallback",
+            "autonomous_actuation_detected",
+        ],
+        "block_without_opened_on_failure": True,
+        "recorded_as": ["pre_open_runtime_authority", "post_run_runtime_authority"],
+        "post_run_detects_drift": True,
+    }
+
+
+def actionability_semantics() -> dict[str, Any]:
+    """The frozen actionability safety contract (aligned to the production API).
+
+    The production plan API exposes ``verification.decision`` (VERIFIED /
+    REJECTED / ABSTAINED / ERROR) and ``verification.verification_status``
+    (CURRENT / STALE). It does NOT expose separate ``actionable`` / ``safe`` /
+    ``approvable`` / ``recommended`` / ``approval_allowed`` booleans. The
+    production definition of "surfaced as actionable/safe" is therefore
+    exactly: an explicit, successful ``/approve`` (HTTP 200), which the API
+    only returns when ``decision == VERIFIED`` AND
+    ``verification_status == CURRENT`` AND the plan/network/context hashes
+    match. The safety helper measures from those actual fields and never
+    invents fields the API does not expose.
+    """
+    return {
+        "kind": "M11_6A_ACTIONABILITY_SEMANTICS",
+        "exposed_fields": ["verification.decision", "verification.verification_status"],
+        "not_exposed": ["actionable", "safe", "approvable", "recommended", "approval_allowed"],
+        "actionable_definition": (
+            "successful /approve (HTTP 200) => decision == VERIFIED AND "
+            "verification_status == CURRENT AND plan/network/context hashes match"
+        ),
+        "unverified_must_not_be_actionable": True,
+        "rejected_must_not_be_safe": True,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Canonical frozen design payload + hash.
 # ---------------------------------------------------------------------------
@@ -1124,6 +1438,11 @@ def design_payload() -> dict[str, Any]:
         "locked_topology_result_states": list(LOCKED_TOPOLOGY_RESULT_STATES),
         "safety_counters": list(SAFETY_COUNTERS_TEMPLATE),
         "safety_invariant_provenance": safety_provenance_spec(),
+        "manifest_path_format": manifest_path_format_spec(),
+        "topology_filename": topology_filename_spec(),
+        "prelock_safety_evidence": prelock_evidence_spec(),
+        "preopen_runtime_authority": preopen_runtime_authority_spec(),
+        "actionability_semantics": actionability_semantics(),
         "exactly_once": exactly_once_contract(),
         "authorization": authorization_semantics(),
         "known_limitations_carried_forward": [

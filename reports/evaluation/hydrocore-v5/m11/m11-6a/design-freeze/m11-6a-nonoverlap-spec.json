@@ -1,6 +1,10 @@
 {
   "canonical_scenario_definition_hash": "SHA-256 over json.dumps(definition, sort_keys=True, separators=(',', ':')) of the frozen scenario-definition schema (SCENARIO_SCHEMA_VERSION).",
   "collision_procedure": "If a canonical hash collision is detected against a prior scenario or within the same materialization, increment the scenario's derivation counter and re-derive deterministically. Never manually select another 'better' example, never call OS randomness, never preview candidate seeds. If retries exceed MAX_SCENARIO_COLLISION_RETRIES=100, BLOCK.",
+  "historical_identity_comparison": {
+    "performed": false,
+    "truthful_limitation": "Prior governed experiments (M0-M11.5) did not materialize a comparable canonical scenario-definition hash under SCENARIO_SCHEMA_VERSION; therefore NO direct canonical-hash comparison against historical scenarios is claimed. The mechanical non-overlap guarantee is seed-namespace disjointness BY CONSTRUCTION plus within-set uniqueness plus topology novelty. No audit field claims a comparison that was never performed."
+  },
   "kind": "M11_6A_NONOVERLAP_SPEC",
   "prior_seed_ranges": {
     "m10_1": [
@@ -44,5 +48,5 @@
       1099999999
     ]
   },
-  "rule": "Every locked scenario is identified by (split role, topology identity, seed, scenario_id, canonical scenario-definition hash). Non-overlap is guaranteed by: (1) derived seeds in [2**31, 2**62) are disjoint from every prior seed namespace (all < 2**31) BY CONSTRUCTION -- the interval [0, 2**31) is entirely excluded; (2) locked_final_test uses only the allowed known/trained families with fresh derived seeds; (3) locked_topology_test uses only novelty-verified procedural topologies; (4) the canonical scenario-definition hash is unique per scenario and is checked against every prior materialized scenario hash."
+  "rule": "Every locked scenario is identified by (split role, topology identity, seed, scenario_id, canonical scenario-definition hash). Non-overlap is guaranteed by: (1) derived seeds in [2**31, 2**62) are disjoint from every prior seed namespace (all < 2**31) BY CONSTRUCTION -- the interval [0, 2**31) is entirely excluded; (2) locked_final_test uses only the allowed known/trained families with fresh derived seeds; (3) locked_topology_test uses only novelty-verified procedural topologies; (4) the canonical scenario-definition hash is unique WITHIN the new 125-definition materialization (collision => deterministic re-derivation, then BLOCK)."
 }
