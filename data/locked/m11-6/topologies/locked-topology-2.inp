@@ -1,0 +1,151 @@
+; Filename: m11-6-locked-topology-j11-r3
+; WNTR: 1.5.0
+; Created: 2026-08-19 19:06:21
+[TITLE]
+
+[JUNCTIONS]
+;ID                      Elevation       Demand Pattern                 
+ J1                       319.3228791    98.290438319 diurnal                    ;
+ J2                      314.23946708    89.680058968 diurnal                    ;
+ J3                      341.73328224    109.94207896 diurnal                    ;
+ J4                      336.19468405    83.506351669 diurnal                    ;
+ J5                      324.13544329    63.321217703 diurnal                    ;
+ J6                      350.55984011    68.273651382 diurnal                    ;
+ J7                      326.14555979    83.014757051 diurnal                    ;
+ J8                      320.26697579    110.86000122 diurnal                    ;
+ J9                      337.67669375    101.96455413 diurnal                    ;
+ J10                     343.05702428    54.522018275 diurnal                    ;
+ J11                     340.19363497    58.794286564 diurnal                    ;
+
+[RESERVOIRS]
+;ID                                   Head                  Pattern
+ R1                      431.24868592                            ;
+
+[TANKS]
+;ID                              Elevation           Init Level            Min Level            Max Level             Diameter           Min Volume Volume Curve         Overflow            
+
+[PIPES]
+;ID                   Node1                Node2                              Length             Diameter            Roughness           Minor Loss               Status
+ P_R1_J1              R1                   J1                      2010.4683093    13.343520773    102.61122576               0                 Open   ;
+ P_J1_J2              J1                   J2                      1064.8126769    14.922282371    121.91997262               0                 Open   ;
+ P_J2_J3              J2                   J3                      2078.6762987      11.8475323    111.72426573               0                 Open   ;
+ P_J3_J4              J3                   J4                       1344.361726    13.894740257    110.60303951               0                 Open   ;
+ P_J4_J5              J4                   J5                      1723.5465787    9.9221371999    118.13074016               0                 Open   ;
+ P_J5_J6              J5                   J6                      1928.4158368    12.248228379    107.27357424               0                 Open   ;
+ P_J6_J7              J6                   J7                      2081.4482317    10.712395305    107.65847303               0                 Open   ;
+ P_J7_J8              J7                   J8                      2019.3980442    12.150725776    109.13736369               0                 Open   ;
+ P_J8_J9              J8                   J9                      1009.7149859      10.6914685    128.51973444               0                 Open   ;
+ P_J9_J10             J9                   J10                     1774.0372211    10.369591572    121.25425833               0                 Open   ;
+ P_J10_J11            J10                  J11                     1368.9416551    10.893623795    107.28107722               0                 Open   ;
+ P_J2_J11_loop0       J2                   J11                      1846.700397    12.393376638     121.6930584               0                 Open   ;
+ P_J3_J7_loop1        J3                   J7                      1730.0064804    14.264606594    104.27072979               0                 Open   ;
+ P_J4_J8_loop2        J4                   J8                      1714.1394738    10.426406293    112.35082651               0                 Open   ;
+
+[PUMPS]
+;ID                   Node1                Node2                Properties          
+
+[VALVES]
+;ID                   Node1                Node2                            Diameter Type              Setting           Minor Loss
+
+[TAGS]
+;type      name       tag       
+
+[DEMANDS]
+;ID        Demand     Pattern   
+
+[STATUS]
+;ID        Setting   
+
+[PATTERNS]
+;ID        Multipliers
+
+diurnal 0.620000 0.560000 0.520000 0.500000 0.550000 0.720000
+diurnal 1.000000 1.220000 1.180000 1.050000 0.980000 1.020000
+diurnal 1.080000 1.040000 0.980000 0.960000 1.080000 1.280000
+diurnal 1.380000 1.240000 1.080000 0.940000 0.800000 0.700000
+
+[CURVES]
+;ID         X-Value      Y-Value     
+
+[CONTROLS]
+
+[RULES]
+
+[ENERGY]
+GLOBAL PRICE           0.0000
+
+[EMITTERS]
+;ID        Flow coefficient
+
+[QUALITY]
+
+[SOURCES]
+;Node      Type       Quality    Pattern   
+
+[REACTIONS]
+;Type           Pipe/Tank               Coefficient
+
+ ORDER BULK 1
+ ORDER TANK 1
+ ORDER WALL 1
+ GLOBAL BULK 0.0000    
+ GLOBAL WALL 0.0000    
+
+[MIXING]
+;Tank ID             Model Fraction
+
+[TIMES]
+DURATION             24:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+PATTERN START        00:00:00
+REPORT TIMESTEP      01:00:00
+REPORT START         00:00:00
+START CLOCKTIME      00:00:00 AM
+RULE TIMESTEP        00:06:00
+STATISTIC            NONE      
+
+[REPORT]
+
+[OPTIONS]
+UNITS                GPM                 
+HEADLOSS             H-W                 
+SPECIFIC GRAVITY     1
+VISCOSITY            1
+TRIALS               200
+ACCURACY             0.001
+CHECKFREQ            2
+MAXCHECK             10
+UNBALANCED           STOP                
+PATTERN              1                   
+DEMAND MULTIPLIER    1
+EMITTER EXPONENT     0.5
+QUALITY              NONE                
+DIFFUSIVITY          1
+TOLERANCE            0.01
+
+[COORDINATES]
+;Node      X-Coord    Y-Coord   
+R1                  0.000000000          0.000000000
+J1                854.581704094       -349.700858661
+J2               1437.591772103        -12.614831965
+J3               2111.281676150       -383.934713232
+J4               2533.537896558       -315.038753989
+J5               3306.835076048       -122.184079445
+J6               3889.498545009       -252.484353698
+J7               4314.008683349        342.060456499
+J8               5136.172975895        274.731869625
+J9               5547.650991880        389.824747045
+J10              6080.664417710        265.385123849
+J11              6690.902778823       -102.571893420
+
+[VERTICES]
+;Link      X-Coord    Y-Coord   
+
+[LABELS]
+
+[BACKDROP]
+UNITS    NONE
+
+[END]

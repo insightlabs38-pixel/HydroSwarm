@@ -1,0 +1,148 @@
+{
+  "all_checks_pass": true,
+  "alternate_seeds_generated": false,
+  "artifact_sha256_matches": true,
+  "canonical_path_issues": [],
+  "canonical_paths_ok": true,
+  "design_freeze_commit_sha": "3568ecdc49c41f765f92460574dae0433e47d684",
+  "design_freeze_commit_sha_matches": true,
+  "design_protocol_sha256_matches": true,
+  "each_satisfies_frozen_novelty_rule": true,
+  "evaluated_by_finalist": false,
+  "evaluator_source_sha256_matches": true,
+  "expected_counts": {
+    "locked_final_test": 105,
+    "locked_topology_test": 20,
+    "total": 125
+  },
+  "finalist_never_evaluated": true,
+  "first_invocation_succeeded": true,
+  "forbidden_metric_fields_present": [],
+  "generation_complete": true,
+  "generator_source_sha256_matches": true,
+  "jsonl_recompute": {
+    "locked_final_test": {
+      "canonical_hashes_match_manifest": true,
+      "n_lines": 105
+    },
+    "locked_topology_test": {
+      "canonical_hashes_match_manifest": true,
+      "n_lines": 20
+    }
+  },
+  "kind": "M11_6A_2_MATERIALIZATION_VERIFICATION",
+  "locked_test_opened": false,
+  "manifest_schema_ok": true,
+  "manifest_schema_violations": [],
+  "master_seeds": {
+    "locked_final_master": {
+      "domain": "LOCKED_FINAL",
+      "hex": "9771ca1531a6c1d12fa7d3a566db97999e5e76c655773ec16f4537d9b44d7fd4"
+    },
+    "locked_topology_master": {
+      "domain": "LOCKED_TOPOLOGY",
+      "hex": "923a84eb4dff7631d6e59e8253aaae9a1d98af364a7570185720a7a348a90f2f"
+    }
+  },
+  "materialization_manifest_file_sha256": "62c21f3d75921068dd045cff07eb33729caf70192fd841502531ad201c9dbedb",
+  "materializer_invocation_count": 1,
+  "n_procedural_topologies": 4,
+  "no_performance_metrics_computed": true,
+  "novelty_audit_result": "PASS",
+  "overlap_audit_result": "PASS",
+  "point_of_no_reroll_recorded": true,
+  "scenario_ids_unique": true,
+  "schema_version": "hydroswarm-m11-6a-design-v1",
+  "seed_namespace_disjoint": true,
+  "seed_range": [
+    2147483648,
+    4611686018427387904
+  ],
+  "seeds_in_range_ok": true,
+  "seeds_max": 4592846615119539720,
+  "seeds_min": 26807139856802784,
+  "seeds_unique": true,
+  "split_counts": {
+    "locked_final_test": 105,
+    "locked_topology_test": 20,
+    "total": 125
+  },
+  "split_counts_ok": true,
+  "topology_filenames": [
+    "data/locked/m11-6/topologies/locked-topology-0.inp",
+    "data/locked/m11-6/topologies/locked-topology-1.inp",
+    "data/locked/m11-6/topologies/locked-topology-2.inp",
+    "data/locked/m11-6/topologies/locked-topology-3.inp"
+  ],
+  "topology_novelty_independently_ok": true,
+  "topology_novelty_rows": [
+    {
+      "cycle_rank": 1,
+      "file_byte_novel": true,
+      "file_sha256": "89abde18ceab17c2b75e6dbd24bb4fc191c6def44c017a5f43a9d436aa874a5b",
+      "file_sha256_matches_manifest": true,
+      "graph_signature_novel": true,
+      "junction_constraint_satisfied": true,
+      "junction_count": 9,
+      "link_count": 10,
+      "network_hash_novel": true,
+      "network_sha256": "ecb4184bd776de4d1ab9c28cea15ae3f8fbdd8c3df2a3997aa4233af03626d46",
+      "network_sha256_matches_manifest": true,
+      "node_count": 10,
+      "topology_id": "locked-topology:0",
+      "within_set_network_novel": true,
+      "within_set_signature_novel": true
+    },
+    {
+      "cycle_rank": 2,
+      "file_byte_novel": true,
+      "file_sha256": "18395c9baf086c90187830ee39feaeb26e5c447084472c6709f888dced768739",
+      "file_sha256_matches_manifest": true,
+      "graph_signature_novel": true,
+      "junction_constraint_satisfied": true,
+      "junction_count": 10,
+      "link_count": 12,
+      "network_hash_novel": true,
+      "network_sha256": "61d4fe603ba1ccaeed1ffef6e601108d2b6969d3fe2802eb8f46558512980d54",
+      "network_sha256_matches_manifest": true,
+      "node_count": 11,
+      "topology_id": "locked-topology:1",
+      "within_set_network_novel": true,
+      "within_set_signature_novel": true
+    },
+    {
+      "cycle_rank": 3,
+      "file_byte_novel": true,
+      "file_sha256": "64a390a848f7a8d16090f78e4b21e5dfff456893da0da0ad4575eac6f6c48546",
+      "file_sha256_matches_manifest": true,
+      "graph_signature_novel": true,
+      "junction_constraint_satisfied": true,
+      "junction_count": 11,
+      "link_count": 14,
+      "network_hash_novel": true,
+      "network_sha256": "e5fb3513897fd5ac4886efe04eab95d98df5923c22905ac7665783f9316241a1",
+      "network_sha256_matches_manifest": true,
+      "node_count": 12,
+      "topology_id": "locked-topology:2",
+      "within_set_network_novel": true,
+      "within_set_signature_novel": true
+    },
+    {
+      "cycle_rank": 4,
+      "file_byte_novel": true,
+      "file_sha256": "8b81dfa07662b44c788bef7af130d1d428972c2768174090ddf08f15408c4bec",
+      "file_sha256_matches_manifest": true,
+      "graph_signature_novel": true,
+      "junction_constraint_satisfied": true,
+      "junction_count": 12,
+      "link_count": 16,
+      "network_hash_novel": true,
+      "network_sha256": "00a59358da23c6bf26fa5a7ee1377049e42efc11f524ac952a61bab77bec146b",
+      "network_sha256_matches_manifest": true,
+      "node_count": 13,
+      "topology_id": "locked-topology:3",
+      "within_set_network_novel": true,
+      "within_set_signature_novel": true
+    }
+  ]
+}

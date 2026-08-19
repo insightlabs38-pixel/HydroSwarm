@@ -1,0 +1,55 @@
+{
+  "authoritative_design_freeze_sha": "3568ecdc49c41f765f92460574dae0433e47d684",
+  "branch": "exp/hydrocore-v5-causal",
+  "canonical_materializer_command": "python scripts/hydrocore_v5/run_m11_6a_materialize.py --design-freeze-sha 3568ecdc49c41f765f92460574dae0433e47d684 --output-root data/locked/m11-6",
+  "ci_status_for_design_sha": "no in-repository CI status artifact recorded for the design SHA; no CI workflow triggers on the exp/hydrocore-v5-causal branch push and no workflow auto-executes the M11.6 locked evaluation",
+  "design_freeze_sha_equals_head": true,
+  "design_freeze_sha_is_ancestor_of_head": true,
+  "design_identity_verified": {
+    "design_hash": "20064961f5ff5bb39490588960bdbf91964d0f72ca420246e50bb92234c20414",
+    "design_hash_matches_current_design_code": true,
+    "governed_file_hashes": {
+      "docs/evaluation/HYDROCORE_V5_M11_6A_LOCKED_EVALUATION_DESIGN_FREEZE.md": "1161b1655469c44e3b64711f1d696face1367b39102fe4b63810c3f9b3bbdaa3",
+      "scripts/hydrocore_v5/m11_6a_design.py": "e97b05d46d2b49f1f3bab0d0d1b69248a774d70d9b7647e66c7bb785f79ea1a6",
+      "scripts/hydrocore_v5/m11_6a_topology.py": "bdae63f25d3db16adc9d322297049639c2875f4104f04a574ab8e083c9e82947",
+      "scripts/hydrocore_v5/run_m11_6_locked_evaluation.py": "08547d47d8d08af6ddc33274c1b7dc15bb2626244f8d575b177ffd71eb6fb27a",
+      "scripts/hydrocore_v5/run_m11_6a_materialize.py": "262d983297b7f7b10cdc402a0a04ad700f5f9f1e81240e09bef950abc43ec979"
+    },
+    "governed_files_byte_identical_to_freeze": true
+  },
+  "finalist_identity_verified": {
+    "all_match": true,
+    "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+    "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "release_manifest_sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34",
+    "selected_seed": 20260814,
+    "serialized_calibration_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+    "system": "HydroCore-v5 M10 frozen release"
+  },
+  "historical_blocker_preserved": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "kind": "M11_6A_2_MATERIALIZATION_PREFLIGHT",
+  "m11_5_state": "M11_5_FULL_VALIDATION_PASS",
+  "no_prior_manifest_existed": true,
+  "pre_materialization_locked_state": {
+    "authorization_consumed": false,
+    "dataset_materialized": false,
+    "design_frozen": true,
+    "final_locked_seed_derived": false,
+    "finalist_evaluated_on_locked": false,
+    "locked_evaluation_authorized": false,
+    "locked_manifest_created": false,
+    "locked_open_count": 0,
+    "locked_test_opened": false
+  },
+  "prior_manifest_path_absent": "data/locked/m11-6/m11-6-materialization-manifest.json",
+  "repository": "insightlabs38-pixel/HydroSwarm",
+  "schema_version": "hydroswarm-m11-6a-design-v1",
+  "starting_head": "3568ecdc49c41f765f92460574dae0433e47d684",
+  "superseded_design_freeze_commits": [
+    "62bf1326081fac9080c3d676827c9596d2379efb",
+    "e5665050811175638b45c0e82ac9959e2354d138",
+    "b561add678ad7ef7c9ac4f153dce9b9d30dd3f55"
+  ],
+  "tuning_closed": true,
+  "worktree_clean_at_start": true
+}

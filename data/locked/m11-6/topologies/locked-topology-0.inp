@@ -1,0 +1,143 @@
+; Filename: m11-6-locked-topology-j9-r1
+; WNTR: 1.5.0
+; Created: 2026-08-19 19:06:21
+[TITLE]
+
+[JUNCTIONS]
+;ID                      Elevation       Demand Pattern                 
+ J1                      332.52269866    106.73626572 diurnal                    ;
+ J2                      315.14270567    72.511451847 diurnal                    ;
+ J3                        341.689922    71.398523806 diurnal                    ;
+ J4                      321.07903573    52.059665692 diurnal                    ;
+ J5                      345.51382906    85.731241201 diurnal                    ;
+ J6                      352.02944013    56.171602981 diurnal                    ;
+ J7                      332.18857207    47.920363993 diurnal                    ;
+ J8                      336.58813091    48.349490599 diurnal                    ;
+ J9                      318.39466284    107.53340223 diurnal                    ;
+
+[RESERVOIRS]
+;ID                                   Head                  Pattern
+ R1                      431.73708341                            ;
+
+[TANKS]
+;ID                              Elevation           Init Level            Min Level            Max Level             Diameter           Min Volume Volume Curve         Overflow            
+
+[PIPES]
+;ID                   Node1                Node2                              Length             Diameter            Roughness           Minor Loss               Status
+ P_R1_J1              R1                   J1                      1543.5054295    15.430160324    129.63389784               0                 Open   ;
+ P_J1_J2              J1                   J2                      1403.5851886    11.535695629    105.00101322               0                 Open   ;
+ P_J2_J3              J2                   J3                      2193.9237397    11.145782017     128.4545973               0                 Open   ;
+ P_J3_J4              J3                   J4                      1608.4307511    12.573651277    125.88188096               0                 Open   ;
+ P_J4_J5              J4                   J5                      2023.1623906    14.996668842    115.60154847               0                 Open   ;
+ P_J5_J6              J5                   J6                      2231.9351665    12.676659625    102.15205484               0                 Open   ;
+ P_J6_J7              J6                   J7                      1371.1716985    11.020379891    118.42255099               0                 Open   ;
+ P_J7_J8              J7                   J8                      1278.9191156    14.468373232    103.37753915               0                 Open   ;
+ P_J8_J9              J8                   J9                        1843.47002    11.700973994    124.68090434               0                 Open   ;
+ P_J1_J4_loop0        J1                   J4                      1008.5977792    10.135399825    124.54302285               0                 Open   ;
+
+[PUMPS]
+;ID                   Node1                Node2                Properties          
+
+[VALVES]
+;ID                   Node1                Node2                            Diameter Type              Setting           Minor Loss
+
+[TAGS]
+;type      name       tag       
+
+[DEMANDS]
+;ID        Demand     Pattern   
+
+[STATUS]
+;ID        Setting   
+
+[PATTERNS]
+;ID        Multipliers
+
+diurnal 0.620000 0.560000 0.520000 0.500000 0.550000 0.720000
+diurnal 1.000000 1.220000 1.180000 1.050000 0.980000 1.020000
+diurnal 1.080000 1.040000 0.980000 0.960000 1.080000 1.280000
+diurnal 1.380000 1.240000 1.080000 0.940000 0.800000 0.700000
+
+[CURVES]
+;ID         X-Value      Y-Value     
+
+[CONTROLS]
+
+[RULES]
+
+[ENERGY]
+GLOBAL PRICE           0.0000
+
+[EMITTERS]
+;ID        Flow coefficient
+
+[QUALITY]
+
+[SOURCES]
+;Node      Type       Quality    Pattern   
+
+[REACTIONS]
+;Type           Pipe/Tank               Coefficient
+
+ ORDER BULK 1
+ ORDER TANK 1
+ ORDER WALL 1
+ GLOBAL BULK 0.0000    
+ GLOBAL WALL 0.0000    
+
+[MIXING]
+;Tank ID             Model Fraction
+
+[TIMES]
+DURATION             24:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+PATTERN START        00:00:00
+REPORT TIMESTEP      01:00:00
+REPORT START         00:00:00
+START CLOCKTIME      00:00:00 AM
+RULE TIMESTEP        00:06:00
+STATISTIC            NONE      
+
+[REPORT]
+
+[OPTIONS]
+UNITS                GPM                 
+HEADLOSS             H-W                 
+SPECIFIC GRAVITY     1
+VISCOSITY            1
+TRIALS               200
+ACCURACY             0.001
+CHECKFREQ            2
+MAXCHECK             10
+UNBALANCED           STOP                
+PATTERN              1                   
+DEMAND MULTIPLIER    1
+EMITTER EXPONENT     0.5
+QUALITY              NONE                
+DIFFUSIVITY          1
+TOLERANCE            0.01
+
+[COORDINATES]
+;Node      X-Coord    Y-Coord   
+R1                  0.000000000          0.000000000
+J1                921.335208630        343.662243907
+J2               1480.572010628       -198.450398323
+J3               1879.761593467       -249.595162078
+J4               2571.895144010         72.015445061
+J5               3129.015660638       -337.916937451
+J6               3698.945103119        369.379571489
+J7               4306.458848717        179.128883370
+J8               4898.231437540       -174.262111101
+J9               5575.660815862         73.949017505
+
+[VERTICES]
+;Link      X-Coord    Y-Coord   
+
+[LABELS]
+
+[BACKDROP]
+UNITS    NONE
+
+[END]

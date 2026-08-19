@@ -1,0 +1,155 @@
+; Filename: m11-6-locked-topology-j12-r4
+; WNTR: 1.5.0
+; Created: 2026-08-19 19:06:21
+[TITLE]
+
+[JUNCTIONS]
+;ID                      Elevation       Demand Pattern                 
+ J1                      341.24719262    68.819745965 diurnal                    ;
+ J2                      332.05033141    79.678814427 diurnal                    ;
+ J3                      352.45250027    66.727785624 diurnal                    ;
+ J4                       342.6666516    90.113416937 diurnal                    ;
+ J5                      350.36222593    84.260502764 diurnal                    ;
+ J6                      322.30959416    82.956427747 diurnal                    ;
+ J7                      341.49291015    72.132557195 diurnal                    ;
+ J8                      325.23014695    75.182144325 diurnal                    ;
+ J9                      334.11149678    79.687820934 diurnal                    ;
+ J10                     334.34819411    72.111086962 diurnal                    ;
+ J11                     326.76288456    75.490506878 diurnal                    ;
+ J12                     342.21878582    80.024051894 diurnal                    ;
+
+[RESERVOIRS]
+;ID                                   Head                  Pattern
+ R1                      448.21903599                            ;
+
+[TANKS]
+;ID                              Elevation           Init Level            Min Level            Max Level             Diameter           Min Volume Volume Curve         Overflow            
+
+[PIPES]
+;ID                   Node1                Node2                              Length             Diameter            Roughness           Minor Loss               Status
+ P_R1_J1              R1                   J1                      1284.7893055    15.438369233    118.65782407               0                 Open   ;
+ P_J1_J2              J1                   J2                      2094.1588708    11.491142698    110.46679642               0                 Open   ;
+ P_J2_J3              J2                   J3                      2096.3624512    12.091631295    102.57133913               0                 Open   ;
+ P_J3_J4              J3                   J4                      2071.4613446    14.976936035    105.81353403               0                 Open   ;
+ P_J4_J5              J4                   J5                      1856.6376184     10.32977538    118.11912944               0                 Open   ;
+ P_J5_J6              J5                   J6                      1062.4592998    11.755736291    107.16355555               0                 Open   ;
+ P_J6_J7              J6                   J7                       1042.793244    13.720176118    113.60124775               0                 Open   ;
+ P_J7_J8              J7                   J8                       1779.536708    11.083298226    120.22544825               0                 Open   ;
+ P_J8_J9              J8                   J9                       1324.856485    10.162196775    116.21139526               0                 Open   ;
+ P_J9_J10             J9                   J10                     1634.7447357    9.9578079959    103.50121488               0                 Open   ;
+ P_J10_J11            J10                  J11                     2116.2041234    14.188891722    111.87172966               0                 Open   ;
+ P_J11_J12            J11                  J12                     2084.3948718    14.246022379    107.13716377               0                 Open   ;
+ P_J4_J11_loop0       J4                   J11                     1996.7166391    11.100038186    109.42200699               0                 Open   ;
+ P_J1_J7_loop1        J1                   J7                      1825.8400095    13.048843814    101.86011086               0                 Open   ;
+ P_J5_J11_loop2       J5                   J11                     1589.0555192    12.235178106    107.37984909               0                 Open   ;
+ P_J4_J7_loop3        J4                   J7                      1337.5622386    10.503753667    103.56397203               0                 Open   ;
+
+[PUMPS]
+;ID                   Node1                Node2                Properties          
+
+[VALVES]
+;ID                   Node1                Node2                            Diameter Type              Setting           Minor Loss
+
+[TAGS]
+;type      name       tag       
+
+[DEMANDS]
+;ID        Demand     Pattern   
+
+[STATUS]
+;ID        Setting   
+
+[PATTERNS]
+;ID        Multipliers
+
+diurnal 0.620000 0.560000 0.520000 0.500000 0.550000 0.720000
+diurnal 1.000000 1.220000 1.180000 1.050000 0.980000 1.020000
+diurnal 1.080000 1.040000 0.980000 0.960000 1.080000 1.280000
+diurnal 1.380000 1.240000 1.080000 0.940000 0.800000 0.700000
+
+[CURVES]
+;ID         X-Value      Y-Value     
+
+[CONTROLS]
+
+[RULES]
+
+[ENERGY]
+GLOBAL PRICE           0.0000
+
+[EMITTERS]
+;ID        Flow coefficient
+
+[QUALITY]
+
+[SOURCES]
+;Node      Type       Quality    Pattern   
+
+[REACTIONS]
+;Type           Pipe/Tank               Coefficient
+
+ ORDER BULK 1
+ ORDER TANK 1
+ ORDER WALL 1
+ GLOBAL BULK 0.0000    
+ GLOBAL WALL 0.0000    
+
+[MIXING]
+;Tank ID             Model Fraction
+
+[TIMES]
+DURATION             24:00:00
+HYDRAULIC TIMESTEP   01:00:00
+QUALITY TIMESTEP     00:05:00
+PATTERN TIMESTEP     01:00:00
+PATTERN START        00:00:00
+REPORT TIMESTEP      01:00:00
+REPORT START         00:00:00
+START CLOCKTIME      00:00:00 AM
+RULE TIMESTEP        00:06:00
+STATISTIC            NONE      
+
+[REPORT]
+
+[OPTIONS]
+UNITS                GPM                 
+HEADLOSS             H-W                 
+SPECIFIC GRAVITY     1
+VISCOSITY            1
+TRIALS               200
+ACCURACY             0.001
+CHECKFREQ            2
+MAXCHECK             10
+UNBALANCED           STOP                
+PATTERN              1                   
+DEMAND MULTIPLIER    1
+EMITTER EXPONENT     0.5
+QUALITY              NONE                
+DIFFUSIVITY          1
+TOLERANCE            0.01
+
+[COORDINATES]
+;Node      X-Coord    Y-Coord   
+R1                  0.000000000          0.000000000
+J1                655.938859961       -102.724119966
+J2               1305.263532596       -244.231258441
+J3               1878.914529161         47.192575234
+J4               2737.057095017       -291.222178224
+J5               3306.299740923       -324.402546985
+J6               3943.484100147       -247.764013485
+J7               4373.254207443        -62.051144136
+J8               5144.392159871         44.624120492
+J9               5459.400853377       -365.301667839
+J10              6227.469694275         33.743458641
+J11              6818.431177848         94.652003105
+J12              7417.754229491       -190.791191837
+
+[VERTICES]
+;Link      X-Coord    Y-Coord   
+
+[LABELS]
+
+[BACKDROP]
+UNITS    NONE
+
+[END]
