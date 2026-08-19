@@ -22,6 +22,7 @@
     "m11-6-opened-record.json",
     "m11-6-raw-incidents.jsonl",
     "m11-6-metrics.json",
+    "m11-6-descriptive.json",
     "m11-6-gate.json",
     "m11-6-safety-counters.json",
     "m11-6-closure.json"

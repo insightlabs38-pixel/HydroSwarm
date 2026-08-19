@@ -31,7 +31,7 @@
   "m11_6a_materialization_evidence_path": "reports/evaluation/hydrocore-v5/m11/m11-6a/materialization/m11-6a-2-closure.json",
   "m11_6a_materialization_state": "M11_6A_2_MATERIALIZATION_PASS",
   "materialization_manifest_file_sha256": "62c21f3d75921068dd045cff07eb33729caf70192fd841502531ad201c9dbedb",
-  "next_action": "INDEPENDENT_REVIEW_BEFORE_M11_6_AUTHORIZATION",
+  "next_action": "MERGE_AFTER_TERMINAL_GREEN_CI",
   "next_authorized_milestone": null,
   "tuning_closed": true
 }
