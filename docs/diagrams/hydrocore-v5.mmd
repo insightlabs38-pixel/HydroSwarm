@@ -1,0 +1,23 @@
+flowchart LR
+  T["Telemetry / samples"] --> R["Hydraulic reconciliation"]
+  R --> C["Classical source signatures<br/>ADVISORY"]
+  R --> N["HydroCore-v5 Sentinel<br/>ADVISORY<br/>5 runtime learned outputs"]
+  C --> F["Fusion + split conformal<br/>CALIBRATED ADVISORY"]
+  N --> F
+  F --> O["OODDetector + evidence control<br/>DETERMINISTIC"]
+  O --> S["rank_sample_locations<br/>DETERMINISTIC"]
+  O --> P["generate_response_plans<br/>DETERMINISTIC"]
+  P --> V["WNTR / EPANET verification<br/>SIMULATOR_VERIFIED"]
+  V --> H["Human approval event<br/>HUMAN_APPROVED"]
+  H --> X["Recorded decision<br/>NO AUTONOMOUS ACTUATION"]
+
+  classDef advisory fill:#d9edf7,stroke:#31708f,color:#17364a;
+  classDef calibrated fill:#e8f3d1,stroke:#607d23,color:#2c3c0f;
+  classDef deterministic fill:#eceff1,stroke:#455a64,color:#263238;
+  classDef verified fill:#fff0c2,stroke:#9a6b00,color:#4f3600;
+  classDef approved fill:#f9d4d2,stroke:#a43b32,color:#5b1c17;
+  class C,N advisory;
+  class F calibrated;
+  class O,S,P deterministic;
+  class V verified;
+  class H approved;

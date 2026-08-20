@@ -1,0 +1,11 @@
+flowchart TD
+  P["Predictive evidence"] --> A["ADVISORY"]
+  A --> C["CALIBRATED ADVISORY<br/>only if artifact applicable"]
+  C --> D["DETERMINISTIC<br/>OOD / Scout / planning"]
+  D --> V["SIMULATOR_VERIFIED<br/>WNTR / EPANET"]
+  V --> H["HUMAN_APPROVED"]
+  H --> N["No actuation connector"]
+
+  U["Unknown topology / invalid calibration"] --> F["FAIL CLOSED"]
+  F --> D
+  F -. "may suppress planning" .-> N

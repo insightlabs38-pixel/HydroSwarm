@@ -2,71 +2,53 @@
 
 ## 0. Start
 
-On first launch with no incident configured, choose **Run Reference Incident** to see the
-full workflow below play out against a real, checksummed replay with no setup required, or
-proceed to step 1 to work with a real network. See [Installation](INSTALLATION.md) for
-setup and [Final system](FINAL_SYSTEM.md) for the experience-state labels (`LIVE`,
-`REFERENCE INCIDENT`, `ILLUSTRATIVE DEMO`, `INCIDENT UNAVAILABLE`) you may see in the mode
-banner.
+On first launch choose **Run Reference Incident** for a deterministic workflow replay, or proceed to a LIVE incident with a local network. The reference replay demonstrates product state/authority; final V5 performance evidence is in [Scientific evidence](SCIENTIFIC_EVIDENCE.md).
 
 ## 1. Prepare a network
 
-Import a local EPANET `.inp` file from the Network view. Review validation errors,
-warnings, units, disconnected elements, node/link counts, tanks, reservoirs, controls,
-and the content hash. The system never fetches a remote file. A failed hydraulic run
-blocks incident analysis.
+Import a local EPANET `.inp`. Review validation errors, units, disconnected elements, node/link counts, tanks, reservoirs, controls, and the content hash. A failed hydraulic run blocks analysis.
 
 ## 2. Open an incident
 
-Create an incident against a validated network, enter the observation time, and add
-measurements with sensor, analyte/channel, value, unit, timestamp, and optional quality
-flags. Keep raw timestamps and units: normalization and fault assessment are auditable.
+Create an incident against a validated network and add timestamped measurements with units/quality state. Preserve raw timestamps and units so preprocessing remains auditable.
 
 ## 3. Interpret localization
 
-The map distinguishes posterior probability from the calibrated candidate region. Read
-the runtime mode, calibration status, OOD status, classical/neural disagreement, sensor
-health, and abstention reason before interpreting a rank. A broad region is a valid
-outcome—not an error to hide.
+Read the posterior together with candidate region, calibration applicability, OOD state, classical/neural disagreement, sensor health, and evidence sufficiency. A broad set or abstention is a valid outcome.
 
-## 4. Collect the recommended sample
+HydroCore-v5 learned outputs are advisory. See [Final system output governance](FINAL_SYSTEM.md#what-is-and-is-not-runtime-enabled).
 
-The Evidence Value / Stop Certificate reports the recommended node, expected information
-gain, expected candidate reduction, remaining sample budget, and whether the recommended
-node is currently accessible. (The deterministic ranking underneath also weighs
-detectability, delay, cost, and redundancy -- but only the fields above are surfaced to the
-operator per recommendation.) Record an arriving sample against its request. Reanalysis
-must create a new posterior revision; the timeline and Evidence Changed panel show
-contraction or expansion and why.
+## 4. Collect evidence
+
+When the deterministic Scout recommends a sample, review node, expected information value, collection-delay/access assumptions, alternatives, and remaining budget. Record the actual arriving sample; reanalysis creates a new evidence/posterior revision.
+
+A learned Scout head does not select the authoritative sample in the final system.
 
 ## 5. Compare response plans
 
-Compare no response, Plan A, Plan B, and rejected candidates side by side. Check exposure
-mass/volume/population proxies, minimum pressure, service/unserved demand, action count,
-verification completeness, and Pareto-dominance status. `VERIFIED` means a completed WNTR
-run passed every configured hard constraint. It does not mean a plan is approved or safe in
-the real utility. (A trained plan-regret head exists but is not runtime-enabled -- see
-[Final system](FINAL_SYSTEM.md#what-is-and-is-not-runtime-enabled) -- so no numeric regret
-score is shown; pump energy is computed by the simulator internally but is not currently
-surfaced to the operator either.)
+Compare generated candidates and modeled consequences. `VERIFIED` means a candidate completed WNTR/EPANET verification and passed the configured modeled constraints. It does not mean the plan is approved or proven safe in the real utility.
+
+Learned plan/consequence heads are not operational authorities; authoritative candidate generation is deterministic and exact verification remains physical-simulator based.
 
 ## 6. Approve or reject
 
-Only a human operator can approve a verified plan. Record the reason, identity label, and
-time. HydroSwarm does not execute the action. Rejections and simulator failures remain in
-the immutable audit history.
+Only a human can record approval of an eligible verified plan. HydroSwarm does not actuate infrastructure. Rejections, stale verification, and simulator failures remain part of the evidence history.
 
 ## 7. Replay and export
 
-Use the timeline to revisit each evidence and decision revision. Export the incident
-review report and audit data for engineering review. A deterministic replay should
-reproduce state transitions and hashes with the same software, data, and configuration.
+Use the timeline/audit record to inspect evidence and decisions in order. Replay should preserve recorded state/hash provenance; it is not a chance to recompute a more favorable result.
 
 ## Status meanings
 
-- `PROPOSED`: generated but not simulated.
-- `VERIFYING`: exact simulation is pending.
-- `REJECTED`: a hard constraint, timeout, instability, or completeness check failed.
-- `VERIFIED`: simulation completed and all configured constraints passed.
-- `APPROVED`: a human recorded approval; no automatic execution occurred.
-- `ABSTAINED`: evidence/calibration/OOD conditions do not justify a confident action.
+- `PROPOSED`: candidate generated; not verified.
+- `VERIFYING`: exact simulation pending.
+- `REJECTED`: verification/constraint/completeness failure.
+- `VERIFIED`: modeled exact verification completed and configured constraints passed.
+- `APPROVED`: separate human approval recorded; no automatic execution.
+- abstention / planning suppression: evidence, calibration, OOD, or safety conditions do not justify continuing.
+
+## Always keep the authority chain in view
+
+**ADVISORY → CALIBRATED ADVISORY → DETERMINISTIC → SIMULATOR_VERIFIED → HUMAN_APPROVED**
+
+See [Authority and safety](AUTHORITY_AND_SAFETY.md) and [Limitations](LIMITATIONS.md).

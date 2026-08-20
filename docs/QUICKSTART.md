@@ -1,58 +1,76 @@
 # Quickstart
 
-The fastest path to seeing HydroSwarm work, in order of least setup required.
+The fastest accurate path to the **current HydroCore-v5 source**.
 
-## 1. Docker (no build, no dependencies to install)
-
-```bash
-docker compose -f docker-compose.release.yml up
-```
-
-Open `http://127.0.0.1:8765`. Choose **Run Reference Incident** on the first-launch
-screen.
-
-## 2. Native setup script (Linux/macOS/Windows)
+## Docker: current checkout
 
 ```bash
 git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
 cd HydroSwarm
-./setup_hydroswarm_linux.sh    # or _macos.sh, or _windows.ps1 in PowerShell
-./start_hydroswarm_linux.sh    # or _macos.sh, or _windows.ps1
+docker compose build
+docker compose up
 ```
 
-The setup script creates a project-local `.venv`, installs CPU-only dependencies,
-verifies the frozen model bundle, builds the console if needed, and runs a readiness
-self-test before it says done.
+Open `http://127.0.0.1:8765`.
 
-## What you'll see
+This builds the current Dockerfile, includes the frozen V5 bundle, runs the strict V5 readiness check during the build, and launches the V5-default API.
 
-On first launch with no incident configured, four choices:
+> `docker compose -f docker-compose.release.yml up` is currently pinned to the historical `v0.1.0-hackathon` image, which predates V5. Do not use that image to verify the final V5 system.
 
-- **Run Reference Incident** (recommended) -- a real, checksummed, progressive replay of
-  the frozen golden scenario. No live backend or network import required.
-- **Run Live Example** -- the real production pipeline computing now (real network
-  import, real incident creation, real analysis, real WNTR verification, real approval
-  pause), automatically, against known reference inputs instead of your own network or
-  live telemetry. Labeled `LIVE COMPUTATION · REFERENCE INPUTS` while it runs.
-- **Import Your Own Network** (advanced) -- import a real EPANET `.inp` file and start an
-  incident against it yourself, through a compact form.
-- **Explore illustrative fallback** -- the hand-authored, clearly-labeled demo fixture.
+## Native
 
-See [Reference demo](REFERENCE_DEMO.md) for what the reference incident actually shows,
-and [Final system](FINAL_SYSTEM.md) for the exact frozen model identity behind it.
-
-## If something doesn't work
-
-See [Installation](INSTALLATION.md)'s troubleshooting section, or run the readiness
-self-test directly:
+Linux:
 
 ```bash
-hydroswarm self-test --human
+./setup_hydroswarm_linux.sh
+./start_hydroswarm_linux.sh
 ```
 
-It prints a checklist (Python runtime, frozen bundle, model hash, calibration,
-normalization, WNTR/EPANET, SQLite, frontend assets, port availability) and says exactly
-which check failed. Add `--strict` to additionally require a genuinely FITTED calibration
-(not merely loadable), the reference-demo artifact, a built frontend, and zero resource
-warnings, exiting nonzero if any of those fail -- the same gate the native setup scripts,
-Docker build, CI, and the release workflow all run.
+macOS and Windows have matching `_macos.sh` and `_windows.ps1` scripts.
+
+The setup scripts finish with the strict application self-test. They currently retain a legacy V4 bundle precheck, but the final strict self-test and application runtime use V5. See [Installation](INSTALLATION.md) for that packaging caveat.
+
+## Verify the model that will serve
+
+```bash
+hydroswarm self-test --strict
+```
+
+The frozen V5 model SHA-256 is:
+
+`de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5`
+
+Exact identity: [Final system](FINAL_SYSTEM.md).
+
+## What to open first
+
+On first launch:
+
+- **Run Reference Incident** — deterministic checksummed replay of the frozen golden workflow. It demonstrates workflow/authority, not final V5 benchmark performance.
+- **Run Live Example** — executes the real API pipeline against known reference inputs.
+- **Import Your Own Network** — advanced path for a local EPANET `.inp`.
+- **Illustrative fallback** — clearly labeled hand-authored fallback.
+
+For final V5 evidence, do not infer performance from the demo. Read [Scientific evidence](SCIENTIFIC_EVIDENCE.md).
+
+## How to read a result
+
+1. Check provenance/model hash.
+2. Check calibration applicability and OOD state.
+3. Treat the learned source/event/evidence outputs as advisory.
+4. Treat Scout/planning decisions as deterministic governed controls.
+5. Require exact WNTR/EPANET verification for `VERIFIED`.
+6. Require a separate human event for `APPROVED`.
+7. Remember that approval records a decision; HydroSwarm does not actuate infrastructure.
+
+## Problems?
+
+Run:
+
+```bash
+hydroswarm self-test --human --strict
+```
+
+Some human-readable self-test labels still contain V4-era wording; the actual implementation and machine-readable trained-asset identity are V5. See [Installation](INSTALLATION.md#known-self-test-presentation-debt).
+
+Then consult [Operator guide](USER_GUIDE.md) and [Limitations](LIMITATIONS.md).
