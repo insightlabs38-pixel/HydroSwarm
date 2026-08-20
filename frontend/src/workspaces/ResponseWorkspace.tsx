@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import type { IncidentView } from '../types';
+import { planningSuppressionDetail } from '../decisionGate';
 import { fetchParetoFrontier } from '../api/planning';
 import { demoParetoFrontier } from '../demoFixture';
 import { useConsoleStore } from '../store';
@@ -40,24 +41,6 @@ const OperationalMap = lazy(() =>
  * and the grounded comparison/rejection explanations as its own PRIMARY
  * content, per "UI-10.5" 2's RESPONSE ordering.
  */
-// UI-11.1 §3: when the incident genuinely has no response plans (planning
-// suppressed -- e.g. invalid calibration or an out-of-validated-range
-// reading), every panel below must say so honestly instead of drawing
-// content that only makes sense once plans exist (a Pareto frontier or a
-// "compare plans" explanation authored for a *different*, populated,
-// scenario). This is the single source of truth for that state, and for
-// the reason shown alongside it, reusing the same calibration/OOD signals
-// ModeBanner already surfaces -- never a new suppression concept.
-function planningSuppressionDetail(incident: IncidentView): string {
-  if (!incident.calibrationValid) {
-    return 'Calibration is invalid for this network. Planning is suppressed until a valid calibration artifact is available.';
-  }
-  if (incident.ood === 'OUTSIDE_VALIDATED_RANGE') {
-    return "This incident is outside the model's validated operating range. Planning is suppressed pending additional evidence or operator review.";
-  }
-  return 'No response plans have been generated for this incident yet.';
-}
-
 export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
   const { selectedPlanId, selectPlan, frontierMode } = useConsoleStore();
   const planningSuppressed = incident.plans.length === 0;

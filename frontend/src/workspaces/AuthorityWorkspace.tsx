@@ -13,8 +13,8 @@ const SYSTEM_AUTHORITY_PATH = [
   { label: 'HydroCore-v5 Sentinel', level: 'ADVISORY' },
   { label: 'Calibrated fusion', level: 'CALIBRATED ADVISORY' },
   { label: 'OODDetector', level: 'DETERMINISTIC' },
-  { label: 'Scout', level: 'DETERMINISTIC' },
-  { label: 'Plan generator', level: 'DETERMINISTIC' },
+  { label: 'Deterministic Scout', level: 'DETERMINISTIC' },
+  { label: 'Deterministic Plan Generator', level: 'DETERMINISTIC' },
   { label: 'WNTR / EPANET', level: 'SIMULATOR VERIFIED' },
   { label: 'Human operator', level: 'HUMAN APPROVED' },
 ] as const;

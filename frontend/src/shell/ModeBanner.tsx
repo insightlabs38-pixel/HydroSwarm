@@ -1,5 +1,5 @@
 import type { IncidentView } from '../types';
-import { isCalibrationApplicable } from '../calibrationDisplay';
+import { deriveDecisionGate } from '../decisionGate';
 import type { ReferenceController } from '../reference/useReferenceIncident';
 
 function replayPauseActionLabel(reference: ReferenceController): string {
@@ -125,23 +125,26 @@ export function ModeBanner({
       </div>
     );
   }
-  if (isCalibrationApplicable(incident) && !incident.calibrationValid) {
+  // Centralized precedence (decisionGate.ts): OOD outside validated range
+  // takes priority over an invalid-but-applicable calibration artifact.
+  const gate = deriveDecisionGate(incident);
+  if (gate.state === 'OUTSIDE_VALIDATED_RANGE') {
+    return (
+      <div className="mode-banner mode-banner-danger" role="alert">
+        <strong>OUTSIDE VALIDATED RANGE</strong>
+        <span>
+          This incident is outside the model&apos;s validated operating range. Planning is suppressed.
+        </span>
+      </div>
+    );
+  }
+  if (gate.state === 'CALIBRATION_INVALID') {
     return (
       <div className="mode-banner mode-banner-warn" role="status">
         <strong>CALIBRATION INVALID</strong>
         <span>
           The calibration artifact backing this incident&apos;s candidate set did not validate.
           Candidate-set sizing is not trustworthy. Planning is suppressed.
-        </span>
-      </div>
-    );
-  }
-  if (incident.ood === 'OUTSIDE_VALIDATED_RANGE') {
-    return (
-      <div className="mode-banner mode-banner-danger" role="alert">
-        <strong>OUTSIDE VALIDATED RANGE</strong>
-        <span>
-          This incident is outside the model&apos;s validated operating range. Planning is suppressed.
         </span>
       </div>
     );

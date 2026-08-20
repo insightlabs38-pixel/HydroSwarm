@@ -72,6 +72,12 @@ interface V5EvidenceDoc {
         top3_rate: number;
         mrr: number;
         actionable_rate: number;
+        calibrated_rate: number;
+      };
+      planning: {
+        human_approved_rate: number;
+        mean_candidates_generated: number;
+        mean_candidates_wntr_verified: number;
       };
       topology_shift_predictive: string;
     };
@@ -205,7 +211,9 @@ export function V5Evidence() {
         </table>
       </div>
       <p className="supporting">
-        Novel topology: calibrated rate {pct(topo.source.actionable_rate)} · human-approved 0% · predictive values are DESCRIPTIVE / NON-GATING · topology fail-closed gate PASS
+        Novel topology: calibrated rate {pct(topo.source.calibrated_rate)} · human-approved{' '}
+        {pct(topo.planning.human_approved_rate)} · predictive values are DESCRIPTIVE / NON-GATING · topology
+        fail-closed gate PASS
       </p>
 
       {/* Section C: Dense seven-condition matrix */}

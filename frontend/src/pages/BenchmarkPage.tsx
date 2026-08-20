@@ -42,7 +42,7 @@ export function BenchmarkPage({ incident }: { incident: IncidentView }) {
           </table>
         </div>
       </Panel>
-      <Panel title="Runtime characteristics" eyebrow="PERFORMANCE">
+      <Panel title="Runtime & system characteristics" eyebrow="PERFORMANCE">
         <ul className="check-list">
           <li>Exact verification: WNTR / EPANET simulator</li>
           <li>Offline/local architecture — no network dependencies</li>

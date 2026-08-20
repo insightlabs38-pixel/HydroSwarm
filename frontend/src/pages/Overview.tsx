@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import type { IncidentView } from '../types';
+import { deriveDecisionGate } from '../decisionGate';
 import {
   candidateCoverageLabel,
   candidateCoverageValueText,
@@ -42,6 +43,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
     incident.plans[0] ??
     null;
   const { nextStep } = deriveWorkflowProgression(incident);
+  const gate = deriveDecisionGate(incident);
 
   return (
     <div className="overview-grid">
@@ -76,6 +78,9 @@ export function Overview({ incident }: { incident: IncidentView }) {
           </p>
         </div>
         <div className="decision-badges">
+          <StatusBadge tone={gate.tone} label={gate.accessibleDetail}>
+            {gate.pathLabel}
+          </StatusBadge>
           <StatusBadge
             tone={incident.ood === 'NORMAL' ? 'good' : 'warn'}
             label={`OOD state ${incident.ood}`}

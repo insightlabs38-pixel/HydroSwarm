@@ -143,7 +143,28 @@ export function SamplingWorkspace({ incident }: { incident: IncidentView }) {
         )}
       </aside>
       <Panel title="Next sample recommendation" eyebrow={incident.mode === 'REFERENCE' ? 'DETERMINISTIC REFERENCE SAMPLE' : 'DETERMINISTIC SCOUT'} className="wide-panel">
-        {certificate?.recommendedSampleNode ? (
+        {incident.mode === 'REFERENCE' ? (
+          incident.recommendedSample ? (
+            <>
+              <div className="candidate-hero">
+                <strong>{incident.recommendedSample.nodeId}</strong>
+                <span>{incident.recommendedSample.informationGain.toFixed(2)} bits</span>
+              </div>
+              <dl className="key-value-grid">
+                <div>
+                  <dt>Expected information gain</dt>
+                  <dd>{incident.recommendedSample.informationGain.toFixed(2)} bits</dd>
+                </div>
+              </dl>
+              <p className="supporting">{incident.recommendedSample.rationale}</p>
+            </>
+          ) : (
+            <EmptyState
+              title="No further sampling recommended."
+              detail="This is a real decision state -- the deterministic reference workflow found no further useful measurement for this incident."
+            />
+          )
+        ) : certificate?.recommendedSampleNode ? (
           <>
             <div className="candidate-hero">
               <strong>{certificate.recommendedSampleNode}</strong>
@@ -205,6 +226,11 @@ export function SamplingWorkspace({ incident }: { incident: IncidentView }) {
               </ul>
             )}
           </>
+        ) : incident.mode === 'REFERENCE' ? (
+          <div className="inspector-stack">
+            <p className="eyebrow">REFERENCE NARRATIVE</p>
+            <p>{incident.explanation || 'Deterministic reference workflow — no grounded sample explanation available.'}</p>
+          </div>
         ) : (
           <EmptyState title="No grounded sample explanation available for this incident." />
         )}

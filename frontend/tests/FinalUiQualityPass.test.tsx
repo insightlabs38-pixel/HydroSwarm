@@ -9,14 +9,18 @@
  * F. Counterfactual
  * G. Gate consistency
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from '../src/App';
 import { Counterfactuals } from '../src/components/Counterfactuals';
-import { deriveDecisionGate } from '../src/decisionGate';
+import { ModeBanner } from '../src/shell/ModeBanner';
+import { SourceWorkspace } from '../src/workspaces/SourceWorkspace';
+import { SamplingWorkspace } from '../src/workspaces/SamplingWorkspace';
+import { deriveDecisionGate, planningSuppressionDetail } from '../src/decisionGate';
 import { useConsoleStore } from '../src/store';
-import type { IncidentView } from '../src/types';
+import { demoIncident } from '../src/demoFixture';
+import type { IncidentView, Plan } from '../src/types';
 
 const v5EvidenceJson = {
   schema: 'hydroswarm-v5-evidence-v1',
@@ -40,8 +44,11 @@ const v5EvidenceJson = {
       },
     },
     locked_topology_test: {
-      source: { n: 20, top1_rate: 0.55, top3_rate: 0.7, mrr: 0.652, coverage_rate: 0.6, actionable_rate: 0.0, calibrated_rate: 0.0, candidate_set_size: 1.3, posterior_entropy: 0.21 },
-      planning: { human_approved_rate: 0.0, mean_candidates_generated: 0.0, mean_candidates_wntr_verified: 0.0 },
+      // actionable_rate and calibrated_rate deliberately differ here so a
+      // regression back to rendering actionable_rate as "calibrated rate"
+      // (the exact bug this pass fixed) is caught by the test below.
+      source: { n: 20, top1_rate: 0.55, top3_rate: 0.7, mrr: 0.652, coverage_rate: 0.6, actionable_rate: 0.05, calibrated_rate: 0.15, candidate_set_size: 1.3, posterior_entropy: 0.21 },
+      planning: { human_approved_rate: 0.1, mean_candidates_generated: 1.2, mean_candidates_wntr_verified: 1.1 },
       topology_shift_predictive: 'DESCRIPTIVE_NON_GATING',
     },
   },
@@ -143,6 +150,37 @@ describe('A. Current V5 evidence', () => {
     await user.click(screen.getByRole('button', { name: /Validation/ }));
     await screen.findByRole('heading', { name: 'HydroCore-v5 final evaluation evidence' });
     expect(screen.getByText(/learned runtime outputs/)).toBeVisible();
+  });
+
+  test('novel-topology "calibrated rate" renders calibrated_rate, not actionable_rate', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await screen.findByText('Verified response awaiting approval');
+    await user.click(screen.getByRole('button', { name: /Validation/ }));
+    await screen.findByRole('heading', { name: 'HydroCore-v5 final evaluation evidence' });
+    // Fixture: topology calibrated_rate=0.15, actionable_rate=0.05 -- these
+    // must never be conflated (V5Evidence.tsx used to render actionable_rate
+    // here under a "calibrated rate" label).
+    expect(screen.getByText(/calibrated rate 15\.0%/)).toBeVisible();
+    expect(screen.queryByText(/calibrated rate 5\.0%/)).toBeNull();
+  });
+
+  test('novel-topology "human-approved" renders the real planning.human_approved_rate field', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await screen.findByText('Verified response awaiting approval');
+    await user.click(screen.getByRole('button', { name: /Validation/ }));
+    await screen.findByRole('heading', { name: 'HydroCore-v5 final evaluation evidence' });
+    expect(screen.getByText(/human-approved 10\.0%/)).toBeVisible();
+  });
+
+  test('stale "one compact reference network" limitation is not shown for the current M11.6 evidence', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await screen.findByText('Verified response awaiting approval');
+    await user.click(screen.getByRole('button', { name: /Validation/ }));
+    await screen.findByRole('heading', { name: 'HydroCore-v5 final evaluation evidence' });
+    expect(screen.queryByText(/one compact reference network/)).toBeNull();
   });
 });
 
@@ -340,5 +378,207 @@ describe('G. Gate consistency', () => {
     // so header should show PATH READY.
     const headerBadge = screen.getAllByText('PATH READY');
     expect(headerBadge.length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// H. Reference Source & Sampling truthfulness
+// ---------------------------------------------------------------------------
+describe('H. Reference Source & Sampling truthfulness', () => {
+  function renderWorkspace(node: React.ReactElement) {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    return render(<QueryClientProvider client={client}>{node}</QueryClientProvider>);
+  }
+
+  test('Reference Source label differs from the LIVE/DEMO Sentinel label', async () => {
+    const first = renderWorkspace(<SourceWorkspace incident={demoIncident} />);
+    expect(await screen.findByText('HYDROCORE-v5 SENTINEL')).toBeVisible();
+    first.unmount();
+
+    const referenceIncident: IncidentView = { ...demoIncident, mode: 'REFERENCE' };
+    renderWorkspace(<SourceWorkspace incident={referenceIncident} />);
+    expect(await screen.findByText('DETERMINISTIC REFERENCE LOCALIZATION')).toBeVisible();
+    expect(screen.queryByText('HYDROCORE-v5 SENTINEL')).toBeNull();
+  });
+
+  test('Reference Sampling uses incident.recommendedSample as the deterministic reference recommendation', async () => {
+    const referenceIncident: IncidentView = {
+      ...demoIncident,
+      mode: 'REFERENCE',
+      recommendedSample: {
+        nodeId: 'J-42',
+        informationGain: 1.23,
+        delayMinutes: null,
+        cost: null,
+        rationale: 'Largest measured signature split; demand-centrality tie-break.',
+      },
+    };
+    renderWorkspace(<SamplingWorkspace incident={referenceIncident} />);
+    expect(await screen.findByText('J-42')).toBeVisible();
+    expect(
+      screen.getByText('Largest measured signature split; demand-centrality tie-break.'),
+    ).toBeVisible();
+    expect(screen.queryByText('No further sampling recommended.')).toBeNull();
+  });
+
+  test('Reference Sampling shows a REFERENCE NARRATIVE fallback when no grounded WHY_SAMPLE explanation exists', async () => {
+    const referenceIncident: IncidentView = {
+      ...demoIncident,
+      mode: 'REFERENCE',
+      explanations: [],
+      explanation: 'Deterministic classical signature narrows the candidate set to one node.',
+    };
+    renderWorkspace(<SamplingWorkspace incident={referenceIncident} />);
+    expect(await screen.findByText('REFERENCE NARRATIVE')).toBeVisible();
+    expect(
+      screen.getByText('Deterministic classical signature narrows the candidate set to one node.'),
+    ).toBeVisible();
+    expect(screen.queryByText('No grounded sample explanation available for this incident.')).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// I. Counterfactual null-vs-zero semantics
+// ---------------------------------------------------------------------------
+function planFixture(overrides: Partial<Plan>): Plan {
+  return {
+    id: 'plan-x',
+    name: 'Plan X',
+    exposureReduction: 0.5,
+    actions: [],
+    status: 'VALID',
+    verification: null,
+    ...overrides,
+  };
+}
+
+describe('I. Counterfactual null-vs-zero semantics', () => {
+  test('no-response baseline still reads "0% by definition"', () => {
+    render(<Counterfactuals plans={[]} />);
+    expect(screen.getByText('0% by definition')).toBeVisible();
+  });
+
+  test('a real plan with unmeasured exposure reduction reads "Not evaluated", never "0% by definition"', () => {
+    const { container } = render(
+      <Counterfactuals
+        plans={[planFixture({ id: 'unmeasured', name: 'Flush zone 2', exposureReduction: null })]}
+      />,
+    );
+    const article = Array.from(container.querySelectorAll('article')).find((el) =>
+      el.textContent?.includes('Flush zone 2'),
+    )!;
+    const exposureRow = Array.from(article.querySelectorAll<HTMLElement>('dl > div')).find((el) =>
+      el.textContent?.includes('Exposure reduced'),
+    )!;
+    expect(within(exposureRow).getByText('Not evaluated')).toBeVisible();
+    expect(within(article).queryByText('0% by definition')).toBeNull();
+  });
+
+  test('a real plan with unmeasured exposure reduction renders no quantitative spread bar', () => {
+    const { container } = render(
+      <Counterfactuals
+        plans={[planFixture({ id: 'unmeasured', name: 'Flush zone 2', exposureReduction: null })]}
+      />,
+    );
+    const article = Array.from(container.querySelectorAll('article')).find((el) =>
+      el.textContent?.includes('Flush zone 2'),
+    )!;
+    expect(article.querySelector('.spread-visual')).toBeNull();
+  });
+
+  test('a real plan with a measured exposure reduction still renders its quantitative value and bar', () => {
+    const { container } = render(
+      <Counterfactuals
+        plans={[planFixture({ id: 'measured', name: 'Isolate zone 4', exposureReduction: 0.42 })]}
+      />,
+    );
+    const article = Array.from(container.querySelectorAll('article')).find((el) =>
+      el.textContent?.includes('Isolate zone 4'),
+    )!;
+    expect(within(article).getByText('42%')).toBeVisible();
+    expect(article.querySelector('.spread-visual')).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// J. Collapsed secondary navigation
+// ---------------------------------------------------------------------------
+describe('J. Collapsed secondary navigation', () => {
+  test('collapsed rail keeps secondary utility buttons visibly labeled, not blank', async () => {
+    const user = userEvent.setup();
+    renderApp();
+    await screen.findByText('Verified response awaiting approval');
+    await user.click(screen.getByRole('button', { name: /Collapse workflow/ }));
+
+    const validationBtn = screen.getByRole('button', { name: /Validation/ });
+    expect(validationBtn.querySelector('.rail-secondary-initial')?.textContent).toBe('V');
+    const networkBtn = screen.getByRole('button', { name: /Network/ });
+    expect(networkBtn.querySelector('.rail-secondary-initial')?.textContent).toBe('N');
+    const authorityBtn = screen.getByRole('button', { name: /Model & Authority/ });
+    expect(authorityBtn.querySelector('.rail-secondary-initial')?.textContent).toBe('A');
+    const benchmarksBtn = screen.getByRole('button', { name: /Benchmarks/ });
+    expect(benchmarksBtn.querySelector('.rail-secondary-initial')?.textContent).toBe('B');
+
+    // Still keyboard/screen-reader accessible: the accessible name is the
+    // full label even though the visible glyph is a single initial.
+    expect(validationBtn).toHaveAccessibleName('Validation');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// K. Header, Banner, and Response derive the same gate state
+// ---------------------------------------------------------------------------
+describe('K. Header, Banner, and Response derive the same gate state', () => {
+  test('OOD outside-validated-range takes precedence over an invalid-but-applicable calibration, everywhere', () => {
+    const incident: IncidentView = {
+      ...demoIncident,
+      mode: 'LIVE',
+      calibrationValid: false,
+      calibrationApplicable: true,
+      ood: 'OUTSIDE_VALIDATED_RANGE',
+    };
+    expect(deriveDecisionGate(incident).state).toBe('OUTSIDE_VALIDATED_RANGE');
+
+    render(<ModeBanner incident={incident} />);
+    expect(screen.getByText('OUTSIDE VALIDATED RANGE')).toBeVisible();
+    expect(screen.queryByText('CALIBRATION INVALID')).toBeNull();
+
+    expect(planningSuppressionDetail(incident)).toMatch(/validated operating range/);
+    expect(planningSuppressionDetail(incident)).not.toMatch(/[Cc]alibration is invalid/);
+  });
+
+  test('an invalid-but-applicable calibration (with normal OOD) reads consistently as CALIBRATION_INVALID everywhere', () => {
+    const incident: IncidentView = {
+      ...demoIncident,
+      mode: 'LIVE',
+      calibrationValid: false,
+      calibrationApplicable: true,
+      ood: 'NORMAL',
+    };
+    expect(deriveDecisionGate(incident).state).toBe('CALIBRATION_INVALID');
+
+    render(<ModeBanner incident={incident} />);
+    expect(screen.getByText('CALIBRATION INVALID')).toBeVisible();
+
+    expect(planningSuppressionDetail(incident)).toMatch(/[Cc]alibration is invalid/);
+  });
+
+  test('REFERENCE mode (calibration not applicable) never reads as CALIBRATION INVALID in planning-suppression text', () => {
+    const incident: IncidentView = {
+      ...demoIncident,
+      mode: 'REFERENCE',
+      calibrationValid: false,
+      calibrationApplicable: false,
+      ood: 'NORMAL',
+    };
+    expect(deriveDecisionGate(incident).state).toBe('CALIBRATION_NOT_APPLICABLE');
+    expect(planningSuppressionDetail(incident)).not.toMatch(/[Cc]alibration is invalid/);
+  });
+
+  test('Overview renders the same centralized gate badge as the header', async () => {
+    renderApp();
+    await screen.findByText('Verified response awaiting approval');
+    const readyBadges = screen.getAllByText('PATH READY');
+    expect(readyBadges.length).toBeGreaterThanOrEqual(2);
   });
 });

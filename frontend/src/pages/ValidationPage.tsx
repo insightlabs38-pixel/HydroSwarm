@@ -30,7 +30,6 @@ export function ValidationPage() {
           </li>
           <li>Unseen-topology transfer is measured but weak: predictive values are DESCRIPTIVE / NON-GATING</li>
           <li>Novel topology calibrated rate 0% — no operational authority granted</li>
-          <li>Frozen proof uses one compact reference network</li>
           <li>No autonomous actuator control</li>
           <li>Candidate coverage is a conformal target, not measured per-incident coverage</li>
           <li>Human engineering review is mandatory</li>

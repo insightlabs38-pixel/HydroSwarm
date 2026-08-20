@@ -82,3 +82,19 @@ export function deriveDecisionGate(incident: IncidentView): DecisionGateInfo {
     tone: 'good',
   };
 }
+
+/**
+ * Response workspace's planning-suppression explanation, derived from the
+ * same gate state as MissionHeader/ModeBanner -- so the same IncidentView
+ * always reads consistently across all three surfaces.
+ */
+export function planningSuppressionDetail(incident: IncidentView): string {
+  const gate = deriveDecisionGate(incident);
+  if (gate.state === 'OUTSIDE_VALIDATED_RANGE') {
+    return "This incident is outside the model's validated operating range. Planning is suppressed pending additional evidence or operator review.";
+  }
+  if (gate.state === 'CALIBRATION_INVALID') {
+    return 'Calibration is invalid for this network. Planning is suppressed until a valid calibration artifact is available.';
+  }
+  return 'No response plans have been generated for this incident yet.';
+}

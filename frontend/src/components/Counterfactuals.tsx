@@ -48,9 +48,9 @@ export function Counterfactuals({ plans }: { plans: Plan[] }) {
     <div className="branch-grid">      {branches.map((branch) => (
         <article key={branch.key} className={branch.recommended ? 'recommended-branch' : ''}>
           <h3>{branch.label}</h3>
-          {branch.key !== 'no-response' && (
+          {branch.key !== 'no-response' && branch.exposure !== null && (
             <div className="spread-visual" aria-hidden="true">
-              <i style={{ width: `${100 - (branch.exposure ?? 0) * 100}%` }} />
+              <i style={{ width: `${100 - branch.exposure * 100}%` }} />
             </div>
           )}
           {branch.key === 'no-response' && (
@@ -63,9 +63,11 @@ export function Counterfactuals({ plans }: { plans: Plan[] }) {
             <div>
               <dt>Exposure reduced</dt>
               <dd>
-                {branch.exposure === null
+                {branch.key === 'no-response'
                   ? '0% by definition'
-                  : `${Math.round(branch.exposure * 100)}%`}
+                  : branch.exposure === null
+                    ? 'Not evaluated'
+                    : `${Math.round(branch.exposure * 100)}%`}
               </dd>
             </div>
             <div>

@@ -61,7 +61,11 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
           <OperationalMap incident={incident} />
         </Suspense>
       </Panel>
-      <Panel title="Ranked source candidates" eyebrow="SENTINEL" className="wide-panel">
+      <Panel
+        title="Ranked source candidates"
+        eyebrow={incident.mode === 'REFERENCE' ? 'DETERMINISTIC REFERENCE LOCALIZATION' : 'HYDROCORE-v5 SENTINEL'}
+        className="wide-panel"
+      >
         {incident.candidates.length === 0 ? (
           <EmptyState title="No source candidates for this incident." />
         ) : (
