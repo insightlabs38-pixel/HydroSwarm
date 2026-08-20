@@ -1,0 +1,287 @@
+{
+  "20260814": {
+    "certificates": {
+      "sample_node": {
+        "task": "sample_node",
+        "output_name": "sample_node_logits",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 3,
+        "loss_present": true,
+        "loss_weight": 1.0,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "sample_node_head.network.1.weight",
+          "sample_node_head.network.0.weight",
+          "sample_node_head.network.0.bias",
+          "sample_node_head.network.1.bias"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 2.2321131229400635,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "information_gain": {
+        "task": "information_gain",
+        "output_name": "expected_information_gain",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 28,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "information_gain_head.1.bias",
+          "information_gain_head.0.weight",
+          "information_gain_head.1.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 1.2377928495407104,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "candidate_reduction": {
+        "task": "candidate_reduction",
+        "output_name": "candidate_reduction_prediction",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 28,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "candidate_reduction_head.1.bias",
+          "candidate_reduction_head.0.weight",
+          "candidate_reduction_head.1.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 0.26320818066596985,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "should_continue_sampling": {
+        "task": "should_continue_sampling",
+        "output_name": "should_continue_sampling_logits",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 8,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "should_continue_sampling_head.network.1.weight",
+          "should_continue_sampling_head.network.0.bias",
+          "should_continue_sampling_head.network.1.bias",
+          "should_continue_sampling_head.network.0.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 0.5110623836517334,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      }
+    },
+    "hash": "3241edf664756ea0ff00d93bbe676bff67d77906075cc591d198969bfd211ae0"
+  },
+  "31874": {
+    "certificates": {
+      "sample_node": {
+        "task": "sample_node",
+        "output_name": "sample_node_logits",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 3,
+        "loss_present": true,
+        "loss_weight": 1.0,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "sample_node_head.network.1.weight",
+          "sample_node_head.network.0.weight",
+          "sample_node_head.network.0.bias",
+          "sample_node_head.network.1.bias"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 1.8908741474151611,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "information_gain": {
+        "task": "information_gain",
+        "output_name": "expected_information_gain",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 28,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "information_gain_head.1.bias",
+          "information_gain_head.0.weight",
+          "information_gain_head.1.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 1.6354659795761108,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "candidate_reduction": {
+        "task": "candidate_reduction",
+        "output_name": "candidate_reduction_prediction",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 28,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "candidate_reduction_head.1.bias",
+          "candidate_reduction_head.0.weight",
+          "candidate_reduction_head.1.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 0.29203635454177856,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "should_continue_sampling": {
+        "task": "should_continue_sampling",
+        "output_name": "should_continue_sampling_logits",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 8,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "should_continue_sampling_head.network.1.weight",
+          "should_continue_sampling_head.network.0.bias",
+          "should_continue_sampling_head.network.1.bias",
+          "should_continue_sampling_head.network.0.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 0.6088943481445312,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      }
+    },
+    "hash": "9ccbb9fda3a1aa91233776499b0bb26e557fd666f2ef12f1d945c966d6034399"
+  },
+  "20260815": {
+    "certificates": {
+      "sample_node": {
+        "task": "sample_node",
+        "output_name": "sample_node_logits",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 3,
+        "loss_present": true,
+        "loss_weight": 1.0,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "sample_node_head.network.1.weight",
+          "sample_node_head.network.0.weight",
+          "sample_node_head.network.0.bias",
+          "sample_node_head.network.1.bias"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 1.7889329195022583,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "information_gain": {
+        "task": "information_gain",
+        "output_name": "expected_information_gain",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 28,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "information_gain_head.1.bias",
+          "information_gain_head.0.weight",
+          "information_gain_head.1.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 2.995490074157715,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "candidate_reduction": {
+        "task": "candidate_reduction",
+        "output_name": "candidate_reduction_prediction",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 28,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "candidate_reduction_head.1.bias",
+          "candidate_reduction_head.0.weight",
+          "candidate_reduction_head.1.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 0.42276278138160706,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      },
+      "should_continue_sampling": {
+        "task": "should_continue_sampling",
+        "output_name": "should_continue_sampling_logits",
+        "task_enabled": true,
+        "target_present": true,
+        "output_present": true,
+        "valid_target_count": 8,
+        "loss_present": true,
+        "loss_weight": 0.5,
+        "loss_finite": true,
+        "trainable_parameter_group": [
+          "should_continue_sampling_head.network.1.weight",
+          "should_continue_sampling_head.network.0.bias",
+          "should_continue_sampling_head.network.1.bias",
+          "should_continue_sampling_head.network.0.weight"
+        ],
+        "gradient_observed": true,
+        "gradient_norm": 0.8456476330757141,
+        "gradient_norm_finite": true,
+        "parameter_changed": true,
+        "passed": true,
+        "failure_reasons": []
+      }
+    },
+    "hash": "30e1228377694753a2288cad433ec3ffd57146556d59f9a7ef699faaeceb87aa"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "pathological_cells": [],
+  "pathological_full_set_behavior_detected": false,
+  "per_arm_seed_family": {
+    "ARM_A|20260814|golden-reference": {
+      "full_set_rate": 0.22142857142857142,
+      "mean_candidate_set_size": 1.7964285714285715,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.44910714285714287,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6375
+    },
+    "ARM_A|20260815|golden-reference": {
+      "full_set_rate": 0.19464285714285715,
+      "mean_candidate_set_size": 1.792857142857143,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.44821428571428573,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6517857142857143
+    },
+    "ARM_A|31874|golden-reference": {
+      "full_set_rate": 0.21607142857142858,
+      "mean_candidate_set_size": 1.8303571428571428,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.4575892857142857,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6303571428571428
+    },
+    "ARM_B2|20260814|branched-loop": {
+      "full_set_rate": 0.08877551020408163,
+      "mean_candidate_set_size": 4.03265306122449,
+      "median_candidate_set_size": 5.0,
+      "normalized_mean_candidate_set_size": 0.5760932944606415,
+      "p90_candidate_set_size": 6.0,
+      "singleton_rate": 0.20816326530612245
+    },
+    "ARM_B2|20260814|golden-reference": {
+      "full_set_rate": 0.25,
+      "mean_candidate_set_size": 1.8375,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.459375,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6446428571428572
+    },
+    "ARM_B2|20260814|loop-grid": {
+      "full_set_rate": 0.15535714285714286,
+      "mean_candidate_set_size": 5.078571428571428,
+      "median_candidate_set_size": 7.0,
+      "normalized_mean_candidate_set_size": 0.6348214285714285,
+      "p90_candidate_set_size": 8.0,
+      "singleton_rate": 0.16428571428571428
+    },
+    "ARM_B2|20260815|branched-loop": {
+      "full_set_rate": 0.13979591836734695,
+      "mean_candidate_set_size": 4.128571428571429,
+      "median_candidate_set_size": 5.0,
+      "normalized_mean_candidate_set_size": 0.589795918367347,
+      "p90_candidate_set_size": 7.0,
+      "singleton_rate": 0.2530612244897959
+    },
+    "ARM_B2|20260815|golden-reference": {
+      "full_set_rate": 0.26607142857142857,
+      "mean_candidate_set_size": 1.8821428571428571,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.4705357142857143,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6214285714285714
+    },
+    "ARM_B2|20260815|loop-grid": {
+      "full_set_rate": 0.2571428571428571,
+      "mean_candidate_set_size": 5.191964285714286,
+      "median_candidate_set_size": 7.0,
+      "normalized_mean_candidate_set_size": 0.6489955357142857,
+      "p90_candidate_set_size": 8.0,
+      "singleton_rate": 0.17857142857142858
+    },
+    "ARM_B2|31874|branched-loop": {
+      "full_set_rate": 0.1469387755102041,
+      "mean_candidate_set_size": 4.025510204081633,
+      "median_candidate_set_size": 5.0,
+      "normalized_mean_candidate_set_size": 0.5750728862973762,
+      "p90_candidate_set_size": 7.0,
+      "singleton_rate": 0.2612244897959184
+    },
+    "ARM_B2|31874|golden-reference": {
+      "full_set_rate": 0.22857142857142856,
+      "mean_candidate_set_size": 1.8267857142857142,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.45669642857142856,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6339285714285714
+    },
+    "ARM_B2|31874|loop-grid": {
+      "full_set_rate": 0.2642857142857143,
+      "mean_candidate_set_size": 5.2125,
+      "median_candidate_set_size": 7.0,
+      "normalized_mean_candidate_set_size": 0.6515625,
+      "p90_candidate_set_size": 8.0,
+      "singleton_rate": 0.18928571428571428
+    }
+  },
+  "threshold_used": 0.8
+}

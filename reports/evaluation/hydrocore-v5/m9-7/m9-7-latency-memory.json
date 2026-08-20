@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Section 10: engineering-only latency/memory preflight, measured AFTER HydroCore-M's architecture was already frozen deterministically (Section 3) -- never used to tune M's width.",
+  "milestone": "M9.7",
+  "environment": {
+    "device": "cpu",
+    "torch_threads": 4,
+    "torch_version": "2.13.0+cu130"
+  },
+  "hydrocore_s": {
+    "variant": "small",
+    "parameter_count": 4182612,
+    "nodes": 25,
+    "steps": 25,
+    "warmup_iterations": 5,
+    "measured_iterations": 20,
+    "median_latency_ms": 41.81930901540909,
+    "mean_latency_ms": 42.03961984894704,
+    "p95_latency_ms": 43.61126499134116,
+    "minimum_latency_ms": 40.944785985630006,
+    "maximum_latency_ms": 44.16431000572629,
+    "process_rss_before_mb": 645.19921875,
+    "process_rss_after_mb": 645.1484375,
+    "rss_delta_mb": -0.05078125,
+    "output_shape": [
+      1,
+      25
+    ],
+    "checkpoint_bytes": 16758808,
+    "checkpoint_mb": 15.982444763183594,
+    "checkpoint_sha256": "a376c3050739adfafc8fd0923c204186a68237150d0cdd69a1116d94d69b8402"
+  },
+  "hydrocore_m": {
+    "variant": "small_v5_capacity_m",
+    "parameter_count": 13919572,
+    "nodes": 25,
+    "steps": 25,
+    "warmup_iterations": 5,
+    "measured_iterations": 20,
+    "median_latency_ms": 47.27570399700198,
+    "mean_latency_ms": 47.524917546252254,
+    "p95_latency_ms": 49.677225993946195,
+    "minimum_latency_ms": 45.79005399136804,
+    "maximum_latency_ms": 50.0520019850228,
+    "process_rss_before_mb": 653.53125,
+    "process_rss_after_mb": 653.46875,
+    "rss_delta_mb": -0.0625,
+    "output_shape": [
+      1,
+      25
+    ],
+    "checkpoint_bytes": 55706824,
+    "checkpoint_mb": 53.12616729736328,
+    "checkpoint_sha256": "513b7abe9f2a21fb8285eb875a40dfe803c31c63ca2b3617e051a57217468e35"
+  },
+  "relative": {
+    "parameter_ratio_M_over_S": 3.3279615704253707,
+    "median_latency_ratio_M_over_S": 1.1304754934994834,
+    "checkpoint_size_ratio_M_over_S": 3.3240325922941536
+  },
+  "no_predictive_evaluation_performed": true,
+  "no_post_hoc_cost_threshold_imposed": true
+}

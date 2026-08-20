@@ -1,0 +1,17 @@
+{
+  "kind": "M10_4_PHYSICAL_OUTCOMES",
+  "protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "n_incidents_with_selected_plan": 210,
+  "n_incidents_with_no_action_reference": 0,
+  "n_paired_selected_vs_no_action": 0,
+  "mean_delta_selected_minus_no_action": {
+    "population_impacted": null,
+    "contaminant_mass_consumed_mg": null,
+    "volume_above_threshold_l": null,
+    "minimum_pressure_m": null,
+    "pressure_violation_minutes": null,
+    "unserved_demand_l": null,
+    "service_availability": null,
+    "containment_time_minutes": null
+  }
+}

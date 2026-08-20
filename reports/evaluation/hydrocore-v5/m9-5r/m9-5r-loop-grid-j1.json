@@ -1,0 +1,50 @@
+{
+  "note": "M9.5R development_m9_5r J1/J7/J8 behavior at the single primary support=20 condition, for descriptive comparison against M9.4/M9.5's findings. Not a gate; training/calibration are not changed based on this.",
+  "per_seed": {
+    "20260814": {
+      "confusion_counts": {
+        "J1->J7": 9,
+        "J1->J8": 24,
+        "J7->J1": 0,
+        "J8->J1": 0
+      },
+      "j1_marginal_coverage": 0.5714285714285714,
+      "j1_mean_candidate_set_size": 4.164285714285715,
+      "j1_mean_true_source_rank": 4.507142857142857,
+      "j1_median_true_source_rank": 3.0,
+      "j1_mrr": 0.4660799319727891,
+      "j1_top1": 0.32857142857142857,
+      "n_j1_development_incidents": 20
+    },
+    "20260815": {
+      "confusion_counts": {
+        "J1->J7": 7,
+        "J1->J8": 37,
+        "J7->J1": 0,
+        "J8->J1": 0
+      },
+      "j1_marginal_coverage": 0.6857142857142857,
+      "j1_mean_candidate_set_size": 4.257142857142857,
+      "j1_mean_true_source_rank": 4.614285714285714,
+      "j1_median_true_source_rank": 4.0,
+      "j1_mrr": 0.4573554421768707,
+      "j1_top1": 0.32142857142857145,
+      "n_j1_development_incidents": 20
+    },
+    "31874": {
+      "confusion_counts": {
+        "J1->J7": 5,
+        "J1->J8": 27,
+        "J7->J1": 0,
+        "J8->J1": 0
+      },
+      "j1_marginal_coverage": 0.6,
+      "j1_mean_candidate_set_size": 4.192857142857143,
+      "j1_mean_true_source_rank": 4.614285714285714,
+      "j1_median_true_source_rank": 4.0,
+      "j1_mrr": 0.44900510204081634,
+      "j1_top1": 0.30714285714285716,
+      "n_j1_development_incidents": 20
+    }
+  }
+}

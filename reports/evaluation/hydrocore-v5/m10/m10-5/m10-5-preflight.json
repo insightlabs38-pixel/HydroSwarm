@@ -1,0 +1,16 @@
+{
+  "blocker": "M9.6 freezes only the export-within-each-seed policy; its authoritative records name all three canonical checkpoints but no deployment seed, deterministic selector, or governed ensemble. Choosing now would be post-hoc, particularly because M10.4 evaluated all three.",
+  "checks": {
+    "all_canonical_checkpoint_hashes_match": true,
+    "locked_test_opened": false,
+    "m10_4_parent_pass": true,
+    "per_seed_final_step_policy_verified": true,
+    "selection_does_not_use_m10_4_performance": true,
+    "selection_uniquely_resolved": false
+  },
+  "kind": "M10_5_PREFLIGHT",
+  "observed_commit": "8a4752bf39f82542735c21dd44981f164ed2b849",
+  "protocol_hash": "1a8e8e9a86752e9d4bb3f7d066833db263b41e2b4f09c82e64ff7b3673c8a908",
+  "result": "M10_5_PREFLIGHT_BLOCKED_SELECTION_IDENTITY",
+  "start_commit": "8a4752bf39f82542735c21dd44981f164ed2b849"
+}

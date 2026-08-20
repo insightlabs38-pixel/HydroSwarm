@@ -1,0 +1,451 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Section 3: deterministic, parameter-count-only enumeration of mechanically possible HydroCore-M candidates, computed BEFORE any predictive evaluation.",
+  "milestone": "M9.7",
+  "target_range": {
+    "low": 12000000,
+    "high": 16000000,
+    "predeclared_center": 14000000
+  },
+  "selection_rule": "Deterministic, parameter-count-only selection, computed BEFORE any predictive evaluation of any candidate (protocol Section 3): (1) fix num_layers=4, latent_tokens=64, modality_layers=1 identical to frozen S (preserve the same number and ordering of semantic stages, per protocol's preferred scaling strategy); (2) fix head_dim = d_model/nhead = 32 and dim_feedforward/d_model = 3.0, both S's own exact ratios; (3) sweep d_model over multiples of 32 (required for integer nhead at fixed head_dim) from 224 to 640; (4) instantiate the real HydroCore for each and count actual parameters (not a formula estimate); (5) filter to the protocol's 12-16M band; (6) select the point nearest the predeclared ~14M center. No accuracy, loss, or any predictive signal was computed for any candidate.",
+  "pure_width_scale_sweep": [
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 224,
+      "nhead": 7,
+      "dim_feedforward": 672,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 5675348,
+      "ratio_vs_small": 1.356890861499943,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 8324652,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 256,
+      "nhead": 8,
+      "dim_feedforward": 768,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 7395412,
+      "ratio_vs_small": 1.7681324492924517,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 6604588,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 288,
+      "nhead": 9,
+      "dim_feedforward": 864,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 9342804,
+      "ratio_vs_small": 2.2337247633775257,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 4657196,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 320,
+      "nhead": 10,
+      "dim_feedforward": 960,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 11517524,
+      "ratio_vs_small": 2.7536678037551656,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 2482476,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 352,
+      "nhead": 11,
+      "dim_feedforward": 1056,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 13919572,
+      "ratio_vs_small": 3.3279615704253707,
+      "in_target_range_12_16M": true,
+      "abs_diff_to_14M_center": 80428,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 384,
+      "nhead": 12,
+      "dim_feedforward": 1152,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 16548948,
+      "ratio_vs_small": 3.9566060633881412,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 2548948,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 416,
+      "nhead": 13,
+      "dim_feedforward": 1248,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 19405652,
+      "ratio_vs_small": 4.639601282643477,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 5405652,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 448,
+      "nhead": 14,
+      "dim_feedforward": 1344,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 22489684,
+      "ratio_vs_small": 5.376947228191379,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 8489684,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 480,
+      "nhead": 15,
+      "dim_feedforward": 1440,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 25801044,
+      "ratio_vs_small": 6.168643900031846,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 11801044,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 512,
+      "nhead": 16,
+      "dim_feedforward": 1536,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 29339732,
+      "ratio_vs_small": 7.014691298164879,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 15339732,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 544,
+      "nhead": 17,
+      "dim_feedforward": 1632,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 33105748,
+      "ratio_vs_small": 7.915089422590477,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 19105748,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 576,
+      "nhead": 18,
+      "dim_feedforward": 1728,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 37099092,
+      "ratio_vs_small": 8.869838273308641,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 23099092,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 608,
+      "nhead": 19,
+      "dim_feedforward": 1824,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 41319764,
+      "ratio_vs_small": 9.87893785031937,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 27319764,
+      "mechanically_valid": true
+    },
+    {
+      "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+      "d_model": 640,
+      "nhead": 20,
+      "dim_feedforward": 1920,
+      "num_layers": 4,
+      "latent_tokens": 64,
+      "modality_layers": 1,
+      "total_parameters": 45767764,
+      "ratio_vs_small": 10.942388153622664,
+      "in_target_range_12_16M": false,
+      "abs_diff_to_14M_center": 31767764,
+      "mechanically_valid": true
+    }
+  ],
+  "unique_in_range_candidate": {
+    "family": "PURE_WIDTH_SCALE_L4_LATENT64_MODALITY1",
+    "d_model": 352,
+    "nhead": 11,
+    "dim_feedforward": 1056,
+    "num_layers": 4,
+    "latent_tokens": 64,
+    "modality_layers": 1,
+    "total_parameters": 13919572,
+    "ratio_vs_small": 3.3279615704253707,
+    "in_target_range_12_16M": true,
+    "abs_diff_to_14M_center": 80428,
+    "mechanically_valid": true
+  },
+  "rejected_alternatives": [
+    {
+      "candidate": "MODEL_VARIANTS['medium'] (pre-existing named variant)",
+      "config": {
+        "d_model": 256,
+        "nhead": 8,
+        "dim_feedforward": 768,
+        "num_layers": 8,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 12673108,
+      "in_target_range_12_16M": true,
+      "mechanically_valid": true,
+      "rejected_because": "Falls inside the 12-16M band (12,673,108) but doubles num_layers (4->8), a depth/semantic-stage-count change, not a pure capacity width change. Protocol Section 3 explicitly instructs preserving 'the same number and ordering of semantic stages' and to 'strongly prefer widening alone' when widening alone can cleanly reach the target range -- which it does (see selected candidate below). Not used as HydroCore-M for M9.7/M9.8, though it remains a valid, independently pre-existing named variant in this codebase for any other purpose."
+    },
+    {
+      "candidate": "MODEL_VARIANTS['large'] (pre-existing named variant, for reference only)",
+      "config": {
+        "d_model": 360,
+        "nhead": 8,
+        "dim_feedforward": 1080,
+        "num_layers": 8,
+        "latent_tokens": 96,
+        "modality_layers": 1
+      },
+      "total_parameters": 24984084,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "~24.98M parameters -- inside the master protocol's own stated HydroCore-L band (~24-32M), not HydroCore-M's 12-16M band. HydroCore-L is explicitly NOT authorized under M9.7 (Section 8: HYDROCORE_L_AUTHORIZED=FALSE); listed here only to confirm the pre-existing 'large' variant is not being silently repurposed as M."
+    },
+    {
+      "candidate": "pure-width d_model=224",
+      "config": {
+        "d_model": 224,
+        "nhead": 7,
+        "dim_feedforward": 672,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 5675348,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "below target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=256",
+      "config": {
+        "d_model": 256,
+        "nhead": 8,
+        "dim_feedforward": 768,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 7395412,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "below target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=288",
+      "config": {
+        "d_model": 288,
+        "nhead": 9,
+        "dim_feedforward": 864,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 9342804,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "below target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=320",
+      "config": {
+        "d_model": 320,
+        "nhead": 10,
+        "dim_feedforward": 960,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 11517524,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "below target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=384",
+      "config": {
+        "d_model": 384,
+        "nhead": 12,
+        "dim_feedforward": 1152,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 16548948,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=416",
+      "config": {
+        "d_model": 416,
+        "nhead": 13,
+        "dim_feedforward": 1248,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 19405652,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=448",
+      "config": {
+        "d_model": 448,
+        "nhead": 14,
+        "dim_feedforward": 1344,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 22489684,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=480",
+      "config": {
+        "d_model": 480,
+        "nhead": 15,
+        "dim_feedforward": 1440,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 25801044,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=512",
+      "config": {
+        "d_model": 512,
+        "nhead": 16,
+        "dim_feedforward": 1536,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 29339732,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=544",
+      "config": {
+        "d_model": 544,
+        "nhead": 17,
+        "dim_feedforward": 1632,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 33105748,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=576",
+      "config": {
+        "d_model": 576,
+        "nhead": 18,
+        "dim_feedforward": 1728,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 37099092,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=608",
+      "config": {
+        "d_model": 608,
+        "nhead": 19,
+        "dim_feedforward": 1824,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 41319764,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    },
+    {
+      "candidate": "pure-width d_model=640",
+      "config": {
+        "d_model": 640,
+        "nhead": 20,
+        "dim_feedforward": 1920,
+        "num_layers": 4,
+        "latent_tokens": 64,
+        "modality_layers": 1
+      },
+      "total_parameters": 45767764,
+      "in_target_range_12_16M": false,
+      "mechanically_valid": true,
+      "rejected_because": "above target range (12,000,000-16,000,000 target band)."
+    }
+  ],
+  "no_predictive_evaluation_performed": true
+}

@@ -1,0 +1,13 @@
+{
+  "autonomous_actuation": false,
+  "deterministic_ood": "OODDetector",
+  "deterministic_planning": "generate_response_plans",
+  "deterministic_scout": "rank_sample_locations",
+  "human_approval_required": true,
+  "kind": "M11_2_AUTHORITY_FREEZE",
+  "learned_ood": "NON_AUTHORITATIVE",
+  "learned_scout": "NON_AUTHORITATIVE",
+  "learned_strategist": "NON_AUTHORITATIVE",
+  "matches_release_manifest": true,
+  "physical_authority": "WNTR/EPANET"
+}

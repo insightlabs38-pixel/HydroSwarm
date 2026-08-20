@@ -1,0 +1,72 @@
+{
+  "M9_6_DECISION": "A",
+  "arms": [
+    "ARM_A_M9_6",
+    "ARM_B_M9_6"
+  ],
+  "branch": "exp/hydrocore-v5-causal",
+  "calibration": {
+    "alpha": 0.1,
+    "candidate_set_guard_passed": true,
+    "coverage_floor": 0.85,
+    "current_control_all_3_pass": true,
+    "interleaved_all_9_pass": true,
+    "representativeness_passed": true
+  },
+  "decision_reason": "Exact compute parity, representativeness, predictive generalization gate, known-family guardrails, and the full calibration gate (CURRENT control, INTERLEAVED 9/9, candidate-set guard) all passed. HydroCore-S architecture and interleaved training recipe are confirmed.",
+  "end_commit_note": "21717b208c4dd374829986aaeac14bd922af6767 was the commit at decide-stage execution time, BEFORE this milestone's own artifact commit existed (a commit cannot embed its own SHA at authoring time -- see M9.4/M9.5/M9.5R's closure/manifest end_commit_note for the same issue). This metadata-only follow-up commit records the true final SHA (8c99f87fc359be508c39e1a61d0f31861672f821, the commit that actually added this closure.json and the rest of the M9.6 evaluation/calibration artifacts).",
+  "evidence_against": "None identified against confirmation at this run.",
+  "execution_commit": "8c99f87fc359be508c39e1a61d0f31861672f821",
+  "hydrocore_s_status": "FROZEN",
+  "kind": "EXACT_COMPUTE_PARITY_FINAL_HYDROCORE_S_CONFIRMATION",
+  "known_family_guardrails": {
+    "early_regression_pp": 4.1666666666666625,
+    "mature_regression_pp": 0.2083333333333437,
+    "mrr_regression": 0.01649305555555547,
+    "passed": true
+  },
+  "limitations": [
+    "M9.6 reuses the historical M7/M9.0/M9.0a train/validation scenario pools (documented scope decision, see m9-6-protocol.json's train_validation_data.scope_decision_note) rather than generating brand-new train/validation seed ranges.",
+    "ARM_A is evaluated on golden-reference (known) and coastal-branch/tree-branch/dense-loop (unseen), matching M9.4's own scope -- branched-loop/loop-grid are ARM_B-only retention figures, never blended into the known-family regression comparison.",
+    "Paired-bootstrap replicate arrays are computed but not persisted in m9-6-paired-bootstrap.json (summary statistics only) to keep the artifact a reasonable size.",
+    "This is a calibration/predictive confirmation only; no field-performance, production-readiness, or locked-test claim is made."
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M9.6",
+  "next_recommended_milestone": "Not started here -- recommended: remaining system-level validation (OOD/fusion, Scout, Strategist, trajectory/planning, safety/authority) OR a separately governed HydroCore-M capacity experiment IF all prerequisite gates are complete AND meaningful headroom remains (not assumed automatically).",
+  "predictive_generalization": {
+    "bootstrap_ci90": [
+      0.008787037037037029,
+      0.056296296296296296
+    ],
+    "macro_mature_delta": 0.03287037037037037,
+    "passed": true,
+    "per_seed_deltas": {
+      "31874": 0.022222222222222223,
+      "20260814": 0.017222222222222226,
+      "20260815": 0.059166666666666666
+    },
+    "unseen_families_improved": [
+      "coastal-branch",
+      "tree-branch",
+      "dense-loop"
+    ]
+  },
+  "protocol_frozen_at_commit": "6b30e093839ef1986fcdf3e3a35f1435f57dc11e",
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "selected_hydrocore_s_recipe": "CLASSICAL_HYDROCORE_S + AGE_FIX_ONLY + EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING + B_DEPTH_AWARE_CALIBRATION + ALPHA_0_1 + SOURCE_REPRESENTATIVE_CALIBRATION_SUPPORT_20_PER_SOURCE",
+  "start_commit": "21717b208c4dd374829986aaeac14bd922af6767",
+  "strongest_evidence": "Macro-family (equal-weight) MATURE neural Top-1 delta on the 3 unseen families: 0.03287037037037037, 90% paired-bootstrap CI [0.008787037037037029, 0.056296296296296296]. Training parity passed: True.",
+  "training_parity": {
+    "all_arm_seed_runs_exactly_1350": true,
+    "exposure_budget_parity": true,
+    "optimizer_steps_required": 1350,
+    "passed": true,
+    "scheduler_parity": true
+  }
+}

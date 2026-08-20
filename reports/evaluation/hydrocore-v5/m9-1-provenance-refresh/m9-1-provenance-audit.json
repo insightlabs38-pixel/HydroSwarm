@@ -1,0 +1,40 @@
+{
+  "kind": "M9_1_PROVENANCE_REFRESH_AUDIT",
+  "milestone": "M9.1-provenance-refresh",
+  "trigger": "tests/scientific/test_m9_1_runner.py::test_assert_code_under_test_commit_passes_at_current_head failed after M9.7 (commit 475874d) added an entry under FROZEN_UNCHANGED_PATHS-protected src/hydroswarm/model/core.py; disclosed (not silently worked around) in M9.8's own closure commit e33d71804c517d712724488ce9f005093cd06cb5.",
+  "prior_floor": "154605180f2a950d86452cfc8ec7202990aba8cf",
+  "new_floor": "475874d8977d0952e8fc3626eb2bd6580cc3c2f7",
+  "frozen_unchanged_paths": [
+    "src/hydroswarm/model/continuous_time.py",
+    "src/hydroswarm/model/core.py",
+    "configs/training-v5-causal.yaml"
+  ],
+  "commits_touching_frozen_paths_in_range": [
+    "475874d8977d0952e8fc3626eb2bd6580cc3c2f7"
+  ],
+  "commits_touching_frozen_paths_in_range_count": 1,
+  "core_py_diff_lines_added": 17,
+  "core_py_diff_lines_removed": 0,
+  "core_py_diff_content": "single new MODEL_VARIANTS dict entry: \"small_v5_capacity_m\": ModelVariant(352, 11, 1056, 4, 64) -- existing \"small\"/\"medium\"/\"large\" entries unmodified",
+  "continuous_time_py_diff_empty": true,
+  "training_v5_causal_yaml_diff_empty": true,
+  "model_variants_lookup_mechanism": "MODEL_VARIANTS[variant.lower()] -- strict key lookup in HydroCore.from_variant, never iterated by position/count, so an added key cannot change any existing variant's resolved configuration",
+  "small_variant_construction_check": {
+    "method": "HydroCore.from_variant('small', use_adapters=False, **m9_1_common.SHARED_MODEL_CONFIG, **m9_1_common.CURRENT_MODEL_KWARGS)",
+    "expected_param_count": 4182612,
+    "observed_param_count": 4182612,
+    "match": true
+  },
+  "graph_ode_cde_sde_construction_affected": false,
+  "temporal_dynamics_affected": false,
+  "training_config_affected": false,
+  "m9_1_frozen_decision_reopened": false,
+  "development_holdout_inspected": false,
+  "calibration_data_inspected": false,
+  "locked_final_test_opened": false,
+  "locked_topology_test_opened": false,
+  "conclusion": "M9.7's core.py change is additive-registration-only and semantically irrelevant to every M9.1-frozen path/config/output. CODE_UNDER_TEST_COMMIT_FLOOR re-superseded from prior_floor to new_floor per the existing 'later commit that changes nothing under the three frozen paths' mechanism (Section 21(a)/(c) of HYDROCORE_V5_M9_1_PROTOCOL.md, amended 2026-08-17). Guard remains intact: any future change to the three frozen paths beyond new_floor still trips assert_code_under_test_commit.",
+  "audit_commit_note": "the commit that adds this file cannot embed its own SHA at authoring time (see m9-8-closure.json's own start_commit_note for the identical issue and convention) -- the audit commit is whatever `git rev-parse HEAD` shows immediately after 'docs/test(v5): refresh M9.1 provenance after additive M variant' lands",
+  "full_repository_suite_before_fix": {"passed": 1536, "skipped": 1, "failed": 1},
+  "full_repository_suite_after_fix": {"passed": 1539, "skipped": 1, "failed": 0}
+}

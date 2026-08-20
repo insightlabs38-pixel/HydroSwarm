@@ -1,0 +1,25 @@
+{
+  "arm": "CURRENT",
+  "checkpoint_sha256": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176",
+  "code_under_test_commit": "684c4de50695085f72beec4057629043da58d08d",
+  "current_checkpoint_source": "REUSED_M8_7_CHECKPOINT",
+  "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m8-7/AGE_FIX_ONLY-seed31874/20260815T070112Z-dc622ed0/model-export.safetensors",
+  "feature_kwargs": {
+    "include_relative_gap_feature": false,
+    "unobserved_age_sentinel": "fixed"
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "m8_7_source_record": "reports/evaluation/hydrocore-v5/m8-7-runs/AGE_FIX_ONLY-seed31874.json",
+  "model_kwargs": {
+    "elapsed_time_normalization": "window_relative",
+    "quality_feature_dim": 4,
+    "temporal_feature_dim": 6
+  },
+  "param_count": 4182612,
+  "protocol_frozen_at_commit": "0f05be1d47258a8c3d19e3a0d0e1122e3e560069",
+  "schema_version": 1,
+  "seed": 31874,
+  "training_summary": null,
+  "wall_seconds": 0.0
+}

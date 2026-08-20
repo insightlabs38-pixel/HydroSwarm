@@ -1,0 +1,262 @@
+{
+  "arms": [
+    "CURRENT",
+    "GRAPH_ODE",
+    "GRAPH_CDE",
+    "GRAPH_SDE"
+  ],
+  "branch": "exp/hydrocore-v5-causal",
+  "canonical_table_path": "reports/evaluation/hydrocore-v5/m9-2/m9-2-canonical-diagnostics.jsonl",
+  "checkpoint_sha256_verified": {
+    "CURRENT-seed20260814": "cac349504b9fad7372356e29cb3fe617ef87e8bae9fbb3255756f350cdca7265",
+    "CURRENT-seed31874": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176",
+    "GRAPH_CDE-seed20260814": "024c72a1204bcf4b5a27599a08ec4ca35b23bd7b8fef034085009e3c280a4f58",
+    "GRAPH_CDE-seed31874": "fd27bc66feb223ac96a29641ea1dda383c0e35867e9155c9102900a4ac45c72e",
+    "GRAPH_ODE-seed20260814": "5a5258b0b9857f7f20a1e980f93c38e564a4d81a7f1c7166315c448cb0d64c72",
+    "GRAPH_ODE-seed31874": "1e9646ff029a916208bcf4b7178c4e7a6763a3a48d472c0975bd621b12af27b2",
+    "GRAPH_SDE-seed20260814": "357cebf55a00efa47441fd61dccc477a0ca04849e3a4dd083fae4386c2fa970d",
+    "GRAPH_SDE-seed31874": "539bdb9f61661d06c951c302408df44342d25940f7a390e67a16e78de43a6c2c"
+  },
+  "code_under_test_commit": "3b6ee2a3529faffdcc2288cda294a4ef4d6f0765",
+  "depths": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "end_commit": "3b6ee2a3529faffdcc2288cda294a4ef4d6f0765",
+  "inference_reconstruction_equivalence": {
+    "CURRENT-seed20260814": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9023809523809524,
+      "marginal_coverage_stored": 0.9023809523809524,
+      "marginal_equivalent": true
+    },
+    "CURRENT-seed31874": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9011904761904762,
+      "marginal_coverage_stored": 0.9011904761904762,
+      "marginal_equivalent": true
+    },
+    "GRAPH_CDE-seed20260814": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9130952380952381,
+      "marginal_coverage_stored": 0.9130952380952381,
+      "marginal_equivalent": true
+    },
+    "GRAPH_CDE-seed31874": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9119047619047619,
+      "marginal_coverage_stored": 0.9119047619047619,
+      "marginal_equivalent": true
+    },
+    "GRAPH_ODE-seed20260814": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9035714285714286,
+      "marginal_coverage_stored": 0.9035714285714286,
+      "marginal_equivalent": true
+    },
+    "GRAPH_ODE-seed31874": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9119047619047619,
+      "marginal_coverage_stored": 0.9119047619047619,
+      "marginal_equivalent": true
+    },
+    "GRAPH_SDE-seed20260814": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9011904761904762,
+      "marginal_coverage_stored": 0.9011904761904762,
+      "marginal_equivalent": true
+    },
+    "GRAPH_SDE-seed31874": {
+      "by_maturity_equivalent": true,
+      "marginal_coverage_reconstructed": 0.9071428571428571,
+      "marginal_coverage_stored": 0.9071428571428571,
+      "marginal_equivalent": true
+    }
+  },
+  "inference_reconstruction_performed": true,
+  "inference_reconstruction_scope": "calibration-split forward passes only (per arm/seed), to refit B_DEPTH_AWARE and derive per-row conformal candidate sets for already-persisted dev_rows; NO development_holdout forward passes were performed (probabilities reused as-is).",
+  "kind": "DIAGNOSTIC_ANALYSIS_ONLY",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "m9_1_aggregate_reproduction": {
+    "guardrail_regression_pp": {
+      "GRAPH_CDE": {
+        "early_regression_pp": 2.361111111111114,
+        "mature_regression_pp": 3.3333333333333326,
+        "mrr_regression": 0.01567460317460312
+      },
+      "GRAPH_ODE": {
+        "early_regression_pp": 0.1388888888888884,
+        "mature_regression_pp": 3.749999999999998,
+        "mrr_regression": 0.005654761904761885
+      },
+      "GRAPH_SDE": {
+        "early_regression_pp": 0.1388888888888884,
+        "mature_regression_pp": 4.166666666666674,
+        "mrr_regression": 0.006746031746031722
+      }
+    },
+    "per_arm_seed_aggregates": {
+      "CURRENT": {
+        "20260814": {
+          "early_top1": 0.45,
+          "mature_top1": 0.9916666666666667,
+          "mid_top1": 0.9041666666666667,
+          "overall_mrr": 0.8299603174603174
+        },
+        "31874": {
+          "early_top1": 0.45555555555555555,
+          "mature_top1": 0.9875,
+          "mid_top1": 0.8875,
+          "overall_mrr": 0.8290674603174603
+        }
+      },
+      "GRAPH_CDE": {
+        "20260814": {
+          "early_top1": 0.4444444444444444,
+          "mature_top1": 0.9458333333333333,
+          "mid_top1": 0.8916666666666667,
+          "overall_mrr": 0.8173611111111112
+        },
+        "31874": {
+          "early_top1": 0.41388888888888886,
+          "mature_top1": 0.9666666666666667,
+          "mid_top1": 0.85,
+          "overall_mrr": 0.8103174603174603
+        }
+      },
+      "GRAPH_ODE": {
+        "20260814": {
+          "early_top1": 0.4527777777777778,
+          "mature_top1": 0.9583333333333334,
+          "mid_top1": 0.9,
+          "overall_mrr": 0.825
+        },
+        "31874": {
+          "early_top1": 0.45,
+          "mature_top1": 0.9458333333333333,
+          "mid_top1": 0.8958333333333334,
+          "overall_mrr": 0.822718253968254
+        }
+      },
+      "GRAPH_SDE": {
+        "20260814": {
+          "early_top1": 0.4527777777777778,
+          "mature_top1": 0.95,
+          "mid_top1": 0.8958333333333334,
+          "overall_mrr": 0.8237103174603174
+        },
+        "31874": {
+          "early_top1": 0.45,
+          "mature_top1": 0.9458333333333333,
+          "mid_top1": 0.8916666666666667,
+          "overall_mrr": 0.8218253968253969
+        }
+      }
+    },
+    "status": "REPRODUCED_EXACTLY",
+    "tolerance_float": 1e-06
+  },
+  "m9_1_closure_commit": "3b6ee2a3529faffdcc2288cda294a4ef4d6f0765",
+  "m9_1_closure_summary": {
+    "M9_1_FINAL_DECISION": "CURRENT_HYDROCORE_RETAINED",
+    "code_under_test_commit": "5b49fef1358dc0bfb237437df27a63242d83efc2"
+  },
+  "m9_1_protocol_frozen_at_commit": "0f05be1d47258a8c3d19e3a0d0e1122e3e560069",
+  "m9_1_source_artifact_identities": {
+    "m9-1-calibration.json": {
+      "git_blob_sha": "c7276c30f0b289be4a96b5ad3e0897c433f0fb9e",
+      "path": "reports/evaluation/hydrocore-v5/m9-1-calibration.json",
+      "sha256": "6cf14db4dcf997958f6db818532b6c3348a38df02cbf766da3482e3bdea54d01"
+    },
+    "m9-1-closure.json": {
+      "git_blob_sha": "ee090bc14695a237e841c7305df1b31fc47779c3",
+      "path": "reports/evaluation/hydrocore-v5/m9-1-closure.json",
+      "sha256": "38c16fa89d8b576927d3e52f987937cd372f1cdff823993a3379ffdb34abb0c5"
+    },
+    "m9-1-guardrails.json": {
+      "git_blob_sha": "4e9f404ffc5bc3cb06d1f4de03ac6b8fb6505244",
+      "path": "reports/evaluation/hydrocore-v5/m9-1-guardrails.json",
+      "sha256": "778fa8eadc120482a2feb61b7d21ba8c5efb09de85426e0be4c9f9abd1a43abc"
+    },
+    "m9-1-results.json": {
+      "git_blob_sha": "abcb6bfc557d4e307aea5bbedeaf4669e38dcc4f",
+      "path": "reports/evaluation/hydrocore-v5/m9-1-results.json",
+      "sha256": "a190f8cc5c844c02225baf3101cc74b7cbf41ed45b7cc08532b4531c419f59e6"
+    }
+  },
+  "milestone": "M9.2",
+  "n_canonical_rows": 6720,
+  "pairing_check": {
+    "all_arm_seed_combinations_paired": true,
+    "n_depths": 7,
+    "n_incidents": 120,
+    "n_keys_per_arm_seed": 840
+  },
+  "schema_version": 1,
+  "seed_excluded_from_pairing": 20260815,
+  "seeds_used": [
+    20260814,
+    31874
+  ],
+  "start_commit": "3b6ee2a3529faffdcc2288cda294a4ef4d6f0765",
+  "topology": {
+    "degree": {
+      "J1": 3,
+      "J2": 3,
+      "J3": 2,
+      "J4": 3,
+      "R1": 1,
+      "T1": 2
+    },
+    "edges": [
+      [
+        "J1",
+        "J2"
+      ],
+      [
+        "J1",
+        "J4"
+      ],
+      [
+        "J1",
+        "R1"
+      ],
+      [
+        "J2",
+        "J3"
+      ],
+      [
+        "J2",
+        "T1"
+      ],
+      [
+        "J3",
+        "J4"
+      ],
+      [
+        "J4",
+        "T1"
+      ]
+    ],
+    "junctions": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ],
+    "node_ids": [
+      "J1",
+      "J2",
+      "J3",
+      "J4",
+      "R1",
+      "T1"
+    ]
+  }
+}

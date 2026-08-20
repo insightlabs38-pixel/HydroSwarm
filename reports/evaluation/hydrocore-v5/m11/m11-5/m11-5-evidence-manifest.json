@@ -1,0 +1,66 @@
+{
+  "kind": "M11_5_EVIDENCE_MANIFEST",
+  "locked_source_count": 0,
+  "sources": [
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json",
+      "sha256": "6b778b14149920247a48a77e45a016b4d4d569c5a194596a0c14466d07ea3a24"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-2/m11-2-reproducibility.json",
+      "sha256": "4369b335ff3593efd9b30a9aee2a52c945f31b3e7d9f326c3eb35ba69cbe8688"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-2/m11-2-output-governance.json",
+      "sha256": "b00231f486edd8dcd15b0f236ff8bd1dfbc63c1df1a297dfcd0bbb3550eccce8"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m9-final/m9-final-closure.json",
+      "sha256": "0c39fe66411fdc0bf44ef1e51aa9f60dddb34b0fcf5747365420df1c8b1090f7"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-1/m10-1-closure.json",
+      "sha256": "e3968013341520e9d77b3a9f1cd0d32596ac13e996c27ff59d901c4a376393f5"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-2/m10-2-closure.json",
+      "sha256": "579d3d71aea4016cb493a273099b67263e76711a60642de7257c7a8d36a0bbe2"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-closure.json",
+      "sha256": "5784a8fe651556961409c59bc25cd978ee121fba632a90de14aba9595dc9acb6"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-gate.json",
+      "sha256": "6aaee77f0f951745d13b2c55a3a96b7ff364402fd64c9b3d0c47697bc1f97855"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-trajectory-summary.json",
+      "sha256": "7b8bb042e549b745d0456f4b4b65905f9bb8e418b432f4bf49fd5a89e559d1d0"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-safety-counters.json",
+      "sha256": "b6cbcd3e41d40ec2c6e81b236fdee957d6ebf5f6298cad0196e455d0bba241b2"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-5-completion/m10-5-completion-closure.json",
+      "sha256": "0f667c667861c734bf1faefff33ed8b980bda57bcac740498a8903039b3e9748"
+    },
+    {
+      "locked": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-5/m10-5-fail-closed.json",
+      "sha256": "23296ba7e435487f0136e93ef052e83cabb4c280a02190c82975b22b01f1163b"
+    }
+  ]
+}

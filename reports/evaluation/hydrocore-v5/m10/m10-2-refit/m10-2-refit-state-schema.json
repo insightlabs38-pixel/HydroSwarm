@@ -1,0 +1,14 @@
+{
+  "kind": "M10_2_REFIT_STATE_SCHEMA",
+  "schema_version": "scout-training-state-v1",
+  "channels": {
+    "already_sampled": "sensor_mask (synthetic SensorSeries fed through HydraulicFeatureBuilder)",
+    "currently_revealed_evidence": "quality_features + sensor_mask (same synthetic series)",
+    "current_posterior_candidate_state": "classical_prior (recomputed via causal_prefix._prefix_classical_prior over augmented series)",
+    "current_sampling_round": "role_features[0] = round / MAXIMUM_SAMPLES_BOUND",
+    "sample_budget_remaining": "role_features[1] = remaining / MAXIMUM_SAMPLES_BOUND",
+    "sampling_constraints_accessibility": "residual_features[..., 0] = 1.0 junction / 0.0 reservoir-tank"
+  },
+  "new_hydrocore_parameters_added": false,
+  "no_new_caller_of_role_or_residual_features_elsewhere_in_repo": true
+}

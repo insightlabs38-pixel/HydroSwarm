@@ -1,0 +1,39 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "evaluation_population_complete": true,
+    "finalist_identity": true,
+    "locked_final_calibration_coverage": true,
+    "locked_final_complete": true,
+    "locked_topology_complete": true,
+    "locked_topology_fail_closed": true,
+    "manifest_hashes": true,
+    "no_unsafe_action": true,
+    "no_v4_fallback": true,
+    "outputs_finite": true,
+    "safety_counters_zero": true,
+    "sample_budget": true,
+    "topology_novelty": true
+  },
+  "completeness": {
+    "expected_final": 105,
+    "expected_topology": 20,
+    "locked_final_complete": true,
+    "locked_topology_complete": true,
+    "overall_complete": true,
+    "problems": []
+  },
+  "coverage_floor": 0.85,
+  "descriptive_metrics": [
+    "top-1/top-3/MRR (both splits)",
+    "candidate-set size, posterior entropy, actionable/abstention rate",
+    "scout sample benefit (rank change, entropy reduction)",
+    "planning candidate/verification/approval counts",
+    "topology-shift predictive metrics (locked_topology_test)",
+    "calibration coverage on novel topologies"
+  ],
+  "global_pass": true,
+  "kind": "M11_6_GATE",
+  "locked_final_pass": true,
+  "locked_topology_pass": true
+}

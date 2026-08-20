@@ -1,0 +1,108 @@
+{
+  "kind": "M10_3C_POPULATION_RUN_SUMMARY",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "4edcf0fe349124653f93ee952cf8151b0ccce257",
+  "final_commit_at_analysis_time": "4edcf0fe349124653f93ee952cf8151b0ccce257",
+  "elapsed_seconds": 723.796952009201,
+  "manifest": {
+    "kind": "M10_3C_POPULATION_MANIFEST",
+    "families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid"
+    ],
+    "depth_buckets": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      25
+    ],
+    "per_family_target_count": 180,
+    "per_cell_target_count": 30,
+    "skipped_no_candidates_by_family": {
+      "golden-reference": 0,
+      "branched-loop": 0,
+      "loop-grid": 0
+    },
+    "cells": {
+      "golden-reference:depth1": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "2353e1027d2f62b3b02b7b10d569dd66c937fa3d54f1dc40296be644a0a6fcbb"
+      },
+      "golden-reference:depth2": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "cf46d631802b00665cb8f64e450d739585cf3a186dc1c2908ffe1362d8f3c7ea"
+      },
+      "golden-reference:depth3": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "ddf3885208ea593f4662b9b2d6662c9c954f10972364b907587a3fc9564ccdf9"
+      },
+      "golden-reference:depth4": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "079e8e6514170524a5d72da842eb7540684103e698ff193d90f1c87a44a3a8c7"
+      },
+      "golden-reference:depth6": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "2cb7e2cf39331c7e34ec14409fb542147279e384146460814dd8078bb31f277a"
+      },
+      "golden-reference:depth25": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "34f44f5ab77601bad4107e8699a2ec800e18d21ba40bdf192555d5ce9a82efd8"
+      },
+      "branched-loop:depth1": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "daeb160ffcb75e0a07615337b1b0d232283e957e7096266772de8ff6b900e4d5"
+      },
+      "branched-loop:depth2": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "e78dc64fd7c500b6ba512879a4649769e9fe4528cd4f7b0191dc17fc464518ec"
+      },
+      "branched-loop:depth3": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "046df1d38b1cca02cab32e53b2ac5be9f5d504af174428c6b77477766a253431"
+      },
+      "branched-loop:depth4": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "510c677ae2758a25ad697f3b7bfb98e8f86a36cd4e91c92740fe81c4deef30b6"
+      },
+      "branched-loop:depth6": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "91111cad6e6d1700d26ae3678621ef51a81904cc7dfa2efce3c305a676451af2"
+      },
+      "branched-loop:depth25": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "c9e94f63eecb40f8ccda784536b1f2a13d5d165079a1138def59a1da0d2730b0"
+      },
+      "loop-grid:depth1": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "3daa0b5ab188bfaa6d60d9e015f0c75b1cdf2a6119f0b0cdd154db926a4614cf"
+      },
+      "loop-grid:depth2": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "068c070a8f537f18cd6ec3d39e22f98b01dbbc8a46aee8c583177aa651b82a87"
+      },
+      "loop-grid:depth3": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "6557cba1cc5d8f20d7ec491715a6594112d1219964b0cdff9f3094b6e2fa9455"
+      },
+      "loop-grid:depth4": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "b9fb5af8fe6c175515e980e790441c276dc38722e4717cf387ef3fae23568c57"
+      },
+      "loop-grid:depth6": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "0cfeca7a0b25c35b686e8fffaa3c9fd50b227255017c5a341e7d7dadc4a66857"
+      },
+      "loop-grid:depth25": {
+        "n_examples": 30,
+        "scenario_ids_sha256": "44a6bef047521c4fe8510eed958f11ab882f9634ac552ba5647e59c2ed2f69dc"
+      }
+    },
+    "total_examples": 540
+  },
+  "decision": "M10_3C_LEARNED_STRATEGIST_NOT_JUSTIFIED",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

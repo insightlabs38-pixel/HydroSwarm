@@ -1,0 +1,236 @@
+{
+  "batch_policy": {
+    "effective_batch_size": 8,
+    "gradient_accumulation_steps": 4,
+    "microbatches_per_optimizer_update": 4,
+    "physical_batch_size": 2
+  },
+  "bootstrap_interval": 0.9,
+  "bootstrap_resamples": 2000,
+  "bootstrap_seed": 20260819,
+  "branch": "exp/hydrocore-v5-causal",
+  "calibration_seed_namespace": {
+    "expected_incidents_per_family": {
+      "branched-loop": 140,
+      "golden-reference": 80,
+      "loop-grid": 160
+    },
+    "expected_total_incidents": 380,
+    "repeats_per_source": 20,
+    "role": "calibration_m9_8",
+    "seed_bases": {
+      "branched-loop": 1000200000,
+      "golden-reference": 1000000000,
+      "loop-grid": 1000400000
+    },
+    "source_stride": 10000
+  },
+  "checkpoint_policy": "FINAL_STEP_1350",
+  "decision_logic": {
+    "A": "HYDROCORE_M_MEANINGFUL_CAPACITY_GAIN_VALIDATED",
+    "B": "HYDROCORE_M_NO_MEANINGFUL_CAPACITY_GAIN",
+    "C": "HYDROCORE_M_PREDICTIVE_GAIN_BUT_GUARDRAIL_FAILURE",
+    "D": "HYDROCORE_M_INCONCLUSIVE",
+    "E": "ENGINEERING_OR_COMPARABILITY_BLOCKER"
+  },
+  "depths": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "development_seed_namespace": {
+    "expected_incidents_per_family": {
+      "branched-loop": 140,
+      "coastal-branch": 120,
+      "dense-loop": 120,
+      "golden-reference": 80,
+      "loop-grid": 160,
+      "tree-branch": 100
+    },
+    "expected_total_incidents": 720,
+    "repeats_per_source": 20,
+    "role": "development_m9_8",
+    "seed_bases": {
+      "branched-loop": 1000300000,
+      "coastal-branch": 1000700000,
+      "dense-loop": 1001100000,
+      "golden-reference": 1000100000,
+      "loop-grid": 1000500000,
+      "tree-branch": 1000900000
+    },
+    "source_stride": 10000
+  },
+  "environment": {
+    "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
+    "python_version": "3.12.13",
+    "torch_version": "2.13.0+cu130"
+  },
+  "guardrails": {
+    "A_primary_effect": "M - S >= +0.02 absolute AND CI90 lower bound > 0",
+    "B_family_consistency": ">=2/3 unseen families improved AND no unseen family regression > 0.03",
+    "C_seed_consistency": "no catastrophic seed reversal; all 3 seed deltas reported individually",
+    "D_known_family_retention": "EARLY regression <= 0.05, MATURE regression <= 0.03, MRR regression <= 0.03",
+    "E_calibration": "alpha=0.1, all required cells coverage >= 0.85, candidate-set guard passes",
+    "F_engineering": "no NaN/Inf/instability, no causal violation, no checkpoint/resume defect, no source-support regression",
+    "G_cost": "report only, not gating"
+  },
+  "hydrocore_l_authorized": false,
+  "hydrocore_m_identity": {
+    "checkpoint_policy": "FINAL_STEP_1350",
+    "checkpoint_source": "freshly trained this milestone, 1350 optimizer steps/seed, canonical FINAL_STEP_1350 export per M9.6 Section-14 procedure",
+    "construction": "HydroCore.from_variant('small_v5_capacity_m', use_adapters=False, **SHARED_MODEL_CONFIG)",
+    "parameter_count": 13919572,
+    "variant": "small_v5_capacity_m"
+  },
+  "hydrocore_s_identity": {
+    "checkpoint_policy": "FINAL_STEP_1350",
+    "checkpoint_source": "reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed{seed}.json canonical_export_path/canonical_export_sha256 (M9.7A-authoritative)",
+    "construction": "HydroCore.from_variant('small', use_adapters=False, **SHARED_MODEL_CONFIG)",
+    "parameter_count": 4182612,
+    "variant": "small"
+  },
+  "kind": "HYDROCORE_S_VS_M_CAPACITY_COMPARISON_EXECUTION_MANIFEST",
+  "locked_test_opened_before": false,
+  "m9_7_closure_hash": "449d29f7b43312ac04caaf7b092359a2a39256f82297884b476cb4953a11175d",
+  "m9_7_preregistration_hash": "f86754cf8eec1620086b92e8199a78478a1dda8b5055203ef363689f643f065b",
+  "m9_7_selected_m_architecture_hash": "8926f329c2502f64b213e0b6d421de720b41e3c2611acffe61a9b36830010adb",
+  "m9_7_semantic_parity_audit_hash": "1b07252c8a9b5a623d0a5800bbe9ab21ae4ec505dc2952600538d267cadf30c3",
+  "m9_7_training_parity_plan_hash": "ad1e526a1711388c7f4025fed900e76543b457c8af8b0a586a94b9c0dd62dae5",
+  "m9_7a_amendment_hash": "8f067468d76c162c767777045517ce8c82f795189a6418c09b0195e2028cf091",
+  "m9_7a_closure_hash": "2e4bd900f546faf1b5b45f5a8123d58922b4c02160ca5439466046f8b94a2528",
+  "maturity_buckets": {
+    "EARLY": [
+      1,
+      2,
+      3
+    ],
+    "MATURE": [
+      12,
+      25
+    ],
+    "MID": [
+      4,
+      6
+    ]
+  },
+  "milestone": "M9.8",
+  "optimizer_config": {
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "optimizer": "AdamW",
+    "weight_decay": 0.01
+  },
+  "optimizer_steps_per_epoch": [
+    15,
+    30,
+    45,
+    60,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75,
+    75
+  ],
+  "parameter_ratio_M_over_S": 3.3279615704253707,
+  "practical_effect_threshold": {
+    "ci_condition": "90% paired-bootstrap CI lower bound > 0",
+    "minimum_absolute_delta": 0.02
+  },
+  "primary_endpoint": {
+    "comparison": "M - S",
+    "name": "unseen-topology MATURE neural Top-1, macro-averaged equally across coastal-branch/tree-branch/dense-loop",
+    "posterior": "softmax(source_node_logits) only -- neither classical nor hybrid posterior"
+  },
+  "purpose": "Frozen BEFORE HydroCore-M training, M9.8 development inference, or M9.8 calibration inference (Section 4 requirement). Not altered after seeing any M result.",
+  "scheduler_config": {
+    "scheduler": "cosine",
+    "scheduler_total_steps": 1500,
+    "warmup_steps": 10
+  },
+  "schema_version": 1,
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "source_lists": {
+    "branched-loop": [
+      "JA",
+      "JB",
+      "JC",
+      "JD",
+      "JE",
+      "JF",
+      "JG"
+    ],
+    "coastal-branch": [
+      "CB1",
+      "CB2",
+      "CB3",
+      "CB4",
+      "CB5",
+      "CB6"
+    ],
+    "dense-loop": [
+      "J1",
+      "J2",
+      "J3",
+      "J4",
+      "J5",
+      "J6"
+    ],
+    "golden-reference": [
+      "J1",
+      "J2",
+      "J3",
+      "J4"
+    ],
+    "loop-grid": [
+      "J1",
+      "J2",
+      "J3",
+      "J4",
+      "J5",
+      "J6",
+      "J7",
+      "J8"
+    ],
+    "tree-branch": [
+      "J1",
+      "J2",
+      "J3",
+      "J4",
+      "J5"
+    ]
+  },
+  "start_commit": "e39412ce56aed4ba31d11bf2fbace55f191428c2",
+  "total_optimizer_steps": 1350,
+  "training_manifests": {
+    "families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid"
+    ],
+    "policy": "reuse M9.6 ARM_B_M9_6's own train/validation family pools (run_m9_0_arm_b._build_family_pools, unmodified) and manifest hashes -- ARM_M must reproduce byte-identical train_manifest_hash_per_family/validation_manifest_hash_per_family to M9.6's own ARM_B_M9_6-seed{seed}.json records (verified per-seed at training time; STOP with comparability blocker on mismatch, per Section 8).",
+    "total_train_scenario_count": 600,
+    "train_scenario_count_per_family": 200
+  },
+  "validation_manifests": {
+    "policy": "see training_manifests -- same _build_family_pools() call provides both."
+  }
+}

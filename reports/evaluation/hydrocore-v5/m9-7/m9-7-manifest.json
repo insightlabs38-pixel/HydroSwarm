@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7: manifest of every artifact this milestone produced, with SHA-256 for immutability verification.",
+  "milestone": "M9.7",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "b43fa489e49c55578c03584d85be732a83c7871d",
+  "inherited_m9_6_decision": "A (HYDROCORE_S_STATUS=FROZEN)",
+  "artifacts": [
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-capacity-candidates.json",
+      "sha256": "36fc541aff6b1fb671b267c5de176a4a2a6861dccd3859412d0119aa050b61a8",
+      "bytes": 14841
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-closure.json",
+      "sha256": "449d29f7b43312ac04caaf7b092359a2a39256f82297884b476cb4953a11175d",
+      "bytes": 6362
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-engineering-smoke.json",
+      "sha256": "1c14695527717e4e639641e7c221da805e5a985d3b1d58c14e9d1622f7944d3e",
+      "bytes": 4875
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-frozen-s-inventory.json",
+      "sha256": "9e91ee33bbaad595961b97a6cec8a9c3216a62835452542bedff27e21e1f9bc1",
+      "bytes": 10612
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-latency-memory.json",
+      "sha256": "0aadf59c595f77ea88c04d4f0ff3a08bee03acae4f1f69802de43fc6e04ae7c1",
+      "bytes": 2091
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-m9-8-preregistration.json",
+      "sha256": "f86754cf8eec1620086b92e8199a78478a1dda8b5055203ef363689f643f065b",
+      "bytes": 8447
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-parameter-counts.json",
+      "sha256": "1b80cca0c8df0bfa08942f5c695fa856d3a55e46a23c02e75e440ec91ffd6bbf",
+      "bytes": 840
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-selected-m-architecture.json",
+      "sha256": "8926f329c2502f64b213e0b6d421de720b41e3c2611acffe61a9b36830010adb",
+      "bytes": 4438
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-semantic-parity-audit.json",
+      "sha256": "1b07252c8a9b5a623d0a5800bbe9ab21ae4ec505dc2952600538d267cadf30c3",
+      "bytes": 3587
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-test-results.json",
+      "sha256": "2cfaaf0ed47aaa49420b86e9f7f691a447f3d6766b8ec9bd8d5bc1c5fd862228",
+      "bytes": 3679
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m9-7/m9-7-training-parity-plan.json",
+      "sha256": "ad1e526a1711388c7f4025fed900e76543b457c8af8b0a586a94b9c0dd62dae5",
+      "bytes": 5815
+    }
+  ],
+  "other_files_this_milestone_touched": [
+    {
+      "path": "docs/evaluation/HYDROCORE_V5_M9_7_PROTOCOL.md",
+      "kind": "new protocol document"
+    },
+    {
+      "path": "src/hydroswarm/model/core.py",
+      "kind": "additive MODEL_VARIANTS entry (small_v5_capacity_m); no existing variant modified"
+    },
+    {
+      "path": "tests/scientific/test_m9_7_capacity_preflight.py",
+      "kind": "new engineering preflight test module"
+    },
+    {
+      "path": "scripts/hydrocore_v5/run_m9_7_latency_memory.py",
+      "kind": "new latency/memory benchmark script"
+    }
+  ]
+}

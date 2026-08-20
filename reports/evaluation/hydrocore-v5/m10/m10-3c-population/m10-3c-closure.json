@@ -1,0 +1,32 @@
+{
+  "kind": "M10_3C_POPULATION_CLOSURE",
+  "milestone": "M10.3C",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "4edcf0fe349124653f93ee952cf8151b0ccce257",
+  "commit_at_closure_time": "4edcf0fe349124653f93ee952cf8151b0ccce257",
+  "amends": "docs/evaluation/HYDROCORE_V5_M10_3B_STRATEGIST_DIAGNOSIS.md -- additive, does not reopen/reverse/alter M10.3A or M10.3B",
+  "central_question": "Does an expanded, still-governed and physically realistic Strategist development population (branched-loop/loop-grid topology families, plus depth buckets 1/2/3/4/6 in addition to golden-reference/25) contain enough within-incident candidate diversity AND exact-oracle decision utility to scientifically justify another learned Strategist training attempt?",
+  "M10_3C_DECISION": "M10_3C_LEARNED_STRATEGIST_NOT_JUSTIFIED",
+  "gate_summary": {
+    "global_pass": false,
+    "passing_families": [],
+    "clear_fail_families": [
+      "golden-reference"
+    ]
+  },
+  "protocol_hash": "56f1f62b2974699e4d7ee1acac02531f038208247a3728de0e6924c074f7cfb3",
+  "population_manifest_total_examples": 540,
+  "does_not_authorize": [
+    "M10.3D Strategist Level-A refit",
+    "any Strategist retraining",
+    "true M10.3",
+    "a full/shared HydroCore retrain",
+    "opening locked final/topology tests",
+    "altering closed M9/M10/M10.3A/M10.3B results"
+  ],
+  "next_milestone_recommended": "M10.4 -- retain deterministic candidate generator + deterministic Strategist + exact WNTR verification permanently for this decision",
+  "m9_m10_historical_artifacts_unchanged": true,
+  "m10_3a_m10_3b_closures_unaltered": true,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

@@ -1,0 +1,14 @@
+{
+  "forward_pass_scout_output_keys_present": [
+    "candidate_reduction_prediction",
+    "expected_information_gain",
+    "sample_node_logits",
+    "should_continue_sampling_logits"
+  ],
+  "real_checkpoint_recommendation_excludes_already_sampled_node": true,
+  "real_checkpoint_recommendation_node_in_topology": true,
+  "real_checkpoint_recommendation_never_promotable": true,
+  "real_checkpoint_outputs_finite": true,
+  "target_only_key_leakage_caught": true,
+  "adversarial_enormous_invalid_logit_blocked_from_argmax": true
+}

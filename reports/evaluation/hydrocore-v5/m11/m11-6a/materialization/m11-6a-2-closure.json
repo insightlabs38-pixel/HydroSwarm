@@ -1,0 +1,20 @@
+{
+  "authorization_consumed": false,
+  "dataset_materialized": true,
+  "design_freeze_commit_sha": "3568ecdc49c41f765f92460574dae0433e47d684",
+  "final_locked_seed_derived": true,
+  "finalist_evaluated_on_locked": false,
+  "kind": "M11_6A_2_MATERIALIZATION_CLOSURE",
+  "locked_evaluation_authorized": false,
+  "locked_final_master_seed_hex": "9771ca1531a6c1d12fa7d3a566db97999e5e76c655773ec16f4537d9b44d7fd4",
+  "locked_manifest_created": true,
+  "locked_open_count": 0,
+  "locked_test_opened": false,
+  "locked_topology_master_seed_hex": "923a84eb4dff7631d6e59e8253aaae9a1d98af364a7570185720a7a348a90f2f",
+  "materialization_manifest_file_sha256": "62c21f3d75921068dd045cff07eb33729caf70192fd841502531ad201c9dbedb",
+  "materialization_manifest_path": "data/locked/m11-6/m11-6-materialization-manifest.json",
+  "next_action": "INDEPENDENT_REVIEW_BEFORE_NEW_EXPLICIT_M11_6_AUTHORIZATION",
+  "schema_version": "hydroswarm-m11-6a-design-v1",
+  "state": "M11_6A_2_MATERIALIZATION_PASS",
+  "verification_all_checks_pass": true
+}

@@ -1,0 +1,18 @@
+{
+  "closure_vocabulary": [
+    "M11_2_FINALIST_FROZEN",
+    "M11_2_FINALIST_FREEZE_BLOCKED_SELECTION_IDENTITY",
+    "M11_2_FINALIST_FREEZE_BLOCKED_IDENTITY_DRIFT",
+    "M11_2_FINALIST_FREEZE_BLOCKED_REQUIRES_SYSTEM_CHANGE",
+    "M11_2_FINALIST_FREEZE_BLOCKED_REPRODUCIBILITY"
+  ],
+  "kind": "M11_2_PROTOCOL",
+  "locked_test_prohibition": true,
+  "milestone": "M11.2",
+  "parent_m11_1_protocol_sha256": "52d911b86b37c7de095643cf02415601e5e1b198cf17c849239b97da8e94264d",
+  "parent_selection": "reports/evaluation/hydrocore-v5/m11/m11-1/final-selection.json",
+  "protocol_path": "docs/evaluation/HYDROCORE_V5_M11_2_FINALIST_FREEZE_PROTOCOL.md",
+  "protocol_sha256": "1974f8d1b40d1318d3c80ec9763ef7ff20b8e6a90d607a917a2aca38162e9d1e",
+  "selected_finalist": "HydroCore-v5 M10 frozen release",
+  "tuning_closed_on_success": true
+}

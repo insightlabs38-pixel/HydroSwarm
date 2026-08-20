@@ -1,0 +1,37 @@
+{
+  "kind": "M10_3C_SEED_DISJOINTNESS",
+  "ranges": {
+    "golden-reference": [
+      1400000000,
+      1400018000
+    ],
+    "branched-loop": [
+      1410000000,
+      1410018000
+    ],
+    "loop-grid": [
+      1420000000,
+      1420018000
+    ],
+    "M10.1": [
+      1100000000,
+      1199999999
+    ],
+    "M10.2": [
+      1200000000,
+      1299999999
+    ],
+    "M10.3A/M10.3B": [
+      1300000000,
+      1399999999
+    ],
+    "M10.3C_reserved_future_M10.3D": [
+      1450000000,
+      1549999999
+    ]
+  },
+  "overlaps_found": [],
+  "all_disjoint": true,
+  "locked_splits_note": "locked_final_test/locked_topology_test are never opened and have no numeric seed range in this repository (hydroswarm.evaluation.live_robustness.locked_test_opened reads a static boolean flag, not a seed-derived split) -- disjointness from them is enforced by never calling that path, verified via locked_test_opened_before/after below, not by seed-range math.",
+  "static_grep_verification": "grep over 1_400_000_000..1_499_999_999 across every *.py/*.json/*.md in the repository found zero prior hits before this protocol was frozen (re-verified at protocol-freeze time)."
+}

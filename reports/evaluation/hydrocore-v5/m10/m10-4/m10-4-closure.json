@@ -1,0 +1,11 @@
+{
+  "kind": "M10_4_CLOSURE",
+  "milestone": "M10.4",
+  "protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit": "57787d0d08633a7d3870de1152b5088d5db06bb0",
+  "closure_state": "M10_4_FULL_TRAJECTORY_PASS",
+  "rationale": "integration valid; all hard safety gates pass; retained system meets the frozen trajectory utility/quality gate",
+  "m10_5_authorized": false,
+  "m10_5_note": "Even a PASS here does not authorize serving-path freeze, runtime promotion, or opening the locked test -- M10.5 requires separate, explicit authorization."
+}

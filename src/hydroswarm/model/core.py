@@ -3,10 +3,22 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from typing import Literal, Required, TypedDict, get_args
+from typing import TYPE_CHECKING, Literal, Required, TypedDict, get_args
 
 import torch
 from torch import Tensor, nn
+
+if TYPE_CHECKING:
+    # M9.1 preflight (experiment-scoped): TemporalDynamicsBase and its
+    # GRAPH_ODE/GRAPH_CDE/GRAPH_SDE variants live in continuous_time.py, a
+    # module with lazy (try/except) imports of torchdiffeq/torchcde/torchsde
+    # so that normal `import hydroswarm` never requires those optional
+    # research dependencies. Only imported here under TYPE_CHECKING to avoid
+    # making core.py itself depend on continuous_time.py (or its optional
+    # deps) at runtime -- the constructor parameter below is typed against
+    # this for static analysis only; at runtime it is accepted structurally
+    # (anything exposing the same forward(...) contract works).
+    from .continuous_time import TemporalDynamicsBase
 
 from .adapters import BottleneckAdapter, RoleHead
 from .candidate_plan_encoder import TARGET_TYPE_CLASSES, TARGET_TYPE_INDEX, CandidatePlanEncoder
@@ -127,6 +139,23 @@ MODEL_VARIANTS: dict[str, ModelVariant] = {
     "small": ModelVariant(192, 6, 576, 4, 64),
     "medium": ModelVariant(256, 8, 768, 8, 64),
     "large": ModelVariant(360, 8, 1080, 8, 96),
+    # HydroCore-v5 Milestone 9.7: pure-capacity-scaled counterpart of
+    # "small" (the frozen M9.6 HydroCore-S recipe), used only by the
+    # governed M9.7/M9.8 capacity-preflight/experiment scripts -- never a
+    # replacement for "medium" above (which independently doubles
+    # num_layers, a depth/stage-count change "small_v5_capacity_m" does
+    # not make). d_model/nhead/dim_feedforward are widened while
+    # preserving "small"'s exact head_dim (192/6=32) and
+    # dim_feedforward/d_model (576/192=3.0) ratios and its num_layers=4,
+    # latent_tokens=64, modality_layers=1 verbatim -- selected
+    # deterministically, by parameter count only (13,919,572, nearest to
+    # the protocol's predeclared ~14M center of the 12-16M v5-M band),
+    # from the unique in-range point of a mechanically enumerated
+    # ratio-preserving width grid. See
+    # reports/evaluation/hydrocore-v5/m9-7/m9-7-capacity-candidates.json
+    # and m9-7-selected-m-architecture.json for the full enumeration and
+    # selection rule; this entry does not itself authorize any training.
+    "small_v5_capacity_m": ModelVariant(352, 11, 1056, 4, 64),
 }
 
 #: Bumped whenever a change could make a checkpoint silently produce
@@ -498,6 +527,29 @@ class HydroCore(nn.Module):
         plan_feature_dim: int = PLAN_FEATURE_DIM,
         ood_category_head: bool = OOD_CATEGORY_HEAD_DEFAULT,
         scout_control_heads: bool = SCOUT_CONTROL_HEADS_DEFAULT,
+        # Milestone 8.7 Arm C (AGE_FIX_PLUS_RELATIVE_TIME): see
+        # encoders.TemporalEncoder's own docstring/comment for what this
+        # changes. Defaults to "window_relative" -- every existing
+        # checkpoint/caller (Arms A/B included) is unaffected unless this
+        # is explicitly overridden.
+        elapsed_time_normalization: str = "window_relative",
+        # HydroCore-v5 Milestone 9.1 preflight: experiment-scoped seam for
+        # swapping the temporal-latent-production step (temporal_encoder +
+        # quality_encoder) for a continuous-time alternative (Graph Neural
+        # ODE/CDE/SDE), without touching node/graph encoders, fusion shape,
+        # backbone, or any output head. Defaults to None for every existing
+        # caller -- when None, HydroCore builds and uses temporal_encoder/
+        # quality_encoder exactly as before (this parameter is purely
+        # additive; it changes zero behavior unless explicitly supplied, so
+        # no production code path or existing checkpoint is affected). Not
+        # recorded in architecture_config(): a supplied temporal_dynamics
+        # module is never checkpointed as part of a promoted HydroCore
+        # export, only used directly inside experiment scripts, so there is
+        # no checkpoint-identity gap to close here the way prior_mode/
+        # incident_pooling/etc. needed (those are simple value fields on a
+        # promoted checkpoint; this is a whole swapped submodule that a
+        # loader would need to reconstruct out-of-band regardless).
+        temporal_dynamics: "TemporalDynamicsBase | None" = None,
     ) -> None:
         super().__init__()
         if d_model % nhead:
@@ -576,6 +628,7 @@ class HydroCore(nn.Module):
         self.plan_feature_dim = plan_feature_dim
         self.ood_category_head_enabled = ood_category_head
         self.scout_control_heads = scout_control_heads
+        self.elapsed_time_normalization = elapsed_time_normalization
         # core-issues.txt repair item 9: set by from_variant() so a
         # checkpoint's own architecture_config() records which named
         # variant it was built from; a model constructed directly (e.g. the
@@ -596,9 +649,12 @@ class HydroCore(nn.Module):
             dropout=dropout,
             normalization=normalization,
             activation=activation,
+            elapsed_time_normalization=elapsed_time_normalization,
         )
-        self.temporal_encoder = TemporalEncoder(temporal_feature_dim, **temporal_args)
-        self.quality_encoder = QualityEncoder(quality_feature_dim, **temporal_args)
+        self.temporal_dynamics = temporal_dynamics
+        if self.temporal_dynamics is None:
+            self.temporal_encoder = TemporalEncoder(temporal_feature_dim, **temporal_args)
+            self.quality_encoder = QualityEncoder(quality_feature_dim, **temporal_args)
         self.modality_fusion = nn.Sequential(
             nn.Linear(4 * d_model, d_model),
             make_activation(activation),
@@ -832,6 +888,7 @@ class HydroCore(nn.Module):
             "verifier_feature_dim": self.verifier_feature_dim,
             "residual_feature_dim": self.residual_feature_dim,
             "dropout": self.dropout_value,
+            "elapsed_time_normalization": self.elapsed_time_normalization,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -896,12 +953,32 @@ class HydroCore(nn.Module):
             batch.get("reservoir_reachability", zeros),
             batch.get("demand_centrality", zeros),
         )
-        temporal = self.temporal_encoder(
-            batch["temporal_features"], batch.get("sensor_mask"), batch.get("timestamps")
-        )
-        quality = self.quality_encoder(
-            batch["quality_features"], batch.get("quality_mask"), batch.get("timestamps")
-        )
+        if self.temporal_dynamics is None:
+            temporal = self.temporal_encoder(
+                batch["temporal_features"], batch.get("sensor_mask"), batch.get("timestamps")
+            )
+            quality = self.quality_encoder(
+                batch["quality_features"], batch.get("quality_mask"), batch.get("timestamps")
+            )
+        else:
+            # M9.1 preflight seam: the continuous-time module additionally
+            # receives graph connectivity (unlike temporal_encoder/
+            # quality_encoder above, which are purely per-node) so its
+            # vector field can be graph-aware, per the frozen preflight
+            # protocol. edge_index/edge_features/edge_mask are otherwise
+            # only read later, inside the backbone loop -- reading them here
+            # too is non-mutating and changes nothing about their later use.
+            temporal, quality = self.temporal_dynamics(
+                batch["temporal_features"],
+                batch["quality_features"],
+                batch.get("sensor_mask"),
+                batch.get("quality_mask"),
+                batch.get("timestamps"),
+                node_mask,
+                batch.get("edge_index"),
+                batch.get("edge_features"),
+                batch.get("edge_mask"),
+            )
         hidden = self.modality_fusion(torch.cat((static, graph, temporal, quality), dim=-1))
         residual = batch.get("residual_features")
         if residual is not None:
@@ -1229,13 +1306,17 @@ class HydroCore(nn.Module):
     def parameter_report(self) -> ParameterReport:
         def count(module: nn.Module) -> int:
             return sum(parameter.numel() for parameter in module.parameters())
+        temporal_modules = (
+            (self.temporal_encoder, self.quality_encoder)
+            if self.temporal_dynamics is None
+            else (self.temporal_dynamics,)
+        )
         encoders = sum(
             count(module)
             for module in (
                 self.node_encoder,
                 self.graph_encoder,
-                self.temporal_encoder,
-                self.quality_encoder,
+                *temporal_modules,
                 self.modality_fusion,
                 self.residual_projection,
                 self.prior_projection,

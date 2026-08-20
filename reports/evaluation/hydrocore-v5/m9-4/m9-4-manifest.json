@@ -1,0 +1,118 @@
+{
+  "alpha": 0.1,
+  "bootstrap_interval": 0.9,
+  "bootstrap_resamples": 2000,
+  "bootstrap_seed": 20260816,
+  "branch": "exp/hydrocore-v5-causal",
+  "checkpoint_identities": {
+    "ARM_A": {
+      "20260814": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m8-7/AGE_FIX_ONLY-seed20260814/20260815T070104Z-9e127274/model-export.safetensors",
+        "sha256_after": "cac349504b9fad7372356e29cb3fe617ef87e8bae9fbb3255756f350cdca7265",
+        "sha256_before": "cac349504b9fad7372356e29cb3fe617ef87e8bae9fbb3255756f350cdca7265",
+        "sha256_during_inference": "cac349504b9fad7372356e29cb3fe617ef87e8bae9fbb3255756f350cdca7265"
+      },
+      "20260815": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m8-7/AGE_FIX_ONLY-seed20260815/20260815T144836Z-8feb22a3/model-export.safetensors",
+        "sha256_after": "728484a261bf8e7d41138ba44501df153856a1a1448b84eeb1df090091f3b387",
+        "sha256_before": "728484a261bf8e7d41138ba44501df153856a1a1448b84eeb1df090091f3b387",
+        "sha256_during_inference": "728484a261bf8e7d41138ba44501df153856a1a1448b84eeb1df090091f3b387"
+      },
+      "31874": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m8-7/AGE_FIX_ONLY-seed31874/20260815T070112Z-dc622ed0/model-export.safetensors",
+        "sha256_after": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176",
+        "sha256_before": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176",
+        "sha256_during_inference": "5596942fbf351b3356181f45dd81fbe002e72c0ad4ad0910387bc5c6f47b3176"
+      }
+    },
+    "ARM_B2": {
+      "20260814": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed20260814/20260815T191447Z-bf995972/model-export.safetensors",
+        "optimizer_steps": 1200,
+        "sha256_after": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+        "sha256_before": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f",
+        "sha256_during_inference": "f07e29b54e7fbebd1414ea57d835b4845614728e476097748bc5c42510d14f4f"
+      },
+      "20260815": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed20260815/20260815T193537Z-8bd68d62/model-export.safetensors",
+        "optimizer_steps": 1350,
+        "sha256_after": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+        "sha256_before": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812",
+        "sha256_during_inference": "0129b88f1d9883a1aca172df9252b594c209e30929a96bdd89841f8134f2f812"
+      },
+      "31874": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-0a/ARM_B2-seed31874/20260815T192502Z-23287f91/model-export.safetensors",
+        "optimizer_steps": 1350,
+        "sha256_after": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe",
+        "sha256_before": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe",
+        "sha256_during_inference": "1924504779ad1c917d3811f917f27e8a6436fda5e5f253a07d1b2c399c8cdbbe"
+      }
+    }
+  },
+  "coverage_floor": 0.85,
+  "coverage_target": 0.9,
+  "depths": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid",
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ],
+  "legacy_reproduction": "PASS",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "m9_0a_protocol_frozen_commit": "d8439830f70e9922f4d7d7e94e2378d94a232efe",
+  "m9_0a_results_commit": "c61dcc19845c8d319178b5cc607c08be0ed10abc",
+  "m9_0b_protocol_frozen_commit": "3b353167d598d76efc6fbde303387388fbc3ccbf",
+  "m9_0b_results_commit": "c7f7bddba9513e748185cd53fde6c003e7213c79",
+  "m9_3_closure_commit": "009be2ea822417458596bfe643308a69992aa060",
+  "m9_4_seed_bases": {
+    "branched-loop|calibration_m9_4": 990200000,
+    "branched-loop|development_m9_4": 990300000,
+    "coastal-branch|calibration_m9_4": 990600000,
+    "coastal-branch|development_m9_4": 990700000,
+    "dense-loop|calibration_m9_4": 991000000,
+    "dense-loop|development_m9_4": 991100000,
+    "golden-reference|calibration_m9_4": 990000000,
+    "golden-reference|development_m9_4": 990100000,
+    "loop-grid|calibration_m9_4": 990400000,
+    "loop-grid|development_m9_4": 990500000,
+    "tree-branch|calibration_m9_4": 990800000,
+    "tree-branch|development_m9_4": 990900000
+  },
+  "milestone": "M9.4",
+  "minimum_group_size": 10,
+  "n_prediction_rows": 4788,
+  "no_predictor_modified": true,
+  "no_training_performed": true,
+  "repeats_per_source": 4,
+  "representativeness_audit_passed": true,
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "start_commit": "009be2ea822417458596bfe643308a69992aa060",
+  "end_commit": "f2e7857f00be6e33420439f44b6ededa0e6c396f",
+  "end_commit_note": "f2e7857f00be6e33420439f44b6ededa0e6c396f is the commit that introduced the M9.4 code+artifacts; see m9-4-closure.json end_commit_note for why a metadata-only follow-up commit was required to record it.",
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "unseen_development_families": [
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ]
+}

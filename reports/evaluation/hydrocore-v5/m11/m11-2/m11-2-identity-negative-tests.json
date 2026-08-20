@@ -1,0 +1,90 @@
+{
+  "all_mutations_rejected": true,
+  "kind": "M11_2_IDENTITY_NEGATIVE_TESTS",
+  "tests": {
+    "add_next_step": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "runtime_enabled_outputs"
+      ]
+    },
+    "calibration_artifact": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "calibration_artifact_hash"
+      ]
+    },
+    "calibration_sha": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "calibration_sha256"
+      ]
+    },
+    "checkpoint_sha": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "checkpoint_sha256"
+      ]
+    },
+    "disable_human_approval": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "deterministic_authority"
+      ]
+    },
+    "enable_autonomous_actuation": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "deterministic_authority"
+      ]
+    },
+    "enable_learned_ood": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "deterministic_authority"
+      ]
+    },
+    "enable_learned_scout": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "deterministic_authority"
+      ]
+    },
+    "enable_learned_strategist": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "deterministic_authority"
+      ]
+    },
+    "feature_schema": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "feature_schema"
+      ]
+    },
+    "fusion": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "fusion_config_hash"
+      ]
+    },
+    "release_manifest": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "release_manifest_sha256"
+      ]
+    },
+    "selected_seed": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "selected_seed"
+      ]
+    },
+    "trained_tasks": {
+      "accepted_as_same_finalist": false,
+      "violations": [
+        "trained_tasks"
+      ]
+    }
+  }
+}

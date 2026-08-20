@@ -1,0 +1,1200 @@
+{
+  "current_arm_families": [
+    "golden-reference"
+  ],
+  "eval_depths": [
+    3,
+    25
+  ],
+  "expanded_arm_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "per_seed": [
+    {
+      "current_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/A-seed20260814/20260814T072921Z-1cfd3b14/model-export.safetensors",
+      "current_family_table": {
+        "branched-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 4.5625,
+            "classical": {
+              "mrr": 0.4953869047619048,
+              "top1": 0.25,
+              "top3": 0.625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6026785714285714,
+              "top1": 0.4375,
+              "top3": 0.625
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5922619047619048,
+              "top1": 0.4375,
+              "top3": 0.625
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 4.25,
+            "classical": {
+              "mrr": 0.5257440476190476,
+              "top1": 0.3125,
+              "top3": 0.625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6760416666666667,
+              "top1": 0.5625,
+              "top3": 0.625
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.634375,
+              "top1": 0.5,
+              "top3": 0.625
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "coastal-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 3.0,
+            "classical": {
+              "mrr": 0.540625,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.56875,
+              "top1": 0.375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5791666666666667,
+              "top1": 0.375,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.75,
+            "candidate_set_size_mean": 3.1875,
+            "classical": {
+              "mrr": 0.6239583333333333,
+              "top1": 0.5,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6208333333333333,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6291666666666667,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "dense-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 4.0,
+            "classical": {
+              "mrr": 0.47604166666666664,
+              "top1": 0.25,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.553125,
+              "top1": 0.3125,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.61875,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 3.125,
+            "classical": {
+              "mrr": 0.765625,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.765625,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.7520833333333333,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 3.0,
+            "classical": {
+              "mrr": 0.640625,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6666666666666666,
+              "top1": 0.5,
+              "top3": 0.75
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6666666666666666,
+              "top1": 0.5,
+              "top3": 0.75
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 1.0,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 5.3125,
+            "classical": {
+              "mrr": 0.43705357142857143,
+              "top1": 0.25,
+              "top3": 0.5
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5215029761904761,
+              "top1": 0.3125,
+              "top3": 0.625
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5506696428571428,
+              "top1": 0.375,
+              "top3": 0.625
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 5.125,
+            "classical": {
+              "mrr": 0.5090029761904762,
+              "top1": 0.3125,
+              "top3": 0.625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5668154761904762,
+              "top1": 0.375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6324404761904762,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "tree-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 2.125,
+            "classical": {
+              "mrr": 0.6520833333333333,
+              "top1": 0.5,
+              "top3": 0.6875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6875,
+              "top1": 0.5625,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6875,
+              "top1": 0.5625,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 1.5625,
+            "classical": {
+              "mrr": 0.7208333333333333,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.90625,
+              "top1": 0.8125,
+              "top3": 1.0
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.9375,
+              "top1": 0.875,
+              "top3": 1.0
+            },
+            "topology_novelty": 1.0
+          }
+        }
+      },
+      "expanded_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed20260814/phase3-loop-grid/20260814T234612Z-173cb86a/model-export.safetensors",
+      "expanded_family_table": {
+        "branched-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.8125,
+            "candidate_set_size_mean": 3.125,
+            "classical": {
+              "mrr": 0.6183035714285714,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6151785714285715,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6099702380952381,
+              "top1": 0.4375,
+              "top3": 0.75
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 3.5,
+            "classical": {
+              "mrr": 0.6964285714285714,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.7037202380952381,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.7072916666666667,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "coastal-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.625,
+            "candidate_set_size_mean": 3.3125,
+            "classical": {
+              "mrr": 0.540625,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5375,
+              "top1": 0.375,
+              "top3": 0.5
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5427083333333333,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 2.75,
+            "classical": {
+              "mrr": 0.6239583333333333,
+              "top1": 0.5,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6114583333333333,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6291666666666667,
+              "top1": 0.4375,
+              "top3": 0.75
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "dense-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.8125,
+            "candidate_set_size_mean": 3.8125,
+            "classical": {
+              "mrr": 0.47604166666666664,
+              "top1": 0.25,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.609375,
+              "top1": 0.4375,
+              "top3": 0.75
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 2.4375,
+            "classical": {
+              "mrr": 0.765625,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.8125,
+              "top1": 0.6875,
+              "top3": 0.875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.8333333333333334,
+              "top1": 0.6875,
+              "top3": 1.0
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 3.0625,
+            "classical": {
+              "mrr": 0.671875,
+              "top1": 0.5,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.671875,
+              "top1": 0.5,
+              "top3": 0.8125
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.671875,
+              "top1": 0.5,
+              "top3": 0.8125
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 1.0625,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 4.9375,
+            "classical": {
+              "mrr": 0.44382440476190477,
+              "top1": 0.25,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5375744047619048,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5375744047619048,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.75,
+            "candidate_set_size_mean": 4.0,
+            "classical": {
+              "mrr": 0.6276041666666666,
+              "top1": 0.5,
+              "top3": 0.75
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6796875,
+              "top1": 0.5625,
+              "top3": 0.75
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6796875,
+              "top1": 0.5625,
+              "top3": 0.75
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "tree-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 2.625,
+            "classical": {
+              "mrr": 0.6520833333333333,
+              "top1": 0.5,
+              "top3": 0.6875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6833333333333333,
+              "top1": 0.5625,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6885416666666667,
+              "top1": 0.5625,
+              "top3": 0.75
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.8125,
+            "candidate_set_size_mean": 1.5,
+            "classical": {
+              "mrr": 0.7208333333333333,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.8541666666666666,
+              "top1": 0.75,
+              "top3": 1.0
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.8541666666666666,
+              "top1": 0.75,
+              "top3": 1.0
+            },
+            "topology_novelty": 1.0
+          }
+        }
+      },
+      "seed": 20260814
+    },
+    {
+      "current_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/A-seed31874/20260814T065947Z-44557eae/model-export.safetensors",
+      "current_family_table": {
+        "branched-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 4.625,
+            "classical": {
+              "mrr": 0.4953869047619048,
+              "top1": 0.25,
+              "top3": 0.625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6047619047619047,
+              "top1": 0.4375,
+              "top3": 0.625
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6151785714285715,
+              "top1": 0.4375,
+              "top3": 0.625
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 3.9375,
+            "classical": {
+              "mrr": 0.5257440476190476,
+              "top1": 0.3125,
+              "top3": 0.625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.678125,
+              "top1": 0.5625,
+              "top3": 0.625
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.68125,
+              "top1": 0.5625,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "coastal-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 2.75,
+            "classical": {
+              "mrr": 0.540625,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.534375,
+              "top1": 0.375,
+              "top3": 0.5
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5635416666666667,
+              "top1": 0.375,
+              "top3": 0.625
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 2.625,
+            "classical": {
+              "mrr": 0.6239583333333333,
+              "top1": 0.5,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5635416666666667,
+              "top1": 0.375,
+              "top3": 0.625
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.565625,
+              "top1": 0.375,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "dense-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 4.0625,
+            "classical": {
+              "mrr": 0.47604166666666664,
+              "top1": 0.25,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5697916666666667,
+              "top1": 0.375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5802083333333333,
+              "top1": 0.375,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 3.0,
+            "classical": {
+              "mrr": 0.765625,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.7625,
+              "top1": 0.625,
+              "top3": 0.8125
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.7604166666666666,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 3.1875,
+            "classical": {
+              "mrr": 0.640625,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6666666666666666,
+              "top1": 0.5,
+              "top3": 0.75
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.625,
+              "top1": 0.4375,
+              "top3": 0.75
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 1.0,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 5.4375,
+            "classical": {
+              "mrr": 0.43705357142857143,
+              "top1": 0.25,
+              "top3": 0.5
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.4054315476190476,
+              "top1": 0.1875,
+              "top3": 0.4375
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.4183779761904762,
+              "top1": 0.1875,
+              "top3": 0.5
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 5.375,
+            "classical": {
+              "mrr": 0.5090029761904762,
+              "top1": 0.3125,
+              "top3": 0.625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.4668154761904762,
+              "top1": 0.25,
+              "top3": 0.5
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5162202380952381,
+              "top1": 0.3125,
+              "top3": 0.5625
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "tree-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 1.875,
+            "classical": {
+              "mrr": 0.6520833333333333,
+              "top1": 0.5,
+              "top3": 0.6875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.71875,
+              "top1": 0.625,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.71875,
+              "top1": 0.625,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 1.375,
+            "classical": {
+              "mrr": 0.7208333333333333,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.9270833333333334,
+              "top1": 0.875,
+              "top3": 1.0
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.9583333333333334,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "topology_novelty": 1.0
+          }
+        }
+      },
+      "expanded_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal/EXPANDED-seed31874/phase3-loop-grid/20260815T000307Z-0f6ba6ec/model-export.safetensors",
+      "expanded_family_table": {
+        "branched-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.8125,
+            "candidate_set_size_mean": 3.1875,
+            "classical": {
+              "mrr": 0.6183035714285714,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6151785714285715,
+              "top1": 0.4375,
+              "top3": 0.8125
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6099702380952381,
+              "top1": 0.4375,
+              "top3": 0.75
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 3.3125,
+            "classical": {
+              "mrr": 0.6964285714285714,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.7068452380952381,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.7072916666666667,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "coastal-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.625,
+            "candidate_set_size_mean": 3.25,
+            "classical": {
+              "mrr": 0.540625,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5375,
+              "top1": 0.375,
+              "top3": 0.5
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5375,
+              "top1": 0.375,
+              "top3": 0.5
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.625,
+            "candidate_set_size_mean": 2.625,
+            "classical": {
+              "mrr": 0.6239583333333333,
+              "top1": 0.5,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6239583333333333,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6239583333333333,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "dense-loop": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.75,
+            "candidate_set_size_mean": 3.4375,
+            "classical": {
+              "mrr": 0.47604166666666664,
+              "top1": 0.25,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6041666666666666,
+              "top1": 0.4375,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6197916666666666,
+              "top1": 0.4375,
+              "top3": 0.75
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.9375,
+            "candidate_set_size_mean": 1.9375,
+            "classical": {
+              "mrr": 0.765625,
+              "top1": 0.625,
+              "top3": 0.875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.8125,
+              "top1": 0.6875,
+              "top3": 0.875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.8177083333333334,
+              "top1": 0.6875,
+              "top3": 0.9375
+            },
+            "topology_novelty": 1.0
+          }
+        },
+        "golden-reference": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.8125,
+            "candidate_set_size_mean": 2.4375,
+            "classical": {
+              "mrr": 0.671875,
+              "top1": 0.5,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.703125,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.703125,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 1.0,
+            "candidate_set_size_mean": 1.0625,
+            "classical": {
+              "mrr": 0.96875,
+              "top1": 0.9375,
+              "top3": 1.0
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 1.0,
+              "top1": 1.0,
+              "top3": 1.0
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "loop-grid": {
+          "EARLY": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.6875,
+            "candidate_set_size_mean": 5.0,
+            "classical": {
+              "mrr": 0.44382440476190477,
+              "top1": 0.25,
+              "top3": 0.5625
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.5256696428571429,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.5360863095238095,
+              "top1": 0.375,
+              "top3": 0.5625
+            },
+            "topology_novelty": 0.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 1.0,
+            "candidate_set_coverage": 0.75,
+            "candidate_set_size_mean": 4.0,
+            "classical": {
+              "mrr": 0.6276041666666666,
+              "top1": 0.5,
+              "top3": 0.75
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6796875,
+              "top1": 0.5625,
+              "top3": 0.75
+            },
+            "known_to_this_model": true,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6796875,
+              "top1": 0.5625,
+              "top3": 0.75
+            },
+            "topology_novelty": 0.0
+          }
+        },
+        "tree-branch": {
+          "EARLY": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.8125,
+            "candidate_set_size_mean": 2.375,
+            "classical": {
+              "mrr": 0.6520833333333333,
+              "top1": 0.5,
+              "top3": 0.6875
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.6833333333333333,
+              "top1": 0.5625,
+              "top3": 0.6875
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.6833333333333333,
+              "top1": 0.5625,
+              "top3": 0.6875
+            },
+            "topology_novelty": 1.0
+          },
+          "MATURE": {
+            "calibration_applicability_rate": 0.0,
+            "candidate_set_coverage": 0.875,
+            "candidate_set_size_mean": 1.5,
+            "classical": {
+              "mrr": 0.7208333333333333,
+              "top1": 0.5625,
+              "top3": 0.8125
+            },
+            "hybrid_current_dynamic": {
+              "mrr": 0.8958333333333334,
+              "top1": 0.8125,
+              "top3": 1.0
+            },
+            "known_to_this_model": false,
+            "n": 16,
+            "neural": {
+              "mrr": 0.8958333333333334,
+              "top1": 0.8125,
+              "top3": 1.0
+            },
+            "topology_novelty": 1.0
+          }
+        }
+      },
+      "seed": 31874
+    }
+  ],
+  "schema_version": 1,
+  "section": "milestone_7_part_a_training_diversity",
+  "seeds": [
+    20260814,
+    31874
+  ],
+  "unseen_dev_families": [
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ],
+  "wall_seconds": 1986.902836561203
+}

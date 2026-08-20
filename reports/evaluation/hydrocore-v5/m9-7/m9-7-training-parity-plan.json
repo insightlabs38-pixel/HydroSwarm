@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Section 5: frozen M9.8 training recipe for HydroCore-M, inheriting the M9.6 winning recipe unchanged except architecture capacity.",
+  "milestone": "M9.7",
+  "inherited_from": "M9.6 (m9-6-closure.json M9_6_DECISION=A, selected_hydrocore_s_recipe)",
+  "representation": {
+    "policy": "AGE_FIX_ONLY",
+    "feature_kwargs": {
+      "unobserved_age_sentinel": "fixed",
+      "include_relative_gap_feature": false
+    },
+    "model_kwargs": {
+      "temporal_feature_dim": 6,
+      "quality_feature_dim": 4,
+      "elapsed_time_normalization": "window_relative"
+    },
+    "unchanged_for_M": true
+  },
+  "topology_training": {
+    "policy": "EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING (ARM_B_M9_6 recipe, step_matched_interleaved_optimizer_step)",
+    "trained_families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid"
+    ],
+    "family_weighting": {
+      "golden-reference": 0.3333333333333333,
+      "branched-loop": 0.3333333333333333,
+      "loop-grid": 0.3333333333333333
+    },
+    "microbatches_per_optimizer_update": 4,
+    "family_rotation": "fixed 3-update family rotation (run_m9_0a_arm_b2._build_update_slots), unchanged",
+    "unseen_development_families_for_evaluation": [
+      "coastal-branch",
+      "tree-branch",
+      "dense-loop"
+    ],
+    "unchanged_for_M": true
+  },
+  "optimizer_step_policy": {
+    "total_optimizer_steps_S": 1350,
+    "total_optimizer_steps_M": 1350,
+    "rationale": "Default M9.8 policy holds S and M optimizer-step budgets identical (both 1350) to isolate model capacity while holding data exposure and optimization opportunity fixed, per protocol Section 5. M does NOT receive more steps because it is larger.",
+    "compute_comparability_reasoning": "Explicitly checked: hydroswarm.training.trainer._scheduler(optimizer, config, total_steps) builds its LambdaLR multiplier purely as a function of config.warmup_steps/config.scheduler and the total_steps argument -- it takes no dependency on model parameter count, d_model, or any architecture-derived quantity. Therefore scheduler construction does NOT mathematically depend on parameter count for this codebase, and 'same 1350 optimizer steps' remains the fairest capacity comparison. No compute-comparability blocker was found; none is invented.",
+    "no_blocker_found": true
+  },
+  "scheduler": {
+    "type": "cosine (config.scheduler)",
+    "warmup_steps": 10,
+    "scheduler_total_steps_S": 1500,
+    "scheduler_total_steps_M": 1500,
+    "note": "ARM_A_SCHEDULER_TOTAL_STEPS=1500 (m9_6_common.SCHEDULER_TOTAL_STEPS) governs the cosine trajectory denominator identically for S and M; scheduler trajectory is a pure function of (config, total_steps), independent of model width -- see optimizer_step_policy.compute_comparability_reasoning.",
+    "unchanged_for_M": true
+  },
+  "optimizer": {
+    "type": "torch.optim.AdamW",
+    "learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "gradient_clip_norm": 1.0,
+    "source": "configs/training-v5-causal.yaml, unmodified",
+    "unchanged_for_M": true,
+    "note": "No size-dependent scaling (e.g. LR scaling by width) is defined anywhere in the frozen historical recipe; none is introduced for M9.8."
+  },
+  "batch_microbatch": {
+    "physical_batch_size": 2,
+    "gradient_accumulation_steps": 4,
+    "effective_batch_size": 8,
+    "microbatches_per_optimizer_update_interleaved": 4,
+    "unchanged_for_M": true,
+    "note": "M9.7 engineering smoke (Section 9) verifies HydroCore-M fits the same CPU training configuration (device='cpu', fp32=True, batch_size=2) without requiring a physical microbatch-size change. If a future M9.8 execution environment requires a smaller physical microbatch for HydroCore-M due to memory, gradient_accumulation_steps MUST be increased proportionally to preserve effective_batch_size=8 and the exact optimizer-step/scheduler semantics above -- this is a preregistered compensation rule, not a silent effective-batch-size change, per protocol Section 5's explicit instruction."
+  },
+  "training_depth_policy": {
+    "policy": "full-history depth=25 training only (ARM_POLICIES['A'] equivalent / full_history_policy), matching M9.6 ARM_B exactly",
+    "unchanged_for_M": true
+  },
+  "seeds": {
+    "values": [
+      20260814,
+      31874,
+      20260815
+    ],
+    "representative_seed": 31874,
+    "confirmation_seed": 20260815,
+    "unchanged_for_M": true,
+    "no_reroll_no_substitution": true
+  },
+  "checkpoint_selection": {
+    "policy": "validation only (lowest validation loss across the run, per-family mean for interleaved training)",
+    "unchanged_for_M": true
+  },
+  "calibration": {
+    "method": "B_DEPTH_AWARE",
+    "alpha": 0.1,
+    "minimum_group_size": 10,
+    "source_representative_support": "20 per source (CALIBRATION_REPEATS_PER_SOURCE=20, m9_6_common)",
+    "refit_policy": "refit independently per architecture (S and M each get their own fit) per seed, from that architecture's own governed calibration-split rows -- never reusing S's quantiles for M (M9.1 protocol Section 11.2 precedent, carried forward)",
+    "unchanged_for_M": true
+  },
+  "development_use": {
+    "policy": "evaluation only, never optimization -- development_holdout/development-representative population used only to REPORT M9.8 results, never to select HydroCore-M's width/depth/dropout/optimizer/duration/parameter-count/calibration-scheme (protocol Sections 3 and 7's standing rule)."
+  },
+  "locked_splits": {
+    "policy": "locked_final_test and locked_topology_test remain unopened for the entirety of M9.7 and M9.8 screening/confirmation stages."
+  },
+  "architecture_difference_from_S": "capacity only (d_model 192->352, nhead 6->11, dim_feedforward 576->1056); see m9-7-selected-m-architecture.json / m9-7-semantic-parity-audit.json."
+}

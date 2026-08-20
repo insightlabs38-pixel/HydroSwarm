@@ -1,0 +1,273 @@
+{
+  "kind": "M10_3_REFIT_LEVEL_A_GATE",
+  "protocol_hash": "f73accbf548e9b8987b8b1258efd7d3e61e052f802714ace3bb5f8b1b8d0f587",
+  "n_train_examples": 250,
+  "n_validation_examples": 300,
+  "train_baseline_stats": {
+    "plan_validity_train_majority_class": 1,
+    "plan_value_train_mean": 0.9840743541717529,
+    "exposure_proxy_train_mean": 0.9997309446334839,
+    "pressure_risk_proxy_train_mean": 0.0,
+    "service_loss_proxy_train_mean": 5.473297596397808e-13,
+    "containment_time_proxy_train_mean": 2.0013792514801025,
+    "plan_regret_proxy_train_mean": 0.024660149589180946
+  },
+  "per_seed": {
+    "20260814": {
+      "metrics": {
+        "plan_validity": {
+          "n": 2700,
+          "auroc": 0.9758209336590561,
+          "auroc_ci_lower": 0.9694908547932843,
+          "auroc_ci_upper": 0.9816511882821074,
+          "majority_baseline_accuracy": 0.6422222222222222,
+          "criterion_passed": true
+        },
+        "plan_value": {
+          "n": 1734,
+          "model_mse": 0.00597806740552187,
+          "baseline_mse": 0.006162899546325207,
+          "baseline_value": 0.9840743541717529,
+          "spearman": -0.006834974217019472,
+          "spearman_ci_lower": -0.048154713277281824,
+          "spearman_ci_upper": 0.03327514488685518,
+          "criterion_passed": false
+        },
+        "exposure_proxy": {
+          "n": 1734,
+          "model_mse": 0.0028718665707856417,
+          "baseline_mse": 0.003178155515342951,
+          "baseline_value": 0.9997309446334839,
+          "spearman": 0.04187411087211147,
+          "spearman_ci_lower": -0.005040424151346274,
+          "spearman_ci_upper": 0.08966960577214717,
+          "criterion_passed": false
+        },
+        "pressure_risk_proxy": {
+          "n": 1734,
+          "model_mse": 0.00041114361374638975,
+          "baseline_mse": 0.0,
+          "baseline_value": 0.0,
+          "spearman": NaN,
+          "spearman_ci_lower": 0.0,
+          "spearman_ci_upper": 0.0,
+          "criterion_passed": false
+        },
+        "service_loss_proxy": {
+          "n": 1734,
+          "model_mse": 0.0002393812028458342,
+          "baseline_mse": 3.618155664639949e-23,
+          "baseline_value": 5.473297596397808e-13,
+          "spearman": 0.02984548892852771,
+          "spearman_ci_lower": -0.012543375180985349,
+          "spearman_ci_upper": 0.06979985432084385,
+          "criterion_passed": false
+        },
+        "containment_time_proxy": {
+          "n": 1734,
+          "model_mse": 0.3054139316082001,
+          "baseline_mse": 0.844602108001709,
+          "baseline_value": 2.0013792514801025,
+          "spearman": 0.793095416743413,
+          "spearman_ci_lower": 0.7769565849079514,
+          "spearman_ci_upper": 0.8079413749626014,
+          "criterion_passed": true
+        },
+        "plan_regret_proxy": {
+          "n": 1734,
+          "model_mse": 0.02676479145884514,
+          "baseline_mse": 0.029643462970852852,
+          "baseline_value": 0.024660149589180946,
+          "spearman": -0.030490043781762215,
+          "spearman_ci_lower": -0.07248906526952396,
+          "spearman_ci_upper": 0.010164968804590647,
+          "criterion_passed": false
+        },
+        "pairwise_ranking": {
+          "n_incidents_with_a_real_pair": 167,
+          "n_pairs_total": 835,
+          "pooled_accuracy": 0.4035928143712575,
+          "mean_per_incident_accuracy": 0.40359281437125755,
+          "ci_lower": 0.35203592814371254,
+          "ci_upper": 0.4562874251497006,
+          "criterion_passed": false
+        }
+      },
+      "support_ok": true,
+      "all_finite": true,
+      "gate_criteria_passed": false
+    },
+    "31874": {
+      "metrics": {
+        "plan_validity": {
+          "n": 2700,
+          "auroc": 0.9742681386280002,
+          "auroc_ci_lower": 0.9676185790478695,
+          "auroc_ci_upper": 0.9804998590898156,
+          "majority_baseline_accuracy": 0.6422222222222222,
+          "criterion_passed": true
+        },
+        "plan_value": {
+          "n": 1734,
+          "model_mse": 0.006446039769798517,
+          "baseline_mse": 0.006162899546325207,
+          "baseline_value": 0.9840743541717529,
+          "spearman": 0.06867346669385262,
+          "spearman_ci_lower": 0.029021234166039106,
+          "spearman_ci_upper": 0.10975170211685696,
+          "criterion_passed": false
+        },
+        "exposure_proxy": {
+          "n": 1734,
+          "model_mse": 0.003412944730371237,
+          "baseline_mse": 0.003178155515342951,
+          "baseline_value": 0.9997309446334839,
+          "spearman": -0.05674800326244426,
+          "spearman_ci_lower": -0.10664298824984837,
+          "spearman_ci_upper": -0.007368326107479649,
+          "criterion_passed": false
+        },
+        "pressure_risk_proxy": {
+          "n": 1734,
+          "model_mse": 0.00011785970127675682,
+          "baseline_mse": 0.0,
+          "baseline_value": 0.0,
+          "spearman": NaN,
+          "spearman_ci_lower": 0.0,
+          "spearman_ci_upper": 0.0,
+          "criterion_passed": false
+        },
+        "service_loss_proxy": {
+          "n": 1734,
+          "model_mse": 0.00016210315516218543,
+          "baseline_mse": 3.618155664639949e-23,
+          "baseline_value": 5.473297596397808e-13,
+          "spearman": -0.031650781091921994,
+          "spearman_ci_lower": -0.07173939373734027,
+          "spearman_ci_upper": 0.007472121088364669,
+          "criterion_passed": false
+        },
+        "containment_time_proxy": {
+          "n": 1734,
+          "model_mse": 0.33971792459487915,
+          "baseline_mse": 0.844602108001709,
+          "baseline_value": 2.0013792514801025,
+          "spearman": 0.772225008933759,
+          "spearman_ci_lower": 0.7558619946489216,
+          "spearman_ci_upper": 0.7864257104847521,
+          "criterion_passed": true
+        },
+        "plan_regret_proxy": {
+          "n": 1734,
+          "model_mse": 0.02976585365831852,
+          "baseline_mse": 0.029643462970852852,
+          "baseline_value": 0.024660149589180946,
+          "spearman": -0.03864489545106291,
+          "spearman_ci_lower": -0.07890120663388268,
+          "spearman_ci_upper": 0.003435748869169216,
+          "criterion_passed": false
+        },
+        "pairwise_ranking": {
+          "n_incidents_with_a_real_pair": 167,
+          "n_pairs_total": 835,
+          "pooled_accuracy": 0.48622754491017967,
+          "mean_per_incident_accuracy": 0.48622754491017967,
+          "ci_lower": 0.43952095808383235,
+          "ci_upper": 0.5341317365269461,
+          "criterion_passed": false
+        }
+      },
+      "support_ok": true,
+      "all_finite": true,
+      "gate_criteria_passed": false
+    },
+    "20260815": {
+      "metrics": {
+        "plan_validity": {
+          "n": 2700,
+          "auroc": 0.9762179381556544,
+          "auroc_ci_lower": 0.9699749839309052,
+          "auroc_ci_upper": 0.9818625796847856,
+          "majority_baseline_accuracy": 0.6422222222222222,
+          "criterion_passed": true
+        },
+        "plan_value": {
+          "n": 1734,
+          "model_mse": 0.006125112529844046,
+          "baseline_mse": 0.006162899546325207,
+          "baseline_value": 0.9840743541717529,
+          "spearman": -0.018368153131839208,
+          "spearman_ci_lower": -0.058544477701257695,
+          "spearman_ci_upper": 0.02311520974422907,
+          "criterion_passed": false
+        },
+        "exposure_proxy": {
+          "n": 1734,
+          "model_mse": 0.0031409356743097305,
+          "baseline_mse": 0.003178155515342951,
+          "baseline_value": 0.9997309446334839,
+          "spearman": 0.043150342781601826,
+          "spearman_ci_lower": -0.004369833566765511,
+          "spearman_ci_upper": 0.0916563935338703,
+          "criterion_passed": false
+        },
+        "pressure_risk_proxy": {
+          "n": 1734,
+          "model_mse": 0.0008844853146001697,
+          "baseline_mse": 0.0,
+          "baseline_value": 0.0,
+          "spearman": NaN,
+          "spearman_ci_lower": 0.0,
+          "spearman_ci_upper": 0.0,
+          "criterion_passed": false
+        },
+        "service_loss_proxy": {
+          "n": 1734,
+          "model_mse": 0.00026559855905361474,
+          "baseline_mse": 3.618155664639949e-23,
+          "baseline_value": 5.473297596397808e-13,
+          "spearman": -0.03876299051745676,
+          "spearman_ci_lower": -0.07623067010293967,
+          "spearman_ci_upper": 0.0015856333260670038,
+          "criterion_passed": false
+        },
+        "containment_time_proxy": {
+          "n": 1734,
+          "model_mse": 0.3853936195373535,
+          "baseline_mse": 0.844602108001709,
+          "baseline_value": 2.0013792514801025,
+          "spearman": 0.7724136878501665,
+          "spearman_ci_lower": 0.757193228011175,
+          "spearman_ci_upper": 0.7869521775399382,
+          "criterion_passed": true
+        },
+        "plan_regret_proxy": {
+          "n": 1734,
+          "model_mse": 0.02736564353108406,
+          "baseline_mse": 0.029643462970852852,
+          "baseline_value": 0.024660149589180946,
+          "spearman": -0.13666028226899932,
+          "spearman_ci_lower": -0.17920696066750338,
+          "spearman_ci_upper": -0.09591202311578996,
+          "criterion_passed": false
+        },
+        "pairwise_ranking": {
+          "n_incidents_with_a_real_pair": 167,
+          "n_pairs_total": 835,
+          "pooled_accuracy": 0.20239520958083831,
+          "mean_per_incident_accuracy": 0.20239520958083831,
+          "ci_lower": 0.15568862275449102,
+          "ci_upper": 0.2502994011976048,
+          "criterion_passed": false
+        }
+      },
+      "support_ok": true,
+      "all_finite": true,
+      "gate_criteria_passed": false
+    }
+  },
+  "all_seeds_pass_competence_gate": false,
+  "any_seed_passes_competence_gate": false,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

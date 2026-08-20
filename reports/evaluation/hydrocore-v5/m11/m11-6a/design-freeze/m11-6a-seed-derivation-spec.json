@@ -1,0 +1,49 @@
+{
+  "allowed_integer_range": [
+    2147483648,
+    4611686018427387903
+  ],
+  "byte_encoding": "utf-8",
+  "collision_handling": "If a derived seed collides with a seed already used in the same materialization (or a canonical scenario-definition hash collides with a prior hash), increment `counter` and re-derive deterministically. Never select a different example manually, never call OS randomness, and never preview candidate seeds.",
+  "digest_to_integer": "LOCKED_SEED_MIN + int(SHA256(material).hexdigest(), 16) % LOCKED_SEED_SPAN",
+  "disjoint_by_construction": "Every derived seed is >= 2**31; every prior governed seed namespace is < 2**31, so the derived range [2**31, 2**62) is mechanically disjoint from all prior namespaces.",
+  "hash_algorithm": "sha256",
+  "kind": "M11_6A_SEED_DERIVATION_SPEC",
+  "labels": {
+    "FINAL_SCENARIO": {
+      "consumed_by_generation": true,
+      "note": "One derived seed per locked_final_test incident; drives the full WNTR scenario (start/duration/strength/demand/roughness/sensor layout/perturbations) via the single-RNG-stream generator.",
+      "split": "locked_final_test"
+    },
+    "FINAL_TOPOLOGY": {
+      "consumed_by_generation": false,
+      "note": "Reserved in v1: locked_final_test uses the fixed, already-governed known topologies (golden-reference/branched-loop/loop-grid); no topology-level seed is consumed.",
+      "split": "locked_final_test"
+    },
+    "SENSOR_PERTURBATION": {
+      "consumed_by_generation": false,
+      "note": "Reserved in v1: sensor-level perturbations (noise/missingness/frozen/outage) are driven by the same single scenario seed via WNTRScenarioGenerator._degrade, matching M9/M10/M11.5.",
+      "split": null
+    },
+    "TOPOLOGY_TEST_NETWORK": {
+      "consumed_by_generation": true,
+      "note": "One derived seed per locked_topology_test topology instance; drives the deterministic procedural topology generator (rejection candidates increment the counter).",
+      "split": "locked_topology_test"
+    },
+    "TOPOLOGY_TEST_SCENARIO": {
+      "consumed_by_generation": true,
+      "note": "One derived seed per locked_topology_test incident; drives the full WNTR scenario for a fixed procedural topology.",
+      "split": "locked_topology_test"
+    }
+  },
+  "locked_seed_max_exclusive": 4611686018427387904,
+  "locked_seed_min": 2147483648,
+  "locked_seed_span": 4611686016279904256,
+  "master_formula": {
+    "locked_final_master": "H(\"HYDROSWARM|M11.6|LOCKED_FINAL|v1|\" + DESIGN_FREEZE_COMMIT_SHA)",
+    "locked_topology_master": "H(\"HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|\" + DESIGN_FREEZE_COMMIT_SHA)"
+  },
+  "max_collision_retries": 100,
+  "per_seed_material": "f\"{master_hex}|{label}|{index}|{counter}\"",
+  "rule_version": "v1"
+}

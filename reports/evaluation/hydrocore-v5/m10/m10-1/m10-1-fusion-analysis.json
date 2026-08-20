@@ -1,0 +1,6 @@
+{
+  "abstention_rate": 0.012345679012345678,
+  "n_rows": 1944,
+  "learned_vs_classical_disagreement_mean_js": 0.12684168061037845,
+  "fraction_fusion_changes_top1_vs_neural_alone": 0.015432098765432098
+}

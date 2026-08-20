@@ -1,0 +1,20 @@
+{
+  "kind": "M10_0_CLOSURE",
+  "milestone": "M10.0",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "8284e48095acd14270be962250d1aebe9ce5cbcf",
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "all_three_checkpoints_sha256_verified": true,
+  "source_posterior_interface_ok": true,
+  "conformal_candidate_set_interface_ok": true,
+  "ood_category_head_present_but_advisory_only": true,
+  "scout_named_heads_present": true,
+  "strategist_role_group_present_but_named_proxy_heads_absent": true,
+  "scout_strategist_schema_integration_status": "scout-state-v1-unbuilt / strategist-candidate-v1-unbuilt (checkpoint_identity.py) -- Scout has named raw heads (sample_node_logits/expected_information_gain/candidate_reduction_prediction/should_continue_sampling_logits); Strategist has only a generic per-node 'strategist' role-hidden group ([1,N,3]), with none of the 7 named STRATEGIST_OUTPUTS proxy heads materialized -- mechanically confirmed by this preflight's own forward pass, per M10 protocol Section 2",
+  "deterministic_fallback_paths_verified": true,
+  "wntr_epanet_authority_unaffected": true,
+  "no_learned_autonomous_actuation": true,
+  "M10_0_RESULT": "SYSTEM_PREFLIGHT_PASS",
+  "next_recommended": "M10.1 (OOD/fusion validation) may proceed -- deterministic and neural OOD/fusion paths are both fully wired and callable, unlike Scout/Strategist which remain schema-unbuilt."
+}

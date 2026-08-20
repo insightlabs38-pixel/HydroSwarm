@@ -1,0 +1,22 @@
+{
+  "kind": "M10_2_SCOUT_SCHEMA",
+  "milestone": "M10.2-preflight",
+  "scout_eval_state_schema_version": "scout-eval-state-v1",
+  "training_corpus_scout_schema_version_unchanged": "scout-state-v1-unbuilt",
+  "fields": {
+    "node_ids": "tuple[tuple[str, ...], ...] -- per-batch-item physical node ordering, matching batch tensor position i",
+    "batch": "HydroBatch -- the exact model input for this decision step (existing channels only, no new HydroCore parameters)",
+    "already_sampled_mask": "[batch, nodes] bool -- nodes already sampled this incident, excluded from candidacy",
+    "accessible_mask": "[batch, nodes] bool -- operator/physical accessibility constraint",
+    "sampling_round": "[batch] int64 -- number of samples already collected",
+    "sample_budget_remaining": "[batch] int64 -- remaining sample budget"
+  },
+  "candidate_mask_definition": "node_mask (valid, non-padding) AND NOT already_sampled AND accessible",
+  "output_semantics": {
+    "sample_node_logits": "masked candidate ranking signal only -- never authoritative",
+    "expected_information_gain": "diagnostic-only (untrained in the M9.6 canonical checkpoint per the governance audit below)",
+    "candidate_reduction_prediction": "diagnostic-only (same)",
+    "should_continue_sampling_logits": "diagnostic-only, incident-level scalar (same)"
+  },
+  "ground_truth_isolation": "build_scout_evaluation_state accepts only a HydroBatch + explicit decision-time scalars; assert_no_target_only_keys fails closed if any targets_v2 governed target name (excluding the legitimate travel_time input-feature collision) appears in the batch."
+}

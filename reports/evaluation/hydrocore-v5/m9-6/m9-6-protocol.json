@@ -1,0 +1,356 @@
+{
+  "arms": {
+    "ARM_A_M9_6": {
+      "code_path": "Trainer-based, mirrors run_m8_7_arm.py's AGE_FIX_ONLY arm exactly (build_scenario_pool, ARM_POLICIES['A'] full-history depth policy)",
+      "name": "CURRENT / SINGLE_FAMILY",
+      "train_scenario_count": 600,
+      "trained_families": [
+        "golden-reference"
+      ],
+      "validation_scenario_count": 100
+    },
+    "ARM_B_M9_6": {
+      "code_path": "hand-rolled step-matched interleaved loop, mirrors run_m9_0a_arm_b2.py's train_arm_b2 exactly (_build_family_pools, step_matched_interleaved_optimizer_step, fixed 3-update rotation)",
+      "family_weighting": {
+        "branched-loop": 0.333333,
+        "golden-reference": 0.333333,
+        "loop-grid": 0.333333
+      },
+      "name": "INTERLEAVED_MULTI_FAMILY",
+      "total_train_scenario_count": 600,
+      "train_scenario_count_per_family": 200,
+      "trained_families": [
+        "golden-reference",
+        "branched-loop",
+        "loop-grid"
+      ]
+    },
+    "architecture_identical": true,
+    "no_architectural_difference_whatsoever": true
+  },
+  "artifacts_directory": "reports/evaluation/hydrocore-v5/m9-6",
+  "branch": "exp/hydrocore-v5-causal",
+  "calibration_gate": {
+    "candidate_set_guard_threshold": 0.8,
+    "coverage_floor": 0.85,
+    "current_required_cells": [
+      "golden-reference|20260814",
+      "golden-reference|31874",
+      "golden-reference|20260815"
+    ],
+    "interleaved_required_cells": [
+      "golden-reference|20260814",
+      "golden-reference|31874",
+      "golden-reference|20260815",
+      "branched-loop|20260814",
+      "branched-loop|31874",
+      "branched-loop|20260815",
+      "loop-grid|20260814",
+      "loop-grid|31874",
+      "loop-grid|20260815"
+    ]
+  },
+  "calibration_method_frozen": {
+    "alpha": 0.1,
+    "calibrator_class": "SplitConformalCalibrator",
+    "coverage_floor": 0.85,
+    "grouping": "B_DEPTH_AWARE / CURRENT_FAMILY_DEPTH",
+    "minimum_group_size": 10,
+    "reused_from": "hydroswarm.calibration.conformal (unmodified), method independently confirmed in M9.5R"
+  },
+  "calibration_population": {
+    "expected_counts": {
+      "branched-loop": 140,
+      "golden-reference": 80,
+      "loop-grid": 160
+    },
+    "families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid"
+    ],
+    "repeats_per_source": 20
+  },
+  "closed_axes": [
+    "GRAPH_ODE",
+    "GRAPH_CDE",
+    "GRAPH_SDE",
+    "Mamba",
+    "S4",
+    "Mamba-2",
+    "SSMs",
+    "transformer variants",
+    "new graph architectures",
+    "HydroCore-M",
+    "HydroCore-L",
+    "another temporal encoder",
+    "causal-depth policy search",
+    "task loss/weight search",
+    "optimizer/LR/scheduler/batch search",
+    "calibration-method search"
+  ],
+  "decision_logic": {
+    "anti_post_hoc_rule": "This protocol (arms, seeds, 1350-step requirement, exposure budget, family rotation, seed ranges, promotion gates, decision logic) is committed BEFORE any M9.6 training/evaluation/calibration executes. If a flaw is discovered after results, the result is preserved and the flaw is reported -- not silently patched and rerun.",
+    "codes": {
+      "A": "EXACT_COMPUTE_INTERLEAVED_CONFIRMATION_PASS",
+      "B": "PREDICTIVE_GAIN_NOT_CONFIRMED",
+      "C": "PREDICTIVE_GAIN_CONFIRMED_CALIBRATION_FAILS",
+      "D": "KNOWN_FAMILY_REGRESSION_BLOCKER",
+      "E": "COMPUTE_PARITY_OR_TRAINING_PROTOCOL_BLOCKER",
+      "F": "CALIBRATION_OR_REPRESENTATIVENESS_BLOCKER",
+      "G": "INCONCLUSIVE"
+    },
+    "evaluation_order": [
+      "E if exact 1350-step parity (or another training invariant: scheduler/optimizer/exposure/param-count/checkpoint-corruption/topology-exposure-mismatch/locked-data-access) fails for ANY arm/seed",
+      "F if calibration representativeness OR the M9.5R-identical implementation/sanity invariants fail before a clean decision can be reached",
+      "B if compute parity holds but the primary predictive promotion gate (Section 22) fails",
+      "D if the predictive gate passes but known-family preservation (Section 23) fails",
+      "C if the predictive gate passes, known-family guardrails pass, but the calibration gate (Section 28/29/30) fails",
+      "A if exact compute parity PASS, predictive generalization gate PASS, known-family guardrails PASS, calibration representativeness PASS, CURRENT control PASS, INTERLEAVED 9/9 PASS, candidate-set guard PASS, all finite, no safety/authority regression, locks unopened",
+      "G only if a genuinely valid but statistically unresolved result remains after all the above are checked"
+    ],
+    "frozen_before_training": true
+  },
+  "depths": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "development_population": {
+    "expected_counts": {
+      "branched-loop": 140,
+      "coastal-branch": 120,
+      "dense-loop": 120,
+      "golden-reference": 80,
+      "loop-grid": 160,
+      "tree-branch": 100
+    },
+    "families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid",
+      "coastal-branch",
+      "tree-branch",
+      "dense-loop"
+    ],
+    "repeats_per_source": 20,
+    "trained_vs_unseen": {
+      "trained": [
+        "golden-reference",
+        "branched-loop",
+        "loop-grid"
+      ],
+      "unseen": [
+        "coastal-branch",
+        "tree-branch",
+        "dense-loop"
+      ]
+    }
+  },
+  "exact_compute_parity": {
+    "batch_size": 2,
+    "canonical_checkpoint_policy": "FINAL_STEP_1350",
+    "canonical_checkpoint_policy_note": "Trainer.fit()/train_arm_b2() both always re-load the BEST-VALIDATION checkpoint into the model right before exporting model-export.safetensors, even when all 20 epochs ran without early stopping (confirmed historically: m8-7-runs/AGE_FIX_ONLY-seed20260815.json has stopped_early=false, epochs_completed=20, but exported global_steps=1275, not 1350). M9.6 preserves this best-validation export UNCHANGED for the record, and additionally reloads the LAST periodic checkpoint (guaranteed epoch 20 with early stopping disabled) into a fresh model instance and exports it separately as the canonical, promotion-authoritative M9.6 checkpoint -- FINAL STEP 1350, per this Section's predeclaration.",
+    "checkpoint_every_epochs": 1,
+    "config_source": "configs/training-v5-causal.yaml (unmodified; only early_stopping_patience overridden at the TrainingConfig instantiation call site, not in the yaml file)",
+    "deterministic": true,
+    "early_stopping_disabled_via": "TrainingConfig.early_stopping_patience=0 (existing, already-validated config field; 0 is falsy so Trainer.fit()'s/train_arm_b2()'s own early-exit becomes a structural no-op -- no training-loop code is modified)",
+    "gradient_accumulation_steps": 4,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "microbatches_per_optimizer_update": 4,
+    "no_exceptions": true,
+    "optimizer": "AdamW",
+    "optimizer_steps_per_epoch": [
+      15,
+      30,
+      45,
+      60,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75,
+      75
+    ],
+    "precision": "fp32",
+    "scheduler": "cosine",
+    "scheduler_total_steps": 1500,
+    "total_optimizer_steps_required": 1350,
+    "warmup_steps": 10,
+    "weight_decay": 0.01
+  },
+  "hard_non_goals": [
+    "no architecture change",
+    "no AGE_FIX_ONLY change",
+    "no model width/depth change",
+    "no HydroCore-M/L",
+    "no other temporal encoder",
+    "no causal-depth policy change",
+    "no task loss/weight change",
+    "no confidence regularization",
+    "no auxiliary losses",
+    "no optimizer change",
+    "no hyperparameter search",
+    "no Optuna",
+    "no LR/batch/scheduler tuning",
+    "no post-hoc family-sampling tuning",
+    "no early-stopping-driven compute-budget change (other than disabling it entirely, per Section 9)",
+    "no alpha change from 0.1",
+    "no conformal score change",
+    "no calibration-method change",
+    "no APS/RAPS",
+    "no temperature scaling",
+    "no tuning calibration on development",
+    "no topology-definition change",
+    "no omitting difficult source nodes",
+    "no dropping seeds",
+    "no rerunning only failed seeds",
+    "no opening locked_final_test",
+    "no opening locked_topology_test",
+    "no automatic production promotion"
+  ],
+  "kind": "EXACT_COMPUTE_PARITY_FINAL_HYDROCORE_S_CONFIRMATION",
+  "known_family_guardrails": {
+    "family": "golden-reference (shared, trained by both arms)",
+    "max_early_top1_regression_pp": 5.0,
+    "max_mature_top1_regression_pp": 3.0,
+    "max_mrr_regression": 0.03
+  },
+  "locked_test_opened_before_protocol_freeze": false,
+  "maturity_groups": {
+    "EARLY": [
+      1,
+      2,
+      3
+    ],
+    "MATURE": [
+      12,
+      25
+    ],
+    "MID": [
+      4,
+      6
+    ]
+  },
+  "milestone": "M9.6",
+  "model_configuration": {
+    "expected_approximate_param_count": 4000000,
+    "feature_kwargs": {
+      "include_relative_gap_feature": false,
+      "unobserved_age_sentinel": "fixed"
+    },
+    "model_kwargs": {
+      "elapsed_time_normalization": "window_relative",
+      "quality_feature_dim": 4,
+      "temporal_feature_dim": 6
+    },
+    "note": "actual parameter count verified and recorded per-run in m9-6-training-parity.json; both arms MUST match exactly",
+    "pcgrad_enabled": false,
+    "representation": "AGE_FIX_ONLY",
+    "use_adapters": false,
+    "variant": "small"
+  },
+  "not_an_architecture_search": true,
+  "paired_bootstrap": {
+    "interval": 0.9,
+    "pairing": "family, source, incident_id, physical seed -- same physical scenarios scored under both arms",
+    "resamples": 2000,
+    "resampling_unit": "physical base incident (all depths stay attached)",
+    "seed": 20260818
+  },
+  "primary_predictive_promotion_gate": {
+    "all_outputs_finite": true,
+    "bootstrap_ci90_lower_bound_must_be_positive": true,
+    "max_unseen_family_regression_pp": 5.0,
+    "min_unseen_families_improved": 2,
+    "no_safety_authority_regression": true,
+    "per_seed_macro_delta_must_be_nonnegative_all_3_seeds": true,
+    "unseen_macro_family_mature_delta_must_be_positive": true
+  },
+  "primary_question": "Under a freshly trained, exactly matched 1350-optimizer-step protocol, does multi-topology INTERLEAVED HydroCore-S still outperform CURRENT HydroCore-S on source-representative unseen topology localization without materially regressing known-family performance, while satisfying the independently confirmed M9.5R calibration policy?",
+  "provenance": {
+    "m9_4_closure_sha256": "8dcf43ceb0c04ac7185ecdba4c3752e6f65e613f10dfef761c73b4fde329ccba",
+    "m9_5_closure_sha256": "656b31c7e27947f2e7af551bcd5bc9136dd724b8705b1619447f50d6ecf2a0ec",
+    "m9_5r_artifact_commit": "9948f718434851c2dd57b7a0d064d983ffa21b9c",
+    "m9_5r_closure_sha256": "72a986cc9cab2f5fce1079e4ed9a43dc960aa0ef8f9e3657bbc07845ce243901",
+    "m9_5r_code_commit": "b6e41404eda87a22abeffad12968e89a8b1a8496",
+    "m9_5r_manifest_sha256": "6506f5e0d1a464ccce98a3ce9e920de7d03e37eb045c2adfe11c5c41bdf95649",
+    "m9_5r_metadata_fix_commit": "4fd80a4f1e39e997e241bf3bc4a135745ce1b1e5"
+  },
+  "seed_namespace": {
+    "disjoint_from": [
+      "M7 train/validation",
+      "M9.4",
+      "M9.5",
+      "M9.5R",
+      "locked_final_test",
+      "locked_topology_test"
+    ],
+    "roles": [
+      "calibration_m9_6",
+      "development_m9_6"
+    ],
+    "seed_base_floor": 998000000,
+    "seed_base_step": 100000,
+    "seed_bases": {
+      "branched-loop|calibration_m9_6": 998200000,
+      "branched-loop|development_m9_6": 998300000,
+      "coastal-branch|calibration_m9_6": 998600000,
+      "coastal-branch|development_m9_6": 998700000,
+      "dense-loop|calibration_m9_6": 999000000,
+      "dense-loop|development_m9_6": 999100000,
+      "golden-reference|calibration_m9_6": 998000000,
+      "golden-reference|development_m9_6": 998100000,
+      "loop-grid|calibration_m9_6": 998400000,
+      "loop-grid|development_m9_6": 998500000,
+      "tree-branch|calibration_m9_6": 998800000,
+      "tree-branch|development_m9_6": 998900000
+    },
+    "source_stride": 10000
+  },
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "start_commit": "4fd80a4f1e39e997e241bf3bc4a135745ce1b1e5",
+  "train_validation_data": {
+    "arm_a_seed_range_source": "causal_prefix.SPLIT_SEED_RANGES (~900,000,000-903,999,999)",
+    "arm_b_seed_range_source": "run_m7_topology.SEED_BASES[(family,'train'/'validation')] (940,000,000-970,000,000)",
+    "disjoint_from_m9_6_calibration_development": true,
+    "reused_unmodified_from": [
+      "hydroswarm.training.causal_prefix.build_scenario_pool (ARM_A)",
+      "run_m9_0_arm_b._build_family_pools (ARM_B)"
+    ],
+    "scope_decision_note": "M9.6 reuses the EXACT historical train/validation pools (same physical scenarios M8.7/M9.0/M9.0a already used) rather than generating new train/validation seed ranges from scratch. This is a documented interpretation of governing Section 11: those pools' seed ranges are already, by construction, physically disjoint from every calibration/development namespace in this repo including M9.6's own (998,000,000+) -- reusing them satisfies the disjointness requirement without inventing a new curriculum (Section 6) and keeps ARM_A/ARM_B exposure-budget comparison apples-to-apples with the historical M9.0a definition, isolating TOPOLOGY DIVERSITY as the only intended difference (Section 11's own stated goal)."
+  },
+  "training_exposure_parity": {
+    "arm_a_composition": {
+      "golden-reference": 600
+    },
+    "arm_a_total_train_scenarios": 600,
+    "arm_b_composition": {
+      "branched-loop": 200,
+      "golden-reference": 200,
+      "loop-grid": 200
+    },
+    "arm_b_total_train_scenarios": 600,
+    "equal_total_exposure_budget": true,
+    "family_rotation_policy": "reused unmodified from run_m9_0a_arm_b2.py: fixed 3-update rotation (golden/branched/loop/EXTRA, cycling which family gets the 4th microbatch slot), no new curriculum invented"
+  }
+}

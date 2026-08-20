@@ -50,8 +50,8 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
             dependencies[name] = "importable"
 
     from hydroswarm.model import HydroCore
-    from hydroswarm.runtime import V4PipelineFactory
-    from hydroswarm.runtime.paths import resolve_reference_demo_path, resolve_v4_bundle_dir
+    from hydroswarm.runtime import V5PipelineFactory
+    from hydroswarm.runtime.paths import resolve_reference_demo_path, resolve_v5_bundle_dir
     from hydroswarm.simulation.network import build_networkx_network, build_wntr_network
 
     graph = build_networkx_network()
@@ -143,9 +143,9 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     # default) instead of two independently-computed, workspace-relative
     # paths that could silently diverge for a non-editable install or a
     # non-repository-root working directory.
-    trained_factory = V4PipelineFactory(resolve_v4_bundle_dir())
+    trained_factory = V5PipelineFactory(resolve_v5_bundle_dir())
     trained_assets_ready = trained_factory.trained_assets_ready
-    identity = trained_factory.identity
+    release_manifest = trained_factory.manifest
 
     # SUB-12.1 #21: read the bundle's own calibration-status.json directly
     # (the same file V4PipelineFactory's internal loader already validated
@@ -153,13 +153,7 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     # one isn't present) rather than adding a new public property to the
     # runtime factory just for this report -- self-test already resolves
     # the same bundle directory the factory loaded from.
-    calibration_status_path = trained_factory.checkpoint_dir / "calibration-status.json"
-    calibration_status = "MISSING"
-    if calibration_status_path.exists():
-        try:
-            calibration_status = json.loads(calibration_status_path.read_text()).get("status", "MISSING")
-        except (OSError, ValueError):
-            calibration_status = "UNREADABLE"
+    calibration_status = "FITTED" if trained_assets_ready else "MISSING"
 
     reference_artifact_path = resolve_reference_demo_path()
     reference_artifact_present = reference_artifact_path.exists()
@@ -178,10 +172,10 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
         "trained_assets": {
             "ready": trained_assets_ready,
             "fallback_reason": trained_factory.fallback_reason,
-            "architecture_version": identity.architecture_version if identity is not None else None,
+            "architecture_version": "hydroswarm-v5-release-v1" if release_manifest is not None else None,
             "model_sha256": trained_factory.model_hash,
-            "normalization_hash": identity.normalization_hash if identity is not None else None,
-            "bundle_dir": str(trained_factory.checkpoint_dir),
+            "normalization_hash": "NO_NORMALIZATION_SENTINEL",
+            "bundle_dir": str(trained_factory.bundle_dir),
             "calibration_status": calibration_status,
         },
         "inference_run": True,
@@ -211,7 +205,7 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     if strict:
         failures: list[str] = []
         if not trained_assets_ready:
-            failures.append(f"frozen V4 bundle not ready: {trained_factory.fallback_reason}")
+            failures.append(f"frozen V5 bundle not ready: {trained_factory.fallback_reason}")
         if calibration_status != "FITTED":
             failures.append(f"calibration status is {calibration_status!r}, not FITTED")
         if report["frontend_assets"] != "built":

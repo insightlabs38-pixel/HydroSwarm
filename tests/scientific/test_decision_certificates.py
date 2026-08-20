@@ -93,6 +93,42 @@ def test_ood_certificate_always_reports_learned_ood_category_suppressed() -> Non
     assert "LEARNED_OOD_CATEGORY_SUPPRESSED:NOT_PROMOTED" in ood.suppression_reasons
 
 
+@pytest.mark.real_simulation
+def test_ood_certificate_unaffected_by_extreme_ood_category_even_when_runtime_enabled() -> None:
+    """M10.1 readiness-review gap: closes the loop between the pipeline-
+    level isolation proof (test_hybrid_pipeline_v4_gating.py's
+    test_extreme_ood_category_logits_cannot_move_deterministic_ood_
+    severity_*) and the Decision Authority contract actually surfaced to
+    callers -- the certificate must keep reporting DETERMINISTIC/
+    NOT_PROMOTED with an unchanged value even when a v4 identity runtime-
+    enables ood_category AND the underlying head is pinned to an extreme,
+    maximally-confident, different SUPPORTED category."""
+
+    from test_hybrid_pipeline_v4_gating import EventAwareModel, ExtremeOODCategoryModel
+
+    moderate_pipeline, network = _pipeline(EventAwareModel())
+    moderate_pipeline.runtime_enabled_outputs = frozenset({"ood_category"})
+    moderate = moderate_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    extreme_pipeline, network = _pipeline(ExtremeOODCategoryModel())
+    extreme_pipeline.runtime_enabled_outputs = frozenset({"ood_category"})
+    extreme = extreme_pipeline.analyze(uuid4(), network, [_series("J1", 0.78)])
+
+    assert moderate.semantic_predictions.ood_category != extreme.semantic_predictions.ood_category
+
+    for analysis in (moderate, extreme):
+        certificates = build_decision_certificates(analysis)
+        ood = next(c for c in certificates if c.name == "ood_state")
+        assert ood.source == "DETERMINISTIC_CONTROLLER"
+        assert ood.authority == AuthorityLevel.DETERMINISTIC
+        assert ood.value == analysis.ood_level.value
+        assert "LEARNED_OOD_CATEGORY_SUPPRESSED:NOT_PROMOTED" in ood.suppression_reasons
+
+    moderate_certificate = next(c for c in build_decision_certificates(moderate) if c.name == "ood_state")
+    extreme_certificate = next(c for c in build_decision_certificates(extreme) if c.name == "ood_state")
+    assert moderate_certificate.value == extreme_certificate.value
+
+
 def test_verified_plan_certificate_is_simulator_verified_and_current() -> None:
     verification = _verification(decision=PlanDecision.VERIFIED)
     certificate = plan_consequence_certificate(verification)

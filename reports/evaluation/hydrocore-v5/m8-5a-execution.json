@@ -1,0 +1,445 @@
+{
+  "abcd_minimal_comparison": {
+    "A_trivial_immediate_exit": {
+      "got_result": true,
+      "is_alive_after_join": false,
+      "pid": 246375,
+      "wall_ms": 23.985861997061875
+    },
+    "B_trivial_small_result": {
+      "got_result": true,
+      "is_alive_after_join": false,
+      "pid": 246377,
+      "value": {
+        "ok": 1.0
+      },
+      "wall_ms": 21.634987002471462
+    },
+    "C_and_D_real_simulation": {
+      "10": {
+        "C_falsely_timed_out_relative_to_D": false,
+        "C_wrapped_production_method": {
+          "error": null,
+          "status": "OK",
+          "wall_ms": 52.17577899747994
+        },
+        "D_direct_unwrapped": {
+          "error": null,
+          "status": "OK",
+          "wall_ms": 22.5019719946431
+        }
+      },
+      "25": {
+        "C_falsely_timed_out_relative_to_D": true,
+        "C_wrapped_production_method": {
+          "error": "SimulationTimeoutError: m8-5a-abcd-C-25 exceeded the 8-second timeout",
+          "status": "FAILED",
+          "wall_ms": 8036.399077995156
+        },
+        "D_direct_unwrapped": {
+          "error": null,
+          "status": "OK",
+          "wall_ms": 38.65465900162235
+        }
+      }
+    }
+  },
+  "branch": "exp/hydrocore-v5-causal",
+  "environment": {
+    "multiprocessing_start_method_used": "fork",
+    "platform": "linux",
+    "python_version": "3.12.13 (main, Aug  5 2026, 01:16:26) [GCC 14.2.0]"
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "payload_size_sweep": [
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246342,
+        "result_size_bytes": 1000,
+        "timed_out": false,
+        "wall_ms": 22.750172996893525
+      },
+      "join_first": {
+        "got_result": true,
+        "is_alive_after_join": false,
+        "join_wait_ms": 28.90870600094786,
+        "os_state_at_join_check": "GONE",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246340,
+        "result_size_bytes": 1000,
+        "timed_out": false,
+        "wall_ms": 29.242532997159287
+      },
+      "join_first_falsely_timed_out": false,
+      "payload_bytes": 1000
+    },
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246346,
+        "result_size_bytes": 16000,
+        "timed_out": false,
+        "wall_ms": 21.589772004517727
+      },
+      "join_first": {
+        "got_result": true,
+        "is_alive_after_join": false,
+        "join_wait_ms": 21.297962994140107,
+        "os_state_at_join_check": "GONE",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246344,
+        "result_size_bytes": 16000,
+        "timed_out": false,
+        "wall_ms": 21.571002995187882
+      },
+      "join_first_falsely_timed_out": false,
+      "payload_bytes": 16000
+    },
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246350,
+        "result_size_bytes": 60000,
+        "timed_out": false,
+        "wall_ms": 21.728644001996145
+      },
+      "join_first": {
+        "got_result": true,
+        "is_alive_after_join": false,
+        "join_wait_ms": 21.80916200450156,
+        "os_state_at_join_check": "GONE",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246348,
+        "result_size_bytes": 60000,
+        "timed_out": false,
+        "wall_ms": 22.08719600457698
+      },
+      "join_first_falsely_timed_out": false,
+      "payload_bytes": 60000
+    },
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246356,
+        "result_size_bytes": 100000,
+        "timed_out": false,
+        "wall_ms": 28.43958800076507
+      },
+      "join_first": {
+        "got_result": false,
+        "is_alive_after_join": true,
+        "join_wait_ms": 8005.354198001442,
+        "os_state_at_join_check": "S",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246352,
+        "result_size_bytes": null,
+        "timed_out": true,
+        "wall_ms": 8020.457844002522
+      },
+      "join_first_falsely_timed_out": true,
+      "payload_bytes": 100000
+    },
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246361,
+        "result_size_bytes": 300000,
+        "timed_out": false,
+        "wall_ms": 29.063346999464557
+      },
+      "join_first": {
+        "got_result": false,
+        "is_alive_after_join": true,
+        "join_wait_ms": 8013.791525001579,
+        "os_state_at_join_check": "S",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246358,
+        "result_size_bytes": null,
+        "timed_out": true,
+        "wall_ms": 8029.270642000483
+      },
+      "join_first_falsely_timed_out": true,
+      "payload_bytes": 300000
+    },
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246367,
+        "result_size_bytes": 1000000,
+        "timed_out": false,
+        "wall_ms": 32.399140000052284
+      },
+      "join_first": {
+        "got_result": false,
+        "is_alive_after_join": true,
+        "join_wait_ms": 8019.5261940025375,
+        "os_state_at_join_check": "S",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246363,
+        "result_size_bytes": null,
+        "timed_out": true,
+        "wall_ms": 8035.347058001207
+      },
+      "join_first_falsely_timed_out": true,
+      "payload_bytes": 1000000
+    },
+    {
+      "drain_first": {
+        "got_result": true,
+        "pattern": "DRAIN_FIRST_CANDIDATE",
+        "pid": 246373,
+        "result_size_bytes": 5000000,
+        "timed_out": false,
+        "wall_ms": 50.89099399629049
+      },
+      "join_first": {
+        "got_result": false,
+        "is_alive_after_join": true,
+        "join_wait_ms": 8015.079757999047,
+        "os_state_at_join_check": "S",
+        "pattern": "JOIN_FIRST_PRODUCTION_EQUIVALENT",
+        "pid": 246369,
+        "result_size_bytes": null,
+        "timed_out": true,
+        "wall_ms": 8030.896447999112
+      },
+      "join_first_falsely_timed_out": true,
+      "payload_bytes": 5000000
+    }
+  ],
+  "payload_size_sweep_bytes_tested": [
+    1000,
+    16000,
+    60000,
+    100000,
+    300000,
+    1000000,
+    5000000
+  ],
+  "purpose": "Milestone 8.5a Phase 0/1/3: diagnose the wrapped-execution false-timeout mechanism M8.5 observed but did not root-cause, testing the IPC/pipe-draining hypothesis against the SIGCHLD/zombie-reaping hypothesis M8.5 explicitly speculated but never confirmed.",
+  "real_simulation_pickled_result_sizes": {
+    "10": {
+      "pickled_result_bytes": 30891,
+      "status": "OK"
+    },
+    "100": {
+      "pickled_result_bytes": 258443,
+      "status": "OK"
+    },
+    "25": {
+      "pickled_result_bytes": 68068,
+      "status": "OK"
+    },
+    "50": {
+      "pickled_result_bytes": 132284,
+      "status": "OK"
+    }
+  },
+  "repeated_leak_check_current_unfixed_wrapper": {
+    "leaked_children_detected": false,
+    "n_runs": 30,
+    "node_count": 50,
+    "outcomes": [
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.585490000609
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.705222999037
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5033.983825996984
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5033.25456300081
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.4284620005055
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.650082001463
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.310440001718
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.591319003084
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.33805199893
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5030.736704997253
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.702613003901
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.732093001367
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.957275005581
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.00029399927
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.61172599782
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5031.1827049954445
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.345214000496
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.581282998261
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.150042003603
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.40224899532
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.5309670010465
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.131637999963
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5035.46752800321
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.383705999062
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5035.282151999127
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.812001998944
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5032.876009994652
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5031.780762998096
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.5987059990875
+      },
+      {
+        "active_children_after": 0,
+        "active_children_before": 0,
+        "status": "TIMEOUT",
+        "wall_ms": 5034.280847998161
+      }
+    ],
+    "timeout_count": 30,
+    "timeout_seconds": 5.0
+  },
+  "root_cause": {
+    "classification": "IPC_BLOCKING_ON_UNDRAINED_QUEUE_PIPE",
+    "payload_bytes_threshold_where_join_first_first_fails": 100000,
+    "rationale": "The join-first (production-equivalent) pattern falsely times out only once the child's return payload exceeds a threshold size, while the drain-first pattern succeeds at every tested size with the same worker function; the child's real /proc OS state at the moment of the false timeout was observed as still running/sleeping/blocked-on-IO, never a zombie -- this rules out SIGCHLD/process-reaping as the mechanism and confirms the child is genuinely still executing (blocked in a pipe write its own feeder thread cannot complete because the parent is not draining the queue while it waits) exactly as Python's own multiprocessing documentation describes for this join-before-get call ordering.",
+    "real_simulation_c_vs_d_confound_reproduced": true,
+    "root_cause_established": "YES",
+    "running_or_blocked_os_state_observed_during_false_timeout": true,
+    "zombie_os_state_ever_observed_during_false_timeout": false
+  },
+  "schema_version": 1
+}

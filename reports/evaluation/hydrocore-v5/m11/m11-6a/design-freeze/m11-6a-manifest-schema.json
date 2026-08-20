@@ -1,0 +1,43 @@
+{
+  "forbidden_fields": [
+    "metrics",
+    "performance",
+    "accuracy",
+    "top1",
+    "mrr",
+    "coverage_measured"
+  ],
+  "kind": "M11_6A_MANIFEST_SCHEMA",
+  "must_not_contain_model_performance_metrics": true,
+  "required_fields": [
+    "schema_version",
+    "design_freeze_commit_sha",
+    "design_protocol_sha256",
+    "generator_source_sha256",
+    "evaluator_source_sha256",
+    "seed_derivation",
+    "master_seeds",
+    "splits",
+    "topologies",
+    "scenarios",
+    "artifact_sha256",
+    "simulator",
+    "generation_complete",
+    "overlap_audit",
+    "novelty_audit",
+    "evaluated_by_finalist",
+    "locked_test_opened"
+  ],
+  "schema_version": "hydroswarm-m11-6-materialization-manifest-v1",
+  "storage_convention": {
+    "content_addressing": "every artifact's SHA-256 is recorded in artifact_sha256; the manifest is the authoritative content-addressed record",
+    "layout": [
+      "data/locked/m11-6/topologies/<topology_id>.inp",
+      "data/locked/m11-6/locked_final_test/scenarios.jsonl",
+      "data/locked/m11-6/locked_topology_test/scenarios.jsonl",
+      "data/locked/m11-6/m11-6-materialization-manifest.json"
+    ],
+    "root": "data/locked/m11-6/",
+    "tracking": "ordinary Git tracked text (definitions-only, deterministic WNTR replay); no Git LFS (LFS is reserved for large binary tensor corpora per .gitattributes)"
+  }
+}

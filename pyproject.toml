@@ -31,6 +31,14 @@ dependencies = [
 console = ["streamlit>=1.41"]
 openvino = ["openvino>=2026.0"]
 report = ["pdfplumber>=0.11", "pypdf>=6.0", "reportlab>=4.4"]
+# HydroCore-v5 Milestone 9.1 preflight (docs/evaluation/
+# HYDROCORE_V5_M9_1_PREFLIGHT_PROTOCOL.md): differentiable ODE/CDE/SDE
+# solvers for the GRAPH_ODE/GRAPH_CDE/GRAPH_SDE continuous-time architecture
+# candidates (src/hydroswarm/model/continuous_time.py). Research/experiment
+# dependencies only -- never required at normal HydroSwarm runtime; all
+# three are imported lazily (try/except) so `import hydroswarm` never fails
+# if this group is not installed.
+continuous-time = ["torchdiffeq>=0.2.5", "torchcde>=0.2.5", "torchsde>=0.2.6"]
 dev = [
   "build>=1.2",
   "hypothesis>=6.120",

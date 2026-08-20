@@ -1,0 +1,583 @@
+{
+  "benchmark_sweep": [
+    {
+      "actual_node_count": 10,
+      "arm": "CURRENT_WNTR_PDD",
+      "deterministic_repeatability": true,
+      "max_pressure_m": 110.33562892215583,
+      "min_pressure_m": 106.52249110583054,
+      "repeats": [
+        {
+          "elapsed_ms": 50.833363995479885,
+          "fingerprint": "f973b75031fe70015fb0de88e175d83964cba43ad24699b78677a5b92494342a"
+        },
+        {
+          "elapsed_ms": 53.2048430031864,
+          "fingerprint": "f973b75031fe70015fb0de88e175d83964cba43ad24699b78677a5b92494342a"
+        }
+      ],
+      "status": "OK",
+      "target_node_count": 10,
+      "warmup_ms": 54.352269995433744
+    },
+    {
+      "actual_node_count": 10,
+      "arm": "EPANET_PDD",
+      "deterministic_repeatability": true,
+      "max_pressure_m": 110.33561706542969,
+      "min_pressure_m": 106.52249145507812,
+      "repeats": [
+        {
+          "elapsed_ms": 45.638215997314546,
+          "fingerprint": "1fedf06069f9847a2e1e60479c04d35c450b460bc1ccb828bd8c3b5dc493b280"
+        },
+        {
+          "elapsed_ms": 48.70936599763809,
+          "fingerprint": "1fedf06069f9847a2e1e60479c04d35c450b460bc1ccb828bd8c3b5dc493b280"
+        }
+      ],
+      "status": "OK",
+      "target_node_count": 10,
+      "warmup_ms": 46.48834899853682
+    },
+    {
+      "actual_node_count": 10,
+      "arm": "WNTR_DDA",
+      "deterministic_repeatability": true,
+      "max_pressure_m": 110.33562892216527,
+      "min_pressure_m": 106.52249110584253,
+      "repeats": [
+        {
+          "elapsed_ms": 51.80350600130623,
+          "fingerprint": "989afa0c1d560debaaf5cf13f5db765998beccc6e3d7bf484891cef44719dc62"
+        },
+        {
+          "elapsed_ms": 46.46321399923181,
+          "fingerprint": "989afa0c1d560debaaf5cf13f5db765998beccc6e3d7bf484891cef44719dc62"
+        }
+      ],
+      "status": "OK",
+      "target_node_count": 10,
+      "warmup_ms": 48.23376800050028
+    },
+    {
+      "actual_node_count": 10,
+      "arm": "EPANET_DDA",
+      "deterministic_repeatability": true,
+      "max_pressure_m": 110.33561706542969,
+      "min_pressure_m": 106.52249145507812,
+      "repeats": [
+        {
+          "elapsed_ms": 47.890385998471174,
+          "fingerprint": "06bc6d0dd6395cd79d223a435742ed095a9cbfe8c31cbe5d691017c99291fa4b"
+        },
+        {
+          "elapsed_ms": 45.64783200476086,
+          "fingerprint": "06bc6d0dd6395cd79d223a435742ed095a9cbfe8c31cbe5d691017c99291fa4b"
+        }
+      ],
+      "status": "OK",
+      "target_node_count": 10,
+      "warmup_ms": 47.76202100038063
+    },
+    {
+      "arm": "CURRENT_WNTR_PDD",
+      "error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 25
+    },
+    {
+      "actual_node_count": 25,
+      "arm": "EPANET_PDD",
+      "deterministic_repeatability": true,
+      "max_pressure_m": 111.32968139648438,
+      "min_pressure_m": 106.50658416748047,
+      "repeats": [
+        {
+          "elapsed_ms": 54.481226005009376,
+          "fingerprint": "cf7fc72d117924aa57ad4a31414bf7cf9365e1167aa8d3d6af036e538cb32464"
+        },
+        {
+          "elapsed_ms": 54.09005699766567,
+          "fingerprint": "cf7fc72d117924aa57ad4a31414bf7cf9365e1167aa8d3d6af036e538cb32464"
+        }
+      ],
+      "status": "OK",
+      "target_node_count": 25,
+      "warmup_ms": 54.32580699562095
+    },
+    {
+      "arm": "WNTR_DDA",
+      "error": "SimulationTimeoutError: WNTR_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 25
+    },
+    {
+      "actual_node_count": 25,
+      "arm": "EPANET_DDA",
+      "deterministic_repeatability": true,
+      "max_pressure_m": 111.32968139648438,
+      "min_pressure_m": 106.50658416748047,
+      "repeats": [
+        {
+          "elapsed_ms": 48.38786299660569,
+          "fingerprint": "0f047437f51d1a08971c1e05223ab49ef5ff564ade4b414566eea0b491d764c1"
+        },
+        {
+          "elapsed_ms": 51.95282800559653,
+          "fingerprint": "0f047437f51d1a08971c1e05223ab49ef5ff564ade4b414566eea0b491d764c1"
+        }
+      ],
+      "status": "OK",
+      "target_node_count": 25,
+      "warmup_ms": 52.49870700208703
+    },
+    {
+      "arm": "CURRENT_WNTR_PDD",
+      "error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 50
+    },
+    {
+      "arm": "EPANET_PDD",
+      "error": "SimulationTimeoutError: EPANET_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 50
+    },
+    {
+      "arm": "WNTR_DDA",
+      "error": "SimulationTimeoutError: WNTR_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 50
+    },
+    {
+      "arm": "EPANET_DDA",
+      "error": "SimulationTimeoutError: EPANET_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 50
+    },
+    {
+      "arm": "CURRENT_WNTR_PDD",
+      "error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 100
+    },
+    {
+      "arm": "EPANET_PDD",
+      "error": "SimulationTimeoutError: EPANET_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 100
+    },
+    {
+      "arm": "WNTR_DDA",
+      "error": "SimulationTimeoutError: WNTR_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 100
+    },
+    {
+      "arm": "EPANET_DDA",
+      "error": "SimulationTimeoutError: EPANET_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 100
+    },
+    {
+      "arm": "CURRENT_WNTR_PDD",
+      "error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 250
+    },
+    {
+      "arm": "EPANET_PDD",
+      "error": "SimulationTimeoutError: EPANET_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 250
+    },
+    {
+      "arm": "WNTR_DDA",
+      "error": "SimulationTimeoutError: WNTR_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 250
+    },
+    {
+      "arm": "EPANET_DDA",
+      "error": "SimulationTimeoutError: EPANET_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 250
+    },
+    {
+      "arm": "CURRENT_WNTR_PDD",
+      "error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 500
+    },
+    {
+      "arm": "EPANET_PDD",
+      "error": "SimulationTimeoutError: EPANET_PDD exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 500
+    },
+    {
+      "arm": "WNTR_DDA",
+      "error": "SimulationTimeoutError: WNTR_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 500
+    },
+    {
+      "arm": "EPANET_DDA",
+      "error": "SimulationTimeoutError: EPANET_DDA exceeded the 60-second timeout",
+      "status": "FAILED",
+      "target_node_count": 500
+    }
+  ],
+  "branch": "exp/hydrocore-v5-causal",
+  "capability_matrix": {
+    "EPANET_DDA": {
+      "hydraulic_output_present": true,
+      "node_result_keys": [
+        "demand",
+        "head",
+        "pressure",
+        "quality"
+      ],
+      "supported": true
+    },
+    "EPANET_PDD": {
+      "hydraulic_output_present": true,
+      "node_result_keys": [
+        "demand",
+        "head",
+        "pressure",
+        "quality"
+      ],
+      "supported": true
+    },
+    "EPANET_WATER_QUALITY": {
+      "reason": "production's own simulate_incident/_run_epanet path already uses this; re-verified in Section 7.",
+      "supported": true
+    },
+    "WNTR_NATIVE_DDA": {
+      "hydraulic_output_present": true,
+      "node_result_keys": [
+        "demand",
+        "head",
+        "leak_demand",
+        "pressure"
+      ],
+      "supported": true
+    },
+    "WNTR_NATIVE_PDD": {
+      "hydraulic_output_present": true,
+      "node_result_keys": [
+        "demand",
+        "head",
+        "leak_demand",
+        "pressure"
+      ],
+      "supported": true
+    },
+    "WNTR_NATIVE_WATER_QUALITY": {
+      "node_result_keys": [
+        "demand",
+        "head",
+        "leak_demand",
+        "pressure"
+      ],
+      "reason": "no `quality` result key; native WNTRSimulator does not simulate water quality",
+      "supported": false
+    },
+    "wntr_version": "1.5.0"
+  },
+  "decision": {
+    "criteria": {
+      "1_materially_better_scalability": true,
+      "2_meaningfully_larger_network": false,
+      "3_hydraulically_close_on_overlap": true,
+      "4_safety_decision_equivalent_on_plans": true,
+      "5_acceptable_under_stress": true,
+      "6_water_quality_capability_preserved": true,
+      "7_no_safety_threshold_weakened": true
+    },
+    "critical_methodological_finding": "CONFIRMED: at least one arm succeeds in milliseconds when called directly (unwrapped) but times out through HydraulicSimulator._run_with_timeout (wrapped) at the same size. This means the process-completion detection in the fork-based timeout wrapper -- not the solver engine or demand model -- is the actual scalability driver Milestone 8 observed. The apparent 'PDD bottleneck' is very likely this wrapper artifact, not a genuine PDD/engine performance limitation. Root-causing the exact OS/signal-handling mechanism (this sandbox's SIGCHLD/process-reaping behavior is the leading suspect, given the unrelated zombie-process accumulation already observed in this same environment across Milestones 7B/8) is out of scope for this diagnostic milestone.",
+    "decision": "PDD_SCALABILITY_BLOCKER_REMAINS",
+    "largest_current_wntr_pdd_completed": 10,
+    "largest_epanet_pdd_completed": 25,
+    "m9_scientifically_unblocked": true,
+    "m9_unblock_rationale": "M8/M8.5 diagnose a solver-PERFORMANCE limitation, not a data-integrity or model-input correctness issue -- HydroCore's own inputs/training/calibration are untouched and unaffected by this finding at the network sizes M9's capacity study is expected to use. M8.5's own confound check further shows the limitation most likely sits in HydraulicSimulator._run_with_timeout's fork-based process-completion detection (this execution sandbox specifically), not in PDD or any specific solver engine -- an important correction to M8's own attribution, but still a backend-engineering question orthogonal to HydroCore's architecture/training/calibration. Engineering remediation of the hydraulic backend (if pursued) remains separate from M9.",
+    "wrapper_confound_detected": true
+  },
+  "equivalence_checks": {
+    "benign": {
+      "10": {
+        "arm_a": "CURRENT_WNTR_PDD",
+        "arm_b": "EPANET_PDD",
+        "below_minimum_pressure_junctions_a": [],
+        "below_minimum_pressure_junctions_b": [],
+        "below_minimum_pressure_sets_match": true,
+        "classification": {
+          "NUMERICALLY_CLOSE": true,
+          "SAFETY_DECISION_EQUIVALENT": true,
+          "thresholds": {
+            "max_abs_demand_diff_m3s": 1e-05,
+            "max_abs_pressure_diff_m": 1.0,
+            "max_rel_demand_diff": 0.05,
+            "service_availability_diff_pp": 1.0
+          }
+        },
+        "demand_diff": {
+          "max_abs": 9.326897745169475e-08,
+          "max_rel": 6.317171708418447e-05,
+          "mean_abs": 9.121767990556956e-08,
+          "mean_rel": 5.3195505107435785e-05,
+          "median_abs": 9.124975012056447e-08,
+          "median_rel": 5.412427291800566e-05,
+          "p95_abs": 9.273607331973955e-08,
+          "p95_rel": 6.313558879558927e-05
+        },
+        "n_nodes": 10,
+        "pressure_diff": {
+          "max_abs": 1.1150313795837974e-05,
+          "max_rel": 1.0105863307514785e-07,
+          "mean_abs": 5.252023538560025e-06,
+          "mean_rel": 4.855978260925895e-08,
+          "median_abs": 4.351707922012338e-06,
+          "median_rel": 4.0362241203440534e-08,
+          "p95_abs": 1.0348883890998193e-05,
+          "p95_rel": 9.495229010387732e-08
+        },
+        "service_availability_a": 1.0,
+        "service_availability_b": 1.0
+      }
+    },
+    "overlap_sizes": [
+      10
+    ]
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "node_count_targets": [
+    10,
+    25,
+    50,
+    100,
+    250,
+    500
+  ],
+  "plan_verification_check": {
+    "disagreements": [],
+    "network_node_count": 10,
+    "per_plan": {
+      "LOW_IMPACT": {
+        "agree": true,
+        "decision_a": "VERIFIED",
+        "decision_b": "VERIFIED",
+        "minimum_pressure_m_a": 106.52249110583054,
+        "minimum_pressure_m_b": 106.52249145507812,
+        "rejection_codes_a": [],
+        "rejection_codes_b": [],
+        "service_availability_a": 1.0,
+        "service_availability_b": 1.0,
+        "unserved_demand_l_a": 4.2934406030425976e-11,
+        "unserved_demand_l_b": 0.0
+      },
+      "NO_ACTION": {
+        "agree": true,
+        "decision_a": "VERIFIED",
+        "decision_b": "VERIFIED",
+        "minimum_pressure_m_a": 106.52249110583054,
+        "minimum_pressure_m_b": 106.52249145507812,
+        "rejection_codes_a": [],
+        "rejection_codes_b": [],
+        "service_availability_a": 1.0,
+        "service_availability_b": 1.0,
+        "unserved_demand_l_a": 0.0,
+        "unserved_demand_l_b": 0.0
+      },
+      "STRESSFUL": {
+        "agree": true,
+        "decision_a": "REJECTED",
+        "decision_b": "REJECTED",
+        "minimum_pressure_m_a": 0.0,
+        "minimum_pressure_m_b": -3.811702251434326,
+        "rejection_codes_a": [
+          "PRESSURE_BELOW_MINIMUM"
+        ],
+        "rejection_codes_b": [
+          "PRESSURE_BELOW_MINIMUM"
+        ],
+        "service_availability_a": 0.9736057896977423,
+        "service_availability_b": 0.973606015607658,
+        "unserved_demand_l_a": 67406.40006607395,
+        "unserved_demand_l_b": 67408.1303179264
+      }
+    },
+    "plan_rejection_agreement_rate": 1.0
+  },
+  "production_source_hashes_after": {
+    "src/hydroswarm/simulation/verifier.py": "8511371ea4bca43bd45189d7543f0845f1e88390e0b37a52641cc80f9b770205",
+    "src/hydroswarm/simulation/wrapper.py": "0d46b2dbe9ee58d4025186940b0ae30a7ccd83278a392c61357f33a43d75006a"
+  },
+  "production_source_hashes_before": {
+    "src/hydroswarm/simulation/verifier.py": "8511371ea4bca43bd45189d7543f0845f1e88390e0b37a52641cc80f9b770205",
+    "src/hydroswarm/simulation/wrapper.py": "0d46b2dbe9ee58d4025186940b0ae30a7ccd83278a392c61357f33a43d75006a"
+  },
+  "production_source_unchanged": true,
+  "purpose": "Milestone 8.5: hydraulic backend diagnostic for the PDD scalability bottleneck found in Milestone 8.",
+  "repeats_after_warmup": 2,
+  "schema_version": 1,
+  "stress_checks": {
+    "results": {
+      "10": {
+        "arm_a": "CURRENT_WNTR_PDD",
+        "arm_b": "EPANET_PDD",
+        "below_minimum_pressure_junctions_a": [
+          "J1",
+          "J10",
+          "J2",
+          "J3",
+          "J4",
+          "J5",
+          "J6",
+          "J7",
+          "J8",
+          "J9"
+        ],
+        "below_minimum_pressure_junctions_b": [
+          "J1",
+          "J10",
+          "J2",
+          "J3",
+          "J4",
+          "J5",
+          "J6",
+          "J7",
+          "J8",
+          "J9"
+        ],
+        "below_minimum_pressure_sets_match": true,
+        "classification": {
+          "NUMERICALLY_CLOSE": true,
+          "SAFETY_DECISION_EQUIVALENT": true,
+          "thresholds": {
+            "max_abs_demand_diff_m3s": 1e-05,
+            "max_abs_pressure_diff_m": 1.0,
+            "max_rel_demand_diff": 0.05,
+            "service_availability_diff_pp": 1.0
+          }
+        },
+        "demand_diff": {
+          "max_abs": 1.2514595302754313e-08,
+          "max_rel": 12.514595302754312,
+          "mean_abs": 1.1081178197047656e-08,
+          "mean_rel": 11.081178197047658,
+          "median_abs": 1.1078938551648143e-08,
+          "median_rel": 11.078938551648143,
+          "p95_abs": 1.2412404072501658e-08,
+          "p95_rel": 12.412404072501657
+        },
+        "n_nodes": 10,
+        "pressure_diff": {
+          "max_abs": 1.7902564763971895e-06,
+          "max_rel": 1.5393307392961123e-07,
+          "mean_abs": 1.138472684658609e-06,
+          "mean_rel": 9.62934978852193e-08,
+          "median_abs": 1.1240596577977158e-06,
+          "median_rel": 1.0222340947195101e-07,
+          "p95_abs": 1.7879225929107178e-06,
+          "p95_rel": 1.4429406633514337e-07
+        },
+        "service_availability_a": 0.0,
+        "service_availability_b": 0.0
+      }
+    },
+    "sizes_tested": [
+      10
+    ],
+    "stress_mechanism": "every reservoir base_head scaled to 40% of nominal"
+  },
+  "timeout_seconds": 60.0,
+  "water_quality_check": {
+    "note": "production's own simulate_incident already runs EPANET_PDD's exact engine+demand-model combination; this checks whether that already-shared path succeeds at the sizes where PDD hydraulics-only (Section 2) succeeds.",
+    "results": {
+      "10": {
+        "elapsed_ms": 51.74396000074921,
+        "has_concentration_output": true,
+        "source_node_represented": true,
+        "status": "OK",
+        "timestamps_count": 25
+      }
+    },
+    "sizes_tested": [
+      10
+    ]
+  },
+  "wrapper_confound_check": {
+    "interpretation": "CONFIRMED: at least one arm succeeds in milliseconds when called directly (unwrapped) but times out through HydraulicSimulator._run_with_timeout (wrapped) at the same size. This means the process-completion detection in the fork-based timeout wrapper -- not the solver engine or demand model -- is the actual scalability driver Milestone 8 observed. The apparent 'PDD bottleneck' is very likely this wrapper artifact, not a genuine PDD/engine performance limitation. Root-causing the exact OS/signal-handling mechanism (this sandbox's SIGCHLD/process-reaping behavior is the leading suspect, given the unrelated zombie-process accumulation already observed in this same environment across Milestones 7B/8) is out of scope for this diagnostic milestone.",
+    "results": {
+      "25": {
+        "CURRENT_WNTR_PDD": {
+          "confound_detected": true,
+          "unwrapped_ms": 47.95440500311088,
+          "unwrapped_status": "OK",
+          "wrapped_error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 20-second timeout",
+          "wrapped_status": "FAILED"
+        },
+        "EPANET_DDA": {
+          "confound_detected": false,
+          "unwrapped_ms": 15.383190002467018,
+          "unwrapped_status": "OK",
+          "wrapped_ms": 55.89089800196234,
+          "wrapped_status": "OK"
+        },
+        "EPANET_PDD": {
+          "confound_detected": false,
+          "unwrapped_ms": 21.10224199714139,
+          "unwrapped_status": "OK",
+          "wrapped_ms": 58.06294299691217,
+          "wrapped_status": "OK"
+        },
+        "WNTR_DDA": {
+          "confound_detected": true,
+          "unwrapped_ms": 29.788595995341893,
+          "unwrapped_status": "OK",
+          "wrapped_error": "SimulationTimeoutError: WNTR_DDA exceeded the 20-second timeout",
+          "wrapped_status": "FAILED"
+        }
+      },
+      "50": {
+        "CURRENT_WNTR_PDD": {
+          "confound_detected": true,
+          "unwrapped_ms": 87.43919499829644,
+          "unwrapped_status": "OK",
+          "wrapped_error": "SimulationTimeoutError: CURRENT_WNTR_PDD exceeded the 20-second timeout",
+          "wrapped_status": "FAILED"
+        },
+        "EPANET_DDA": {
+          "confound_detected": true,
+          "unwrapped_ms": 18.907398996816482,
+          "unwrapped_status": "OK",
+          "wrapped_error": "SimulationTimeoutError: EPANET_DDA exceeded the 20-second timeout",
+          "wrapped_status": "FAILED"
+        },
+        "EPANET_PDD": {
+          "confound_detected": true,
+          "unwrapped_ms": 24.839443001837935,
+          "unwrapped_status": "OK",
+          "wrapped_error": "SimulationTimeoutError: EPANET_PDD exceeded the 20-second timeout",
+          "wrapped_status": "FAILED"
+        },
+        "WNTR_DDA": {
+          "confound_detected": true,
+          "unwrapped_ms": 208.85513299435843,
+          "unwrapped_status": "OK",
+          "wrapped_error": "SimulationTimeoutError: WNTR_DDA exceeded the 20-second timeout",
+          "wrapped_status": "FAILED"
+        }
+      }
+    },
+    "sizes_tested": [
+      25,
+      50
+    ],
+    "wrapper_confound_detected": true
+  }
+}

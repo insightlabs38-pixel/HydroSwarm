@@ -1,0 +1,83 @@
+{
+  "locked_test_opened_after": false,
+  "node_ids": [
+    "J1",
+    "J2",
+    "J3",
+    "J4"
+  ],
+  "per_depth": {
+    "1": {
+      "classical_mrr": 0.5090277777777777,
+      "classical_top1": 0.23333333333333334,
+      "classical_top3": 0.725,
+      "distinguishable_source_fraction": 0.0,
+      "mean_pairwise_signature_correlation": 0.15990579366363203,
+      "mean_source_ambiguity_count": 3.9833333333333334,
+      "mean_true_source_probability": 0.25036746400098003,
+      "n": 120
+    },
+    "12": {
+      "classical_mrr": 0.9388888888888888,
+      "classical_top1": 0.9,
+      "classical_top3": 0.9833333333333333,
+      "distinguishable_source_fraction": 0.95,
+      "mean_pairwise_signature_correlation": 0.029277690334814064,
+      "mean_source_ambiguity_count": 1.0583333333333333,
+      "mean_true_source_probability": 0.6317098152202865,
+      "n": 120
+    },
+    "2": {
+      "classical_mrr": 0.6611111111111111,
+      "classical_top1": 0.49166666666666664,
+      "classical_top3": 0.8,
+      "distinguishable_source_fraction": 0.5333333333333333,
+      "mean_pairwise_signature_correlation": 0.047705573434464195,
+      "mean_source_ambiguity_count": 1.475,
+      "mean_true_source_probability": 0.35457330166051787,
+      "n": 120
+    },
+    "25": {
+      "classical_mrr": 0.9388888888888888,
+      "classical_top1": 0.9,
+      "classical_top3": 0.9833333333333333,
+      "distinguishable_source_fraction": 0.95,
+      "mean_pairwise_signature_correlation": 0.13015045522549348,
+      "mean_source_ambiguity_count": 1.05,
+      "mean_true_source_probability": 0.6287638914460937,
+      "n": 120
+    },
+    "3": {
+      "classical_mrr": 0.7305555555555555,
+      "classical_top1": 0.5916666666666667,
+      "classical_top3": 0.85,
+      "distinguishable_source_fraction": 1.0,
+      "mean_pairwise_signature_correlation": -0.010361115914096395,
+      "mean_source_ambiguity_count": 1.0,
+      "mean_true_source_probability": 0.4357521115181347,
+      "n": 120
+    },
+    "4": {
+      "classical_mrr": 0.8979166666666667,
+      "classical_top1": 0.8333333333333334,
+      "classical_top3": 0.9583333333333334,
+      "distinguishable_source_fraction": 0.8833333333333333,
+      "mean_pairwise_signature_correlation": -0.0657513494643922,
+      "mean_source_ambiguity_count": 1.125,
+      "mean_true_source_probability": 0.5654185785911977,
+      "n": 120
+    },
+    "6": {
+      "classical_mrr": 0.9694444444444444,
+      "classical_top1": 0.9416666666666667,
+      "classical_top3": 1.0,
+      "distinguishable_source_fraction": 0.975,
+      "mean_pairwise_signature_correlation": -0.09876480449462964,
+      "mean_source_ambiguity_count": 1.025,
+      "mean_true_source_probability": 0.6299590962628524,
+      "n": 120
+    }
+  },
+  "purpose": "Milestone 1.2: deterministic/classical separability diagnostic -- prevents treating physically ambiguous low-depth observations as a neural failure. Computed on development_holdout only, never train/calibration/locked.",
+  "schema_version": 1
+}

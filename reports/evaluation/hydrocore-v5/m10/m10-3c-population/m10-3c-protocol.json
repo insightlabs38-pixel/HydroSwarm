@@ -1,0 +1,70 @@
+{
+  "kind": "M10_3C_POPULATION_PROTOCOL",
+  "milestone": "M10.3C",
+  "families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "depth_buckets": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    25
+  ],
+  "maximum_plan_count": 9,
+  "seed_namespace_base": 1400000000,
+  "family_seed_offset": {
+    "golden-reference": 0,
+    "branched-loop": 10000000,
+    "loop-grid": 20000000
+  },
+  "family_seed_base": {
+    "golden-reference": 1400000000,
+    "branched-loop": 1410000000,
+    "loop-grid": 1420000000
+  },
+  "reserved_future_m10_3d_seed_base": 1450000000,
+  "source_round_robin": true,
+  "split_label": "development_holdout",
+  "per_family_count": 180,
+  "per_cell_count": 30,
+  "total_scenario_count": 540,
+  "gate": {
+    "diversity_2plus_fraction_threshold": 0.35,
+    "diversity_3plus_fraction_threshold": 0.1,
+    "diversity_min_contributing_cells": 3,
+    "diversity_cell_min_support": 20,
+    "oracle_meaningful_gain_fraction_threshold": 0.2,
+    "oracle_mean_gain_threshold": 0.05,
+    "oracle_no_action_near_optimal_max": 0.75,
+    "oracle_min_contributing_cells": 3,
+    "oracle_cell_min_support": 20,
+    "conditional_family_clear_fail_diversity_max": 0.2,
+    "conditional_family_clear_fail_oracle_max": 0.1,
+    "family_level_min_support": 100,
+    "decision_tree": "1) unbuildable population -> BLOCKED. 2) pooled diversity_pass AND pooled oracle_pass -> PASS. 3) else >=1 FAMILY_PASS and >=1 different FAMILY_CLEAR_FAIL -> CONDITIONAL scoped to the passing family/families. 4) else >=1 FAMILY_PASS but no FAMILY_CLEAR_FAIL (no clean regime split) -> NOT_JUSTIFIED (conservative default, no cherry-picking). 5) else (no family passes) -> NOT_JUSTIFIED."
+  },
+  "m10_3b_baseline": {
+    "fraction_2plus_distinguishable_plan_value": 0.175,
+    "fraction_3plus_distinguishable_plan_value": 0.0,
+    "oracle_meaningful_gain_fraction": 0.096,
+    "oracle_mean_gain": 0.022,
+    "no_action_near_optimal_fraction": 0.904
+  },
+  "protocol_hash": "56f1f62b2974699e4d7ee1acac02531f038208247a3728de0e6924c074f7cfb3",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "4edcf0fe349124653f93ee952cf8151b0ccce257",
+  "amends_nothing_in": [
+    "docs/evaluation/HYDROCORE_V5_M10_3_STRATEGIST_PREFLIGHT_REFIT.md",
+    "docs/evaluation/HYDROCORE_V5_M10_3_STRATEGIST_REFIT_RESULTS.md",
+    "docs/evaluation/HYDROCORE_V5_M10_3B_STRATEGIST_DIAGNOSIS.md",
+    "reports/evaluation/hydrocore-v5/m10/m10-3-refit/*",
+    "reports/evaluation/hydrocore-v5/m10/m10-3b-diagnosis/*"
+  ],
+  "trains_nothing": true,
+  "touches_no_checkpoint": true,
+  "locked_test_opened_before": false
+}

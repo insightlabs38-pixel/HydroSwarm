@@ -1,0 +1,19 @@
+{
+  "authorization_consumed": false,
+  "blocker_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "branch": "exp/hydrocore-v5-causal",
+  "design_hash": "20064961f5ff5bb39490588960bdbf91964d0f72ca420246e50bb92234c20414",
+  "expected_blocker_head": "6c84b3b710f50c9bf58f6f76d881af7f32e0710b",
+  "frozen_finalist_identity_verified": true,
+  "head": "b561add678ad7ef7c9ac4f153dce9b9d30dd3f55",
+  "kind": "M11_6A_DESIGN_PREFLIGHT",
+  "locked_evaluation_authorized": false,
+  "locked_open_count_at_start": 0,
+  "locked_test_opened": false,
+  "m11_5_matrix_green": true,
+  "m11_5_state": "M11_5_FULL_VALIDATION_PASS",
+  "m11_6_preconditions_satisfied": true,
+  "repository": "insightlabs38-pixel/HydroSwarm",
+  "tuning_closed": true,
+  "worktree_clean": false
+}

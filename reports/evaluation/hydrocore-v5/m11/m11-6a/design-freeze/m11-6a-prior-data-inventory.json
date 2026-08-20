@@ -1,0 +1,222 @@
+{
+  "frozen_regression_fixtures": {
+    "data/frozen/golden_scenario.json": {
+      "path": "data/frozen/golden_scenario.json",
+      "sha256": "ad7a80496f3501d0e53b0a6aac80cad349b73b7c97b9ae7698a28e57a8c76a06"
+    },
+    "data/frozen/live_example_network.inp": {
+      "path": "data/frozen/live_example_network.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    },
+    "data/frozen/live_example_scenario.json": {
+      "path": "data/frozen/live_example_scenario.json",
+      "sha256": "9fe2fa3bf3ba706cedb0a7557d00522ff5693bcf3a1823add730a36ffddc7af4"
+    },
+    "data/frozen/manifest.json": {
+      "path": "data/frozen/manifest.json",
+      "sha256": "8ec6082765ff2a78ac061db557483b2568334241ec933a8a6ce431acc0c08a08"
+    }
+  },
+  "kind": "M11_6A_PRIOR_DATA_INVENTORY",
+  "locked_splits_never_used": [
+    "locked_final_test",
+    "locked_topology_test"
+  ],
+  "no_relabeling": "data/frozen regression/golden fixtures and every M0-M11.5 development/validation/OOD population MUST NOT be relabeled as the final locked evaluation (task Section 0).",
+  "note": "provenance/hashes/ranges only -- establishes the formal NON-OVERLAP rule; contains no historical outcome tables and no candidate locked examples",
+  "prior_topology_file_bytes": [
+    {
+      "path": "data/frozen/golden_network.inp",
+      "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
+    },
+    {
+      "path": "data/topology-transfer/branched-loop.inp",
+      "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed"
+    },
+    {
+      "path": "data/topologies/loop-grid.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    },
+    {
+      "path": "data/topologies/coastal-branch.inp",
+      "sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f"
+    },
+    {
+      "path": "data/frozen/live_example_network.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    }
+  ],
+  "seed_namespaces": {
+    "m10_1": [
+      1100000000,
+      1199999999
+    ],
+    "m10_2": [
+      1200000000,
+      1299999999
+    ],
+    "m10_3": [
+      1300000000,
+      1399999999
+    ],
+    "m10_3c_population": [
+      1400000000,
+      1449999999
+    ],
+    "m10_3d_reserved_unused": [
+      1450000000,
+      1499999999
+    ],
+    "m10_4": [
+      1500000000,
+      1599999999
+    ],
+    "m1_split_seed_ranges": [
+      900000000,
+      903999999
+    ],
+    "m6": [
+      960000000,
+      969999999
+    ],
+    "m7_seed_bases": [
+      940000000,
+      989999999
+    ],
+    "m9_4_floor_and_up": [
+      990000000,
+      1099999999
+    ]
+  },
+  "split_roles_used": [
+    "train",
+    "validation",
+    "calibration",
+    "development_holdout",
+    "ood_development"
+  ],
+  "topology_families": [
+    {
+      "cycle_rank": 2,
+      "degree_profile": [
+        1,
+        2,
+        2,
+        3,
+        3,
+        3
+      ],
+      "junction_count": 4,
+      "link_count": 7,
+      "name": "golden-reference",
+      "network_sha256": "5508d2721298ea31b9caa37db81fa90d66a5b7fb17587f78cd5b9bcf8f299c8c",
+      "node_count": 6
+    },
+    {
+      "cycle_rank": 1,
+      "degree_profile": [
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        3,
+        3
+      ],
+      "junction_count": 7,
+      "link_count": 8,
+      "name": "branched-loop",
+      "network_sha256": "9926474d1f8e7925d47ad3d77740cd27ff1b6d1d42f95d87acca52e244c01d46",
+      "node_count": 8
+    },
+    {
+      "cycle_rank": 3,
+      "degree_profile": [
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "junction_count": 8,
+      "link_count": 11,
+      "name": "loop-grid",
+      "network_sha256": "35af6056fe885934bc8bda9b1e6ac178926ac24cac47bc8f2c00fb045730c2a9",
+      "node_count": 9
+    },
+    {
+      "cycle_rank": 1,
+      "degree_profile": [
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        2,
+        4
+      ],
+      "junction_count": 6,
+      "link_count": 8,
+      "name": "coastal-branch",
+      "network_sha256": "76692a7d8d51b82d480a3a366bb7e0b13052b368f74db0a4a26377c6fdfdcd3f",
+      "node_count": 8
+    },
+    {
+      "cycle_rank": 0,
+      "degree_profile": [
+        1,
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "junction_count": 5,
+      "link_count": 5,
+      "name": "tree-branch",
+      "network_sha256": "530fa29d583cf80f3a8388922b76b0e4d21024dc32c544cce7031123b1294f5a",
+      "node_count": 6
+    },
+    {
+      "cycle_rank": 3,
+      "degree_profile": [
+        1,
+        2,
+        2,
+        2,
+        3,
+        3,
+        5
+      ],
+      "junction_count": 6,
+      "link_count": 9,
+      "name": "dense-loop",
+      "network_sha256": "7c0e5fecd6e93b0d4a2dc93a230e348f2efaf13c7a436af6501c588fbaf06fc8",
+      "node_count": 7
+    }
+  ],
+  "topology_files": {
+    "branched-loop": {
+      "path": "data/topology-transfer/branched-loop.inp",
+      "sha256": "c1a4a9cf61354ef127f1d539002cc3bcfcf57965bc124983acf53905f89418ed"
+    },
+    "coastal-branch": {
+      "path": "data/topologies/coastal-branch.inp",
+      "sha256": "cf7c160ff81a13158093de3bfd614eb88ab49ba445d71b662cd6f275b9005f3f"
+    },
+    "golden-reference": {
+      "path": "data/frozen/golden_network.inp",
+      "sha256": "be87afc15834e215185fad504004fdd579c69dcc3030a60407b06e9e701458ef"
+    },
+    "loop-grid": {
+      "path": "data/topologies/loop-grid.inp",
+      "sha256": "ec01aa0347de9dba09e38094813c04483fda3bc391a95e5122d42936c20a09d6"
+    }
+  }
+}

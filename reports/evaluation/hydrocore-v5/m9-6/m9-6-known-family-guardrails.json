@@ -1,0 +1,21 @@
+{
+  "arm_b_retention_branched_loop_and_loop_grid": {
+    "branched-loop": {
+      "EARLY_top1_mean": 0.31507936507936507,
+      "MATURE_top1_mean": 0.6642857142857143
+    },
+    "golden-reference": {
+      "EARLY_top1_mean": 0.4236111111111111,
+      "MATURE_top1_mean": 0.9791666666666666
+    },
+    "loop-grid": {
+      "EARLY_top1_mean": 0.2652777777777778,
+      "MATURE_top1_mean": 0.5
+    }
+  },
+  "golden_reference_early_regression_pp": 4.1666666666666625,
+  "golden_reference_mature_regression_pp": 0.2083333333333437,
+  "golden_reference_mrr_regression": 0.01649305555555547,
+  "note": "golden-reference is the only family with a paired ARM_A comparison; branched-loop/loop-grid are reported as ARM_B-only retention figures, never blended into the regression comparison.",
+  "passed": true
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7 Section 4: S vs M parameter-count and semantic-parity audit table.",
+  "milestone": "M9.7",
+  "rows": [
+    {
+      "model": "HydroCore-S",
+      "variant": "small",
+      "trainable_parameters": 4182612,
+      "parameter_ratio_M_over_S": 1.0,
+      "graph_stages": [
+        "node_encoder",
+        "graph_encoder",
+        "modality_fusion",
+        "backbone x4 (LatentHydraulicBlock)",
+        "final_norm"
+      ],
+      "temporal_stages": [
+        "TemporalEncoder (1 TransformerEncoderLayer, d_model=192, nhead=6, dim_feedforward=576)",
+        "QualityEncoder (same shape, independent instance)"
+      ],
+      "number_of_output_heads": 23,
+      "input_schema": "node_feature_dim=19, edge_feature_dim=13, temporal_feature_dim=6, quality_feature_dim=4, role/action/verifier=8, residual=4",
+      "output_schema": "HydroOutput TypedDict, identical field set for every HydroCore instance regardless of variant",
+      "representation_policy": "AGE_FIX_ONLY (unobserved_age_sentinel='fixed', elapsed_time_normalization='window_relative')",
+      "causal_policy": "full-history depth=25 training (ARM_POLICIES['A']); evaluation across depths (1,2,3,4,6,12,25); no future leakage (CausalPrefixDatasetView)",
+      "pooling_semantics": "mean incident pooling; latent-token (64) cross-attention pooling inside each backbone block",
+      "prior_interface": "prior_mode='feature_only', prior_projection(classical_prior)",
+      "calibration_interface": "B_DEPTH_AWARE (network_id=f'{family}:{depth_bucket}'), SplitConformalCalibrator, alpha=0.1, minimum_group_size=10",
+      "source_candidate_semantics": "strategist_mode='candidate_conditioned', CandidatePlanEncoder consumes plan_template_ids/plan_target_type/plan_features/plan_mask/incident_context"
+    },
+    {
+      "model": "HydroCore-M",
+      "variant": "small_v5_capacity_m",
+      "trainable_parameters": 13919572,
+      "parameter_ratio_M_over_S": 3.3279615704253707,
+      "graph_stages": [
+        "node_encoder",
+        "graph_encoder",
+        "modality_fusion",
+        "backbone x4 (LatentHydraulicBlock)",
+        "final_norm"
+      ],
+      "temporal_stages": [
+        "TemporalEncoder (1 TransformerEncoderLayer, d_model=352, nhead=11, dim_feedforward=1056)",
+        "QualityEncoder (same shape, independent instance)"
+      ],
+      "number_of_output_heads": 23,
+      "input_schema": "node_feature_dim=19, edge_feature_dim=13, temporal_feature_dim=6, quality_feature_dim=4, role/action/verifier=8, residual=4 (IDENTICAL to S)",
+      "output_schema": "HydroOutput TypedDict, IDENTICAL to S",
+      "representation_policy": "AGE_FIX_ONLY (IDENTICAL to S)",
+      "causal_policy": "IDENTICAL to S (inherited, frozen for M9.8)",
+      "pooling_semantics": "IDENTICAL to S (mean incident pooling; latent-token count=64, unchanged)",
+      "prior_interface": "IDENTICAL to S (prior_mode='feature_only')",
+      "calibration_interface": "IDENTICAL to S (B_DEPTH_AWARE, alpha=0.1, minimum_group_size=10 -- calibration operates on downstream posteriors/candidate sets, which are node-count-shaped, not d_model-shaped, so it is architecture-size-agnostic by construction)",
+      "source_candidate_semantics": "IDENTICAL to S (strategist_mode='candidate_conditioned', same CandidatePlanEncoder wiring, only its internal Linear/Embedding widths scale with d_model)"
+    }
+  ],
+  "required_conclusion": "M differs from S in capacity only, except for no unavoidable mechanical dimensional adjustments (none were needed).",
+  "M9_7_CAPACITY_ISOLATION_FAILED": false
+}

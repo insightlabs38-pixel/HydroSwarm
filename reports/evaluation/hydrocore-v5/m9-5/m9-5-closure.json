@@ -1,0 +1,118 @@
+{
+  "M9_5_DECISION": "E",
+  "M9_5_DECISION_NAME": "REPRESENTATIVENESS_OR_IMPLEMENTATION_BLOCKER",
+  "alpha": 0.1,
+  "candidate_set_guard_passed": true,
+  "control_arm": {
+    "adequate_support_restored_calibration": true,
+    "golden_reference_per_seed_coverage": {
+      "20260814": {
+        "12": 0.8839285714285714,
+        "20": 0.8928571428571429,
+        "4": 0.9142857142857143,
+        "8": 0.8696428571428572
+      },
+      "20260815": {
+        "12": 0.8910714285714286,
+        "20": 0.9035714285714286,
+        "4": 0.9125,
+        "8": 0.8785714285714286
+      },
+      "31874": {
+        "12": 0.8821428571428571,
+        "20": 0.8892857142857142,
+        "4": 0.9321428571428572,
+        "8": 0.875
+      }
+    }
+  },
+  "coverage_floor": 0.85,
+  "end_commit": "ff79856620c74593e47c069277cb41936e2fc6eb",
+  "end_commit_note": "ff79856620c74593e47c069277cb41936e2fc6eb is the commit that introduced the M9.5 code+artifacts (this file included); a commit cannot embed its own SHA at authoring time, so that value was 3c575ba87bc3f495d33da68c2c5add1b2d257de2 (the start_commit) until this metadata-only follow-up correction, mirroring the fix applied to M9.4's closure/manifest.",
+  "evidence_against": "The representativeness audit or the Section 12 reproduction/implementation-path-consistency sanity gate did not pass; the M9.5 support-level calibration results below cannot yet be scientifically interpreted.",
+  "interleaved_calibration_gate": {
+    "all_9_family_seed_cells_pass": true,
+    "passed": true,
+    "per_family_seed": {
+      "ARM_B2|branched-loop|20260814": {
+        "marginal_coverage": 0.9336734693877551,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|branched-loop|20260815": {
+        "marginal_coverage": 0.9295918367346939,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|branched-loop|31874": {
+        "marginal_coverage": 0.926530612244898,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|golden-reference|20260814": {
+        "marginal_coverage": 0.8875,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|golden-reference|20260815": {
+        "marginal_coverage": 0.8910714285714286,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|golden-reference|31874": {
+        "marginal_coverage": 0.8732142857142857,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|loop-grid|20260814": {
+        "marginal_coverage": 0.9107142857142857,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|loop-grid|20260815": {
+        "marginal_coverage": 0.9053571428571429,
+        "passes_operational_floor_0_85": true
+      },
+      "ARM_B2|loop-grid|31874": {
+        "marginal_coverage": 0.8991071428571429,
+        "passes_operational_floor_0_85": true
+      }
+    }
+  },
+  "kind": "SOURCE_REPRESENTATIVE_CALIBRATION_SUPPORT_CONFIRMATION",
+  "limitations": [
+    "SCOPE: unseen-family (coastal-branch/tree-branch/dense-loop) inference was omitted entirely (optional per governing Section 10; calibration validity concerns trained families only) -- see manifest unseen_family_scope_note.",
+    "The Section 12A reproduction/sanity check is an implementation-path-consistency + qualitative-pattern check against M9.4's OWN observations, not a numerical reproduction (M9.5 uses intentionally new, disjoint seeds -- exact-value equality was never expected or required).",
+    "Section 28 predictive sanity metrics are descriptive only; M9.5 does not redefine or retest M9.4's predictive-generalization decision.",
+    "seed20260814's ARM_B2 checkpoint has 1200 optimizer steps vs 1350 for the other two seeds and vs ARM_A's 1350 (known M9.0a optimizer-step-parity gap) -- preserved, not fixed, here; unaffected by M9.5 since no training occurs.",
+    "Quantile-stability bootstrap compares support=4 vs support=20 only (per Section 14); the full 4-level curve is in m9-5-support-curve.json but the formal stability comparison is 4-vs-20."
+  ],
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M9.5",
+  "next_recommended_milestone": "M9.5_RECHECK (resolve representativeness/reproduction blocker before any further interpretation)",
+  "no_predictor_modified": true,
+  "no_training_performed": true,
+  "primary_support_repeats_per_source": 20,
+  "provisional_best_hydrocore_s_recipe": null,
+  "quantile_stability_improved_with_support": true,
+  "recommendation_reason": "The representativeness audit or the Section 12 reproduction/implementation-path-consistency sanity gate did not pass; the M9.5 support-level calibration results below cannot yet be scientifically interpreted.",
+  "representativeness_audit_passed": true,
+  "reproduction_sanity_gate_passed": false,
+  "section_12_gate_analysis_ADDED_POST_HOC_FOR_TRANSPARENCY": {
+    "added_by": "coordinator review after decide.py ran (does NOT alter M9_5_DECISION, any gate logic, or any computed number -- purely explanatory, written after seeing this result, and labeled as such)",
+    "what_actually_failed": "Only the 'qualitatively_consistent_with_m9_4_pattern' sub-check inside the Section-12 reproduction/sanity gate. The 'implementation_path_consistent' sub-check (same calibrator class, alpha=0.1, grouping construction) PASSED. Category E's own definition (Section 23: 'new populations cannot be validated' or 'implementation invariants fail') was not literally met by either the representativeness audit (passed) or the implementation-path check (passed) -- E was reached via decide.py's operationalization of Section 12's soft 'expected approximate behavior' language as a hard blocking precondition, which is a stricter reading than Section 12's own text ('Do not require exact equality if scenario seeds are intentionally new') asks for.",
+    "why_the_qualitative_pattern_did_not_match": "M9.5's own disjoint support=4 subset (16 physical incidents for golden-reference, same nominal size as M9.4's calibration_m9_4) calibrated WELL (ARM_A 0.91-0.93, ARM_B2 0.87-0.96 across all trained families), unlike M9.4's specific draw (ARM_A 0.60-0.68). This is the opposite of an implementation bug -- it is itself consistent with (and arguably supporting) the small-n-variance hypothesis: M9.5's own quantile-stability bootstrap (m9-5-quantile-stability.json) shows quantile span shrinking from support=4 to support=20 in 31/36 cells, i.e. small-n IS high-variance in this pipeline; M9.4's particular 16-incident draw appears to have been an unlucky tail draw rather than support=16 being deterministically insufficient.",
+    "all_other_predeclared_criteria_at_this_run": {
+      "representativeness_audit": "PASS",
+      "resubstitution_diagnostic (near-nominal, no gross bug)": "PASS (0.90-0.91 in-sample across all arm/seed/family)",
+      "interleaved_calibration_gate_at_PRIMARY_support_20 (9/9 ARM_B2 cells)": "PASS (0.873-0.934 coverage, all >=0.85)",
+      "control_arm_at_PRIMARY_support_20 (3/3 ARM_A seeds)": "PASS (0.889-0.904)",
+      "control_arm_at_ALL_4_support_levels": "PASS at every level, including support=4",
+      "candidate_set_pathological_full_set_guard": "PASS (no pathological cells)",
+      "quantile_stability_improved_with_support": "true (31/36 cells)"
+    },
+    "coordinator_recommendation": "M9_5_DECISION=E is preserved as the literal, predeclared-code output and is the authoritative record -- it was NOT altered post-hoc. However, given every criterion with a basis in Category A's own definition (Section 24) passed cleanly, the human reviewer may reasonably conclude the Section-12 gate's specific qualitative-pattern sub-check was miscalibrated to expect a coverage failure that need not recur on a fresh, disjoint draw, and may wish to direct a follow-up milestone that formally re-specifies Section 12 and re-runs a decision (not something the coordinator will do unilaterally by editing code after seeing this result)."
+  },
+  "start_commit": "3c575ba87bc3f495d33da68c2c5add1b2d257de2",
+  "strongest_evidence": "ARM_B2 PRIMARY-support(=20) trained-family/seed cells passing >=0.85: 9/9. Control-arm (ARM_A golden-reference) all-3-seeds-pass at PRIMARY support: True.",
+  "support_levels_repeats_per_source": [
+    4,
+    8,
+    12,
+    20
+  ]
+}

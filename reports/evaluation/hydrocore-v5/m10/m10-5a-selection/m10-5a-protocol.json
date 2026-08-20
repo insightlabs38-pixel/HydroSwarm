@@ -1,0 +1,6 @@
+{
+  "kind": "M10_5A_PROTOCOL",
+  "protocol_hash": "f11661d52c6f1d8324712ea6c530b6a195434e950afe3500b42abee3e3868752",
+  "selection_rule": "FIRST_CANONICAL_SEED_IN_PREEXISTING_FROZEN_SEED_ORDER",
+  "start_commit": "cecee4c8a8bd9bc3801d8038bfe9b858508bc8fd"
+}

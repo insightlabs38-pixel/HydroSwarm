@@ -1,0 +1,207 @@
+{
+  "arm": "AGE_FIX_ONLY",
+  "calibration_seed_20260815": {
+    "alpha": 0.1,
+    "by_maturity": {
+      "early": {
+        "coverage": 0.825,
+        "mean_set_size": 2.602777777777778
+      },
+      "mature": {
+        "coverage": 1.0,
+        "mean_set_size": 1.2833333333333334
+      },
+      "mid": {
+        "coverage": 0.975,
+        "mean_set_size": 1.4166666666666667
+      }
+    },
+    "marginal_coverage": 0.9178571428571428,
+    "mean_candidate_set_size": 1.8869047619047619,
+    "seed": 20260815,
+    "singleton_rate": 0.5654761904761905
+  },
+  "checkpoint_sha256": "728484a261bf8e7d41138ba44501df153856a1a1448b84eeb1df090091f3b387",
+  "dev_grid_25_origin_invariance_and_counterfactual": {
+    "any_origin_invariance_failure": false,
+    "counterfactual": {
+      "N2": {
+        "label": "REPRESENTATION_SENSITIVITY_COUNTERFACTUAL",
+        "max_abs_diff": 0.002148240804672241
+      },
+      "N3": {
+        "label": "REPRESENTATION_SENSITIVITY_COUNTERFACTUAL",
+        "max_abs_diff": 0.005724966526031494
+      }
+    },
+    "network_label": "dev-grid-25",
+    "origin_invariance": {
+      "no_event": {
+        "+1h": {
+          "max_abs_diff": 0.0,
+          "pass": true
+        },
+        "+24h": {
+          "max_abs_diff": 0.0,
+          "pass": true
+        },
+        "+7d": {
+          "max_abs_diff": 0.0,
+          "pass": true
+        }
+      },
+      "sparse": {
+        "+1h": {
+          "max_abs_diff": 0.0,
+          "pass": true
+        },
+        "+24h": {
+          "max_abs_diff": 0.0,
+          "pass": true
+        },
+        "+7d": {
+          "max_abs_diff": 0.0,
+          "pass": true
+        }
+      }
+    },
+    "tolerance": 0.0001
+  },
+  "final_decision": {
+    "all_gates_pass": true,
+    "correctness_fix_required": true,
+    "final_m8_7_decision": "PROMOTE_AGE_FIX_ONLY",
+    "gate_checklist": {
+      "10_locked_data_unopened": {
+        "locked_test_opened_after": false,
+        "locked_test_opened_before": false,
+        "pass": true
+      },
+      "1_seed_trains_stable": {
+        "detail": "20 epochs completed, stop_reason=maximum_epochs, best_epoch=18, best_validation_loss=1.2790485370159148, no NaN/Inf.",
+        "pass": true
+      },
+      "2_origin_invariance_both_networks": {
+        "dev_grid_25": true,
+        "golden_reference": true,
+        "pass": true
+      },
+      "3_early_top1_guardrail": {
+        "bar_pp": 5.0,
+        "pass": true,
+        "regression_pp": 0.37037037037036535
+      },
+      "4_mature_top1_guardrail": {
+        "bar_pp": 3.0,
+        "pass": true,
+        "regression_pp": -0.0694444444444331
+      },
+      "5_mrr_guardrail": {
+        "bar": 0.05,
+        "pass": true,
+        "regression": 0.0009755291005292266
+      },
+      "6_marginal_coverage": {
+        "bar": 0.85,
+        "pass": true,
+        "representative_seed_31874_coverage": 0.8988095238095238,
+        "seed_20260815_coverage": 0.9178571428571428
+      },
+      "7_candidate_set_size": {
+        "bar": 3.0,
+        "mean_size": 1.8869047619047619,
+        "pass": true
+      },
+      "8_no_ood_safety_authority_regression": {
+        "detail": "all outputs finite, OOD logits finite; no safety/authority/WNTR-gating code modified this run.",
+        "pass": true
+      },
+      "9_no_seed_instability": {
+        "pass": true,
+        "stdev_early_top1": 0.002618914004394611,
+        "stdev_mature_top1": 0.0019641855032959585,
+        "stdev_overall_mrr": 0.0004461222739163717
+      }
+    },
+    "m8_7_formally_complete": true,
+    "m9_0_scientifically_unblocked": true,
+    "relative_time_capability_gain_validated": false,
+    "selected_representation_for_future_experiments": "AGE_FIX_ONLY"
+  },
+  "guardrails_3seed_vs_control_2seed": {
+    "all_finite": true,
+    "candidate_set_ok": true,
+    "coverage_ok": true,
+    "early_regression_pp": 0.37037037037036535,
+    "guardrails_passed": true,
+    "mature_regression_pp": -0.0694444444444331,
+    "mrr_regression": 0.0009755291005292266,
+    "ood_logits_finite": true
+  },
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "paired_incident_bootstrap": {
+    "arm_a": "AGE_FIX_ONLY",
+    "arm_b": "CURRENT_CONTROL",
+    "bootstrap_seed": 20260815,
+    "ci_excludes_zero": false,
+    "ci_lower": -0.009523809523809523,
+    "ci_upper": 0.010714285714285714,
+    "interval": 0.9,
+    "locked_test_opened_after": false,
+    "locked_test_opened_before": false,
+    "metric": "mean_top1_over_depths_per_incident",
+    "n_incidents": 120,
+    "observed_mean_diff": 0.001190476190476189,
+    "purpose": "Paired incident bootstrap, AGE_FIX_ONLY (seed 20260815) minus CURRENT_CONTROL (representative seed 31874), mean top1 averaged over the standard depth grid per development_holdout incident (frozen protocol Section 10).",
+    "resamples": 2000,
+    "seed_a": 20260815,
+    "seed_b": 31874
+  },
+  "purpose": "Milestone 8.7 third-seed closure: seed 20260815 dev-grid-25 origin-invariance check and seed-specific B_DEPTH_AWARE calibration for the provisionally selected arm (AGE_FIX_ONLY). golden-reference origin invariance and standard localization for this seed are already recorded per-seed in m8-7-results.json (run_m8_7_evaluate.py, unmodified).",
+  "schema_version": 1,
+  "seed": 20260815,
+  "three_seed_promotion_summary": {
+    "all_finite_all_seeds": true,
+    "mean_early_top1": 0.4518518518518519,
+    "mean_mature_top1": 0.9902777777777777,
+    "mean_mid_top1": 0.8972222222222221,
+    "mean_overall_mrr": 0.8293320105820104,
+    "ood_logits_finite_all_seeds": true,
+    "per_seed": {
+      "20260814": {
+        "all_finite": true,
+        "early_top1": 0.45,
+        "mature_top1": 0.9916666666666667,
+        "mid_top1": 0.9041666666666666,
+        "ood_logits_finite": true,
+        "overall_mrr": 0.8299603174603174
+      },
+      "20260815": {
+        "all_finite": true,
+        "early_top1": 0.45,
+        "mature_top1": 0.9916666666666667,
+        "mid_top1": 0.8999999999999999,
+        "ood_logits_finite": true,
+        "overall_mrr": 0.828968253968254
+      },
+      "31874": {
+        "all_finite": true,
+        "early_top1": 0.45555555555555555,
+        "mature_top1": 0.9875,
+        "mid_top1": 0.8875,
+        "ood_logits_finite": true,
+        "overall_mrr": 0.8290674603174603
+      }
+    },
+    "seed_instability_detected": false,
+    "seeds": [
+      "20260814",
+      "31874",
+      "20260815"
+    ],
+    "stdev_early_top1": 0.002618914004394611,
+    "stdev_mature_top1": 0.0019641855032959585,
+    "stdev_overall_mrr": 0.0004461222739163717
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "kind": "M10_2_CHECKPOINT_GOVERNANCE_AUDIT",
+  "milestone": "M10.2-preflight",
+  "scout_outputs_vocabulary": [
+    "candidate_reduction",
+    "information_gain",
+    "sample_node",
+    "should_continue_sampling"
+  ],
+  "scout_heads_present_in_checkpoint": true,
+  "scout_heads_trained_in_selected_checkpoint": false,
+  "required_scout_target_keys": [
+    "candidate_reduction",
+    "information_gain",
+    "sample_node",
+    "should_continue_sampling"
+  ],
+  "observed_m9_6_corpus_target_keys": [
+    "duration",
+    "duration_mask",
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "relative_strength_mask",
+    "sensor_fault",
+    "sensor_fault_mask",
+    "source_node",
+    "source_node_mask",
+    "source_region",
+    "source_region_mask",
+    "start_time",
+    "start_time_mask"
+  ],
+  "missing_scout_target_keys": [
+    "candidate_reduction",
+    "information_gain",
+    "sample_node",
+    "should_continue_sampling"
+  ],
+  "finding": "hydroswarm.training.causal_prefix.scenario_to_prefix_example is the sole targets source for every M9.6 training example (via CausalPrefixDatasetView, used unmodified by scripts/hydrocore_v5/run_m9_6_train_arm_b.py); its targets dict never includes sample_node/information_gain/candidate_reduction/should_continue_sampling. hydroswarm.training.losses.compute_multitask_loss's `if task in targets and output_name in outputs:` guard therefore skipped all four Scout tasks in every training batch, so candidate_reduction_head/should_continue_sampling_head/sample_node_head/information_gain_head hold their random initialization in the canonical FINAL_STEP_1350 checkpoints, despite scout_control_heads=True constructing them and despite configs/training-v5-causal.yaml declaring nonzero task_weight entries for all four. Consistent with (but independently derived from) M10.1's already-closed finding that the structurally analogous ood_category head -- also absent from this same targets dict -- scored AUROC 0.508 (~chance) in reports/evaluation/hydrocore-v5/m10/m10-1/m10-1-closure.json.",
+  "checkpoints_per_seed": {
+    "20260814": {
+      "canonical_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260814/model-export-final-step.safetensors",
+      "canonical_export_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+      "observed_sha256_matches": true,
+      "observed_parameter_count": 4182612,
+      "checkpoint_policy": "FINAL_STEP_1350"
+    },
+    "31874": {
+      "canonical_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors",
+      "canonical_export_sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+      "observed_sha256_matches": true,
+      "observed_parameter_count": 4182612,
+      "checkpoint_policy": "FINAL_STEP_1350"
+    },
+    "20260815": {
+      "canonical_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260815/model-export-final-step.safetensors",
+      "canonical_export_sha256": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+      "observed_sha256_matches": true,
+      "observed_parameter_count": 4182612,
+      "checkpoint_policy": "FINAL_STEP_1350"
+    }
+  },
+  "checkpoint_weights_unchanged": true,
+  "sample_governance_invariant_holds": true,
+  "readiness": "M10_2_PREFLIGHT_BLOCKED"
+}

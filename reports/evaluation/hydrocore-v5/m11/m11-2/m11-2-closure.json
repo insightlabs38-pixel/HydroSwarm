@@ -1,0 +1,14 @@
+{
+  "closure_state": "M11_2_FINALIST_FROZEN",
+  "code_under_test_commit": "7169e70010e8646cb27c27e09c3708a3b5ac6826",
+  "finalist": "HydroCore-v5 M10 frozen release",
+  "finalist_frozen": true,
+  "finalist_selected": true,
+  "kind": "M11_2_CLOSURE",
+  "locked_evaluation_authorized": false,
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M11.2",
+  "next_authorized_milestone": "M11.5 (not executed)",
+  "tuning_closed": true
+}

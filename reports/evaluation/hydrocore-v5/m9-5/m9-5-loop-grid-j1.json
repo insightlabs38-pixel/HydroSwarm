@@ -1,0 +1,44 @@
+{
+  "note": "M9.5 development_m9_5 J1/J7/J8 behavior at PRIMARY support=20, for descriptive comparison against M9.4's m9-4-confusion-matrices.json findings. Source-discrimination behavior (as opposed to calibration coverage) is NOT altered by M9.5's intervention -- this is a secondary diagnostic, not a gate.",
+  "per_seed": {
+    "20260814": {
+      "confusion_counts": {
+        "J1->J7": 12,
+        "J1->J8": 10,
+        "J7->J1": 2,
+        "J8->J1": 0
+      },
+      "j1_marginal_coverage": 0.5714285714285714,
+      "j1_mean_candidate_set_size": 4.1571428571428575,
+      "j1_mean_true_source_rank": 4.585714285714285,
+      "j1_top1": 0.44285714285714284,
+      "n_j1_development_incidents": 20
+    },
+    "20260815": {
+      "confusion_counts": {
+        "J1->J7": 11,
+        "J1->J8": 19,
+        "J7->J1": 1,
+        "J8->J1": 0
+      },
+      "j1_marginal_coverage": 0.5928571428571429,
+      "j1_mean_candidate_set_size": 4.021428571428571,
+      "j1_mean_true_source_rank": 4.621428571428571,
+      "j1_top1": 0.44285714285714284,
+      "n_j1_development_incidents": 20
+    },
+    "31874": {
+      "confusion_counts": {
+        "J1->J7": 8,
+        "J1->J8": 13,
+        "J7->J1": 1,
+        "J8->J1": 0
+      },
+      "j1_marginal_coverage": 0.6357142857142857,
+      "j1_mean_candidate_set_size": 4.171428571428572,
+      "j1_mean_true_source_rank": 4.5928571428571425,
+      "j1_top1": 0.44285714285714284,
+      "n_j1_development_incidents": 20
+    }
+  }
+}

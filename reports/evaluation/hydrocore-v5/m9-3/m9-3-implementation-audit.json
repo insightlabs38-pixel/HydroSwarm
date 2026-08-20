@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "milestone": "M9.3",
+  "purpose": "Section 21: independent read of the exact conformal code path used by M9.0a/M9.0b (src/hydroswarm/calibration/conformal.py, scripts/hydrocore_v5/m9_0b_calibration_schemes.py) before trusting M9.0b's failure as scientifically real. This audit was performed by direct source inspection, cross-checked against the M9.3 Section-5 reproduction gate (m9-3-reproduction.json), which is the empirical confirmation that this audit's understanding is correct.",
+  "audited_files": [
+    "src/hydroswarm/calibration/conformal.py",
+    "scripts/hydrocore_v5/m9_0b_calibration_schemes.py",
+    "scripts/hydrocore_v5/run_m9_0a_evaluate.py",
+    "scripts/hydrocore_v5/run_m9_0b_evaluate.py",
+    "scripts/hydrocore_v5/run_m7_topology.py"
+  ],
+  "checks": {
+    "nonconformity_score_definition": {
+      "location": "conformal.py:202, SplitConformalCalibrator.fit",
+      "formula": "score = 1.0 - probabilities[true_index] (probabilities pre-normalized to sum to 1 via _normalize)",
+      "assessment": "Standard split-conformal nonconformity score for a classification/localization posterior. No defect found.",
+      "verdict": "OK"
+    },
+    "quantile_calculation": {
+      "location": "conformal.py:147-152, _quantile()",
+      "formula": "rank = min(n, max(1, ceil((n+1)*(1-alpha)))); quantile = nth order statistic (1-indexed) via np.partition",
+      "assessment": "This IS the finite-sample-corrected split-conformal quantile (the ceil((n+1)*(1-alpha)) rank, not the naive floor(n*(1-alpha))). Verified against a hand-computed example in tests/scientific/test_m9_3_diagnostics.py::test_finite_sample_quantile_formula_matches_hand_computation (n=10, alpha=0.1 -> rank=10 -> quantile=max(scores)).",
+      "verdict": "OK, standard and correctly implemented"
+    },
+    "finite_sample_correction": {
+      "assessment": "Present and correctly applied (see quantile_calculation above); this is exactly why n=10 calibration examples yields quantile=max(scores) -- a known, expected small-sample conformal property, not a bug.",
+      "verdict": "OK"
+    },
+    "alpha_handling": {
+      "assessment": "alpha=0.1 is a single pinned module constant (m9_0b_calibration_schemes.ALPHA, re-exported and reused verbatim by run_m9_0a_evaluate.py's ALPHA and run_m9_0b_evaluate.py's import) threaded through every SplitConformalCalibrator.fit call. grep across scripts/hydrocore_v5/run_m9_0*.py found no second alpha value or per-scheme override. m9_3_common.ALPHA asserts equality to m9_0b_calibration_schemes.ALPHA at import time.",
+      "verdict": "OK, no drift found"
+    },
+    "candidate_inclusion_condition": {
+      "location": "conformal.py:225-238, candidate_set()",
+      "formula": "index included iff (1 - normalized_probabilities[index]) <= quantile, i.e. probabilities[index] >= 1 - quantile",
+      "assessment": "Standard split-conformal candidate-set construction, consistent with the nonconformity score definition above.",
+      "verdict": "OK"
+    },
+    "group_key_construction": {
+      "CURRENT_FAMILY_DEPTH": "f'{family}:{depth_bucket}' (m9_0b_calibration_schemes._network_id_current_family_depth)",
+      "POOLED_DEPTH_AWARE": "depth_bucket only (m9_0b_calibration_schemes._network_id_pooled_depth)",
+      "BROAD_FALLBACK_CONTROL": "None always -- forces CONDITION_SPECIFIC or GLOBAL fallback, never NETWORK_SPECIFIC (m9_0b_calibration_schemes._network_id_broad_fallback)",
+      "HIERARCHICAL_CONSERVATIVE": "max(q_family_depth, q_pooled_depth) when family:depth has >= minimum_group_size examples, else q_pooled_depth (with its own further fallback) -- by construction always >= POOLED_DEPTH_AWARE's own quantile",
+      "verdict": "OK, matches m9-0b-summary.md's documented scheme descriptions exactly"
+    },
+    "family_label_construction": {
+      "assessment": "Family strings originate from a single source of truth (run_m7_topology.TRAINED_FAMILIES / UNSEEN_FAMILIES tuples: golden-reference, branched-loop, loop-grid, coastal-branch, tree-branch, dense-loop) and are threaded unchanged through scenario generation (network_family=family in ScenarioGenerationConfig), row construction, and network_id string building. No family-name transformation, truncation, or aliasing found anywhere in the audited files.",
+      "verdict": "OK"
+    },
+    "maturity_bucket_mapping": {
+      "location": "scripts/hydrocore_v5/run_m3_calibration.py DEPTH_BUCKET_OF, imported unmodified by run_m9_0a_evaluate.py, run_m9_0b_evaluate.py, and M9.3's own build/analysis scripts",
+      "mapping": "EARLY={1,2,3}, MID={4,6}, MATURE={12,25} -- identical to M9.1/M9.2's own DEPTH_BUCKET_OF usage",
+      "verdict": "OK, single source of truth, no redefinition found"
+    },
+    "fallback_hierarchy": {
+      "location": "conformal.py:296-305, SplitConformalCalibrator.selection()",
+      "order": "NETWORK_SPECIFIC (network_id present AND in usable_networks) -> CONDITION_SPECIFIC (condition present AND in usable_conditions) -> GLOBAL",
+      "assessment": "Verified directly by unit test (test_selection_fallback_hierarchy) constructing a calibrator with a known-present network group, a known-present condition group, and neither, confirming all three fallback tiers fire in the documented order.",
+      "verdict": "OK"
+    },
+    "minimum_group_size_behavior": {
+      "location": "conformal.py:208-209, SplitConformalCalibrator.fit()",
+      "assessment": "A group (network_id OR condition) with fewer than minimum_group_size (10, never overridden anywhere in M9.0a/M9.0b/M9.3) calibration-split examples is excluded from network_scores/mondrian_scores ENTIRELY at fit time -- an all-or-nothing decision made once, from calibration-split counts only. No development-time information ever influences which groups are usable (verified: usable_networks/usable_conditions are computed purely inside SplitConformalCalibrator.fit from `examples`, which is always calibration-split-only in every M9.0a/M9.0b/M9.3 call site).",
+      "verdict": "OK, no train/test leakage found"
+    },
+    "source_node_ordering": {
+      "assessment": "node_ids ordering (hydroswarm.preprocessing.alignment.canonical_node_order) is a deterministic pure function of a network's node-name set, independent of scenario/sensor placement (confirmed for golden-reference in M9.2's own audit; same construction reused unmodified here for branched-loop/loop-grid via HydraulicFeatureBuilder.build). Both calibration-row and development-row construction call the SAME network loader per family, so node ordering cannot drift within a family across splits.",
+      "verdict": "OK"
+    },
+    "predictor_checkpoint_matching": {
+      "assessment": "run_m9_3_build_table.verify_and_load_checkpoints() cross-checks recorded SHA256 (m8-7-runs/m9-0a-runs) against m9-0a-results.json's own recorded hash AND the current on-disk file hash, for all 2 arms x 3 seeds, BEFORE any inference -- raises SystemExit on any mismatch. Result recorded in m9-3-manifest.json.checkpoint_sha256.",
+      "verdict": "OK (see m9-3-manifest.json for the actual verified hashes)"
+    },
+    "calibration_checkpoint_seed_association": {
+      "assessment": "Each seed's model and calibrator are constructed fresh within that seed's own loop iteration in run_m9_3_build_table.main(); model_hash strings (e.g. 'm9-3-ARM_B2-seed20260814') are provenance labels only, not used in any score/candidate-set computation, so no risk of cross-seed contamination.",
+      "verdict": "OK"
+    },
+    "dataset_split_identity": {
+      "assessment": "Calibration and development(eval) scenario pools are built from DISJOINT seed_base ranges per (family, role) via run_m7_topology.SEED_BASES, assigned once at module load before any training/evaluation. train/validation/calibration/eval/classical_fit roles each get a distinct, non-overlapping seed_base. This machinery is frozen and reused unmodified from M9.0/M9.0a/M9.0b (three prior milestones' worth of use without a reported split-identity defect).",
+      "verdict": "OK, reused unmodified, no new risk introduced by M9.3"
+    },
+    "candidate_source_count_normalization": {
+      "assessment": "normalized_set_size = len(candidate) / len(probabilities), where len(probabilities) is the FULL node count for the family (including non-junction nodes such as reservoirs/tanks that can never be a true source) -- not the junction-only candidate-source count. This is an existing, consistent convention across M9.0a/M9.0b/M9.3 (the model's own output space spans all graph nodes), not a new or M9.3-introduced choice.",
+      "verdict": "OK, consistent with existing convention, flagged as a LIMITATION for interpretation (candidate-set-size guardrails are therefore slightly conservative relative to a junction-only denominator)"
+    }
+  },
+  "overall_finding": "No implementation defect was found in the audited conformal code path, group-key construction, fallback hierarchy, or split-identity machinery. This audit's conclusions are cross-checked empirically by the Section-5 reproduction gate (m9-3-reproduction.json): if the reproduction gate passed exactly, the audited code path behaves as documented here on real data, not merely in isolated unit tests.",
+  "M9_3_STATUS_IMPLICATION": "No ENGINEERING_BLOCKER identified from this audit alone; final H7 status is additionally conditioned on the Section-5 reproduction gate result recorded in m9-3-reproduction.json."
+}

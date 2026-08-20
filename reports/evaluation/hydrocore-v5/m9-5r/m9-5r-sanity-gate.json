@@ -1,0 +1,18 @@
+{
+  "M9_5R_SANITY_GATE": "PASS",
+  "checks": {
+    "A_checkpoint_sha_identity": true,
+    "B_calibrator_class_identity_matches_m9_5": true,
+    "C_alpha_equals_0_1": true,
+    "D_nonconformity_score_implementation_identity_matches": true,
+    "E_grouping_construction_identity_matches": true,
+    "F_maturity_depth_mapping_identity_matches": true,
+    "G_candidate_set_inclusion_rule_matches": true,
+    "H_source_node_ordering_correct": true,
+    "I_calibration_development_split_disjointness_passes": true,
+    "J_all_source_nodes_represented": true,
+    "K_all_outputs_finite": true,
+    "L_resubstitution_diagnostic_numerically_plausible": true
+  },
+  "note": "Corrected Section-11 sanity gate: checks ONLY implementation/provenance invariants. Does NOT require reproducing M9.4's or M9.5's coverage pattern, and does NOT require any particular performance direction or specific numerical calibration result."
+}

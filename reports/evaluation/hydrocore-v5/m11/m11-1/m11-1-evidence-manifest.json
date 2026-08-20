@@ -1,0 +1,78 @@
+{
+  "forbidden_sources": [
+    "locked final evaluation",
+    "locked topology evaluation",
+    "future M11 evidence",
+    "newly tuned variants"
+  ],
+  "kind": "M11_1_EVIDENCE_MANIFEST",
+  "locked_source_count": 0,
+  "permitted_only": true,
+  "sources": [
+    {
+      "locked_source": false,
+      "path": "reports/results/v4/architecture-freeze.json",
+      "sha256": "4b76c2460447edc2b9b7dfd6cc558035a36321f2bb08fc8b4ad23eef04edbc8c"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m0-baseline.json",
+      "sha256": "09efb71663f0adc2aeee571dedf203c76bde6d72073f68e33be53049d021dc64"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m9-final/m9-final-closure.json",
+      "sha256": "0c39fe66411fdc0bf44ef1e51aa9f60dddb34b0fcf5747365420df1c8b1090f7"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m9-8/m9-8-closure.json",
+      "sha256": "a208bf3a8a2031fd149617c4b9d6eddbead1a16cb1ff2f6b23aa752d01ed5c4e"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-0/m10-0-closure.json",
+      "sha256": "76c8fa99065b254aa097bea2cf14b6bce0af86c4642523bb2315c1b4d18bbb20"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-1/m10-1-closure.json",
+      "sha256": "e3968013341520e9d77b3a9f1cd0d32596ac13e996c27ff59d901c4a376393f5"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-2/m10-2-closure.json",
+      "sha256": "579d3d71aea4016cb493a273099b67263e76711a60642de7257c7a8d36a0bbe2"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-3-refit/m10-3-refit-closure.json",
+      "sha256": "f1a0c1fb49cd7cb9ccd9c5e330d65e922686de52616ce1851ec88028fdaf9371"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-closure.json",
+      "sha256": "5784a8fe651556961409c59bc25cd978ee121fba632a90de14aba9595dc9acb6"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-gate.json",
+      "sha256": "6aaee77f0f951745d13b2c55a3a96b7ff364402fd64c9b3d0c47697bc1f97855"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-trajectory-summary.json",
+      "sha256": "7b8bb042e549b745d0456f4b4b65905f9bb8e418b432f4bf49fd5a89e559d1d0"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-5-completion/m10-5-completion-closure.json",
+      "sha256": "0f667c667861c734bf1faefff33ed8b980bda57bcac740498a8903039b3e9748"
+    },
+    {
+      "locked_source": false,
+      "path": "reports/evaluation/hydrocore-v5/m10/m10-current-status.json",
+      "sha256": "271beca9ed992a723bf27c18560076d416fb2b71f990feaa0f313b9eb0bc44f5"
+    }
+  ]
+}

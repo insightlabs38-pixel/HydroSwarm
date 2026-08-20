@@ -1,0 +1,77 @@
+{
+  "M9_8_DEVELOPMENT_REPRESENTATIVENESS": "PASS",
+  "all_families_pass": true,
+  "expected_total_incidents": 720,
+  "families": {
+    "branched-loop": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 140
+    },
+    "coastal-branch": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 120
+    },
+    "dense-loop": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 120
+    },
+    "golden-reference": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 80
+    },
+    "loop-grid": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 160
+    },
+    "tree-branch": {
+      "checks": {
+        "all_sources_present": true,
+        "exactly_20_incidents_per_source": true,
+        "no_duplicate_scenario_ids": true,
+        "no_duplicate_seeds": true,
+        "no_zero_support_source": true
+      },
+      "family_pass": true,
+      "n": 100
+    }
+  },
+  "no_cross_family_scenario_id_collision": true,
+  "no_cross_family_seed_collision": true,
+  "total_incidents": 720,
+  "total_matches_expected": true
+}

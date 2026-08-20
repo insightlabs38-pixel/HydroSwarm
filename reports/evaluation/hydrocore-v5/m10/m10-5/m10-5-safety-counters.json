@@ -1,0 +1,10 @@
+{
+  "all_zero": true,
+  "checkpoint_selection_from_m10_4_performance": 0,
+  "default_path_redirected_without_selection_rule": 0,
+  "kind": "M10_5_SAFETY_COUNTERS",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "serving_mutations": 0,
+  "v5_bundle_created_without_selection_rule": 0
+}

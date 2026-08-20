@@ -1,0 +1,17 @@
+{
+  "candidate_set": [
+    "HydroCore-v5 M10 frozen release",
+    "HydroCore-v4 frozen incumbent"
+  ],
+  "closure_vocabulary": [
+    "M11_1_FINALIST_SELECTED",
+    "M11_1_FINALIST_SELECTION_BLOCKED_UPSTREAM_IDENTITY",
+    "M11_1_FINALIST_SELECTION_BLOCKED_REQUIRES_SYSTEM_CHANGE",
+    "M11_1_FINALIST_SELECTION_BLOCKED_AMBIGUOUS"
+  ],
+  "kind": "M11_1_PROTOCOL",
+  "locked_test_prohibition": true,
+  "milestone": "M11.1",
+  "protocol_path": "docs/evaluation/HYDROCORE_V5_M11_1_FINALIST_SELECTION_PROTOCOL.md",
+  "protocol_sha256": "52d911b86b37c7de095643cf02415601e5e1b198cf17c849239b97da8e94264d"
+}

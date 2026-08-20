@@ -1,0 +1,18 @@
+{
+  "autonomous_actuation_detected": 0,
+  "finalist_identity_drift": 0,
+  "human_approval_bypassed": 0,
+  "inaccessible_sample_selected": 0,
+  "invariant_failures": 0,
+  "learned_ood_overrode_deterministic": 0,
+  "learned_scout_selected_sample": 0,
+  "learned_strategist_selected_plan": 0,
+  "locked_test_opened": 0,
+  "nonfinite_value_reached_decision": 0,
+  "rejected_plan_surfaced_as_safe": 0,
+  "sampled_node_reselected": 0,
+  "sampling_budget_exceeded": 0,
+  "silent_v4_fallback": 0,
+  "stale_approval_accepted": 0,
+  "unverified_plan_surfaced_as_actionable": 0
+}

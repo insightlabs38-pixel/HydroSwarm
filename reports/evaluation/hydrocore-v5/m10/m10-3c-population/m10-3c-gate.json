@@ -1,0 +1,67 @@
+{
+  "kind": "M10_3C_GATE",
+  "decision_tree": "1) unbuildable population -> BLOCKED. 2) pooled diversity_pass AND pooled oracle_pass -> PASS. 3) else >=1 FAMILY_PASS and >=1 different FAMILY_CLEAR_FAIL -> CONDITIONAL scoped to the passing family/families. 4) else >=1 FAMILY_PASS but no FAMILY_CLEAR_FAIL (no clean regime split) -> NOT_JUSTIFIED (conservative default, no cherry-picking). 5) else (no family passes) -> NOT_JUSTIFIED.",
+  "global_pooled": {
+    "diversity": {
+      "fraction_2plus": 0.2303370786516854,
+      "fraction_3plus": 0.056179775280898875,
+      "contributing_cells": 2,
+      "threshold_2plus": 0.35,
+      "threshold_3plus": 0.1,
+      "threshold_min_contributing_cells": 3
+    },
+    "oracle": {
+      "fraction_meaningfully_positive": 0.13670411985018727,
+      "mean_gain": 0.02688497416535567,
+      "no_action_near_optimal_fraction": 0.8632958801498127,
+      "contributing_cells": 13,
+      "threshold_meaningful_fraction": 0.2,
+      "threshold_mean_gain": 0.05,
+      "threshold_no_action_near_optimal_max": 0.75,
+      "threshold_min_contributing_cells": 3
+    },
+    "diversity_pass": false,
+    "oracle_pass": false,
+    "global_pass": false
+  },
+  "per_family": {
+    "golden-reference": {
+      "support_diversity": 174,
+      "support_oracle": 174,
+      "fraction_2plus": 0.14942528735632185,
+      "fraction_3plus": 0.0,
+      "oracle_fraction_meaningfully_positive": 0.06321839080459771,
+      "oracle_mean_gain": 0.013842051056609756,
+      "no_action_near_optimal_fraction": 0.9367816091954023,
+      "family_pass": false,
+      "family_clear_fail": true
+    },
+    "branched-loop": {
+      "support_diversity": 180,
+      "support_oracle": 180,
+      "fraction_2plus": 0.3055555555555556,
+      "fraction_3plus": 0.1,
+      "oracle_fraction_meaningfully_positive": 0.18888888888888888,
+      "oracle_mean_gain": 0.039175301127963594,
+      "no_action_near_optimal_fraction": 0.8111111111111111,
+      "family_pass": false,
+      "family_clear_fail": false
+    },
+    "loop-grid": {
+      "support_diversity": 180,
+      "support_oracle": 180,
+      "fraction_2plus": 0.23333333333333334,
+      "fraction_3plus": 0.06666666666666667,
+      "oracle_fraction_meaningfully_positive": 0.15555555555555556,
+      "oracle_mean_gain": 0.027202806207868788,
+      "no_action_near_optimal_fraction": 0.8444444444444444,
+      "family_pass": false,
+      "family_clear_fail": false
+    }
+  },
+  "passing_families": [],
+  "clear_fail_families": [
+    "golden-reference"
+  ],
+  "decision": "M10_3C_LEARNED_STRATEGIST_NOT_JUSTIFIED"
+}

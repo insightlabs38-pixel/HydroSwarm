@@ -1,0 +1,18 @@
+{
+  "forbidden": [
+    "backslash separators",
+    "leading '/' (absolute path)",
+    "Windows drive prefix / colon",
+    "'..' traversal segments",
+    "'.' segments",
+    "empty segments",
+    "NUL bytes",
+    "non-canonical POSIX representation",
+    "resolution outside the repository root"
+  ],
+  "format": "canonical POSIX repository-relative path (Path.resolve().relative_to(root.resolve()).as_posix())",
+  "helper": "repo_relative_manifest_path / validate_manifest_path / validate_manifest_path_under_root",
+  "kind": "M11_6A_MANIFEST_PATH_FORMAT",
+  "no_silent_normalization": true,
+  "separator": "/"
+}

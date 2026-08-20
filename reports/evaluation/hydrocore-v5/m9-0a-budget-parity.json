@@ -1,0 +1,156 @@
+{
+  "all_seeds_match_arm_a_per_epoch_steps": false,
+  "all_seeds_match_arm_a_total_steps": false,
+  "arm_a": {
+    "microbatches_per_update": 4,
+    "per_seed": {
+      "20260814": {
+        "epochs_completed": 20,
+        "train_scenario_count": 600,
+        "wall_seconds": 14680.665653944016
+      },
+      "20260815": {
+        "epochs_completed": 20,
+        "train_scenario_count": 600,
+        "wall_seconds": 1614.1576991081238
+      },
+      "31874": {
+        "epochs_completed": 20,
+        "train_scenario_count": 600,
+        "wall_seconds": 14735.01326751709
+      }
+    },
+    "scheduler_total_steps": 1500,
+    "total_examples": 600,
+    "total_optimizer_steps": 1350
+  },
+  "arm_b2": {
+    "matches_arm_a_per_epoch_optimizer_steps_all_seeds": [
+      false,
+      true,
+      true
+    ],
+    "matches_arm_a_total_optimizer_steps_all_seeds": [
+      false,
+      true,
+      true
+    ],
+    "mean_wall_seconds": 432.8050085379994,
+    "microbatches_per_update": 4,
+    "per_seed": {
+      "20260814": {
+        "actual_optimizer_steps_per_epoch": [
+          15,
+          30,
+          45,
+          60,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75
+        ],
+        "actual_optimizer_steps_total": 1200,
+        "family_exposure_counts": {
+          "branched-loop": 3200,
+          "golden-reference": 3200,
+          "loop-grid": 3200
+        },
+        "matches_arm_a_per_epoch_optimizer_steps": false,
+        "matches_arm_a_total_optimizer_steps": false,
+        "scheduler_total_steps": 1500,
+        "wall_seconds": 397.2813531629945
+      },
+      "20260815": {
+        "actual_optimizer_steps_per_epoch": [
+          15,
+          30,
+          45,
+          60,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75
+        ],
+        "actual_optimizer_steps_total": 1350,
+        "family_exposure_counts": {
+          "branched-loop": 3600,
+          "golden-reference": 3600,
+          "loop-grid": 3600
+        },
+        "matches_arm_a_per_epoch_optimizer_steps": true,
+        "matches_arm_a_total_optimizer_steps": true,
+        "scheduler_total_steps": 1500,
+        "wall_seconds": 447.6037348890095
+      },
+      "31874": {
+        "actual_optimizer_steps_per_epoch": [
+          15,
+          30,
+          45,
+          60,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75,
+          75
+        ],
+        "actual_optimizer_steps_total": 1350,
+        "family_exposure_counts": {
+          "branched-loop": 3600,
+          "golden-reference": 3600,
+          "loop-grid": 3600
+        },
+        "matches_arm_a_per_epoch_optimizer_steps": true,
+        "matches_arm_a_total_optimizer_steps": true,
+        "scheduler_total_steps": 1500,
+        "wall_seconds": 453.5299375619943
+      }
+    },
+    "scheduler_total_steps": 1500,
+    "total_examples": 600,
+    "total_optimizer_steps_all_seeds": [
+      1200,
+      1350,
+      1350
+    ]
+  },
+  "exposure_difference": 0,
+  "exposure_ratio": 1.0,
+  "optimizer_step_difference": -50.0,
+  "optimizer_step_ratio": 0.9629629629629629,
+  "overall_optimization_budget_parity_pass": false,
+  "scheduler_total_steps_match": true
+}

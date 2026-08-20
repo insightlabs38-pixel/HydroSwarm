@@ -1,0 +1,20 @@
+{
+  "authorization_consumed": false,
+  "authorization_scope": "one-time locked evaluation of the exact M11.2-frozen HydroCore-v5 finalist only",
+  "authorized_openings": 0,
+  "authorizing_human": "explicit user authorization (task prompt)",
+  "code_under_test_sha": "cd77e9e41d0fb435fb738770976f2bf25aea9550",
+  "committed_guard": {
+    "authorization_granted": false,
+    "detail": "locked final test is not authorized; failing preconditions: ['manifest_hashes_match']",
+    "exception": "SplitPolicyViolation",
+    "reason": "no on-disk locked_final_test/locked_topology_test manifest exists to satisfy manifest_hashes_match"
+  },
+  "finalist_identity": "HydroCore-v5 M10 frozen release",
+  "kind": "M11_6_AUTHORIZATION",
+  "lock_state_before_authorization": false,
+  "milestone": "M11.6",
+  "not_permission_for_post_result_tuning": true,
+  "not_permission_for_repeated_evaluation": true,
+  "not_transferable": true
+}

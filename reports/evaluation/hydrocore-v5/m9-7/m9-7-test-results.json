@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "purpose": "Milestone 9.7: raw test-run results for the engineering preflight and relevant regression suites.",
+  "milestone": "M9.7",
+  "runs": [
+    {
+      "command": ".venv/bin/python -m pytest tests/scientific/test_m9_7_capacity_preflight.py -v",
+      "result": "21 passed in 4.08s",
+      "tests": [
+        "test_locked_test_unopened_before_module",
+        "test_hydrocore_m_instantiates_successfully",
+        "test_hydrocore_m_registered_in_model_variants",
+        "test_hydrocore_m_parameter_count_in_frozen_range",
+        "test_hydrocore_s_parameter_count_unchanged",
+        "test_s_and_m_accept_identical_batch_schema_and_produce_identical_output_shapes",
+        "test_incident_level_head_widths_are_class_counts_not_d_model",
+        "test_variable_topology_still_works[_build_s]",
+        "test_variable_topology_still_works[_build_m]",
+        "test_hydrocore_m_graph_permutation_equivariance",
+        "test_hydrocore_m_source_region_logits_invariant_under_permutation",
+        "test_causal_masking_ignores_content_beyond_the_valid_window[_build_s]",
+        "test_causal_masking_ignores_content_beyond_the_valid_window[_build_m]",
+        "test_age_fix_only_model_side_config_identical_for_s_and_m",
+        "test_all_supervised_heads_receive_gradients",
+        "test_interleaved_microbatching_and_gradient_accumulation_work_for_hydrocore_m",
+        "test_1350_step_budget_representable_for_both_s_and_m",
+        "test_scheduler_trajectory_is_identical_for_s_and_m",
+        "test_hydrocore_m_checkpoint_save_load_round_trip",
+        "test_calibration_interface_accepts_hydrocore_m_posteriors_unmodified",
+        "test_locked_test_unopened_after_module"
+      ],
+      "outcome": "PASS"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/unit/test_model.py -q",
+      "result": "14 passed in 1.81s",
+      "outcome": "PASS",
+      "note": "Confirms MODEL_VARIANTS addition (small_v5_capacity_m) does not break existing model unit tests, including the pre-existing medium/large parameter-count-range assertions."
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/unit/test_model.py tests/unit/test_permutation.py tests/unit/test_split_policy.py tests/scientific/test_m9_6_exact_compute_parity.py tests/scientific/test_m9_5r_source_representative.py tests/scientific/test_m9_4_source_representative.py -q",
+      "result": "135 passed in 66.05s",
+      "outcome": "PASS"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/scientific/test_calibration.py tests/scientific/test_m9_0b_calibration_schemes.py -q -m \"not real_simulation\"",
+      "result": "20 passed",
+      "outcome": "PASS"
+    },
+    {
+      "command": ".venv/bin/python -m pytest --collect-only -q",
+      "result": "1475 tests collected, 0 collection errors",
+      "outcome": "PASS",
+      "note": "Confirms the src/hydroswarm/model/core.py MODEL_VARIANTS edit does not break import/collection anywhere in the repository."
+    },
+    {
+      "command": ".venv/bin/pyright src/hydroswarm/model/core.py tests/scientific/test_m9_7_capacity_preflight.py scripts/hydrocore_v5/run_m9_7_latency_memory.py",
+      "result": "0 errors, 0 warnings, 0 informations",
+      "outcome": "PASS"
+    }
+  ],
+  "full_repository_suite": {
+    "command": ".venv/bin/python -m pytest -q",
+    "result": "1474 passed, 1 skipped, 14243 warnings in 1310.01s (0:21:50)",
+    "skipped": "tests/evaluation/test_capability_diagnostic.py:74 -- pre-existing, documented 'Temporary PR #12 exception: this diagnostic branch needs a CI checkout-history fix; restore before merging.' Unrelated to M9.7.",
+    "outcome": "PASS",
+    "failed": 0
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "kind": "M10_3B_LEAKAGE_AUDIT_COMBINED",
+  "manifest": {
+    "train_scenario_ids_sha256": "872bb9a30b07555db9b38e8950b549e6104db8ab613f462b6e31d4be1c1e59c1",
+    "validation_scenario_ids_sha256": "0d965ce92eddc10e3c03c68465a5de9fccdbe3409714fa9c506a8041bd9fbf52",
+    "n_train_examples": 250,
+    "n_validation_examples": 300
+  },
+  "train": {
+    "kind": "M10_3B_LEAKAGE_AUDIT",
+    "split": "train",
+    "candidate_order_is_fixed_canonical_template_order_never_truth_derived": {
+      "passed": true,
+      "n_incidents_checked": 250,
+      "n_violations": 0,
+      "note": "response.py::generate_response_plans appends templates in the SAME fixed literal order every call (NO_ACTION always first/always proposed), driven only by PlanGenerationContext's current-evidence-derived fields -- never by exact WNTR outcome or future truth."
+    },
+    "input_construction_never_reads_incident_ground_truth": {
+      "passed": true,
+      "note": "_reconstruct_context_and_proposals (the INPUT side) source contains no reference to manifest.incident/incident_truth -- structural, re-confirmed here, matches the existing repository test test_context_construction_never_reads_scenario_incident_ground_truth_for_candidate_generation."
+    },
+    "existing_m10_3a_adversarial_tests_reused": "tests/scientific/test_m10_3_strategist_refit_corpus.py (alignment-guard fail-closed test, no-target-key-in-input test, permutation-invariance test) -- re-run as part of this task's own pytest pass, not re-implemented.",
+    "conclusion": "No target/outcome leakage into candidate ordering or INPUT tensors found, consistent with M10.3A's own Part 5 finding."
+  },
+  "validation": {
+    "kind": "M10_3B_LEAKAGE_AUDIT",
+    "split": "validation",
+    "candidate_order_is_fixed_canonical_template_order_never_truth_derived": {
+      "passed": true,
+      "n_incidents_checked": 300,
+      "n_violations": 0,
+      "note": "response.py::generate_response_plans appends templates in the SAME fixed literal order every call (NO_ACTION always first/always proposed), driven only by PlanGenerationContext's current-evidence-derived fields -- never by exact WNTR outcome or future truth."
+    },
+    "input_construction_never_reads_incident_ground_truth": {
+      "passed": true,
+      "note": "_reconstruct_context_and_proposals (the INPUT side) source contains no reference to manifest.incident/incident_truth -- structural, re-confirmed here, matches the existing repository test test_context_construction_never_reads_scenario_incident_ground_truth_for_candidate_generation."
+    },
+    "existing_m10_3a_adversarial_tests_reused": "tests/scientific/test_m10_3_strategist_refit_corpus.py (alignment-guard fail-closed test, no-target-key-in-input test, permutation-invariance test) -- re-run as part of this task's own pytest pass, not re-implemented.",
+    "conclusion": "No target/outcome leakage into candidate ordering or INPUT tensors found, consistent with M10.3A's own Part 5 finding."
+  }
+}

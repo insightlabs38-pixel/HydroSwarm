@@ -1,0 +1,1742 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9988895106768764
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9166666666666666,
+            "quantile": 0.9945926140062511
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9988895106768764
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.7083333333333334,
+            "quantile": 0.987552665745963
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9966557768639177
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": -0.0022337338129586604
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.027932623468880258
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9945926140062511
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.027932623468880258
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9977093209738042
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.0011868476867675781
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.02674577578211268
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.9277352614844875
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9945926140062511
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.9277352614844875
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9977093209738042
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9466178491711617
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.018882587686674168
+        }
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9977044734443755
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9951328854076564
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9977044734443755
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9952248537620548
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9939446938224137
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": -0.003759779621961834
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.024383064614192596
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9951328854076564
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.024383064614192596
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.995267087816272
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.0007972121238708496
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.023585852490321746
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.917743644439635
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9951328854076564
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.917743644439635
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.995267087816272
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9902457930147648
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.07250214857512982
+        }
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9977582285724642
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9910659259185195
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9977582285724642
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9739113678102003
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9898304538801312
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": -0.007927774692332967
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.036264115807468134
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9910659259185195
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.036264115807468134
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9958527241847238
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.0008502006530761719
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.03541391515439196
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.928555866256586
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9910659259185195
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.928555866256586
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9958527241847238
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9726956561207771
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.04413978986419109
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.7708333333333334,
+            "quantile": 0.9166073578722501
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.8333333333333334,
+            "quantile": 0.9229619279503822
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9361752831235359
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.8541666666666666,
+            "quantile": 0.9314222538895087
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9330134466290474
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": 0.016406088756797277
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9263976770759668
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9229619279503822
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9106473475694656
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9314222538895087
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9207383468747139
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.005659330201252866
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9263976770759668
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9229619279503822
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9229619311072631
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.9314222538895087
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9207383468747139
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.005659330201252866
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9887682976660022
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9739414546638727
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9166666666666666,
+            "quantile": 0.9361752831235359
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.9166666666666666,
+            "quantile": 0.9314222538895087
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9730043560266495
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": -0.015763941639352685
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.6382037933047795
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9739414546638727
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9106473475694656
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.913613117958288
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.0022202134132385254
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.635983579891541
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.913613117958288
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.9739414546638727
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9229619311072631
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.913613117958288
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9533839672803879
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.039770849322099844
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.7083333333333334,
+            "quantile": 0.9100610183540542
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.7083333333333334,
+            "quantile": 0.9132193699479103
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9361752831235359
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.7083333333333334,
+            "quantile": 0.9314222538895087
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9598363861441612
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": 0.04977536779010705
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9247537349414969
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9132193699479103
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9106473475694656
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.913613117958288
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9644845090806484
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.03973077413915149
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.9247537349414969
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.9132193699479103
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.9229619311072631
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.913613117958288
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9644845090806484
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.03973077413915149
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.6875,
+            "quantile": 0.9227942663847546
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9290126636624336
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9458785836308139
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9308791394400725
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9446614980697632
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": 0.021867231685008592
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9393126876498614
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9290126636624336
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.8125,
+            "quantile": 0.9121850106771293
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9308791394400725
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9448367729783058
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.005524085328444395
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9318301426456264
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9290126636624336
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9318301426456264
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9308791394400725
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9448367729783058
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.013006630332679459
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9940300600061194
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9166666666666666,
+            "quantile": 0.9835523087531328
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.6666666666666666,
+            "quantile": 0.9458785836308139
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.5625,
+            "quantile": 0.9308791394400725
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9872397780418396
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": -0.006790281964279776
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.5920789904688069
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9835523087531328
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9121850106771293
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9311380052303148
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.021231472492218018
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.5708475179765888
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.960053008644983
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9835523087531328
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9318301426456264
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9311380052303148
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9766810275614262
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.016628018916443166
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.7083333333333334,
+            "quantile": 0.9153923330397556
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9181661084294319
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9458785836308139
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9308791394400725
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9706771764904261
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": 0.05528484345067042
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9213022145580418
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9181661084294319
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9121850106771293
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9311380052303148
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9785723406821489
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.05727012612410709
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.6875,
+            "quantile": 0.9325002545677258
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.6875,
+            "quantile": 0.9181661084294319
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.6875,
+            "quantile": 0.9318301426456264
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.6875,
+            "quantile": 0.9311380052303148
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9788522962480783
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.04635204168035256
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9284785145164642
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.8541666666666666,
+            "quantile": 0.9343039393424988
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9450286999344826
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.936907145221212
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9393537230789661
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": 0.010875208562501903
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.943657294178424
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9343039393424988
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9130298002899334
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.936907145221212
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9295992031693459
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.014058091009078177
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.96875,
+            "quantile": 0.943657294178424
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9343039393424988
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9342240780392868
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.936907145221212
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9314759597182274
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.012181334460196647
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.9583333333333334,
+            "quantile": 0.9964479704988682
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.7916666666666666,
+            "quantile": 0.9796485789120197
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.7083333333333334,
+            "quantile": 0.9450286999344826
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.6458333333333334,
+            "quantile": 0.936907145221212
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9947452205233276
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": -0.0017027499755406517
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.17543282436577723
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9796485789120197
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9130298002899334
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 1.0,
+            "quantile": 0.9294778579276028
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.0025226473808288574
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": -0.17291017698494837
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.8711227146766632
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.90625,
+            "quantile": 0.9796485789120197
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9342240780392868
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.875,
+            "quantile": 0.9294778579276028
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9802763871848583
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.10915367250819508
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9092147197917653
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.9130298048257828
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.7916666666666666,
+            "quantile": 0.9450286999344826
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.7291666666666666,
+            "quantile": 0.936907145221212
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9734742250293493
+          },
+          "n_development": 48,
+          "required_quantile_shift_oracle_minus_actual": 0.06425950523758406
+        },
+        "MATURE": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9288161987723127
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9130298048257828
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9130298002899334
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.75,
+            "quantile": 0.9294778579276028
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.979801008477807
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.05098480970549435
+        },
+        "MID": {
+          "A_actual_current_family_depth": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.931742082607355
+          },
+          "B_family_only_pooled_depth_within_family": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.9130298048257828
+          },
+          "C_pooled_depth_aware": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.9342240780392868
+          },
+          "D_broad_fallback_control": {
+            "diagnostic_coverage": 0.71875,
+            "quantile": 0.9294778579276028
+          },
+          "E_DEVELOPMENT_ORACLE_NOT_VALID_FOR_DEPLOYMENT": {
+            "diagnostic_coverage": 0.9375,
+            "quantile": 0.9800727367401123
+          },
+          "n_development": 32,
+          "required_quantile_shift_oracle_minus_actual": 0.04833065413275728
+        }
+      }
+    }
+  },
+  "sample_size_estimation": {
+    "20260814": {
+      "branched-loop": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.030121615486522813,
+              "quantile_std_at_this_tier": 0.009217340412649126
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.02636538860972735,
+              "quantile_std_at_this_tier": 0.007628909688996642
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.03551632661652958,
+              "quantile_std_at_this_tier": 0.011801633407067325
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.03384882422277296,
+              "quantile_std_at_this_tier": 0.011190595729845404
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.012140210011563238,
+              "quantile_std_at_this_tier": 0.004986006730984109
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.04799712022755597,
+              "quantile_std_at_this_tier": 0.011992708540311686
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.021371936338135476,
+              "quantile_std_at_this_tier": 0.0070997949743005235
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.10017438746342534,
+              "quantile_std_at_this_tier": 0.03322553148649668
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.053897224403244515,
+              "quantile_std_at_this_tier": 0.02058153177737568
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.010870065690013522,
+              "quantile_std_at_this_tier": 0.0036519350117701524
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.027306486667565126,
+              "quantile_std_at_this_tier": 0.010918532340653308
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.02536770545290983,
+              "quantile_std_at_this_tier": 0.00906376791995566
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.09228377173537589,
+              "quantile_std_at_this_tier": 0.028111809189411873
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.053897224403244515,
+              "quantile_std_at_this_tier": 0.016218552889414897
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.021068395190692837,
+              "quantile_std_at_this_tier": 0.006387377039693731
+            }
+          }
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.01989565777413314,
+              "quantile_std_at_this_tier": 0.006811855359170149
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.015135044572556162,
+              "quantile_std_at_this_tier": 0.006152840433047012
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.027600227304595895,
+              "quantile_std_at_this_tier": 0.014590493797941572
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.024653395864815908,
+              "quantile_std_at_this_tier": 0.008780041738283716
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.012478106023991414,
+              "quantile_std_at_this_tier": 0.00498724533262674
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 1.0757824604056883,
+              "quantile_std_at_this_tier": 0.2697612254859516
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 1.0701486548921888,
+              "quantile_std_at_this_tier": 0.2559917734494089
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 1.276620062096046,
+              "quantile_std_at_this_tier": 0.3261012489398807
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 1.2042799279705225,
+              "quantile_std_at_this_tier": 0.29647804806680783
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 1.0432995466730448,
+              "quantile_std_at_this_tier": 0.21176431943212287
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.9542427309715963,
+              "quantile_std_at_this_tier": 0.2706188759456178
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.6220099021653983,
+              "quantile_std_at_this_tier": 0.18059072568573573
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.8469510396269155,
+              "quantile_std_at_this_tier": 0.26529273947066173
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.917247511414613,
+              "quantile_std_at_this_tier": 0.2973212048535948
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.5144013776101755,
+              "quantile_std_at_this_tier": 0.10695357277225646
+            }
+          }
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.019423461391519802,
+              "quantile_std_at_this_tier": 0.005465653308926469
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.016190794512830276,
+              "quantile_std_at_this_tier": 0.00405662012647027
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.045064879839540696,
+              "quantile_std_at_this_tier": 0.010691247571716998
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.024865336631534896,
+              "quantile_std_at_this_tier": 0.007397385129093259
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.009093481362983753,
+              "quantile_std_at_this_tier": 0.0030241783169354967
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.042180905120116914,
+              "quantile_std_at_this_tier": 0.014162012360800707
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.020701976005239195,
+              "quantile_std_at_this_tier": 0.009681247544773229
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.10488173864041071,
+              "quantile_std_at_this_tier": 0.03389592904296979
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.04603945600769068,
+              "quantile_std_at_this_tier": 0.020772374121511058
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.020701976005239195,
+              "quantile_std_at_this_tier": 0.006855240429359199
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.035115510120603044,
+              "quantile_std_at_this_tier": 0.01036161996424392
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.024954187090353238,
+              "quantile_std_at_this_tier": 0.00775700739933987
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.09365553729606789,
+              "quantile_std_at_this_tier": 0.03132925276458431
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.08986793511466819,
+              "quantile_std_at_this_tier": 0.018478821307878972
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.013085930206368768,
+              "quantile_std_at_this_tier": 0.0051133806131056355
+            }
+          }
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.021963067804499387,
+              "quantile_std_at_this_tier": 0.006949439231112761
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.014083267295276303,
+              "quantile_std_at_this_tier": 0.005310625611554386
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.05064734845331142,
+              "quantile_std_at_this_tier": 0.014414351613635171
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.03200638738346789,
+              "quantile_std_at_this_tier": 0.009826080304076914
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.012944681033156824,
+              "quantile_std_at_this_tier": 0.0040228651413042795
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.07012305586436177,
+              "quantile_std_at_this_tier": 0.021726619806824443
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.053050629671843756,
+              "quantile_std_at_this_tier": 0.01675961641027084
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.09368791973400516,
+              "quantile_std_at_this_tier": 0.03008247474837573
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.07012305586436177,
+              "quantile_std_at_this_tier": 0.024641617302793233
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.053050629671843756,
+              "quantile_std_at_this_tier": 0.0101713048283262
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.062479146654100766,
+              "quantile_std_at_this_tier": 0.01507341983538966
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.03606214070699713,
+              "quantile_std_at_this_tier": 0.010638562075739618
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.0932889608903379,
+              "quantile_std_at_this_tier": 0.02966012901007062
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.07446587209970566,
+              "quantile_std_at_this_tier": 0.021992158690792976
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.02625351183604935,
+              "quantile_std_at_this_tier": 0.007001313591202774
+            }
+          }
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.01407806947821701,
+              "quantile_std_at_this_tier": 0.00459248968550475
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.012437672462839049,
+              "quantile_std_at_this_tier": 0.0039617386373385945
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.015591114746976805,
+              "quantile_std_at_this_tier": 0.008035688937183868
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.015892592331336726,
+              "quantile_std_at_this_tier": 0.007147003831662652
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.007542642591218958,
+              "quantile_std_at_this_tier": 0.00253008818053773
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.9074242278880914,
+              "quantile_std_at_this_tier": 0.2188138139991346
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.8535421828315819,
+              "quantile_std_at_this_tier": 0.20704707278770831
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 1.5124715687716466,
+              "quantile_std_at_this_tier": 0.2998493783460751
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 1.0053577125419932,
+              "quantile_std_at_this_tier": 0.23911929329622625
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.8084002546147925,
+              "quantile_std_at_this_tier": 0.16916324286066847
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.6232842716506971,
+              "quantile_std_at_this_tier": 0.18151059608263806
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.35731271767517375,
+              "quantile_std_at_this_tier": 0.10496099851626003
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.5957615645985477,
+              "quantile_std_at_this_tier": 0.2058476236183326
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.6145897892978451,
+              "quantile_std_at_this_tier": 0.19671960311763798
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.11232027422272452,
+              "quantile_std_at_this_tier": 0.04684052124657689
+            }
+          }
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.020908246080136916,
+              "quantile_std_at_this_tier": 0.005919997071618615
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.016157924666046725,
+              "quantile_std_at_this_tier": 0.004889084490709161
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.043475266938620104,
+              "quantile_std_at_this_tier": 0.011426051142814498
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.026016919373339505,
+              "quantile_std_at_this_tier": 0.00841143061534003
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.011760839587139882,
+              "quantile_std_at_this_tier": 0.003255275447899084
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.03218381386483974,
+              "quantile_std_at_this_tier": 0.013530068651389268
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.027457325048245083,
+              "quantile_std_at_this_tier": 0.008094710417309713
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.10516383785323741,
+              "quantile_std_at_this_tier": 0.03488365079257349
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.10415072784306736,
+              "quantile_std_at_this_tier": 0.023057800876471135
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.027457325048245083,
+              "quantile_std_at_this_tier": 0.0050129759664402865
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.043690643957377866,
+              "quantile_std_at_this_tier": 0.013833747184096598
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.025753034566705434,
+              "quantile_std_at_this_tier": 0.009024903904305118
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.09233654147037094,
+              "quantile_std_at_this_tier": 0.030413779848611273
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.09281541331103663,
+              "quantile_std_at_this_tier": 0.021515743137426345
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.02545216260945037,
+              "quantile_std_at_this_tier": 0.007238458633562931
+            }
+          }
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.029996274382739815,
+              "quantile_std_at_this_tier": 0.009239688375342607
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.02368676124198664,
+              "quantile_std_at_this_tier": 0.006672067899300096
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.0434654911742053,
+              "quantile_std_at_this_tier": 0.013147539336235727
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.03478371872185547,
+              "quantile_std_at_this_tier": 0.011207687522121926
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.01707278473343669,
+              "quantile_std_at_this_tier": 0.0052094507128877445
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.06926209602166032,
+              "quantile_std_at_this_tier": 0.02138272944063292
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.04984247333046927,
+              "quantile_std_at_this_tier": 0.015677689640295846
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.09443284605214897,
+              "quantile_std_at_this_tier": 0.03280942708529133
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.08941397745834839,
+              "quantile_std_at_this_tier": 0.025080579118256247
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.019081293622870615,
+              "quantile_std_at_this_tier": 0.008745634011847586
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.060698248191477615,
+              "quantile_std_at_this_tier": 0.01666641830375039
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.03195127186219361,
+              "quantile_std_at_this_tier": 0.010628731989637015
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.09913562313516126,
+              "quantile_std_at_this_tier": 0.02991332558447885
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.07471161337892547,
+              "quantile_std_at_this_tier": 0.021074329495211725
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.02364528183099092,
+              "quantile_std_at_this_tier": 0.006700997417392512
+            }
+          }
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.013909937966039693,
+              "quantile_std_at_this_tier": 0.005070485615304301
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.011658433083915544,
+              "quantile_std_at_this_tier": 0.00397617649177681
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.03274628458850298,
+              "quantile_std_at_this_tier": 0.014625524376909584
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.022114047543688356,
+              "quantile_std_at_this_tier": 0.0073242641565579
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.007883734086656395,
+              "quantile_std_at_this_tier": 0.0020572545796072876
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 22.795027737209857,
+              "quantile_std_at_this_tier": 0.2845819067617491
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 3.6232492540619723,
+              "quantile_std_at_this_tier": 0.21084050532941034
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 1.4532250786003265,
+              "quantile_std_at_this_tier": 0.3695381059832425
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 4.733571101433302,
+              "quantile_std_at_this_tier": 0.31765649611423213
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 3.5961544864664314,
+              "quantile_std_at_this_tier": 0.14985525431524052
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 1.0825089613325036,
+              "quantile_std_at_this_tier": 0.3593571739572983
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 1.0069409818475028,
+              "quantile_std_at_this_tier": 0.2729554012096881
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.9573783028399241,
+              "quantile_std_at_this_tier": 0.3214926983449675
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 1.1056305990260256,
+              "quantile_std_at_this_tier": 0.39794199633609384
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.9010378962859701,
+              "quantile_std_at_this_tier": 0.2342512734751896
+            }
+          }
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "n_observed": 150,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.015595311189913731,
+              "quantile_std_at_this_tier": 0.004437728989609835
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.010254226951925818,
+              "quantile_std_at_this_tier": 0.0031963298949375164
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.038141910774563206,
+              "quantile_std_at_this_tier": 0.011050506729085972
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.021777786199842972,
+              "quantile_std_at_this_tier": 0.0068696543012610745
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.006556598166521403,
+              "quantile_std_at_this_tier": 0.002059986633261634
+            }
+          }
+        },
+        "MATURE": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.03509474297228702,
+              "quantile_std_at_this_tier": 0.013056198481191423
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.02648842988684049,
+              "quantile_std_at_this_tier": 0.010440398982845529
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.10831686371051698,
+              "quantile_std_at_this_tier": 0.03719409628686723
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.0414927693408501,
+              "quantile_std_at_this_tier": 0.020558276242804818
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.022990822501516104,
+              "quantile_std_at_this_tier": 0.008564402072410793
+            }
+          }
+        },
+        "MID": {
+          "n_observed": 100,
+          "tiers": {
+            "100": {
+              "finite_sample_resolution": 0.009900990099009901,
+              "quantile_relative_span_5_95": 0.027637257873563383,
+              "quantile_std_at_this_tier": 0.009835464688582771
+            },
+            "200": {
+              "finite_sample_resolution": 0.004975124378109453,
+              "quantile_relative_span_5_95": 0.024501490348687288,
+              "quantile_std_at_this_tier": 0.008013441083705464
+            },
+            "25": {
+              "finite_sample_resolution": 0.038461538461538464,
+              "quantile_relative_span_5_95": 0.10304531162529025,
+              "quantile_std_at_this_tier": 0.03253882361159652
+            },
+            "50": {
+              "finite_sample_resolution": 0.0196078431372549,
+              "quantile_relative_span_5_95": 0.09928108882634906,
+              "quantile_std_at_this_tier": 0.019216102590840754
+            },
+            "500": {
+              "finite_sample_resolution": 0.001996007984031936,
+              "quantile_relative_span_5_95": 0.02251849676831568,
+              "quantile_std_at_this_tier": 0.006222634073945037
+            }
+          }
+        }
+      }
+    }
+  }
+}

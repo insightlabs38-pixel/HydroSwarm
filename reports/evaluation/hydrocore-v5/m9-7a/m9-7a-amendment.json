@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "kind": "M9_7A_PROTOCOL_CONSISTENCY_AMENDMENT",
+  "milestone": "M9.7A",
+  "amends": "M9.7 (does not alter M9.6 or M9.7's own historical artifacts, per Section 1 rule 9 'Historical artifacts/checkpoints/results are immutable' -- every M9.7 report file listed in m9_7_artifacts_hash_snapshot below is byte-identical to its state at M9.7 closure; this amendment is additive only)",
+  "purpose": "Fix a checkpoint-selection inconsistency in the M9.8 design M9.7 froze, discovered BEFORE any M9.8 execution and BEFORE any HydroCore-M development/predictive performance was observed. Does not reopen, re-tune, or re-derive any other M9.7-frozen quantity.",
+  "problem_identified": {
+    "statement": "m9-7-training-parity-plan.json's checkpoint_selection.policy field reads 'validation only (lowest validation loss across the run, per-family mean for interleaved training)', with no mention of M9.6's own promotion-authoritative canonical checkpoint. m9-7-m9-8-preregistration.json's ARM_S definition says to reuse 'M9.6's own trained checkpoints' without specifying WHICH of M9.6's two recorded checkpoints per seed (best-validation vs. canonical FINAL_STEP_1350) that means. M9.6 itself did NOT use best-validation as its promotion-authoritative checkpoint: m9_6_common.CANONICAL_CHECKPOINT_POLICY = 'FINAL_STEP_1350', both run_m9_6_train_arm_a.py and run_m9_6_train_arm_b.py export a SEPARATE canonical FINAL_STEP_1350 checkpoint after training completes (Section 14 of both scripts), and run_m9_6_evaluate.py's _canonical_model helper loads record['canonical_export_path'] (the FINAL_STEP_1350 export) -- NOT record['best_validation_export_path'] -- for every number M9.6's own M9_6_DECISION=A rested on. Left as originally worded, a future M9.8 executor could legally satisfy M9.7's own text by checkpointing ARM_M (freshly trained) at best-validation while ARM_S (reused from M9.6) is actually the FINAL_STEP_1350 canonical checkpoint -- a checkpoint-selection-criterion mismatch between the two arms being compared, which would break the intended exact-compute capacity comparison even though the OPTIMIZER-STEP budget (1350/1350) was already correctly matched.",
+    "concrete_evidence_of_real_divergence_risk": "Not merely theoretical: reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed20260814.json (an already-committed, immutable M9.6 artifact) records best_epoch=12 while canonical_epoch=19 -- best-validation and the canonical FINAL_STEP_1350 checkpoint are DIFFERENT checkpoints (different export_path, different sha256) for this real, already-trained seed. Had M9.6 used best-validation as authoritative, its own frozen decision would rest on a materially earlier, less-exposed checkpoint for that seed."
+  },
+  "corrected_m9_8_checkpoint_policy": {
+    "ARM_S": "Reuse M9.6's own SHA-verified canonical checkpoint: read m9-6-training-runs/ARM_B_M9_6-seed{seed}.json's `canonical_export_path`/`canonical_export_sha256` (NOT `best_validation_export_path`/`best_validation_export_sha256`), recompute the SHA-256 of the file at `canonical_export_path` and compare against `canonical_export_sha256`; on match, load it as ARM_S's model for that seed. On mismatch or physical absence, follow the SAME REUSED_M9_6_CHECKPOINT / REGENERATED_NOT_ORIGINAL_M9_6_CHECKPOINT transparency procedure m9-7-m9-8-preregistration.json already specifies -- unchanged except that 'M9.6's own trained checkpoints' now unambiguously means the canonical FINAL_STEP_1350 export.",
+    "ARM_M": "Train exactly 1350 optimizer steps (unchanged from M9.7), then apply M9.6's OWN Section-14 procedure verbatim: reload the LAST periodic checkpoint (epoch 20 / global_step 1350, guaranteed to exist since early_stopping_patience=0 per the frozen recipe) into a FRESH model instance and export it separately as the canonical, promotion-authoritative checkpoint (`model-export-final-step.safetensors`, `canonical_checkpoint_policy='FINAL_STEP_1350'`, `canonical_global_step=1350`, `canonical_epoch=19`). This canonical export -- not the best-validation export `Trainer.fit()` writes along the way -- is ARM_M's authoritative M9.8 checkpoint.",
+    "best_validation_checkpoints": "MAY still be saved and reported for both arms (M9.6's own scripts already do this via `best_validation_export_path`/`best_validation_export_sha256`/`best_epoch`) for diagnostic/convergence-monitoring purposes only. They MUST NOT be loaded for, or in any way determine, the M9.8 Section-12 guardrail evaluation, the paired-bootstrap primary-endpoint comparison, or any A-E promotion decision. Any M9.8 result artifact that reports a best-validation-checkpoint number MUST label it diagnostic-only and keep it structurally separate from the canonical FINAL_STEP_1350 numbers the promotion decision actually uses -- mirroring M9.6's own record-keeping convention exactly (both fields present, only one authoritative)."
+  },
+  "supersedes": [
+    {
+      "artifact": "reports/evaluation/hydrocore-v5/m9-7/m9-7-training-parity-plan.json",
+      "field": "checkpoint_selection.policy",
+      "original_text_unedited": "validation only (lowest validation loss across the run, per-family mean for interleaved training)",
+      "effective_correction": "For M9.8 purposes, 'checkpoint selection' is superseded by this document's corrected_m9_8_checkpoint_policy above: the CANONICAL FINAL_STEP_1350 checkpoint is authoritative for both arms; validation loss determines only the diagnostic best-validation checkpoint, never the promotion-relevant one. The original M9.7 file is NOT edited -- it remains the immutable historical record of what M9.7 originally froze; this amendment is the authoritative correction for any future M9.8 executor."
+    },
+    {
+      "artifact": "reports/evaluation/hydrocore-v5/m9-7/m9-7-m9-8-preregistration.json",
+      "field": "arms.ARM_S",
+      "original_text_unedited": "frozen HydroCore-S architecture (variant='small', 4,182,612 params) + frozen M9.6 ARM_B_M9_6 interleaved recipe -- reuse M9.6's own trained checkpoints where available (zero redundant retraining)... read m9-6-training-runs/ARM_B_M9_6-seed{seed}.json's export_path/export_sha256, verify SHA-256 on disk...",
+      "effective_correction": "'export_path/export_sha256' in the original text is clarified/superseded to mean specifically 'canonical_export_path/canonical_export_sha256' (FINAL_STEP_1350), not 'best_validation_export_path/best_validation_export_sha256' -- both fields exist on the same M9.6 training-run record and the original wording was ambiguous between them. The original M9.7 file is not edited."
+    },
+    {
+      "artifact": "docs/evaluation/HYDROCORE_V5_M9_7_PROTOCOL.md",
+      "field": "Section 5 ('Optimizer-step budget... Checkpoint selection: validation only, unchanged.')",
+      "effective_correction": "Superseded by an appended, dated Amendment section (this document's own convention, matching HYDROCORE_V5_M9_1_PROTOCOL.md Section 21's established amendment-log pattern) -- the frozen protocol document is not edited in place."
+    }
+  ],
+  "unchanged_and_reverified": {
+    "hydrocore_m_architecture": "d_model=352, nhead=11, dim_feedforward=1056, num_layers=4, latent_tokens=64, modality_layers=1 -- 13,919,572 parameters (m9-7-selected-m-architecture.json, untouched)",
+    "hydrocore_s_architecture": "variant='small', 4,182,612 parameters (m9-7-frozen-s-inventory.json, untouched)",
+    "seeds": [
+      20260814,
+      31874,
+      20260815
+    ],
+    "optimizer_step_budget": {
+      "S": 1350,
+      "M": 1350
+    },
+    "optimizer_scheduler_batch_exposure_policy": "AdamW lr=0.0003, cosine schedule warmup_steps=10 scheduler_total_steps=1500, batch_size=2, gradient_accumulation_steps=4, microbatches_per_optimizer_update=4 -- unchanged",
+    "datasets_source_policy": "trained families {golden-reference, branched-loop, loop-grid}, unseen development families {coastal-branch, tree-branch, dense-loop}, source-representative calibration support 20/source -- unchanged",
+    "primary_endpoint": "unseen-topology MATURE neural Top-1, macro-averaged across the 3 unseen families, ARM_M - ARM_S -- unchanged",
+    "bootstrap_procedure": "paired bootstrap, 2000 resamples, 90% CI, resampling unit=incidents, bootstrap_seed=20260819 -- unchanged",
+    "practical_effect_threshold": "M - S >= +0.02 absolute AND 90% CI lower bound > 0 -- unchanged",
+    "calibration_policy": "B_DEPTH_AWARE, alpha=0.1, minimum_group_size=10, refit independently per architecture per seed -- unchanged",
+    "promotion_guardrails_A_through_F": "unchanged verbatim (m9-7-m9-8-preregistration.json practical_effect_threshold.rules, untouched)",
+    "hydrocore_l_authorization": false,
+    "m9_6_m9_7_historical_artifacts": "unmodified -- see m9_7_artifacts_hash_snapshot below"
+  },
+  "m9_7_artifacts_hash_snapshot": {
+    "m9-7-capacity-candidates.json": "36fc541aff6b1fb671b267c5de176a4a2a6861dccd3859412d0119aa050b61a8",
+    "m9-7-closure.json": "449d29f7b43312ac04caaf7b092359a2a39256f82297884b476cb4953a11175d",
+    "m9-7-engineering-smoke.json": "1c14695527717e4e639641e7c221da805e5a985d3b1d58c14e9d1622f7944d3e",
+    "m9-7-frozen-s-inventory.json": "9e91ee33bbaad595961b97a6cec8a9c3216a62835452542bedff27e21e1f9bc1",
+    "m9-7-latency-memory.json": "0aadf59c595f77ea88c04d4f0ff3a08bee03acae4f1f69802de43fc6e04ae7c1",
+    "m9-7-m9-8-preregistration.json": "f86754cf8eec1620086b92e8199a78478a1dda8b5055203ef363689f643f065b",
+    "m9-7-parameter-counts.json": "1b80cca0c8df0bfa08942f5c695fa856d3a55e46a23c02e75e440ec91ffd6bbf",
+    "m9-7-selected-m-architecture.json": "8926f329c2502f64b213e0b6d421de720b41e3c2611acffe61a9b36830010adb",
+    "m9-7-semantic-parity-audit.json": "1b07252c8a9b5a623d0a5800bbe9ab21ae4ec505dc2952600538d267cadf30c3",
+    "m9-7-test-results.json": "2cfaaf0ed47aaa49420b86e9f7f691a447f3d6766b8ec9bd8d5bc1c5fd862228",
+    "m9-7-training-parity-plan.json": "ad1e526a1711388c7f4025fed900e76543b457c8af8b0a586a94b9c0dd62dae5",
+    "m9-7-summary.md": "d44f4e26c21b1d5d24b3e8fd2131c5dfc1c32db9493629a0915d9f7d5209ee84"
+  },
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

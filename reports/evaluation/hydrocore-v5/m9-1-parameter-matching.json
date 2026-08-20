@@ -1,0 +1,22 @@
+{
+  "baseline_total_params": 4182612,
+  "baseline_temporal_and_quality_params_replaced": 744768,
+  "arms": {
+    "GRAPH_ODE": {
+      "mlp_width": 574,
+      "total_params": 4184118,
+      "delta_percent": 0.036006208560583675
+    },
+    "GRAPH_CDE": {
+      "mlp_width": 214,
+      "total_params": 4182894,
+      "delta_percent": 0.006742198415726823
+    },
+    "GRAPH_SDE": {
+      "mlp_width": 464,
+      "total_params": 4183540,
+      "delta_percent": 0.022187092658845716
+    }
+  },
+  "every_novel_arm_within_5_percent": true
+}

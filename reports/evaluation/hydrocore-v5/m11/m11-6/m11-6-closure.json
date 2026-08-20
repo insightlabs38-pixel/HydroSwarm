@@ -1,0 +1,21 @@
+{
+  "authorization_consumed": false,
+  "authorization_received": true,
+  "blocked_reason": "No locked_final_test / locked_topology_test dataset or manifest is materialized in this repository. Committed governance: run_m7_topology.py records 'this repo currently has no locked-topology fixture materialized at all'; run_m10_3c_population.py records the locked splits 'have no numeric seed range in this repository (locked_test_opened reads a static boolean flag, not a seed-derived split)'; no committed code references a data/locked_* path; no git-tracked file contains 'locked' in its path; reports/results/v4/architecture-freeze.json records locked_evaluation_status 'NOT PERFORMED -- awaiting separate explicit authorization'. The exact locked split(s) to be evaluated therefore cannot be specified, and the committed authorize_locked_final_test guard cannot be satisfied (no on-disk locked-test manifest to hash-match). No evaluation was run and no result was fabricated.",
+  "closure_state": "M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET",
+  "code_under_test_commit": "cd77e9e41d0fb435fb738770976f2bf25aea9550",
+  "finalist_identity": "HydroCore-v5 M10 frozen release",
+  "hard_gate_outcome": "NOT_EVALUATED",
+  "kind": "M11_6_CLOSURE",
+  "locked_final_result": "NOT_EVALUATED",
+  "locked_open_count": 0,
+  "locked_rerun": false,
+  "locked_test_opened": false,
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "locked_topology_result": "NOT_EVALUATED",
+  "milestone": "M11.6",
+  "next_action": "AWAIT_MATERIALIZED_LOCKED_DATASET_BEFORE_ONE_TIME_EVALUATION",
+  "post_locked_tuning": false,
+  "safety_outcome": "NO_RUN_ALL_COUNTERS_ZERO"
+}

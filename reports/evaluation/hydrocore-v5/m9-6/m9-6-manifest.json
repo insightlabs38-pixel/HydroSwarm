@@ -1,0 +1,115 @@
+{
+  "alpha": 0.1,
+  "bootstrap_interval": 0.9,
+  "bootstrap_resamples": 2000,
+  "bootstrap_seed": 20260818,
+  "branch": "exp/hydrocore-v5-causal",
+  "calibration_repeats_per_source": 20,
+  "calibration_representativeness_passed": true,
+  "checkpoint_identities": {
+    "ARM_A_M9_6": {
+      "20260814": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_A-seed20260814/model-export-final-step.safetensors",
+        "sha256_after": "d9b51cccecf708f5438c95e121f2b5eaea5c2ff84f3df33dbbbe50ee14aa3f23",
+        "sha256_before": "d9b51cccecf708f5438c95e121f2b5eaea5c2ff84f3df33dbbbe50ee14aa3f23",
+        "sha256_during_inference": "d9b51cccecf708f5438c95e121f2b5eaea5c2ff84f3df33dbbbe50ee14aa3f23"
+      },
+      "20260815": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_A-seed20260815/model-export-final-step.safetensors",
+        "sha256_after": "5a7aaa6d894e1a44a1d4084ef4e13cdf9d75e4f6ec578de0e0327706a1034777",
+        "sha256_before": "5a7aaa6d894e1a44a1d4084ef4e13cdf9d75e4f6ec578de0e0327706a1034777",
+        "sha256_during_inference": "5a7aaa6d894e1a44a1d4084ef4e13cdf9d75e4f6ec578de0e0327706a1034777"
+      },
+      "31874": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_A-seed31874/model-export-final-step.safetensors",
+        "sha256_after": "6295cd9855eb6096af6977a02678b9e32e15a2dd258b6304ff3169435610327b",
+        "sha256_before": "6295cd9855eb6096af6977a02678b9e32e15a2dd258b6304ff3169435610327b",
+        "sha256_during_inference": "6295cd9855eb6096af6977a02678b9e32e15a2dd258b6304ff3169435610327b"
+      }
+    },
+    "ARM_B_M9_6": {
+      "20260814": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260814/model-export-final-step.safetensors",
+        "sha256_after": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+        "sha256_before": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+        "sha256_during_inference": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+      },
+      "20260815": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260815/model-export-final-step.safetensors",
+        "sha256_after": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+        "sha256_before": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c",
+        "sha256_during_inference": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+      },
+      "31874": {
+        "export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors",
+        "sha256_after": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+        "sha256_before": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+        "sha256_during_inference": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332"
+      }
+    }
+  },
+  "coverage_floor": 0.85,
+  "depths": [
+    1,
+    2,
+    3,
+    4,
+    6,
+    12,
+    25
+  ],
+  "development_repeats_per_source": 20,
+  "development_representativeness_passed": true,
+  "environment": {
+    "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41",
+    "python_version": "3.12.13",
+    "torch_version": "2.13.0+cu130"
+  },
+  "families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid",
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ],
+  "kind": "EXACT_COMPUTE_PARITY_FINAL_HYDROCORE_S_CONFIRMATION",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "m9_6_seed_bases": {
+    "branched-loop|calibration_m9_6": 998200000,
+    "branched-loop|development_m9_6": 998300000,
+    "coastal-branch|calibration_m9_6": 998600000,
+    "coastal-branch|development_m9_6": 998700000,
+    "dense-loop|calibration_m9_6": 999000000,
+    "dense-loop|development_m9_6": 999100000,
+    "golden-reference|calibration_m9_6": 998000000,
+    "golden-reference|development_m9_6": 998100000,
+    "loop-grid|calibration_m9_6": 998400000,
+    "loop-grid|development_m9_6": 998500000,
+    "tree-branch|calibration_m9_6": 998800000,
+    "tree-branch|development_m9_6": 998900000
+  },
+  "milestone": "M9.6",
+  "minimum_group_size": 10,
+  "n_calibration_rows": 9660,
+  "n_prediction_rows": 23940,
+  "no_predictor_modified": true,
+  "no_training_performed": true,
+  "seeds": [
+    20260814,
+    31874,
+    20260815
+  ],
+  "start_commit": "21717b208c4dd374829986aaeac14bd922af6767",
+  "trained_families": [
+    "golden-reference",
+    "branched-loop",
+    "loop-grid"
+  ],
+  "unseen_development_families": [
+    "coastal-branch",
+    "tree-branch",
+    "dense-loop"
+  ]
+}

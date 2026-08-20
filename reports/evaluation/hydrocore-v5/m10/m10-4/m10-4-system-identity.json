@@ -1,0 +1,26 @@
+{
+  "kind": "M10_4_SYSTEM_IDENTITY",
+  "canonical_checkpoint_sha256": {
+    "20260814": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "31874": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+    "20260815": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+  },
+  "trained_tasks": [
+    "sentinel"
+  ],
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "next_step",
+    "relative_strength",
+    "source_node"
+  ],
+  "calibration_alpha": 0.1,
+  "calibration_minimum_group_size": 10,
+  "environment": {
+    "python_version": "3.12.13",
+    "torch_version": "2.13.0+cu130",
+    "platform": "Linux-6.17.0-1022-gcp-aarch64-with-glibc2.41"
+  }
+}

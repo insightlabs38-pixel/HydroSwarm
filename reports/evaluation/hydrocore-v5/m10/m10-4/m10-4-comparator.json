@@ -1,0 +1,23 @@
+{
+  "kind": "M10_4_COMPARATOR",
+  "protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "n_pairs": 360,
+  "n_pairs_initial_state_equal": 360,
+  "paired_initial_state_equal_rate": 1.0,
+  "arm_full_final_top1": {
+    "n": 360,
+    "rate": 0.8194444444444444,
+    "wilson_90_lo": 0.7837550508421033,
+    "wilson_90_hi": 0.8503681495084565
+  },
+  "arm_no_extra_sampling_final_top1": {
+    "n": 360,
+    "rate": 0.7916666666666666,
+    "wilson_90_lo": 0.7543483702916196,
+    "wilson_90_hi": 0.8246336822023697
+  },
+  "n_pairs_where_sampling_occurred": 65,
+  "fraction_final_decision_changed_by_sampling": 0.0,
+  "n_incidents_sampling_improved_top1": 20,
+  "n_incidents_sampling_worsened_top1": 10
+}

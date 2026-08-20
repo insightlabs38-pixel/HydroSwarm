@@ -1,0 +1,7 @@
+{
+  "bundle_path": null,
+  "checkpoint": null,
+  "kind": "M10_5_RELEASE_MANIFEST",
+  "reason": "A manifest naming a checkpoint or ensemble would itself make the forbidden post-hoc selection.",
+  "status": "NOT_CREATED_DUE_TO_SELECTION_IDENTITY_BLOCKER"
+}

@@ -1,0 +1,16 @@
+{
+  "kind": "M10_3B_DIAGNOSIS_PROTOCOL",
+  "milestone": "M10.3B",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "29e5e5719a8c0e27792a42d639b382e20f625332",
+  "amends_nothing_in": [
+    "docs/evaluation/HYDROCORE_V5_M10_3_STRATEGIST_PREFLIGHT_REFIT.md",
+    "docs/evaluation/HYDROCORE_V5_M10_3_STRATEGIST_REFIT_RESULTS.md",
+    "reports/evaluation/hydrocore-v5/m10/m10-3-refit/m10-3-refit-closure.json"
+  ],
+  "reuses_frozen_population_from": "scripts/hydrocore_v5/m10_3_refit_protocol.py (unchanged)",
+  "m10_3a_protocol_hash": "f73accbf548e9b8987b8b1258efd7d3e61e052f802714ace3bb5f8b1b8d0f587",
+  "trains_nothing": true,
+  "touches_no_checkpoint": true,
+  "locked_test_opened_before": false
+}

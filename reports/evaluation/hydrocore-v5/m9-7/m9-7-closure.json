@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "milestone": "M9.7",
+  "kind": "HYDROCORE_M_CAPACITY_PREFLIGHT_AND_EXPERIMENT_FREEZE",
+  "branch": "exp/hydrocore-v5-causal",
+  "start_commit": "b43fa489e49c55578c03584d85be732a83c7871d",
+  "execution_commit": "da36182ed63cd501cb2670da850b684e16eb57b4",
+  "end_commit_note": "This closure.json is committed in the same commit that adds it (M9.7's own final closure commit) -- following the standing M9.4/M9.5/M9.5R/M9.6 convention, a commit cannot embed its own SHA at authoring time, so `execution_commit` below records the LAST commit before this closure commit; the true final SHA is whatever `git rev-parse HEAD` shows after this milestone's last commit lands, per every prior milestone's own closure convention.",
+  "m9_6_inherited_decision": {
+    "M9_6_DECISION": "A",
+    "HYDROCORE_S_STATUS": "FROZEN",
+    "selected_hydrocore_s_recipe": "CLASSICAL_HYDROCORE_S + AGE_FIX_ONLY + EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING + B_DEPTH_AWARE_CALIBRATION + ALPHA_0_1 + SOURCE_REPRESENTATIVE_CALIBRATION_SUPPORT_20_PER_SOURCE"
+  },
+  "frozen_hydrocore_s_identity": {
+    "variant": "small",
+    "construction": "HydroCore.from_variant('small', use_adapters=False, temporal_feature_dim=6, quality_feature_dim=4, elapsed_time_normalization='window_relative', prior_mode='feature_only', event_control_heads=True, scout_control_heads=True, strategist_mode='candidate_conditioned', action_vocabulary_size=9, consequence_prescreening_heads=True, ood_category_head=True)",
+    "parameter_count": 4182612,
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-frozen-s-inventory.json"
+  },
+  "selected_hydrocore_m": {
+    "variant": "small_v5_capacity_m",
+    "model_variants_entry": "MODEL_VARIANTS['small_v5_capacity_m'] = ModelVariant(352, 11, 1056, 4, 64, modality_layers=1)",
+    "parameter_count": 13919572,
+    "parameter_ratio_M_over_S": 3.3279615704253707,
+    "distance_to_14M_center": 80428,
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-selected-m-architecture.json"
+  },
+  "semantic_parity": {
+    "M9_7_CAPACITY_ISOLATION_FAILED": false,
+    "changed_dimensions": [
+      "d_model (192->352)",
+      "nhead (6->11)",
+      "dim_feedforward (576->1056)"
+    ],
+    "unchanged_dimensions": [
+      "num_layers=4",
+      "latent_tokens=64",
+      "modality_layers=1",
+      "all input feature dims",
+      "all output-head identities/class counts",
+      "AGE_FIX_ONLY representation",
+      "all SHARED_MODEL_CONFIG flags"
+    ],
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-semantic-parity-audit.json"
+  },
+  "engineering_smoke": {
+    "pass": true,
+    "checks_total": 22,
+    "checks_passed": 22,
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-engineering-smoke.json"
+  },
+  "training_parity_plan": {
+    "optimizer_steps_S": 1350,
+    "optimizer_steps_M": 1350,
+    "compute_comparability_blocker_found": false,
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-training-parity-plan.json"
+  },
+  "m9_8_preregistration": {
+    "seeds": [
+      20260814,
+      31874,
+      20260815
+    ],
+    "primary_endpoint": "unseen-topology MATURE neural Top-1, macro-averaged equally across coastal-branch/tree-branch/dense-loop",
+    "statistical_procedure": "paired bootstrap, 2000 resamples, 90% CI, resampling unit=incidents, bootstrap_seed=20260819",
+    "practical_effect_threshold": "M-S >= +0.02 absolute AND 90% CI lower bound > 0, plus guardrails B-F (family/seed consistency, known-family retention, calibration, engineering)",
+    "no_historical_numeric_threshold_found_more_authoritative": true,
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-m9-8-preregistration.json"
+  },
+  "hydrocore_l_policy": {
+    "HYDROCORE_L_AUTHORIZED": false
+  },
+  "latency_memory": {
+    "median_latency_ratio_M_over_S": "see m9-7-latency-memory.json (measured after M was already frozen; never used to retune M)",
+    "source": "reports/evaluation/hydrocore-v5/m9-7/m9-7-latency-memory.json"
+  },
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false,
+  "tests_run": {
+    "m9_7_engineering_preflight": "21 passed (tests/scientific/test_m9_7_capacity_preflight.py)",
+    "targeted_regression_suites": "135 passed (test_model, test_permutation, test_split_policy, test_m9_6_exact_compute_parity, test_m9_5r_source_representative, test_m9_4_source_representative)",
+    "calibration_suites": "20 passed (test_calibration, test_m9_0b_calibration_schemes)",
+    "collection_check": "1475 tests collected repository-wide, 0 collection errors",
+    "pyright": "0 errors, 0 warnings, 0 informations on all touched files",
+    "full_repository_suite": "1474 passed, 1 skipped (pre-existing, documented, unrelated PR#12 CI-checkout-history exception), 0 failed, 14243 warnings in 1310.01s -- .venv/bin/python -m pytest -q, full repository suite"
+  },
+  "known_limitations": [
+    "This milestone does not run any HydroCore-M predictive/development evaluation -- that is M9.8's job, explicitly not authorized by this document.",
+    "Interleaved-microbatching/gradient-accumulation engineering checks use synthetic single-example family slots, not the real build_wntr_network-derived multi-topology pools -- sufficient for a drop-in-compatibility proof, not a training-loop rehearsal.",
+    "The frozen M9.8 practical-effect threshold (+0.02 absolute) is adopted from this task's own prompt rather than a repo-preregistered exact number, since none exists (m9-7-m9-8-preregistration.json documents the qualitative experiments.txt precedent this adoption is consistent with)."
+  ],
+  "blockers": [],
+  "M9_7_DECISION": "A",
+  "M9_7_DECISION_NAME": "M9_8_CAPACITY_EXPERIMENT_READY",
+  "decision_reason": "Deterministic, parameter-count-only capacity selection produced exactly one clean pure-width HydroCore-M candidate (13,919,572 params, 0.57% from the 14M center) with zero qualitative architecture change and zero unavoidable mechanical adjustment. All 22 engineering preflight checks passed. No compute-comparability blocker was found for the 1350-optimizer-step S-vs-M comparison. The M9.8 scientific design (endpoints, statistics, guardrails, promotion rule, L policy) is fully frozen and committed. Locked splits remain unopened throughout.",
+  "next_recommended_milestone": "M9.8 (HydroCore-S vs HydroCore-M capacity comparison), NOT started by this document."
+}

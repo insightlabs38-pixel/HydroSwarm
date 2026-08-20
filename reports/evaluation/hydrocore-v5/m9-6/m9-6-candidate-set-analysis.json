@@ -1,0 +1,103 @@
+{
+  "pathological_cells": [],
+  "pathological_full_set_behavior_detected": false,
+  "per_arm_seed_family": {
+    "ARM_A_M9_6|20260814|golden-reference": {
+      "full_set_rate": 0.22321428571428573,
+      "mean_candidate_set_size": 1.8357142857142856,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.4589285714285714,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6035714285714285
+    },
+    "ARM_A_M9_6|20260815|golden-reference": {
+      "full_set_rate": 0.24821428571428572,
+      "mean_candidate_set_size": 1.8196428571428571,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.4549107142857143,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6571428571428571
+    },
+    "ARM_A_M9_6|31874|golden-reference": {
+      "full_set_rate": 0.22678571428571428,
+      "mean_candidate_set_size": 1.8142857142857143,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.45357142857142857,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6375
+    },
+    "ARM_B_M9_6|20260814|branched-loop": {
+      "full_set_rate": 0.3193877551020408,
+      "mean_candidate_set_size": 4.290816326530612,
+      "median_candidate_set_size": 5.0,
+      "normalized_mean_candidate_set_size": 0.6129737609329445,
+      "p90_candidate_set_size": 7.0,
+      "singleton_rate": 0.26326530612244897
+    },
+    "ARM_B_M9_6|20260814|golden-reference": {
+      "full_set_rate": 0.2517857142857143,
+      "mean_candidate_set_size": 1.8767857142857143,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.46919642857142857,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6
+    },
+    "ARM_B_M9_6|20260814|loop-grid": {
+      "full_set_rate": 0.30089285714285713,
+      "mean_candidate_set_size": 4.9089285714285715,
+      "median_candidate_set_size": 6.0,
+      "normalized_mean_candidate_set_size": 0.6136160714285714,
+      "p90_candidate_set_size": 8.0,
+      "singleton_rate": 0.18928571428571428
+    },
+    "ARM_B_M9_6|20260815|branched-loop": {
+      "full_set_rate": 0.20204081632653062,
+      "mean_candidate_set_size": 4.134693877551021,
+      "median_candidate_set_size": 5.0,
+      "normalized_mean_candidate_set_size": 0.5906705539358601,
+      "p90_candidate_set_size": 7.0,
+      "singleton_rate": 0.2693877551020408
+    },
+    "ARM_B_M9_6|20260815|golden-reference": {
+      "full_set_rate": 0.25,
+      "mean_candidate_set_size": 1.8875,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.471875,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.5803571428571429
+    },
+    "ARM_B_M9_6|20260815|loop-grid": {
+      "full_set_rate": 0.2125,
+      "mean_candidate_set_size": 4.8741071428571425,
+      "median_candidate_set_size": 6.0,
+      "normalized_mean_candidate_set_size": 0.6092633928571428,
+      "p90_candidate_set_size": 8.0,
+      "singleton_rate": 0.20982142857142858
+    },
+    "ARM_B_M9_6|31874|branched-loop": {
+      "full_set_rate": 0.25204081632653064,
+      "mean_candidate_set_size": 4.2,
+      "median_candidate_set_size": 5.0,
+      "normalized_mean_candidate_set_size": 0.6,
+      "p90_candidate_set_size": 7.0,
+      "singleton_rate": 0.28469387755102044
+    },
+    "ARM_B_M9_6|31874|golden-reference": {
+      "full_set_rate": 0.23214285714285715,
+      "mean_candidate_set_size": 1.8339285714285714,
+      "median_candidate_set_size": 1.0,
+      "normalized_mean_candidate_set_size": 0.45848214285714284,
+      "p90_candidate_set_size": 4.0,
+      "singleton_rate": 0.6285714285714286
+    },
+    "ARM_B_M9_6|31874|loop-grid": {
+      "full_set_rate": 0.3410714285714286,
+      "mean_candidate_set_size": 5.2160714285714285,
+      "median_candidate_set_size": 7.0,
+      "normalized_mean_candidate_set_size": 0.6520089285714286,
+      "p90_candidate_set_size": 8.0,
+      "singleton_rate": 0.17589285714285716
+    }
+  },
+  "threshold_used": 0.8
+}

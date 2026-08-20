@@ -1,0 +1,42 @@
+{
+  "arm": "ARM_S_M9_8",
+  "best_validation_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/20260816T232200Z-4c7053ac/model-export.safetensors",
+  "best_validation_export_sha256": "f079dc86c146232c5d2dd94f128a7b4a878baf49b06b3f6bfb08a59a33ef89de",
+  "best_validation_note": "diagnostic-only, per M9.7A -- MUST NOT be used for any M9.8 promotion decision",
+  "canonical_checkpoint_policy": "FINAL_STEP_1350",
+  "canonical_epoch": 19,
+  "canonical_export_path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors",
+  "canonical_export_sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+  "canonical_global_step": 1350,
+  "checkpoint_provenance": "REUSED_M9_6_CHECKPOINT",
+  "locked_test_opened_after": false,
+  "milestone": "M9.8",
+  "model_architecture": {
+    "action_vocabulary_size": 9,
+    "consequence_prescreening_heads": true,
+    "event_control_heads": true,
+    "ood_category_head": true,
+    "param_count": 4182612,
+    "prior_mode": "feature_only",
+    "scout_control_heads": true,
+    "strategist_mode": "candidate_conditioned",
+    "use_adapters": false,
+    "variant": "small"
+  },
+  "purpose": "Milestone 9.8: ARM_S checkpoint-provenance record (M9.7A-authoritative FINAL_STEP_1350).",
+  "schema_version": 1,
+  "seed": 31874,
+  "sha256_after_load": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+  "sha256_before_load": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332",
+  "source_m9_6_record": "reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed31874.json",
+  "train_manifest_hash_per_family": {
+    "branched-loop": "bf831d7fcec8df52be36018158e366d03ef0276901390b8b2655d94d5451e054",
+    "golden-reference": "1848aad5f9eee075aabc6617668656755a032da10bd1fe773acab11161fceeaa",
+    "loop-grid": "3e914ccdbda6d73ca3168145bbfa22bb634e3928af3bc03d844761a523064abd"
+  },
+  "validation_manifest_hash_per_family": {
+    "branched-loop": "c43c1071cb77989924e7fe815465ad5b33b7c331c507be4473559cffc721c44a",
+    "golden-reference": "30b286e41155ff3aff8ae7012c16a3b796ab81aba4116e652f1a6cfd2d5bb633",
+    "loop-grid": "a406f348f64dfaddd0658bd3ca86cd37064bc07df1de2938bedc2ce846169cad"
+  }
+}

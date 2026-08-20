@@ -1,0 +1,42 @@
+{
+  "kind": "M10_3B_CALIBRATION_PRESERVATION_PROTOCOL_AUDIT",
+  "label": "PROTOCOL-INTERPRETATION AUDIT ONLY -- does not reopen, reverse, or refit M10.3A's Level-B rejection",
+  "source_artifact": "reports/evaluation/hydrocore-v5/m10/m10-3-refit/m10-3-refit-preservation.json",
+  "calibration_coverage_floor_origin": {
+    "value": 0.85,
+    "source": "scripts/hydrocore_v5/m9_4_common.py::OPERATIONAL_COVERAGE_FLOOR (alpha=0.1, nominal_coverage_target=0.90) -- an M9-wide governance floor, reused verbatim (not re-derived) by run_m10_3_level_b_preservation.py::CALIBRATION_COVERAGE_FLOOR",
+    "population_it_was_governing_when_frozen": "the M9 canonical calibration/operational-evaluation population (multi-family, full depth grid) -- NOT specific to the M10.3A golden-reference/MATURE/VALIDATION_SEED_BASE=1_300_100_000 development-only population it is applied to here."
+  },
+  "per_seed": {
+    "20260814": {
+      "teacher_calibration_coverage": 0.86,
+      "level_b_calibration_coverage": 0.8233333333333334,
+      "floor": 0.85,
+      "teacher_itself_below_absolute_floor_on_this_population": false,
+      "level_b_below_absolute_floor": true,
+      "relative_degradation_teacher_to_level_b": 0.036666666666666625,
+      "any_ci_confident_sentinel_regression": true
+    },
+    "31874": {
+      "teacher_calibration_coverage": 0.8466666666666667,
+      "level_b_calibration_coverage": 0.7766666666666666,
+      "floor": 0.85,
+      "teacher_itself_below_absolute_floor_on_this_population": true,
+      "level_b_below_absolute_floor": true,
+      "relative_degradation_teacher_to_level_b": 0.07000000000000006,
+      "any_ci_confident_sentinel_regression": true
+    },
+    "20260815": {
+      "teacher_calibration_coverage": 0.8033333333333333,
+      "level_b_calibration_coverage": 0.6666666666666666,
+      "floor": 0.85,
+      "teacher_itself_below_absolute_floor_on_this_population": true,
+      "level_b_below_absolute_floor": true,
+      "relative_degradation_teacher_to_level_b": 0.13666666666666671,
+      "any_ci_confident_sentinel_regression": true
+    }
+  },
+  "finding": "The UNMODIFIED M9.6 teacher itself already scores below the 0.85 absolute floor for 2/3 seeds on THIS specific development population (seed 31874: 0.8467, seed 20260815: 0.8033) -- before Level B touches anything. This shows the 0.85 absolute floor, while a valid TARGET for the original M9 operational-evaluation population it was governed for, is not automatically a well-calibrated ABSOLUTE cutoff for every smaller/differently-composed development population a later milestone might evaluate on -- finite-sample conformal coverage on a 300-scenario single-family subset can legitimately sit below a floor set for a much larger/broader population without that alone indicating a defect.",
+  "does_this_change_the_m10_3a_level_b_rejection": "NO. Level B is independently, sufficiently disqualified by CI-confident PAIRED regressions against its OWN unmodified parent teacher on the SAME population (source_region/start_time/event_presence/event_cause and others, varying by seed, all with CI excluding zero) -- a RELATIVE criterion that does not depend on where the absolute floor is set. Even if the floor question were resolved in Level B's favor, the relative-regression criterion alone still rejects Level B for all three seeds.",
+  "recommendation_for_future_full_shared_refit_preservation_gates": "Future preservation gates should require BOTH: (A) no CI-confident paired-bootstrap degradation against the SAME checkpoint's own frozen parent teacher on the SAME population (a population-invariant, self-relative criterion); AND (B) calibration coverage validity under the calibration regime's OWN governed population/support set -- not an absolute floor number transplanted onto a different, smaller development-only population it was never calibrated against. Where a smaller development population's teacher coverage is already below the M9-wide floor (as observed here), that population should either use a floor re-derived for its own support size/composition, or the calibration criterion should be evaluated as relative-to-teacher (like criterion A) rather than absolute, on that population specifically."
+}

@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import functools
+import os
+import sys
 import time
 from datetime import UTC, datetime
+from pathlib import Path
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -22,7 +25,12 @@ from hydroswarm.simulation import (
     build_wntr_network,
     calculate_consequences,
 )
+from hydroswarm.simulation.wrapper import SimulationError, _invoke_wntr_simulator
 from hydroswarm.storage.cache import SimulationResultCache
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(_REPO_ROOT / "scripts"))
+sys.path.insert(0, str(_REPO_ROOT / "scripts" / "hydrocore_v5"))
 
 
 def _network(hours: int = 4):
@@ -206,4 +214,128 @@ def test_timeout_and_result_completeness_fail_closed() -> None:
     )
     with pytest.raises(SimulationUnstableError, match="non-finite"):
         simulator._validate_results(unstable)
+
+
+# --- Milestone 8.5a regressions -------------------------------------------
+#
+# reports/evaluation/hydrocore-v5/m8-5a-execution.json root-caused M8's
+# reported "PDD scalability ceiling" as a false timeout in
+# HydraulicSimulator._run_with_timeout, not a genuine solver limitation:
+# `process.join(timeout)` was called BEFORE ever reading `result_queue`,
+# so a child whose pickled return value exceeded the OS pipe's buffered
+# capacity (~64KiB on Linux -- crossed by a real PDD result around 25-49
+# grid junctions, matching M8's own reported ceiling) would block flushing
+# its queue feeder thread with nobody draining the pipe, appear
+# `is_alive()` for the entire timeout, and be killed and reported as
+# SimulationTimeoutError even though the underlying computation had
+# already finished in milliseconds. Diagnosed empirically: the child's
+# real /proc OS state during a false timeout was 'S' (sleeping/blocked-on-
+# IO), never 'Z' (zombie) -- ruling out the SIGCHLD/process-reaping
+# hypothesis M8.5 speculated but did not confirm.
+
+
+def _large_payload(n_bytes: int) -> bytes:
+    """Module-level (picklable under spawn) worker returning an
+    arbitrarily large object through the same IPC path production uses."""
+
+    return os.urandom(n_bytes)
+
+
+def _raise_value_error() -> None:
+    raise ValueError("m8-5a-regression: deliberate child exception")
+
+
+@pytest.mark.real_simulation
+def test_immediate_successful_child_returns_promptly() -> None:
+    simulator = HydraulicSimulator(_network(1), timeout_seconds=10.0)
+    result = simulator._run_with_timeout("m8-5a-immediate", _large_payload, (16,))
+    assert isinstance(result, (bytes, bytearray)) and len(result) == 16
+
+
+@pytest.mark.real_simulation
+def test_large_result_transfer_does_not_falsely_time_out() -> None:
+    """The core M8.5a regression: a result payload well above a typical OS
+    pipe buffer (64KiB) must still be returned successfully within a
+    timeout that would only be exceeded by a genuine hang, not by IPC
+    transfer of a large-but-fast-to-compute result."""
+
+    simulator = HydraulicSimulator(_network(1), timeout_seconds=10.0)
+    started = time.perf_counter()
+    result = simulator._run_with_timeout("m8-5a-large-result", _large_payload, (5_000_000,))
+    elapsed = time.perf_counter() - started
+    assert isinstance(result, (bytes, bytearray)) and len(result) == 5_000_000
+    assert elapsed < 5.0, f"large-result transfer took {elapsed:.2f}s -- IPC-blocking regression reintroduced"
+
+
+@pytest.mark.real_simulation
+def test_child_exception_propagates_through_wrapper() -> None:
+    simulator = HydraulicSimulator(_network(1), timeout_seconds=10.0)
+    with pytest.raises(ValueError, match="m8-5a-regression"):
+        simulator._run_with_timeout("m8-5a-exception", _raise_value_error)
+
+
+@pytest.mark.real_simulation
+def test_genuine_timeout_still_raises_and_reaps_cleanly() -> None:
+    import multiprocessing
+
+    simulator = HydraulicSimulator(_network(1), timeout_seconds=0.2)
+    assert multiprocessing.active_children() == []
+    started = time.perf_counter()
+    with pytest.raises(SimulationTimeoutError):
+        simulator._run_with_timeout("m8-5a-genuine-timeout", functools.partial(time.sleep, 30))
+    elapsed = time.perf_counter() - started
+    assert elapsed < 10.0, "genuine timeout should be bounded near timeout_seconds, not the full hang duration"
+    assert multiprocessing.active_children() == []
+
+
+@pytest.mark.real_simulation
+def test_repeated_large_result_runs_leave_no_leaked_children() -> None:
+    import multiprocessing
+
+    simulator = HydraulicSimulator(_network(1), timeout_seconds=10.0)
+    for _ in range(20):
+        result = simulator._run_with_timeout("m8-5a-repeated-large", _large_payload, (200_000,))
+        assert len(result) == 200_000
+        assert multiprocessing.active_children() == []
+
+
+@pytest.mark.real_simulation
+def test_wntr_pdd_wrapped_execution_completes_at_previously_falsely_timing_out_size() -> None:
+    """N=25 on M8's own deterministic grid generator is the exact size
+    M8/M8.5's own reported ceiling first fails at; its pickled PDD result
+    (~68KB, reports/evaluation/hydrocore-v5/m8-5a-execution.json) is large
+    enough to have falsely timed out under the pre-M8.5a join-before-get
+    wrapper. Confirms the corrected wrapper both completes AND agrees
+    numerically with the direct/unwrapped call."""
+
+    from run_m8_scaling import build_grid_network
+
+    network, names = build_grid_network(25)
+    simulator = HydraulicSimulator(network, timeout_seconds=10.0)
+    model = simulator._prepared_network()
+
+    started = time.perf_counter()
+    wrapped = simulator._run_with_timeout("m8-5a-wrapped-pdd-25", _invoke_wntr_simulator, (model,))
+    wrapped_elapsed = time.perf_counter() - started
+    assert wrapped_elapsed < 5.0, f"wrapped PDD execution at N=25 took {wrapped_elapsed:.2f}s -- IPC-blocking regression reintroduced"
+
+    direct = _invoke_wntr_simulator(model)
+    pressure_wrapped = wrapped.node["pressure"][names].to_numpy(dtype=float)
+    pressure_direct = direct.node["pressure"][names].to_numpy(dtype=float)
+    assert np.allclose(pressure_wrapped, pressure_direct, atol=1e-9)
+
+
+@pytest.mark.real_simulation
+def test_run_with_timeout_worker_exit_without_result_raises_simulation_error() -> None:
+    """A child that dies without ever putting a result onto the queue
+    (distinct from a genuine hang) must fail fast as SimulationError, not
+    be misreported as SimulationTimeoutError."""
+
+    simulator = HydraulicSimulator(_network(1), timeout_seconds=5.0)
+    started = time.perf_counter()
+    with pytest.raises(SimulationError) as excinfo:
+        simulator._run_with_timeout("m8-5a-hard-exit", functools.partial(os._exit, 1))
+    elapsed = time.perf_counter() - started
+    assert excinfo.type is SimulationError, "a dead-without-result child must not be misreported as a timeout"
+    assert elapsed < 2.0, "a child that already exited should fail fast, not wait out the full timeout"
 

@@ -66,11 +66,11 @@ from hydroswarm.simulation.wrapper import (
     IncidentSourceProfile,
     wntr,
 )
-from hydroswarm.runtime import V4PipelineFactory
+from hydroswarm.runtime import V5PipelineFactory
 from hydroswarm.runtime.paths import (
     resolve_frozen_scenario_dir,
     resolve_reference_demo_path,
-    resolve_v4_bundle_dir,
+    resolve_v5_bundle_dir,
 )
 
 from .state import (
@@ -1852,8 +1852,8 @@ def create_app(
 # (HYDROSWARM_V4_BUNDLE_DIR set) and a source checkout (unset) can never
 # silently disagree about which directory is actually being served.
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_V4_RELEASE_BUNDLE_DIR = resolve_v4_bundle_dir(_PROJECT_ROOT)
+DEFAULT_V5_RELEASE_BUNDLE_DIR = resolve_v5_bundle_dir(_PROJECT_ROOT)
 
 app = create_app(
-    pipeline_factory=V4PipelineFactory(DEFAULT_V4_RELEASE_BUNDLE_DIR, project_root=_PROJECT_ROOT)
+    pipeline_factory=V5PipelineFactory(DEFAULT_V5_RELEASE_BUNDLE_DIR, project_root=_PROJECT_ROOT)
 )

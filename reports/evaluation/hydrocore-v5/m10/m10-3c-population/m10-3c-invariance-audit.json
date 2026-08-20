@@ -1,0 +1,167 @@
+{
+  "kind": "M10_3C_INVARIANCE_AUDIT",
+  "ranking_alignment_audit": {
+    "kind": "M10_3B_RANKING_ALIGNMENT_AUDIT",
+    "conclusion": "NO mechanical sign/ranking/candidate-alignment defect found. The gate's pairwise comparator (run_m10_3_level_a_gate.py::_pairwise_ranking_accuracy_per_incident) uses `target[i] > target[j]` vs `pred[i] > pred[j]` on plan_value alone (both higher-is-better, consistent direction); padded slots are excluded via `mask`, never contaminate the count; candidate identity is keyed by a single content-preserving enumerate() pass with no reordering step; the existing repository test test_candidate_order_does_not_change_per_candidate_model_output already proves the MODEL's own per-row output is permutation-invariant. The near-chance/sub-chance pairwise-ranking accuracy observed in M10.3A is therefore NOT explained by a sign, ordering, masking, or indexing defect.",
+    "checks": [
+      {
+        "name": "perfect_agreement_gives_100pct",
+        "expects": "3/3 correct when pred order == target order exactly",
+        "correct": 3,
+        "total": 3,
+        "passed": true
+      },
+      {
+        "name": "inverted_prediction_gives_0pct",
+        "expects": "0/3 correct when pred is exactly inverted vs target (sanity: metric is direction-sensitive)",
+        "correct": 0,
+        "total": 3,
+        "passed": true
+      },
+      {
+        "name": "pairwise_metric_permutation_invariant",
+        "base": [
+          13,
+          36
+        ],
+        "permuted": [
+          13,
+          36
+        ],
+        "passed": true
+      },
+      {
+        "name": "padded_slot_excluded_from_pairwise_count",
+        "correct": 1,
+        "total": 1,
+        "passed": true
+      },
+      {
+        "name": "gate_ranks_only_plan_value_not_regret",
+        "note": "confirms the gate's pairwise-ranking criterion is computed on plan_value (higher=better) consistently, never accidentally mixed with plan_regret_proxy (lower=better) which would silently invert the comparison",
+        "passed": true
+      },
+      {
+        "name": "candidate_tensorizer_single_pass_content_keyed",
+        "note": "every INPUT tensor row for position p is written from proposals[p] in a single enumerate() pass -- no separate reordering/sorting step exists that could desynchronize row p's inputs from row p's targets",
+        "passed": true
+      }
+    ],
+    "all_checks_passed": true
+  },
+  "leakage_audit": {
+    "kind": "M10_3B_LEAKAGE_AUDIT",
+    "split": "m10-3c-pooled",
+    "candidate_order_is_fixed_canonical_template_order_never_truth_derived": {
+      "passed": true,
+      "n_incidents_checked": 540,
+      "n_violations": 0,
+      "note": "response.py::generate_response_plans appends templates in the SAME fixed literal order every call (NO_ACTION always first/always proposed), driven only by PlanGenerationContext's current-evidence-derived fields -- never by exact WNTR outcome or future truth."
+    },
+    "input_construction_never_reads_incident_ground_truth": {
+      "passed": true,
+      "note": "_reconstruct_context_and_proposals (the INPUT side) source contains no reference to manifest.incident/incident_truth -- structural, re-confirmed here, matches the existing repository test test_context_construction_never_reads_scenario_incident_ground_truth_for_candidate_generation."
+    },
+    "existing_m10_3a_adversarial_tests_reused": "tests/scientific/test_m10_3_strategist_refit_corpus.py (alignment-guard fail-closed test, no-target-key-in-input test, permutation-invariance test) -- re-run as part of this task's own pytest pass, not re-implemented.",
+    "conclusion": "No target/outcome leakage into candidate ordering or INPUT tensors found, consistent with M10.3A's own Part 5 finding."
+  },
+  "depth_causal_independence_finding": "Confirmed by direct source inspection (hydroswarm.training.strategist_trajectory.build_strategist_trajectory, hydroswarm.training.strategist_candidate_corpus._reconstruct_context_and_proposals): neither function receives or reads a depth argument anywhere; both build the classical localizer/plan context from build_sensor_series(scenario, feature_context) -- the scenario's FULL sensor series, never truncated. depth (hydroswarm.training.causal_prefix.CAUSAL_PREFIX_DEPTHS) is consumed ONLY by scenario_to_prefix_example, a step this diagnostic never calls (no training/model forward pass occurs here). Depth is therefore a bookkeeping label on this population, not a scenario-generation or candidate-generation parameter.",
+  "depth_invariance_empirical_check": {
+    "golden-reference": {
+      "per_depth_plan_value_mean": {
+        "1": {
+          "n": 173,
+          "mean": 0.9770867824554443
+        },
+        "2": {
+          "n": 179,
+          "mean": 0.9916532039642334
+        },
+        "3": {
+          "n": 166,
+          "mean": 0.9697806239128113
+        },
+        "4": {
+          "n": 171,
+          "mean": 0.9851645231246948
+        },
+        "6": {
+          "n": 172,
+          "mean": 0.9848765730857849
+        },
+        "25": {
+          "n": 174,
+          "mean": 0.9845020771026611
+        }
+      },
+      "cross_depth_std_of_means": 0.006964168634120983,
+      "cross_depth_range_of_means": 0.02187258005142212
+    },
+    "branched-loop": {
+      "per_depth_plan_value_mean": {
+        "1": {
+          "n": 210,
+          "mean": 0.9637490510940552
+        },
+        "2": {
+          "n": 210,
+          "mean": 0.9437645077705383
+        },
+        "3": {
+          "n": 210,
+          "mean": 0.9439515471458435
+        },
+        "4": {
+          "n": 210,
+          "mean": 0.9550609588623047
+        },
+        "6": {
+          "n": 210,
+          "mean": 0.9831928014755249
+        },
+        "25": {
+          "n": 210,
+          "mean": 0.970532238483429
+        }
+      },
+      "cross_depth_std_of_means": 0.014191647409809946,
+      "cross_depth_range_of_means": 0.03942829370498657
+    },
+    "loop-grid": {
+      "per_depth_plan_value_mean": {
+        "1": {
+          "n": 210,
+          "mean": 0.9803357720375061
+        },
+        "2": {
+          "n": 210,
+          "mean": 0.9543585777282715
+        },
+        "3": {
+          "n": 210,
+          "mean": 0.9904054999351501
+        },
+        "4": {
+          "n": 210,
+          "mean": 0.9744793772697449
+        },
+        "6": {
+          "n": 210,
+          "mean": 0.9762545824050903
+        },
+        "25": {
+          "n": 210,
+          "mean": 0.9669118523597717
+        }
+      },
+      "cross_depth_std_of_means": 0.011183026261809727,
+      "cross_depth_range_of_means": 0.03604692220687866
+    }
+  },
+  "candidate_generation_determinism_probe": {
+    "family": "golden-reference",
+    "scenario_id": "6e4da4de-febd-503d-91f0-51a82ed612e9",
+    "rebuild_byte_identical": true
+  },
+  "candidate_order_alignment": "reused m10-3b leakage_audit's own candidate_order_is_fixed_canonical_template_order_never_truth_derived check, applied to this population's pooled records (see leakage_audit above)."
+}

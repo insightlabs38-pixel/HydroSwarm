@@ -1,0 +1,29 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "authority": true,
+    "calibration": true,
+    "calibration_artifact": true,
+    "checkpoint": true,
+    "default_serving": true,
+    "feature_schema": true,
+    "feature_semantics": true,
+    "fusion": true,
+    "locked_unopened": true,
+    "m10_complete": true,
+    "m10_serving_freeze": true,
+    "m11_1_parent": true,
+    "next_step_suppressed": true,
+    "no_v4_fallback": true,
+    "output_allowlist": true,
+    "release_exists": true,
+    "release_manifest": true,
+    "selected_seed": true,
+    "trained_tasks": true
+  },
+  "code_under_test_commit": "7169e70010e8646cb27c27e09c3708a3b5ac6826",
+  "kind": "M11_2_PREFLIGHT",
+  "locked_test_opened_after": false,
+  "locked_test_opened_before": false,
+  "milestone": "M11.2"
+}

@@ -54,10 +54,10 @@ def test_strict_self_test_reports_every_real_failure_not_just_the_first() -> Non
     class FakeFactory:
         def __init__(self, *_args, **_kwargs):
             self.trained_assets_ready = False
-            self.fallback_reason = "v4_trained_assets_unavailable:InferenceBundleError"
-            self.identity = None
+            self.fallback_reason = "v5_trained_assets_unavailable:V5InferenceBundleError"
+            self.manifest = None
             self.model_hash = None
-            self.checkpoint_dir = Path("/nonexistent-bundle-dir")
+            self.bundle_dir = Path("/nonexistent-bundle-dir")
 
     # Only strict-mode's own failure-aggregation branch is under test here;
     # everything else in run_self_test still runs for real (dependencies,
@@ -66,15 +66,15 @@ def test_strict_self_test_reports_every_real_failure_not_just_the_first() -> Non
     # function still surfaces.
     import hydroswarm.runtime as runtime_module
 
-    original_factory = runtime_module.V4PipelineFactory
+    original_factory = runtime_module.V5PipelineFactory
     try:
-        runtime_module.V4PipelineFactory = FakeFactory  # type: ignore[misc,assignment]
+        runtime_module.V5PipelineFactory = FakeFactory  # type: ignore[misc,assignment]
         report = cli.run_self_test(strict=True)
     finally:
-        runtime_module.V4PipelineFactory = original_factory
+        runtime_module.V5PipelineFactory = original_factory
 
     assert report["ok"] is False
-    assert any("frozen V4 bundle not ready" in failure for failure in report["strict_failures"])
+    assert any("frozen V5 bundle not ready" in failure for failure in report["strict_failures"])
     assert any("calibration status" in failure for failure in report["strict_failures"])
 
 

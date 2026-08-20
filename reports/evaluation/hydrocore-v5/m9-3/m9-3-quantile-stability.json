@@ -1,0 +1,474 @@
+{
+  "ARM_A": {
+    "20260814": {
+      "golden-reference": {
+        "EARLY": {
+          "absolute_span": 0.0016142948297783732,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.9375,
+          "development_coverage_at_p95_quantile": 0.9583333333333334,
+          "median_quantile": 0.9988895107526332,
+          "n_incidents": 150,
+          "p5_quantile": 0.9977268103975803,
+          "p95_quantile": 0.9993411052273586,
+          "relative_span": 0.0016160894797684388,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.07506787776947021,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 1.0,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.02793252468109131,
+          "n_incidents": 150,
+          "p5_quantile": 0.013408005237579346,
+          "p95_quantile": 0.08847588300704956,
+          "relative_span": 2.6874719928301647,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.20503704342991114,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.875,
+          "development_coverage_at_p95_quantile": 0.96875,
+          "median_quantile": 0.927735261619091,
+          "n_incidents": 150,
+          "p5_quantile": 0.7818807065486908,
+          "p95_quantile": 0.9869177499786019,
+          "relative_span": 0.22100813875725586,
+          "resamples": 2000
+        }
+      }
+    },
+    "20260815": {
+      "golden-reference": {
+        "EARLY": {
+          "absolute_span": 0.0018947699572890997,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.9583333333333334,
+          "development_coverage_at_p95_quantile": 0.9583333333333334,
+          "median_quantile": 0.99770447332412,
+          "n_incidents": 150,
+          "p5_quantile": 0.9965592662338167,
+          "p95_quantile": 0.9984540361911058,
+          "relative_span": 0.0018991294596246175,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.05872863531112671,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 1.0,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.024383068084716797,
+          "n_incidents": 150,
+          "p5_quantile": 0.005653679370880127,
+          "p95_quantile": 0.06438231468200684,
+          "relative_span": 2.408582673315733,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.3177009876817465,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.84375,
+          "development_coverage_at_p95_quantile": 0.90625,
+          "median_quantile": 0.9177436381578445,
+          "n_incidents": 150,
+          "p5_quantile": 0.6547848582267761,
+          "p95_quantile": 0.9724858459085226,
+          "relative_span": 0.34617618087710944,
+          "resamples": 2000
+        }
+      }
+    },
+    "31874": {
+      "golden-reference": {
+        "EARLY": {
+          "absolute_span": 0.002285546623170376,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.9583333333333334,
+          "development_coverage_at_p95_quantile": 0.9583333333333334,
+          "median_quantile": 0.9977582285646349,
+          "n_incidents": 150,
+          "p5_quantile": 0.9963268146384507,
+          "p95_quantile": 0.9986123612616211,
+          "relative_span": 0.0022906818082155437,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.042263925075531006,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 1.0,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.03626406192779541,
+          "n_incidents": 150,
+          "p5_quantile": 0.017657577991485596,
+          "p95_quantile": 0.0599215030670166,
+          "relative_span": 1.165449285843428,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.33717639837414026,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.84375,
+          "development_coverage_at_p95_quantile": 0.9375,
+          "median_quantile": 0.9285558685660362,
+          "n_incidents": 150,
+          "p5_quantile": 0.6498294770717621,
+          "p95_quantile": 0.9870058754459023,
+          "relative_span": 0.36311912916434413,
+          "resamples": 2000
+        }
+      }
+    }
+  },
+  "ARM_B2": {
+    "20260814": {
+      "branched-loop": {
+        "EARLY": {
+          "absolute_span": 0.027800440788269043,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6875,
+          "development_coverage_at_p95_quantile": 0.9375,
+          "median_quantile": 0.9166073575615883,
+          "n_incidents": 50,
+          "p5_quantile": 0.9067360013723373,
+          "p95_quantile": 0.9345364421606064,
+          "relative_span": 0.030329715945358958,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.04993026331067085,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.875,
+          "development_coverage_at_p95_quantile": 0.9375,
+          "median_quantile": 0.9263976737856865,
+          "n_incidents": 50,
+          "p5_quantile": 0.9051815047860146,
+          "p95_quantile": 0.9551117680966854,
+          "relative_span": 0.053897224403244515,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.04993026331067085,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.875,
+          "development_coverage_at_p95_quantile": 0.96875,
+          "median_quantile": 0.9263976737856865,
+          "n_incidents": 50,
+          "p5_quantile": 0.9051815047860146,
+          "p95_quantile": 0.9551117680966854,
+          "relative_span": 0.053897224403244515,
+          "resamples": 2000
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "absolute_span": 0.02146693249233067,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.9583333333333334,
+          "development_coverage_at_p95_quantile": 0.9583333333333334,
+          "median_quantile": 0.9887682972475886,
+          "n_incidents": 50,
+          "p5_quantile": 0.97570207901299,
+          "p95_quantile": 0.9971690115053207,
+          "relative_span": 0.02171078153707767,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.7733079195022583,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 1.0,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.6382037997245789,
+          "n_incidents": 50,
+          "p5_quantile": 0.035161614418029785,
+          "p95_quantile": 0.8084695339202881,
+          "relative_span": 1.2116943205853437,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.8322856286540627,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.75,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.9136131256818771,
+          "n_incidents": 50,
+          "p5_quantile": 0.16105502843856812,
+          "p95_quantile": 0.9933406570926309,
+          "relative_span": 0.910982565002976,
+          "resamples": 2000
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "absolute_span": 0.018891222774982452,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.5208333333333334,
+          "development_coverage_at_p95_quantile": 0.7291666666666666,
+          "median_quantile": 0.9100610166788101,
+          "n_incidents": 50,
+          "p5_quantile": 0.8985780775547028,
+          "p95_quantile": 0.9174693003296852,
+          "relative_span": 0.020758193603242513,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.039819128811359406,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6875,
+          "development_coverage_at_p95_quantile": 0.8125,
+          "median_quantile": 0.9247537329792976,
+          "n_incidents": 50,
+          "p5_quantile": 0.8986127078533173,
+          "p95_quantile": 0.9384318366646767,
+          "relative_span": 0.043059170664900503,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.04072011555544819,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.65625,
+          "development_coverage_at_p95_quantile": 0.75,
+          "median_quantile": 0.9247537329792976,
+          "n_incidents": 50,
+          "p5_quantile": 0.9006350189447403,
+          "p95_quantile": 0.9413551345001885,
+          "relative_span": 0.04403346978039156,
+          "resamples": 2000
+        }
+      }
+    },
+    "20260815": {
+      "branched-loop": {
+        "EARLY": {
+          "absolute_span": 0.025233857333660126,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6458333333333334,
+          "development_coverage_at_p95_quantile": 0.7291666666666666,
+          "median_quantile": 0.9227942675352097,
+          "n_incidents": 50,
+          "p5_quantile": 0.9059041440486908,
+          "p95_quantile": 0.9311380013823509,
+          "relative_span": 0.027345052111192612,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.06638672971166626,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.8125,
+          "development_coverage_at_p95_quantile": 0.9375,
+          "median_quantile": 0.9393126890063286,
+          "n_incidents": 50,
+          "p5_quantile": 0.908689521253109,
+          "p95_quantile": 0.9750762509647752,
+          "relative_span": 0.07067585745263895,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.06713107414543629,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.78125,
+          "development_coverage_at_p95_quantile": 0.96875,
+          "median_quantile": 0.931830145418644,
+          "n_incidents": 50,
+          "p5_quantile": 0.907123863697052,
+          "p95_quantile": 0.9742549378424883,
+          "relative_span": 0.07204217901243821,
+          "resamples": 2000
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "absolute_span": 0.014093227800913155,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.9166666666666666,
+          "development_coverage_at_p95_quantile": 0.9583333333333334,
+          "median_quantile": 0.9940300602465868,
+          "n_incidents": 50,
+          "p5_quantile": 0.9843833651393652,
+          "p95_quantile": 0.9984765929402784,
+          "relative_span": 0.014177868823621974,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.5965135991573334,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 1.0,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.5920789837837219,
+          "n_incidents": 50,
+          "p5_quantile": 0.0599442720413208,
+          "p95_quantile": 0.6564578711986542,
+          "relative_span": 1.0074899050550177,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.5900387759320438,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.75,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.9600530080497265,
+          "n_incidents": 50,
+          "p5_quantile": 0.40776604413986206,
+          "p95_quantile": 0.9978048200719059,
+          "relative_span": 0.6145897892978451,
+          "resamples": 2000
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "absolute_span": 0.020345039665699005,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6041666666666666,
+          "development_coverage_at_p95_quantile": 0.7291666666666666,
+          "median_quantile": 0.9153923317790031,
+          "n_incidents": 50,
+          "p5_quantile": 0.9011617749929428,
+          "p95_quantile": 0.9215068146586418,
+          "relative_span": 0.022225486230761617,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.04337022826075554,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6875,
+          "development_coverage_at_p95_quantile": 0.75,
+          "median_quantile": 0.9213022142648697,
+          "n_incidents": 50,
+          "p5_quantile": 0.8983496278524399,
+          "p95_quantile": 0.9417198561131954,
+          "relative_span": 0.047074920247925096,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.04634011909365654,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6875,
+          "development_coverage_at_p95_quantile": 0.71875,
+          "median_quantile": 0.9325002580881119,
+          "n_incidents": 50,
+          "p5_quantile": 0.9098614901304245,
+          "p95_quantile": 0.956201609224081,
+          "relative_span": 0.04969448393362039,
+          "resamples": 2000
+        }
+      }
+    },
+    "31874": {
+      "branched-loop": {
+        "EARLY": {
+          "absolute_span": 0.026794947683811188,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.6458333333333334,
+          "development_coverage_at_p95_quantile": 0.875,
+          "median_quantile": 0.9284785091876984,
+          "n_incidents": 50,
+          "p5_quantile": 0.9092577546834946,
+          "p95_quantile": 0.9360527023673058,
+          "relative_span": 0.028858985338554997,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.08437615167349577,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.875,
+          "development_coverage_at_p95_quantile": 0.9375,
+          "median_quantile": 0.9436572901904583,
+          "n_incidents": 50,
+          "p5_quantile": 0.9079414904117584,
+          "p95_quantile": 0.9923176420852542,
+          "relative_span": 0.08941397745834839,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.07037053443491459,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.84375,
+          "development_coverage_at_p95_quantile": 0.96875,
+          "median_quantile": 0.9436572901904583,
+          "n_incidents": 50,
+          "p5_quantile": 0.9079414904117584,
+          "p95_quantile": 0.978312024846673,
+          "relative_span": 0.07457213033421456,
+          "resamples": 2000
+        }
+      },
+      "golden-reference": {
+        "EARLY": {
+          "absolute_span": 0.019414093403611332,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.7916666666666666,
+          "development_coverage_at_p95_quantile": 0.9791666666666666,
+          "median_quantile": 0.9964479703921825,
+          "n_incidents": 50,
+          "p5_quantile": 0.9796485789120197,
+          "p95_quantile": 0.9990626723156311,
+          "relative_span": 0.019483298657300013,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.8274180144071579,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 1.0,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.17543280124664307,
+          "n_incidents": 50,
+          "p5_quantile": 0.01939016580581665,
+          "p95_quantile": 0.8468081802129745,
+          "relative_span": 4.716438479733793,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.9429981485009193,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.71875,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.8711227178573608,
+          "n_incidents": 50,
+          "p5_quantile": 0.05078178644180298,
+          "p95_quantile": 0.9937799349427223,
+          "relative_span": 1.0825089613325036,
+          "resamples": 2000
+        }
+      },
+      "loop-grid": {
+        "EARLY": {
+          "absolute_span": 0.014179766178131104,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.7083333333333334,
+          "development_coverage_at_p95_quantile": 0.7291666666666666,
+          "median_quantile": 0.9092147201299667,
+          "n_incidents": 50,
+          "p5_quantile": 0.9014649912714958,
+          "p95_quantile": 0.9156447574496269,
+          "relative_span": 0.015595618795199655,
+          "resamples": 2000
+        },
+        "MATURE": {
+          "absolute_span": 0.10034173843450844,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.75,
+          "development_coverage_at_p95_quantile": 1.0,
+          "median_quantile": 0.9288161993026733,
+          "n_incidents": 50,
+          "p5_quantile": 0.8970088586211205,
+          "p95_quantile": 0.9973505970556289,
+          "relative_span": 0.10803185658243465,
+          "resamples": 2000
+        },
+        "MID": {
+          "absolute_span": 0.04433627054095268,
+          "bootstrap_seed": 20260816,
+          "development_coverage_at_p5_quantile": 0.71875,
+          "development_coverage_at_p95_quantile": 0.78125,
+          "median_quantile": 0.9288161993026733,
+          "n_incidents": 50,
+          "p5_quantile": 0.9027100652456284,
+          "p95_quantile": 0.947046335786581,
+          "relative_span": 0.04773417019883912,
+          "resamples": 2000
+        }
+      }
+    }
+  }
+}

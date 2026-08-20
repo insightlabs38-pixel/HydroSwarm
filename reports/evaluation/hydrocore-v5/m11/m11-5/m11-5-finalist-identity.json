@@ -1,0 +1,15 @@
+{
+  "all_checks_pass": true,
+  "checks": {
+    "calibration": true,
+    "calibration_artifact": true,
+    "checkpoint": true,
+    "finalist": true,
+    "identity_violations": true,
+    "outputs": true,
+    "release_manifest": true,
+    "tasks": true,
+    "tuning_closed": true
+  },
+  "freeze_sha256": "6b778b14149920247a48a77e45a016b4d4d569c5a194596a0c14466d07ea3a24"
+}

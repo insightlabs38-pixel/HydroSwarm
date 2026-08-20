@@ -205,6 +205,144 @@ finding in `reports/evaluation/hydrocore-v5/m0-baseline.json`
 (`current_sampling_baseline`) that EIG did not beat random valid-unsampled
 selection pre-v5.
 
+## 8.5. Amendment: Milestone 8.7 (temporal representation correction)
+
+Milestone 8.6 (`reports/evaluation/hydrocore-v5/m8-6-summary.md`) audited
+the frozen Milestone-1 predictor's representation correctness and found:
+
+- `ABSOLUTE_TIME_ORIGIN_LEAKAGE`: `HydraulicFeatureBuilder.build`'s
+  never-observed-node `measurement_age` fallback depended on the incident's
+  own timestamp origin rather than representing an origin-independent
+  quantity.
+- `TEMPORAL_FEATURE_USAGE_WEAK_OR_PARTIAL`: the explicit timestamp/
+  positional-encoding pathway was measurably inert while the derived
+  age-feature pathway was measurably used.
+
+Milestone 8.7 (`docs/evaluation/HYDROCORE_V5_M8_7_PROTOCOL.md`, its own
+frozen sub-protocol) trains and evaluates three matched-size representation
+arms (CURRENT_CONTROL, AGE_FIX_ONLY, AGE_FIX_PLUS_RELATIVE_TIME) to
+determine which representation, if any, corrects these findings without
+materially regressing accuracy or calibration, and should become the
+candidate small-size recipe for Milestone 9. See
+`reports/evaluation/hydrocore-v5/m8-7-summary.md` for the outcome. This
+amendment does not alter any prior milestone's historical results.
+
+## 8.6. Amendment: Milestone 9.0 (interleaved topology-diversity training)
+
+Milestone 7 (`reports/evaluation/hydrocore-v5/m7-summary.md`) compared a
+golden-reference-only model against a model trained on golden-reference +
+branched-loop + loop-grid, but the latter used a SEQUENTIAL three-phase
+curriculum (one family per phase, chained via `Trainer.fit(resume_from=
+...)`) because `CausalPrefixDatasetView`/`collate_scenarios` cannot mix
+differently-shaped topology families within one micro-batch. M7 found no
+robust unseen-topology generalization gain, but that result is confounded
+by family recency/catastrophic forgetting/optimizer-state dominated by the
+last-trained family -- it establishes only that the TESTED SEQUENTIAL
+curriculum did not generalize, not that topology diversity itself cannot
+help.
+
+Milestone 9.0 (`docs/evaluation/HYDROCORE_V5_M9_0_PROTOCOL.md`, its own
+frozen sub-protocol) retests the same question with TRUE interleaving --
+family-pure micro-batches, cross-family gradient accumulation within one
+optimizer step -- at the current (~4.18M) model size and the Milestone-8.7
+`AGE_FIX_ONLY` representation, before any Milestone-9 capacity scaling
+begins. See `reports/evaluation/hydrocore-v5/m9-0-summary.md` for the
+outcome. This amendment does not alter Milestone 7's own historical
+results, and Milestone 9's own capacity-scaling scope (Section 6 above) is
+unchanged except that it now also inherits whichever topology-training
+recipe M9.0 selects.
+
+## 8.7. Amendment: Milestone 9.0a (optimizer-step-matched interleaved topology training)
+
+Milestone 9.0 found a strong pooled unseen-topology gain for
+`INTERLEAVED_MULTI_FAMILY` training but rejected it because known-family
+`B_DEPTH_AWARE` marginal coverage (0.833, representative seed 31874 only)
+fell below the frozen 0.85 guardrail, and because Arm B received
+approximately 33% more optimizer updates than Arm A (1800 vs 1350 real
+steps) with a correspondingly different scheduler trajectory -- so the
+observed gain could not yet be attributed solely to topology diversity
+rather than extra optimization budget, and the calibration rejection itself
+rested on a single predictor seed.
+
+Milestone 9.0a (`docs/evaluation/HYDROCORE_V5_M9_0A_PROTOCOL.md`, its own
+frozen sub-protocol) resolves both: Arm B2
+(`STEP_MATCHED_INTERLEAVED_MULTI_FAMILY`) uses 4 microbatches/optimizer-
+update (matching Arm A's `gradient_accumulation_steps=4`) in a fixed 3-update
+family rotation, achieving exact per-epoch and total optimizer-step and
+scheduler-trajectory parity with Arm A; calibration is fit/evaluated
+separately for all three predictor seeds for both arms. See
+`reports/evaluation/hydrocore-v5/m9-0a-summary.md` for the outcome. This
+amendment does not alter Milestone 9.0's own historical results, and
+Milestone 9's capacity-scaling scope (Section 6 above) now also inherits
+whichever topology-training recipe M9.0a's own decision freezes.
+
+## 8.8. Amendment: Milestone 9.0b (multi-topology calibration grouping study)
+
+Milestone 9.0a validated that `STEP_MATCHED_INTERLEAVED_MULTI_FAMILY`
+training gives a real, optimizer-step-parity-robust unseen-topology gain,
+but found its `B_DEPTH_AWARE` (`network_id = f"{family}:{depth_bucket}"`)
+calibration fails the frozen 0.85 known-family marginal-coverage floor on
+all three predictor seeds -- `CALIBRATION_SYSTEMATICALLY_INCOMPATIBLE`.
+
+Milestone 9.0b (`docs/evaluation/HYDROCORE_V5_M9_0B_PROTOCOL.md`, its own
+frozen sub-protocol) tests, at fixed alpha=0.1 and the frozen M9.0a `ARM_B2`
+predictor checkpoints (zero retraining), whether a different Mondrian
+grouping/fallback construction over the same conformal machinery
+(`hydroswarm.calibration.conformal.SplitConformalCalibrator`, unmodified)
+restores safety-valid coverage, closing the calibration question one way or
+the other before Milestone 9.1 (continuous-time architecture trial) begins.
+See `reports/evaluation/hydrocore-v5/m9-0b-summary.md` for the outcome.
+
+## 8.9. Amendment: Milestone 9.1 preflight (continuous-time architecture feasibility)
+
+M9.0b closed `INTERLEAVED_PREDICTOR_CALIBRATION_NOT_RESOLVED`; its own recorded
+M9.1 recipe (representation `AGE_FIX_ONLY`, topology training
+`SINGLE_FAMILY_CURRENT_TRAINING`, calibration `B_DEPTH_AWARE`, `alpha=0.1`)
+leaves `M9_1_SCIENTIFICALLY_UNBLOCKED: YES`.
+
+Before Milestone 9.1's own scientific comparison of CURRENT HydroCore against
+Graph Neural ODE/CDE/Stable Graph Neural SDE candidates begins, a separate
+PREFLIGHT milestone
+(`docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_PROTOCOL.md`, its own frozen
+sub-protocol) establishes that the continuous-time architecture testbed
+itself -- interface, time semantics, causality, solver configuration,
+parameter matching, numerical stability -- is correct, independent of any
+predictive-performance signal. The preflight computes and reports zero
+localization/accuracy numbers for any candidate; it answers only "can we run
+the experiment correctly?", never "which architecture is best?". The frozen
+scientific M9.1 comparison protocol (arms, promotion gates, statistical
+procedure) is written and frozen separately, only after this preflight
+closes with `M9_1_FULL_EXPERIMENT_READY = YES` (or with an explicit,
+documented reduction in arms). See
+`reports/evaluation/hydrocore-v5/m9-1-preflight-summary.md` for the preflight
+outcome. This amendment does not alter M9.0b's own historical results.
+
+## 8.10. Amendment: Milestone 9.1 scientific protocol (frozen)
+
+The M9.1 preflight closed `M9_1_FULL_EXPERIMENT_READY = YES` for all four
+arms (CURRENT, GRAPH_ODE, GRAPH_CDE, GRAPH_SDE) after one correction pass
+(`docs/evaluation/HYDROCORE_V5_M9_1_PREFLIGHT_CORRECTION.md`, closing two
+implementation gaps against the preflight's own frozen design --
+`reports/evaluation/hydrocore-v5/m9-1-preflight-correction-summary.md`).
+
+Milestone 9.1's own scientific comparison protocol
+(`docs/evaluation/HYDROCORE_V5_M9_1_PROTOCOL.md`, its own frozen
+sub-protocol) is frozen after that closure, before any candidate is trained
+on the full recipe or evaluated on `development_holdout`: it locks the arms,
+splits/seeds (including a checkpoint-reuse rule for `CURRENT`, identical by
+construction to M8.7's own closed `AGE_FIX_ONLY` arm -- zero redundant
+retraining), architecture/solver configuration (taken verbatim from the
+corrected preflight, never re-tuned), one predeclared primary metric
+(pooled EARLY+MID neural top-1, chosen on M8.7's own pre-existing
+MATURE-saturation finding, not on any M9.1 result), guardrails, a
+statistical promotion procedure with a fully enumerated decision tree and
+numeric tie-break, and artifact/logging requirements. It was reviewed once
+for researcher degrees of freedom before commit (its own Section 20 records
+what was found and closed, including that an early draft left `CURRENT`'s
+retrain-vs-reuse question undecided). This amendment does not alter M9.0b's
+or the M9.1 preflight's own historical results, and does not itself
+authorize execution of the scientific run.
+
 ## 9. No-lock rule (restated)
 
 Never use the locked final evaluation for development, tuning, model

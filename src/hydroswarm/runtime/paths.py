@@ -32,6 +32,7 @@ from pathlib import Path
 #: non-standard deployment should set rather than relying on source-tree-
 #: relative inference.
 V4_BUNDLE_DIR_ENV_VAR = "HYDROSWARM_V4_BUNDLE_DIR"
+V5_BUNDLE_DIR_ENV_VAR = "HYDROSWARM_V5_BUNDLE_DIR"
 
 #: Explicit override for the writable runtime data directory (database,
 #: signature cache, imported networks). Matches the variable name already
@@ -52,6 +53,7 @@ REFERENCE_DEMO_PATH_ENV_VAR = "HYDROSWARM_REFERENCE_DEMO_PATH"
 FROZEN_SCENARIO_DIR_ENV_VAR = "HYDROSWARM_FROZEN_SCENARIO_DIR"
 
 _BUNDLE_RELATIVE_PATH = ("models", "hydrocore-v4-release")
+_V5_BUNDLE_RELATIVE_PATH = ("models", "hydrocore-v5-release")
 _REFERENCE_DEMO_RELATIVE_PATH = ("artifacts", "reference-demo", "reference-incident-v1.json")
 _FROZEN_SCENARIO_RELATIVE_PATH = ("data", "frozen")
 
@@ -103,6 +105,19 @@ def resolve_v4_bundle_dir(project_root: str | Path | None = None) -> Path:
         return cwd_candidate.resolve()
 
     return source_tree_candidate.resolve()
+
+
+def resolve_v5_bundle_dir(project_root: str | Path | None = None) -> Path:
+    """Resolve only the v5 release path; never fall back to v4."""
+    override = os.environ.get(V5_BUNDLE_DIR_ENV_VAR, "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    root = Path(project_root).resolve() if project_root is not None else _source_tree_project_root()
+    candidate = root.joinpath(*_V5_BUNDLE_RELATIVE_PATH)
+    if candidate.is_dir():
+        return candidate.resolve()
+    cwd_candidate = Path.cwd().joinpath(*_V5_BUNDLE_RELATIVE_PATH)
+    return cwd_candidate.resolve() if cwd_candidate.is_dir() else candidate.resolve()
 
 
 def resolve_data_dir(project_root: str | Path | None = None) -> Path:

@@ -1,0 +1,12 @@
+{
+  "classification": {
+    "create_app_pipeline_factory_injection": "B_HARMLESS_COMPATIBILITY",
+    "m10_4_factory": "C_EVALUATION_ONLY",
+    "v4_default_bundle": "A_REQUIRED_TO_REPLACE_IF_AND_ONLY_IF_SELECTION_IDENTITY_IS_RESOLVED"
+  },
+  "kind": "M10_5_SERVING_PATH_AUDIT",
+  "m10_4_evaluated_factory": "M10_4_PipelineFactory injected into create_app; canonical M9.6 model/calibration",
+  "pre_modification_default": "hydroswarm.api.app -> V4PipelineFactory(resolve_v4_bundle_dir()) -> models/hydrocore-v4-release",
+  "reason": "Blocked before selection; default wiring must not be changed to an arbitrarily chosen v5 seed.",
+  "serving_change_performed": false
+}

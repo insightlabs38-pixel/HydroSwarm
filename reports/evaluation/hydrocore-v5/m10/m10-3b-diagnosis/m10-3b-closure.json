@@ -1,0 +1,34 @@
+{
+  "kind": "M10_3B_DIAGNOSIS_CLOSURE",
+  "milestone": "M10.3B",
+  "branch": "exp/hydrocore-v5-causal",
+  "commit_at_closure_time": "29e5e5719a8c0e27792a42d639b382e20f625332",
+  "amends": "docs/evaluation/HYDROCORE_V5_M10_3B_STRATEGIST_DIAGNOSIS.md -- additive to M10.3A, does not reopen/reverse/alter M10.3A's closure",
+  "central_question": "Did M10.3A fail because HydroCore needs broader retraining, or because the current Strategist objective/population does not contain enough correct, legally observable, within-incident decision signal to justify such retraining?",
+  "answer": "The current Strategist objective/population does not contain enough within-incident decision signal, for a concrete, mechanistically-proven physical reason specific to this task's single-family/single-depth pilot scope -- NOT because HydroCore's frozen representation is insufficient. No broader/full retrain is scientifically justified by this evidence.",
+  "M10_3B_DECISION": "M10_3B_POPULATION_AMENDMENT_REQUIRED",
+  "decision_reasoning": "Section 20(D) (M10_3B_LEARNED_STRATEGIST_NOT_JUSTIFIED) does not yet apply: this task's own evidence traces the degeneracy to a SPECIFIC, narrow, already-disclosed pilot-scope choice (M10.3A Part 7's own frozen protocol: family='golden-reference' ONLY, depth=25 'MATURE' ONLY -- mirroring M10.2's precedent, not an exhaustive population) rather than a fundamental property of every realistic candidate population the system could legitimately generate. Two already-governed, already-trained-on TRAINED_FAMILIES (branched-loop, loop-grid -- see scripts/hydrocore_v5/run_m7_topology.py) and five already-governed depth buckets (1,2,3,4,6 -- EARLY/MID severity, never sampled here) exist and were never evaluated for Strategist candidate diversity. Because the isolation-template rejection mechanism this task identified (PRESSURE_BELOW_MINIMUM, a hydraulic-redundancy property of THIS SPECIFIC network under MATURE-depth severity) is plausibly, but not yet confirmedly, specific to golden-reference/MATURE, declaring D (LEARNED_STRATEGIST_NOT_JUSTIFIED) now would extrapolate beyond this task's own evidence. Declaring C (BROADER_REFIT_SCIENTIFICALLY_JUSTIFIED) is directly contradicted by the evidence: root-cause classification found CANDIDATE_POPULATION_DEGENERACY and mathematically-forced TARGET_DEGENERACY for every failed criterion, and explicitly found no support for FROZEN_REPRESENTATION_INSUFFICIENT anywhere. Declaring A (CORRECTION_REQUIRED) is directly contradicted: the ranking-alignment/target-formula/leakage audits found zero mechanical defects across 6 independent mechanical checks plus real-code unit tests.",
+  "specified_population_amendment_scope": {
+    "principle": "Development-only, must remain within already-existing, already-governed system semantics (existing TRAINED_FAMILIES, existing depth buckets, existing deterministic candidate templates) -- no new/invented candidate templates, no weakened safety thresholds, no hand-crafted implausible plans.",
+    "recommended_additions_for_a_future_M10_3C_population_amendment": [
+      "Include the OTHER 2 already-trained families (branched-loop, loop-grid) in addition to golden-reference -- different topology redundancy may allow the isolation templates to remain WNTR-VERIFIED (not systematically PRESSURE_BELOW_MINIMUM) on at least some incidents, restoring real exposure/pressure/plan_value tradeoffs.",
+      "Include EARLY/MID depth buckets (1,2,3,4,6) in addition to MATURE (25) -- lower-severity incidents may need less aggressive isolation, making PROTECT_CRITICAL/FLUSH_DOWNSTREAM-class actions genuinely differentiate from NO_ACTION even where isolation remains infeasible.",
+      "The amendment must FREEZE this expanded population and its own frozen protocol BEFORE inspecting any Level-A result, per this task's own governance rules -- this diagnosis provides the motivating evidence, not the frozen protocol itself.",
+      "The amendment should re-run this SAME within-incident-identifiability/oracle-utility diagnostic on the expanded population BEFORE any training, to confirm the expansion actually restores meaningful within-incident decision signal (never assume it will)."
+    ],
+    "if_the_amendment_finds_the_same_degeneracy_on_the_expanded_population": "Then M10_3B_LEARNED_STRATEGIST_NOT_JUSTIFIED (Section 20-D) becomes the well-evidenced conclusion, and the system should retain the deterministic candidate generator + deterministic Strategist + exact WNTR verification permanently for this decision, proceeding to M10.4 on that basis."
+  },
+  "does_not_authorize": [
+    "true M10.3",
+    "Strategist retraining of any kind",
+    "another Level A or Level B",
+    "a full/shared HydroCore retrain",
+    "opening locked final/topology tests",
+    "altering closed M9/M10 results",
+    "the M10.3C population amendment itself (a separately authorized future task)"
+  ],
+  "m9_m10_historical_artifacts_unchanged": true,
+  "m10_3a_closure_unaltered": true,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

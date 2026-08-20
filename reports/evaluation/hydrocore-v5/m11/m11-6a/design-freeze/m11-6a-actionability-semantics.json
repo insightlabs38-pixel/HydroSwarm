@@ -1,0 +1,17 @@
+{
+  "actionable_definition": "successful /approve (HTTP 200) => decision == VERIFIED AND verification_status == CURRENT AND plan/network/context hashes match",
+  "exposed_fields": [
+    "verification.decision",
+    "verification.verification_status"
+  ],
+  "kind": "M11_6A_ACTIONABILITY_SEMANTICS",
+  "not_exposed": [
+    "actionable",
+    "safe",
+    "approvable",
+    "recommended",
+    "approval_allowed"
+  ],
+  "rejected_must_not_be_safe": true,
+  "unverified_must_not_be_actionable": true
+}

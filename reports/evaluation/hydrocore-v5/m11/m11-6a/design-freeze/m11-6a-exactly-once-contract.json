@@ -1,0 +1,28 @@
+{
+  "before_first_locked_read": [
+    "verify authorization (consumed=false, authorized_openings=0)",
+    "verify frozen finalist identity (M11.2 hashes)",
+    "verify code/evaluator identities",
+    "verify locked materialization manifest (all hashes, overlap/novelty audits)",
+    "verify locked_test_opened=false",
+    "atomically create/set the one-time OPENED record"
+  ],
+  "crash_semantics": "If the evaluator crashes AFTER the OPENED marker is atomically committed: the locked test counts as opened; do NOT auto-retry; do NOT remove the marker; do NOT regenerate data; do NOT change code; record partial/crash evidence; stop for human review. NO resume, NO generic retry (one-shot semantics are simple and auditable).",
+  "if_opened_exists": "REFUSE TO RUN",
+  "kind": "M11_6A_EXACTLY_ONCE_CONTRACT",
+  "mechanism": "atomic create-exclusive file (os.open O_CREAT|O_EXCL|O_WRONLY) at reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-opened-record.json",
+  "no_auto_clearing": true,
+  "no_force": true,
+  "no_reset": true,
+  "opened_record_binds": [
+    "run_id",
+    "timestamp",
+    "code_under_test_sha",
+    "design_freeze_sha",
+    "materialization_manifest_sha",
+    "finalist_checkpoint_sha",
+    "calibration_sha",
+    "release_manifest_sha",
+    "evaluator_sha"
+  ]
+}

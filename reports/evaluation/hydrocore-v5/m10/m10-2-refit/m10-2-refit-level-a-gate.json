@@ -1,0 +1,143 @@
+{
+  "kind": "M10_2_REFIT_LEVEL_A_GATE",
+  "protocol_hash": "99d2c31f419960dddd83be2665b47cebaf5d3bffc84d939d174cd61b3e16cece",
+  "validation_count_used": 300,
+  "validation_count_amendment_reason": "original VALIDATION_COUNT=100 produced only 17 validation examples with sample_node_mask=True, below GATE_MIN_SUPPORT=20; discovered from corpus size statistics only, before any competence metric was computed for either split",
+  "n_validation_examples": 360,
+  "n_validation_examples_with_real_recommendation": 65,
+  "gate_min_support": 20,
+  "support_criterion_2_passed": true,
+  "train_baseline_stats": {
+    "information_gain_train_mean": 0.3834151029586792,
+    "candidate_reduction_train_mean": 0.36331087350845337,
+    "should_continue_sampling_train_majority_class": 0
+  },
+  "per_seed_metrics": {
+    "20260814": {
+      "sample_node": {
+        "n": 65,
+        "model_top1_accuracy": 0.8,
+        "naive_baseline_top1_accuracy": 0.2961538461538461,
+        "diff_ci_lower": 0.41147435897435897,
+        "diff_ci_upper": 0.5871794871794872,
+        "criterion_3_passed": true
+      },
+      "information_gain": {
+        "n": 1359,
+        "model_mse": 0.6809555470827967,
+        "baseline_mse": 1.128523989568671,
+        "baseline_value": 0.3834151029586792,
+        "spearman": 0.28823100583147476,
+        "spearman_ci_lower": 0.24104182360512333,
+        "spearman_ci_upper": 0.3325245801528022,
+        "criterion_passed": true
+      },
+      "candidate_reduction": {
+        "n": 1359,
+        "model_mse": 0.0601513693526878,
+        "baseline_mse": 0.10443777560976503,
+        "baseline_value": 0.36331087350845337,
+        "spearman": 0.4357738604637875,
+        "spearman_ci_lower": 0.39657299813221303,
+        "spearman_ci_upper": 0.47454747432654615,
+        "criterion_passed": true
+      },
+      "should_continue_sampling": {
+        "n": 360,
+        "model_accuracy": 0.8611111111111112,
+        "accuracy_ci_lower": 0.8305555555555556,
+        "accuracy_ci_upper": 0.8888888888888888,
+        "majority_baseline_accuracy": 0.8194444444444444,
+        "both_classes_present": true,
+        "criterion_6_passed": true
+      }
+    },
+    "31874": {
+      "sample_node": {
+        "n": 65,
+        "model_top1_accuracy": 0.7538461538461538,
+        "naive_baseline_top1_accuracy": 0.2961538461538461,
+        "diff_ci_lower": 0.3641025641025641,
+        "diff_ci_upper": 0.5461538461538462,
+        "criterion_3_passed": true
+      },
+      "information_gain": {
+        "n": 1359,
+        "model_mse": 0.687206371578778,
+        "baseline_mse": 1.128523989568671,
+        "baseline_value": 0.3834151029586792,
+        "spearman": 0.27028521222655477,
+        "spearman_ci_lower": 0.21998644168821907,
+        "spearman_ci_upper": 0.3138873139748937,
+        "criterion_passed": true
+      },
+      "candidate_reduction": {
+        "n": 1359,
+        "model_mse": 0.05994449566825084,
+        "baseline_mse": 0.10443777560976503,
+        "baseline_value": 0.36331087350845337,
+        "spearman": 0.4672812475964534,
+        "spearman_ci_lower": 0.42943916352832073,
+        "spearman_ci_upper": 0.5039477263965909,
+        "criterion_passed": true
+      },
+      "should_continue_sampling": {
+        "n": 360,
+        "model_accuracy": 0.8638888888888889,
+        "accuracy_ci_lower": 0.8333333333333334,
+        "accuracy_ci_upper": 0.8944444444444445,
+        "majority_baseline_accuracy": 0.8194444444444444,
+        "both_classes_present": true,
+        "criterion_6_passed": true
+      }
+    },
+    "20260815": {
+      "sample_node": {
+        "n": 65,
+        "model_top1_accuracy": 0.7692307692307693,
+        "naive_baseline_top1_accuracy": 0.2961538461538461,
+        "diff_ci_lower": 0.38326923076923075,
+        "diff_ci_upper": 0.5602564102564103,
+        "criterion_3_passed": true
+      },
+      "information_gain": {
+        "n": 1359,
+        "model_mse": 0.672299736599824,
+        "baseline_mse": 1.128523989568671,
+        "baseline_value": 0.3834151029586792,
+        "spearman": 0.2643155773011747,
+        "spearman_ci_lower": 0.2145665867236462,
+        "spearman_ci_upper": 0.31178075259158117,
+        "criterion_passed": true
+      },
+      "candidate_reduction": {
+        "n": 1359,
+        "model_mse": 0.059544721374632806,
+        "baseline_mse": 0.10443777560976503,
+        "baseline_value": 0.36331087350845337,
+        "spearman": 0.4255946672884438,
+        "spearman_ci_lower": 0.38291832440709683,
+        "spearman_ci_upper": 0.4669388499794996,
+        "criterion_passed": true
+      },
+      "should_continue_sampling": {
+        "n": 360,
+        "model_accuracy": 0.8888888888888888,
+        "accuracy_ci_lower": 0.8611111111111112,
+        "accuracy_ci_upper": 0.9138888888888889,
+        "majority_baseline_accuracy": 0.8194444444444444,
+        "both_classes_present": true,
+        "criterion_6_passed": true
+      }
+    }
+  },
+  "per_seed_scout_competence_gate_passed": {
+    "20260814": true,
+    "31874": true,
+    "20260815": true
+  },
+  "all_seeds_pass_competence_gate": true,
+  "any_seed_passes_competence_gate": true,
+  "locked_test_opened_before": false,
+  "locked_test_opened_after": false
+}

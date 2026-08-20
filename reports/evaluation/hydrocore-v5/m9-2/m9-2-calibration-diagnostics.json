@@ -1,0 +1,626 @@
+{
+  "by_arm_depth_correctness": {
+    "CURRENT": {
+      "1": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.7873342147240272,
+          "mean_max_probability": 0.6447668969631195,
+          "mean_normalized_set_size": 0.5974358974358973,
+          "mean_probability_true_source": 0.6447668969631195,
+          "n": 65
+        },
+        "incorrect": {
+          "coverage": 0.8514285714285714,
+          "mean_entropy": 0.848476662476148,
+          "mean_max_probability": 0.61489613703319,
+          "mean_normalized_set_size": 0.5952380952380952,
+          "mean_probability_true_source": 0.12137375440982785,
+          "n": 175
+        }
+      },
+      "12": {
+        "correct": {
+          "coverage": 0.8940677966101694,
+          "mean_entropy": 0.05281317805383878,
+          "mean_max_probability": 0.9839440407389302,
+          "mean_normalized_set_size": 0.14901129943502828,
+          "mean_probability_true_source": 0.9839440407389302,
+          "n": 236
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.5714102648198605,
+          "mean_max_probability": 0.6849542260169983,
+          "mean_normalized_set_size": 0.0,
+          "mean_probability_true_source": 0.31090363301336765,
+          "n": 4
+        }
+      },
+      "2": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.29892381201699675,
+          "mean_max_probability": 0.8822468601855911,
+          "mean_normalized_set_size": 0.38235294117647045,
+          "mean_probability_true_source": 0.8822468601855911,
+          "n": 119
+        },
+        "incorrect": {
+          "coverage": 0.8181818181818182,
+          "mean_entropy": 0.5597849250251565,
+          "mean_max_probability": 0.7787011728799047,
+          "mean_normalized_set_size": 0.5702479338842975,
+          "mean_probability_true_source": 0.05775732103493959,
+          "n": 121
+        }
+      },
+      "25": {
+        "correct": {
+          "coverage": 0.8786610878661087,
+          "mean_entropy": 0.053933904095281066,
+          "mean_max_probability": 0.9836057344739906,
+          "mean_normalized_set_size": 0.14644351464435146,
+          "mean_probability_true_source": 0.9836057344739906,
+          "n": 239
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.6629044413566589,
+          "mean_max_probability": 0.6641174554824829,
+          "mean_normalized_set_size": 0.0,
+          "mean_probability_true_source": 0.3318351209163666,
+          "n": 1
+        }
+      },
+      "3": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.14892225606110232,
+          "mean_max_probability": 0.9423662608777973,
+          "mean_normalized_set_size": 0.3016431924882629,
+          "mean_probability_true_source": 0.9423662608777973,
+          "n": 142
+        },
+        "incorrect": {
+          "coverage": 0.7857142857142857,
+          "mean_entropy": 0.4774287927762738,
+          "mean_max_probability": 0.8036851706553478,
+          "mean_normalized_set_size": 0.5561224489795918,
+          "mean_probability_true_source": 0.05944392070503974,
+          "n": 98
+        }
+      },
+      "4": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.08360888560495462,
+          "mean_max_probability": 0.9709689102111718,
+          "mean_normalized_set_size": 0.18717948717948718,
+          "mean_probability_true_source": 0.9709689102111718,
+          "n": 195
+        },
+        "incorrect": {
+          "coverage": 0.24444444444444444,
+          "mean_entropy": 0.5394547622443902,
+          "mean_max_probability": 0.7414065049754248,
+          "mean_normalized_set_size": 0.3,
+          "mean_probability_true_source": 0.08332859347897789,
+          "n": 45
+        }
+      },
+      "6": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.08650532968229604,
+          "mean_max_probability": 0.9698958384229782,
+          "mean_normalized_set_size": 0.18936170212765957,
+          "mean_probability_true_source": 0.9698958384229782,
+          "n": 235
+        },
+        "incorrect": {
+          "coverage": 0.4,
+          "mean_entropy": 0.3131222667172551,
+          "mean_max_probability": 0.8247971773147583,
+          "mean_normalized_set_size": 0.2333333333333333,
+          "mean_probability_true_source": 0.17110007286537438,
+          "n": 5
+        }
+      }
+    },
+    "GRAPH_CDE": {
+      "1": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.3777085703331977,
+          "mean_max_probability": 0.8853272292762995,
+          "mean_normalized_set_size": 0.6119791666666666,
+          "mean_probability_true_source": 0.8853272292762995,
+          "n": 64
+        },
+        "incorrect": {
+          "coverage": 0.8522727272727273,
+          "mean_entropy": 0.3769441174385561,
+          "mean_max_probability": 0.8879317221316424,
+          "mean_normalized_set_size": 0.6041666666666667,
+          "mean_probability_true_source": 0.038345885161561455,
+          "n": 176
+        }
+      },
+      "12": {
+        "correct": {
+          "coverage": 0.9434782608695652,
+          "mean_entropy": 0.09730904424852824,
+          "mean_max_probability": 0.9695150135651879,
+          "mean_normalized_set_size": 0.15724637681159423,
+          "mean_probability_true_source": 0.9695150135651879,
+          "n": 230
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.5349356770515442,
+          "mean_max_probability": 0.7639154136180878,
+          "mean_normalized_set_size": 0.05,
+          "mean_probability_true_source": 0.18499103249050677,
+          "n": 10
+        }
+      },
+      "2": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.5114027587375952,
+          "mean_max_probability": 0.7634505362154167,
+          "mean_normalized_set_size": 0.45794392523364486,
+          "mean_probability_true_source": 0.7634505362154167,
+          "n": 107
+        },
+        "incorrect": {
+          "coverage": 0.8120300751879699,
+          "mean_entropy": 0.7234352240268898,
+          "mean_max_probability": 0.6617683600214191,
+          "mean_normalized_set_size": 0.5538847117794485,
+          "mean_probability_true_source": 0.11817296200801261,
+          "n": 133
+        }
+      },
+      "25": {
+        "correct": {
+          "coverage": 0.9432314410480349,
+          "mean_entropy": 0.10643086473702293,
+          "mean_max_probability": 0.9671358247511251,
+          "mean_normalized_set_size": 0.1572052401746725,
+          "mean_probability_true_source": 0.9671358247511251,
+          "n": 229
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.4982957941564647,
+          "mean_max_probability": 0.7768733555620367,
+          "mean_normalized_set_size": 0.0606060606060606,
+          "mean_probability_true_source": 0.18567023661241613,
+          "n": 11
+        }
+      },
+      "3": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.2305699814650048,
+          "mean_max_probability": 0.9178882401058639,
+          "mean_normalized_set_size": 0.3743961352657004,
+          "mean_probability_true_source": 0.9178882401058639,
+          "n": 138
+        },
+        "incorrect": {
+          "coverage": 0.8137254901960784,
+          "mean_entropy": 0.4107039416683655,
+          "mean_max_probability": 0.8703677309494392,
+          "mean_normalized_set_size": 0.5539215686274509,
+          "mean_probability_true_source": 0.05203020319494695,
+          "n": 102
+        }
+      },
+      "4": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.14816986996592424,
+          "mean_max_probability": 0.9528886129718801,
+          "mean_normalized_set_size": 0.19197207678883074,
+          "mean_probability_true_source": 0.9528886129718801,
+          "n": 191
+        },
+        "incorrect": {
+          "coverage": 0.4897959183673469,
+          "mean_entropy": 0.5850638642298932,
+          "mean_max_probability": 0.7376729639209046,
+          "mean_normalized_set_size": 0.34013605442176864,
+          "mean_probability_true_source": 0.11405231982079923,
+          "n": 49
+        }
+      },
+      "6": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.10406415372201666,
+          "mean_max_probability": 0.968280880724281,
+          "mean_normalized_set_size": 0.17914831130690156,
+          "mean_probability_true_source": 0.968280880724281,
+          "n": 227
+        },
+        "incorrect": {
+          "coverage": 0.6153846153846154,
+          "mean_entropy": 0.5119083735805291,
+          "mean_max_probability": 0.7849026505763714,
+          "mean_normalized_set_size": 0.3333333333333333,
+          "mean_probability_true_source": 0.12817762231973645,
+          "n": 13
+        }
+      }
+    },
+    "GRAPH_ODE": {
+      "1": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.23968894116114825,
+          "mean_max_probability": 0.9436301849782467,
+          "mean_normalized_set_size": 0.6380208333333333,
+          "mean_probability_true_source": 0.9436301849782467,
+          "n": 64
+        },
+        "incorrect": {
+          "coverage": 0.9602272727272727,
+          "mean_entropy": 0.2445155062120069,
+          "mean_max_probability": 0.9437921104783361,
+          "mean_normalized_set_size": 0.6534090909090909,
+          "mean_probability_true_source": 0.016756957154112486,
+          "n": 176
+        }
+      },
+      "12": {
+        "correct": {
+          "coverage": 0.9511111111111111,
+          "mean_entropy": 0.08061823520912892,
+          "mean_max_probability": 0.9743136207262675,
+          "mean_normalized_set_size": 0.15851851851851853,
+          "mean_probability_true_source": 0.9743136207262675,
+          "n": 225
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.5127668540303906,
+          "mean_max_probability": 0.7526995539665222,
+          "mean_normalized_set_size": 0.08888888888888888,
+          "mean_probability_true_source": 0.2101056382448102,
+          "n": 15
+        }
+      },
+      "2": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.27043454399849365,
+          "mean_max_probability": 0.9146302531836397,
+          "mean_normalized_set_size": 0.3983050847457627,
+          "mean_probability_true_source": 0.9146302531836397,
+          "n": 118
+        },
+        "incorrect": {
+          "coverage": 0.7213114754098361,
+          "mean_entropy": 0.527703576721251,
+          "mean_max_probability": 0.8006862585173279,
+          "mean_normalized_set_size": 0.534153005464481,
+          "mean_probability_true_source": 0.05389352206052014,
+          "n": 122
+        }
+      },
+      "25": {
+        "correct": {
+          "coverage": 0.9137931034482759,
+          "mean_entropy": 0.11552131923637152,
+          "mean_max_probability": 0.9564569849392464,
+          "mean_normalized_set_size": 0.15229885057471262,
+          "mean_probability_true_source": 0.9564569849392464,
+          "n": 232
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.40279462886974216,
+          "mean_max_probability": 0.8183531910181046,
+          "mean_normalized_set_size": 0.08333333333333333,
+          "mean_probability_true_source": 0.15819342253962532,
+          "n": 8
+        }
+      },
+      "3": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.13140099550030762,
+          "mean_max_probability": 0.9619926285076809,
+          "mean_normalized_set_size": 0.3531468531468531,
+          "mean_probability_true_source": 0.9619926285076809,
+          "n": 143
+        },
+        "incorrect": {
+          "coverage": 0.7010309278350515,
+          "mean_entropy": 0.376391634978738,
+          "mean_max_probability": 0.8885796383484122,
+          "mean_normalized_set_size": 0.48625429553264604,
+          "mean_probability_true_source": 0.038924159397472825,
+          "n": 97
+        }
+      },
+      "4": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.13457270781138647,
+          "mean_max_probability": 0.9491781903540387,
+          "mean_normalized_set_size": 0.1919934640522876,
+          "mean_probability_true_source": 0.9491781903540387,
+          "n": 204
+        },
+        "incorrect": {
+          "coverage": 0.3611111111111111,
+          "mean_entropy": 0.5292812926798232,
+          "mean_max_probability": 0.7709336438112788,
+          "mean_normalized_set_size": 0.28240740740740733,
+          "mean_probability_true_source": 0.11746736459503558,
+          "n": 36
+        }
+      },
+      "6": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.06630062228448214,
+          "mean_max_probability": 0.9811563310644175,
+          "mean_normalized_set_size": 0.17327459618208516,
+          "mean_probability_true_source": 0.9811563310644175,
+          "n": 227
+        },
+        "incorrect": {
+          "coverage": 0.38461538461538464,
+          "mean_entropy": 0.504816560074687,
+          "mean_max_probability": 0.7646622955799103,
+          "mean_normalized_set_size": 0.2692307692307692,
+          "mean_probability_true_source": 0.18348192302017616,
+          "n": 13
+        }
+      }
+    },
+    "GRAPH_SDE": {
+      "1": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.19126371946185827,
+          "mean_max_probability": 0.9514670129865408,
+          "mean_normalized_set_size": 0.6380208333333333,
+          "mean_probability_true_source": 0.9514670129865408,
+          "n": 64
+        },
+        "incorrect": {
+          "coverage": 0.9602272727272727,
+          "mean_entropy": 0.19456046859903092,
+          "mean_max_probability": 0.9538909058001909,
+          "mean_normalized_set_size": 0.6486742424242424,
+          "mean_probability_true_source": 0.01318743065514189,
+          "n": 176
+        }
+      },
+      "12": {
+        "correct": {
+          "coverage": 0.933920704845815,
+          "mean_entropy": 0.09006747357251886,
+          "mean_max_probability": 0.9699723263669119,
+          "mean_normalized_set_size": 0.15565345080763585,
+          "mean_probability_true_source": 0.9699723263669119,
+          "n": 227
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.3950323243267261,
+          "mean_max_probability": 0.8306615788203019,
+          "mean_normalized_set_size": 0.11538461538461539,
+          "mean_probability_true_source": 0.14099806769697282,
+          "n": 13
+        }
+      },
+      "2": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.26328253349036734,
+          "mean_max_probability": 0.9187742512104875,
+          "mean_normalized_set_size": 0.41384180790960456,
+          "mean_probability_true_source": 0.9187742512104875,
+          "n": 118
+        },
+        "incorrect": {
+          "coverage": 0.680327868852459,
+          "mean_entropy": 0.5464416794997992,
+          "mean_max_probability": 0.7895076103874894,
+          "mean_normalized_set_size": 0.523224043715847,
+          "mean_probability_true_source": 0.05832161243024977,
+          "n": 122
+        }
+      },
+      "25": {
+        "correct": {
+          "coverage": 0.9298245614035088,
+          "mean_entropy": 0.10613498258610714,
+          "mean_max_probability": 0.9646289089792653,
+          "mean_normalized_set_size": 0.15497076023391815,
+          "mean_probability_true_source": 0.9646289089792653,
+          "n": 228
+        },
+        "incorrect": {
+          "coverage": 0.0,
+          "mean_entropy": 0.46714636295412976,
+          "mean_max_probability": 0.7849415242671967,
+          "mean_normalized_set_size": 0.05555555555555555,
+          "mean_probability_true_source": 0.1941988396041173,
+          "n": 12
+        }
+      },
+      "3": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.1328910601405114,
+          "mean_max_probability": 0.9631407994490403,
+          "mean_normalized_set_size": 0.36946386946386944,
+          "mean_probability_true_source": 0.9631407994490403,
+          "n": 143
+        },
+        "incorrect": {
+          "coverage": 0.7216494845360825,
+          "mean_entropy": 0.37420717822675853,
+          "mean_max_probability": 0.889000454514297,
+          "mean_normalized_set_size": 0.5,
+          "mean_probability_true_source": 0.037003661150293674,
+          "n": 97
+        }
+      },
+      "4": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.125468049317385,
+          "mean_max_probability": 0.9549410438596322,
+          "mean_normalized_set_size": 0.18801313628899835,
+          "mean_probability_true_source": 0.9549410438596322,
+          "n": 203
+        },
+        "incorrect": {
+          "coverage": 0.32432432432432434,
+          "mean_entropy": 0.5457158027267134,
+          "mean_max_probability": 0.7570218991588902,
+          "mean_normalized_set_size": 0.3018018018018018,
+          "mean_probability_true_source": 0.1077453914036301,
+          "n": 37
+        }
+      },
+      "6": {
+        "correct": {
+          "coverage": 1.0,
+          "mean_entropy": 0.06792165738076128,
+          "mean_max_probability": 0.98086113001393,
+          "mean_normalized_set_size": 0.17551622418879054,
+          "mean_probability_true_source": 0.98086113001393,
+          "n": 226
+        },
+        "incorrect": {
+          "coverage": 0.5,
+          "mean_entropy": 0.5327362375599998,
+          "mean_max_probability": 0.738718011549541,
+          "mean_normalized_set_size": 0.29761904761904756,
+          "mean_probability_true_source": 0.2089377870683425,
+          "n": 14
+        }
+      }
+    }
+  },
+  "paired_case_probability_comparison": {
+    "GRAPH_CDE": {
+      "20260814": {
+        "current_correct_novel_wrong": {
+          "mean_entropy_current": 0.42914456338233625,
+          "mean_entropy_novel": 0.5443117496040132,
+          "mean_probability_true_source_current": 0.8114735239081913,
+          "mean_probability_true_source_novel": 0.185963285028831,
+          "n": 45
+        },
+        "novel_correct_current_wrong": {
+          "mean_entropy_current": 0.6911561174382423,
+          "mean_entropy_novel": 0.5592844948686403,
+          "mean_probability_true_source_current": 0.18501167252844455,
+          "mean_probability_true_source_novel": 0.7577400300009497,
+          "n": 29
+        },
+        "rank_probability_correlation_spearman": 0.7900777876753351
+      },
+      "31874": {
+        "current_correct_novel_wrong": {
+          "mean_entropy_current": 0.3491522333402511,
+          "mean_entropy_novel": 0.4547504864471114,
+          "mean_probability_true_source_current": 0.8517855431722559,
+          "mean_probability_true_source_novel": 0.14619436118316473,
+          "n": 46
+        },
+        "novel_correct_current_wrong": {
+          "mean_entropy_current": 0.6631477039636058,
+          "mean_entropy_novel": 0.5768229453002706,
+          "mean_probability_true_source_current": 0.21371293998569907,
+          "mean_probability_true_source_novel": 0.7859371935620028,
+          "n": 17
+        },
+        "rank_probability_correlation_spearman": 0.8171053120485378
+      }
+    },
+    "GRAPH_ODE": {
+      "20260814": {
+        "current_correct_novel_wrong": {
+          "mean_entropy_current": 0.545877913961054,
+          "mean_entropy_novel": 0.4331698107856269,
+          "mean_probability_true_source_current": 0.7679192904306917,
+          "mean_probability_true_source_novel": 0.12044582226817326,
+          "n": 49
+        },
+        "novel_correct_current_wrong": {
+          "mean_entropy_current": 0.743106988781109,
+          "mean_entropy_novel": 0.4531169325658461,
+          "mean_probability_true_source_current": 0.15793679715787265,
+          "mean_probability_true_source_novel": 0.8291767617551292,
+          "n": 41
+        },
+        "rank_probability_correlation_spearman": 0.7740672725039945
+      },
+      "31874": {
+        "current_correct_novel_wrong": {
+          "mean_entropy_current": 0.5234392724368114,
+          "mean_entropy_novel": 0.46622027872606764,
+          "mean_probability_true_source_current": 0.7869252534799798,
+          "mean_probability_true_source_novel": 0.13324206584027623,
+          "n": 43
+        },
+        "novel_correct_current_wrong": {
+          "mean_entropy_current": 0.7519448031530236,
+          "mean_entropy_novel": 0.49243206124414096,
+          "mean_probability_true_source_current": 0.14265853086853345,
+          "mean_probability_true_source_novel": 0.8197469666148677,
+          "n": 33
+        },
+        "rank_probability_correlation_spearman": 0.8183332594767974
+      }
+    },
+    "GRAPH_SDE": {
+      "20260814": {
+        "current_correct_novel_wrong": {
+          "mean_entropy_current": 0.5089306803966626,
+          "mean_entropy_novel": 0.4095442860330246,
+          "mean_probability_true_source_current": 0.7904460965370645,
+          "mean_probability_true_source_novel": 0.10371538391811963,
+          "n": 49
+        },
+        "novel_correct_current_wrong": {
+          "mean_entropy_current": 0.7207782496943286,
+          "mean_entropy_novel": 0.3983066424139236,
+          "mean_probability_true_source_current": 0.1595502253116329,
+          "mean_probability_true_source_novel": 0.8603157244230571,
+          "n": 38
+        },
+        "rank_probability_correlation_spearman": 0.7733898387991522
+      },
+      "31874": {
+        "current_correct_novel_wrong": {
+          "mean_entropy_current": 0.5122919398954966,
+          "mean_entropy_novel": 0.46271422555049263,
+          "mean_probability_true_source_current": 0.7889592130978902,
+          "mean_probability_true_source_novel": 0.14113475299802505,
+          "n": 45
+        },
+        "novel_correct_current_wrong": {
+          "mean_entropy_current": 0.749513045172481,
+          "mean_entropy_novel": 0.46109630167484283,
+          "mean_probability_true_source_current": 0.14876249267527944,
+          "mean_probability_true_source_novel": 0.8249606989762363,
+          "n": 34
+        },
+        "rank_probability_correlation_spearman": 0.7924065687132106
+      }
+    }
+  }
+}

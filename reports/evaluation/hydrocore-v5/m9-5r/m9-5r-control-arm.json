@@ -1,0 +1,17 @@
+{
+  "all_3_pass": true,
+  "per_seed_coverage": {
+    "20260814": {
+      "marginal_coverage": 0.9,
+      "passes_operational_floor_0_85": true
+    },
+    "20260815": {
+      "marginal_coverage": 0.9089285714285714,
+      "passes_operational_floor_0_85": true
+    },
+    "31874": {
+      "marginal_coverage": 0.9178571428571428,
+      "passes_operational_floor_0_85": true
+    }
+  }
+}

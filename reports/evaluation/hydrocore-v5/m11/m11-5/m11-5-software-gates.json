@@ -1,0 +1,128 @@
+{
+  "all_required_pass": true,
+  "evidence_source": "GitHub Actions PR #15 (exp/hydrocore-v5-causal) head dc715a16ffd98fab184ceeb2e666904ff30ec53a",
+  "gates": [
+    {
+      "category": "full_pytest + self-test + static checks (backend)",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "python-quality (ubuntu-latest, 3.12)",
+      "output_tail": "python-quality (ubuntu-latest, 3.12): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040199/job/95946487891",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm CI"
+    },
+    {
+      "category": "pytest + simulator smoke (backend, Windows)",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "python-quality (windows-latest, 3.12)",
+      "output_tail": "python-quality (windows-latest, 3.12): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040199/job/95946487787",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm CI"
+    },
+    {
+      "category": "frontend lint/typecheck/tests",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "frontend-quality",
+      "output_tail": "frontend-quality: SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040199/job/95946487847",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm CI"
+    },
+    {
+      "category": "frontend end-to-end",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "frontend-e2e",
+      "output_tail": "frontend-e2e: SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040199/job/95946487749",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm CI"
+    },
+    {
+      "category": "docker build + hardened startup + frozen hashes + EPANET smoke + live workflow + persistence + offline",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "docker-verify (linux/amd64, ubuntu-24.04)",
+      "output_tail": "docker-verify (linux/amd64, ubuntu-24.04): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040133/job/95946487414",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Docker Build & Runtime Gate (PR)"
+    },
+    {
+      "category": "docker build + hardened startup + frozen hashes + EPANET smoke + live workflow + persistence + offline",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "docker-verify (linux/arm64, ubuntu-24.04-arm)",
+      "output_tail": "docker-verify (linux/arm64, ubuntu-24.04-arm): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040133/job/95946487499",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Docker Build & Runtime Gate (PR)"
+    },
+    {
+      "category": "native Windows x86_64",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "native-verify (windows-x86_64)",
+      "output_tail": "native-verify (windows-x86_64): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040164/job/95946487613",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Native Cross-Platform Verification"
+    },
+    {
+      "category": "native Linux x86_64",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "native-verify (linux-x86_64)",
+      "output_tail": "native-verify (linux-x86_64): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040164/job/95946487657",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Native Cross-Platform Verification"
+    },
+    {
+      "category": "native Linux arm64",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "native-verify (linux-arm64)",
+      "output_tail": "native-verify (linux-arm64): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040164/job/95946487681",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Native Cross-Platform Verification"
+    },
+    {
+      "category": "native macOS x86_64",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "native-verify (macos-x86_64)",
+      "output_tail": "native-verify (macos-x86_64): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040164/job/95946487627",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Native Cross-Platform Verification"
+    },
+    {
+      "category": "native macOS arm64",
+      "conclusion": "SUCCESS",
+      "exit_code": 0,
+      "name": "native-verify (macos-arm64)",
+      "output_tail": "native-verify (macos-arm64): SUCCESS (GitHub Actions)",
+      "passed": true,
+      "source": "https://github.com/insightlabs38-pixel/HydroSwarm/actions/runs/32212040164/job/95946487656",
+      "status": "COMPLETED",
+      "workflow": "HydroSwarm Native Cross-Platform Verification"
+    }
+  ],
+  "kind": "M11_5_SOFTWARE_GATES"
+}

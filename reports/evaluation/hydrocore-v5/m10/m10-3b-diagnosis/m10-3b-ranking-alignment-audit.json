@@ -1,0 +1,49 @@
+{
+  "kind": "M10_3B_RANKING_ALIGNMENT_AUDIT",
+  "conclusion": "NO mechanical sign/ranking/candidate-alignment defect found. The gate's pairwise comparator (run_m10_3_level_a_gate.py::_pairwise_ranking_accuracy_per_incident) uses `target[i] > target[j]` vs `pred[i] > pred[j]` on plan_value alone (both higher-is-better, consistent direction); padded slots are excluded via `mask`, never contaminate the count; candidate identity is keyed by a single content-preserving enumerate() pass with no reordering step; the existing repository test test_candidate_order_does_not_change_per_candidate_model_output already proves the MODEL's own per-row output is permutation-invariant. The near-chance/sub-chance pairwise-ranking accuracy observed in M10.3A is therefore NOT explained by a sign, ordering, masking, or indexing defect.",
+  "checks": [
+    {
+      "name": "perfect_agreement_gives_100pct",
+      "expects": "3/3 correct when pred order == target order exactly",
+      "correct": 3,
+      "total": 3,
+      "passed": true
+    },
+    {
+      "name": "inverted_prediction_gives_0pct",
+      "expects": "0/3 correct when pred is exactly inverted vs target (sanity: metric is direction-sensitive)",
+      "correct": 0,
+      "total": 3,
+      "passed": true
+    },
+    {
+      "name": "pairwise_metric_permutation_invariant",
+      "base": [
+        13,
+        36
+      ],
+      "permuted": [
+        13,
+        36
+      ],
+      "passed": true
+    },
+    {
+      "name": "padded_slot_excluded_from_pairwise_count",
+      "correct": 1,
+      "total": 1,
+      "passed": true
+    },
+    {
+      "name": "gate_ranks_only_plan_value_not_regret",
+      "note": "confirms the gate's pairwise-ranking criterion is computed on plan_value (higher=better) consistently, never accidentally mixed with plan_regret_proxy (lower=better) which would silently invert the comparison",
+      "passed": true
+    },
+    {
+      "name": "candidate_tensorizer_single_pass_content_keyed",
+      "note": "every INPUT tensor row for position p is written from proposals[p] in a single enumerate() pass -- no separate reordering/sorting step exists that could desynchronize row p's inputs from row p's targets",
+      "passed": true
+    }
+  ],
+  "all_checks_passed": true
+}

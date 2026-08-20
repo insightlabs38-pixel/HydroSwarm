@@ -1,0 +1,105 @@
+{
+  "deterministic_ordering": {
+    "locked_final_test": "family order (golden-reference, branched-loop, loop-grid) -> condition order (LOCKED_FINAL_CONDITIONS) -> incident_index 0..4",
+    "locked_topology_test": "topology_index 0..3 -> incident_index 0..4"
+  },
+  "kind": "M11_6A_POPULATION_SPEC",
+  "locked_final_test": {
+    "condition_kwargs": {
+      "AMBIGUITY_DISAGREEMENT": {
+        "ambiguity": "disagreement",
+        "perturbation_level": "disagreement",
+        "perturbation_type": "ambiguity"
+      },
+      "LOW_COVERAGE_ACTIVE_SAMPLING": {
+        "coverage": 0.25,
+        "perturbation_level": "25%",
+        "perturbation_type": "sensor_coverage"
+      },
+      "MEASUREMENT_NOISE": {
+        "noise_std": 0.05,
+        "perturbation_level": "moderate",
+        "perturbation_type": "measurement_noise"
+      },
+      "NOMINAL": {
+        "perturbation_level": "clean_operational",
+        "perturbation_type": "nominal"
+      },
+      "SENSOR_DROPOUT": {
+        "missing_rate": 0.3,
+        "perturbation_level": "30%",
+        "perturbation_type": "missingness"
+      },
+      "SENSOR_HEALTH_DEGRADED": {
+        "health_fraction": 0.5,
+        "health_mode": "frozen",
+        "perturbation_level": "frozen:50%",
+        "perturbation_type": "sensor_health"
+      },
+      "SEVERITY_SHIFT": {
+        "hydraulic": "source_strength",
+        "perturbation_level": "source_strength",
+        "perturbation_type": "hydraulic_mismatch"
+      }
+    },
+    "conditions": [
+      "NOMINAL",
+      "LOW_COVERAGE_ACTIVE_SAMPLING",
+      "SENSOR_DROPOUT",
+      "SENSOR_HEALTH_DEGRADED",
+      "MEASUREMENT_NOISE",
+      "SEVERITY_SHIFT",
+      "AMBIGUITY_DISAGREEMENT"
+    ],
+    "contamination_proportion": 1.0,
+    "demand_regimes": [
+      0.8,
+      1.0,
+      1.2
+    ],
+    "duration_bins_min": [
+      30,
+      60,
+      120
+    ],
+    "event_type": "contamination",
+    "families": [
+      "golden-reference",
+      "branched-loop",
+      "loop-grid"
+    ],
+    "incidents_per_cell": 5,
+    "maximum_samples": 3,
+    "purpose": "Final prospective evaluation of the exact frozen finalist on genuinely unseen incidents drawn from the already-governed problem domain (known/trained topology families with genuinely new, disjoint incident seeds).",
+    "rationale": "3 x 7 x 5 = 105 incidents mirrors M10.4's established (INCIDENTS_PER_CELL=5, same condition matrix, same families) evaluation scale; 5 per cell matches M10.4 exactly; 105 total gives stable pooled aggregate metric estimation while staying within the proven practical EPANET runtime budget.",
+    "source_selection_rule": "round_robin_sorted_junctions",
+    "start_time_bins_min": [
+      0,
+      60,
+      120,
+      240
+    ],
+    "strength_bins": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "total_incidents": 105
+  },
+  "locked_topology_test": {
+    "conditions": [
+      "NOMINAL"
+    ],
+    "contamination_proportion": 1.0,
+    "event_type": "contamination",
+    "incidents_per_topology": 5,
+    "maximum_samples": 3,
+    "predictive_metrics": "DESCRIPTIVE_NON_GATING",
+    "purpose": "Final prospective evaluation of topology generalization and fail-closed behavior on genuinely unseen procedural network structures.",
+    "rationale": "4 procedural topologies x 5 NOMINAL incidents = 20 incidents; 4 instances probe a spread of node counts/cycle ranks outside every prior topology, and 5 incidents each matches M10.4's per-cell scale while keeping EPANET runtime bounded.",
+    "safety_fail_closed": "HARD_GATE",
+    "source_selection_rule": "round_robin_sorted_junctions",
+    "topology_instances": 4,
+    "total_incidents": 20
+  }
+}

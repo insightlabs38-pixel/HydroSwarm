@@ -1,0 +1,389 @@
+# HydroCore-v5 M11.6A-1 — Locked Evaluation Design Freeze (FINAL CORRECTED)
+
+Status: FROZEN before any locked population exists. This document records the
+exact design that a DIFFERENT, fresh session will use to materialize the real
+locked population (M11.6A-2) and, later, to run the one-time M11.6 locked
+evaluation. It is NOT M11.6 execution.
+
+This document is the FINAL CORRECTED design freeze. It supersedes the original
+M11.6A-1 design-freeze commit `62bf1326081fac9080c3d676827c9596d2379efb`, the
+intermediate correction commit `e5665050811175638b45c0e82ac9959e2354d138`, and
+the safety-gates commit `b561add678ad7ef7c9ac4f153dce9b9d30dd3f55`; the final
+correction commit is the ONLY authorized design-freeze SHA for M11.6A-2
+materialization (`materialization_must_use_this_commit = true`).
+
+This task materializes nothing, derives no final seed, and never evaluates the
+finalist on locked data. The authoritative machine-readable payload is
+`scripts/hydrocore_v5/m11_6a_design.py` (`design_hash()` is the frozen
+`design_protocol_sha256`); the JSON artifacts under
+`reports/evaluation/hydrocore-v5/m11/m11-6a/design-freeze/` are generated from
+that module and must never drift from it.
+
+## 0. Governance state at freeze
+
+- Branch: `exp/hydrocore-v5-causal`; blocker HEAD
+  `6c84b3b710f50c9bf58f6f76d881af7f32e0710b`.
+- Blocker closure preserved: `M11_6_LOCKED_EVALUATION_BLOCKED_NO_DATASET`.
+- `M11_5_FULL_VALIDATION_PASS`, `m11_5_matrix_green=true`,
+  `m11_6_preconditions_satisfied=true`, `tuning_closed=true`.
+- `authorization_consumed=false`, `authorized_openings=0`,
+  `locked_open_count=0`, `locked_test_opened=false`,
+  `locked_evaluation_authorized=false`, `locked_final_result=NOT_EVALUATED`,
+  `locked_topology_result=NOT_EVALUATED`, `post_locked_tuning=false`,
+  `locked_rerun=false`.
+
+## 1. Frozen finalist (unchanged, out of scope)
+
+`HydroCore-v5 M10 frozen release` at `models/hydrocore-v5-release`, selected
+seed `20260814`, checkpoint SHA-256
+`de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5`, release
+manifest SHA-256
+`f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34`, serialized
+calibration SHA-256
+`8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d`, calibration
+artifact hash
+`f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd`. Runtime
+outputs `event_cause`, `event_presence`, `evidence_sufficiency`,
+`relative_strength`, `source_node`; `next_step = SUPPRESSED_UNSUPERVISED`;
+deterministic OOD/Scout/planning + WNTR/EPANET + mandatory human approval; no
+autonomous actuation; learned OOD/Scout/Strategist non-authoritative; no silent
+v4 fallback.
+
+## 2. Seed derivation (formula only — no numeric seed is derived here)
+
+`H = SHA-256` over UTF-8 bytes. Master seeds:
+
+- `locked_final_master = H("HYDROSWARM|M11.6|LOCKED_FINAL|v1|" + DESIGN_FREEZE_COMMIT_SHA)`
+- `locked_topology_master = H("HYDROSWARM|M11.6|LOCKED_TOPOLOGY|v1|" + DESIGN_FREEZE_COMMIT_SHA)`
+
+Per-item seeds: `material = f"{master_hex}|{label}|{index}|{counter}"` (UTF-8),
+`seed = 2**31 + int(SHA256(material).hexdigest(), 16) % (2**62 - 2**31)`
+(range `[2**31, 2**62)`). This range is disjoint from every prior seed
+namespace BY CONSTRUCTION (all prior namespaces are `< 2**31`; the interval
+`[0, 2**31)` is entirely excluded — the original `[0, 2**62)` range was
+incorrect because it CONTAINS `[0, 2**31)`).
+`counter=0` is the primary derivation; a positive counter is the deterministic
+next-candidate for rejection sampling and the frozen collision procedure.
+Domain labels: `FINAL_SCENARIO` and `TOPOLOGY_TEST_SCENARIO` /
+`TOPOLOGY_TEST_NETWORK` are consumed by generation; `FINAL_TOPOLOGY` and
+`SENSOR_PERTURBATION` are reserved in v1 (v1 drives each incident from one
+scenario seed, the established WNTRScenarioGenerator single-RNG convention, and
+locked_final_test uses fixed known topologies).
+
+The numeric `DESIGN_FREEZE_COMMIT_SHA` is supplied to the NEXT session after
+independent human review. **The final locked seeds are NOT derived or printed in
+M11.6A-1.**
+
+## 3. Population specification
+
+### `locked_final_test` — 105 incidents
+
+- Families: `golden-reference`, `branched-loop`, `loop-grid` (the 3 already
+  governed TRAINED_FAMILIES).
+- Conditions: the 7 already-governed M10.4 conditions (`NOMINAL`,
+  `LOW_COVERAGE_ACTIVE_SAMPLING`, `SENSOR_DROPOUT`, `SENSOR_HEALTH_DEGRADED`,
+  `MEASUREMENT_NOISE`, `SEVERITY_SHIFT`, `AMBIGUITY_DISAGREEMENT`).
+- 5 incidents per (family × condition) cell → `3 × 7 × 5 = 105`.
+- 100% contamination; source node round-robined over the sorted junction list;
+  start/duration/strength/demand bins are the governed generator defaults
+  (`(0,60,120,240)` / `(30,60,120)` / `(0.5,1.0,2.0)` / `(0.8,1.0,1.2)`);
+  `MAXIMUM_SAMPLES = 3`.
+- Rationale: 5 per cell matches M10.4 exactly; 105 total is the same order as
+  M10.4's 120-incident population and is chosen independently of any outcome.
+
+### `locked_topology_test` — 20 incidents
+
+- 4 procedural topology instances × 5 `NOMINAL` contamination incidents = 20.
+- Topologies are generated by the frozen procedural generator (Section 5 below)
+  with junction counts 9–12 and cycle ranks 1–4 — outside every prior topology's
+  4–8 junction / cycle-rank 0–3 range.
+- Predictive topology-shift metrics are **DESCRIPTIVE_NON_GATING**; safety and
+  fail-closed behavior are **HARD gates**.
+
+## 4. Procedural topology generator
+
+Grammar: one reservoir (`head ∈ [130, 140] m`); `9 + topology_index` junctions
+(elevations `[95, 108] m`, demands `[0.003, 0.007] m³/s`); a spanning-path
+backbone `R1→J1→…→JN` plus `1 + topology_index` deterministic extra loop edges;
+pipe length `[300, 700] m`, diameter `[0.25, 0.40] m`, roughness `[100, 130]`.
+Hydraulic feasibility: WNTR/EPANET hydraulics must produce finite junction
+pressures with `min ≥ 5.0 m`.
+
+Rejection sampling is permitted ONLY for the predeclared structural/physical
+criteria (disconnected graph, invalid EPANET model, simulator failure,
+impossible pressure state, duplicate hash, structural identity to a prior
+topology). Learned/model output is never a rejection criterion. Candidate
+ordering is the counter `0, 1, 2, …`; max 1000 attempts; exhaustion **BLOCKS**
+(it never loosens constraints or chooses a new seed).
+
+## 5. Topology novelty rule
+
+Novelty is computed in TWO phases, and both must pass before the audit may
+report PASS (never a hard-coded `each_satisfies_frozen_novelty_rule=true`):
+
+(A) **pre-serialization graph/network novelty**: the graph-structural
+signature `{node_count, junction_count, link_count, cycle_rank, sorted degree
+profile}` matches no prior topology signature, and the `network_sha256` is not
+in the frozen prior-hash set, and both are unique within the generated set.
+
+(B) **post-serialization file-byte novelty**: after each procedural `.inp` is
+written, its exact file-byte SHA-256 is computed and must differ from every
+frozen prior-topology file hash (the immutable `PRIOR_TOPOLOGY_FILES` registry
+of the exact committed M9/M10/M11.5 `.inp` files, built at design-freeze time)
+and from every other generated `.inp` file. The audit records exact per-topology
+results for each of these components.
+
+All prior topologies have 4–8 junctions; the generator is constrained to 9–12,
+so the node-count component is decisive by construction, with the full
+signature/hash/file-byte checks as the frozen mechanical rule (no vague "looks
+different" judgment).
+
+## 6. Non-overlap rule
+
+Every locked scenario is identified by (split role, topology identity, seed,
+scenario_id, canonical scenario-definition hash). Non-overlap is guaranteed by:
+(1) derived seeds in `[2**31, 2**62)` are disjoint from every prior seed
+namespace (all `< 2**31`) BY CONSTRUCTION; (2) locked_final_test uses only the
+allowed known families with fresh derived seeds; (3) locked_topology_test uses
+only novelty-verified procedural topologies; (4) the canonical
+scenario-definition hash is unique WITHIN the new 125-definition
+materialization. A within-set collision triggers only the preregistered
+deterministic collision procedure (increment counter, re-derive; max 100
+retries; then BLOCK).
+
+**Truthful historical-comparison limitation:** prior governed experiments
+(M0–M11.5) did not materialize a comparable canonical scenario-definition hash
+under `SCENARIO_SCHEMA_VERSION`, so NO direct canonical-hash comparison against
+historical scenarios is performed or claimed. The mechanical guarantee is seed-
+namespace disjointness BY CONSTRUCTION plus within-set uniqueness plus topology
+novelty. No audit field claims a comparison that was never performed.
+
+## 7. Simulator / ground-truth authority
+
+WNTR/EPANET remains the final physical authority. Ground truth is regenerated
+deterministically from the scenario definition (topology + derived seed +
+frozen config) by `WNTRScenarioGenerator`; the full truth arrays are never
+stored, only the definition. HydroCore is never used to create labels, and no
+learned prediction influences which examples enter the locked population.
+
+## 8. Storage / manifest
+
+`data/locked/m11-6/` (ordinary Git tracked text — definitions-only, no LFS;
+LFS is reserved for large binary tensor corpora). Layout: `topologies/*.inp`,
+`locked_final_test/scenarios.jsonl`, `locked_topology_test/scenarios.jsonl`,
+`m11-6-materialization-manifest.json`.
+
+Every manifest path is a **canonical POSIX repository-relative string**
+(`path.resolve().relative_to(root.resolve()).as_posix()`), independent of host
+OS. Manifest paths are strictly validated (`validate_manifest_path` /
+`validate_manifest_path_under_root`): they must use `/` separators, be
+repository-relative, contain no Windows drive prefix/colon, no `..`/`.`/empty
+segments, no NUL, round-trip to the canonical POSIX representation, and resolve
+underneath the repository root. Non-canonical/malicious paths are REJECTED,
+never silently normalized.
+
+Procedural topology logical IDs (`locked-topology:0`) are UNCHANGED; only the
+on-disk `.inp` filename uses the portable, deterministic mapping
+`topology_filename()` (`locked-topology-0.inp`, colon-free for Windows).
+
+The manifest (schema `hydroswarm-m11-6-materialization-manifest-v1`) records
+every field required by task Section 11 (design-freeze SHA, design/generator/
+evaluator source hashes, seed-derivation rule, derived master-seed identities,
+split names, exact counts, topology IDs + file/structural/file-byte hashes,
+scenario IDs + canonical definition hashes, artifact hashes, simulator version,
+generation completion, overlap/novelty audit results,
+`evaluated_by_finalist=false`, `locked_test_opened=false`) and MUST NOT contain
+model performance metrics.
+
+## 9. Evaluator contract
+
+```
+python scripts/hydrocore_v5/run_m11_6_locked_evaluation.py \
+    --manifest data/locked/m11-6/m11-6-materialization-manifest.json \
+    --authorization reports/evaluation/hydrocore-v5/m11/m11-6/m11-6-execution-authorization.json \
+    --output-dir reports/evaluation/hydrocore-v5/m11/m11-6-final
+```
+
+Materialization is a separate program
+(`scripts/hydrocore_v5/run_m11_6a_materialize.py`); the evaluator never silently
+generates the population.
+
+## 10. Exactly-once guard and crash semantics
+
+Before reading the first locked scenario, the evaluator verifies authorization,
+frozen finalist identity, code/evaluator identities, the locked manifest (all
+hashes + overlap/novelty audits), and `locked_test_opened=false`, then atomically
+creates the OPENED record (`os.open(O_CREAT|O_EXCL|O_WRONLY)` at
+`reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-opened-record.json`)
+binding run_id, timestamp, code-under-test SHA, design-freeze SHA,
+materialization-manifest SHA, finalist checkpoint SHA, calibration SHA,
+release-manifest SHA, and evaluator SHA. If an OPENED record already exists, the
+evaluator REFUSES (no `--force`, no `--reset`, no auto-clearing). If it crashes
+after the OPENED marker commits, the locked test counts as opened: no auto
+retry, no marker removal, no regeneration, no code change; partial/crash
+evidence is recorded and the run stops for human review. There is no resume.
+
+## 11. Metrics, gates, closure
+
+Metrics reuse the M10.4 frozen vocabulary (top-1/top-3/MRR, coverage,
+candidate-set size, actionable/abstention, scout sample count/benefit, planning
+verification/approval, safety counters, topology-shift predictive metrics).
+Hard gates (with provenance) are split-scoped:
+
+- **global** (both splits + overall closure): exact finalist identity; exact
+  manifest + recomputed artifact/source hash match; all 15 safety counters
+  zero; finite outputs; no v4 fallback; sample-budget compliance; no
+  unsafe/unverified action surfaced; and `evaluation_population_complete`
+  (exactly 105 + 20 rows; every expected scenario ID exactly once; no
+  HARNESS_ERROR; every row in an allowed terminal outcome
+  `VERIFIED`/`SUPPRESSED`/`ABSTAINED`).
+- **locked_final_test**: 105 complete rows; known-family empirical coverage ≥
+  the frozen M9 0.85 floor.
+- **locked_topology_test**: 20 complete rows; topology novelty verified; every
+  topology incident satisfies the per-row fail-closed predicate
+  `topology_incident_is_fail_closed(row)` (row exists, no HARNESS_ERROR, finite
+  decision, zero per-incident safety/authority counters, no invariant failure,
+  no approved-but-unverified plan). Population presence is NOT fail-closed.
+
+`locked_final_result` and `locked_topology_result` are computed independently
+from their own gates (plus the global gates); the overall M11.6 closure requires
+every applicable gate. Everything not gated is `DESCRIPTIVE_NON_GATING`. Closure
+vocabulary: `M11_6_LOCKED_EVALUATION_PASS`,
+`M11_6_LOCKED_EVALUATION_FAIL`,
+`M11_6_LOCKED_EVALUATION_CRASHED_AFTER_OPEN`, `M11_6_BLOCKED_PRE_OPEN`. No state
+permits changing the finalist and retrying.
+
+Authorization binds to `materialization_manifest_file_sha256` (SHA-256 of the
+exact committed manifest file bytes), never to a canonical-dict hash (which is
+recorded separately as `manifest_canonical_hash`).
+
+## 12. Known limitations carried forward (not erased)
+
+M10.4 plan-vs-NO_ACTION Gate E limitation; modest sampling benefit; no
+demonstrated approved-action change from sampling; limited unseen-topology
+evidence; M9.6-fixed vs production `incident_elapsed` age semantics; learned
+OOD/Scout/Strategist not promoted. Scenario generation does not bias against
+these.
+
+## 13. Design-freeze record
+
+`design_frozen=true`, `dataset_materialized=false`,
+`locked_manifest_created=false`, `final_locked_seed_derived=false`,
+`finalist_evaluated_on_locked=false`, `locked_open_count=0`,
+`locked_test_opened=false`, `locked_evaluation_authorized=false`,
+`authorization_consumed=false`,
+`superseded_design_freeze_commits = [62bf1326081fac9080c3d676827c9596d2379efb, e5665050811175638b45c0e82ac9959e2354d138, b561add678ad7ef7c9ac4f153dce9b9d30dd3f55]`,
+`materialization_must_use_this_commit = true`,
+`next_action = M11_6A_2_MATERIALIZE_FROM_CORRECTED_FROZEN_DESIGN`.
+
+## 14. Corrections applied (pre-materialization integrity/governance only)
+
+1. Seed range made disjoint by construction: `[2**31, 2**62)` (was `[0, 2**62)`,
+   which contains `[0, 2**31)`).
+2. Locked scenario reconstruction uses `DatasetSplit.TEST` (was
+   `DEVELOPMENT_HOLDOUT`).
+3. Real per-row topology fail-closed predicate replaces "topology rows > 0".
+4. `verify_materialized_artifacts()` recomputes every artifact/source hash
+   before OPENED (was schema-only).
+5. `evaluation_population_complete` hard gate (exactly 105 + 20, no
+   HARNESS_ERROR, allowed terminal outcomes).
+6. Safety counters aggregated exactly once (per-incident summed once, global
+   merged once; no shared aggregate × population size).
+7. Split-specific `locked_final_result` / `locked_topology_result`.
+8. Manifest file-byte SHA (`materialization_manifest_file_sha256`) is the
+   authorization binding; canonical-dict hash recorded separately.
+9. The correction commit supersedes the original design-freeze commit.
+10. Safety-invariant provenance: every hard safety zero is measured or
+    mechanically verified (never zero-by-default); per-incident vs
+    runtime-structure vs frozen-prelock classification; `evaluated=false` ⇒
+    FAIL/BLOCK.
+11. Corrected `human_approval_bypassed` semantics (failed approval request is
+    `approval_request_failed`, not a bypass).
+12. Materializer `validate_design_freeze_sha()` rejects superseded / malformed
+    / nonexistent / non-ancestor / wrong-artifact design-freeze SHAs.
+13. Canonical POSIX manifest paths on all hosts (was host-dependent `str()`
+    paths that produced `\` separators on Windows), used everywhere manifest
+    paths are written; strict manifest-path validation rejects backslash,
+    absolute, drive, traversal, and repo-escaping paths.
+14. Portable topology filenames: logical IDs keep `:`; only the `.inp` filename
+    uses the colon-free deterministic `topology_filename()` mapping.
+15. Design-freeze SHA is bound to code identity: the freeze artifact's
+    `design_hash` must equal the current `design.design_hash()` AND every
+    governed design/materializer/evaluator file must be byte-identical to the
+    `design_file_hashes` frozen at that commit ("SHA is an ancestor" alone is
+    rejected).
+16. Governed 409 abstention is a valid terminal trajectory whose applicable
+    safety invariants are explicitly evaluated (never `evaluated=false`);
+    inapplicable invariants record explicit applicability, not fictional zeroes.
+17. `stale_approval_accepted` is bound to mechanically recomputed pre-lock
+    evidence (exact evidence/test path + SHA-256 + test identifier + expected
+    PASS field/value), verified at pre-open; missing/changed/absent PASS
+    BLOCKS before OPENED.
+18. Historical non-overlap claims made truthful: no direct canonical-hash
+    comparison against prior M0-M11.5 scenarios is performed or claimed.
+19. Two-phase topology novelty (graph/network + materialized file-byte) with a
+    frozen prior-topology file-byte registry; the audit computes
+    `each_satisfies_frozen_novelty_rule` instead of hard-coding it true.
+20. Pre-open runtime-authority verification runs BEFORE `LockedRunState.acquire`
+    (blocks without OPENED on any false/unevaluated structural invariant), is
+    re-run post-run to detect drift, and binds to the actual V5 factory wiring
+    (not merely constructor defaults).
+
+## 15. Safety-invariant provenance (final correction)
+
+Every hard safety gate zero must be **measured** or **mechanically verified** —
+never a zero-by-default. `SAFETY_INVARIANT_PROVENANCE` classifies each of the
+15 frozen counters into exactly one authority class, and no hard gate may lack
+provenance. An unmeasured hard invariant causes FAIL/BLOCK, never an implicit
+PASS (each record carries an explicit `evaluated` flag; `evaluated=false` ⇒
+gate fails).
+
+- **`MEASURED_LOCKED_INCIDENT`** (per incident, summed exactly once):
+  `human_approval_bypassed`, `unverified_plan_surfaced_as_actionable`,
+  `rejected_plan_surfaced_as_safe`, `nonfinite_value_reached_decision`,
+  `sampling_budget_exceeded`, `inaccessible_sample_selected`,
+  `sampled_node_reselected`, `invariant_failures`. Measured by
+  `_run_single_incident` (see `measure_approval_bypass`, `measure_plan_safety`,
+  `detect_nonfinite_decision`, `measure_sampling_budget`,
+  `measure_sample_accessibility`, plus the `m10_4_common._invariants`
+  primitive); never copied as one shared aggregate into every row.
+- **`VERIFIED_RUNTIME_STRUCTURE`** (verified once globally, pre-open and
+  post-run, via `verify_runtime_authority_invariants`):
+  `finalist_identity_drift`, `learned_ood_overrode_deterministic`,
+  `learned_scout_selected_sample`, `learned_strategist_selected_plan`,
+  `silent_v4_fallback`, `autonomous_actuation_detected`. Verified from actual
+  frozen factory/manifest/route-table structure, never documentation text.
+- **`FROZEN_PRELOCK_EVIDENCE`** (population-independent, mechanically bound):
+  `stale_approval_accepted` is bound to exact pre-lock evidence — the test
+  `tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability`
+  (exact file SHA-256) plus the M11.5 safety-counter PASS artifact
+  (`reports/evaluation/hydrocore-v5/m11/m11-5/m11-5-safety-counters.json`,
+  `stale_approval_accepted == 0`, exact SHA-256). `verify_prelock_safety_evidence()`
+  recomputes both hashes and the PASS field/value at pre-open; a text string is
+  NEVER treated as mechanical evidence. NOT represented as a per-incident
+  counter, so the locked population is not modified merely to exercise it.
+
+**`human_approval_bypassed` semantics:** a failed `/approve` request is
+`approval_request_failed` (a descriptive diagnostic), NOT a bypass. The counter
+is incremented ONLY when an incident reaches an approved (`CLOSED`) terminal
+state without a successful explicit `/approve` transition.
+
+## 16. Materializer design-freeze SHA validation (final correction)
+
+`validate_design_freeze_sha()` is fail-closed: it rejects a malformed
+(non-40-hex) SHA, any superseded freeze SHA, a SHA that does not exist in Git,
+a SHA that is not an ancestor of the governed branch HEAD, and a SHA whose
+frozen design artifact does not declare `design_frozen=true`,
+`materialization_must_use_this_commit=true`, `dataset_materialized=false`,
+`locked_open_count=0`, and `locked_test_opened=false`.
+
+**Code-identity binding:** the supplied freeze commit's artifact must also
+record `design_hash == design.design_hash()` (the current frozen design code)
+AND every governed file in `GOVERNED_DESIGN_FILES` (the design-freeze markdown,
+`m11_6a_design.py`, `m11_6a_topology.py`, `run_m11_6a_materialize.py`,
+`run_m11_6_locked_evaluation.py`) must be byte-identical to the
+`design_file_hashes` frozen in that artifact. "SHA is an ancestor" alone is NOT
+sufficient: it is acceptable for unrelated later commits to exist only if every
+frozen governed file remains byte-identical. The materializer does NOT hardcode
+its own commit SHA (avoiding a self-referential commit-hash cycle); the NEXT
+M11.6A-2 session supplies the final correction SHA externally.

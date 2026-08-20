@@ -1,0 +1,39 @@
+{
+  "kind": "M10_4_FAIL_CLOSED",
+  "protocol_hash": "cd0ac1f2d5a12a771cc441b4ea19bf0d76c672809b35d3d178f8893b768a177c",
+  "cases": [
+    {
+      "case": "MODEL_UNAVAILABLE",
+      "create_status": 201,
+      "analyze_status": 200,
+      "control_action": "ABSTAIN",
+      "neural_belief": null,
+      "classical_fallback_used": true,
+      "bounded": true
+    },
+    {
+      "case": "CALIBRATION_UNAVAILABLE",
+      "calibrated": false,
+      "control_action": "ABSTAIN",
+      "bounded": true
+    },
+    {
+      "case": "SENSOR_STATE_INSUFFICIENT",
+      "create_status": 422,
+      "bounded": true
+    },
+    {
+      "case": "SAMPLING_BUDGET_PREEXHAUSTED",
+      "create_status": 422,
+      "bounded": true
+    },
+    {
+      "case": "NO_ACCESSIBLE_UNSAMPLED_CANDIDATE",
+      "create_status": 201,
+      "analyze_status": 200,
+      "recommend_status": 409,
+      "bounded": true
+    }
+  ],
+  "all_cases_bounded_and_deterministic": true
+}

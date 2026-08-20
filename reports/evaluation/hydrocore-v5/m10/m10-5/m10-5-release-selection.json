@@ -1,0 +1,41 @@
+{
+  "authoritative_records_scanned": [
+    "reports/evaluation/hydrocore-v5/m9-6/m9-6-closure.json",
+    "reports/evaluation/hydrocore-v5/m9-6/m9-6-manifest.json",
+    "reports/evaluation/hydrocore-v5/m9-6/m9-6-protocol.json",
+    "scripts/hydrocore_v5/m9_6_common.py",
+    "scripts/hydrocore_v5/m10_common.py"
+  ],
+  "candidate_count": 3,
+  "candidates": [
+    {
+      "matches_expected": true,
+      "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260814/model-export-final-step.safetensors",
+      "seed": 20260814,
+      "sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+    },
+    {
+      "matches_expected": true,
+      "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed31874/model-export-final-step.safetensors",
+      "seed": 31874,
+      "sha256": "527e707b988870dff323b6a3e0f1bde36a152b7bbe7e4c7f4bf0e59cdaf19332"
+    },
+    {
+      "matches_expected": true,
+      "path": "/workspace/HydroSwarm/experiments/runs/hydrocore-v5-causal-m9-6/ARM_B-seed20260815/model-export-final-step.safetensors",
+      "seed": 20260815,
+      "sha256": "b45f5afeabba820270130595dffb44152ec12fad6fa383cce67013f14524113c"
+    }
+  ],
+  "explicit_selector_token_hits": {},
+  "kind": "M10_5_RELEASE_SELECTION_AUDIT",
+  "m10_4_parent_pass": true,
+  "m10_4_performance_used": false,
+  "m9_6_recipe": "CLASSICAL_HYDROCORE_S + AGE_FIX_ONLY + EXACT_1350_STEP_INTERLEAVED_MULTI_TOPOLOGY_TRAINING + B_DEPTH_AWARE_CALIBRATION + ALPHA_0_1 + SOURCE_REPRESENTATIVE_CALIBRATION_SUPPORT_20_PER_SOURCE",
+  "m9_6_status": "FROZEN",
+  "per_seed_export_policy": "FINAL_STEP_1350",
+  "per_seed_export_policy_verified": true,
+  "selection_reason": "M9.6 freezes only the export-within-each-seed policy; its authoritative records name all three canonical checkpoints but no deployment seed, deterministic selector, or governed ensemble. Choosing now would be post-hoc, particularly because M10.4 evaluated all three.",
+  "selection_resolved": false,
+  "selection_rule": null
+}

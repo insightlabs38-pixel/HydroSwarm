@@ -1,0 +1,114 @@
+{
+  "M9_0A_REPRODUCTION": "EXACT_OR_WITHIN_DECLARED_FLOAT_TOLERANCE",
+  "M9_0B_REPRODUCTION": "EXACT_OR_WITHIN_DECLARED_FLOAT_TOLERANCE",
+  "mismatches": [],
+  "reproduced_m9_0a_known_network_top1": {
+    "ARM_A": {
+      "20260814": {
+        "EARLY": {
+          "reproduced": 0.375,
+          "stored": 0.375
+        },
+        "MATURE": {
+          "reproduced": 1.0,
+          "stored": 1.0
+        },
+        "MID": {
+          "reproduced": 0.84375,
+          "stored": 0.84375
+        }
+      },
+      "20260815": {
+        "EARLY": {
+          "reproduced": 0.3958333333333333,
+          "stored": 0.3958333333333333
+        },
+        "MATURE": {
+          "reproduced": 1.0,
+          "stored": 1.0
+        },
+        "MID": {
+          "reproduced": 0.84375,
+          "stored": 0.84375
+        }
+      },
+      "31874": {
+        "EARLY": {
+          "reproduced": 0.3541666666666667,
+          "stored": 0.3541666666666667
+        },
+        "MATURE": {
+          "reproduced": 1.0,
+          "stored": 1.0
+        },
+        "MID": {
+          "reproduced": 0.84375,
+          "stored": 0.84375
+        }
+      }
+    },
+    "ARM_B2": {
+      "20260814": {
+        "EARLY": {
+          "reproduced": 0.4166666666666667,
+          "stored": 0.4166666666666667
+        },
+        "MATURE": {
+          "reproduced": 1.0,
+          "stored": 1.0
+        },
+        "MID": {
+          "reproduced": 0.8125,
+          "stored": 0.8125
+        }
+      },
+      "20260815": {
+        "EARLY": {
+          "reproduced": 0.4166666666666667,
+          "stored": 0.4166666666666667
+        },
+        "MATURE": {
+          "reproduced": 1.0,
+          "stored": 1.0
+        },
+        "MID": {
+          "reproduced": 0.78125,
+          "stored": 0.78125
+        }
+      },
+      "31874": {
+        "EARLY": {
+          "reproduced": 0.3958333333333333,
+          "stored": 0.3958333333333333
+        },
+        "MATURE": {
+          "reproduced": 1.0,
+          "stored": 1.0
+        },
+        "MID": {
+          "reproduced": 0.84375,
+          "stored": 0.84375
+        }
+      }
+    }
+  },
+  "reproduced_m9_0b_current_family_depth_marginal": {
+    "20260814": {
+      "n": 336,
+      "reproduced": 0.8482142857142857,
+      "stored": 0.8482142857142857
+    },
+    "20260815": {
+      "n": 336,
+      "reproduced": 0.8214285714285714,
+      "stored": 0.8214285714285714
+    },
+    "31874": {
+      "n": 336,
+      "reproduced": 0.8452380952380952,
+      "stored": 0.8452380952380952
+    }
+  },
+  "status": "EXACT_OR_WITHIN_DECLARED_FLOAT_TOLERANCE",
+  "tolerance_float": 1e-06
+}

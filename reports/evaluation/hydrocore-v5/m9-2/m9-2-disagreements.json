@@ -1,0 +1,1500 @@
+{
+  "by_arm_depth": {
+    "GRAPH_CDE": {
+      "1": {
+        "20260814": {
+          "both_correct_A": 18,
+          "both_wrong_D": 74,
+          "complementarity_ratio_C_over_maxB1": 1.0,
+          "current_only_B": 14,
+          "current_only_win_incident_ids": [
+            902000600,
+            902001700,
+            902003600,
+            902005200,
+            902005700,
+            902006300,
+            902007800,
+            902008300,
+            902008700,
+            902009500,
+            902009800,
+            902010200,
+            902010300,
+            902011200
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 0,
+          "novel_only_C": 14,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001200,
+            902002700,
+            902003000,
+            902003900,
+            902004500,
+            902006000,
+            902007200,
+            902007300,
+            902007600,
+            902008400,
+            902009000,
+            902009100,
+            902011000
+          ],
+          "pct_both_correct": 0.15,
+          "pct_both_wrong": 0.6166666666666667,
+          "pct_current_only": 0.11666666666666667,
+          "pct_novel_only": 0.11666666666666667
+        },
+        "31874": {
+          "both_correct_A": 24,
+          "both_wrong_D": 79,
+          "complementarity_ratio_C_over_maxB1": 0.8888888888888888,
+          "current_only_B": 9,
+          "current_only_win_incident_ids": [
+            902001700,
+            902003600,
+            902005200,
+            902007800,
+            902008300,
+            902009500,
+            902009800,
+            902010300,
+            902011200
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 8,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001600,
+            902002800,
+            902004200,
+            902007200,
+            902007600,
+            902009100,
+            902011000
+          ],
+          "pct_both_correct": 0.2,
+          "pct_both_wrong": 0.6583333333333333,
+          "pct_current_only": 0.075,
+          "pct_novel_only": 0.06666666666666667
+        }
+      },
+      "12": {
+        "20260814": {
+          "both_correct_A": 114,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902002100,
+            902004500,
+            902006100,
+            902006800,
+            902008000
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -5,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.95,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.0
+        },
+        "31874": {
+          "both_correct_A": 116,
+          "both_wrong_D": 3,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 1,
+          "current_only_win_incident_ids": [
+            902004500
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9666666666666667,
+          "pct_both_wrong": 0.025,
+          "pct_current_only": 0.008333333333333333,
+          "pct_novel_only": 0.0
+        }
+      },
+      "2": {
+        "20260814": {
+          "both_correct_A": 48,
+          "both_wrong_D": 51,
+          "complementarity_ratio_C_over_maxB1": 0.9090909090909091,
+          "current_only_B": 11,
+          "current_only_win_incident_ids": [
+            902000000,
+            902000200,
+            902001800,
+            902001900,
+            902002200,
+            902003300,
+            902005200,
+            902006900,
+            902008000,
+            902008800,
+            902009300
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 10,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001200,
+            902003900,
+            902006700,
+            902007200,
+            902008400,
+            902008600,
+            902009000,
+            902009200,
+            902011300
+          ],
+          "pct_both_correct": 0.4,
+          "pct_both_wrong": 0.425,
+          "pct_current_only": 0.09166666666666666,
+          "pct_novel_only": 0.08333333333333333
+        },
+        "31874": {
+          "both_correct_A": 47,
+          "both_wrong_D": 58,
+          "complementarity_ratio_C_over_maxB1": 0.15384615384615385,
+          "current_only_B": 13,
+          "current_only_win_incident_ids": [
+            902000000,
+            902000200,
+            902000900,
+            902001900,
+            902002200,
+            902002400,
+            902004800,
+            902005200,
+            902005400,
+            902008000,
+            902008500,
+            902008800,
+            902009600
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -11,
+          "novel_only_C": 2,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902008900
+          ],
+          "pct_both_correct": 0.39166666666666666,
+          "pct_both_wrong": 0.48333333333333334,
+          "pct_current_only": 0.10833333333333334,
+          "pct_novel_only": 0.016666666666666666
+        }
+      },
+      "25": {
+        "20260814": {
+          "both_correct_A": 113,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 6,
+          "current_only_win_incident_ids": [
+            902002100,
+            902004500,
+            902004700,
+            902006100,
+            902006800,
+            902008000
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -6,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9416666666666667,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.05,
+          "pct_novel_only": 0.0
+        },
+        "31874": {
+          "both_correct_A": 116,
+          "both_wrong_D": 0,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 4,
+          "current_only_win_incident_ids": [
+            902004500,
+            902006100,
+            902007800,
+            902008000
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -4,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9666666666666667,
+          "pct_both_wrong": 0.0,
+          "pct_current_only": 0.03333333333333333,
+          "pct_novel_only": 0.0
+        }
+      },
+      "3": {
+        "20260814": {
+          "both_correct_A": 67,
+          "both_wrong_D": 46,
+          "complementarity_ratio_C_over_maxB1": 0.75,
+          "current_only_B": 4,
+          "current_only_win_incident_ids": [
+            902000000,
+            902003400,
+            902004200,
+            902004900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 3,
+          "novel_only_win_incident_ids": [
+            902002400,
+            902008100,
+            902010400
+          ],
+          "pct_both_correct": 0.5583333333333333,
+          "pct_both_wrong": 0.38333333333333336,
+          "pct_current_only": 0.03333333333333333,
+          "pct_novel_only": 0.025
+        },
+        "31874": {
+          "both_correct_A": 64,
+          "both_wrong_D": 45,
+          "complementarity_ratio_C_over_maxB1": 0.5714285714285714,
+          "current_only_B": 7,
+          "current_only_win_incident_ids": [
+            902000000,
+            902002400,
+            902003400,
+            902004800,
+            902004900,
+            902009600,
+            902010500
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -3,
+          "novel_only_C": 4,
+          "novel_only_win_incident_ids": [
+            902004200,
+            902006600,
+            902008100,
+            902010400
+          ],
+          "pct_both_correct": 0.5333333333333333,
+          "pct_both_wrong": 0.375,
+          "pct_current_only": 0.058333333333333334,
+          "pct_novel_only": 0.03333333333333333
+        }
+      },
+      "4": {
+        "20260814": {
+          "both_correct_A": 97,
+          "both_wrong_D": 20,
+          "complementarity_ratio_C_over_maxB1": 0.5,
+          "current_only_B": 2,
+          "current_only_win_incident_ids": [
+            902000000,
+            902007800
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 1,
+          "novel_only_win_incident_ids": [
+            902001800
+          ],
+          "pct_both_correct": 0.8083333333333333,
+          "pct_both_wrong": 0.16666666666666666,
+          "pct_current_only": 0.016666666666666666,
+          "pct_novel_only": 0.008333333333333333
+        },
+        "31874": {
+          "both_correct_A": 92,
+          "both_wrong_D": 23,
+          "complementarity_ratio_C_over_maxB1": 0.25,
+          "current_only_B": 4,
+          "current_only_win_incident_ids": [
+            902000900,
+            902005400,
+            902006100,
+            902011600
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -3,
+          "novel_only_C": 1,
+          "novel_only_win_incident_ids": [
+            902003300
+          ],
+          "pct_both_correct": 0.7666666666666667,
+          "pct_both_wrong": 0.19166666666666668,
+          "pct_current_only": 0.03333333333333333,
+          "pct_novel_only": 0.008333333333333333
+        }
+      },
+      "6": {
+        "20260814": {
+          "both_correct_A": 115,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.3333333333333333,
+          "current_only_B": 3,
+          "current_only_win_incident_ids": [
+            902004100,
+            902004500,
+            902008000
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -2,
+          "novel_only_C": 1,
+          "novel_only_win_incident_ids": [
+            902002400
+          ],
+          "pct_both_correct": 0.9583333333333334,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.025,
+          "pct_novel_only": 0.008333333333333333
+        },
+        "31874": {
+          "both_correct_A": 109,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.25,
+          "current_only_B": 8,
+          "current_only_win_incident_ids": [
+            902000900,
+            902002400,
+            902004100,
+            902004500,
+            902004900,
+            902005400,
+            902006100,
+            902010500
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -6,
+          "novel_only_C": 2,
+          "novel_only_win_incident_ids": [
+            902003300,
+            902008000
+          ],
+          "pct_both_correct": 0.9083333333333333,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.06666666666666667,
+          "pct_novel_only": 0.016666666666666666
+        }
+      }
+    },
+    "GRAPH_ODE": {
+      "1": {
+        "20260814": {
+          "both_correct_A": 18,
+          "both_wrong_D": 74,
+          "complementarity_ratio_C_over_maxB1": 1.0,
+          "current_only_B": 14,
+          "current_only_win_incident_ids": [
+            902000600,
+            902001700,
+            902003600,
+            902005200,
+            902005700,
+            902006300,
+            902007800,
+            902008300,
+            902008700,
+            902009500,
+            902009800,
+            902010200,
+            902010300,
+            902011200
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 0,
+          "novel_only_C": 14,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001200,
+            902002700,
+            902003000,
+            902003900,
+            902004500,
+            902006000,
+            902007200,
+            902007300,
+            902007600,
+            902008400,
+            902009000,
+            902009100,
+            902011000
+          ],
+          "pct_both_correct": 0.15,
+          "pct_both_wrong": 0.6166666666666667,
+          "pct_current_only": 0.11666666666666667,
+          "pct_novel_only": 0.11666666666666667
+        },
+        "31874": {
+          "both_correct_A": 23,
+          "both_wrong_D": 78,
+          "complementarity_ratio_C_over_maxB1": 0.9,
+          "current_only_B": 10,
+          "current_only_win_incident_ids": [
+            902000600,
+            902001700,
+            902003600,
+            902005200,
+            902007800,
+            902008300,
+            902009500,
+            902009800,
+            902010300,
+            902011200
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 9,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001600,
+            902002800,
+            902004200,
+            902007200,
+            902007300,
+            902007600,
+            902009100,
+            902011000
+          ],
+          "pct_both_correct": 0.19166666666666668,
+          "pct_both_wrong": 0.65,
+          "pct_current_only": 0.08333333333333333,
+          "pct_novel_only": 0.075
+        }
+      },
+      "12": {
+        "20260814": {
+          "both_correct_A": 113,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 6,
+          "current_only_win_incident_ids": [
+            902003000,
+            902004500,
+            902006100,
+            902008000,
+            902008100,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -6,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9416666666666667,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.05,
+          "pct_novel_only": 0.0
+        },
+        "31874": {
+          "both_correct_A": 112,
+          "both_wrong_D": 3,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902003000,
+            902003300,
+            902004500,
+            902006800,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -5,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9333333333333333,
+          "pct_both_wrong": 0.025,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.0
+        }
+      },
+      "2": {
+        "20260814": {
+          "both_correct_A": 44,
+          "both_wrong_D": 45,
+          "complementarity_ratio_C_over_maxB1": 1.0666666666666667,
+          "current_only_B": 15,
+          "current_only_win_incident_ids": [
+            902001000,
+            902001800,
+            902003300,
+            902004700,
+            902005200,
+            902006500,
+            902006900,
+            902007000,
+            902008500,
+            902008800,
+            902009300,
+            902010000,
+            902010100,
+            902011600,
+            902011900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 1,
+          "novel_only_C": 16,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902000500,
+            902001200,
+            902002400,
+            902002800,
+            902003500,
+            902003800,
+            902003900,
+            902004600,
+            902005900,
+            902007200,
+            902007300,
+            902008400,
+            902008900,
+            902009000,
+            902011000
+          ],
+          "pct_both_correct": 0.36666666666666664,
+          "pct_both_wrong": 0.375,
+          "pct_current_only": 0.125,
+          "pct_novel_only": 0.13333333333333333
+        },
+        "31874": {
+          "both_correct_A": 43,
+          "both_wrong_D": 45,
+          "complementarity_ratio_C_over_maxB1": 0.8823529411764706,
+          "current_only_B": 17,
+          "current_only_win_incident_ids": [
+            902001000,
+            902001800,
+            902003300,
+            902004700,
+            902005200,
+            902006100,
+            902006500,
+            902006900,
+            902007000,
+            902008200,
+            902008500,
+            902008800,
+            902009300,
+            902010000,
+            902010100,
+            902011600,
+            902011900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -2,
+          "novel_only_C": 15,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902000500,
+            902001200,
+            902002800,
+            902003500,
+            902003800,
+            902003900,
+            902004600,
+            902005900,
+            902007200,
+            902007300,
+            902008400,
+            902008900,
+            902009000,
+            902011000
+          ],
+          "pct_both_correct": 0.35833333333333334,
+          "pct_both_wrong": 0.375,
+          "pct_current_only": 0.14166666666666666,
+          "pct_novel_only": 0.125
+        }
+      },
+      "25": {
+        "20260814": {
+          "both_correct_A": 116,
+          "both_wrong_D": 0,
+          "complementarity_ratio_C_over_maxB1": 0.3333333333333333,
+          "current_only_B": 3,
+          "current_only_win_incident_ids": [
+            902004500,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -2,
+          "novel_only_C": 1,
+          "novel_only_win_incident_ids": [
+            902007800
+          ],
+          "pct_both_correct": 0.9666666666666667,
+          "pct_both_wrong": 0.0,
+          "pct_current_only": 0.025,
+          "pct_novel_only": 0.008333333333333333
+        },
+        "31874": {
+          "both_correct_A": 115,
+          "both_wrong_D": 0,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902003300,
+            902004500,
+            902007800,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -5,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9583333333333334,
+          "pct_both_wrong": 0.0,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.0
+        }
+      },
+      "3": {
+        "20260814": {
+          "both_correct_A": 68,
+          "both_wrong_D": 46,
+          "complementarity_ratio_C_over_maxB1": 1.0,
+          "current_only_B": 3,
+          "current_only_win_incident_ids": [
+            902003400,
+            902004200,
+            902004900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 0,
+          "novel_only_C": 3,
+          "novel_only_win_incident_ids": [
+            902002400,
+            902008100,
+            902010400
+          ],
+          "pct_both_correct": 0.5666666666666667,
+          "pct_both_wrong": 0.38333333333333336,
+          "pct_current_only": 0.025,
+          "pct_novel_only": 0.025
+        },
+        "31874": {
+          "both_correct_A": 69,
+          "both_wrong_D": 46,
+          "complementarity_ratio_C_over_maxB1": 1.5,
+          "current_only_B": 2,
+          "current_only_win_incident_ids": [
+            902003400,
+            902004900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 1,
+          "novel_only_C": 3,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902008100,
+            902010400
+          ],
+          "pct_both_correct": 0.575,
+          "pct_both_wrong": 0.38333333333333336,
+          "pct_current_only": 0.016666666666666666,
+          "pct_novel_only": 0.025
+        }
+      },
+      "4": {
+        "20260814": {
+          "both_correct_A": 96,
+          "both_wrong_D": 15,
+          "complementarity_ratio_C_over_maxB1": 2.0,
+          "current_only_B": 3,
+          "current_only_win_incident_ids": [
+            902003300,
+            902007800,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 3,
+          "novel_only_C": 6,
+          "novel_only_win_incident_ids": [
+            902000500,
+            902001800,
+            902002400,
+            902003500,
+            902004600,
+            902005900
+          ],
+          "pct_both_correct": 0.8,
+          "pct_both_wrong": 0.125,
+          "pct_current_only": 0.025,
+          "pct_novel_only": 0.05
+        },
+        "31874": {
+          "both_correct_A": 96,
+          "both_wrong_D": 18,
+          "complementarity_ratio_C_over_maxB1": 6.0,
+          "current_only_B": 0,
+          "current_only_win_incident_ids": [],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 6,
+          "novel_only_C": 6,
+          "novel_only_win_incident_ids": [
+            902000500,
+            902002400,
+            902003500,
+            902004600,
+            902005900,
+            902011700
+          ],
+          "pct_both_correct": 0.8,
+          "pct_both_wrong": 0.15,
+          "pct_current_only": 0.0,
+          "pct_novel_only": 0.05
+        }
+      },
+      "6": {
+        "20260814": {
+          "both_correct_A": 113,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.2,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902004100,
+            902004500,
+            902006100,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -4,
+          "novel_only_C": 1,
+          "novel_only_win_incident_ids": [
+            902002400
+          ],
+          "pct_both_correct": 0.9416666666666667,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.008333333333333333
+        },
+        "31874": {
+          "both_correct_A": 113,
+          "both_wrong_D": 3,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 4,
+          "current_only_win_incident_ids": [
+            902004100,
+            902004500,
+            902006100,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -4,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9416666666666667,
+          "pct_both_wrong": 0.025,
+          "pct_current_only": 0.03333333333333333,
+          "pct_novel_only": 0.0
+        }
+      }
+    },
+    "GRAPH_SDE": {
+      "1": {
+        "20260814": {
+          "both_correct_A": 18,
+          "both_wrong_D": 74,
+          "complementarity_ratio_C_over_maxB1": 1.0,
+          "current_only_B": 14,
+          "current_only_win_incident_ids": [
+            902000600,
+            902001700,
+            902003600,
+            902005200,
+            902005700,
+            902006300,
+            902007800,
+            902008300,
+            902008700,
+            902009500,
+            902009800,
+            902010200,
+            902010300,
+            902011200
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 0,
+          "novel_only_C": 14,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001200,
+            902002700,
+            902003000,
+            902003900,
+            902004500,
+            902006000,
+            902007200,
+            902007300,
+            902007600,
+            902008400,
+            902009000,
+            902009100,
+            902011000
+          ],
+          "pct_both_correct": 0.15,
+          "pct_both_wrong": 0.6166666666666667,
+          "pct_current_only": 0.11666666666666667,
+          "pct_novel_only": 0.11666666666666667
+        },
+        "31874": {
+          "both_correct_A": 23,
+          "both_wrong_D": 78,
+          "complementarity_ratio_C_over_maxB1": 0.9,
+          "current_only_B": 10,
+          "current_only_win_incident_ids": [
+            902000600,
+            902001700,
+            902003600,
+            902005200,
+            902007800,
+            902008300,
+            902009500,
+            902009800,
+            902010300,
+            902011200
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -1,
+          "novel_only_C": 9,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902001600,
+            902002800,
+            902004200,
+            902007200,
+            902007300,
+            902007600,
+            902009100,
+            902011000
+          ],
+          "pct_both_correct": 0.19166666666666668,
+          "pct_both_wrong": 0.65,
+          "pct_current_only": 0.08333333333333333,
+          "pct_novel_only": 0.075
+        }
+      },
+      "12": {
+        "20260814": {
+          "both_correct_A": 114,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902002400,
+            902003000,
+            902004500,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -5,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.95,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.0
+        },
+        "31874": {
+          "both_correct_A": 113,
+          "both_wrong_D": 3,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 4,
+          "current_only_win_incident_ids": [
+            902003000,
+            902003300,
+            902004500,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -4,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9416666666666667,
+          "pct_both_wrong": 0.025,
+          "pct_current_only": 0.03333333333333333,
+          "pct_novel_only": 0.0
+        }
+      },
+      "2": {
+        "20260814": {
+          "both_correct_A": 44,
+          "both_wrong_D": 45,
+          "complementarity_ratio_C_over_maxB1": 1.0666666666666667,
+          "current_only_B": 15,
+          "current_only_win_incident_ids": [
+            902001000,
+            902001800,
+            902003300,
+            902004700,
+            902005200,
+            902006500,
+            902006900,
+            902007000,
+            902008500,
+            902008800,
+            902009300,
+            902010000,
+            902010100,
+            902011600,
+            902011900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 1,
+          "novel_only_C": 16,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902000500,
+            902001200,
+            902002400,
+            902002800,
+            902003500,
+            902003800,
+            902003900,
+            902004600,
+            902005900,
+            902007200,
+            902007300,
+            902008400,
+            902008900,
+            902009000,
+            902011000
+          ],
+          "pct_both_correct": 0.36666666666666664,
+          "pct_both_wrong": 0.375,
+          "pct_current_only": 0.125,
+          "pct_novel_only": 0.13333333333333333
+        },
+        "31874": {
+          "both_correct_A": 43,
+          "both_wrong_D": 45,
+          "complementarity_ratio_C_over_maxB1": 0.8823529411764706,
+          "current_only_B": 17,
+          "current_only_win_incident_ids": [
+            902001000,
+            902001800,
+            902003300,
+            902004700,
+            902005200,
+            902006100,
+            902006500,
+            902006900,
+            902007000,
+            902008200,
+            902008500,
+            902008800,
+            902009300,
+            902010000,
+            902010100,
+            902011600,
+            902011900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -2,
+          "novel_only_C": 15,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902000500,
+            902001200,
+            902002800,
+            902003500,
+            902003800,
+            902003900,
+            902004600,
+            902005900,
+            902007200,
+            902007300,
+            902008400,
+            902008900,
+            902009000,
+            902011000
+          ],
+          "pct_both_correct": 0.35833333333333334,
+          "pct_both_wrong": 0.375,
+          "pct_current_only": 0.14166666666666666,
+          "pct_novel_only": 0.125
+        }
+      },
+      "25": {
+        "20260814": {
+          "both_correct_A": 114,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902002400,
+            902004500,
+            902004700,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -5,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.95,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.0
+        },
+        "31874": {
+          "both_correct_A": 114,
+          "both_wrong_D": 0,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 6,
+          "current_only_win_incident_ids": [
+            902004500,
+            902004700,
+            902006100,
+            902007800,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -6,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.95,
+          "pct_both_wrong": 0.0,
+          "pct_current_only": 0.05,
+          "pct_novel_only": 0.0
+        }
+      },
+      "3": {
+        "20260814": {
+          "both_correct_A": 68,
+          "both_wrong_D": 46,
+          "complementarity_ratio_C_over_maxB1": 1.0,
+          "current_only_B": 3,
+          "current_only_win_incident_ids": [
+            902003400,
+            902004200,
+            902004900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 0,
+          "novel_only_C": 3,
+          "novel_only_win_incident_ids": [
+            902002400,
+            902008100,
+            902010400
+          ],
+          "pct_both_correct": 0.5666666666666667,
+          "pct_both_wrong": 0.38333333333333336,
+          "pct_current_only": 0.025,
+          "pct_novel_only": 0.025
+        },
+        "31874": {
+          "both_correct_A": 69,
+          "both_wrong_D": 46,
+          "complementarity_ratio_C_over_maxB1": 1.5,
+          "current_only_B": 2,
+          "current_only_win_incident_ids": [
+            902003400,
+            902004900
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 1,
+          "novel_only_C": 3,
+          "novel_only_win_incident_ids": [
+            902000300,
+            902008100,
+            902010400
+          ],
+          "pct_both_correct": 0.575,
+          "pct_both_wrong": 0.38333333333333336,
+          "pct_current_only": 0.016666666666666666,
+          "pct_novel_only": 0.025
+        }
+      },
+      "4": {
+        "20260814": {
+          "both_correct_A": 97,
+          "both_wrong_D": 17,
+          "complementarity_ratio_C_over_maxB1": 2.0,
+          "current_only_B": 2,
+          "current_only_win_incident_ids": [
+            902007800,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 2,
+          "novel_only_C": 4,
+          "novel_only_win_incident_ids": [
+            902001100,
+            902001800,
+            902002400,
+            902005900
+          ],
+          "pct_both_correct": 0.8083333333333333,
+          "pct_both_wrong": 0.14166666666666666,
+          "pct_current_only": 0.016666666666666666,
+          "pct_novel_only": 0.03333333333333333
+        },
+        "31874": {
+          "both_correct_A": 95,
+          "both_wrong_D": 17,
+          "complementarity_ratio_C_over_maxB1": 7.0,
+          "current_only_B": 1,
+          "current_only_win_incident_ids": [
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": 6,
+          "novel_only_C": 7,
+          "novel_only_win_incident_ids": [
+            902000500,
+            902001800,
+            902002400,
+            902003500,
+            902004600,
+            902005900,
+            902011700
+          ],
+          "pct_both_correct": 0.7916666666666666,
+          "pct_both_wrong": 0.14166666666666666,
+          "pct_current_only": 0.008333333333333333,
+          "pct_novel_only": 0.058333333333333334
+        }
+      },
+      "6": {
+        "20260814": {
+          "both_correct_A": 113,
+          "both_wrong_D": 1,
+          "complementarity_ratio_C_over_maxB1": 0.2,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902004100,
+            902004500,
+            902006100,
+            902008000,
+            902008400
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -4,
+          "novel_only_C": 1,
+          "novel_only_win_incident_ids": [
+            902002400
+          ],
+          "pct_both_correct": 0.9416666666666667,
+          "pct_both_wrong": 0.008333333333333333,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.008333333333333333
+        },
+        "31874": {
+          "both_correct_A": 112,
+          "both_wrong_D": 3,
+          "complementarity_ratio_C_over_maxB1": 0.0,
+          "current_only_B": 5,
+          "current_only_win_incident_ids": [
+            902004100,
+            902004500,
+            902006100,
+            902008400,
+            902009000
+          ],
+          "n": 120,
+          "net_paired_advantage_C_minus_B": -5,
+          "novel_only_C": 0,
+          "novel_only_win_incident_ids": [],
+          "pct_both_correct": 0.9333333333333333,
+          "pct_both_wrong": 0.025,
+          "pct_current_only": 0.041666666666666664,
+          "pct_novel_only": 0.0
+        }
+      }
+    }
+  },
+  "cross_arm_overlap": {
+    "20260814": {
+      "1": {
+        "all_ct_lose_current_wins_ids": [
+          902000600,
+          902001700,
+          902003600,
+          902005200,
+          902005700,
+          902006300,
+          902007800,
+          902008300,
+          902008700,
+          902009500,
+          902009800,
+          902010200,
+          902010300,
+          902011200
+        ],
+        "all_ct_win_current_loses_ids": [
+          902000300,
+          902001200,
+          902002700,
+          902003000,
+          902003900,
+          902004500,
+          902006000,
+          902007200,
+          902007300,
+          902007600,
+          902008400,
+          902009000,
+          902009100,
+          902011000
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "12": {
+        "all_ct_lose_current_wins_ids": [
+          902004500,
+          902008000
+        ],
+        "all_ct_win_current_loses_ids": [],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "2": {
+        "all_ct_lose_current_wins_ids": [
+          902001800,
+          902003300,
+          902005200,
+          902006900,
+          902008800,
+          902009300
+        ],
+        "all_ct_win_current_loses_ids": [
+          902000300,
+          902001200,
+          902003900,
+          902007200,
+          902008400,
+          902009000
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [
+            902006700,
+            902008600,
+            902009200,
+            902011300
+          ],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "25": {
+        "all_ct_lose_current_wins_ids": [
+          902004500,
+          902008000
+        ],
+        "all_ct_win_current_loses_ids": [],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [
+            902007800
+          ],
+          "GRAPH_SDE": []
+        }
+      },
+      "3": {
+        "all_ct_lose_current_wins_ids": [
+          902003400,
+          902004200,
+          902004900
+        ],
+        "all_ct_win_current_loses_ids": [
+          902002400,
+          902008100,
+          902010400
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "4": {
+        "all_ct_lose_current_wins_ids": [
+          902007800
+        ],
+        "all_ct_win_current_loses_ids": [
+          902001800
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [
+            902000500,
+            902003500,
+            902004600
+          ],
+          "GRAPH_SDE": [
+            902001100
+          ]
+        }
+      },
+      "6": {
+        "all_ct_lose_current_wins_ids": [
+          902004100,
+          902004500,
+          902008000
+        ],
+        "all_ct_win_current_loses_ids": [
+          902002400
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      }
+    },
+    "31874": {
+      "1": {
+        "all_ct_lose_current_wins_ids": [
+          902001700,
+          902003600,
+          902005200,
+          902007800,
+          902008300,
+          902009500,
+          902009800,
+          902010300,
+          902011200
+        ],
+        "all_ct_win_current_loses_ids": [
+          902000300,
+          902001600,
+          902002800,
+          902004200,
+          902007200,
+          902007600,
+          902009100,
+          902011000
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "12": {
+        "all_ct_lose_current_wins_ids": [
+          902004500
+        ],
+        "all_ct_win_current_loses_ids": [],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "2": {
+        "all_ct_lose_current_wins_ids": [
+          902005200,
+          902008500,
+          902008800
+        ],
+        "all_ct_win_current_loses_ids": [
+          902000300,
+          902008900
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "25": {
+        "all_ct_lose_current_wins_ids": [
+          902004500,
+          902007800,
+          902008000
+        ],
+        "all_ct_win_current_loses_ids": [],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "3": {
+        "all_ct_lose_current_wins_ids": [
+          902003400,
+          902004900
+        ],
+        "all_ct_win_current_loses_ids": [
+          902008100,
+          902010400
+        ],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [
+            902004200,
+            902006600
+          ],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      },
+      "4": {
+        "all_ct_lose_current_wins_ids": [],
+        "all_ct_win_current_loses_ids": [],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [
+            902003300
+          ],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": [
+            902001800
+          ]
+        }
+      },
+      "6": {
+        "all_ct_lose_current_wins_ids": [
+          902004100,
+          902004500,
+          902006100
+        ],
+        "all_ct_win_current_loses_ids": [],
+        "n_incidents": 120,
+        "unique_contributor_wins_by_arm": {
+          "GRAPH_CDE": [
+            902003300,
+            902008000
+          ],
+          "GRAPH_ODE": [],
+          "GRAPH_SDE": []
+        }
+      }
+    }
+  }
+}

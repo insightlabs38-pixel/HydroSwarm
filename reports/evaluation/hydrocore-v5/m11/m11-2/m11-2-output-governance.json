@@ -1,0 +1,16 @@
+{
+  "allowlist_matches": true,
+  "kind": "M11_2_OUTPUT_GOVERNANCE",
+  "next_step_disposition": "SUPPRESSED_UNSUPERVISED",
+  "runtime_enabled_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "suppressed_output": "next_step",
+  "trained_tasks": [
+    "sentinel"
+  ]
+}

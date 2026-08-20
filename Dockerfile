@@ -24,6 +24,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HYDROSWARM_DATA_DIR=/data \
     HYDROSWARM_V4_BUNDLE_DIR=/app/models/hydrocore-v4-release \
+    HYDROSWARM_V5_BUNDLE_DIR=/app/models/hydrocore-v5-release \
     HYDROSWARM_REFERENCE_DEMO_PATH=/app/artifacts/reference-demo/reference-incident-v1.json \
     HYDROSWARM_FROZEN_SCENARIO_DIR=/app/data/frozen \
     MPLCONFIGDIR=/tmp/matplotlib \
@@ -75,6 +76,10 @@ COPY configs/ configs/
 # site-packages. Without this COPY+ENV pair the container would silently
 # fail closed to the classical-safe fallback while still reporting healthy.
 COPY models/hydrocore-v4-release/ models/hydrocore-v4-release/
+# The governed v5 finalist is also required by the strict build-time self-test.
+# This copies the exact frozen bundle; it does not alter its identity or enable
+# any additional learned authority.
+COPY models/hydrocore-v5-release/ models/hydrocore-v5-release/
 # SUB-4/SUB-3: bake in the governed REFERENCE INCIDENT artifact so the
 # judge demo path works fully offline in the container, served at
 # HYDROSWARM_REFERENCE_DEMO_PATH above via GET /api/reference-demo.

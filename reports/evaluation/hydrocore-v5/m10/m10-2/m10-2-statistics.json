@@ -1,0 +1,20 @@
+{
+  "kind": "M10_2_TRUE_STATISTICS",
+  "protocol_hash": "5dba094406aa6df7b85f50a6becdd4a092c171a7a766f75877584e7885548ad8",
+  "bootstrap_resamples": 2000,
+  "bootstrap_ci": 0.9,
+  "bootstrap_seed": 20260819,
+  "promotion_decision": {
+    "hard_gates_passed": true,
+    "primary_metric_positive_seeds": 0,
+    "primary_metric_ci_excludes_zero_seeds": 0,
+    "criterion_2_consistency_passed": false,
+    "regressions": {
+      "never_actionable_fraction": [],
+      "source_top1_final_round": []
+    },
+    "criterion_3_no_regression_passed": true,
+    "result": "M10_2_LEARNED_SCOUT_NOT_PROMOTED_DETERMINISTIC_RETAINED",
+    "reason": "primary metric consistency bar not met (positive point estimate in 0/3 seeds, required 3; CI excludes zero in 0/3 seeds, required 2)"
+  }
+}

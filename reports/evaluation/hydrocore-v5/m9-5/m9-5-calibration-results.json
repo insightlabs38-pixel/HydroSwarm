@@ -1,0 +1,119 @@
+{
+  "primary_support": 20,
+  "reproduction_sanity_gate": {
+    "M9_5_REPRODUCTION_SANITY_GATE": "FAIL",
+    "implementation_path_consistent": true,
+    "note": "Implementation-path consistency (same calibrator class/alpha/grouping), NOT exact-value equality (M9.5 uses intentionally NEW, disjoint seeds from M9.4's calibration_m9_4/development_m9_4 pools). Qualitative check: ARM_A/golden-reference poor (<0.85) on >=2/3 seeds and ARM_B2 mixed-or-failing on >=1/3 seeds at the support=4 nested subset, consistent with M9.4's own observed pattern.",
+    "per_arm_seed": {
+      "ARM_A|20260814": {
+        "minimum_group_size_used": 10,
+        "per_family_marginal_coverage_at_support_4": {
+          "golden-reference": 0.9142857142857143
+        },
+        "support_4_calibrator_config_matches_frozen_construction": true
+      },
+      "ARM_A|20260815": {
+        "minimum_group_size_used": 10,
+        "per_family_marginal_coverage_at_support_4": {
+          "golden-reference": 0.9125
+        },
+        "support_4_calibrator_config_matches_frozen_construction": true
+      },
+      "ARM_A|31874": {
+        "minimum_group_size_used": 10,
+        "per_family_marginal_coverage_at_support_4": {
+          "golden-reference": 0.9321428571428572
+        },
+        "support_4_calibrator_config_matches_frozen_construction": true
+      },
+      "ARM_B2|20260814": {
+        "minimum_group_size_used": 10,
+        "per_family_marginal_coverage_at_support_4": {
+          "branched-loop": 0.9275510204081633,
+          "golden-reference": 0.8875,
+          "loop-grid": 0.9607142857142857
+        },
+        "support_4_calibrator_config_matches_frozen_construction": true
+      },
+      "ARM_B2|20260815": {
+        "minimum_group_size_used": 10,
+        "per_family_marginal_coverage_at_support_4": {
+          "branched-loop": 0.9285714285714286,
+          "golden-reference": 0.8857142857142857,
+          "loop-grid": 0.9366071428571429
+        },
+        "support_4_calibrator_config_matches_frozen_construction": true
+      },
+      "ARM_B2|31874": {
+        "minimum_group_size_used": 10,
+        "per_family_marginal_coverage_at_support_4": {
+          "branched-loop": 0.9275510204081633,
+          "golden-reference": 0.8892857142857142,
+          "loop-grid": 0.9526785714285714
+        },
+        "support_4_calibrator_config_matches_frozen_construction": true
+      }
+    },
+    "qualitatively_consistent_with_m9_4_pattern": false
+  },
+  "resubstitution_diagnostic_only": {
+    "RESUBSTITUTION_DIAGNOSTIC_ONLY": true,
+    "note": "In-sample (resubstitution) coverage on the SAME support=20 calibration pool the calibrator was fit on -- expected near-nominal, used only to rule out a gross implementation bug, never as an operational validity metric.",
+    "per_arm_seed_family": {
+      "ARM_A|20260814|golden-reference": {
+        "in_sample_coverage": 0.9053571428571429,
+        "n": 560
+      },
+      "ARM_A|20260815|golden-reference": {
+        "in_sample_coverage": 0.9053571428571429,
+        "n": 560
+      },
+      "ARM_A|31874|golden-reference": {
+        "in_sample_coverage": 0.9053571428571429,
+        "n": 560
+      },
+      "ARM_B2|20260814|branched-loop": {
+        "in_sample_coverage": 0.9040816326530612,
+        "n": 980
+      },
+      "ARM_B2|20260814|golden-reference": {
+        "in_sample_coverage": 0.9053571428571429,
+        "n": 560
+      },
+      "ARM_B2|20260814|loop-grid": {
+        "in_sample_coverage": 0.9035714285714286,
+        "n": 1120
+      },
+      "ARM_B2|20260815|branched-loop": {
+        "in_sample_coverage": 0.9040816326530612,
+        "n": 980
+      },
+      "ARM_B2|20260815|golden-reference": {
+        "in_sample_coverage": 0.9053571428571429,
+        "n": 560
+      },
+      "ARM_B2|20260815|loop-grid": {
+        "in_sample_coverage": 0.9035714285714286,
+        "n": 1120
+      },
+      "ARM_B2|31874|branched-loop": {
+        "in_sample_coverage": 0.9040816326530612,
+        "n": 980
+      },
+      "ARM_B2|31874|golden-reference": {
+        "in_sample_coverage": 0.9053571428571429,
+        "n": 560
+      },
+      "ARM_B2|31874|loop-grid": {
+        "in_sample_coverage": 0.9035714285714286,
+        "n": 1120
+      }
+    }
+  },
+  "support_levels": [
+    4,
+    8,
+    12,
+    20
+  ]
+}
