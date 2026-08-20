@@ -27,6 +27,16 @@ const SECONDARY_UTILITIES: { id: Workspace; label: string }[] = [
   { id: 'benchmarks', label: 'Benchmarks' },
 ];
 
+/** Compact semantic initials shown ONLY in the collapsed rail, so
+ * secondary utility buttons never render blank (`.rail-label` is hidden
+ * when collapsed, and secondary buttons carry no workflow-status glyph). */
+const SECONDARY_INITIAL: Partial<Record<Workspace, string>> = {
+  network: 'N',
+  validation: 'V',
+  authority: 'A',
+  benchmarks: 'B',
+};
+
 /**
  * Secondary utilities are NOT workflow stages -- they are neutral
  * navigation links with active-page state only.
@@ -88,7 +98,9 @@ function RailButton({
   collapsed: boolean;
   isSecondary?: boolean;
 }) {
-  // Secondary utilities: no glyph, no stage-status, just active-page highlight.
+  // Secondary utilities: no workflow-status glyph, just active-page
+  // highlight -- but the collapsed rail still needs a visible compact
+  // initial, or the button renders blank once `.rail-label` is hidden.
   if (isSecondary) {
     return (
       <button
@@ -97,7 +109,13 @@ function RailButton({
         onClick={() => onSelect(id)}
         aria-current={active ? 'page' : undefined}
         aria-label={label}
+        title={label}
       >
+        {collapsed && (
+          <span className="rail-secondary-initial" aria-hidden="true">
+            {SECONDARY_INITIAL[id] ?? label.charAt(0)}
+          </span>
+        )}
         <span className="rail-label" aria-hidden={collapsed}>
           {label}
         </span>

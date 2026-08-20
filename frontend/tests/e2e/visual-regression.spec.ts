@@ -280,9 +280,9 @@ test.describe('keyboard-only navigation', () => {
     { rail: /^Approval/, heading: 'Operator approval' },
     { rail: /^Replay/, heading: 'Event ledger' },
     { rail: /^Network/, heading: 'Import network' },
-    { rail: /^Validation/, heading: 'Benchmarks and operating range' },
-    { rail: /^Model/, heading: 'Authority ladder' },
-    { rail: /^Benchmarks/, heading: 'Operational benchmarks' },
+    { rail: /^Validation/, heading: 'HydroCore-v5 final evaluation evidence' },
+    { rail: /^Model/, heading: 'Decision authority path' },
+    { rail: /^Benchmarks/, heading: 'Regression and runtime benchmarks' },
   ];
 
   test('every workflow-rail stage is reachable and focus is visible without a mouse', async ({
@@ -601,9 +601,9 @@ test.describe('final visual coverage matrix', () => {
   test('utility workspaces @ 1440x900', async ({ page }) => {
     for (const [rail, heading, name] of [
       [/^Network/, 'Import network', 'network-1440x900.png'],
-      [/^Validation/, 'Benchmarks and operating range', 'validation-1440x900.png'],
-      [/^Model/, 'Authority ladder', 'authority-1440x900.png'],
-      [/^Benchmarks/, 'Operational benchmarks', 'benchmarks-1440x900.png'],
+      [/^Validation/, 'HydroCore-v5 final evaluation evidence', 'validation-1440x900.png'],
+      [/^Model/, 'Decision authority path', 'authority-1440x900.png'],
+      [/^Benchmarks/, 'Regression and runtime benchmarks', 'benchmarks-1440x900.png'],
     ] as const) {
       await gotoWorkspace(page, 1440, 900, { rail, heading });
       await expect(page).toHaveScreenshot(name, { fullPage: true });
