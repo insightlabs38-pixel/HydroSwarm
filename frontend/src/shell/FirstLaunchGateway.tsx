@@ -40,13 +40,13 @@ export function FirstLaunchGateway({
           <button type="button" className="first-launch-primary" onClick={onRunReference}>
             Run Reference Incident
             <span className="first-launch-recommended">
-              Recommended · checksummed verified replay
+              Recommended · deterministic checksummed workflow replay
             </span>
           </button>
           <button type="button" onClick={onRunLive}>
             Run Live Example
             <span className="first-launch-secondary-label">
-              Real production computation · reference inputs
+              Current HydroCore-v5 runtime · real computation on reference inputs
             </span>
           </button>
           <button type="button" onClick={onImportNetwork}>

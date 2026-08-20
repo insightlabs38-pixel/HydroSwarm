@@ -57,8 +57,8 @@ export function PlanTable({ plans }: { plans: Plan[] }) {
                   {consequences === null
                     ? '—'
                     : consequences.pressureViolationMinutes === 0
-                      ? '0 — safe'
-                      : `${consequences.pressureViolationMinutes} — unsafe`}
+                      ? '0 min — no modeled violation'
+                      : `${consequences.pressureViolationMinutes} min — violation`}
                 </td>
                 <td>
                   {consequences === null

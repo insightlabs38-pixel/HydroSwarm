@@ -1,0 +1,230 @@
+{
+  "schema": "hydroswarm-v5-evidence-v1",
+  "generated_from": [
+    {
+      "path": "models/hydrocore-v5-release/runtime_manifest.json",
+      "sha256": "f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34"
+    },
+    {
+      "path": "models/hydrocore-v5-release/calibration.json",
+      "sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d"
+    },
+    {
+      "path": "models/hydrocore-v5-release/model.safetensors",
+      "sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json",
+      "sha256": "6b778b14149920247a48a77e45a016b4d4d569c5a194596a0c14466d07ea3a24"
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-metrics.json",
+      "sha256": "731bc1f891050cc8afbd5af79384b20a4144a08900d9a8533086639ce9baf7cd"
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-gate.json",
+      "sha256": "01d4e54ac2dabe5afba557d770ecc8abca2ab59a637877d9b49a8404805a6d5a"
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-safety-counters.json",
+      "sha256": "c4bbf32169f6bd3b9bbcd37a4abf10c028d3702a3b628d9f59aff3903df362c7"
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-closure.json",
+      "sha256": "c73b0064e38456893138f5b94fe1b450e3329806791ca17eb8805895137c70d0"
+    },
+    {
+      "path": "reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-post-run-governance.json",
+      "sha256": "2262e22f6629d3ecf6dea6a3b1bb32871a1b181d4b754c2eea7405578c0f4d7b"
+    }
+  ],
+  "system_identity": {
+    "name": "HydroCore-v5 M10 frozen release",
+    "variant": "small",
+    "parameters": 4182612,
+    "selected_seed": 20260814,
+    "checkpoint_sha256": "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5",
+    "calibration_artifact_hash": "f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd",
+    "calibration_sha256": "8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d",
+    "feature_schema_hash": "7ec97775e5f01f87ae62669146a7eb70958f99b1162a356614eb87220e9ddd09",
+    "release_bundle": "models/hydrocore-v5-release",
+    "release_schema_version": "hydroswarm-v5-release-v1"
+  },
+  "runtime_outputs": [
+    "event_cause",
+    "event_presence",
+    "evidence_sufficiency",
+    "relative_strength",
+    "source_node"
+  ],
+  "trained_tasks": ["sentinel"],
+  "deterministic_authority": {
+    "ood": "OODDetector",
+    "scout": "rank_sample_locations",
+    "planner": "generate_response_plans",
+    "physical_verification": "WNTR/EPANET",
+    "human_approval_required": true,
+    "autonomous_actuation": false
+  },
+  "locked_governance": {
+    "gate_pass": true,
+    "locked_final_count": 105,
+    "locked_topology_count": 20,
+    "total_count": 125,
+    "authorized_openings": 1,
+    "actual_openings": 1,
+    "rerun": false,
+    "post_lock_tuning": false,
+    "closure_state": "M11_6_LOCKED_EVALUATION_PASS",
+    "locked_final_result": "M11_6_LOCKED_FINAL_PASS",
+    "locked_topology_result": "M11_6_LOCKED_TOPOLOGY_PASS"
+  },
+  "hard_safety_counters": {
+    "total_counters": 15,
+    "counters_zero": true,
+    "all_pass": true,
+    "counters": [
+      "autonomous_actuation_detected",
+      "human_approval_bypassed",
+      "inaccessible_sample_selected",
+      "invariant_failures",
+      "learned_ood_overrode_deterministic",
+      "learned_scout_selected_sample",
+      "learned_strategist_selected_plan",
+      "nonfinite_value_reached_decision",
+      "rejected_plan_surfaced_as_safe",
+      "sampled_node_reselected",
+      "sampling_budget_exceeded",
+      "silent_v4_fallback",
+      "stale_approval_accepted",
+      "unverified_plan_surfaced_as_actionable",
+      "finalist_identity_drift"
+    ]
+  },
+  "metrics": {
+    "locked_final_test": {
+      "aggregate": {
+        "source": {
+          "n": 105,
+          "top1_rate": 0.5523809523809524,
+          "top3_rate": 0.7619047619047619,
+          "mrr": 0.6874603174603175,
+          "coverage_rate": 0.8857142857142857,
+          "actionable_rate": 0.6095238095238096,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 3.085714285714286,
+          "posterior_entropy": 1.0655724901222412
+        },
+        "planning": {
+          "human_approved_rate": 0.4,
+          "no_safe_plan_rate": 0.20952380952380953,
+          "mean_candidates_generated": 0.819047619047619,
+          "mean_candidates_wntr_verified": 0.4
+        },
+        "scout": {
+          "mean_samples_per_incident": 0.7714285714285715,
+          "mean_entropy_reduction_bits_per_sample": 0.13616209324524337,
+          "fraction_requesting_ge1_sample": 0.37142857142857144
+        }
+      },
+      "by_condition": {
+        "NOMINAL": {
+          "n": 15,
+          "top1_rate": 0.7333333333333333,
+          "top3_rate": 0.8666666666666667,
+          "mrr": 0.8206349206349207,
+          "coverage_rate": 0.9333333333333333,
+          "actionable_rate": 0.8,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 2.0,
+          "posterior_entropy": 0.5546461869616789
+        },
+        "SENSOR_HEALTH_DEGRADED": {
+          "n": 15,
+          "top1_rate": 0.6666666666666666,
+          "top3_rate": 0.8666666666666667,
+          "mrr": 0.7777777777777778,
+          "coverage_rate": 0.8666666666666667,
+          "actionable_rate": 0.9333333333333333,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 1.7333333333333334,
+          "posterior_entropy": 0.5870999132471911
+        },
+        "SEVERITY_SHIFT": {
+          "n": 15,
+          "top1_rate": 0.7333333333333333,
+          "top3_rate": 0.8666666666666667,
+          "mrr": 0.8150793650793651,
+          "coverage_rate": 0.8666666666666667,
+          "actionable_rate": 0.8,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 2.2666666666666666,
+          "posterior_entropy": 0.7833300601532684
+        },
+        "LOW_COVERAGE_ACTIVE_SAMPLING": {
+          "n": 15,
+          "top1_rate": 0.4666666666666667,
+          "top3_rate": 0.8666666666666667,
+          "mrr": 0.6484126984126984,
+          "coverage_rate": 0.9333333333333333,
+          "actionable_rate": 0.4,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 3.933333333333333,
+          "posterior_entropy": 1.3166952493420303
+        },
+        "SENSOR_DROPOUT": {
+          "n": 15,
+          "top1_rate": 0.4666666666666667,
+          "top3_rate": 0.6,
+          "mrr": 0.5974603174603175,
+          "coverage_rate": 0.6666666666666666,
+          "actionable_rate": 0.6,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 3.066666666666667,
+          "posterior_entropy": 1.1837258654624312
+        },
+        "MEASUREMENT_NOISE": {
+          "n": 15,
+          "top1_rate": 0.4,
+          "top3_rate": 0.6666666666666666,
+          "mrr": 0.5855555555555555,
+          "coverage_rate": 0.9333333333333333,
+          "actionable_rate": 0.3333333333333333,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 4.2,
+          "posterior_entropy": 1.4253477359141826
+        },
+        "AMBIGUITY_DISAGREEMENT": {
+          "n": 15,
+          "top1_rate": 0.4,
+          "top3_rate": 0.6,
+          "mrr": 0.5673015873015873,
+          "coverage_rate": 1.0,
+          "actionable_rate": 0.4,
+          "calibrated_rate": 1.0,
+          "candidate_set_size": 4.4,
+          "posterior_entropy": 1.6081624197749056
+        }
+      }
+    },
+    "locked_topology_test": {
+      "source": {
+        "n": 20,
+        "top1_rate": 0.55,
+        "top3_rate": 0.7,
+        "mrr": 0.6522222222222223,
+        "coverage_rate": 0.6,
+        "actionable_rate": 0.0,
+        "calibrated_rate": 0.0,
+        "candidate_set_size": 1.3,
+        "posterior_entropy": 0.2086929170984389
+      },
+      "planning": {
+        "human_approved_rate": 0.0,
+        "mean_candidates_generated": 0.0,
+        "mean_candidates_wntr_verified": 0.0
+      },
+      "topology_shift_predictive": "DESCRIPTIVE_NON_GATING"
+    }
+  }
+}

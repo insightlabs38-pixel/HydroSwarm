@@ -117,31 +117,33 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
           <PlanTable plans={incident.plans} />
         )}
       </Panel>
-      <Panel
-        title="Verified response Pareto frontier"
-        eyebrow={`${frontierMode === 'posterior_weighted' ? 'POSTERIOR-WEIGHTED' : 'WORST-CASE'} CONTEXT`}
-        className="wide-panel"
-      >
-        {planningSuppressed ? (
-          <EmptyState
-            title="Planning suppressed -- no Pareto frontier to display."
-            detail={planningSuppressionDetail(incident)}
-          />
-        ) : incident.mode === 'LIVE' && frontierQuery.isLoading ? (
-          <p role="status">Loading Pareto frontier…</p>
-        ) : incident.mode === 'LIVE' && frontierQuery.isError ? (
-          <EmptyState
-            title="Pareto frontier unavailable."
-            detail={(frontierQuery.error as Error).message}
-          />
-        ) : (
-          <ParetoFrontier
-            entries={frontier}
-            selectedPlanId={activePlan?.id ?? null}
-            onSelectPlan={selectPlan}
-          />
-        )}
-      </Panel>
+      {incident.mode !== 'REFERENCE' && (
+        <Panel
+          title="Verified response Pareto frontier"
+          eyebrow={`${frontierMode === 'posterior_weighted' ? 'POSTERIOR-WEIGHTED' : 'WORST-CASE'} CONTEXT`}
+          className="wide-panel"
+        >
+          {planningSuppressed ? (
+            <EmptyState
+              title="Planning suppressed -- no Pareto frontier to display."
+              detail={planningSuppressionDetail(incident)}
+            />
+          ) : incident.mode === 'LIVE' && frontierQuery.isLoading ? (
+            <p role="status">Loading Pareto frontier…</p>
+          ) : incident.mode === 'LIVE' && frontierQuery.isError ? (
+            <EmptyState
+              title="Pareto frontier unavailable."
+              detail={(frontierQuery.error as Error).message}
+            />
+          ) : (
+            <ParetoFrontier
+              entries={frontier}
+              selectedPlanId={activePlan?.id ?? null}
+              onSelectPlan={selectPlan}
+            />
+          )}
+        </Panel>
+      )}
       <Panel
         title="Counterfactual consequence branches"
         eyebrow="NO-RESPONSE COMPARATOR"
@@ -172,6 +174,11 @@ export function ResponseWorkspace({ incident }: { incident: IncidentView }) {
           />
         ) : comparePlans ? (
           <p>{comparePlans.text}</p>
+        ) : incident.mode === 'REFERENCE' ? (
+          <div className="inspector-stack">
+            <p className="eyebrow">REFERENCE NARRATIVE</p>
+            <p>{incident.explanation || 'Deterministic reference workflow — no grounded plan explanation available.'}</p>
+          </div>
         ) : (
           <EmptyState title="No grounded plan comparison available for this incident." />
         )}

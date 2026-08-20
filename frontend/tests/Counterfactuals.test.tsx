@@ -78,12 +78,12 @@ test('renders real plan names, never the old hard-coded PLAN A / PLAN B labels',
 test('does not crash with a single plan (plans[1] used to throw)', () => {
   render(<Counterfactuals plans={[plan({ id: 'only', name: 'Only plan' })]} />);
   expect(screen.getByText('Only plan')).toBeInTheDocument();
-  expect(screen.getByText('No response')).toBeInTheDocument();
+  expect(screen.getByText('No response · NOT SIMULATED')).toBeInTheDocument();
 });
 
 test('does not crash and renders correctly with zero plans', () => {
   render(<Counterfactuals plans={[]} />);
-  expect(screen.getByText('No response')).toBeInTheDocument();
+  expect(screen.getByText('No response · NOT SIMULATED')).toBeInTheDocument();
 });
 
 test('recommended styling follows plan.status, not plan order or position', () => {

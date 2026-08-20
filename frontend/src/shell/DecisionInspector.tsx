@@ -428,8 +428,18 @@ function ReplaySummary({ incident }: { incident: IncidentView }) {
   );
 }
 
+/** Secondary utilities waste horizontal space with empty inspector content. */
+const SECONDARY_WORKSPACES: ReadonlySet<string> = new Set([
+  'network', 'validation', 'authority', 'benchmarks',
+]);
+
 export function DecisionInspector({ incident }: { incident: IncidentView }) {
   const { workspace, inspectorCollapsed, toggleInspector } = useConsoleStore();
+
+  // Secondary utility pages: no Decision Inspector rendered.
+  if (SECONDARY_WORKSPACES.has(workspace)) {
+    return null;
+  }
 
   if (inspectorCollapsed) {
     return (
@@ -457,36 +467,6 @@ export function DecisionInspector({ incident }: { incident: IncidentView }) {
     body = <ApprovalSummary incident={incident} />;
   } else if (workspace === 'replay') {
     body = <ReplaySummary incident={incident} />;
-  } else if (workspace === 'network') {
-    body = (
-      <p className="supporting">
-        Local .inp import and validation only -- no cloud upload. See the Network workspace to
-        import or inspect a network.
-      </p>
-    );
-  } else if (workspace === 'authority') {
-    body = (
-      <p className="supporting">
-        Governance table of which subsystem is authoritative for source localization, sample
-        recommendation, OOD, and plan verification. See the Model &amp; Authority workspace for the
-        full table.
-      </p>
-    );
-  } else if (workspace === 'validation') {
-    body = (
-      <p className="supporting">
-        Governed evaluation and promotion evidence loaded from committed artifacts. See the
-        Validation workspace for the full table.
-      </p>
-    );
-  } else if (workspace === 'benchmarks') {
-    body = (
-      <p className="supporting">
-        {incident.benchmarks.length} operational benchmark row
-        {incident.benchmarks.length === 1 ? '' : 's'} loaded for this build. See the Benchmarks
-        workspace for detail.
-      </p>
-    );
   } else {
     body = (
       <EmptyState

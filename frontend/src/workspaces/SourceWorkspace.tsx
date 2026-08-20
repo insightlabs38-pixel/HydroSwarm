@@ -81,8 +81,8 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
         )}
         {incident.runtimeAnalysisMode === 'CLASSICAL_SAFE' && (
           <p className="supporting">
-            Running in CLASSICAL_SAFE mode (the neural pipeline did not run for this incident); the
-            exact reason is not yet exposed to the console.
+            Learned localization was unavailable for this incident; deterministic classical
+            localization remains authoritative.
           </p>
         )}
       </Panel>
@@ -91,7 +91,38 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
         eyebrow="DECISION CERTIFICATE"
         className="wide-panel"
       >
-        {incident.mode === 'LIVE' && authorityQuery.isLoading ? (
+        {incident.mode === 'REFERENCE' ? (
+          <div className="inspector-stack">
+            <dl className="key-value-grid">
+              <div>
+                <dt>Mode</dt>
+                <dd>Deterministic reference workflow</dd>
+              </div>
+              <div>
+                <dt>Calibration</dt>
+                <dd>Not applicable to reference replay</dd>
+              </div>
+              {incident.provenance.networkHash && (
+                <div>
+                  <dt>Network provenance</dt>
+                  <dd title={incident.provenance.networkHash} className="mono">
+                    {incident.provenance.networkHash.length > 16
+                      ? `${incident.provenance.networkHash.slice(0, 8)}…${incident.provenance.networkHash.slice(-6)}`
+                      : incident.provenance.networkHash}
+                  </dd>
+                </div>
+              )}
+              <div>
+                <dt>Learned checkpoint</dt>
+                <dd>Not claimed for reference replay</dd>
+              </div>
+              <div>
+                <dt>Live V5 DecisionCertificate</dt>
+                <dd>Not applicable — deterministic reference replay</dd>
+              </div>
+            </dl>
+          </div>
+        ) : incident.mode === 'LIVE' && authorityQuery.isLoading ? (
           <p role="status">Loading authority certificate…</p>
         ) : incident.mode === 'LIVE' && authorityQuery.isError ? (
           <EmptyState
@@ -155,6 +186,11 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
               </ul>
             )}
           </>
+        ) : incident.mode === 'REFERENCE' ? (
+          <div className="inspector-stack">
+            <p className="eyebrow">REFERENCE NARRATIVE</p>
+            <p>{incident.explanation || 'Deterministic reference workflow — no grounded model explanation available.'}</p>
+          </div>
         ) : (
           <EmptyState title="No grounded source explanation available for this incident." />
         )}

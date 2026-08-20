@@ -72,7 +72,20 @@ export function SamplingWorkspace({ incident }: { incident: IncidentView }) {
       </Panel>
       <aside className="right-rail" aria-label="Evidence stop certificate">
         <Panel title="Evidence status" eyebrow="STOP CERTIFICATE">
-          {incident.mode === 'LIVE' && evidenceQuery.isLoading ? (
+          {incident.mode === 'REFERENCE' ? (
+            <div className="inspector-stack">
+              <StatusBadge tone="info">DETERMINISTIC REFERENCE SAMPLE</StatusBadge>
+              <p className="supporting">
+                Reference replay uses a deterministic classical workflow.
+                The live EvidenceCertificate contract does not apply.
+              </p>
+              {scoutCertificate && (
+                <p className="supporting">
+                  Deterministic authority: <AuthorityBadge authority={scoutCertificate.authority} />
+                </p>
+              )}
+            </div>
+          ) : incident.mode === 'LIVE' && evidenceQuery.isLoading ? (
             <p role="status">Loading evidence certificate…</p>
           ) : incident.mode === 'LIVE' && evidenceQuery.isError ? (
             <EmptyState
@@ -129,7 +142,7 @@ export function SamplingWorkspace({ incident }: { incident: IncidentView }) {
           </Panel>
         )}
       </aside>
-      <Panel title="Next sample recommendation" eyebrow="SCOUT" className="wide-panel">
+      <Panel title="Next sample recommendation" eyebrow={incident.mode === 'REFERENCE' ? 'DETERMINISTIC REFERENCE SAMPLE' : 'DETERMINISTIC SCOUT'} className="wide-panel">
         {certificate?.recommendedSampleNode ? (
           <>
             <div className="candidate-hero">

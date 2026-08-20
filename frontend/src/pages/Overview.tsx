@@ -145,7 +145,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
           </button>
         </Panel>
 
-        <Panel title="Evidence / sampling" eyebrow="SCOUT">
+        <Panel title="Evidence / sampling" eyebrow="DETERMINISTIC SCOUT">
           {incident.recommendedSample ? (
             <>
               <div className="candidate-hero">
@@ -165,7 +165,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
           </button>
         </Panel>
 
-        <Panel title="Response" eyebrow="STRATEGIST">
+        <Panel title="Response" eyebrow="DETERMINISTIC PLANNER">
           {activePlan ? (
             <>
               <p className="supporting">

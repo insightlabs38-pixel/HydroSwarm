@@ -8,14 +8,15 @@ import { AuthorityBadge } from '../components/status/AuthorityBadge';
 import { ApplicabilityBadge } from '../components/status/ApplicabilityBadge';
 import { EmptyState } from '../components/common/EmptyState';
 
-const AUTHORITY_LADDER = [
-  'UNAVAILABLE',
-  'SUPPRESSED',
-  'ADVISORY',
-  'CALIBRATED_ADVISORY',
-  'DETERMINISTIC',
-  'SIMULATOR_VERIFIED',
-  'HUMAN_APPROVED',
+/** Frozen SYSTEM authority path for HydroCore-v5. Not per-incident. */
+const SYSTEM_AUTHORITY_PATH = [
+  { label: 'HydroCore-v5 Sentinel', level: 'ADVISORY' },
+  { label: 'Calibrated fusion', level: 'CALIBRATED ADVISORY' },
+  { label: 'OODDetector', level: 'DETERMINISTIC' },
+  { label: 'Scout', level: 'DETERMINISTIC' },
+  { label: 'Plan generator', level: 'DETERMINISTIC' },
+  { label: 'WNTR / EPANET', level: 'SIMULATOR VERIFIED' },
+  { label: 'Human operator', level: 'HUMAN APPROVED' },
 ] as const;
 
 function certificateLabel(name: string): string {
@@ -63,18 +64,23 @@ export function AuthorityWorkspace({ incident }: { incident: IncidentView }) {
 
   return (
     <div className="page-stack">
-      <Panel title="Authority ladder" eyebrow="GOVERNANCE">
+      <Panel title="Decision authority path" eyebrow="SYSTEM AUTHORITY">
         <p className="supporting">
-          Ordered from least to most operationally binding. A UI must never let a lower authority
-          result visually outrank a higher one.
+          Frozen HydroCore-v5 system authority path. Not per-incident.
         </p>
-        <ol className="approval-hierarchy" aria-label="Authority ladder">
-          {AUTHORITY_LADDER.map((level) => (
-            <li key={level}>{level.replaceAll('_', ' ')}</li>
+        <ol className="approval-hierarchy authority-path" aria-label="System authority path">
+          {SYSTEM_AUTHORITY_PATH.map((step, index) => (
+            <li key={step.label}>
+              <span className="authority-path-label">{step.label}</span>
+              <span className="authority-path-level">{step.level}</span>
+              {index < SYSTEM_AUTHORITY_PATH.length - 1 && (
+                <span className="authority-path-arrow" aria-hidden="true">→</span>
+              )}
+            </li>
           ))}
         </ol>
       </Panel>
-      <Panel title="Decision certificates" eyebrow="CURRENT INCIDENT">
+      <Panel title="Current incident certificates" eyebrow="CURRENT INCIDENT CERTIFICATE">
         {incident.mode === 'LIVE' && authorityQuery.isLoading ? (
           <p role="status">Loading decision certificates…</p>
         ) : incident.mode === 'LIVE' && authorityQuery.isError ? (

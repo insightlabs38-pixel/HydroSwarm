@@ -311,7 +311,7 @@ export function ApprovalWorkspace({ incident }: { incident: IncidentView }) {
           <PlanActionSequence plan={activePlan} />
         </Panel>
         {verification?.consequences && (
-          <Panel title="Safety margins and consequences" eyebrow="EXPECTED">
+          <Panel title="Modeled margins and consequences" eyebrow="EXPECTED">
             <KeyValueGrid
               entries={[
                 {

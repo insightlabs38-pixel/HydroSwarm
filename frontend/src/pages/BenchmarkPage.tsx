@@ -1,44 +1,22 @@
 import type { IncidentView } from '../types';
 import { Panel } from '../components/Panel';
 import { StatusBadge } from '../components/StatusBadge';
-import { ModelGovernanceTable } from '../components/ModelGovernanceTable';
 
 export function BenchmarkPage({ incident }: { incident: IncidentView }) {
   return (
     <div className="page-stack">
       <header className="page-heading">
-        <p className="eyebrow">FROZEN EVALUATION RUN</p>
-        <h1>Operational benchmarks</h1>
+        <p className="eyebrow">SYSTEM REGRESSION &amp; PERFORMANCE</p>
+        <h1>Regression and runtime benchmarks</h1>
         <p>
-          End-to-end outcomes regenerated from three seeded runs of the checked-in WNTR golden
-          fixture. This is regression evidence, not field performance.
+          Golden/reference WNTR regression, deterministic replay/regression facts,
+          and runtime measurements. This is regression evidence, not final-model accuracy.
         </p>
       </header>
-      <div className="validation-summary">
-        <article>
-          <strong>0.98 s</strong>
-          <span>mean golden runtime</span>
-        </article>
-        <article>
-          <strong>99.41%</strong>
-          <span>true-source posterior</span>
-        </article>
-        <article>
-          <strong>1.0 bit</strong>
-          <span>sample information gain</span>
-        </article>
-        <article>
-          <strong>14,723 mg</strong>
-          <span>modeled reduction</span>
-        </article>
-      </div>
-      <Panel title="Model evaluation and promotion" eyebrow="GOVERNED RESULTS">
-        <ModelGovernanceTable />
-      </Panel>
-      <Panel title="Benchmark evidence" eyebrow="MEASURED + MISSING MADE EXPLICIT">
+      <Panel title="Reference fixture / regression evidence" eyebrow="FROZEN WNTR REGRESSION">
         <div className="table-scroll">
           <table className="benchmark-table">
-            <caption>Measured frozen WNTR metrics</caption>
+            <caption>Measured frozen WNTR regression metrics</caption>
             <thead>
               <tr>
                 <th>Metric</th>
@@ -63,6 +41,17 @@ export function BenchmarkPage({ incident }: { incident: IncidentView }) {
             </tbody>
           </table>
         </div>
+      </Panel>
+      <Panel title="Runtime characteristics" eyebrow="PERFORMANCE">
+        <ul className="check-list">
+          <li>Exact verification: WNTR / EPANET simulator</li>
+          <li>Offline/local architecture — no network dependencies</li>
+          <li>Human approval required before any action</li>
+          <li>No autonomous actuation</li>
+          <li>Deterministic OOD detection (OODDetector)</li>
+          <li>Deterministic scout (rank_sample_locations)</li>
+          <li>Deterministic planner (generate_response_plans)</li>
+        </ul>
       </Panel>
     </div>
   );

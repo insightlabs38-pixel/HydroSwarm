@@ -1,5 +1,5 @@
 import type { IncidentView } from '../types';
-import { isCalibrationApplicable } from '../calibrationDisplay';
+import { deriveDecisionGate } from '../decisionGate';
 import { StatusBadge } from '../components/StatusBadge';
 import { formatDisplayId } from '../displayId';
 
@@ -33,18 +33,7 @@ const controllerStageLabel: Record<IncidentView['status'], string> = {
  * header must stay cheap and synchronous with the incident it is
  * already rendering).
  */
-function readinessLabel(incident: IncidentView): {
-  label: string;
-  tone: 'good' | 'warn' | 'danger';
-} {
-  if (incident.mode === 'ERROR') return { label: 'NOT READY', tone: 'danger' };
-  if (
-    (isCalibrationApplicable(incident) && !incident.calibrationValid) ||
-    incident.ood !== 'NORMAL'
-  )
-    return { label: 'DEGRADED', tone: 'warn' };
-  return { label: 'READY', tone: 'good' };
-}
+
 
 function formatTimestamp(iso: string | null): string | null {
   if (!iso) return null;
@@ -54,7 +43,7 @@ function formatTimestamp(iso: string | null): string | null {
 }
 
 export function MissionHeader({ incident }: { incident: IncidentView }) {
-  const readiness = readinessLabel(incident);
+  const gate = deriveDecisionGate(incident);
   const timestamp = formatTimestamp(incident.generatedAt);
   return (
     <header className="mission-header">
@@ -76,7 +65,11 @@ export function MissionHeader({ incident }: { incident: IncidentView }) {
                 {formatDisplayId(incident.id)}
               </strong>
             </span>
-            <span>{incident.networkId}</span>
+            <span title={incident.networkId}>
+              {incident.networkId.length > 16
+                ? `${incident.networkId.slice(0, 8)}…${incident.networkId.slice(-6)}`
+                : incident.networkId}
+            </span>
             <span>{controllerStageLabel[incident.status]}</span>
             {timestamp && <span className="mono">{timestamp}</span>}
           </>
@@ -94,7 +87,7 @@ export function MissionHeader({ incident }: { incident: IncidentView }) {
             {incident.runtimeAnalysisMode}
           </StatusBadge>
         )}
-        <StatusBadge tone={readiness.tone}>{readiness.label}</StatusBadge>
+        <StatusBadge tone={gate.tone} label={gate.accessibleDetail}>{gate.pathLabel}</StatusBadge>
         {incident.ood !== 'NORMAL' && (
           <StatusBadge tone={incident.ood === 'OUTSIDE_VALIDATED_RANGE' ? 'danger' : 'warn'}>
             OOD {incident.ood}

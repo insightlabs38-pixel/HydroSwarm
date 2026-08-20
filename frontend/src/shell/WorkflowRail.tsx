@@ -28,24 +28,16 @@ const SECONDARY_UTILITIES: { id: Workspace; label: string }[] = [
 ];
 
 /**
- * Every status here is derived from real IncidentView fields, never
- * hard-coded (ui-work.txt 4: "Derive state from backend truth rather than
- * hard-coding it"). Source/Sampling/Response/Approval come from the
- * single shared `deriveWorkflowProgression` helper (workflow.ts), whose
- * authority is `incident.status` -- the real controller stage -- rather
- * than incidental artifacts like `recommendedSample`/`plans`, so this
- * rail cannot disagree with Overview/DecisionInspector about what stage
- * the incident is actually in. Note this means the "current" glyph marks
- * the stage the controller considers active right now, which is
- * independent of which page the operator happens to be viewing (that is
- * `aria-current="page"` / the `.rail-item[aria-current='page']` border
- * highlight, rendered separately below).
+ * Secondary utilities are NOT workflow stages -- they are neutral
+ * navigation links with active-page state only.
  */
 function deriveStageStatus(
   incident: IncidentView,
   workspace: Workspace,
 ): Record<Workspace, StageStatus> {
   const isCurrent = (id: Workspace): boolean => workspace === id;
+  const secondaryNeutral = (): StageStatus => 'waiting';
+
   if (incident.mode === 'ERROR') {
     return {
       incident: 'blocked',
@@ -55,28 +47,27 @@ function deriveStageStatus(
       approval: 'unavailable',
       replay:
         incident.audit.length > 0 ? (isCurrent('replay') ? 'current' : 'waiting') : 'unavailable',
-      // Network import/management does not depend on this incident's
-      // analysis succeeding.
-      network: isCurrent('network') ? 'current' : 'complete',
-      validation: isCurrent('validation') ? 'current' : 'complete',
-      // Authority certificates are scoped to this incident's analysis,
-      // which failed -- honestly unavailable rather than an empty table.
+      network: secondaryNeutral(),
+      validation: secondaryNeutral(),
       authority: 'unavailable',
-      benchmarks: isCurrent('benchmarks') ? 'current' : 'complete',
+      benchmarks: secondaryNeutral(),
     };
   }
   const progression = deriveWorkflowProgression(incident);
+  const primaryReplay: StageStatus =
+    incident.audit.length > 0 ? (isCurrent('replay') ? 'current' : 'waiting') : 'unavailable';
+
   return {
     incident: isCurrent('incident') ? 'current' : 'complete',
     source: progression.source,
     sampling: progression.sampling,
     response: progression.response,
     approval: progression.approval,
-    replay: isCurrent('replay') ? 'current' : incident.audit.length > 0 ? 'waiting' : 'unavailable',
-    network: isCurrent('network') ? 'current' : 'complete',
-    validation: isCurrent('validation') ? 'current' : 'complete',
-    authority: isCurrent('authority') ? 'current' : 'complete',
-    benchmarks: isCurrent('benchmarks') ? 'current' : 'complete',
+    replay: primaryReplay,
+    network: secondaryNeutral(),
+    validation: secondaryNeutral(),
+    authority: secondaryNeutral(),
+    benchmarks: secondaryNeutral(),
   };
 }
 
@@ -87,6 +78,7 @@ function RailButton({
   active,
   onSelect,
   collapsed,
+  isSecondary,
 }: {
   id: Workspace;
   label: string;
@@ -94,13 +86,33 @@ function RailButton({
   active: boolean;
   onSelect: (id: Workspace) => void;
   collapsed: boolean;
+  isSecondary?: boolean;
 }) {
+  // Secondary utilities: no glyph, no stage-status, just active-page highlight.
+  if (isSecondary) {
+    return (
+      <button
+        type="button"
+        className={`rail-item rail-secondary${active ? ' rail-active' : ''}`}
+        onClick={() => onSelect(id)}
+        aria-current={active ? 'page' : undefined}
+        aria-label={label}
+      >
+        <span className="rail-label" aria-hidden={collapsed}>
+          {label}
+        </span>
+      </button>
+    );
+  }
   const meta = STAGE_STATUS_META[status];
+  // Unavailable stages should not be navigable.
+  const disabled = status === 'unavailable';
   return (
     <button
       type="button"
       className={`rail-item rail-status-${status}`}
       onClick={() => onSelect(id)}
+      disabled={disabled}
       aria-current={active ? 'page' : undefined}
       aria-label={`${label}: ${meta.word}`}
     >
@@ -146,6 +158,7 @@ export function WorkflowRail({ incident }: { incident: IncidentView }) {
             active={workspace === stage.id}
             onSelect={setWorkspace}
             collapsed={leftRailCollapsed}
+            isSecondary
           />
         ))}
       </div>

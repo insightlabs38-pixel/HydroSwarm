@@ -19,9 +19,9 @@ test('renders the SS5 target copy and all four actions', () => {
     ),
   ).toBeVisible();
   expect(screen.getByRole('button', { name: /Run Reference Incident/ })).toBeVisible();
-  expect(screen.getByText(/Recommended.*checksummed verified replay/)).toBeVisible();
+  expect(screen.getByText(/Recommended.*deterministic checksummed workflow replay/)).toBeVisible();
   expect(screen.getByRole('button', { name: /Run Live Example/ })).toBeVisible();
-  expect(screen.getByText(/Real production computation.*reference inputs/)).toBeVisible();
+  expect(screen.getByText(/Current HydroCore-v5 runtime.*real computation on reference inputs/)).toBeVisible();
   expect(screen.getByRole('button', { name: /Import Your Own Network/ })).toBeVisible();
   expect(screen.getByText('Advanced')).toBeVisible();
   expect(screen.getByRole('button', { name: 'Explore illustrative fallback' })).toBeVisible();

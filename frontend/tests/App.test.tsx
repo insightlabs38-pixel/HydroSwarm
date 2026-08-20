@@ -91,12 +91,12 @@ test('workflow rail navigates to Validation and Benchmarks, and derives stage st
 
   await user.click(screen.getByRole('button', { name: /Validation/ }));
   expect(
-    await screen.findByRole('heading', { name: 'Benchmarks and operating range' }),
+    await screen.findByRole('heading', { name: 'HydroCore-v5 final evaluation evidence' }),
   ).toBeVisible();
-  expect(screen.getByText('HydroCore S / M / L checkpoint')).toBeVisible();
+  expect(screen.getByText(/M11\.6 locked evaluation/)).toBeVisible();
 
   await user.click(screen.getByRole('button', { name: /Benchmarks/ }));
-  expect(await screen.findByRole('heading', { name: 'Operational benchmarks' })).toBeVisible();
+  expect(await screen.findByRole('heading', { name: 'Regression and runtime benchmarks' })).toBeVisible();
 });
 
 test('Network workspace honestly reports the network list as unavailable when the backend is unreachable, never a fabricated empty success', async () => {
@@ -113,11 +113,13 @@ test('Model & Authority workspace renders the real DEMO_FALLBACK decision certif
   renderApp();
   await screen.findByText('Verified response awaiting approval');
   await user.click(screen.getByRole('button', { name: /^Model/ }));
-  expect(await screen.findByRole('heading', { name: 'Authority ladder' })).toBeVisible();
+  expect(await screen.findByRole('heading', { name: 'Decision authority path' })).toBeVisible();
+  expect(screen.getByText('HydroCore-v5 Sentinel')).toBeVisible();
+  expect(screen.getByText('WNTR / EPANET')).toBeVisible();
+  expect(screen.getByText('Human operator')).toBeVisible();
   expect(screen.getByText('Source localization')).toBeVisible();
   expect(screen.getByText('Sample recommendation')).toBeVisible();
   expect(screen.getByText('OOD decision')).toBeVisible();
-  expect(screen.getByText('Plan verification: B')).toBeVisible();
   expect(screen.getAllByText('CALIBRATED ADVISORY').length).toBeGreaterThan(0);
 });
 
@@ -239,7 +241,7 @@ test.each([
   ['Approval', 'Operator approval'],
   ['Replay', 'Event ledger'],
   ['Network', 'Import network'],
-  ['Model', 'Authority ladder'],
+  ['Model', 'Decision authority path'],
 ] as const)('%s workspace has no automated accessibility violations', async (rail, heading) => {
   const user = userEvent.setup();
   const { container } = renderApp();

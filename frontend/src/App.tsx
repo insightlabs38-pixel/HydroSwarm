@@ -174,7 +174,7 @@ export default function App() {
   } else if (workspace === 'authority') {
     workspaceBody = <AuthorityWorkspace incident={incident} />;
   } else if (workspace === 'validation') {
-    workspaceBody = <ValidationPage incident={incident} />;
+    workspaceBody = <ValidationPage />;
   } else if (workspace === 'benchmarks') {
     workspaceBody = <BenchmarkPage incident={incident} />;
   } else {
@@ -198,7 +198,7 @@ export default function App() {
         incident={incident}
         onRetry={incident.mode === 'ERROR' ? () => liveQuery.refetch() : undefined}
         reference={isReference ? referenceController : undefined}
-        onExploreReplay={() => setWorkspace('replay')}
+        onExploreValidation={() => setWorkspace('validation')}
       />
       <div className="mission-shell-body">
         <WorkflowRail incident={incident} />

@@ -24,14 +24,14 @@ export function ModeBanner({
   incident,
   onRetry,
   reference,
-  onExploreReplay,
+  onExploreValidation,
 }: {
   incident: IncidentView;
   onRetry?: () => void;
   /** Only meaningful when incident.mode === 'REFERENCE' -- the progressive
    * milestone controller driving this view (submission.txt SS5/SS6). */
   reference?: ReferenceController;
-  onExploreReplay?: () => void;
+  onExploreValidation?: () => void;
 }) {
   if (incident.mode === 'REFERENCE' && reference) {
     return (
@@ -51,7 +51,7 @@ export function ModeBanner({
           <span className="mode-banner-reference-explanation">
             {reference.isPaused && reference.pauseReason
               ? reference.pauseReason
-              : incident.modeReason}
+              : reference.narrative || incident.modeReason}
           </span>
         </div>
         <div className="mode-banner-controls">
@@ -85,9 +85,9 @@ export function ModeBanner({
           <button type="button" className="mode-banner-restart-action" onClick={reference.reset}>
             Restart
           </button>
-          {reference.isAtEnd && onExploreReplay && (
-            <button type="button" onClick={onExploreReplay}>
-              Explore full replay →
+          {reference.isAtEnd && onExploreValidation && (
+            <button type="button" onClick={onExploreValidation}>
+              Review final validation →
             </button>
           )}
         </div>
@@ -131,7 +131,7 @@ export function ModeBanner({
         <strong>CALIBRATION INVALID</strong>
         <span>
           The calibration artifact backing this incident&apos;s candidate set did not validate.
-          Candidate-set sizing is not trustworthy.
+          Candidate-set sizing is not trustworthy. Planning is suppressed.
         </span>
       </div>
     );
@@ -141,8 +141,7 @@ export function ModeBanner({
       <div className="mode-banner mode-banner-danger" role="alert">
         <strong>OUTSIDE VALIDATED RANGE</strong>
         <span>
-          This incident is outside the model&apos;s validated operating range. Planning may be
-          suppressed.
+          This incident is outside the model&apos;s validated operating range. Planning is suppressed.
         </span>
       </div>
     );
