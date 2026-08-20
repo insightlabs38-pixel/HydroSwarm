@@ -1,79 +1,137 @@
-# HydroCore-v4 Synthetic Dataset Card
+# HydroCore-v5 synthetic dataset card
 
-## Scope and current corpus
+## Scope
 
-The current shipped HydroCore-v4 bundle was trained from the governed
-`cycle-b2-joint-v4` synthetic corpus, not primarily from the historical
-learning-v1 corpus. It contains deterministic WNTR/EPANET-generated
-contamination, normal, and sensor-fault scenarios represented as versioned
-feature tensors (`hydroswarm-features-v2`) plus JSONL metadata and checksum
-manifests. The corpus fingerprint is
-`32b0528f569d27a0e51e6285d9da696c794c720d8ffc5c6d702042532d67f93c`.
+HydroCore-v5 is trained, calibrated, developed, and finally evaluated on governed WNTR/EPANET-generated synthetic water-network scenarios. This card distinguishes **physical scenarios**, **derived causal-prefix/evaluation rows**, **development trajectories**, and the **one-time locked populations** so counts are not accidentally compared as if they represented the same unit.
 
-| Population | Role | Committed examples |
-|---|---|---:|
-| `train` | optimization only | 9,000 |
-| `validation` | selection/validation evidence | 1,000 |
-| `calibration` | split-conformal fitting only | 1,000 |
-| `development_holdout` | repeated development characterization, never optimization | 1,750 |
-| `ood-*` development populations | governed OOD/authority experiments | 400 each (six populations) |
-| locked final test | one-time final evaluation only | intentionally not enumerated or inspected here |
+No utility telemetry or field-incident outcome data establishes the reported performance.
 
-The split policy is [evaluation_policy_v3.json](../configs/evaluation_policy_v3.json).
-The v4 locked final evaluation remains unopened; no result in this repository
-uses it.
+## Split roles
 
-## Topologies and generation
+| Role | Allowed use |
+|---|---|
+| Training | gradient optimization |
+| Validation | model/recipe comparison before freeze |
+| Calibration | conformal fitting only; no gradient/checkpoint selection |
+| Development holdout / OOD development | repeated characterization before freeze |
+| M10 development trajectories | production-path integration/authority evaluation |
+| `locked_final_test` | one-time final applicable stress evaluation |
+| `locked_topology_test` | one-time novel-topology/fail-closed evaluation |
 
-Training/validation/calibration include governed synthetic network families
-such as `golden-reference`, `branched-loop`, and `loop-grid`; topology hashes,
-node IDs, edge IDs, hydraulic-state hashes, and signature-library identity are
-recorded per example. The current calibration artifact declares exactly those
-validated topology hashes. The existing unseen-topology population is a
-development-only safety experiment, not a training topology or transfer claim.
+The governing split policy was frozen before the final program; physical scenarios are split before causal prefixes/augmentations are generated.
 
-Scenarios are generated under governed WNTR/EPANET hydraulics with source,
-timing, duration, strength, demand regime, tank state, roughness, and network
-state controls. Sensor observations can include nominal noise, missing values,
-quantization, signed drift, frozen/carry-forward readings, communication
-outage/delay, and unit mismatch. The generator records masks and provenance
-instead of silently treating missing or frozen readings as healthy evidence.
+## Causal-prefix foundation
 
-## Split isolation and provenance
+The M1 causal-prefix foundation used one `golden-reference` family with 970 physical scenarios:
 
-Seeds, seed families, scenario IDs, split labels, checksums, and network
-identities are persisted. Split integrity prohibits duplicate scenario IDs and
-seed-family overlap within the governed corpus. Training, validation,
-calibration, development-holdout, and locked-final roles are intentionally
-separate; development populations are not authorized for fitting calibration
-or weights. New characterization fixtures must remain outside all of them.
+| Split | Physical scenarios |
+|---|---:|
+| train | 600 |
+| validation | 100 |
+| calibration | 150 |
+| development_holdout | 120 |
+| total | 970 |
 
-All data in this card are synthetic. The project does not contain utility
-telemetry, consumer records, or a public utility-network dataset. WNTR and
-EPANET model assumptions, not field measurements, generate concentration and
-hydraulic outcomes.
+Each physical scenario can be viewed at causal depths `1, 2, 3, 4, 6, 12, 25` without moving across splits. See [M1 prefix dataset artifact](../reports/evaluation/hydrocore-v5/m1-prefix-dataset.json).
 
-## Data quality, imbalance, and limitations
+This M1 population is important lineage, but it is **not** the whole final training story: later M9 work established multi-topology interleaved training.
 
-- Contamination/source labels and response targets are simulator-derived;
-  they can encode modeling assumptions and historical label defects. The
-  repository retains label-audit and leakage reports rather than hiding them.
-- Event/cause and OOD categories are not uniformly represented. In particular,
-  the v4 OOD classifier received no real training-split gradient and is not a
-  runtime-promoted head.
-- Sensor fault, missingness, and topology shifts are governed synthetic
-  mechanisms, not a claim that their real-world prevalence or failure mode has
-  been measured.
-- The robustness-scale study reports a limited 168-row development replay;
-  it does not establish utility-scale performance, field accuracy, or all
-  missingness/sensor-coverage strata.
+## Final selected training population
 
-## Storage, licenses, and legacy data
+The selected M9.6 `ARM_B_M9_6` run trained on **600 physical training scenarios** across three topology families, with equal family weighting:
 
-Committed tables/manifests use JSON/JSONL, arrays use safetensors/NPZ, and
-network definitions use EPANET `.inp` files. Code is Apache-2.0; consult each
-third-party tool/dataset source before redistributing any external material.
+| Trained family | Physical training scenarios |
+|---|---:|
+| `golden-reference` | 200 |
+| `branched-loop` | 200 |
+| `loop-grid` | 200 |
+| total | 600 |
 
-`learning-v1` remains a clearly historical 1,320-incident corpus (800 train,
-160 validation, 160 calibration, 200 test) retained for research provenance.
-It is not the primary description of the shipped HydroCore-v4 system.
+The final selected run completed exactly 1,350 optimizer steps. Across 20 epochs, the training record reports equal family exposure (3,600 scenario exposures per family). See [selected training record](../reports/evaluation/hydrocore-v5/m9-6/m9-6-training-runs/ARM_B_M9_6-seed20260814.json).
+
+The M9.6 evaluation manifest also includes three unseen development families—`coastal-branch`, `tree-branch`, and `dense-loop`—for generalization characterization. Its `9,660` calibration rows and `23,940` prediction rows are **derived evaluation rows across seeds/depths/families**, not unique physical incident counts. See [M9.6 manifest](../reports/evaluation/hydrocore-v5/m9-6/m9-6-manifest.json).
+
+## Supervision scope
+
+The causal V5 corpus provides valid targets for the Sentinel task family. The final frozen release therefore declares `trained_tasks = ["sentinel"]`.
+
+Model architecture/configuration may contain OOD, Scout, Strategist, and consequence-control heads, but the final freeze records those operational outputs as suppressed/non-authoritative. Dataset documentation must not infer supervision merely from a nonzero task weight or the presence of a head.
+
+## M10 development populations
+
+M10.4 evaluated full production-path trajectories across:
+
+- 3 model seeds;
+- 3 trained families (`golden-reference`, `branched-loop`, `loop-grid`);
+- 3 unseen development families (`coastal-branch`, `tree-branch`, `dense-loop`);
+- 7 condition kinds;
+- 360 physical incidents total;
+- 720 API incidents/trajectories total.
+
+The seven conditions were nominal, low-coverage active sampling, sensor dropout, degraded sensor health, measurement noise, severity shift, and ambiguity/disagreement.
+
+This was development evidence used before the finalist freeze. See [M10.4 population manifest](../reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-population-manifest.json).
+
+## Final locked populations
+
+The final design was frozen before population materialization. M11.6 then materialized two isolated populations:
+
+| Locked split | Count | Purpose |
+|---|---:|---|
+| `locked_final_test` | 105 | 7 applicable condition kinds × 15 incidents |
+| `locked_topology_test` | 20 | genuine novel-topology characterization + fail-closed authority |
+| total | 125 | exactly-once final evaluation |
+
+The locked-final matrix contains 15 incidents each for NOMINAL, AMBIGUITY_DISAGREEMENT, LOW_COVERAGE_ACTIVE_SAMPLING, MEASUREMENT_NOISE, SENSOR_DROPOUT, SENSOR_HEALTH_DEGRADED, and SEVERITY_SHIFT.
+
+### Locked-topology generation
+
+The topology population uses **four procedurally generated novel topologies**, with 9–12 junctions. The materialization novelty audit checked:
+
+- file-byte novelty;
+- network-hash novelty;
+- graph-signature novelty;
+- within-set network/signature uniqueness;
+- disjointness from the prior topology evidence it could mechanically compare against.
+
+All four passed the frozen novelty rule.
+
+### Seed isolation and overlap control
+
+The locked generator derives seeds in a namespace beginning at `2**31`, while the prior governed seed namespaces are below `2**31`. The materialization report records 125 unique canonical scenario hashes, zero within-set collisions, and seed-namespace disjointness by construction.
+
+The report explicitly does **not** claim a historical canonical-scenario-hash comparison where prior schemas were not comparable. That limitation is preferable to inventing an overlap proof the artifacts cannot support.
+
+See [M11.6 materialization manifest](../data/locked/m11-6/m11-6-materialization-manifest.json).
+
+## Locked-data governance
+
+Materialization itself did not evaluate the finalist and recorded the locked test as unopened. After M11.5 passed and the finalist was frozen, explicit authorization was consumed exactly once. The M11.6 opened record then established the atomic transition to OPENED; 125/125 incidents were evaluated; no rerun and no post-lock tuning followed.
+
+The correct reproduction of this dataset's final-test role is to verify the materialization/opened/governance artifacts, **not** regenerate or reopen the final test as an ordinary benchmark.
+
+## Scenario content and corruption mechanisms
+
+Across the V5 program, governed synthetic variation includes hydraulic/topology family, incident source and severity, causal evidence depth, sensor coverage/health, missingness/dropout, noise, ambiguity/disagreement, and timing effects. WNTR/EPANET supplies modeled hydraulic/water-quality behavior.
+
+Every mechanism remains a simulation assumption. Its inclusion does not establish that real utilities have the same distribution, failure frequencies, or network-model fidelity.
+
+## Data quality and limitations
+
+- All labels/outcomes are simulator-derived.
+- Synthetic topology diversity is finite and does not prove utility-scale transfer.
+- Sensor/dropout/noise mechanisms are governed stressors, not prevalence estimates.
+- The final locked sensor-dropout slice shows a real weak point: 66.7% applicable coverage in 15 incidents.
+- Novel locked topology was calibration-inapplicable; predictive metrics there are descriptive only.
+- The M9.6 train/serve unobserved-age semantic deviation is frozen and disclosed.
+- Counts labelled “rows” in evaluation manifests may reflect derived prefix/depth/seed evaluations and must not be re-described as unique incidents.
+
+## Storage and provenance
+
+The repository uses JSON/JSONL manifests, safetensors model artifacts, EPANET `.inp` networks, and checksummed generated evidence. Frozen final identities are hash-bound in the V5 release manifest and M11 finalist/evaluation records.
+
+See [Data generation](DATA_GENERATION.md), [Evaluation](EVALUATION.md), and [Reproducibility](REPRODUCIBILITY.md).
+
+## Historical datasets
+
+`learning-v1`, `cycle-b2-joint-v4`, and earlier V3/V4 dataset cards/reports remain historical provenance. Their counts and split semantics should not be presented as the final V5 locked population.
