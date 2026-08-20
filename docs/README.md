@@ -2,6 +2,12 @@
 
 The final submission is **HydroCore-v5**. Start with the path that matches your review goal; historical V3/V4/M9/M10 material is preserved but never overrides [Final system](FINAL_SYSTEM.md).
 
+## New reader / domain expert path
+
+[Executive summary](EXECUTIVE_SUMMARY.md) → [Scientific evidence](SCIENTIFIC_EVIDENCE.md) → [Authority and safety](AUTHORITY_AND_SAFETY.md)
+
+Read this first if you are new to the project or reviewing it from a water-infrastructure or general technical background. It explains the problem, the system, the final results, and the limitations without requiring any other document.
+
 ## Two-minute judge path
 
 [Top-level README](../README.md) → [Scientific evidence](SCIENTIFIC_EVIDENCE.md) → [Judging evidence map](JUDGING.md)
@@ -28,6 +34,7 @@ For V5, build/run the current source. The pinned `docker-compose.release.yml` im
 
 ## Core current documentation
 
+- [Executive summary](EXECUTIVE_SUMMARY.md)
 - [Final system authority](FINAL_SYSTEM.md)
 - [Scientific evidence dossier](SCIENTIFIC_EVIDENCE.md)
 - [Authority and safety](AUTHORITY_AND_SAFETY.md)

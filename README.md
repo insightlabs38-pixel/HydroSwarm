@@ -4,6 +4,8 @@ Offline, physics-verified decision support for drinking-water contamination inci
 
 [![CI](https://github.com/insightlabs38-pixel/HydroSwarm/actions/workflows/ci.yml/badge.svg)](https://github.com/insightlabs38-pixel/HydroSwarm/actions/workflows/ci.yml)
 
+> **Start here: [Executive Summary](docs/EXECUTIVE_SUMMARY.md).** A 5–10 minute explanation of the problem, system, results, limitations, and why HydroSwarm is designed to fail closed.
+
 > **Research software, not production control.** All reported model/evaluation data are synthetic. HydroSwarm does not identify contaminant chemistry, certify water safety, replace laboratory or utility procedures, or execute infrastructure actions.
 
 ![HydroSwarm first-launch gateway](docs/screenshots/first-launch-gateway.png)

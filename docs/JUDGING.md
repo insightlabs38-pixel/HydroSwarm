@@ -2,9 +2,9 @@
 
 This page is a reviewer router, not a marketing scorecard. Every strong claim below points to a frozen artifact or current technical document, and every capability is paired with its authority boundary.
 
-## Two-minute review
+## Five-minute review
 
-1. [Top-level README](../README.md) — what the system does and the final V5 result.
+1. [Executive summary](EXECUTIVE_SUMMARY.md) — the problem, the system, the final result, and the limitations, in one self-contained document.
 2. [Scientific evidence](SCIENTIFIC_EVIDENCE.md) — one-time locked matrix, including weak stress slices.
 3. This page — where each judging claim is proven.
 
@@ -60,7 +60,7 @@ Predictive headline, with denominators:
 
 This is stronger evidence presentation than quoting the most favorable slice alone.
 
-## Five-minute technical review
+## Deep technical review
 
 Read:
 
