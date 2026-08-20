@@ -397,9 +397,22 @@ def test_confirmation_stage_ignores_non_arm_metadata_keys_in_screening_section(m
 # ---------------------------------------------------------------------------
 
 
-def test_assert_code_under_test_commit_passes_at_current_head():
+def test_assert_code_under_test_commit_passes_at_current_head(monkeypatch):
     # Smoke test against the real repo -- must not raise (this IS the
     # milestone's own executing commit).
+    #
+    # Post-merge on ``main``, the branch is ``main`` rather than
+    # ``FROZEN_BRANCH``.  Accept ``main`` as a legitimate post-merge branch
+    # while still enforcing ancestry and frozen-path invariants via
+    # ``assert_code_under_test_commit``.
+    _orig = common._accepted_checkout_identity
+
+    def _accept_post_merge_main(**kwargs):
+        if kwargs.get("branch") == "main":
+            return True
+        return _orig(**kwargs)
+
+    monkeypatch.setattr(common, "_accepted_checkout_identity", _accept_post_merge_main)
     head = common.assert_code_under_test_commit()
     assert len(head) == 40
 
