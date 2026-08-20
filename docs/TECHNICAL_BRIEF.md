@@ -1,70 +1,69 @@
 # Technical brief
 
-A one-page technical summary for a reviewer who wants real depth without reading every
-doc in the repository. Each claim links to its authoritative source.
+A compact technical review of the final HydroSwarm system. For exact hashes and authority, [Final system](FINAL_SYSTEM.md) is canonical.
 
-## What runs by default
+## System in one paragraph
 
-`hydroswarm.api.app:app` serves HydroCore-v4 (4.18M parameters, `small` variant, frozen)
-by default -- see [Final system](FINAL_SYSTEM.md) for the exact identity, hashes, and
-which of its 21 trained output heads are actually runtime-enabled versus trained-but-
-unpromoted versus excluded. `hydroswarm self-test` validates the same bundle the API
-serves through one shared resolver (`hydroswarm.runtime.paths.resolve_v4_bundle_dir`),
-so the two can never silently disagree about which weights are actually live.
+HydroSwarm is a local hybrid decision-support pipeline for simulated drinking-water contamination incidents. A classical hydraulic/signature branch and a learned HydroCore-v5 Sentinel produce source evidence; frozen split-conformal calibration is applied when valid; deterministic OOD/evidence control decides whether the workflow may continue; deterministic Scout and plan-generation logic choose evidence/action candidates; WNTR/EPANET is required to verify response plans; and a distinct human event is required for approval. The learned model never owns verification, approval, or actuation authority.
 
-## Decision pipeline
+## Frozen V5 identity
 
-Classical, physics-derived source signatures and HydroCore-v4's neural estimate fuse
-under a dynamic, disagreement-aware trust coefficient (sensor health, missingness,
-residuals, entropy, five-component OOD evidence). The fused belief is calibrated with
-split-conformal prediction (alpha=0.1, held-out coverage 91.4%). Deterministic Scout logic
-ranks the next sample by expected information gain; deterministic Strategist logic
-proposes typed response plans under a hard simulation budget. Every candidate plan is
-re-simulated with real WNTR/EPANET hydraulics before it can be marked `VERIFIED` -- no
-neural or classical estimate alone promotes a plan. See
-[Full architecture](ARCHITECTURE.md) and [Model card](MODEL_CARD.md).
+Finalist: **HydroCore-v5 M10 frozen release**, `small`, 4,182,612 parameters, seed `20260814`.
 
-## Controller and event model
+- checkpoint: `de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5`
+- release manifest: `f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34`
+- calibration file: `8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d`
+- calibration artifact: `f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd`
+- alpha/grouping: `0.1`, `B_DEPTH_AWARE`
+- serving: `V5PipelineFactory(resolve_v5_bundle_dir())`
 
-An 18-state deterministic controller drives every incident: detection, data quality,
-hydraulic state estimation, source localization, evidence sufficiency check, sample
-selection/receipt, plan generation, constraint checking, exact verification, plan
-comparison, human approval, and completion. Every transition is a real event in an
-append-only, hash-chained ledger -- replay reproduces the exact chain, including the
-`previous_hash`/`event_hash` linkage, not a re-narrated summary. See
-[Reference demo](REFERENCE_DEMO.md) for a concrete, generated walkthrough of this chain.
+## Learned versus deterministic authority
 
-## Evaluation
+The model architecture includes optional specialist/control heads, but final valid training scope is `sentinel` only. Runtime learned outputs are exactly `source_node`, `event_presence`, `event_cause`, `evidence_sufficiency`, and `relative_strength`.
 
-`reports/results/v4/phase13-metrics-and-baselines.md` is the authoritative HydroCore-v4
-evaluation: source top-1 72.1-73.3%, top-3/coverage@3 86.8-87.6%, MRR 0.811-0.817,
-event-presence F1 0.895, event-cause macro F1 0.698 (on 3 supported classes). The report
-surfaces two evaluation caveats up front rather than hiding them (a trivially-perfect
-`sensor_fault` metric with zero true negatives in the evaluated population, and a
-near-chance `ood_category` head that never received a real training gradient under the
-current governed data-split design). The locked final evaluation has not been opened. See
-[Evaluation protocol](EVALUATION.md) for the full methodology and required ablations.
+Operational controls are deterministic:
 
-## Safety/authority boundaries that are never weakened
+- OOD: `OODDetector`
+- sampling: `rank_sample_locations`
+- planning: `generate_response_plans`
+- physical verification: WNTR/EPANET
+- approval: human operator
+- autonomous actuation: none
 
-No `VERIFIED` without a completed WNTR run. No `APPROVED` without a separate human event.
-No execution of any kind -- HydroSwarm is decision support, not infrastructure control.
-Stale verifications block approval. Invalid calibration or an unrecognized topology
-suppresses planning (`CAUTION`), not just a warning label. See
-[Final system: authority boundaries](FINAL_SYSTEM.md#authority-boundaries-never-weakened)
-and [Limitations](LIMITATIONS.md).
+This separation is enforced by the release loader and was rechecked by M11.6 safety counters.
 
-## Runtime and deployment
+## Training and model selection
 
-FastAPI + SQLite + a bounded local worker, offline by default (no internet calls, no
-remote map tiles, no hosted model API). Native setup scripts or a multiarch
-(`linux/amd64`, `linux/arm64`) Docker image; both resolve the frozen bundle through the
-same path-resolution logic. See [Installation](INSTALLATION.md).
+The selected S model used `AGE_FIX_ONLY` plus exact 1,350-step interleaved multi-topology training over `golden-reference`, `branched-loop`, and `loop-grid`. M9 tested larger capacity; the ~13.9M-parameter M model did not meet the predeclared meaningful unseen-topology gain, so S remained selected.
+
+A frozen caveat: the M9.6 training record used a fixed unobserved-age sentinel, while M10.4-tested serving retained `incident_elapsed`. This known train/serve feature-semantics deviation was not changed after lock.
+
+## Final evidence
+
+M11.6 opened the final locked populations exactly once after authorization:
+
+| Population | n | Top-1 | Top-3 | Coverage/applicability | Actionable |
+|---|---:|---:|---:|---:|---:|
+| nominal final | 15 | 73.3% | 86.7% | 93.3% coverage | 80.0% |
+| all locked-final | 105 | 55.2% | 76.2% | 88.6% coverage | 61.0% |
+| novel topology | 20 | 55.0% | 70.0% | calibration inapplicable | 0.0% |
+
+Overall M11.6: 125/125 complete, locked-final PASS, locked-topology PASS, 15/15 hard safety counters zero, one authorized opening, no rerun, no post-lock tuning.
+
+Topology predictive metrics are descriptive/non-gating. The operational topology result is fail-closed: 0% calibrated, 0% actionable, 0% human-approved.
+
+## Runtime
+
+FastAPI + SQLite + bounded local jobs expose typed local APIs and durable audit history. The current source app serves V5. `hydroswarm self-test --strict` checks the V5 bundle and a bounded real WNTR run.
+
+For V5 Docker, build the current checkout. The pinned `docker-compose.release.yml` tag is historical V4 packaging and is not a current V5 release image.
 
 ## Reproducibility
 
-`python scripts/run_golden.py` regenerates the frozen golden scenario end to end (real
-WNTR simulation, not a cached artifact). `python -m pytest` runs the full test suite
-(unit, scientific/real-simulator, integration, end-to-end). CI runs on Windows and
-Ubuntu. See the top-level [README](../README.md#research-evaluation-and-historical-development)
-for exact commands.
+Do not rerun M11.6. Verify the immutable model/calibration/release hashes plus the M11.6 opened/metrics/gate/safety/closure chain. Ordinary source checks, self-test, and non-locked tests remain reproducible.
+
+See [Reproducibility](REPRODUCIBILITY.md) and [Claims and evidence](CLAIMS_AND_EVIDENCE.md).
+
+## Limits
+
+All data are synthetic. Stress performance is materially lower than nominal performance. Novel-topology prediction is not calibrated. WNTR/EPANET inherits network/model assumptions. No field/utility accuracy, chemistry determination, public-health safety, or autonomous-control claim is supported.

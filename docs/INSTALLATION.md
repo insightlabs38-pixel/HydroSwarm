@@ -1,179 +1,179 @@
 # Installation and offline launch
 
+> **Current model identity:** the source application serves the frozen HydroCore-v5 bundle through `V5PipelineFactory(resolve_v5_bundle_dir())`. The historical `docker-compose.release.yml` image predates V5; use one of the V5 source paths below for the final system.
+
+## Runtime boundary
+
 ```mermaid
 flowchart TD
-  B["Browser"] <-->|"localhost:8765 only"| F["FastAPI"]
-  F <--> S["SQLite / local files"]
-  F <--> H["HydroCore-v4 + WNTR"]
-
-  N1["NO CLOUD RUNTIME DEPENDENCY"]
-  N2["NO REMOTE MAP TILES"]
-  N3["NO HOSTED MODEL API"]
-
-  classDef boundary fill:#f16c62,stroke:#7a221c,color:#1a0503,font-weight:bold;
-  class N1,N2,N3 boundary;
+  B["Browser"] <-->|"localhost:8765"| F["FastAPI + built console"]
+  F <--> D["SQLite / local files"]
+  F <--> V["HydroCore-v5 + classical pipeline"]
+  V <--> W["WNTR / EPANET"]
+  X["No hosted model API"]
+  Y["No required cloud runtime"]
+  Z["No autonomous actuation connector"]
 ```
 
-(Source: [docs/diagrams/offline-deployment.mmd](diagrams/offline-deployment.mmd).)
+Current diagram source: [diagrams/offline-deployment-v5.mmd](diagrams/offline-deployment-v5.mmd).
 
 ## Requirements
 
-- Python 3.12 (64-bit)
-- Node.js 22 only when rebuilding the frontend
-- Approximately 4 GiB RAM for the small/default demonstration; more for large models
-- WNTR's EPANET runtime, installed as a Python dependency
+- 64-bit Python 3.12+
+- Node.js 22+ only when the frontend must be rebuilt
+- roughly 4 GiB RAM for the small/default local demonstration
+- Docker, if using the container path
+- installation-time internet access to obtain dependencies unless they are already cached
+- runtime internet access is not required by the scientific pipeline
 
-## Native install (recommended: platform setup script)
+## V5 path A: build the current Docker checkout
 
-The setup scripts create a project-local `.venv`, install CPU-only dependencies into it
-(never globally, never via `sudo`/system package managers), verify the frozen
-HydroCore-v4 release bundle, build the frontend if no prebuilt `frontend/dist` exists,
-and run the readiness self-test. They are safe to re-run.
+This is the cleanest container path to the **current source**:
 
 ```bash
 git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
 cd HydroSwarm
-
-./setup_hydroswarm_linux.sh   # Linux (x86-64 or ARM64)
-./setup_hydroswarm_macos.sh   # macOS (Apple Silicon or Intel)
-```
-
-```powershell
-.\setup_hydroswarm_windows.ps1   # Windows (PowerShell)
-```
-
-Then launch with the matching platform launcher -- each fails closed (rather than
-silently falling back to an ambient system Python) if `.venv` does not exist, and each
-runs a readiness check before binding to loopback:
-
-```bash
-./start_hydroswarm_linux.sh
-./start_hydroswarm_macos.sh
-```
-
-```powershell
-.\start_hydroswarm_windows.ps1
-```
-
-`start_hydroswarm.sh` / `start_hydroswarm.bat` remain as thin compatibility wrappers
-that delegate to the platform-specific launcher above.
-
-The app opens at `http://127.0.0.1:8765`. Dependency downloads are required only during
-installation; runtime operation is offline.
-
-## Manual native install
-
-The setup scripts above are equivalent to, and preferred over, the manual steps:
-
-```powershell
-git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
-cd HydroSwarm
-python -m venv .venv
-.venv\Scripts\python -m pip install --upgrade pip
-.venv\Scripts\python -m pip install -e "."
-cd frontend
-npm.cmd ci
-npm.cmd run build
-cd ..
-.venv\Scripts\hydroswarm self-test
-.\start_hydroswarm.bat
-```
-
-Linux/macOS equivalents use `.venv/bin/python`, `npm ci && npm run build`, and
-`./start_hydroswarm.sh`.
-
-## Container
-
-**Judge/release path (recommended, no build required):** pulls the published multiarch
-(amd64 + arm64) image from GHCR.
-
-```text
-docker compose -f docker-compose.release.yml up
-```
-
-**Developer path (builds from source):**
-
-```text
 docker compose build
 docker compose up
 ```
 
-Both compose files publish only `127.0.0.1:8765`, remove Linux capabilities, prevent
-privilege escalation, use a read-only root filesystem, and persist application state in
-the `hydroswarm-data` volume. The release image is built and pushed by
-`.github/workflows/release.yml` on a version tag (`v*`); see `RELEASE_MANIFEST.json` in
-each release for the exact model/calibration/normalization hashes and container digest
-that image was built from.
+Then open `http://127.0.0.1:8765`.
 
-## Performance: native Windows vs. Linux/Docker
+The current `Dockerfile`:
 
-HydroSwarm's optimized, production-equivalent runtime target is **Linux**
-(Docker, amd64/arm64) -- see [Container](#container) above. Native Windows is a
-fully supported, correct install path, but it has materially higher latency for
-exact hydraulic/water-quality simulation specifically, for a real, unavoidable
-platform reason:
+- copies the frozen `models/hydrocore-v5-release/` bundle;
+- sets `HYDROSWARM_V5_BUNDLE_DIR`;
+- builds the frontend;
+- includes the reference-demo/frozen runtime fixtures;
+- runs `run_self_test(strict=True)` during image construction;
+- runs the API that defaults to V5.
 
-HydroSwarm's simulator wrapper runs every real WNTR/EPANET call in a genuine,
-killable OS subprocess with a hard wall-clock timeout (not a daemon thread, which
-Python cannot forcibly stop). On Linux/macOS this uses `multiprocessing`'s `"fork"`
-start method -- a near-instant, sub-millisecond way to hand a live incident
-analysis off to a child process. Windows has no `fork()` syscall at all, so the
-same code correctly falls back to `"spawn"` there -- the only start method Windows
-supports -- which starts a brand-new Python interpreter and re-imports NumPy,
-pandas, WNTR, and Torch for every single exact simulation call. That is a real,
-multi-second-per-call cost on native Windows that does not exist on Linux/macOS.
+The developer compose file publishes `127.0.0.1:8765`, drops Linux capabilities, prevents privilege escalation, uses a read-only root filesystem, and persists `/data`.
 
-This does not affect correctness, but it does mean HydroSwarm's Windows CI matrix
-leg does not run every real-simulator test the way Ubuntu does:
+## Important: historical release-compose image
 
-- **Linux/Ubuntu CI runs the complete, authoritative scientific/backend test
-  suite** -- every real WNTR/EPANET test, with coverage. This is the correctness
-  reference.
-- **Native Windows CI runs a broad cross-platform backend suite (audited to make
-  zero real simulator calls) plus a small, dedicated real-simulator compatibility
-  suite** proving native WNTR/EPANET execution, timeout/termination, exception
-  propagation, and one exact plan-verification and end-to-end incident workflow
-  through the real Windows `"spawn"` path -- once, not hundreds of times. A
-  runtime audit (`tests/conftest.py`) independently fails Windows CI if any test
-  outside that dedicated suite is ever found making a real simulator call, so
-  this split is enforced, not merely documented.
-
-**If you are running HydroSwarm natively on Windows and need production-equivalent
-exact-simulation latency and test coverage, use Docker Desktop (WSL2 backend) and
-the Container path above instead of the native PowerShell install** -- that runs
-the real Linux container image, restoring the `"fork"` path. Do not expect native
-Windows performance parity, or an equally exhaustive real-simulator test pass, to
-Linux for workloads that make many exact simulator calls (e.g. bulk plan
-comparison, corpus generation, training); native Windows remains appropriate for a
-demo/self-test/light interactive session.
-
-## Reproducibility checks
-
-```powershell
-hydroswarm self-test
-python -m pytest --cov=hydroswarm --cov-branch
-python -m ruff check src tests
-python -m pyright
-python -m build --wheel --no-isolation
-cd frontend
-npm.cmd run lint
-npm.cmd run test -- --run
-npm.cmd run build
+```bash
+docker compose -f docker-compose.release.yml up
 ```
 
-`self-test` executes real model inference and a bounded WNTR simulation, checks SQLite,
-resource availability, bind-port status, dependency versions, and frontend assets, and
-emits machine-readable hashes. A failure exits nonzero. `self-test --strict` additionally
-requires a genuinely FITTED calibration artifact, the reference-demo artifact, a built
-frontend, and zero resource warnings -- the release-readiness gate the native setup
-scripts, Docker build, CI, and the release workflow all run; plain `self-test` reports the
-same facts without failing on them, for local iteration.
+is **not the final V5 path at the current repository state**. That file is pinned to `ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon`. The Dockerfile at that tag contains the V4 bundle and predates V5 packaging.
+
+This is a repository packaging/versioning follow-up, not a model/evaluation ambiguity. Do not use the historical release image to verify V5 identity.
+
+## V5 path B: native setup and launch
+
+```bash
+git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
+cd HydroSwarm
+
+./setup_hydroswarm_linux.sh
+./start_hydroswarm_linux.sh
+```
+
+macOS:
+
+```bash
+./setup_hydroswarm_macos.sh
+./start_hydroswarm_macos.sh
+```
+
+Windows PowerShell:
+
+```powershell
+.\setup_hydroswarm_windows.ps1
+.\start_hydroswarm_windows.ps1
+```
+
+The platform setup scripts create a project-local `.venv`, install dependencies, build the frontend when needed, and finish with the strict application self-test.
+
+### Native setup caveat
+
+The setup helper still performs an older **redundant V4 bundle precheck** before the final strict readiness check. The current `hydroswarm self-test --strict` itself uses `V5PipelineFactory(resolve_v5_bundle_dir())`, and the application default also serves V5.
+
+This means a native setup can currently require the retained historical V4 bundle even though V5 is the final serving identity. The repository contains that V4 bundle, so this does not change the V5 runtime result, but the helper should eventually be cleaned up in a non-documentation pass.
+
+## Manual native install
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+cd frontend
+npm ci
+npm run build
+cd ..
+hydroswarm self-test --strict --human
+hydroswarm start
+```
+
+Windows uses `.venv\Scripts\python`, `npm.cmd`, and the PowerShell launcher as appropriate.
+
+## Verify the final V5 identity
+
+Run:
+
+```bash
+hydroswarm self-test --strict
+```
+
+The machine-readable report includes `trained_assets.architecture_version`, `trained_assets.model_sha256`, `trained_assets.bundle_dir`, calibration status, bounded inference/simulation checks, resources, frontend assets, and the reference artifact.
+
+For the final frozen system, the model hash must be:
+
+```text
+de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5
+```
+
+The release manifest itself is [models/hydrocore-v5-release/runtime_manifest.json](../models/hydrocore-v5-release/runtime_manifest.json), and the authoritative freeze is [FINAL_SYSTEM.md](FINAL_SYSTEM.md).
+
+### Known self-test presentation debt
+
+Some CLI docstrings/human-readable checklist text still says “V4” even though the implementation now instantiates and validates the V5 factory. Treat the returned V5 architecture version/model hash as the identity evidence. Correcting those source strings is intentionally outside this documentation-only pass.
+
+## Runtime behavior if V5 assets are invalid
+
+The V5 loader verifies:
+
+- release schema;
+- five-output runtime allowlist;
+- `sentinel` trained-task allowlist;
+- feature-schema identity;
+- fusion identity;
+- release file hashes;
+- checkpoint hash;
+- calibration artifact identity.
+
+A failure makes the trained V5 assets unavailable and the pipeline fails closed toward classical-safe behavior. It never silently falls back to V4.
+
+## Native Windows versus Linux/Docker
+
+HydroSwarm's exact simulator runs in a killable subprocess with a hard timeout. Linux/macOS can use `fork`; Windows uses `spawn`, which starts a new Python interpreter and re-imports scientific dependencies. As a result, native Windows simulator-heavy workloads have materially higher process-start overhead.
+
+For production-equivalent demo latency and the most exhaustive real-simulator test path on a Windows host, prefer Docker Desktop/WSL2.
+
+## Offline operation
+
+The scientific runtime does not require a hosted model service. The application is designed for local operation with local model, calibration, network, database, and reference assets. Dependency downloads and container/image acquisition are installation concerns, not runtime inference dependencies.
 
 ## Troubleshooting
 
-- If port 8765 is occupied, pass `--port` to `hydroswarm start`.
-- If memory is constrained, use a small checkpoint or classical-safe mode.
-- A missing frontend build does not invalidate scientific APIs, but self-test reports
-  `source-only`; run the frontend build before a demo.
-- Delete no incident database to “fix” a migration. Preserve it and inspect the startup
-  error; production-like evidence must remain recoverable.
+- Port occupied: pass `--port` to `hydroswarm start`.
+- Strict self-test says V5 assets unavailable: inspect the reported `bundle_dir`, fallback reason, and checkpoint hash.
+- Frontend missing: rebuild `frontend/dist`.
+- WNTR/EPANET check fails: verify the installed simulator dependency/runtime.
+- Do not delete the incident database to “fix” a migration or evidence inconsistency; preserve the record and inspect the error.
+- Do not use the historical release-compose image when validating V5.
+
+## Reproducibility checks
+
+Useful non-locked checks include:
+
+```bash
+hydroswarm self-test --strict
+python -m pytest
+python -m pyright
+python -m ruff check src tests scripts
+```
+
+These commands do not authorize rerunning the final locked M11.6 evaluation. See [Reproducibility](REPRODUCIBILITY.md).

@@ -20,19 +20,19 @@
 - [x] Python and frontend quality gates pass from a clean install (ruff, pyright, full
       pytest, npm lint/typecheck/format:check/vitest/build all green throughout this
       session; see `reports/submission-readiness/`).
-- [x] Evaluation results were regenerated and match README/report tables. (This session
-      additionally corrected a real staleness gap: the README/MODEL_CARD/EVALUATION docs
-      cited only the superseded v3-era S/M/L benchmark with no mention that HydroCore-v4
-      is the actual frozen default -- fixed; see docs/FINAL_SYSTEM.md.)
+- [x] Current scientific documentation is rebased to the frozen HydroCore-v5 finalist and
+      one-time M11.6 locked result. Historical V3/V4/M9/M10 artifacts remain preserved and
+      explicitly separated from current claims; see [Final system](FINAL_SYSTEM.md),
+      [Scientific evidence](SCIENTIFIC_EVIDENCE.md), and [Claims and evidence](CLAIMS_AND_EVIDENCE.md).
 - [x] Frozen scenario outputs are computed, checksummed, and not embedded UI claims.
 - [x] Technical report PDF visually reviewed; figures, tables, limitations, references present.
 - [x] Demo video recording exists. Captions, audio, visible real outputs, and no cuts
       implying false causality remain a final-release review task; its public submission
       URL must be inserted manually on submission day.
 - [x] Fresh Playwright screenshots show the first-launch gateway, reference sampling,
-      approval boundary, and LIVE V4 proof start without sensitive paths/data; all 53
-      Playwright tests passed. README uses these as its primary
-      visual story rather than the old fallback-only screenshot.
+      approval boundary, and a LIVE proof start without sensitive paths/data; all 53
+      Playwright tests passed. The screenshots predate the V5 documentation rebase and are
+      retained as UI/workflow evidence, not as proof of the current finalist model identity.
 - [ ] Submission-day/manual task: verify the Devpost write-up, built-with list,
       repository, report links, and final public video URL anonymously.
 - [x] AI-assistance disclosure uses the approved wording.
@@ -41,12 +41,11 @@
 - [x] Safety boundary and absence of autonomous control are visible in README, UI, and
       the recorded demo. Final-release review must confirm the final exported video still
       shows that boundary.
-- [x] A local `v0.1.0-hackathon` runtime ZIP was built, extracted into a clean Linux
-      ARM64 directory, and passed setup → strict self-test → loopback launch. It includes
-      checksums, the frozen V4 bundle, built frontend, and reference artifact. The
-      Historical `v0.1.3-hackathon` GitHub Release publishes the prior runtime ZIP and
-      `RELEASE_MANIFEST.json`; its GHCR multiarch image passed strict self-tests for both
-      published architectures.
+- [x] Historical release artifacts are preserved as historical. The existing
+      `v0.1.0-hackathon`/`v0.1.3-hackathon` release paths contain the frozen V4-era bundle;
+      they are not presented as the current HydroCore-v5 serving identity. A new reviewed
+      release/tag must be cut from the eventual final submission commit before claiming a
+      published V5 image or runtime ZIP.
 - [x] Hardened Docker verification (`--read-only`, non-root, dropped capabilities,
       no-new-privileges, `/data` persistence, `/tmp` tmpfs) passed on hosted native
       AMD64 and ARM64. This is not a Docker Desktop host-integration claim.
