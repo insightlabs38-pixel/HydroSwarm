@@ -155,6 +155,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # provenance/sbom deliberately omitted here: BuildKit wraps a
+      # provenance/sbom-attested push-by-digest build in an "attestation
+      # index" (image manifest + an unrelated provenance/sbom manifest
+      # under a synthetic unknown/unknown "platform"), so
+      # `steps.build.outputs.digest` would be that WRAPPING index's
+      # digest, not the plain per-platform image manifest's -- and
+      # combine-candidate's `docker buildx imagetools create` would
+      # recursively flatten it, producing three manifests (amd64, arm64,
+      # and a stray unknown/unknown entry) instead of exactly two,
+      # confirmed by a real failed preflight run before this fix. A plain
+      # (non-attested) single-platform build's digest is unambiguous and
+      # stable, which combine-candidate's exact-two-platforms check below
+      # depends on.
       - name: Build and push linux/amd64 candidate by digest (native, no QEMU)
         id: build
         uses: docker/build-push-action@v6
@@ -162,8 +175,6 @@ jobs:
           context: .
           platforms: linux/amd64
           outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-          provenance: true
-          sbom: true
 
   # Native linux/arm64 build on a genuine arm64 runner -- no QEMU. Pushed by
   # DIGEST ONLY (no tag), same as the amd64 leg above.
@@ -185,6 +196,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # See build-candidate-amd64's comment: provenance/sbom deliberately
+      # omitted so this job's digest output is the plain, unambiguous
+      # per-platform image manifest digest, not a wrapping attestation
+      # index.
       - name: Build and push linux/arm64 candidate by digest (native, no QEMU)
         id: build
         uses: docker/build-push-action@v6
@@ -192,8 +207,6 @@ jobs:
           context: .
           platforms: linux/arm64
           outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-          provenance: true
-          sbom: true
 
   # SUB-3 acceptance criterion: "amd64 image boots; arm64 image
   # builds/smokes; one tag resolves both architectures." SUB-12.1 #21:
