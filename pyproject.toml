@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hydroswarm"
-version = "0.1.0"
+version = "0.2.0"
 description = "Offline neuro-hydraulic decision support for drinking-water contamination incidents"
 readme = "README.md"
 requires-python = ">=3.12"

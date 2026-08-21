@@ -1,6 +1,6 @@
 """SUB-3 (submission.txt SS21): produce the source/runtime release archive
-`HydroSwarm-v{version}-hackathon-runtime.zip`, in addition to the Docker
-release path.
+`HydroSwarm-{version}-runtime.zip` (e.g. `HydroSwarm-v0.2.0-runtime.zip`),
+in addition to the Docker release path.
 
 Contents (per SS21): source/, frontend/dist/, models/hydrocore-v5-release/,
 configs/, examples/ (if present), artifacts/reference-demo/ (if present),
@@ -171,7 +171,7 @@ def build_bundle(output_path: Path, *, release_version: str) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--release-version", required=True, help='e.g. "v0.1.0-hackathon"')
+    parser.add_argument("--release-version", required=True, help='e.g. "v0.2.0"')
     parser.add_argument("--out-dir", type=Path, default=PROJECT_ROOT / "dist")
     args = parser.parse_args(argv)
 

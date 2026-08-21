@@ -1,6 +1,6 @@
 # Installation and offline launch
 
-> **Current model identity:** the source application serves the frozen HydroCore-v5 bundle through `V5PipelineFactory(resolve_v5_bundle_dir())`. The historical `docker-compose.release.yml` image predates V5; use one of the V5 source paths below for the final system.
+> **Current model identity:** the source application serves the frozen HydroCore-v5 bundle through `V5PipelineFactory(resolve_v5_bundle_dir())`. `docker-compose.release.yml` now targets the intended `v0.2.0` V5 release image, but as of this pre-tag commit that tag has not been published yet; use one of the V5 source paths below until it is.
 
 ## Runtime boundary
 
@@ -50,15 +50,15 @@ The current `Dockerfile`:
 
 The developer compose file publishes `127.0.0.1:8765`, drops Linux capabilities, prevents privilege escalation, uses a read-only root filesystem, and persists `/data`.
 
-## Important: historical release-compose image
+## Important: release-compose image is not published yet (pre-tag state)
 
 ```bash
 docker compose -f docker-compose.release.yml up
 ```
 
-is **not the final V5 path at the current repository state**. That file is still pinned to `ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon`, an image published before the V5 packaging rebase; no new image has been published under that tag yet. `docker-compose.release.yml` will be repointed at a new immutable V5 image tag/digest once one is published.
+is **not usable at the current repository state**. `docker-compose.release.yml` is pinned to `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.0`, the intended V5 release tag, but no image has been published under that tag yet -- `v0.2.0` has not been tagged or released. Once the real `v0.2.0` tag is pushed and the release workflow's `promote-release` job publishes the tested image, this path will work as documented; until then it will fail with an image-not-found error.
 
-This is a repository packaging/versioning follow-up, not a model/evaluation ambiguity. Do not use the historical release image to verify V5 identity; use [V5 path A](#v5-path-a-build-the-current-docker-checkout) (developer compose, built from this checkout's own current Dockerfile) or [V5 path B](#v5-path-b-native-setup-and-launch) below instead.
+This is a packaging/publication-sequencing fact, not a model/evaluation ambiguity. Until `v0.2.0` is published, use [V5 path A](#v5-path-a-build-the-current-docker-checkout) (developer compose, built from this checkout's own current Dockerfile) or [V5 path B](#v5-path-b-native-setup-and-launch) below instead.
 
 ## V5 path B: native setup and launch
 

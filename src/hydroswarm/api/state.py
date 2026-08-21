@@ -367,7 +367,7 @@ class RuntimeState:
             actor=actor,
             input_state_hash=self.state_hash(runtime.state),
             payload=payload,
-            model_version="hydroswarm-api-0.1.0",
+            model_version="hydroswarm-api-0.2.0",
             simulator_version=simulator_version,
         )
 

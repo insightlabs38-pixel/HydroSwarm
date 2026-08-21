@@ -15,7 +15,7 @@ Open `http://127.0.0.1:8765`.
 
 This builds the current Dockerfile, includes the frozen V5 bundle, runs the strict V5 readiness check during the build, and launches the V5-default API.
 
-> `docker compose -f docker-compose.release.yml up` is currently pinned to the historical `v0.1.0-hackathon` image, which predates V5. Do not use that image to verify the final V5 system.
+> `docker compose -f docker-compose.release.yml up` now points at the intended `v0.2.0` V5 release image, but that tag has not been published yet at this pre-tag commit -- it will fail with an image-not-found error until `v0.2.0` is tagged and released. Use the checkout build above to verify the current V5 system in the meantime.
 
 ## Native
 

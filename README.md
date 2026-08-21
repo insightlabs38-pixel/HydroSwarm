@@ -85,7 +85,7 @@ cd HydroSwarm
 ./start_hydroswarm_linux.sh   # or matching platform launcher
 ```
 
-The current API default serves V5 and `hydroswarm self-test --strict` validates the V5 release bundle; the native setup scripts, the runtime ZIP builder, `RELEASE_MANIFEST.json` generation, and the Docker image now all resolve exclusively to the same V5 bundle, with no current-path dependency on the historical V4 bundle. One packaging caveat remains: `docker-compose.release.yml` is still pinned to the historical `v0.1.0-hackathon` image, which predates the V5 bundle, so it is **not yet** the V5 launch path -- a new immutable image tag must be published first. See [Installation](docs/INSTALLATION.md) for exact behavior.
+The current API default serves V5 and `hydroswarm self-test --strict` validates the V5 release bundle; the native setup scripts, the runtime ZIP builder, `RELEASE_MANIFEST.json` generation, and the Docker image now all resolve exclusively to the same V5 bundle, with no current-path dependency on the historical V4 bundle. One packaging caveat remains: `docker-compose.release.yml` now targets the intended `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.0` release image, but that tag is **not yet published** at this pre-tag commit -- it will become the V5 launch path once `v0.2.0` is tagged and released. See [Installation](docs/INSTALLATION.md) for exact behavior.
 
 ## Authority and safety boundaries
 

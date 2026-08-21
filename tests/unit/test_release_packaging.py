@@ -56,6 +56,33 @@ def test_release_compose_preserves_security_hardening() -> None:
     assert service["ports"][0].startswith("127.0.0.1:")
 
 
+# --- current product version consistency ------------------------------------
+
+
+def test_current_product_version_is_consistent_across_python_and_frontend() -> None:
+    """The current product version (pyproject.toml / __version__, which
+    drives GET /api/health's `version` field) must agree with the frontend
+    package version -- both are CURRENT release surfaces, not historical
+    evidence, and a real release should never ship with them disagreeing."""
+    import re
+
+    pyproject_text = (PROJECT_ROOT / "pyproject.toml").read_text()
+    pyproject_version = re.search(r'^version\s*=\s*"([^"]+)"', pyproject_text, flags=re.MULTILINE).group(1)
+
+    init_text = (PROJECT_ROOT / "src" / "hydroswarm" / "__init__.py").read_text()
+    init_version = re.search(r'^__version__\s*=\s*"([^"]+)"', init_text, flags=re.MULTILINE).group(1)
+
+    import json
+
+    frontend_package = json.loads((PROJECT_ROOT / "frontend" / "package.json").read_text())
+    frontend_lock = json.loads((PROJECT_ROOT / "frontend" / "package-lock.json").read_text())
+
+    assert pyproject_version == init_version
+    assert pyproject_version == frontend_package["version"]
+    assert pyproject_version == frontend_lock["version"]
+    assert pyproject_version == frontend_lock["packages"][""]["version"]
+
+
 # --- .github/workflows/release.yml ------------------------------------------
 
 

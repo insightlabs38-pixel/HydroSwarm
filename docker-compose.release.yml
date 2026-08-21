@@ -5,7 +5,15 @@ services:
     # dependency. Pin the versioned tag rather than `:latest` so a judge's
     # run is reproducible. See docker-compose.yml for the developer,
     # build-from-source compose file.
-    image: ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon
+    #
+    # v0.2.0 preflight (pre-tag state): this points at the intended V5
+    # release tag, but as of this commit `v0.2.0` has not been tagged or
+    # published yet -- `docker compose -f docker-compose.release.yml up`
+    # will fail with "image not found" until the real `v0.2.0` tag is
+    # pushed and release.yml's promote-release job publishes it. Until
+    # then, use docker-compose.yml (build from this checkout) or the
+    # native setup scripts instead; see docs/INSTALLATION.md.
+    image: ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.0
     ports:
       - "127.0.0.1:8765:8765"
     volumes:

@@ -139,7 +139,7 @@ def test_full_typed_workflow_rejects_unsafe_and_gates_approval(tmp_path) -> None
     assert client.get("/api/health").json() == {
         "status": "ok",
         "offline": True,
-        "version": "0.1.0",
+        "version": "0.2.0",
     }
     assert client.get("/api/readiness").status_code == 200
     assert client.get("/api/version").json()["offline"] is True

@@ -49,7 +49,7 @@ docker compose up
 
 The current Dockerfile includes the V5 bundle and runs the strict self-test during image build.
 
-Do not use `docker-compose.release.yml` to verify the final V5 system: it is pinned to the historical `v0.1.0-hackathon` image, which predates V5.
+Do not use `docker-compose.release.yml` to verify the final V5 system yet: it is pinned to the intended `v0.2.0` release image, but as of this pre-tag commit that tag has not been published, so the pull will fail.
 
 ## Verify the one-time lock without reopening it
 
