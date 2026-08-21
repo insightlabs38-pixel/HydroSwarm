@@ -28,8 +28,11 @@ esac
 log "HydroSwarm setup (macOS, $CHIP_LABEL)"
 log ""
 
-if [ "$ARCH" = "x86_64" ] && [ "$(sysctl -in sysctl.proc_translated 2>/dev/null || echo 0)" = "1" ]; then
-  log "note: running under Rosetta 2 translation. A native arm64 Python is recommended on Apple Silicon for best performance; this script does not require or assume Rosetta."
+if [ "$ARCH" = "x86_64" ]; then
+  if [ "$(sysctl -in sysctl.proc_translated 2>/dev/null || echo 0)" = "1" ]; then
+    fail "this shell is running under Rosetta 2 translation (reports x86_64), but the current HydroSwarm native macOS runtime targets Apple Silicon (arm64); the required current PyTorch runtime has no supported Intel macOS binary distribution. Re-run this script from a native arm64 terminal/Python (e.g. a Terminal window not launched with 'Open using Rosetta')."
+  fi
+  fail "the current HydroSwarm native macOS runtime targets Apple Silicon (arm64); the required current PyTorch runtime has no supported Intel macOS binary distribution. Native macOS Intel/x86_64 is not a supported HydroSwarm platform."
 fi
 
 # --- 1. Locate a usable bootstrap Python (>=3.12, 64-bit) ------------------

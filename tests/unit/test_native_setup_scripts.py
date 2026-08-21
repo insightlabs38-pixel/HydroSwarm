@@ -177,6 +177,26 @@ def test_windows_setup_does_not_run_full_real_simulator_suite() -> None:
     assert "pytest" not in text
 
 
+def test_macos_setup_fails_closed_on_intel_x86_64() -> None:
+    """Native macOS support targets Apple Silicon only -- the frozen
+    torch>=2.5 requirement has no macOS x86_64 wheel upstream (confirmed
+    via a real CI run on a genuine Intel macOS runner, see
+    native-cross-platform.yml). The setup script must refuse early with a
+    clear message instead of proceeding until pip fails obscurely deep
+    inside dependency installation."""
+    text = (PROJECT_ROOT / "setup_hydroswarm_macos.sh").read_text()
+    assert '"$ARCH" = "x86_64"' in text
+    # The guard must fire (and the script must exit) before any pip install
+    # is attempted, not merely print an advisory note alongside it.
+    guard_index = text.index('"$ARCH" = "x86_64"')
+    first_pip_install_index = text.index("pip install")
+    assert guard_index < first_pip_install_index
+    fail_closed_section = text[guard_index : guard_index + 800]
+    assert "fail " in fail_closed_section or 'fail "' in fail_closed_section
+    assert "Apple Silicon" in fail_closed_section
+    assert "no supported Intel macOS binary distribution" in fail_closed_section
+
+
 def test_legacy_launchers_are_thin_compatibility_wrappers() -> None:
     sh_text = (PROJECT_ROOT / "start_hydroswarm.sh").read_text()
     assert "start_hydroswarm_linux.sh" in sh_text

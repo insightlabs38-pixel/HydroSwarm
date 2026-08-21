@@ -16,6 +16,18 @@ name: HydroSwarm Native Cross-Platform Verification
 # pass. If a listed runner type is ever unavailable, that job fails
 # loudly (a real, visible CI failure) rather than being silently skipped
 # or reported as green.
+#
+# Supported native platforms: Linux x86_64, Linux ARM64, Windows x86_64,
+# macOS Apple Silicon (ARM64). macOS Intel/x86_64 is deliberately NOT in
+# this matrix: the frozen `torch>=2.5` runtime requirement has no
+# official PyPI wheel for macOS x86_64 (upstream PyTorch dropped Intel
+# macOS binary distribution after 2.2.x) -- confirmed via a real CI run
+# on a genuine macos-15-intel runner (`ERROR: Could not find a version
+# that satisfies the requirement torch>=2.5 (from versions: 2.2.0,
+# 2.2.1, 2.2.2)`), not assumed. This is an upstream platform-support gap,
+# not a HydroSwarm defect, so the honest fix is to stop claiming Intel
+# macOS support rather than keep a permanently-red or artificially
+# masked job. See docs/INSTALLATION.md for the user-facing note.
 on:
   push:
     branches: [main, "agent/**"]
@@ -57,10 +69,6 @@ jobs:
             os: macos-15
             shell: bash
             expected_arch: arm64
-          - name: macos-x86_64
-            os: macos-15-intel
-            shell: bash
-            expected_arch: x86_64
     name: native-verify (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40

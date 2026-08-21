@@ -70,12 +70,14 @@ cd HydroSwarm
 ./start_hydroswarm_linux.sh
 ```
 
-macOS:
+macOS (Apple Silicon / arm64):
 
 ```bash
 ./setup_hydroswarm_macos.sh
 ./start_hydroswarm_macos.sh
 ```
+
+Native macOS support targets Apple Silicon (arm64) only. The frozen runtime requires `torch>=2.5`, for which official macOS Intel/x86_64 binary support is unavailable upstream; `setup_hydroswarm_macos.sh` fails early with this explanation on Intel Macs rather than failing obscurely mid-install.
 
 Windows PowerShell:
 
