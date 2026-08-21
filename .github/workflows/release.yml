@@ -3,18 +3,43 @@ name: HydroSwarm Release
 # SUB-3 (submission.txt SS19.1): build and publish one multiarch (amd64 +
 # arm64) image tag on a version release/tag, plus the runtime source zip
 # and release manifest. Deliberately does NOT publish from arbitrary
-# feature-branch pushes -- only version tags (`v*`) or an explicit manual
-# dispatch, per submission.txt "Do not publish from arbitrary feature
-# branch pushes".
+# feature-branch pushes -- only version tags (`v*`).
+#
+# P0 fix (v0.2.0 release preflight): the previous revision of this workflow
+# pushed the FINAL version tag and `latest` in the same step that built the
+# image, *before* the post-push amd64/arm64 strict container-self-test ran
+# -- meaning a broken image could exist under a public, final tag for as
+# long as it took the self-test job to fail. This revision separates
+# "build and test" from "publish" so that never happens again:
+#
+#   verify-frozen-bundle
+#   -> build-candidate        (push ONLY a disposable `release-candidate-<sha>`
+#                               tag; never the final version tag or `latest`)
+#   -> container-self-test    (pull the exact candidate DIGEST -- not the
+#                               mutable tag -- and run `self-test --strict`
+#                               on both linux/amd64 and linux/arm64)
+#   -> promote-release        (tag-push only: retag -- never rebuild -- the
+#                               SAME tested digest as the final version and
+#                               `latest`, via `docker buildx imagetools create`)
+#   -> release-artifacts      (build/verify RELEASE_MANIFEST.json + the
+#                               runtime zip against the tested digest;
+#                               create the GitHub Release only on a real
+#                               tag push)
+#
+# `workflow_dispatch` deliberately has no `release_version` input and never
+# runs `promote-release` or creates a GitHub Release -- it is a NON-PUBLISHING
+# preflight run of the exact same build+test flow (this is Option A from the
+# v0.2.0 preflight task: a tag push is the only publishing trigger, and a
+# manual run from `main` -- where `GITHUB_REF_NAME` is `main`, not a version
+# -- can never be interpreted as a legitimate release version because it
+# never reaches the promotion/publish jobs at all). The only artifact a
+# `workflow_dispatch` run publishes anywhere is the disposable
+# `release-candidate-<sha>` image tag itself, which is never promoted to a
+# final tag unless a real `vX.Y.Z` tag triggered the run.
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
-    inputs:
-      release_version:
-        description: 'Release tag, e.g. "v0.1.0-hackathon" (defaults to the pushed tag).'
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -28,17 +53,33 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_version: ${{ steps.version.outputs.value }}
+      is_release: ${{ steps.version.outputs.is_release }}
     steps:
       - uses: actions/checkout@v4
 
+      # Only a real `push` (tag) event may ever resolve to a publishable
+      # release version, and even then it must match `vX.Y.Z` exactly --
+      # `tags: ["v*"]` above is a glob, not a format guarantee, so a
+      # malformed tag (e.g. "v0.2" or "vfoo") is rejected here rather than
+      # silently flowing into a GHCR tag / GitHub Release name.
+      # `workflow_dispatch` always resolves to a clearly non-version
+      # "preflight-<sha>" label used only for self-test/manifest labeling;
+      # it is never used to publish anything.
       - name: Resolve release version
         id: version
         shell: bash
         run: |
-          if [ -n "${{ inputs.release_version }}" ]; then
-            echo "value=${{ inputs.release_version }}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            version="${GITHUB_REF_NAME}"
+            if ! [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::Release tag '$version' does not match the required vX.Y.Z format; refusing to publish." >&2
+              exit 1
+            fi
+            echo "value=$version" >> "$GITHUB_OUTPUT"
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
           else
-            echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "value=preflight-${GITHUB_SHA:0:12}" >> "$GITHUB_OUTPUT"
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: actions/setup-python@v5
@@ -73,7 +114,7 @@ jobs:
           python -m ruff check src tests
           python -m pytest tests/unit -q -m "not real_simulation"
 
-  build-and-push:
+  build-candidate:
     needs: verify-frozen-bundle
     runs-on: ubuntu-latest
     outputs:
@@ -94,21 +135,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push multiarch image
+      # Publishes ONLY a disposable, clearly non-final staging tag -- never
+      # the requested release version and never `latest`. Those are only
+      # ever written by promote-release below, and only by retagging this
+      # exact digest, never by a second build.
+      - name: Build and push staging candidate image (never a final tag)
         id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: |
-            ${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}
-            ${{ env.IMAGE_NAME }}:latest
+          tags: ${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}
           provenance: true
           sbom: true
 
   container-self-test:
-    needs: [verify-frozen-bundle, build-and-push]
+    needs: [verify-frozen-bundle, build-candidate]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -121,13 +164,18 @@ jobs:
       # builds/smokes; one tag resolves both architectures." SUB-12.1 #21:
       # --strict requires trained assets ready, a genuinely FITTED
       # calibration (not merely loadable), the reference-demo artifact
-      # present, the frontend built, and zero resource warnings -- inside
-      # the actual pushed image, not a rebuilt copy -- for both platforms.
-      - name: Pull and self-test (${{ matrix.platform }})
+      # present, the frontend built, and zero resource warnings.
+      #
+      # Pulled by immutable DIGEST, not by the mutable candidate tag: this
+      # is the exact same artifact promote-release will later retag as the
+      # final release, byte for byte, not merely "an image with the same
+      # tag at the time this ran."
+      - name: Pull and self-test (${{ matrix.platform }}) -- exact candidate digest
         run: |
-          docker pull --platform ${{ matrix.platform }} "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}"
+          image_ref="${{ env.IMAGE_NAME }}@${{ needs.build-candidate.outputs.digest }}"
+          docker pull --platform ${{ matrix.platform }} "$image_ref"
           docker run --rm --platform ${{ matrix.platform }} \
-            "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}" \
+            "$image_ref" \
             hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
           python3 -c "
           import json, sys
@@ -142,8 +190,53 @@ jobs:
           print('container strict self-test OK for ${{ matrix.platform }}:', trained_assets['model_sha256'])
           "
 
+  # Tag-push (real release) only. Never runs for workflow_dispatch --
+  # `needs.verify-frozen-bundle.outputs.is_release` is only 'true' for a
+  # push event that resolved a valid `vX.Y.Z` tag above. Retags the exact
+  # digest that already passed container-self-test on both platforms; does
+  # NOT rebuild, so there is no way for the published tag to point at an
+  # image that was never actually tested.
+  promote-release:
+    needs: [verify-frozen-bundle, build-candidate, container-self-test]
+    if: needs.verify-frozen-bundle.outputs.is_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Promote the exact tested digest to the final release tag and latest
+        run: |
+          source_ref="${{ env.IMAGE_NAME }}@${{ needs.build-candidate.outputs.digest }}"
+          docker buildx imagetools create \
+            --tag "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}" \
+            --tag "${{ env.IMAGE_NAME }}:latest" \
+            "$source_ref"
+
+      - name: Verify both promoted tags resolve to the exact tested digest
+        run: |
+          expected="${{ needs.build-candidate.outputs.digest }}"
+          for tag in "${{ needs.verify-frozen-bundle.outputs.release_version }}" latest; do
+            resolved=$(docker buildx imagetools inspect "${{ env.IMAGE_NAME }}:${tag}" --format '{{json .Manifest}}' | python3 -c "import json, sys; print('sha256:' + json.load(sys.stdin)['digest'].split(':', 1)[1])")
+            if [ "$resolved" != "$expected" ]; then
+              echo "::error::Promoted tag '${tag}' resolves to ${resolved}, not the tested candidate digest ${expected}" >&2
+              exit 1
+            fi
+            echo "promoted tag '${tag}' verified to point at the exact tested digest: $resolved"
+          done
+
+  # Runs for BOTH event types: this is also the CI-enforced, non-publishing
+  # release-manifest/ZIP dry run (v0.2.0 preflight task sections 9-10).
+  # Only the final "Create GitHub Release" step is gated to a real tag push.
   release-artifacts:
-    needs: [verify-frozen-bundle, build-and-push, container-self-test]
+    needs: [verify-frozen-bundle, build-candidate, container-self-test, promote-release]
+    if: "always() && needs.container-self-test.result == 'success' && (needs.promote-release.result == 'success' || needs.promote-release.result == 'skipped')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -157,12 +250,29 @@ jobs:
           python -m pip install --quiet -e .
           cd frontend && npm ci && npm run build
 
+      # The container identity this manifest/ZIP describes is always the
+      # SAME digest container-self-test already verified on both
+      # platforms -- for a real release it is that digest under its
+      # promoted final tag; for a non-publishing preflight run it is that
+      # digest under its disposable candidate tag. Never a second,
+      # unvalidated image.
+      - name: Resolve tested container identity for this manifest
+        id: identity
+        shell: bash
+        run: |
+          if [ "${{ needs.verify-frozen-bundle.outputs.is_release }}" = "true" ]; then
+            echo "image=${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "image=${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "digest=${{ needs.build-candidate.outputs.digest }}" >> "$GITHUB_OUTPUT"
+
       - name: Build RELEASE_MANIFEST.json
         run: |
           python scripts/build_release_manifest.py \
             --release-version "${{ needs.verify-frozen-bundle.outputs.release_version }}" \
-            --container-image "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}" \
-            --container-digest "${{ needs.build-and-push.outputs.digest }}"
+            --container-image "${{ steps.identity.outputs.image }}" \
+            --container-digest "${{ steps.identity.outputs.digest }}"
 
       - name: Build runtime source/asset zip
         run: |
@@ -202,7 +312,19 @@ jobs:
           print('ZIP checksums and frozen V5 identity independently verified OK')
           "
 
-      - name: Upload release artifacts
+      - name: Upload manifest/ZIP as workflow artifacts (both release and preflight runs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-manifest-and-zip-${{ github.sha }}
+          path: |
+            dist/*.zip
+            RELEASE_MANIFEST.json
+
+      # Publish-only step: creates the GitHub Release, and only for a real
+      # `vX.Y.Z` tag push. A workflow_dispatch preflight run never reaches
+      # this step.
+      - name: Create GitHub Release
+        if: needs.verify-frozen-bundle.outputs.is_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.verify-frozen-bundle.outputs.release_version }}

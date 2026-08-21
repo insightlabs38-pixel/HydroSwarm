@@ -101,8 +101,94 @@ def test_release_workflow_verifies_frozen_bundle_hashes_before_building() -> Non
     with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
         workflow = yaml.safe_load(handle)
     job_order = list(workflow["jobs"])
-    assert job_order.index("verify-frozen-bundle") < job_order.index("build-and-push")
-    assert "needs" in workflow["jobs"]["build-and-push"]
+    assert job_order.index("verify-frozen-bundle") < job_order.index("build-candidate")
+    assert "needs" in workflow["jobs"]["build-candidate"]
+
+
+# --- P0 fix: publication order (v0.2.0 preflight) ---------------------------
+#
+# The previous revision of this workflow pushed the final version tag and
+# `latest` in the same job that built the image, before the post-push
+# amd64/arm64 strict container-self-test ran -- a broken image could exist
+# under a final public tag for as long as it took that job to fail. These
+# tests prove the fixed publication order is structural (in the workflow
+# graph itself), not just a comment/intention.
+
+
+def test_release_workflow_never_pushes_a_final_tag_before_testing() -> None:
+    """The pre-validation build/push step (`build-candidate`) must publish
+    ONLY a disposable, clearly non-final candidate tag -- never the
+    requested release version and never `latest`. If a future edit
+    reintroduces `${{ needs.verify-frozen-bundle.outputs.release_version }}`
+    or `:latest` into this job's own tags, this must fail."""
+    with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
+        workflow = yaml.safe_load(handle)
+    build_job = workflow["jobs"]["build-candidate"]
+    build_step = next(step for step in build_job["steps"] if step.get("id") == "build")
+    tags = build_step["with"]["tags"]
+    assert "release-candidate-" in tags
+    assert "release_version" not in tags
+    assert ":latest" not in tags
+
+
+def test_release_workflow_container_self_test_pulls_by_exact_digest() -> None:
+    """container-self-test must pull the exact digest build-candidate
+    produced, not a mutable tag -- otherwise "the tested image" and "the
+    image later promoted" could silently diverge."""
+    text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
+    assert "needs.build-candidate.outputs.digest" in text
+    assert "docker pull --platform ${{ matrix.platform }} \"$image_ref\"" in text
+
+
+def test_release_workflow_final_promotion_depends_on_container_self_test() -> None:
+    """Final-tag promotion must be gated on the container-self-test job
+    actually succeeding on both platforms, and must reuse the SAME tested
+    digest (via `docker buildx imagetools create`, a registry-native
+    retag) rather than rebuilding a second, unvalidated image."""
+    with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
+        workflow = yaml.safe_load(handle)
+    promote_job = workflow["jobs"]["promote-release"]
+    assert "container-self-test" in promote_job["needs"]
+    assert "build-candidate" in promote_job["needs"]
+
+    text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
+    assert "docker buildx imagetools create" in text
+    promote_step = next(step for step in promote_job["steps"] if "imagetools create" in step.get("run", ""))
+    assert "needs.build-candidate.outputs.digest" in promote_step["run"]
+
+
+def test_release_workflow_promotion_and_github_release_are_publish_only() -> None:
+    """`promote-release` (which writes the final version tag and `latest`)
+    and the "Create GitHub Release" step must both be gated to a real
+    `push` (tag) event -- never a manual `workflow_dispatch` run, and
+    never merely because `GITHUB_REF_NAME` happens to be `main`."""
+    with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
+        workflow = yaml.safe_load(handle)
+
+    promote_job = workflow["jobs"]["promote-release"]
+    assert promote_job["if"] == "needs.verify-frozen-bundle.outputs.is_release == 'true'"
+
+    release_job = workflow["jobs"]["release-artifacts"]
+    gh_release_step = next(
+        step for step in release_job["steps"] if step.get("uses", "").startswith("softprops/action-gh-release")
+    )
+    assert gh_release_step["if"] == "needs.verify-frozen-bundle.outputs.is_release == 'true'"
+
+
+def test_release_workflow_dispatch_has_no_publishable_version_input() -> None:
+    """OPTION A (v0.2.0 preflight task SS4): a tag push is the ONLY
+    publishing trigger. `workflow_dispatch` must not accept a
+    `release_version`-style input that could be mistaken for -- or misused
+    to request -- a real publish; it always resolves to a non-version
+    `preflight-<sha>` label that is never promoted."""
+    with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
+        workflow = yaml.safe_load(handle)
+    triggers = workflow[True]
+    dispatch = triggers["workflow_dispatch"]
+    assert not dispatch or not dispatch.get("inputs")
+
+    text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
+    assert "GITHUB_REF_NAME" not in text or "is_release" in text
 
 
 # --- scripts/build_release_manifest.py --------------------------------------
