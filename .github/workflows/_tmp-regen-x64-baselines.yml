@@ -1,0 +1,66 @@
+name: TEMP regenerate x64 Playwright visual baselines
+
+# Bounded pre-release CI repair pass: the committed
+# *-chromium-x64-linux.png visual-regression baselines were captured
+# somewhere other than actual GitHub ubuntu-latest x86_64 CI and have
+# drifted (small font/antialiasing pixel diffs across nearly every
+# baseline, confirmed from real frontend-e2e CI logs, not assumed).
+# The development environment authoring this workflow is ARM64 and must
+# not fabricate x64 baselines by hand -- this workflow runs on the real
+# x86_64 runner GitHub CI itself uses, regenerates ONLY the current
+# visual-regression baselines, and uploads them as an artifact for
+# manual review. It does not commit or push anything; a human/agent
+# downloads the artifact, visually reviews each screenshot, and copies
+# back only the ones confirmed to show the intended current UI.
+#
+# workflow_dispatch only -- no push/pull_request trigger, no deployment,
+# no release publication, no model/scientific execution.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  regen-x64-baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Fix APT sources and timeouts for Playwright dependency install
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/azure-*
+          echo 'Acquire::Retries "3";' | sudo tee /etc/apt/apt.conf.d/99retry > /dev/null
+          echo 'Acquire::http::Timeout "15";' | sudo tee -a /etc/apt/apt.conf.d/99retry > /dev/null
+          echo 'Acquire::https::Timeout "15";' | sudo tee -a /etc/apt/apt.conf.d/99retry > /dev/null
+          echo 'DPkg::Lock::Timeout "30";' | sudo tee -a /etc/apt/apt.conf.d/99retry > /dev/null
+          sudo apt-get update -qq
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Regenerate visual-regression baselines (x64) -- update-snapshots only touches files that actually differ
+        run: npx playwright test tests/e2e/visual-regression.spec.ts --update-snapshots
+      - name: Upload regenerated x64 snapshots for manual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: x64-visual-baselines
+          path: frontend/tests/e2e/visual-regression.spec.ts-snapshots/*-chromium-x64-linux.png
+          retention-days: 7
+      - name: Upload Playwright report (for context on what changed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: x64-playwright-report
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 7
