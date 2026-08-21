@@ -1835,21 +1835,21 @@ def create_app(
 
 
 # UI-11.1: the normal documented production launch (start_hydroswarm.sh/.bat ->
-# hydroswarm.cli start -> this module) serves the frozen HydroCore-v5 M10
-# frozen release by default, composed through V5PipelineFactory against the
-# committed, self-contained release bundle under models/hydrocore-v5-release/
-# -- see that directory's own runtime_manifest.json for the exact frozen
-# identity this resolves to and how it was produced (an unmodified copy of
-# the real build output, not a fresh build). DefaultPipelineFactory (the
-# pre-freeze hydrocore-v3 / adapters=true / feature_and_logit path) and the
-# historical V4PipelineFactory are both untouched and still importable; they
-# are simply no longer the module-level default this app object is built
-# with, and V5PipelineFactory never falls back to either.
+# hydroswarm.cli start -> this module) now serves the frozen, tagged
+# hydrocore-v4-architecture-freeze candidate by default, composed through the
+# existing V4PipelineFactory (never reimplemented here) against the committed,
+# self-contained release bundle under models/hydrocore-v4-release/ -- see that
+# directory's own README section for the exact frozen identity this resolves
+# to and how it was produced (an unmodified copy of the real build output, not
+# a fresh build). DefaultPipelineFactory (the pre-freeze hydrocore-v3 /
+# adapters=true / feature_and_logit path) is untouched and still importable;
+# it is simply no longer the module-level default this app object is built
+# with.
 #
 # Submission-readiness SUB-1: the bundle directory is resolved through
-# hydroswarm.runtime.paths.resolve_v5_bundle_dir, the same function
+# hydroswarm.runtime.paths.resolve_v4_bundle_dir, the same function
 # hydroswarm.cli.run_self_test uses, so a container/packaged deployment
-# (HYDROSWARM_V5_BUNDLE_DIR set) and a source checkout (unset) can never
+# (HYDROSWARM_V4_BUNDLE_DIR set) and a source checkout (unset) can never
 # silently disagree about which directory is actually being served.
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_V5_RELEASE_BUNDLE_DIR = resolve_v5_bundle_dir(_PROJECT_ROOT)
