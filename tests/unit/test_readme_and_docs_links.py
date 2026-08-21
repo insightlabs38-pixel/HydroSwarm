@@ -45,39 +45,52 @@ def test_relative_links_resolve(name: str) -> None:
 
 def test_readme_opening_sections_are_judge_first_ordered() -> None:
     """submission.txt SS3.1's required opening order: one-line value prop,
-    screenshot, problem, operator workflow, why different, strongest
-    measured results, try it -- before any deep research/benchmark
-    detail."""
+    screenshot, current-system story, strongest measured results, try it --
+    before deep research/historical detail. The docs/v5-final-documentation-
+    rebase renamed the original SS3.1 headings ("The problem", "Operator
+    workflow", "Why HydroSwarm is different") into one consolidated "What
+    HydroSwarm does" section; this checks the current heading names for the
+    same judge-first ordering intent, not the pre-rebase ones."""
     text = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
     headings = re.findall(r"^## (.+)$", text, flags=re.MULTILINE)
 
     required_order = [
-        "The problem",
-        "Operator workflow",
-        "Why HydroSwarm is different",
-        "Strongest measured results",
-        "Try it",
+        "What HydroSwarm does",
+        "Final system: HydroCore-v5",
+        "Final locked evaluation",
+        "Try the current V5 source",
     ]
     positions = [headings.index(section) for section in required_order]
     assert positions == sorted(positions), (
         f"README section order violates the judge-first requirement: {headings}"
     )
+    # Deep research/historical material must stay after the judge-first
+    # sections above, not interleaved with them.
+    assert headings.index("Historical research") > max(positions)
 
 
-def test_readme_screenshot_appears_before_the_problem_section() -> None:
+def test_readme_screenshot_appears_before_the_current_system_section() -> None:
     text = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
-    match = re.search(r"!\[HydroSwarm first-launch gateway\]\((docs/screenshots/[^)]+)\)", text)
+    match = re.search(r"!\[HydroSwarm first-launch gateway[^\]]*\]\((docs/screenshots/[^)]+)\)", text)
     assert match, "README must retain a canonical hero screenshot"
     assert (PROJECT_ROOT / match.group(1)).is_file(), "README hero screenshot is missing"
     screenshot_index = match.start()
-    problem_index = text.index("## The problem")
-    assert screenshot_index < problem_index
+    section_index = text.index("## What HydroSwarm does")
+    assert screenshot_index < section_index
 
 
-def test_readme_historical_benchmark_is_collapsed_and_labeled_superseded() -> None:
+def test_readme_historical_research_labels_v4_as_superseded() -> None:
+    """The docs/v5-final-documentation-rebase replaced README's collapsed
+    `<details>` historical-benchmark table (a big pre-V5 results dump that
+    needed collapsing) with one short "Historical research" paragraph --
+    there's no longer a large table to collapse, but it must still honestly
+    label HydroCore-v4 as historical/superseded rather than a current claim."""
     text = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
-    assert "<details>" in text
-    assert "superseded by the frozen HydroCore-v4" in text
+    section = text[text.index("## Historical research") :]
+    assert "HydroCore-v4" in section
+    assert "historical" in section.lower()
+    assert "superseded" in section.lower()
+    assert "not current V5 claims" in section
 
 
 DIAGRAM_FILES = [
@@ -125,11 +138,16 @@ def test_readme_and_devpost_tell_the_same_story() -> None:
 
 
 def test_final_system_doc_states_the_real_frozen_model_hash() -> None:
+    """FINAL_SYSTEM.md is the current authority for the frozen HydroCore-v5
+    finalist (see its own "Current authority" banner) -- must check the v5
+    release manifest, not the superseded v4 one. v5's manifest has no
+    single `normalization_hash` field (that's v4-runtime-specific); its
+    checked identity fields are model_sha256 and feature_schema_hash."""
     import json
 
     runtime_manifest = json.loads(
-        (PROJECT_ROOT / "models" / "hydrocore-v4-release" / "runtime_manifest.json").read_text()
+        (PROJECT_ROOT / "models" / "hydrocore-v5-release" / "runtime_manifest.json").read_text()
     )
     text = (PROJECT_ROOT / "docs" / "FINAL_SYSTEM.md").read_text(encoding="utf-8")
     assert runtime_manifest["model_sha256"] in text
-    assert runtime_manifest["normalization_hash"] in text
+    assert runtime_manifest["feature_schema_hash"] in text

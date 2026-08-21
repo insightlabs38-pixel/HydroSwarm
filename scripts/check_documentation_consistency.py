@@ -17,9 +17,16 @@ def check(root: Path) -> list[str]:
     if frontend["version"] != package_version:
         errors.append("frontend/package.json version differs from project version")
 
-    manifest = json.loads((root / "models/hydrocore-v4-release/runtime_manifest.json").read_text(encoding="utf-8"))
+    # FINAL_SYSTEM.md documents the frozen HydroCore-v5 finalist (the
+    # current serving identity, per its own "Current authority" banner),
+    # so this must check the v5 release manifest, not the superseded v4
+    # one. The v5 manifest also has no single `normalization_hash` field
+    # (that concept is v4-runtime-specific -- see runtime/v4_normalization.py);
+    # v5's checked identity fields are model_sha256, feature_schema_hash,
+    # and calibration_artifact_hash.
+    manifest = json.loads((root / "models/hydrocore-v5-release/runtime_manifest.json").read_text(encoding="utf-8"))
     final_system = (root / "docs/FINAL_SYSTEM.md").read_text(encoding="utf-8")
-    for key in ("model_sha256", "feature_schema_hash", "normalization_hash"):
+    for key in ("model_sha256", "feature_schema_hash"):
         if manifest[key] not in final_system:
             errors.append(f"FINAL_SYSTEM.md is missing current {key}")
     if manifest["calibration_artifact_hash"] not in final_system:

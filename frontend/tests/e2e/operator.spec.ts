@@ -22,7 +22,11 @@ test('operator can follow the full normal demo flow (ui-work.txt §32) using onl
   await page.goto('/?experience=fallback');
   await expect(page.getByText('OFFLINE · LOCAL')).toBeVisible();
   await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
-  await expect(page.getByText('READY')).toBeVisible();
+  // The header and Overview's own decision-banner intentionally render the
+  // same gate badge (both derive from the same deriveDecisionGate(incident)
+  // call -- see decisionGate.ts) -- scope to the header specifically so this
+  // assertion isn't a strict-mode race against Overview's copy mounting.
+  await expect(page.getByRole('banner').getByText('READY')).toBeVisible();
 
   // 3. Open incident; 4. map establishes network context.
   await expect(
@@ -107,8 +111,11 @@ test('OOD / suppressed planning shows the governed caution state, not a fabricat
   // so the always-rendered header badges are the real signal here, not the
   // narrow banner strip.
   await expect(page.getByText('ILLUSTRATIVE DEMO / DEMO_FALLBACK')).toBeVisible();
-  await expect(page.getByText('OOD OUTSIDE_VALIDATED_RANGE')).toBeVisible();
-  await expect(page.getByText('DEGRADED')).toBeVisible();
+  // The header and Overview's own decision-banner both render an OOD badge
+  // and the same gate badge (deriveDecisionGate(incident)) -- scope to the
+  // header so these aren't a strict-mode race against Overview's copies.
+  await expect(page.getByRole('banner').getByText('OOD OUTSIDE_VALIDATED_RANGE')).toBeVisible();
+  await expect(page.getByRole('banner').getByText('DEGRADED')).toBeVisible();
 
   await page.getByRole('button', { name: /^Response/ }).click();
   // UI-11.1 §3: while planning is suppressed, no panel may draw content
