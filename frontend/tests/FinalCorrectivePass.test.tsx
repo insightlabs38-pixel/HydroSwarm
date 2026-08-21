@@ -11,6 +11,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import regressionEvidenceArtifact from '../public/system-regression-evidence.json';
 import { FirstLaunchGateway } from '../src/shell/FirstLaunchGateway';
 import { SourceWorkspace } from '../src/workspaces/SourceWorkspace';
 import { AuthorityWorkspace } from '../src/workspaces/AuthorityWorkspace';
@@ -31,7 +32,7 @@ function renderWithQuery(node: React.ReactElement) {
 describe('A. Source attribution', () => {
   test('LIVE/DEMO SourceWorkspace labels the final ranked candidates as fused, not raw Sentinel', async () => {
     renderWithQuery(<SourceWorkspace incident={demoIncident} />);
-    expect(await screen.findByText('CALIBRATED FUSION')).toBeVisible();
+    expect(await screen.findByText('FUSED SOURCE BELIEF')).toBeVisible();
     expect(screen.queryByText('HYDROCORE-v5 SENTINEL')).toBeNull();
     expect(
       screen.getByText('Classical hydraulic/signature evidence + HydroCore-v5 Sentinel evidence.'),
@@ -42,11 +43,52 @@ describe('A. Source attribution', () => {
     const referenceIncident: IncidentView = { ...demoIncident, mode: 'REFERENCE' };
     renderWithQuery(<SourceWorkspace incident={referenceIncident} />);
     expect(await screen.findByText('DETERMINISTIC REFERENCE LOCALIZATION')).toBeVisible();
-    expect(screen.queryByText('CALIBRATED FUSION')).toBeNull();
+    expect(screen.queryByText('FUSED SOURCE BELIEF')).toBeNull();
     // No fusion-composition sentence in REFERENCE mode -- it does not fuse anything live.
     expect(
       screen.queryByText(
         'Classical hydraulic/signature evidence + HydroCore-v5 Sentinel evidence.',
+      ),
+    ).toBeNull();
+  });
+
+  test('CLASSICAL_SAFE SourceWorkspace says deterministic classical localization, not fused', async () => {
+    const classicalSafeIncident: IncidentView = {
+      ...demoIncident,
+      mode: 'LIVE',
+      runtimeAnalysisMode: 'CLASSICAL_SAFE',
+    };
+    renderWithQuery(<SourceWorkspace incident={classicalSafeIncident} />);
+    expect(await screen.findByText('DETERMINISTIC CLASSICAL LOCALIZATION')).toBeVisible();
+    expect(screen.queryByText('FUSED SOURCE BELIEF')).toBeNull();
+    expect(screen.queryByText('CALIBRATED FUSION')).toBeNull();
+    // No fabricated learned contribution -- Sentinel evidence did not run.
+    expect(
+      screen.queryByText(
+        'Classical hydraulic/signature evidence + HydroCore-v5 Sentinel evidence.',
+      ),
+    ).toBeNull();
+    expect(
+      screen.getByText(
+        /Learned localization was unavailable for this incident; deterministic classical/,
+      ),
+    ).toBeVisible();
+  });
+
+  test('normal hybrid/fused SourceWorkspace path shows the classical + Sentinel composition sentence', async () => {
+    const hybridIncident: IncidentView = {
+      ...demoIncident,
+      mode: 'LIVE',
+      runtimeAnalysisMode: 'FULL_HYBRID',
+    };
+    renderWithQuery(<SourceWorkspace incident={hybridIncident} />);
+    expect(await screen.findByText('FUSED SOURCE BELIEF')).toBeVisible();
+    expect(
+      screen.getByText('Classical hydraulic/signature evidence + HydroCore-v5 Sentinel evidence.'),
+    ).toBeVisible();
+    expect(
+      screen.queryByText(
+        /Learned localization was unavailable for this incident; deterministic classical/,
       ),
     ).toBeNull();
   });
@@ -61,6 +103,17 @@ describe('A. Source attribution', () => {
     const referenceIncident: IncidentView = { ...demoIncident, mode: 'REFERENCE' };
     render(<Overview incident={referenceIncident} />);
     expect(await screen.findByText('DETERMINISTIC REFERENCE LOCALIZATION')).toBeVisible();
+    expect(screen.queryByText('FUSED SOURCE BELIEF')).toBeNull();
+  });
+
+  test('Overview Source card for CLASSICAL_SAFE incidents says deterministic classical localization, not fused', async () => {
+    const classicalSafeIncident: IncidentView = {
+      ...demoIncident,
+      mode: 'LIVE',
+      runtimeAnalysisMode: 'CLASSICAL_SAFE',
+    };
+    render(<Overview incident={classicalSafeIncident} />);
+    expect(await screen.findByText('DETERMINISTIC CLASSICAL LOCALIZATION')).toBeVisible();
     expect(screen.queryByText('FUSED SOURCE BELIEF')).toBeNull();
   });
 
@@ -108,6 +161,55 @@ describe('B. Benchmarks', () => {
     render(<BenchmarkPage />);
     expect(await screen.findByText('Regression evidence unavailable.')).toBeVisible();
     expect(screen.queryByRole('table')).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// B2. Benchmark artifact truthfulness (real committed artifact)
+// ---------------------------------------------------------------------------
+describe('B2. Benchmark artifact truthfulness', () => {
+  const realDoc = regressionEvidenceArtifact;
+
+  test('does not include historical/pre-final model-runtime rows', () => {
+    const metricNames = realDoc.metrics.map((metric: { metric: string }) => metric.metric);
+    expect(metricNames).not.toContain('Small-variant model runtime (reference graph, 128 nodes)');
+    expect(metricNames).not.toContain('Small-variant model runtime (stress graph, 1000 nodes)');
+    const values = realDoc.metrics.map((metric: { value: string }) => metric.value);
+    expect(values).not.toContain('31.0 ms median / 32.3 ms p95');
+    expect(values).not.toContain('104.3 ms median / 135.0 ms p95');
+  });
+
+  test('provenance no longer lists reports/results/performance.json', () => {
+    const paths = realDoc.generatedFrom.map((entry: { path: string }) => entry.path);
+    expect(paths).not.toContain('reports/results/performance.json');
+  });
+
+  test('WNTR gate labels use narrower reference/gate wording, not broad safe/unsafe language', () => {
+    const metricNames = realDoc.metrics.map((metric: { metric: string }) => metric.metric);
+    expect(metricNames).not.toContain('Unsafe plan rejection (WNTR)');
+    expect(metricNames).not.toContain('Safe plan acceptance (WNTR)');
+    expect(metricNames).toContain('Reference plan rejection gate (WNTR)');
+    expect(metricNames).toContain('Reference plan acceptance gate (WNTR)');
+  });
+
+  test('deterministic regression evidence remains present', () => {
+    const metricNames = realDoc.metrics.map((metric: { metric: string }) => metric.metric);
+    expect(metricNames).toContain('Top-1 source localization (frozen golden fixture)');
+    expect(metricNames).toContain('Hash-chain replay validity');
+  });
+
+  test('BenchmarkPage rendering the real artifact shows no stale model-runtime rows and shows the new gate labels', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => realDoc }));
+    render(<BenchmarkPage />);
+    expect(await screen.findByText('Reference plan rejection gate (WNTR)')).toBeVisible();
+    expect(screen.getByText('Reference plan acceptance gate (WNTR)')).toBeVisible();
+    expect(
+      screen.queryByText('Small-variant model runtime (reference graph, 128 nodes)'),
+    ).toBeNull();
+    expect(screen.queryByText('Small-variant model runtime (stress graph, 1000 nodes)')).toBeNull();
+    expect(screen.queryByText('31.0 ms median / 32.3 ms p95')).toBeNull();
+    expect(screen.queryByText('104.3 ms median / 135.0 ms p95')).toBeNull();
+    expect(screen.queryByText('reports/results/performance.json')).toBeNull();
   });
 });
 

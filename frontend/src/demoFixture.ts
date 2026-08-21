@@ -424,7 +424,7 @@ export const demoIncident: IncidentView = {
       sequence: 2,
       timestamp: '08:14:05',
       type: 'SOURCE_LOCALIZED',
-      actor: 'CALIBRATED FUSION',
+      actor: 'SOURCE FUSION',
       detail: 'Candidate region contains 11 nodes.',
     },
     {

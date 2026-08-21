@@ -13,6 +13,7 @@ import { EmptyState } from '../components/common/EmptyState';
 import { formatDisplayId } from '../displayId';
 import { useConsoleStore } from '../store';
 import { deriveWorkflowProgression } from '../workflow';
+import { sourceRankingLabel } from '../sourceLabel';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
@@ -128,14 +129,7 @@ export function Overview({ incident }: { incident: IncidentView }) {
       </Panel>
 
       <div className="incident-summary-row wide-panel">
-        <Panel
-          title="Source"
-          eyebrow={
-            incident.mode === 'REFERENCE'
-              ? 'DETERMINISTIC REFERENCE LOCALIZATION'
-              : 'FUSED SOURCE BELIEF'
-          }
-        >
+        <Panel title="Source" eyebrow={sourceRankingLabel(incident)}>
           {leading ? (
             <>
               <div className="candidate-hero">

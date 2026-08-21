@@ -9,6 +9,7 @@ import { AuthorityBadge } from '../components/status/AuthorityBadge';
 import { ApplicabilityBadge } from '../components/status/ApplicabilityBadge';
 import { EmptyState } from '../components/common/EmptyState';
 import { KeyValueGrid } from '../components/common/KeyValueGrid';
+import { sourceRankingLabel, showsFusedComposition } from '../sourceLabel';
 
 const OperationalMap = lazy(() =>
   import('../components/OperationalMap').then((module) => ({ default: module.OperationalMap })),
@@ -63,14 +64,10 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
       </Panel>
       <Panel
         title="Ranked source candidates"
-        eyebrow={
-          incident.mode === 'REFERENCE'
-            ? 'DETERMINISTIC REFERENCE LOCALIZATION'
-            : 'CALIBRATED FUSION'
-        }
+        eyebrow={sourceRankingLabel(incident)}
         className="wide-panel"
       >
-        {incident.mode !== 'REFERENCE' && (
+        {showsFusedComposition(incident) && (
           <p className="supporting">
             Classical hydraulic/signature evidence + HydroCore-v5 Sentinel evidence.
           </p>

@@ -527,13 +527,13 @@ describe('H. Reference Source & Sampling truthfulness', () => {
 
   test('Reference Source label differs from the LIVE/DEMO fused-belief label', async () => {
     const first = renderWorkspace(<SourceWorkspace incident={demoIncident} />);
-    expect(await screen.findByText('CALIBRATED FUSION')).toBeVisible();
+    expect(await screen.findByText('FUSED SOURCE BELIEF')).toBeVisible();
     first.unmount();
 
     const referenceIncident: IncidentView = { ...demoIncident, mode: 'REFERENCE' };
     renderWorkspace(<SourceWorkspace incident={referenceIncident} />);
     expect(await screen.findByText('DETERMINISTIC REFERENCE LOCALIZATION')).toBeVisible();
-    expect(screen.queryByText('CALIBRATED FUSION')).toBeNull();
+    expect(screen.queryByText('FUSED SOURCE BELIEF')).toBeNull();
   });
 
   test('Reference Sampling uses incident.recommendedSample as the deterministic reference recommendation', async () => {
