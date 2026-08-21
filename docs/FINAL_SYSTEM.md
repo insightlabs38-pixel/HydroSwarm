@@ -134,7 +134,7 @@ For the complete per-condition matrix and gating/descriptive distinction, see [S
 
 The current source application default is V5. `hydroswarm.api.app:app` constructs `V5PipelineFactory(resolve_v5_bundle_dir())`, and the current strict self-test loads the same V5 bundle.
 
-For current V5 Docker behavior, build the current checkout (`docker compose build && docker compose up`). `docker-compose.release.yml` remains pinned to the historical `v0.1.0-hackathon` image, whose Dockerfile predates V5; therefore it is not a V5 release path. The native setup helper also contains a legacy redundant V4 precheck before the final V5 strict self-test. These are packaging/readiness follow-ups, not changes to the frozen finalist.
+For current V5 Docker behavior, build the current checkout (`docker compose build && docker compose up`). `docker-compose.release.yml` remains pinned to the historical `v0.1.0-hackathon` image, whose Dockerfile predates V5; therefore it is not a V5 release path until a new immutable V5 image tag is published. This is a packaging/versioning follow-up, not a change to the frozen finalist.
 
 See [Installation](INSTALLATION.md).
 

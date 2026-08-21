@@ -1,12 +1,37 @@
 # Model artifacts
 
-## `hydrocore-v4-release/` — promoted runtime model (current default)
+## `hydrocore-v5-release/` — promoted runtime model (current default)
+
+The frozen **HydroCore-v5 M10 frozen release** bundle (`small`, 4,182,612 parameters,
+selected seed `20260814`), loaded by `V5PipelineFactory` and wired as the default
+`pipeline_factory` for the normal `hydroswarm.api.app:app` production entry point. `V5PipelineFactory`
+never falls back to the historical V4 bundle below.
+
+Frozen identity (matches `runtime_manifest.json` in this directory, the
+[M11.2 finalist freeze](../reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json),
+and [Final system](../docs/FINAL_SYSTEM.md) exactly):
+
+- model SHA-256: `de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5`
+- release manifest SHA-256: `f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34`
+- calibration file SHA-256: `8f77f06b72316455e1f8040dbeb5907503e4eb623dd527d9ea809a56e96c046d`
+- calibration artifact hash: `f2503e856c467eb38c6c7f6dbde679527c1921925941ec52809bd6e8e6dd16dd`
+- runtime-enabled outputs: `event_cause`, `event_presence`, `evidence_sufficiency`,
+  `relative_strength`, `source_node`
+
+Every file's content hash is independently verified against `runtime_manifest.json`'s own
+`files` mapping by `V5PipelineFactory` on every load — a corrupted or hand-edited file
+fails closed, never loads silently, and never falls back to the historical V4 bundle.
+
+## `hydrocore-v4-release/` — historical, no longer the default
 
 A self-contained V4 inference release bundle (`hydroswarm.runtime.v4_inference_bundle`),
-loaded by `V4PipelineFactory` and wired as the default `pipeline_factory` for the normal
-`hydroswarm.api.app:app` production entry point (UI-11.1). This is an exact byte-for-byte
-copy of `experiments/runs/v4-release-bundle/no_adapters-seed20260810/` (an ephemeral,
-gitignored path — see `experiments/runs/`'s own convention) at the moment
+loaded by `V4PipelineFactory`. This was the promoted runtime model prior to the V5 freeze
+(UI-11.1) and remains preserved as historical evidence -- no current runtime path (the
+production app, native setup verification, strict self-test, or the Docker image) depends
+on it any more, and it is not packaged into the current release ZIP or container image.
+This is an exact byte-for-byte copy of
+`experiments/runs/v4-release-bundle/no_adapters-seed20260810/` (an ephemeral, gitignored
+path — see `experiments/runs/`'s own convention) at the moment
 `hydrocore-v4-architecture-freeze` was tagged, except for the documented
 capability-remediation calibration refit. Model weights and normalization remain unchanged.
 

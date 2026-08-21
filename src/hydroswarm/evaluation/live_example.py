@@ -28,8 +28,10 @@ from hydroswarm.simulation import HydraulicSimulator, IncidentSourceProfile
 # `data/frozen/live_example_network.inp` is a byte-for-byte copy of
 # `data/topologies/loop-grid.inp` -- NOT the golden/reference network. The
 # frozen production calibration artifact
-# (models/hydrocore-v4-release/calibration.json: validated_topology_hashes)
-# only recognizes three specific network topologies; a live smoke run
+# (models/hydrocore-v5-release/calibration.json, validated against the
+# topology hashes in models/hydrocore-v5-release/runtime_manifest.json's
+# validated_topology_hashes) only recognizes three specific network
+# topologies; a live smoke run
 # confirmed golden_network.inp is not one of them, so driving the real
 # pipeline against it always yields `calibrated=False` and
 # PLANNING_SUPPRESSED (CALIBRATION_INVALID_OR_MISSING) at plan generation --
@@ -42,7 +44,7 @@ from hydroswarm.simulation import HydraulicSimulator, IncidentSourceProfile
 CANDIDATES = ("J1", "J2", "J3", "J4", "J5", "J6", "J7", "J8")
 TRUE_SOURCE = "J6"
 # The real production signature-localization pipeline's governed policy
-# (models/hydrocore-v4-release/signature-policy-manifest.json:
+# (hydroswarm.classical.signature_policy.GOVERNED_TRAINING_SIGNATURE_POLICY:
 # sensor_layout_policy = "all_junctions_as_sensor_candidates") only
 # recognizes junctions as valid sensor nodes -- a live smoke run against the
 # golden network's reservoir-carried initial sensor confirmed the real

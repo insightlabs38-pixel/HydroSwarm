@@ -56,9 +56,9 @@ The developer compose file publishes `127.0.0.1:8765`, drops Linux capabilities,
 docker compose -f docker-compose.release.yml up
 ```
 
-is **not the final V5 path at the current repository state**. That file is pinned to `ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon`. The Dockerfile at that tag contains the V4 bundle and predates V5 packaging.
+is **not the final V5 path at the current repository state**. That file is still pinned to `ghcr.io/insightlabs38-pixel/hydroswarm:v0.1.0-hackathon`, an image published before the V5 packaging rebase; no new image has been published under that tag yet. `docker-compose.release.yml` will be repointed at a new immutable V5 image tag/digest once one is published.
 
-This is a repository packaging/versioning follow-up, not a model/evaluation ambiguity. Do not use the historical release image to verify V5 identity.
+This is a repository packaging/versioning follow-up, not a model/evaluation ambiguity. Do not use the historical release image to verify V5 identity; use [V5 path A](#v5-path-a-build-the-current-docker-checkout) (developer compose, built from this checkout's own current Dockerfile) or [V5 path B](#v5-path-b-native-setup-and-launch) below instead.
 
 ## V5 path B: native setup and launch
 
@@ -88,11 +88,6 @@ Windows PowerShell:
 
 The platform setup scripts create a project-local `.venv`, install dependencies, build the frontend when needed, and finish with the strict application self-test.
 
-### Native setup caveat
-
-The setup helper still performs an older **redundant V4 bundle precheck** before the final strict readiness check. The current `hydroswarm self-test --strict` itself uses `V5PipelineFactory(resolve_v5_bundle_dir())`, and the application default also serves V5.
-
-This means a native setup can currently require the retained historical V4 bundle even though V5 is the final serving identity. The repository contains that V4 bundle, so this does not change the V5 runtime result, but the helper should eventually be cleaned up in a non-documentation pass.
 
 ## Manual native install
 
@@ -128,10 +123,6 @@ de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5
 ```
 
 The release manifest itself is [models/hydrocore-v5-release/runtime_manifest.json](../models/hydrocore-v5-release/runtime_manifest.json), and the authoritative freeze is [FINAL_SYSTEM.md](FINAL_SYSTEM.md).
-
-### Known self-test presentation debt
-
-Some CLI docstrings/human-readable checklist text still says “V4” even though the implementation now instantiates and validates the V5 factory. Treat the returned V5 architecture version/model hash as the identity evidence. Correcting those source strings is intentionally outside this documentation-only pass.
 
 ## Runtime behavior if V5 assets are invalid
 

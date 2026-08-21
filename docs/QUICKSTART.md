@@ -28,7 +28,7 @@ Linux:
 
 macOS and Windows have matching `_macos.sh` and `_windows.ps1` scripts.
 
-The setup scripts finish with the strict application self-test. They currently retain a legacy V4 bundle precheck, but the final strict self-test and application runtime use V5. See [Installation](INSTALLATION.md) for that packaging caveat.
+The setup scripts finish with the strict application self-test, verifying the frozen V5 release bundle throughout.
 
 ## Verify the model that will serve
 
@@ -70,7 +70,5 @@ Run:
 ```bash
 hydroswarm self-test --human --strict
 ```
-
-Some human-readable self-test labels still contain V4-era wording; the actual implementation and machine-readable trained-asset identity are V5. See [Installation](INSTALLATION.md#known-self-test-presentation-debt).
 
 Then consult [Operator guide](USER_GUIDE.md) and [Limitations](LIMITATIONS.md).

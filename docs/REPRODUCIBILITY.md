@@ -40,8 +40,6 @@ hydroswarm self-test --strict
 
 The machine-readable trained-assets block should report V5 release identity and the frozen checkpoint hash above. The self-test also performs bounded learned inference, a real WNTR smoke run, SQLite/resource/frontend/reference checks.
 
-Some human-facing self-test strings still contain V4-era wording; the implementation's factory/hash fields are the identity evidence.
-
 ## Current V5 container reproduction
 
 ```bash
@@ -123,8 +121,7 @@ The M9.6 manifest preserves the other seeds and calibration/development evaluati
 
 - Early V5 M1 corpus generation records cross-environment WNTR/NumPy RNG divergence relative to historical `cycle-b2` replay; the generated V5 corpus is therefore identified by its own manifests rather than assumed to reproduce old scenario IDs.
 - The final M9.6 train/serve unobserved-age semantic deviation is frozen and documented.
-- Release packaging is not yet aligned: the pinned public release-compose image is older than the V5 source.
-- Some readiness helper presentation/prechecks retain V4-era text/logic despite V5 final serving/self-test identity.
+- Release packaging is not yet aligned: the pinned public release-compose image is older than the V5 source (a new immutable image tag must be published before `docker-compose.release.yml` can point at it).
 
 These caveats should be fixed only in a separate authorized code/packaging pass, not silently rewritten into the frozen evidence.
 

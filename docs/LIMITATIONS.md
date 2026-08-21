@@ -90,8 +90,7 @@ HydroSwarm contains no autonomous actuation connector.
 - Imported network quality can be insufficient despite syntactic validity.
 - Exact simulation can time out or fail numerically; those plans fail closed.
 - Native Windows has higher simulator subprocess overhead than Linux/Docker.
-- Current release packaging has a V5-versioning gap: `docker-compose.release.yml` points to an older V4 image. Build current source for V5.
-- Native setup retains a redundant V4 precheck before the actual V5 strict self-test.
+- Current release packaging has a V5-versioning gap: `docker-compose.release.yml` points to an older, pre-V5 image. Build current source for V5, or wait for a new immutable V5 image tag to be published.
 
 ## Final-evaluation limitations
 
