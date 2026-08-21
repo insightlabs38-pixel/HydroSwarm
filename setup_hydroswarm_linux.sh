@@ -68,6 +68,45 @@ log "Installing dependencies into .venv (CPU wheels; never global) ..."
 "$VENV_PYTHON" -m pip install -e "." --quiet
 log "✓ Runtime dependencies installed"
 
+# --- 3b. ARM64: build the architecture-native EPANET water-quality library --
+# wntr's bundled EPANET toolkit ships prebuilt binaries for windows-x64,
+# darwin-x64, darwin-arm, and linux-x64 only -- there is no linux-arm64
+# build anywhere upstream (see docs/ARM_MIGRATION.md). Without this, a real
+# WNTR/EPANET water-quality simulation (e.g. the Live Example) fails on
+# this architecture with a wrong-ELF-class dlopen error even though
+# `self-test --strict`'s bounded hydraulic simulation does not need it and
+# still passes. scripts/build_epanet_arm64.sh builds the real, official
+# EPANET 2.2 engine for this host and installs it at wntr's own hardcoded
+# path; it is idempotent (a no-op if already installed and AArch64) and a
+# no-op on non-arm64 hosts.
+if [ "$PLATFORM_LABEL" = "linux/arm64" ]; then
+  log ""
+  log "Linux ARM64 detected -- building the native EPANET water-quality library ..."
+  MISSING_TOOLS=""
+  for tool in git cmake make; do
+    command -v "$tool" >/dev/null 2>&1 || MISSING_TOOLS="$MISSING_TOOLS $tool"
+  done
+  if ! command -v cc >/dev/null 2>&1 && ! command -v gcc >/dev/null 2>&1; then
+    MISSING_TOOLS="$MISSING_TOOLS cc/gcc"
+  fi
+  if [ -n "$MISSING_TOOLS" ]; then
+    cat >&2 <<EOF
+error: building the native linux-arm64 EPANET library requires:$MISSING_TOOLS
+(not found on PATH). Install them with your distribution's package manager, e.g.:
+  Debian/Ubuntu:  sudo apt-get install git cmake build-essential
+  Fedora:         sudo dnf install git cmake gcc gcc-c++ make
+  Arch:           sudo pacman -S git cmake base-devel
+
+Then re-run this script.
+EOF
+    exit 1
+  fi
+  if ! PYTHON="$VENV_PYTHON" "$PROJECT_ROOT/scripts/build_epanet_arm64.sh"; then
+    fail "building the native linux-arm64 EPANET library failed (see above). This is required for real WNTR/EPANET water-quality simulation (e.g. the Live Example) on this architecture."
+  fi
+  log "✓ Native linux-arm64 EPANET water-quality library built and verified"
+fi
+
 # --- 4. Verify the frozen V5 release bundle ---------------------------------
 log "Verifying frozen HydroCore-v5 release bundle ..."
 if ! "$VENV_PYTHON" "$PROJECT_ROOT/scripts/setup_common.py" verify-bundle; then

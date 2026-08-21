@@ -26,16 +26,17 @@ patch. Highlights:
   and `latest` are now only ever promoted (retagged, never rebuilt) from a
   digest that has already passed the strict amd64/arm64 container
   self-test, instead of being pushed before that test ran.
+- Native Linux ARM64 setup now builds the architecture-native EPANET
+  water-quality engine automatically (`setup_hydroswarm_linux.sh` now
+  invokes `scripts/build_epanet_arm64.sh`, also included in the runtime
+  ZIP), so the Live Example judge path works out of the box there, not
+  just the strict self-test's bounded hydraulic simulation.
 
 **Limitations:** all reported results are simulation-based measurements,
 not field-validated; there is no claim of real-world utility performance.
-Native macOS support is Apple Silicon only (no Intel Mac). Native Linux
-ARM64 setup passes `self-test --strict`, but the Live Example endpoint
-needs a manual `scripts/build_epanet_arm64.sh` step for real EPANET
-water-quality simulation until that is wired into the setup script
-directly -- see docs/INSTALLATION.md; the Docker image is unaffected.
-HydroSwarm has no autonomous actuation path -- every plan requires a
-separate human approval event.
+Native macOS support is Apple Silicon only (no Intel Mac). HydroSwarm has
+no autonomous actuation path -- every plan requires a separate human
+approval event.
 
 Also in this cycle:
 

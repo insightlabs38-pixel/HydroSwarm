@@ -2,12 +2,17 @@
 
 Launches the real `hydroswarm.cli start` server (the exact command every
 `start_hydroswarm_*` launcher runs) against the interpreter that invokes
-this script, waits for it to report healthy, hits `/api/health` and
-`/api/reference-demo` for real, and stops the server cleanly. Deliberately
-pure Python (no shell-specific job control) so the identical script runs
-unmodified on Linux, macOS, and Windows CI runners -- the cross-platform
-matrix's whole point is proving native portability, not proving five
-different platform-specific smoke scripts each work.
+this script, waits for it to report healthy, hits `/api/health`,
+`/api/reference-demo`, and `/api/live-example-inputs` (a real, WNTR/EPANET
+water-quality-simulated result, not a fixture) for real, and stops the
+server cleanly. Deliberately pure Python (no shell-specific job control)
+so the identical script runs unmodified on Linux, macOS, and Windows CI
+runners -- the cross-platform matrix's whole point is proving native
+portability, not proving five different platform-specific smoke scripts
+each work. The `/api/live-example-inputs` check is what actually catches
+the native linux-arm64 EPANET water-quality gap (wntr ships no
+linux-arm64 EPANET binary upstream); it runs identically on every
+platform rather than being special-cased to arm64.
 
 This is intentionally a second, independent proof beyond `hydroswarm
 self-test --strict`: self-test proves the *components* (model, WNTR,
@@ -19,6 +24,7 @@ just automated.
 
 from __future__ import annotations
 
+import json
 import os
 import signal
 import subprocess
@@ -121,6 +127,30 @@ def main() -> int:
         assert status == 200, f"/api/reference-demo returned {status}"
         assert len(body) > 0, "/api/reference-demo returned an empty body"
         print(f"[native-ci-smoke] GET /api/reference-demo -> 200 ({len(body)} bytes)")
+
+        # A real, WNTR-simulated water-quality result -- not merely a 200
+        # status -- on every native platform this script runs on. This is
+        # the concrete regression check for the native linux-arm64 EPANET
+        # gap: wntr ships no linux-arm64 EPANET binary upstream, so
+        # without scripts/build_epanet_arm64.sh (now run automatically by
+        # setup_hydroswarm_linux.sh) this call fails there with a
+        # wrong-ELF-class dlopen error even though `self-test --strict`'s
+        # bounded hydraulic simulation does not need that binary and would
+        # still pass. Real on every platform, not linux-arm64-specific
+        # logic, matching this script's own cross-platform-identical design.
+        status, body = _get("/api/live-example-inputs", timeout=60.0)
+        assert status == 200, f"/api/live-example-inputs returned {status}"
+        live_example = json.loads(body)
+        signatures = live_example["candidate_signatures_mg_l"]
+        assert signatures, "/api/live-example-inputs returned no candidate signatures"
+        assert any(value > 0.0 for value in signatures.values()), (
+            "/api/live-example-inputs returned no positive real EPANET water-quality "
+            f"concentration -- real simulation did not run: {signatures!r}"
+        )
+        print(
+            "[native-ci-smoke] GET /api/live-example-inputs -> 200 "
+            f"(real EPANET water-quality simulation OK, {len(signatures)} candidate nodes)"
+        )
     finally:
         print("[native-ci-smoke] stopping server ...")
         _stop(process)

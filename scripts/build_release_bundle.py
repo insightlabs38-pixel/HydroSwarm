@@ -46,10 +46,18 @@ SETUP_SCRIPTS = [
 #: judge actually ran one from the extracted archive. Audited against
 #: every `scripts/*` reference in SETUP_SCRIPTS' own files (see
 #: tests/unit/test_release_packaging.py's audit test, which fails loudly
-#: if a setup script starts referencing a scripts/*.py file not listed
-#: here) -- this is the complete set, not a guess.
+#: if a setup script starts referencing a scripts/*.py or scripts/*.sh
+#: file not listed here) -- this is the complete set, not a guess.
+#:
+#: `scripts/build_epanet_arm64.sh`: setup_hydroswarm_linux.sh now invokes
+#: this on linux-arm64 to build the architecture-native EPANET
+#: water-quality library (wntr ships no linux-arm64 EPANET binary
+#: upstream; see docs/ARM_MIGRATION.md) -- without it in the release zip,
+#: a judge extracting the archive on native Linux ARM64 would hit the same
+#: "file not found" setup_common.py used to hit before that P0 fix.
 REQUIRED_HELPER_SCRIPTS = [
     "scripts/setup_common.py",
+    "scripts/build_epanet_arm64.sh",
 ]
 
 TOP_LEVEL_FILES = [
@@ -71,21 +79,30 @@ INCLUDED_DIRS = [
     # -- without it, the extracted release zip's LIVE example judge path
     # 404s even though the REFERENCE INCIDENT path works fine.
     "data/frozen",
+    # v0.2.0 native linux-arm64 EPANET fix: scripts/build_epanet_arm64.sh's
+    # own real-simulation self-verification (run automatically by
+    # setup_hydroswarm_linux.sh on arm64) needs this exact fixture --
+    # without it, ARM64 setup from an extracted release zip would fail
+    # even though the actual EPANET library build succeeded. The same
+    # directory the Dockerfile already COPYs in for the live pipeline's
+    # classical signature priors (see Dockerfile's own comment).
+    "data/topologies",
 ]
 
 
-#: Matches a `scripts/<name>.py` or `scripts\<name>.py` reference inside a
-#: setup/start script's own source text (bash and PowerShell both write it
-#: this way -- see e.g. setup_hydroswarm_windows.ps1's
-#: `"$ProjectRoot\scripts\setup_common.py"`).
-_SCRIPT_REFERENCE = re.compile(r"scripts[/\\]([A-Za-z0-9_]+\.py)")
+#: Matches a `scripts/<name>.py` / `scripts/<name>.sh` or their `\`-separated
+#: equivalent inside a setup/start script's own source text (bash and
+#: PowerShell both write it this way -- see e.g. setup_hydroswarm_windows.ps1's
+#: `"$ProjectRoot\scripts\setup_common.py"` and setup_hydroswarm_linux.sh's
+#: `"$PROJECT_ROOT/scripts/build_epanet_arm64.sh"`).
+_SCRIPT_REFERENCE = re.compile(r"scripts[/\\]([A-Za-z0-9_]+\.(?:py|sh))")
 
 
 def referenced_helper_scripts() -> set[str]:
-    """Every `scripts/*.py` file the committed setup/start scripts
-    actually reference, found by scanning their own source text -- not a
-    hand-maintained guess. `REQUIRED_HELPER_SCRIPTS` must be a superset of
-    this (checked in `build_bundle` and in
+    """Every `scripts/*.py`/`scripts/*.sh` file the committed setup/start
+    scripts actually reference, found by scanning their own source text --
+    not a hand-maintained guess. `REQUIRED_HELPER_SCRIPTS` must be a
+    superset of this (checked in `build_bundle` and in
     tests/unit/test_release_packaging.py) so a future setup script that
     starts calling a new helper script cannot silently ship a release zip
     missing it, the same way `scripts/setup_common.py` was missing before

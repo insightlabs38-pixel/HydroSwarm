@@ -29,18 +29,18 @@ name: HydroSwarm Native Cross-Platform Verification
 # macOS support rather than keep a permanently-red or artificially
 # masked job. See docs/INSTALLATION.md for the user-facing note.
 #
-# Known linux-arm64 gap this job does NOT exercise: `wntr`'s bundled
-# EPANET toolkit has no upstream linux-arm64 build (see
-# docs/ARM_MIGRATION.md and docs/INSTALLATION.md), so a real EPANET
-# water-quality simulation (currently only `GET /api/live-example-inputs`)
-# fails on native Linux ARM64 unless `scripts/build_epanet_arm64.sh` has
-# been run -- which this job's setup step does not do. `self-test
-# --strict`'s bounded simulation does not need that binary, so this job
-# still passes; `native_ci_smoke.py` deliberately only checks
-# `/api/health` and `/api/reference-demo`, not the Live Example path, so
-# it does not (yet) catch this. The Docker image already builds and
-# installs the arm64-native library automatically (see Dockerfile's
-# epanet-builder stage) and is unaffected.
+# linux-arm64 real EPANET water-quality coverage: `wntr`'s bundled EPANET
+# toolkit has no upstream linux-arm64 build (see docs/ARM_MIGRATION.md and
+# docs/INSTALLATION.md). `setup_hydroswarm_linux.sh` now builds the
+# architecture-native EPANET 2.2 engine automatically on `aarch64`/`arm64`
+# hosts (`scripts/build_epanet_arm64.sh`, the same fix the Docker image
+# already applied automatically in its own `epanet-builder` stage), so
+# `self-test --strict`'s bounded hydraulic simulation and a real EPANET
+# water-quality call both work here. `native_ci_smoke.py` hits
+# `/api/live-example-inputs` (a real, WNTR/EPANET-simulated result, not a
+# fixture) on every platform in this matrix -- not special-cased to
+# arm64 -- so this job is the real, independent proof that build is
+# genuinely wired in and working, not just present in the repo.
 on:
   push:
     branches: [main, "agent/**"]
