@@ -31,21 +31,36 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # expected_arch is what Python's platform.machine() reports on
+          # each OS -- it is NOT the same spelling across platforms
+          # (Linux ARM64 says "aarch64", macOS Apple Silicon says
+          # "arm64", Windows x64 says "AMD64"). The architecture-check
+          # step below fails loudly if a runner label ever drifts from
+          # the architecture it's supposed to provide (this bit a prior
+          # revision of this matrix: macos-x86_64 was pinned to the
+          # macos-15 image, which GitHub serves on Apple Silicon by
+          # default, silently testing arm64 twice under two different
+          # names instead of covering Intel at all).
           - name: linux-x86_64
             os: ubuntu-latest
             shell: bash
+            expected_arch: x86_64
           - name: linux-arm64
             os: ubuntu-24.04-arm
             shell: bash
+            expected_arch: aarch64
           - name: windows-x86_64
             os: windows-latest
             shell: pwsh
+            expected_arch: AMD64
           - name: macos-arm64
-            os: macos-14
-            shell: bash
-          - name: macos-x86_64
             os: macos-15
             shell: bash
+            expected_arch: arm64
+          - name: macos-x86_64
+            os: macos-15-intel
+            shell: bash
+            expected_arch: x86_64
     name: native-verify (${{ matrix.name }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
@@ -54,6 +69,47 @@ jobs:
         shell: ${{ matrix.shell }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify runner architecture matches the declared matrix label (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          python3 - "${{ matrix.expected_arch }}" "${{ matrix.name }}" <<'PY'
+          import platform
+          import sys
+
+          expected, name = sys.argv[1], sys.argv[2]
+          got = platform.machine()
+          if got != expected:
+              sys.exit(
+                  f'ARCHITECTURE MISMATCH for matrix "{name}": declared expected_arch='
+                  f'"{expected}" but this runner reports platform.machine()={got!r} '
+                  f'(system={platform.system()}). The matrix os: label no longer maps '
+                  f'to the architecture this job name claims to cover -- fix the label, '
+                  f'do not relax this check.'
+              )
+          print(f'architecture OK for "{name}": {got}')
+          PY
+
+      - name: Verify runner architecture matches the declared matrix label (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          $script = @'
+          import platform
+          import sys
+
+          expected, name = sys.argv[1], sys.argv[2]
+          got = platform.machine()
+          if got != expected:
+              sys.exit(
+                  f'ARCHITECTURE MISMATCH for matrix "{name}": declared expected_arch='
+                  f'"{expected}" but this runner reports platform.machine()={got!r} '
+                  f'(system={platform.system()}). The matrix os: label no longer maps '
+                  f'to the architecture this job name claims to cover -- fix the label, '
+                  f'do not relax this check.'
+              )
+          print(f'architecture OK for "{name}": {got}')
+          '@
+          python -c $script "${{ matrix.expected_arch }}" "${{ matrix.name }}"
 
       - name: Run native setup script (Linux/macOS)
         if: runner.os != 'Windows'
