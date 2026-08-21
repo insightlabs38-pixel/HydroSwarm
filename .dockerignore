@@ -20,15 +20,14 @@ data/*
 !data/learning-v2/cycle-b2
 !data/learning-v2/cycle-b2/signatures
 !data/learning-v2/cycle-b2/signatures/loop-grid.json
-# Submission-readiness SUB-1 (P0): the frozen V4 release bundle is the one
+# Submission-readiness SUB-1 (P0): the frozen V5 release bundle is the one
 # models/ subtree the runtime image actually needs (Dockerfile COPYs it in
-# and serves it via HYDROSWARM_V4_BUNDLE_DIR) -- everything else under
-# models/ (training checkpoints, cycle-b2 candidates/controls) stays out of
-# the build context, both to keep it small and so the image never bundles
-# unpromoted/non-frozen weights.
+# and serves it via HYDROSWARM_V5_BUNDLE_DIR) -- everything else under
+# models/ (training checkpoints, the historical V4 bundle, cycle-b2
+# candidates/controls) stays out of the build context, both to keep it
+# small and so the image never bundles unpromoted/non-frozen weights or a
+# V4 fallback the frozen policy forbids.
 models/*
-!models/hydrocore-v4-release
-!models/hydrocore-v4-release/**
 !models/hydrocore-v5-release
 !models/hydrocore-v5-release/**
 experiments

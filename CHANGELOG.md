@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Rebased the release/setup/packaging surface onto the frozen HydroCore-v5
+  M10 finalist: native setup verification, self-test wording, the release
+  manifest generator, the runtime ZIP builder, and the Docker image now all
+  resolve exclusively to `models/hydrocore-v5-release/` and its M11.2/M11.6
+  evidence, with no current-path dependency on the historical
+  `models/hydrocore-v4-release/` bundle (which remains in the repository as
+  historical evidence). No model weights, calibration values, or M11.6
+  results/gates/authorization changed; M11.6 was not rerun.
 - Added a frozen robustness/scale characterization protocol, deterministic
   locked-test-excluding runner, raw results, summary, and documentation guard.
 - Reconciled current HydroCore-v4 dataset/model/public-submission documentation

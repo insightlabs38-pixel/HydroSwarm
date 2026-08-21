@@ -6,7 +6,7 @@ execute the Windows/macOS variants on this Linux CI runner, and even the
 Linux variant would require a throwaway venv + network access to run for
 real inside the suite. What these tests can and do verify, mirroring the
 static-verification approach already used for Dockerfile packaging in
-`test_dockerfile_v4_bundle_packaging.py`:
+`test_dockerfile_bundle_packaging.py`:
 
 * every required script exists and (on POSIX) is executable;
 * each launcher references the project-local `.venv` interpreter

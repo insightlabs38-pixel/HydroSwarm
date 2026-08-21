@@ -23,7 +23,6 @@ FROM python:3.12-slim AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     HYDROSWARM_DATA_DIR=/data \
-    HYDROSWARM_V4_BUNDLE_DIR=/app/models/hydrocore-v4-release \
     HYDROSWARM_V5_BUNDLE_DIR=/app/models/hydrocore-v5-release \
     HYDROSWARM_REFERENCE_DEMO_PATH=/app/artifacts/reference-demo/reference-incident-v1.json \
     HYDROSWARM_FROZEN_SCENARIO_DIR=/app/data/frozen \
@@ -68,17 +67,18 @@ machine = platform.machine().lower(); \
  && rm -rf /opt/hydroswarm
 COPY --from=frontend /build/frontend/dist frontend/dist
 COPY configs/ configs/
-# Submission-readiness SUB-1 (P0): the frozen, self-contained V4 inference
-# release bundle must be baked into the image and served from the path
-# HYDROSWARM_V4_BUNDLE_DIR points at above -- this app is a *non-editable*
+# Submission-readiness SUB-1 (P0): the frozen, self-contained V5 release
+# bundle must be baked into the image and served from the path
+# HYDROSWARM_V5_BUNDLE_DIR points at above -- this app is a *non-editable*
 # `pip install .`, so the pre-existing source-tree-relative path inference
 # (Path(__file__).resolve().parents[...]) does not land on /app from inside
 # site-packages. Without this COPY+ENV pair the container would silently
 # fail closed to the classical-safe fallback while still reporting healthy.
-COPY models/hydrocore-v4-release/ models/hydrocore-v4-release/
-# The governed v5 finalist is also required by the strict build-time self-test.
-# This copies the exact frozen bundle; it does not alter its identity or enable
-# any additional learned authority.
+# This copies the exact frozen bundle; it does not alter its identity or
+# enable any additional learned authority. The historical
+# models/hydrocore-v4-release/ bundle is deliberately not copied: no
+# current runtime path (this image's own strict self-test gate included)
+# depends on it, and the frozen policy is no V4 fallback.
 COPY models/hydrocore-v5-release/ models/hydrocore-v5-release/
 # SUB-4/SUB-3: bake in the governed REFERENCE INCIDENT artifact so the
 # judge demo path works fully offline in the container, served at

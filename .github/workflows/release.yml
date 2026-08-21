@@ -45,26 +45,33 @@ jobs:
         with:
           python-version: "3.12"
 
-      # The frozen V4 release bundle is committed directly (not via LFS --
+      # The frozen V5 release bundle is committed directly (not via LFS --
       # see .gitattributes), so `actions/checkout` already has real bytes.
       # Verify hashes against the bundle's own manifest before building
       # anything into an image, so a corrupted/edited bundle fails the
-      # release before publishing rather than after.
-      - name: Verify frozen bundle hashes
+      # release before publishing rather than after. This never falls back
+      # to (or even inspects) the historical V4 bundle.
+      - name: Verify frozen V5 bundle hashes
         run: |
           python -m pip install --quiet -e .
           python -c "
           import json, hashlib, sys
           from pathlib import Path
-          bundle = Path('models/hydrocore-v4-release')
-          manifest = json.loads((bundle / 'artifact-manifest.json').read_text())
+          bundle = Path('models/hydrocore-v5-release')
+          manifest = json.loads((bundle / 'runtime_manifest.json').read_text())
           for name, expected in manifest['files'].items():
               actual = hashlib.sha256((bundle / name).read_bytes()).hexdigest()
               if actual != expected:
                   print(f'HASH MISMATCH: {name}: expected {expected}, got {actual}', file=sys.stderr)
                   sys.exit(1)
-          print('all frozen bundle hashes verified OK')
+          print('all frozen V5 bundle hashes verified OK')
           "
+
+      - name: Run release-preflight test gates
+        run: |
+          python -m pip install --quiet -e ".[dev]"
+          python -m ruff check .
+          python -m pytest tests/unit -q -m "not real_simulation"
 
   build-and-push:
     needs: verify-frozen-bundle
@@ -124,10 +131,15 @@ jobs:
             hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
           python3 -c "
           import json, sys
+          FROZEN_MODEL_SHA256 = 'de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5'
+          FROZEN_ARCHITECTURE_VERSION = 'hydroswarm-v5-release-v1'
           report = json.load(open('self-test-${{ strategy.job-index }}.json'))
           assert report['ok'] is True, report.get('strict_failures', report)
-          assert report['trained_assets']['model_sha256'], 'missing model hash'
-          print('container strict self-test OK for ${{ matrix.platform }}')
+          trained_assets = report['trained_assets']
+          assert trained_assets['model_sha256'] == FROZEN_MODEL_SHA256, trained_assets
+          assert trained_assets['architecture_version'] == FROZEN_ARCHITECTURE_VERSION, trained_assets
+          assert trained_assets['calibration_status'] == 'FITTED', trained_assets
+          print('container strict self-test OK for ${{ matrix.platform }}:', trained_assets['model_sha256'])
           "
 
   release-artifacts:
@@ -157,6 +169,38 @@ jobs:
           python scripts/build_release_bundle.py \
             --release-version "${{ needs.verify-frozen-bundle.outputs.release_version }}" \
             --out-dir dist
+
+      - name: Independently verify ZIP checksums and frozen V5 identity
+        run: |
+          python3 -c "
+          import hashlib, json, zipfile
+          from pathlib import Path
+
+          FROZEN_MODEL_SHA256 = 'de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5'
+          FROZEN_RUNTIME_MANIFEST_SHA256 = 'f3fb08642738128f020c50e20e6b68c417bf80703f7ef6bc8f42db2aa41f8d34'
+
+          zip_path, = Path('dist').glob('*.zip')
+          with zipfile.ZipFile(zip_path) as archive:
+              sha256sums = archive.read('SHA256SUMS').decode('utf-8')
+              expected = dict(line.split('  ', 1)[::-1] for line in sha256sums.strip().splitlines())
+              for name in archive.namelist():
+                  if name == 'SHA256SUMS':
+                      continue
+                  actual = hashlib.sha256(archive.read(name)).hexdigest()
+                  assert expected[name] == actual, f'checksum mismatch for {name}'
+
+              model_bytes = archive.read('models/hydrocore-v5-release/model.safetensors')
+              manifest_bytes = archive.read('models/hydrocore-v5-release/runtime_manifest.json')
+              assert hashlib.sha256(model_bytes).hexdigest() == FROZEN_MODEL_SHA256
+              assert hashlib.sha256(manifest_bytes).hexdigest() == FROZEN_RUNTIME_MANIFEST_SHA256
+              assert not any(n.startswith('models/hydrocore-v4-release/') for n in archive.namelist())
+
+          release_manifest = json.loads(Path('RELEASE_MANIFEST.json').read_text())
+          assert release_manifest['model_hash'] == FROZEN_MODEL_SHA256
+          assert release_manifest['runtime_manifest_sha256'] == FROZEN_RUNTIME_MANIFEST_SHA256
+          assert release_manifest['locked_evaluation_status']['state'] == 'M11_6_LOCKED_EVALUATION_PASS'
+          print('ZIP checksums and frozen V5 identity independently verified OK')
+          "
 
       - name: Upload release artifacts
         uses: softprops/action-gh-release@v2

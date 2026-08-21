@@ -278,10 +278,14 @@ def test_suppression_cannot_expose_plan_or_bypass_approval(monkeypatch, state, v
 
 
 def test_workflow_strict_self_test_rejects_wrong_or_fallback_model_identity() -> None:
+    """The container gate must not merely assert report['ok'] is True --
+    it must assert the reported model/calibration identity matches the
+    canonical frozen V5 release, not just that some identity is present."""
     text = WORKFLOW_PATH.read_text()
     assert "hydroswarm self-test --strict" in text
     assert "assert report['ok'] is True" in text
-    assert "report['trained_assets']['model_sha256']" in text
+    assert "FROZEN_MODEL_SHA256 = 'de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5'" in text
+    assert "trained_assets['model_sha256'] == FROZEN_MODEL_SHA256" in text
 
 
 def test_persistence_check_does_not_reanalyze_a_closed_incident(monkeypatch, tmp_path) -> None:

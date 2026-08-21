@@ -73,10 +73,15 @@ jobs:
           docker exec hydroswarm-pr-verify hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
           python3 -c "
           import json
+          FROZEN_MODEL_SHA256 = 'de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5'
+          FROZEN_ARCHITECTURE_VERSION = 'hydroswarm-v5-release-v1'
           report = json.load(open('self-test-${{ strategy.job-index }}.json'))
           assert report['ok'] is True, report.get('strict_failures', report)
-          assert report['trained_assets']['model_sha256'], 'missing model hash'
-          print('container strict self-test OK for ${{ matrix.platform }}:', report['trained_assets']['model_sha256'])
+          trained_assets = report['trained_assets']
+          assert trained_assets['model_sha256'] == FROZEN_MODEL_SHA256, trained_assets
+          assert trained_assets['architecture_version'] == FROZEN_ARCHITECTURE_VERSION, trained_assets
+          assert trained_assets['calibration_status'] == 'FITTED', trained_assets
+          print('container strict self-test OK for ${{ matrix.platform }}:', trained_assets['model_sha256'])
           "
 
       # WNTR's basic hydraulic self-test does not exercise EpanetSimulator's
