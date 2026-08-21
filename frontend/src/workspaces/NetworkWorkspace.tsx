@@ -126,7 +126,7 @@ function CreateIncidentPanel({ network }: { network: NetworkRecord }) {
   const queryClient = useQueryClient();
   const setWorkspace = useConsoleStore((state) => state.setWorkspace);
   // Real production signature-localization policy
-  // (models/hydrocore-v4-release/signature-policy-manifest.json:
+  // (hydroswarm.classical.signature_policy.GOVERNED_TRAINING_SIGNATURE_POLICY:
   // sensor_layout_policy = "all_junctions_as_sensor_candidates") only
   // recognizes junctions as valid sensor nodes -- see
   // hydroswarm.evaluation.live_example's own INITIAL_SENSOR comment for the
