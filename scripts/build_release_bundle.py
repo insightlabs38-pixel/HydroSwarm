@@ -2,14 +2,19 @@
 `HydroSwarm-v{version}-hackathon-runtime.zip`, in addition to the Docker
 release path.
 
-Contents (per SS21): source/, frontend/dist/, models/hydrocore-v4-release/,
+Contents (per SS21): source/, frontend/dist/, models/hydrocore-v5-release/,
 configs/, examples/ (if present), artifacts/reference-demo/ (if present),
 the setup/start scripts, SHA256SUMS, RELEASE_MANIFEST.json, LICENSE,
 README.md.
 
 Deliberately excludes training corpus shards, model checkpoints outside the
 one frozen release bundle, and any experiment scratch data -- this is a
-judge-facing runtime artifact, not a research mirror of the repository.
+judge-facing runtime artifact, not a research mirror of the repository. The
+historical `models/hydrocore-v4-release/` bundle is intentionally excluded
+too: no current runtime path (serving app, setup verification, self-test,
+Docker image) depends on it, so the frozen no-V4-fallback release identity
+never ships it as a live runtime asset -- it remains in the git history/
+checkout as historical evidence, not in the judge-facing release archive.
 """
 
 from __future__ import annotations
@@ -57,7 +62,7 @@ TOP_LEVEL_FILES = [
 INCLUDED_DIRS = [
     "src",
     "frontend/dist",
-    "models/hydrocore-v4-release",
+    "models/hydrocore-v5-release",
     "configs",
     "examples",
     "artifacts/reference-demo",

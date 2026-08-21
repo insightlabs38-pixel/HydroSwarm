@@ -32,16 +32,28 @@ def check(root: Path) -> list[str]:
     if manifest["calibration_artifact_hash"] not in final_system:
         errors.append("FINAL_SYSTEM.md is missing current calibration hash")
 
-    freeze = json.loads((root / "reports/results/v4/architecture-freeze.json").read_text(encoding="utf-8"))
-    if freeze["locked_test_opened"] is not False:
-        errors.append("locked_test_opened must remain false")
+    # The current release's final-lock status must come from the real M11.6
+    # evidence trail, not the superseded V4 architecture-freeze declaration
+    # (whose own locked_test_opened correctly stays False forever -- V4's
+    # locked evaluation was never opened, that is simply V4's own frozen
+    # history). M11.6 has actually executed exactly once, after finalist
+    # freeze and locked-population materialization, and passed both gates.
+    m11_status = json.loads(
+        (root / "reports/evaluation/hydrocore-v5/m11/m11-current-status.json").read_text(encoding="utf-8")
+    )
+    if m11_status["locked_test_opened"] is not True:
+        errors.append("locked_test_opened must be true: M11.6 has already executed and passed")
+    if m11_status["m11_6_state"] != "M11_6_LOCKED_EVALUATION_PASS":
+        errors.append("m11_6_state must report M11_6_LOCKED_EVALUATION_PASS")
+    if m11_status["locked_rerun"] is not False or m11_status["post_locked_tuning"] is not False:
+        errors.append("locked_rerun/post_locked_tuning must both remain false -- no rerun, no post-lock tuning")
     devpost = (root / "docs/DEVPOST.md").read_text(encoding="utf-8").lower()
     checklist = (root / "docs/SUBMISSION_CHECKLIST.md").read_text(encoding="utf-8").lower()
     if "pending final recording" in devpost or "not started" in checklist or "no video exists" in checklist:
         errors.append("public submission docs contain stale video status")
     model_card = (root / "docs/MODEL_CARD.md").read_text(encoding="utf-8")
-    if "HydroCore-v4" not in model_card or "4.18M" not in model_card:
-        errors.append("MODEL_CARD.md does not clearly identify current HydroCore-v4")
+    if "HydroCore-v5" not in model_card or "4,182,612" not in model_card:
+        errors.append("MODEL_CARD.md does not clearly identify current HydroCore-v5")
     return errors
 
 

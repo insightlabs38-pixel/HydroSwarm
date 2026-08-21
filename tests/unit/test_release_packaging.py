@@ -108,26 +108,72 @@ def test_release_workflow_verifies_frozen_bundle_hashes_before_building() -> Non
 # --- scripts/build_release_manifest.py --------------------------------------
 
 
-def test_release_manifest_sources_hashes_from_the_real_runtime_manifest() -> None:
+def test_release_manifest_sources_hashes_from_the_real_v5_runtime_manifest() -> None:
     import json
 
     runtime_manifest = json.loads(
-        (PROJECT_ROOT / "models" / "hydrocore-v4-release" / "runtime_manifest.json").read_text()
+        (PROJECT_ROOT / "models" / "hydrocore-v5-release" / "runtime_manifest.json").read_text()
     )
     manifest = build_release_manifest.build_manifest()
 
     assert manifest["model_hash"] == runtime_manifest["model_sha256"]
-    assert manifest["normalization_hash"] == runtime_manifest["normalization_hash"]
-    assert manifest["calibration_hash"] == runtime_manifest["calibration_artifact_hash"]
+    assert manifest["calibration_artifact_hash"] == runtime_manifest["calibration_artifact_hash"]
+    assert manifest["calibration_file_sha256"] == runtime_manifest["calibration_file_sha256"]
     assert manifest["feature_schema_hash"] == runtime_manifest["feature_schema_hash"]
-    assert manifest["signature_policy_hash"] == runtime_manifest["signature_policy_hash"]
-    assert manifest["schema_version"] == 1
+    assert manifest["fusion_config_hash"] == runtime_manifest["fusion_config_hash"]
+    assert manifest["model_selected_seed"] == runtime_manifest["selected_seed"]
+    assert set(manifest["runtime_enabled_outputs"]) == set(runtime_manifest["runtime_enabled_outputs"])
+    assert manifest["schema_version"] == 2
     assert manifest["git_commit"] != "unavailable"
 
 
-def test_release_manifest_reports_locked_test_status_from_freeze_declaration() -> None:
+def test_release_manifest_runtime_manifest_sha256_matches_the_real_bundle_file() -> None:
+    import hashlib
+
     manifest = build_release_manifest.build_manifest()
-    assert manifest["locked_test_status"]["locked_test_opened"] is False
+    bundle_manifest_path = PROJECT_ROOT / "models" / "hydrocore-v5-release" / "runtime_manifest.json"
+    assert manifest["runtime_manifest_sha256"] == hashlib.sha256(bundle_manifest_path.read_bytes()).hexdigest()
+
+
+def test_release_manifest_sources_frozen_identity_from_m11_2_finalist_identity() -> None:
+    import json
+
+    finalist_identity = json.loads(
+        (
+            PROJECT_ROOT
+            / "reports"
+            / "evaluation"
+            / "hydrocore-v5"
+            / "m11"
+            / "m11-2"
+            / "m11-2-finalist-identity.json"
+        ).read_text()
+    )
+    manifest = build_release_manifest.build_manifest()
+    assert manifest["model_system"] == finalist_identity["system"]
+    assert manifest["model_variant"] == finalist_identity["model_variant"]
+    assert manifest["model_parameter_count"] == finalist_identity["parameter_count"]
+
+
+def test_release_manifest_reports_the_real_completed_m11_6_locked_evaluation() -> None:
+    """Do NOT source the current release's final-lock status from the
+    superseded V4 architecture-freeze record: M11.6 actually executed
+    exactly once, after finalist freeze and locked-population
+    materialization, and passed both locked-final and locked-topology
+    gates. The manifest must report that truthfully, not a stale
+    'not yet opened' status left over from before M11.6 ran."""
+    manifest = build_release_manifest.build_manifest()
+    status = manifest["locked_evaluation_status"]
+    assert status["milestone"] == "M11.6"
+    assert status["state"] == "M11_6_LOCKED_EVALUATION_PASS"
+    assert status["locked_test_opened"] is True
+    assert status["authorization_consumed"] is True
+    assert status["authorized_openings"] == 1
+    assert status["locked_open_count"] == 1
+    assert status["locked_rerun"] is False
+    assert status["post_locked_tuning"] is False
+    assert status["locked_final_result"] == "M11_6_LOCKED_FINAL_PASS"
+    assert status["locked_topology_result"] == "M11_6_LOCKED_TOPOLOGY_PASS"
 
 
 def test_release_manifest_accepts_container_identity_overrides() -> None:
@@ -182,8 +228,23 @@ def test_release_bundle_contains_required_top_level_files(tmp_path: Path) -> Non
     assert "README.md" in names
     assert "setup_hydroswarm_linux.sh" in names
     assert "start_hydroswarm_linux.sh" in names
-    assert any(name.startswith("models/hydrocore-v4-release/") for name in names)
+    assert any(name.startswith("models/hydrocore-v5-release/") for name in names)
     assert any(name.startswith("src/hydroswarm/") for name in names)
+
+
+def test_release_bundle_excludes_the_historical_v4_release_bundle(tmp_path: Path) -> None:
+    """No current runtime path (serving app, setup verify-bundle, strict
+    self-test, Docker image) depends on models/hydrocore-v4-release/ -- the
+    frozen no-V4-fallback release identity must not ship it as a live
+    runtime asset in the judge-facing archive. The historical bundle
+    remains in the repository/git history; it is simply not packaged."""
+    output = tmp_path / "test-runtime.zip"
+    build_release_bundle.build_bundle(output, release_version="v-test")
+
+    with zipfile.ZipFile(output) as archive:
+        names = set(archive.namelist())
+
+    assert not any(name.startswith("models/hydrocore-v4-release/") for name in names)
 
 
 def test_release_bundle_excludes_pycache(tmp_path: Path) -> None:
@@ -279,7 +340,7 @@ def test_extracted_release_bundle_has_every_file_its_own_setup_scripts_need(tmp_
     assert (extract_dir / "LICENSE").is_file()
     assert (extract_dir / "README.md").is_file()
     assert (extract_dir / "src" / "hydroswarm" / "__init__.py").is_file()
-    assert (extract_dir / "models" / "hydrocore-v4-release" / "model.safetensors").is_file()
+    assert (extract_dir / "models" / "hydrocore-v5-release" / "model.safetensors").is_file()
 
     import shutil
     import subprocess
