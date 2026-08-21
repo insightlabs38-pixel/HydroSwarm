@@ -242,9 +242,7 @@ test.describe('reference incident visual regression', () => {
     await expect(page.locator('.mode-banner-milestone')).not.toHaveText(approvalMilestone ?? '');
   });
 
-  test('LIVE V4 flow starts in an explicitly live-computation state @ 1920x1080', async ({
-    page,
-  }) => {
+  test('LIVE flow starts in an explicitly live-computation state @ 1920x1080', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     // Keep the real API request pending only long enough to snapshot the
     // first truthful LIVE state.  The full LIVE workflow is exercised against
@@ -253,7 +251,9 @@ test.describe('reference incident visual regression', () => {
     await page.route('**/api/**', () => new Promise(() => undefined));
     await page.goto('/?experience=live');
     await expect(page.getByText('LIVE COMPUTATION · REFERENCE INPUTS')).toBeVisible();
-    await expect(page).toHaveScreenshot('live-v4-proof-start-1920x1080.png', { fullPage: true });
+    await expect(page).toHaveScreenshot('live-computation-start-1920x1080.png', {
+      fullPage: true,
+    });
   });
 
   test('LIVE sample and approval pauses @ 1920x1080', async ({ page }) => {
