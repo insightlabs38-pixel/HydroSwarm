@@ -10,7 +10,7 @@ name: HydroSwarm Native Cross-Platform Verification
 # single authoritative full scientific/coverage suite; every job here
 # instead proves portability of the same real, documented install path a
 # judge would actually run: real dependency installation (no
-# fixture/mocked runtime), the real frozen V4 bundle, a real bounded WNTR
+# fixture/mocked runtime), the real frozen V5 bundle, a real bounded WNTR
 # simulation (part of `self-test --strict`), a real running server, and
 # real HTTP requests against it -- nothing here is a fixture or a faked
 # pass. If a listed runner type is ever unavailable, that job fails
