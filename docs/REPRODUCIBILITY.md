@@ -78,6 +78,10 @@ The post-run governance confirms:
 - no manifest/dataset changes;
 - no code/evaluator changes.
 
+### Pre-lock evidence hashes bind a historical commit, not the live tree
+
+M11.6A's pre-lock safety evidence (`m11_6a_design.PRE_LOCK_SAFETY_EVIDENCE`) freezes the SHA-256 of a specific historical state of `tests/integration/test_api.py` and a bound PASS artifact, as they existed at the design-freeze commit recorded in `data/locked/m11-6/m11-6-materialization-manifest.json`'s `design_freeze_commit_sha` -- proof that the evidence M11.6's pre-open verification actually relied on has not been silently altered since. It is not a promise that the current, evolving source tree keeps that shared, multi-purpose test file byte-frozen forever after M11.6 closed; that test file legitimately continues to change for unrelated reasons (e.g. a later product-version bump touching an unrelated assertion in the same file). `tests/scientific/test_m11_6a_design_freeze.py` verifies this binding against the immutable git blob at that recorded commit (`git show <design_freeze_commit_sha>:<path>`), not against the current working tree, while a separate, independent test in the same file re-runs the actual safety regression (`tests/integration/test_api.py::test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability`) against current source to confirm the behavior itself still holds. Neither `m11_6a_design.py` nor `run_m11_6_locked_evaluation.py` was changed to make this correction -- only the test file's own verification target.
+
 ## Why rerunning M11.6 would be the wrong reproduction
 
 A one-time final holdout is evidence precisely because it is not repeatedly observed. Running it again after results are known would not “make the result more reproducible”; it would consume the same held-out data again and weaken the governance story.

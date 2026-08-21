@@ -10,9 +10,11 @@ fake SHA constants (``"0"*40`` / ``"1"*40``), never a real commit SHA.
 
 from __future__ import annotations
 
+import functools
 import hashlib
 import json
 import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -31,6 +33,95 @@ TEST_SHA = "0" * 40
 OTHER_SHA = "1" * 40
 SMOKE = design.FORBIDDEN_SMOKE_NAMESPACE
 REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _design_freeze_commit_sha() -> str:
+    manifest = json.loads(
+        (REPO_ROOT / "data" / "locked" / "m11-6" / "m11-6-materialization-manifest.json").read_text()
+    )
+    return manifest["design_freeze_commit_sha"]
+
+
+def _git_show_bytes(commit_sha: str, path: str) -> bytes:
+    result = subprocess.run(
+        ["git", "show", f"{commit_sha}:{path}"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        check=True,
+    )
+    return result.stdout
+
+
+@functools.lru_cache(maxsize=1)
+def _historical_prelock_evidence() -> dict[str, dict]:
+    """Recompute ``m11_6a_design.PRE_LOCK_SAFETY_EVIDENCE`` against the
+    immutable git blobs at the recorded design-freeze commit
+    (``data/locked/m11-6/m11-6-materialization-manifest.json``'s own
+    ``design_freeze_commit_sha``), not against the live, mutable working
+    tree.
+
+    The frozen evidence binding proves that a specific historical state of
+    ``tests/integration/test_api.py`` (and the bound PASS artifact) existed
+    -- byte for byte -- at M11.6's pre-open verification, and that it has
+    not been silently altered since. It was never a promise that the
+    *current* source tree would keep that shared, multi-purpose test file
+    frozen forever after M11.6 closed; nothing in
+    ``m11_6a_design.PRE_LOCK_SAFETY_EVIDENCE`` or
+    ``evaluator.verify_prelock_safety_evidence`` claims that, and neither
+    is modified here. This is the correct post-closure check: verify the
+    binding against the exact historical commit it was recorded against,
+    the same way any other frozen artifact in this repository is verified
+    against its own recorded identity rather than against whatever the
+    current tree happens to contain. M11.6 already ran and passed exactly
+    once (``reports/evaluation/hydrocore-v5/m11/m11-current-status.json``);
+    this does not re-verify, re-run, or reinterpret that result -- it only
+    supplies ``evaluator.build_safety_result`` with the same evidence
+    ``verify_prelock_safety_evidence`` would have produced, sourced
+    correctly.
+    """
+    commit_sha = _design_freeze_commit_sha()
+    evidence = design.PRE_LOCK_SAFETY_EVIDENCE
+    counter = evidence["counter"]
+    violations: list[str] = []
+
+    evidence_blob = _git_show_bytes(commit_sha, evidence["evidence_file_path"])
+    if hashlib.sha256(evidence_blob).hexdigest() != evidence["evidence_file_sha256"]:
+        violations.append(
+            f"historical pre-lock evidence blob at {commit_sha}:{evidence['evidence_file_path']} "
+            "does not match the frozen hash"
+        )
+    else:
+        bound_test_name = evidence["test_identifier"].split("::")[-1]
+        if bound_test_name not in evidence_blob.decode("utf-8"):
+            violations.append(
+                f"historical pre-lock evidence blob does not contain the bound test identifier {bound_test_name!r}"
+            )
+
+    pass_blob = _git_show_bytes(commit_sha, evidence["pass_evidence_path"])
+    payload: dict = {}
+    if hashlib.sha256(pass_blob).hexdigest() != evidence["pass_evidence_sha256"]:
+        violations.append(
+            f"historical pre-lock PASS artifact blob at {commit_sha}:{evidence['pass_evidence_path']} "
+            "does not match the frozen hash"
+        )
+    else:
+        payload = json.loads(pass_blob.decode("utf-8"))
+    for field, expected in evidence["expected_pass"].items():
+        if payload.get(field) != expected:
+            violations.append(
+                f"historical pre-lock PASS artifact lacks expected PASS {field}={expected!r} (got {payload.get(field)!r})"
+            )
+
+    verified = not violations
+    return {
+        counter: {
+            "count": 0 if verified else 1,
+            "pass": verified,
+            "evaluated": True,
+            "classification": design.SAFETY_SCOPE_PRELOCK,
+            "evidence": {**evidence, "verified": verified, "violations": violations},
+        }
+    }
 
 
 def _final_master() -> str:
@@ -457,7 +548,11 @@ def _full_population() -> tuple[list[dict], dict]:
 
 def _gates_for(rows, manifest, *, identity_ok=True, novelty_ok=True):
     metrics = evaluator.compute_metrics(rows)
-    safety = evaluator.build_safety_result(rows, runtime_authority=_runtime_authority(identity_ok=identity_ok))
+    safety = evaluator.build_safety_result(
+        rows,
+        runtime_authority=_runtime_authority(identity_ok=identity_ok),
+        prelock_evidence=_historical_prelock_evidence(),
+    )
     return evaluator.compute_gates(
         metrics=metrics, safety=safety, manifest_ok=True, novelty_ok=novelty_ok, rows=rows, manifest=manifest,
     )
@@ -720,14 +815,18 @@ def test_finalist_identity_drift_detected():
 def test_evaluated_state_gate_behavior():
     rows, _manifest = _full_population()
     # All measured + zero -> pass.
-    safety = evaluator.build_safety_result(rows, runtime_authority=_runtime_authority())
+    safety = evaluator.build_safety_result(
+        rows, runtime_authority=_runtime_authority(), prelock_evidence=_historical_prelock_evidence(),
+    )
     assert safety["all_hard_safety_pass"] is True
     assert safety["aggregate_hard_gate"]["sampled_node_reselected"]["evaluated"] is True
     assert safety["aggregate_hard_gate"]["sampled_node_reselected"]["pass"] is True
 
     # One incident unmeasured -> that per-incident invariant blocks.
     rows[0]["incident_safety"]["evaluated"] = False
-    safety = evaluator.build_safety_result(rows, runtime_authority=_runtime_authority())
+    safety = evaluator.build_safety_result(
+        rows, runtime_authority=_runtime_authority(), prelock_evidence=_historical_prelock_evidence(),
+    )
     assert safety["per_incident"]["sampled_node_reselected"]["evaluated"] is False
     assert safety["aggregate_hard_gate"]["sampled_node_reselected"]["pass"] is False
     assert safety["all_hard_safety_pass"] is False
@@ -966,9 +1065,46 @@ def test_prelock_evidence_exact_hash_and_pass_accepted(tmp_path, monkeypatch):
     assert result["stale_approval_accepted"]["count"] == 0
 
 
-def test_prelock_evidence_real_repo_binding_verified():
-    result = evaluator.verify_prelock_safety_evidence(REPO_ROOT)
-    assert result["stale_approval_accepted"]["pass"] is True
+def test_prelock_evidence_historical_design_freeze_binding_verified():
+    """The frozen pre-lock evidence binds a historical state of
+    ``tests/integration/test_api.py`` at the design-freeze commit recorded
+    in ``data/locked/m11-6/m11-6-materialization-manifest.json``
+    (``design_freeze_commit_sha``) -- not "whatever the live working tree
+    currently contains". Verify it against that immutable git blob, which
+    is what ``_historical_prelock_evidence()`` above does; this is the
+    real, mechanical proof the binding still holds, not merely a call
+    through ``evaluator.verify_prelock_safety_evidence`` (which reads the
+    live filesystem tree and is exercised directly by
+    ``test_prelock_evidence_exact_hash_and_pass_accepted``/
+    ``test_prelock_evidence_missing_rejected``/etc. below against
+    synthetic tmp_path fixtures -- those keep proving the frozen verifier
+    function itself accepts/rejects correctly; this test proves the real
+    historical evidence the M11.6 pre-open check actually relied on is
+    still byte-identical and reconstructible)."""
+    result = _historical_prelock_evidence()
+    assert result["stale_approval_accepted"]["pass"] is True, result["stale_approval_accepted"]["evidence"]["violations"]
+    assert result["stale_approval_accepted"]["count"] == 0
+
+
+def test_current_stale_approval_safety_regression_still_passes():
+    """The behavior the frozen pre-lock evidence is *about* -- stale
+    verification correctly blocking approval -- must keep passing on the
+    current, maintained source tree independent of the historical evidence
+    binding above; this is a live regression check, not history."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            "-q",
+            "tests/integration/test_api.py::"
+            "test_new_sample_invalidates_prior_verification_and_reverify_restores_approvability",
+        ],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def test_prelock_evidence_missing_rejected(tmp_path, monkeypatch):
