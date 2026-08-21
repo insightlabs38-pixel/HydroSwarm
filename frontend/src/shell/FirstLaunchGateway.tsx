@@ -29,7 +29,8 @@ export function FirstLaunchGateway({
           Local incident decision support, ready when the evidence is.
         </h1>
         <p className="supporting">
-          Offline mission-control decision support for drinking-water contamination incidents.
+          Localize suspected sources, collect evidence selectively, verify response options with
+          WNTR/EPANET, and keep the final decision with a human operator.
         </p>
         <ul className="first-launch-trust" aria-label="System safeguards">
           <li>Local / offline</li>

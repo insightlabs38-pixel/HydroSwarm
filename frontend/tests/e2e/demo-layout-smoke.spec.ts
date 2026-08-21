@@ -15,7 +15,7 @@ async function mockReferenceArtifact(page: Page) {
 async function openReferenceAtMilestone(page: Page, milestone: number) {
   await mockReferenceArtifact(page);
   await page.goto('/?experience=reference');
-  await expect(page.getByText('REFERENCE INCIDENT · VERIFIED REPLAY')).toBeVisible();
+  await expect(page.getByText('REFERENCE INCIDENT · CHECKSUMMED REPLAY')).toBeVisible();
   await page.getByRole('button', { name: 'Pause' }).click();
   for (let index = 0; index < milestone; index += 1) {
     const next = page.getByRole('button', { name: 'Next', exact: true });

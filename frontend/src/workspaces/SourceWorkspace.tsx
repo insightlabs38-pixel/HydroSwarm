@@ -63,9 +63,18 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
       </Panel>
       <Panel
         title="Ranked source candidates"
-        eyebrow={incident.mode === 'REFERENCE' ? 'DETERMINISTIC REFERENCE LOCALIZATION' : 'HYDROCORE-v5 SENTINEL'}
+        eyebrow={
+          incident.mode === 'REFERENCE'
+            ? 'DETERMINISTIC REFERENCE LOCALIZATION'
+            : 'CALIBRATED FUSION'
+        }
         className="wide-panel"
       >
+        {incident.mode !== 'REFERENCE' && (
+          <p className="supporting">
+            Classical hydraulic/signature evidence + HydroCore-v5 Sentinel evidence.
+          </p>
+        )}
         {incident.candidates.length === 0 ? (
           <EmptyState title="No source candidates for this incident." />
         ) : (
@@ -193,7 +202,10 @@ export function SourceWorkspace({ incident }: { incident: IncidentView }) {
         ) : incident.mode === 'REFERENCE' ? (
           <div className="inspector-stack">
             <p className="eyebrow">REFERENCE NARRATIVE</p>
-            <p>{incident.explanation || 'Deterministic reference workflow — no grounded model explanation available.'}</p>
+            <p>
+              {incident.explanation ||
+                'Deterministic reference workflow — no grounded model explanation available.'}
+            </p>
           </div>
         ) : (
           <EmptyState title="No grounded source explanation available for this incident." />

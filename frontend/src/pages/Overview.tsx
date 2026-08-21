@@ -128,7 +128,14 @@ export function Overview({ incident }: { incident: IncidentView }) {
       </Panel>
 
       <div className="incident-summary-row wide-panel">
-        <Panel title="Source" eyebrow="SENTINEL">
+        <Panel
+          title="Source"
+          eyebrow={
+            incident.mode === 'REFERENCE'
+              ? 'DETERMINISTIC REFERENCE LOCALIZATION'
+              : 'FUSED SOURCE BELIEF'
+          }
+        >
           {leading ? (
             <>
               <div className="candidate-hero">

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "hydroswarm-system-regression-evidence-v1",
+  "generatedFrom": [
+    {
+      "path": "reports/results/summary.md",
+      "sha256": "44d18df26c9fd2f0add07e6060d1d08f1afb53cab63c790b5ccf553c9d0b8f69"
+    },
+    {
+      "path": "reports/results/golden_result.json",
+      "sha256": "9472c0b34ac47d213fcb761b09069a7455d7ef431cdfc802632a31b67ee17ee7"
+    },
+    {
+      "path": "reports/results/performance.json",
+      "sha256": "964bee0ff225bde624412746febebc493c9021478471759637f7b5c7a06b5b2d"
+    }
+  ],
+  "note": "Static snapshot of the frozen WNTR golden-fixture regression benchmark and measured model runtime, copied from the source reports above (values verified against them directly, not invented). This is deterministic regression / runtime / system verification evidence -- not final-model accuracy, which is reported on the Validation page from the M11.6 locked evaluation. A live /api/benchmarks endpoint reading these reports at request time is future work; until then this file is the single source BenchmarkPage reads from.",
+  "metrics": [
+    {
+      "metric": "Top-1 source localization (frozen golden fixture)",
+      "value": "100%",
+      "comparison": "3 seeded golden runs",
+      "status": "PASS"
+    },
+    {
+      "metric": "Candidate-region contraction",
+      "value": "4 → 1 node",
+      "comparison": "after 1 evidence sample",
+      "status": "PASS"
+    },
+    {
+      "metric": "Unsafe plan rejection (WNTR)",
+      "value": "100%",
+      "comparison": "exact WNTR verifier",
+      "status": "PASS"
+    },
+    {
+      "metric": "Safe plan acceptance (WNTR)",
+      "value": "100%",
+      "comparison": "exact WNTR verifier",
+      "status": "PASS"
+    },
+    {
+      "metric": "Human-approval pause",
+      "value": "Always pauses",
+      "comparison": "approval_pause gate",
+      "status": "PASS"
+    },
+    {
+      "metric": "Hash-chain replay validity",
+      "value": "Valid",
+      "comparison": "replay_valid gate",
+      "status": "PASS"
+    },
+    {
+      "metric": "Exact-verifier fail-closed behavior",
+      "value": "Fails closed",
+      "comparison": "no_exact_verifier_fails_closed gate",
+      "status": "PASS"
+    },
+    {
+      "metric": "Authoritative hash repeatability",
+      "value": "Repeats exactly",
+      "comparison": "authoritative_hashes_repeat gate",
+      "status": "PASS"
+    },
+    {
+      "metric": "Cache-ablation isolation",
+      "value": "No ablation contamination",
+      "comparison": "no_cache_ablation_measured gate",
+      "status": "PASS"
+    },
+    {
+      "metric": "End-to-end golden-fixture latency",
+      "value": "0.98 s",
+      "comparison": "3 seeded golden runs",
+      "status": "MEASURED"
+    },
+    {
+      "metric": "True-source posterior probability",
+      "value": "99.41%",
+      "comparison": "uniform prior → posterior after 1 sample",
+      "status": "MEASURED"
+    },
+    {
+      "metric": "Modeled exposure reduction (golden fixture)",
+      "value": "14,723 mg",
+      "comparison": "vs. exact no-response baseline",
+      "status": "MEASURED"
+    },
+    {
+      "metric": "Small-variant model runtime (reference graph, 128 nodes)",
+      "value": "31.0 ms median / 32.3 ms p95",
+      "comparison": "CPU, 4 threads, FP32 eager",
+      "status": "MEASURED"
+    },
+    {
+      "metric": "Small-variant model runtime (stress graph, 1000 nodes)",
+      "value": "104.3 ms median / 135.0 ms p95",
+      "comparison": "CPU, 4 threads, FP32 eager",
+      "status": "MEASURED"
+    }
+  ],
+  "limitations": [
+    "This is a regression benchmark against a frozen golden fixture, not evidence of field performance.",
+    "Latency and RSS are measured on the CI/build host and are not portable across CPUs.",
+    "The 1000-node stress case measures canonical model scaling, not a 1000-node WNTR solve.",
+    "Random seeded weights establish runtime and numerical repeatability, not accuracy."
+  ]
+}

@@ -176,7 +176,7 @@ export default function App() {
   } else if (workspace === 'validation') {
     workspaceBody = <ValidationPage />;
   } else if (workspace === 'benchmarks') {
-    workspaceBody = <BenchmarkPage incident={incident} />;
+    workspaceBody = <BenchmarkPage />;
   } else {
     workspaceBody = (
       <div className="workspace-placeholder">

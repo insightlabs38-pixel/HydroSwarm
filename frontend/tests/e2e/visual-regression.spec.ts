@@ -77,7 +77,7 @@ async function mockLiveExampleFlow(page: Page) {
 async function openReferenceAtMilestone(page: Page, milestone: number) {
   await mockReferenceArtifact(page);
   await page.goto('/?experience=reference');
-  await expect(page.getByText('REFERENCE INCIDENT · VERIFIED REPLAY')).toBeVisible();
+  await expect(page.getByText('REFERENCE INCIDENT · CHECKSUMMED REPLAY')).toBeVisible();
   // Freeze auto-advance before moving to an exact authored milestone.
   await page.getByRole('button', { name: 'Pause' }).click();
   for (let index = 0; index < milestone; index += 1) {
@@ -606,6 +606,9 @@ test.describe('final visual coverage matrix', () => {
       [/^Benchmarks/, 'Regression and runtime benchmarks', 'benchmarks-1440x900.png'],
     ] as const) {
       await gotoWorkspace(page, 1440, 900, { rail, heading });
+      if (name === 'benchmarks-1440x900.png') {
+        await expect(page.getByText('Measured frozen WNTR regression')).toBeVisible();
+      }
       await expect(page).toHaveScreenshot(name, { fullPage: true });
     }
   });

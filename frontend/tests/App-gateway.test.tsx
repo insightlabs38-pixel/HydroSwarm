@@ -98,7 +98,7 @@ test('?experience=reference bypasses the gateway entirely', async () => {
   await renderFreshApp();
 
   expect(
-    await screen.findByText('REFERENCE INCIDENT · VERIFIED REPLAY', { exact: false }),
+    await screen.findByText('REFERENCE INCIDENT · CHECKSUMMED REPLAY', { exact: false }),
   ).toBeVisible();
   expect(
     screen.queryByRole('heading', { name: /Local incident decision support/ }),
@@ -114,7 +114,7 @@ test('clicking Run Reference Incident on the gateway shows the REFERENCE banner'
   await user.click(await screen.findByRole('button', { name: /Run Reference Incident/ }));
 
   expect(
-    await screen.findByText('REFERENCE INCIDENT · VERIFIED REPLAY', { exact: false }),
+    await screen.findByText('REFERENCE INCIDENT · CHECKSUMMED REPLAY', { exact: false }),
   ).toBeVisible();
   expect(new URLSearchParams(window.location.search).get('experience')).toBe('reference');
 });

@@ -37,7 +37,7 @@ export function ModeBanner({
     return (
       <div className="mode-banner mode-banner-info mode-banner-reference" role="status">
         <div className="mode-banner-reference-content">
-          <strong>REFERENCE INCIDENT · VERIFIED REPLAY</strong>
+          <strong>REFERENCE INCIDENT · CHECKSUMMED REPLAY</strong>
           <span className="mode-banner-milestone">
             {reference.milestoneLabel} · {reference.milestoneIndex + 1} / {reference.milestoneCount}
           </span>
@@ -133,7 +133,8 @@ export function ModeBanner({
       <div className="mode-banner mode-banner-danger" role="alert">
         <strong>OUTSIDE VALIDATED RANGE</strong>
         <span>
-          This incident is outside the model&apos;s validated operating range. Planning is suppressed.
+          This incident is outside the model&apos;s validated operating range. Planning is
+          suppressed.
         </span>
       </div>
     );

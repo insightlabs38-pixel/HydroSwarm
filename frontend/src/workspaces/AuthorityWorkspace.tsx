@@ -66,19 +66,25 @@ export function AuthorityWorkspace({ incident }: { incident: IncidentView }) {
     <div className="page-stack">
       <Panel title="Decision authority path" eyebrow="SYSTEM AUTHORITY">
         <p className="supporting">
-          Frozen HydroCore-v5 system authority path. Not per-incident.
+          Frozen HydroCore-v5 system authority path. Not per-incident. Source fusion combines
+          deterministic hydraulic/signature evidence with HydroCore-v5 Sentinel evidence before
+          downstream deterministic authority checks.
         </p>
-        <ol className="approval-hierarchy authority-path" aria-label="System authority path">
-          {SYSTEM_AUTHORITY_PATH.map((step, index) => (
-            <li key={step.label}>
-              <span className="authority-path-label">{step.label}</span>
-              <span className="authority-path-level">{step.level}</span>
-              {index < SYSTEM_AUTHORITY_PATH.length - 1 && (
-                <span className="authority-path-arrow" aria-hidden="true">→</span>
-              )}
-            </li>
-          ))}
-        </ol>
+        <div className="table-scroll">
+          <ol className="approval-hierarchy authority-path" aria-label="System authority path">
+            {SYSTEM_AUTHORITY_PATH.map((step, index) => (
+              <li key={step.label}>
+                <span className="authority-path-label">{step.label}</span>
+                <span className="authority-path-level">{step.level}</span>
+                {index < SYSTEM_AUTHORITY_PATH.length - 1 && (
+                  <span className="authority-path-arrow" aria-hidden="true">
+                    →
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </div>
       </Panel>
       <Panel title="Current incident certificates" eyebrow="CURRENT INCIDENT CERTIFICATE">
         {incident.mode === 'LIVE' && authorityQuery.isLoading ? (
@@ -87,6 +93,11 @@ export function AuthorityWorkspace({ incident }: { incident: IncidentView }) {
           <EmptyState
             title="Decision certificates unavailable."
             detail={(authorityQuery.error as Error).message}
+          />
+        ) : certificates.length === 0 && incident.mode === 'REFERENCE' ? (
+          <EmptyState
+            title="Deterministic Reference replay does not claim live DecisionCertificates."
+            detail="The deterministic Reference replay does not claim live HydroCore-v5 DecisionCertificates. Run Live Example to inspect incident-native authority certificates."
           />
         ) : certificates.length === 0 ? (
           <EmptyState title="No decision certificates available for this incident." />

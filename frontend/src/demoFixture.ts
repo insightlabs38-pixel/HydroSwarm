@@ -424,7 +424,7 @@ export const demoIncident: IncidentView = {
       sequence: 2,
       timestamp: '08:14:05',
       type: 'SOURCE_LOCALIZED',
-      actor: 'SENTINEL',
+      actor: 'CALIBRATED FUSION',
       detail: 'Candidate region contains 11 nodes.',
     },
     {
@@ -537,7 +537,9 @@ export const demoIncident: IncidentView = {
       intent: 'UNCERTAINTY_REMAINS',
       text: 'Start time, duration, and relative strength estimates remain exploratory (a known governed limitation) and are not shown as calibrated quantities.',
       facts: {},
-      limitations: ['Unseen-topology transfer is measured but weak for this checkpoint.'],
+      limitations: [
+        'Unseen-topology transfer retains measurable localization signal for this checkpoint; predictive metrics are DESCRIPTIVE / NON-GATING.',
+      ],
     },
     {
       intent: 'WHICH_SENSOR_MATTERED',

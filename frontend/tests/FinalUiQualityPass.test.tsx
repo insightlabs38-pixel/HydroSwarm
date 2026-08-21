@@ -24,31 +24,163 @@ import type { IncidentView, Plan } from '../src/types';
 
 const v5EvidenceJson = {
   schema: 'hydroswarm-v5-evidence-v1',
-  system_identity: { name: 'HydroCore-v5 M10 frozen release', variant: 'small', parameters: 4182612, selected_seed: 20260814, checkpoint_sha256: 'abc', calibration_artifact_hash: 'abc', calibration_sha256: 'abc', feature_schema_hash: 'abc', release_bundle: 'models/hydrocore-v5-release', release_schema_version: 'hydroswarm-v5-release-v1' },
-  runtime_outputs: ['event_cause', 'event_presence', 'evidence_sufficiency', 'relative_strength', 'source_node'],
+  system_identity: {
+    name: 'HydroCore-v5 M10 frozen release',
+    variant: 'small',
+    parameters: 4182612,
+    selected_seed: 20260814,
+    checkpoint_sha256: 'abc',
+    calibration_artifact_hash: 'abc',
+    calibration_sha256: 'abc',
+    feature_schema_hash: 'abc',
+    release_bundle: 'models/hydrocore-v5-release',
+    release_schema_version: 'hydroswarm-v5-release-v1',
+  },
+  runtime_outputs: [
+    'event_cause',
+    'event_presence',
+    'evidence_sufficiency',
+    'relative_strength',
+    'source_node',
+  ],
   trained_tasks: ['sentinel'],
-  deterministic_authority: { ood: 'OODDetector', scout: 'rank_sample_locations', planner: 'generate_response_plans', physical_verification: 'WNTR/EPANET', human_approval_required: true, autonomous_actuation: false },
-  locked_governance: { gate_pass: true, locked_final_count: 105, locked_topology_count: 20, total_count: 125, authorized_openings: 1, actual_openings: 1, rerun: false, post_lock_tuning: false, closure_state: 'M11_6_LOCKED_EVALUATION_PASS', locked_final_result: 'M11_6_LOCKED_FINAL_PASS', locked_topology_result: 'M11_6_LOCKED_TOPOLOGY_PASS' },
+  deterministic_authority: {
+    ood: 'OODDetector',
+    scout: 'rank_sample_locations',
+    planner: 'generate_response_plans',
+    physical_verification: 'WNTR/EPANET',
+    human_approval_required: true,
+    autonomous_actuation: false,
+  },
+  locked_governance: {
+    gate_pass: true,
+    locked_final_count: 105,
+    locked_topology_count: 20,
+    total_count: 125,
+    authorized_openings: 1,
+    actual_openings: 1,
+    rerun: false,
+    post_lock_tuning: false,
+    closure_state: 'M11_6_LOCKED_EVALUATION_PASS',
+    locked_final_result: 'M11_6_LOCKED_FINAL_PASS',
+    locked_topology_result: 'M11_6_LOCKED_TOPOLOGY_PASS',
+  },
   hard_safety_counters: { total_counters: 15, counters_zero: true, all_pass: true, counters: [] },
   metrics: {
     locked_final_test: {
-      aggregate: { source: { n: 105, top1_rate: 0.55, top3_rate: 0.76, mrr: 0.687, coverage_rate: 0.886, actionable_rate: 0.61, calibrated_rate: 1.0, candidate_set_size: 3.09, posterior_entropy: 1.07 } },
+      aggregate: {
+        source: {
+          n: 105,
+          top1_rate: 0.55,
+          top3_rate: 0.76,
+          mrr: 0.687,
+          coverage_rate: 0.886,
+          actionable_rate: 0.61,
+          calibrated_rate: 1.0,
+          candidate_set_size: 3.09,
+          posterior_entropy: 1.07,
+        },
+      },
       by_condition: {
-        NOMINAL: { n: 15, top1_rate: 0.73, top3_rate: 0.87, mrr: 0.821, coverage_rate: 0.933, actionable_rate: 0.8, calibrated_rate: 1.0, candidate_set_size: 2.0, posterior_entropy: 0.55 },
-        SENSOR_HEALTH_DEGRADED: { n: 15, top1_rate: 0.67, top3_rate: 0.87, mrr: 0.778, coverage_rate: 0.867, actionable_rate: 0.93, calibrated_rate: 1.0, candidate_set_size: 1.73, posterior_entropy: 0.59 },
-        SEVERITY_SHIFT: { n: 15, top1_rate: 0.73, top3_rate: 0.87, mrr: 0.815, coverage_rate: 0.867, actionable_rate: 0.8, calibrated_rate: 1.0, candidate_set_size: 2.27, posterior_entropy: 0.78 },
-        LOW_COVERAGE_ACTIVE_SAMPLING: { n: 15, top1_rate: 0.47, top3_rate: 0.87, mrr: 0.648, coverage_rate: 0.933, actionable_rate: 0.4, calibrated_rate: 1.0, candidate_set_size: 3.93, posterior_entropy: 1.32 },
-        SENSOR_DROPOUT: { n: 15, top1_rate: 0.47, top3_rate: 0.6, mrr: 0.597, coverage_rate: 0.667, actionable_rate: 0.6, calibrated_rate: 1.0, candidate_set_size: 3.07, posterior_entropy: 1.18 },
-        MEASUREMENT_NOISE: { n: 15, top1_rate: 0.4, top3_rate: 0.67, mrr: 0.586, coverage_rate: 0.933, actionable_rate: 0.33, calibrated_rate: 1.0, candidate_set_size: 4.2, posterior_entropy: 1.43 },
-        AMBIGUITY_DISAGREEMENT: { n: 15, top1_rate: 0.4, top3_rate: 0.6, mrr: 0.567, coverage_rate: 1.0, actionable_rate: 0.4, calibrated_rate: 1.0, candidate_set_size: 4.4, posterior_entropy: 1.61 },
+        NOMINAL: {
+          n: 15,
+          top1_rate: 0.73,
+          top3_rate: 0.87,
+          mrr: 0.821,
+          coverage_rate: 0.933,
+          actionable_rate: 0.8,
+          calibrated_rate: 1.0,
+          candidate_set_size: 2.0,
+          posterior_entropy: 0.55,
+        },
+        SENSOR_HEALTH_DEGRADED: {
+          n: 15,
+          top1_rate: 0.67,
+          top3_rate: 0.87,
+          mrr: 0.778,
+          coverage_rate: 0.867,
+          actionable_rate: 0.93,
+          calibrated_rate: 1.0,
+          candidate_set_size: 1.73,
+          posterior_entropy: 0.59,
+        },
+        SEVERITY_SHIFT: {
+          n: 15,
+          top1_rate: 0.73,
+          top3_rate: 0.87,
+          mrr: 0.815,
+          coverage_rate: 0.867,
+          actionable_rate: 0.8,
+          calibrated_rate: 1.0,
+          candidate_set_size: 2.27,
+          posterior_entropy: 0.78,
+        },
+        LOW_COVERAGE_ACTIVE_SAMPLING: {
+          n: 15,
+          top1_rate: 0.47,
+          top3_rate: 0.87,
+          mrr: 0.648,
+          coverage_rate: 0.933,
+          actionable_rate: 0.4,
+          calibrated_rate: 1.0,
+          candidate_set_size: 3.93,
+          posterior_entropy: 1.32,
+        },
+        SENSOR_DROPOUT: {
+          n: 15,
+          top1_rate: 0.47,
+          top3_rate: 0.6,
+          mrr: 0.597,
+          coverage_rate: 0.667,
+          actionable_rate: 0.6,
+          calibrated_rate: 1.0,
+          candidate_set_size: 3.07,
+          posterior_entropy: 1.18,
+        },
+        MEASUREMENT_NOISE: {
+          n: 15,
+          top1_rate: 0.4,
+          top3_rate: 0.67,
+          mrr: 0.586,
+          coverage_rate: 0.933,
+          actionable_rate: 0.33,
+          calibrated_rate: 1.0,
+          candidate_set_size: 4.2,
+          posterior_entropy: 1.43,
+        },
+        AMBIGUITY_DISAGREEMENT: {
+          n: 15,
+          top1_rate: 0.4,
+          top3_rate: 0.6,
+          mrr: 0.567,
+          coverage_rate: 1.0,
+          actionable_rate: 0.4,
+          calibrated_rate: 1.0,
+          candidate_set_size: 4.4,
+          posterior_entropy: 1.61,
+        },
       },
     },
     locked_topology_test: {
       // actionable_rate and calibrated_rate deliberately differ here so a
       // regression back to rendering actionable_rate as "calibrated rate"
       // (the exact bug this pass fixed) is caught by the test below.
-      source: { n: 20, top1_rate: 0.55, top3_rate: 0.7, mrr: 0.652, coverage_rate: 0.6, actionable_rate: 0.05, calibrated_rate: 0.15, candidate_set_size: 1.3, posterior_entropy: 0.21 },
-      planning: { human_approved_rate: 0.1, mean_candidates_generated: 1.2, mean_candidates_wntr_verified: 1.1 },
+      source: {
+        n: 20,
+        top1_rate: 0.55,
+        top3_rate: 0.7,
+        mrr: 0.652,
+        coverage_rate: 0.6,
+        actionable_rate: 0.05,
+        calibrated_rate: 0.15,
+        candidate_set_size: 1.3,
+        posterior_entropy: 0.21,
+      },
+      planning: {
+        human_approved_rate: 0.1,
+        mean_candidates_generated: 1.2,
+        mean_candidates_wntr_verified: 1.1,
+      },
       topology_shift_predictive: 'DESCRIPTIVE_NON_GATING',
     },
   },
@@ -65,12 +197,15 @@ function renderApp() {
 
 beforeEach(() => {
   // Mock fetch: return v5 evidence for the evidence JSON, reject everything else
-  vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
-    if (typeof url === 'string' && url.includes('hydrocore-v5-evidence.json')) {
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(v5EvidenceJson) });
-    }
-    return Promise.reject(new Error('offline test'));
-  }));
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockImplementation((url: string) => {
+      if (typeof url === 'string' && url.includes('hydrocore-v5-evidence.json')) {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(v5EvidenceJson) });
+      }
+      return Promise.reject(new Error('offline test'));
+    }),
+  );
   useConsoleStore.setState({
     workspace: 'incident',
     selectedNodeId: null,
@@ -209,11 +344,11 @@ describe('B. Authority labels', () => {
     expect(screen.queryByText('STRATEGIST')).toBeNull();
   });
 
-  test('Sentinel remains learned/advisory (not deterministic)', async () => {
+  test('Overview Source card labels the final ranking as fused, not raw Sentinel', async () => {
     renderApp();
     await screen.findByText('Verified response awaiting approval');
-    // Overview Source card should still say SENTINEL
-    expect(screen.getAllByText('SENTINEL').length).toBeGreaterThan(0);
+    expect(screen.getByText('FUSED SOURCE BELIEF')).toBeVisible();
+    expect(screen.queryByText('SENTINEL')).toBeNull();
   });
 });
 
@@ -309,8 +444,8 @@ describe('F. Counterfactual', () => {
 
   test('unavailable metric does not render a misleading quantitative bar', () => {
     const { container } = render(<Counterfactuals plans={[]} />);
-    const noResponseArticle = Array.from(container.querySelectorAll('article')).find(
-      (el) => el.textContent?.includes('NOT SIMULATED'),
+    const noResponseArticle = Array.from(container.querySelectorAll('article')).find((el) =>
+      el.textContent?.includes('NOT SIMULATED'),
     );
     expect(noResponseArticle).toBeDefined();
     // The spread-visual bar should NOT be present for the no-response branch
@@ -390,15 +525,15 @@ describe('H. Reference Source & Sampling truthfulness', () => {
     return render(<QueryClientProvider client={client}>{node}</QueryClientProvider>);
   }
 
-  test('Reference Source label differs from the LIVE/DEMO Sentinel label', async () => {
+  test('Reference Source label differs from the LIVE/DEMO fused-belief label', async () => {
     const first = renderWorkspace(<SourceWorkspace incident={demoIncident} />);
-    expect(await screen.findByText('HYDROCORE-v5 SENTINEL')).toBeVisible();
+    expect(await screen.findByText('CALIBRATED FUSION')).toBeVisible();
     first.unmount();
 
     const referenceIncident: IncidentView = { ...demoIncident, mode: 'REFERENCE' };
     renderWorkspace(<SourceWorkspace incident={referenceIncident} />);
     expect(await screen.findByText('DETERMINISTIC REFERENCE LOCALIZATION')).toBeVisible();
-    expect(screen.queryByText('HYDROCORE-v5 SENTINEL')).toBeNull();
+    expect(screen.queryByText('CALIBRATED FUSION')).toBeNull();
   });
 
   test('Reference Sampling uses incident.recommendedSample as the deterministic reference recommendation', async () => {
@@ -433,7 +568,9 @@ describe('H. Reference Source & Sampling truthfulness', () => {
     expect(
       screen.getByText('Deterministic classical signature narrows the candidate set to one node.'),
     ).toBeVisible();
-    expect(screen.queryByText('No grounded sample explanation available for this incident.')).toBeNull();
+    expect(
+      screen.queryByText('No grounded sample explanation available for this incident.'),
+    ).toBeNull();
   });
 });
 
