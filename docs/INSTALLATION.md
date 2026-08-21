@@ -79,6 +79,8 @@ macOS (Apple Silicon / arm64):
 
 Native macOS support targets Apple Silicon (arm64) only. The frozen runtime requires `torch>=2.5`, for which official macOS Intel/x86_64 binary support is unavailable upstream; `setup_hydroswarm_macos.sh` fails early with this explanation on Intel Macs rather than failing obscurely mid-install.
 
+**Known native Linux ARM64 limitation:** `wntr` 1.5's bundled EPANET toolkit ships prebuilt binaries for `windows-x64`, `darwin-x64`, `darwin-arm`, and `linux-x64` only -- there is no upstream `linux-arm64` build (confirmed against `wntr/epanet/toolkit.py`; see `docs/ARM_MIGRATION.md`). `setup_hydroswarm_linux.sh` and `hydroswarm self-test --strict` still pass on native Linux ARM64 (the strict self-test's bounded simulation does not need this binary), but a real WNTR/EPANET **water-quality** simulation call -- currently only `GET /api/live-example-inputs` (the Live Example judge path) -- fails with `OSError: .../libepanet22.so: cannot open shared object file` until the architecture-native library is built and installed at wntr's hardcoded path via `scripts/build_epanet_arm64.sh` (the same fix the Docker image applies automatically for `linux/arm64` in its `epanet-builder` build stage). This is an upstream packaging gap, not a HydroSwarm defect or a change to EPANET/WNTR verification semantics -- the exact same official EPANET 2.2 engine is used, just built for the host architecture. The Docker path (`docker compose build`) is unaffected and is the recommended path for judges on native Linux ARM64 hosts until this is wired into `setup_hydroswarm_linux.sh` directly.
+
 Windows PowerShell:
 
 ```powershell

@@ -371,6 +371,36 @@ def test_release_bundle_excludes_pycache(tmp_path: Path) -> None:
     assert not any(name.endswith((".pyc", ".pyo")) for name in names)
 
 
+def test_release_bundle_excludes_editable_install_scratch_artifacts(tmp_path: Path) -> None:
+    """release.yml's release-artifacts job runs `pip install -e .` before
+    calling build_bundle() (needed to build the frontend and to run the
+    manifest generator against an installed package) -- a real, reproduced
+    condition here, not a hypothetical: an editable setuptools install
+    creates `src/hydroswarm.egg-info/` (SOURCES.txt, PKG-INFO, ...), and
+    without this exclusion it would silently ship inside every real
+    release ZIP. Proven against a real stray directory under src/, not
+    just a filename string check."""
+    egg_info_dir = PROJECT_ROOT / "src" / "hydroswarm.egg-info"
+    pre_existing = egg_info_dir.is_dir()
+    if not pre_existing:
+        egg_info_dir.mkdir()
+        (egg_info_dir / "PKG-INFO").write_text("Name: hydroswarm\n")
+
+    try:
+        output = tmp_path / "test-runtime.zip"
+        build_release_bundle.build_bundle(output, release_version="v-test")
+
+        with zipfile.ZipFile(output) as archive:
+            names = archive.namelist()
+
+        assert not any(".egg-info" in name for name in names), names
+    finally:
+        if not pre_existing:
+            import shutil
+
+            shutil.rmtree(egg_info_dir, ignore_errors=True)
+
+
 def test_release_bundle_sha256sums_matches_every_entry(tmp_path: Path) -> None:
     import hashlib
 

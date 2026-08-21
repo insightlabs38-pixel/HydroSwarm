@@ -107,7 +107,16 @@ def _iter_files(directory: Path) -> list[Path]:
     return [
         path
         for path in sorted(directory.rglob("*"))
-        if path.is_file() and "__pycache__" not in path.parts and path.suffix not in {".pyc", ".pyo"}
+        if path.is_file()
+        and "__pycache__" not in path.parts
+        # release.yml's release-artifacts job runs `pip install -e .`
+        # (needed to build the frontend/run the manifest generator) before
+        # calling this function -- an editable setuptools install creates
+        # `src/hydroswarm.egg-info/` (SOURCES.txt, PKG-INFO, etc.), a local
+        # build-scratch artifact, not a runtime source file. Without this
+        # exclusion it would silently ship inside every real release ZIP.
+        and not any(part.endswith((".egg-info", ".dist-info")) for part in path.parts)
+        and path.suffix not in {".pyc", ".pyo"}
     ]
 
 

@@ -29,9 +29,13 @@ patch. Highlights:
 
 **Limitations:** all reported results are simulation-based measurements,
 not field-validated; there is no claim of real-world utility performance.
-Native support is macOS Apple Silicon only (no Intel Mac). HydroSwarm has
-no autonomous actuation path -- every plan requires a separate human
-approval event.
+Native macOS support is Apple Silicon only (no Intel Mac). Native Linux
+ARM64 setup passes `self-test --strict`, but the Live Example endpoint
+needs a manual `scripts/build_epanet_arm64.sh` step for real EPANET
+water-quality simulation until that is wired into the setup script
+directly -- see docs/INSTALLATION.md; the Docker image is unaffected.
+HydroSwarm has no autonomous actuation path -- every plan requires a
+separate human approval event.
 
 Also in this cycle:
 
