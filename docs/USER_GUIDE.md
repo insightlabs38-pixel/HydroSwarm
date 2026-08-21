@@ -1,5 +1,15 @@
 # Operator guide
 
+## Where things are
+
+**Primary operator workflow** (left rail, top group): Incident → Source → Sampling → Response → Approval → Replay (once available). This is the sequence sections 2–7 below walk through.
+
+**Secondary utilities** (left rail, bottom group): Network, Validation, Model & Authority, Benchmarks. These do not depend on which incident is open — Validation is the frozen M11.6 scientific evaluation, Benchmarks is deterministic regression/runtime evidence, Model & Authority is the frozen system authority path plus the current incident's Decision Certificates, and Network is where a local `.inp` is imported and validated.
+
+**Persistent surfaces**: the Decision Inspector (right-hand panel, present on the primary-workflow pages only) and the Technical Dock (bottom drawer, timeline/evidence/verification detail) are available throughout the workflow. A mode/reference banner appears at the top whenever the incident is not an ordinary LIVE/NORMAL one — REFERENCE, REPLAY, the illustrative DEMO_FALLBACK, or a suppressed-planning state.
+
+**REFERENCE INCIDENT vs LIVE EXAMPLE**: Reference Incident is a deterministic, checksummed replay of a frozen workflow artifact, used to demonstrate the product's workflow and authority boundaries reliably. Live Example runs the current HydroCore-v5 runtime on the same reference inputs. Reference replay is not live V5 inference and is never presented as one — see [Reference demo](REFERENCE_DEMO.md).
+
 ## 0. Start
 
 On first launch choose **Run Reference Incident** for a deterministic workflow replay, or proceed to a LIVE incident with a local network. The reference replay demonstrates product state/authority; final V5 performance evidence is in [Scientific evidence](SCIENTIFIC_EVIDENCE.md).

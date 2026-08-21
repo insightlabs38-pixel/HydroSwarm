@@ -5,7 +5,7 @@ HydroSwarm's frozen, WNTR-backed golden scenario. It is a product/workflow demon
 not final HydroCore-v5 benchmark evidence. Every value traces back to a real run of
 `scripts/run_golden.py`'s `GoldenScenarioRunner` and the frozen scenario/network fixtures.
 
-Label: `REFERENCE INCIDENT · VERIFIED REPLAY`. Supporting copy: *"Replaying a checksummed
+Label: `REFERENCE INCIDENT · CHECKSUMMED REPLAY`. Supporting copy: *"Replaying a checksummed
 HydroSwarm reference workflow generated from the frozen WNTR-backed scenario. Not live
 telemetry."*
 

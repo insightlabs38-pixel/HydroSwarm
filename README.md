@@ -8,9 +8,9 @@ Offline, physics-verified decision support for drinking-water contamination inci
 
 > **Research software, not production control.** All reported model/evaluation data are synthetic. HydroSwarm does not identify contaminant chemistry, certify water safety, replace laboratory or utility procedures, or execute infrastructure actions.
 
-![HydroSwarm first-launch gateway](docs/screenshots/first-launch-gateway.png)
+![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](docs/screenshots/first-launch-gateway.png)
 
-*The existing screenshots document the operator experience and provenance labels; they are not evidence of the current model identity. Final V5 identity and results are tied to immutable artifacts below.*
+*Screenshots ([more in docs/screenshots](docs/screenshots)) document the operator experience and provenance labels; they are not evidence of the current model identity. Final V5 identity and results are tied to immutable artifacts below.*
 
 ## What HydroSwarm does
 
