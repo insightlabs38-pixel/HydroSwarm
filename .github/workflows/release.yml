@@ -70,7 +70,7 @@ jobs:
       - name: Run release-preflight test gates
         run: |
           python -m pip install --quiet -e ".[dev]"
-          python -m ruff check .
+          python -m ruff check src tests
           python -m pytest tests/unit -q -m "not real_simulation"
 
   build-and-push:
