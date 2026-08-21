@@ -103,33 +103,46 @@ def test_release_workflow_does_not_publish_on_arbitrary_branch_push() -> None:
     assert "pull_request" not in triggers, "must not publish from PRs against arbitrary branches"
 
 
-def test_release_workflow_targets_both_platforms() -> None:
+def test_release_workflow_builds_each_platform_natively_with_no_qemu() -> None:
+    """v0.2.0 preflight: the original combined `linux/amd64,linux/arm64`
+    QEMU-emulated build was observed to stall for 90+ minutes at the
+    frontend Node stage's `npm ci` under arm64 emulation. Each platform is
+    now built natively on a matching-architecture runner, and this
+    workflow must never reintroduce QEMU."""
+    with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
+        workflow = yaml.safe_load(handle)
+    assert workflow["jobs"]["build-candidate-amd64"]["runs-on"] == "ubuntu-latest"
+    assert workflow["jobs"]["build-candidate-arm64"]["runs-on"] == "ubuntu-24.04-arm"
+    assert workflow["jobs"]["container-self-test-amd64"]["runs-on"] == "ubuntu-latest"
+    assert workflow["jobs"]["container-self-test-arm64"]["runs-on"] == "ubuntu-24.04-arm"
+
     text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
-    assert "linux/amd64,linux/arm64" in text
-    assert "setup-qemu-action" in text
+    assert "setup-qemu-action" not in text
     assert "setup-buildx-action" in text
 
 
 def test_release_workflow_has_a_container_self_test_gate_for_each_platform() -> None:
     with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
         workflow = yaml.safe_load(handle)
-    job = workflow["jobs"]["container-self-test"]
-    assert job["strategy"]["matrix"]["platform"] == ["linux/amd64", "linux/arm64"]
+    assert "container-self-test-amd64" in workflow["jobs"]
+    assert "container-self-test-arm64" in workflow["jobs"]
     text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
     # SUB-12.1 #21: the release gate uses `--strict`, which already
     # requires trained_assets.ready, a FITTED calibration, the
     # reference-demo artifact, and a built frontend -- report['ok'] is the
     # single real verdict, not a hand-picked subset of fields re-checked here.
-    assert "self-test --strict" in text
-    assert "report['ok'] is True" in text
+    assert text.count("self-test --strict") >= 2
+    assert text.count("report['ok'] is True") == 2
 
 
 def test_release_workflow_verifies_frozen_bundle_hashes_before_building() -> None:
     with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
         workflow = yaml.safe_load(handle)
     job_order = list(workflow["jobs"])
-    assert job_order.index("verify-frozen-bundle") < job_order.index("build-candidate")
-    assert "needs" in workflow["jobs"]["build-candidate"]
+    assert job_order.index("verify-frozen-bundle") < job_order.index("build-candidate-amd64")
+    assert job_order.index("verify-frozen-bundle") < job_order.index("build-candidate-arm64")
+    assert "needs" in workflow["jobs"]["build-candidate-amd64"]
+    assert "needs" in workflow["jobs"]["build-candidate-arm64"]
 
 
 # --- P0 fix: publication order (v0.2.0 preflight) ---------------------------
@@ -143,45 +156,74 @@ def test_release_workflow_verifies_frozen_bundle_hashes_before_building() -> Non
 
 
 def test_release_workflow_never_pushes_a_final_tag_before_testing() -> None:
-    """The pre-validation build/push step (`build-candidate`) must publish
-    ONLY a disposable, clearly non-final candidate tag -- never the
-    requested release version and never `latest`. If a future edit
-    reintroduces `${{ needs.verify-frozen-bundle.outputs.release_version }}`
-    or `:latest` into this job's own tags, this must fail."""
+    """The pre-validation per-arch build/push steps must publish ONLY a
+    temporary, unnamed candidate identity (digest-only push -- no tag at
+    all) -- never the requested release version and never `latest`. If a
+    future edit reintroduces a `tags:` pointing at
+    `${{ needs.verify-frozen-bundle.outputs.release_version }}` or
+    `:latest` into either per-arch build job, this must fail."""
     with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
         workflow = yaml.safe_load(handle)
-    build_job = workflow["jobs"]["build-candidate"]
-    build_step = next(step for step in build_job["steps"] if step.get("id") == "build")
-    tags = build_step["with"]["tags"]
-    assert "release-candidate-" in tags
-    assert "release_version" not in tags
-    assert ":latest" not in tags
+    for job_name in ("build-candidate-amd64", "build-candidate-arm64"):
+        build_step = next(step for step in workflow["jobs"][job_name]["steps"] if step.get("id") == "build")
+        with_block = build_step["with"]
+        assert "push-by-digest=true" in with_block["outputs"]
+        assert "tags" not in with_block
+        outputs_text = with_block["outputs"]
+        assert "release_version" not in outputs_text
+        assert ":latest" not in outputs_text
 
 
 def test_release_workflow_container_self_test_pulls_by_exact_digest() -> None:
-    """container-self-test must pull the exact digest build-candidate
-    produced, not a mutable tag -- otherwise "the tested image" and "the
-    image later promoted" could silently diverge."""
+    """Each container-self-test-<arch> job must pull the exact digest its
+    matching build-candidate-<arch> job produced, not a mutable tag --
+    otherwise "the tested image" and "the image later combined/promoted"
+    could silently diverge."""
     text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
-    assert "needs.build-candidate.outputs.digest" in text
-    assert "docker pull --platform ${{ matrix.platform }} \"$image_ref\"" in text
+    assert "needs.build-candidate-amd64.outputs.digest" in text
+    assert "needs.build-candidate-arm64.outputs.digest" in text
+    assert text.count('docker pull "$image_ref"') == 2
 
 
-def test_release_workflow_final_promotion_depends_on_container_self_test() -> None:
-    """Final-tag promotion must be gated on the container-self-test job
-    actually succeeding on both platforms, and must reuse the SAME tested
-    digest (via `docker buildx imagetools create`, a registry-native
-    retag) rather than rebuilding a second, unvalidated image."""
+def test_release_workflow_combine_candidate_reuses_tested_digests_without_rebuilding() -> None:
+    """combine-candidate must depend on both per-arch container-self-test
+    jobs actually succeeding, and must fold the SAME tested digests into
+    one multiarch manifest (via `docker buildx imagetools create`, a
+    registry-native operation) rather than rebuilding either image."""
+    with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
+        workflow = yaml.safe_load(handle)
+    combine_job = workflow["jobs"]["combine-candidate"]
+    assert "container-self-test-amd64" in combine_job["needs"]
+    assert "container-self-test-arm64" in combine_job["needs"]
+    assert "build-candidate-amd64" in combine_job["needs"]
+    assert "build-candidate-arm64" in combine_job["needs"]
+
+    combine_step = next(step for step in combine_job["steps"] if step.get("id") == "combine")
+    assert "docker buildx imagetools create" in combine_step["run"]
+    assert "needs.build-candidate-amd64.outputs.digest" in combine_step["run"]
+    assert "needs.build-candidate-arm64.outputs.digest" in combine_step["run"]
+
+    verify_step = next(
+        step for step in combine_job["steps"] if "imagetools inspect --raw" in step.get("run", "")
+    )
+    assert "'linux/amd64'" in verify_step["run"]
+    assert "'linux/arm64'" in verify_step["run"]
+
+
+def test_release_workflow_final_promotion_depends_on_combined_candidate() -> None:
+    """Final-tag promotion must be gated on combine-candidate (which
+    itself required both per-arch self-tests to pass) and must reuse the
+    SAME tested combined digest rather than rebuilding a second,
+    unvalidated image."""
     with (PROJECT_ROOT / ".github" / "workflows" / "release.yml").open() as handle:
         workflow = yaml.safe_load(handle)
     promote_job = workflow["jobs"]["promote-release"]
-    assert "container-self-test" in promote_job["needs"]
-    assert "build-candidate" in promote_job["needs"]
+    assert "combine-candidate" in promote_job["needs"]
 
     text = (PROJECT_ROOT / ".github" / "workflows" / "release.yml").read_text()
     assert "docker buildx imagetools create" in text
     promote_step = next(step for step in promote_job["steps"] if "imagetools create" in step.get("run", ""))
-    assert "needs.build-candidate.outputs.digest" in promote_step["run"]
+    assert "needs.combine-candidate.outputs.digest" in promote_step["run"]
 
 
 def test_release_workflow_promotion_and_github_release_are_publish_only() -> None:

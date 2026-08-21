@@ -9,33 +9,53 @@ name: HydroSwarm Release
 # pushed the FINAL version tag and `latest` in the same step that built the
 # image, *before* the post-push amd64/arm64 strict container-self-test ran
 # -- meaning a broken image could exist under a public, final tag for as
-# long as it took the self-test job to fail. This revision separates
-# "build and test" from "publish" so that never happens again:
+# long as it took the self-test job to fail. That revision separated
+# "build and test" from "publish"; this revision additionally replaces the
+# single QEMU-emulated `linux/amd64,linux/arm64` combined build with two
+# NATIVE per-architecture builds, because that QEMU build was observed to
+# stall for 90+ minutes at the frontend Node stage's `npm ci` under arm64
+# emulation (npm's native bindings/syscall volume are notoriously slow
+# under QEMU). Current flow:
 #
 #   verify-frozen-bundle
-#   -> build-candidate        (push ONLY a disposable `release-candidate-<sha>`
-#                               tag; never the final version tag or `latest`)
-#   -> container-self-test    (pull the exact candidate DIGEST -- not the
-#                               mutable tag -- and run `self-test --strict`
-#                               on both linux/amd64 and linux/arm64)
-#   -> promote-release        (tag-push only: retag -- never rebuild -- the
-#                               SAME tested digest as the final version and
-#                               `latest`, via `docker buildx imagetools create`)
-#   -> release-artifacts      (build/verify RELEASE_MANIFEST.json + the
+#   -> build-candidate-amd64   (runs-on: ubuntu-latest, linux/amd64, NATIVE --
+#   -> build-candidate-arm64      runs-on: ubuntu-24.04-arm, linux/arm64, NATIVE;
+#                                  no QEMU anywhere in this workflow any more.
+#                                  Each pushes its image by DIGEST ONLY --
+#                                  push-by-digest=true, no tag -- a temporary,
+#                                  immutable, unnamed candidate identity)
+#   -> container-self-test-amd64  (needs build-candidate-amd64; runs-on:
+#   -> container-self-test-arm64      ubuntu-latest / ubuntu-24.04-arm to match;
+#                                      pulls the exact per-arch DIGEST -- not a
+#                                      tag -- natively, no QEMU, and runs
+#                                      `self-test --strict`)
+#   -> combine-candidate       (needs both self-tests to have passed; combines
+#                               -- never rebuilds -- the two already-tested
+#                               per-arch digests into one multiarch manifest
+#                               tagged `release-candidate-<sha>` via
+#                               `docker buildx imagetools create`, then
+#                               verifies the resulting manifest list contains
+#                               exactly linux/amd64 + linux/arm64, each
+#                               pointing at the exact digest that was tested)
+#   -> promote-release          (tag-push only: retag -- never rebuild -- the
+#                               SAME tested combined digest as the final
+#                               version and `latest`)
+#   -> release-artifacts        (build/verify RELEASE_MANIFEST.json + the
 #                               runtime zip against the tested digest;
 #                               create the GitHub Release only on a real
 #                               tag push)
 #
 # `workflow_dispatch` deliberately has no `release_version` input and never
 # runs `promote-release` or creates a GitHub Release -- it is a NON-PUBLISHING
-# preflight run of the exact same build+test flow (this is Option A from the
+# preflight run of the exact same build+test+combine flow (Option A from the
 # v0.2.0 preflight task: a tag push is the only publishing trigger, and a
 # manual run from `main` -- where `GITHUB_REF_NAME` is `main`, not a version
 # -- can never be interpreted as a legitimate release version because it
-# never reaches the promotion/publish jobs at all). The only artifact a
-# `workflow_dispatch` run publishes anywhere is the disposable
-# `release-candidate-<sha>` image tag itself, which is never promoted to a
-# final tag unless a real `vX.Y.Z` tag triggered the run.
+# never reaches the promotion/publish jobs at all). The only artifacts a
+# `workflow_dispatch` run publishes anywhere are digest-only per-arch pushes
+# and the disposable `release-candidate-<sha>` multiarch tag, neither of
+# which is ever promoted to a final tag unless a real `vX.Y.Z` tag triggered
+# the run.
 on:
   push:
     tags: ["v*"]
@@ -114,16 +134,16 @@ jobs:
           python -m ruff check src tests
           python -m pytest tests/unit -q -m "not real_simulation"
 
-  build-candidate:
+  # Native linux/amd64 build -- no QEMU. Pushed by DIGEST ONLY (no tag): a
+  # temporary, immutable, unnamed candidate identity, never a final tag or
+  # `latest`.
+  build-candidate-amd64:
     needs: verify-frozen-bundle
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set up QEMU (cross-arch emulation for linux/arm64)
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -135,69 +155,166 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Publishes ONLY a disposable, clearly non-final staging tag -- never
-      # the requested release version and never `latest`. Those are only
-      # ever written by promote-release below, and only by retagging this
-      # exact digest, never by a second build.
-      - name: Build and push staging candidate image (never a final tag)
+      - name: Build and push linux/amd64 candidate by digest (native, no QEMU)
         id: build
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}
+          platforms: linux/amd64
+          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           provenance: true
           sbom: true
 
-  container-self-test:
-    needs: [verify-frozen-bundle, build-candidate]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [linux/amd64, linux/arm64]
+  # Native linux/arm64 build on a genuine arm64 runner -- no QEMU. Pushed by
+  # DIGEST ONLY (no tag), same as the amd64 leg above.
+  build-candidate-arm64:
+    needs: verify-frozen-bundle
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
-      - name: Set up QEMU (cross-arch emulation for linux/arm64)
-        uses: docker/setup-qemu-action@v3
+      - uses: actions/checkout@v4
 
-      # SUB-3 acceptance criterion: "amd64 image boots; arm64 image
-      # builds/smokes; one tag resolves both architectures." SUB-12.1 #21:
-      # --strict requires trained assets ready, a genuinely FITTED
-      # calibration (not merely loadable), the reference-demo artifact
-      # present, the frontend built, and zero resource warnings.
-      #
-      # Pulled by immutable DIGEST, not by the mutable candidate tag: this
-      # is the exact same artifact promote-release will later retag as the
-      # final release, byte for byte, not merely "an image with the same
-      # tag at the time this ran."
-      - name: Pull and self-test (${{ matrix.platform }}) -- exact candidate digest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push linux/arm64 candidate by digest (native, no QEMU)
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          provenance: true
+          sbom: true
+
+  # SUB-3 acceptance criterion: "amd64 image boots; arm64 image
+  # builds/smokes; one tag resolves both architectures." SUB-12.1 #21:
+  # --strict requires trained assets ready, a genuinely FITTED calibration
+  # (not merely loadable), the reference-demo artifact present, the
+  # frontend built, and zero resource warnings. Pulled by immutable
+  # DIGEST, not a tag: this is the exact same artifact combine-candidate
+  # will later fold into the multiarch manifest, byte for byte. Runs
+  # natively on a matching-architecture runner -- no QEMU, no
+  # `--platform` flag needed since the digest already names one specific
+  # single-arch image.
+  container-self-test-amd64:
+    needs: [verify-frozen-bundle, build-candidate-amd64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull and self-test (linux/amd64, native) -- exact candidate digest
         run: |
-          image_ref="${{ env.IMAGE_NAME }}@${{ needs.build-candidate.outputs.digest }}"
-          docker pull --platform ${{ matrix.platform }} "$image_ref"
-          docker run --rm --platform ${{ matrix.platform }} \
-            "$image_ref" \
-            hydroswarm self-test --strict > self-test-${{ strategy.job-index }}.json
+          image_ref="${{ env.IMAGE_NAME }}@${{ needs.build-candidate-amd64.outputs.digest }}"
+          docker pull "$image_ref"
+          docker run --rm "$image_ref" hydroswarm self-test --strict > self-test.json
           python3 -c "
           import json, sys
           FROZEN_MODEL_SHA256 = 'de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5'
           FROZEN_ARCHITECTURE_VERSION = 'hydroswarm-v5-release-v1'
-          report = json.load(open('self-test-${{ strategy.job-index }}.json'))
+          report = json.load(open('self-test.json'))
           assert report['ok'] is True, report.get('strict_failures', report)
           trained_assets = report['trained_assets']
           assert trained_assets['model_sha256'] == FROZEN_MODEL_SHA256, trained_assets
           assert trained_assets['architecture_version'] == FROZEN_ARCHITECTURE_VERSION, trained_assets
           assert trained_assets['calibration_status'] == 'FITTED', trained_assets
-          print('container strict self-test OK for ${{ matrix.platform }}:', trained_assets['model_sha256'])
+          print('container strict self-test OK for linux/amd64 (native):', trained_assets['model_sha256'])
+          "
+
+  container-self-test-arm64:
+    needs: [verify-frozen-bundle, build-candidate-arm64]
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Pull and self-test (linux/arm64, native) -- exact candidate digest
+        run: |
+          image_ref="${{ env.IMAGE_NAME }}@${{ needs.build-candidate-arm64.outputs.digest }}"
+          docker pull "$image_ref"
+          docker run --rm "$image_ref" hydroswarm self-test --strict > self-test.json
+          python3 -c "
+          import json, sys
+          FROZEN_MODEL_SHA256 = 'de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5'
+          FROZEN_ARCHITECTURE_VERSION = 'hydroswarm-v5-release-v1'
+          report = json.load(open('self-test.json'))
+          assert report['ok'] is True, report.get('strict_failures', report)
+          trained_assets = report['trained_assets']
+          assert trained_assets['model_sha256'] == FROZEN_MODEL_SHA256, trained_assets
+          assert trained_assets['architecture_version'] == FROZEN_ARCHITECTURE_VERSION, trained_assets
+          assert trained_assets['calibration_status'] == 'FITTED', trained_assets
+          print('container strict self-test OK for linux/arm64 (native):', trained_assets['model_sha256'])
+          "
+
+  # Combines -- never rebuilds -- the two already-tested per-arch digests
+  # into one multiarch manifest, then verifies the result contains exactly
+  # those two platforms pointing at exactly those two tested digests. This
+  # is a registry-metadata operation (`docker buildx imagetools create`),
+  # not an image build, so it needs no QEMU either.
+  combine-candidate:
+    needs:
+      [
+        verify-frozen-bundle,
+        build-candidate-amd64,
+        build-candidate-arm64,
+        container-self-test-amd64,
+        container-self-test-arm64,
+      ]
+    runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.combine.outputs.digest }}
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Combine the two tested per-arch digests into one multiarch candidate manifest (no rebuild)
+        id: combine
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}" \
+            "${{ env.IMAGE_NAME }}@${{ needs.build-candidate-amd64.outputs.digest }}" \
+            "${{ env.IMAGE_NAME }}@${{ needs.build-candidate-arm64.outputs.digest }}"
+          # The default (non --format) text output's own "Digest:" line is
+          # the documented, stable way to read this back.
+          digest=$(docker buildx imagetools inspect "${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}" | awk '/^Digest:/{print $2; exit}')
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+
+      - name: Verify the combined manifest contains exactly the two tested per-arch digests
+        run: |
+          docker buildx imagetools inspect --raw "${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}" | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          platforms = {
+              f\"{m['platform']['os']}/{m['platform']['architecture']}\": m['digest']
+              for m in data['manifests']
+              if 'platform' in m
+          }
+          expected = {
+              'linux/amd64': '${{ needs.build-candidate-amd64.outputs.digest }}',
+              'linux/arm64': '${{ needs.build-candidate-arm64.outputs.digest }}',
+          }
+          assert platforms == expected, (platforms, expected)
+          print('combined candidate manifest verified: exactly', sorted(platforms), 'each pointing at its own tested digest')
           "
 
   # Tag-push (real release) only. Never runs for workflow_dispatch --
   # `needs.verify-frozen-bundle.outputs.is_release` is only 'true' for a
   # push event that resolved a valid `vX.Y.Z` tag above. Retags the exact
-  # digest that already passed container-self-test on both platforms; does
-  # NOT rebuild, so there is no way for the published tag to point at an
-  # image that was never actually tested.
+  # combined digest that already passed both per-arch container-self-tests;
+  # does NOT rebuild, so there is no way for the published tag to point at
+  # an image that was never actually tested.
   promote-release:
-    needs: [verify-frozen-bundle, build-candidate, container-self-test]
+    needs: [verify-frozen-bundle, combine-candidate]
     if: needs.verify-frozen-bundle.outputs.is_release == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -211,36 +328,32 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Promote the exact tested digest to the final release tag and latest
+      - name: Promote the exact tested combined digest to the final release tag and latest
         run: |
-          source_ref="${{ env.IMAGE_NAME }}@${{ needs.build-candidate.outputs.digest }}"
+          source_ref="${{ env.IMAGE_NAME }}@${{ needs.combine-candidate.outputs.digest }}"
           docker buildx imagetools create \
             --tag "${{ env.IMAGE_NAME }}:${{ needs.verify-frozen-bundle.outputs.release_version }}" \
             --tag "${{ env.IMAGE_NAME }}:latest" \
             "$source_ref"
 
-      - name: Verify both promoted tags resolve to the exact tested digest
+      - name: Verify both promoted tags resolve to the exact tested combined digest
         run: |
-          expected="${{ needs.build-candidate.outputs.digest }}"
+          expected="${{ needs.combine-candidate.outputs.digest }}"
           for tag in "${{ needs.verify-frozen-bundle.outputs.release_version }}" latest; do
-            # The default (non --format) text output's own "Digest:" line
-            # is the documented, stable way to read this back -- avoids
-            # depending on undocumented internal field names of the
-            # manifest-list JSON body itself.
             resolved=$(docker buildx imagetools inspect "${{ env.IMAGE_NAME }}:${tag}" | awk '/^Digest:/{print $2; exit}')
             if [ "$resolved" != "$expected" ]; then
-              echo "::error::Promoted tag '${tag}' resolves to ${resolved}, not the tested candidate digest ${expected}" >&2
+              echo "::error::Promoted tag '${tag}' resolves to ${resolved}, not the tested combined candidate digest ${expected}" >&2
               exit 1
             fi
-            echo "promoted tag '${tag}' verified to point at the exact tested digest: $resolved"
+            echo "promoted tag '${tag}' verified to point at the exact tested combined digest: $resolved"
           done
 
   # Runs for BOTH event types: this is also the CI-enforced, non-publishing
   # release-manifest/ZIP dry run (v0.2.0 preflight task sections 9-10).
   # Only the final "Create GitHub Release" step is gated to a real tag push.
   release-artifacts:
-    needs: [verify-frozen-bundle, build-candidate, container-self-test, promote-release]
-    if: "always() && needs.container-self-test.result == 'success' && (needs.promote-release.result == 'success' || needs.promote-release.result == 'skipped')"
+    needs: [verify-frozen-bundle, combine-candidate, promote-release]
+    if: "always() && needs.combine-candidate.result == 'success' && (needs.promote-release.result == 'success' || needs.promote-release.result == 'skipped')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -255,8 +368,8 @@ jobs:
           cd frontend && npm ci && npm run build
 
       # The container identity this manifest/ZIP describes is always the
-      # SAME digest container-self-test already verified on both
-      # platforms -- for a real release it is that digest under its
+      # SAME combined digest container-self-test-{amd64,arm64} already
+      # verified -- for a real release it is that digest under its
       # promoted final tag; for a non-publishing preflight run it is that
       # digest under its disposable candidate tag. Never a second,
       # unvalidated image.
@@ -269,7 +382,7 @@ jobs:
           else
             echo "image=${{ env.IMAGE_NAME }}:release-candidate-${{ github.sha }}" >> "$GITHUB_OUTPUT"
           fi
-          echo "digest=${{ needs.build-candidate.outputs.digest }}" >> "$GITHUB_OUTPUT"
+          echo "digest=${{ needs.combine-candidate.outputs.digest }}" >> "$GITHUB_OUTPUT"
 
       - name: Build RELEASE_MANIFEST.json
         run: |
