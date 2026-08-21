@@ -1,5 +1,5 @@
 # Native Windows setup for HydroSwarm: creates a project-local virtual
-# environment, installs the CPU runtime, verifies the frozen HydroCore-v4
+# environment, installs the CPU runtime, verifies the frozen HydroCore-v5
 # release bundle, builds the frontend if needed, and runs the readiness
 # self-test. Safe to re-run -- every step is idempotent.
 #
@@ -75,13 +75,13 @@ Write-Info "Installing dependencies into .venv (CPU wheels; never global) ..."
 & $VenvPython -m pip install -e "." --quiet
 Write-Info "✓ Runtime dependencies installed"
 
-# --- 4. Verify the frozen V4 release bundle ---------------------------------
-Write-Info "Verifying frozen HydroCore-v4 release bundle ..."
+# --- 4. Verify the frozen V5 release bundle ---------------------------------
+Write-Info "Verifying frozen HydroCore-v5 release bundle ..."
 & $VenvPython "$ProjectRoot\scripts\setup_common.py" verify-bundle
 if ($LASTEXITCODE -ne 0) {
-    Fail "frozen HydroCore-v4 bundle failed verification (see above). This is a P0 blocker -- the release bundle under models\hydrocore-v4-release\ must be present and hash-verified before the app can serve the frozen architecture."
+    Fail "frozen HydroCore-v5 bundle failed verification (see above). This is a P0 blocker -- the release bundle under models\hydrocore-v5-release\ must be present and hash-verified before the app can serve the frozen architecture."
 }
-Write-Info "✓ Frozen HydroCore-v4 bundle verified"
+Write-Info "✓ Frozen HydroCore-v5 bundle verified"
 
 # --- 5. Frontend: use prebuilt dist\ if present, else build with Node 22 ----
 $FrontendStatus = & $VenvPython "$ProjectRoot\scripts\setup_common.py" frontend-status

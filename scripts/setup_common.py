@@ -58,14 +58,18 @@ def cmd_check_python(_args: argparse.Namespace) -> int:
 
 
 def cmd_verify_bundle(_args: argparse.Namespace) -> int:
-    """Verify the frozen V4 release bundle exists and hashes match, using the
-    project's own resolver/factory so setup-time verification cannot drift
-    from what the running application actually checks at startup."""
+    """Verify the frozen V5 release bundle exists and hashes match, using the
+    same resolver/factory the running application actually serves from
+    (`hydroswarm.api.app`, `hydroswarm.cli.run_self_test`) so setup-time
+    verification cannot drift from what the application actually checks at
+    startup. This never falls back to the historical V4 bundle: it succeeds
+    only when the V5 bundle itself is present and hash-verified, regardless
+    of whether the V4 bundle happens to also exist in the checkout."""
     sys.path.insert(0, str(_project_root() / "src"))
-    from hydroswarm.runtime import V4PipelineFactory, resolve_v4_bundle_dir
+    from hydroswarm.runtime import V5PipelineFactory, resolve_v5_bundle_dir
 
-    bundle_dir = resolve_v4_bundle_dir(_project_root())
-    factory = V4PipelineFactory(bundle_dir)
+    bundle_dir = resolve_v5_bundle_dir(_project_root())
+    factory = V5PipelineFactory(bundle_dir)
     report = {
         "ok": factory.trained_assets_ready,
         "bundle_dir": str(bundle_dir),
@@ -74,7 +78,7 @@ def cmd_verify_bundle(_args: argparse.Namespace) -> int:
     }
     print(json.dumps(report))
     if not report["ok"]:
-        print(f"error: frozen HydroCore-v4 bundle failed verification: {factory.fallback_reason}", file=sys.stderr)
+        print(f"error: frozen HydroCore-v5 bundle failed verification: {factory.fallback_reason}", file=sys.stderr)
         return 1
     return 0
 
@@ -110,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("check-python", help="Verify interpreter is 64-bit Python >= 3.12.")
-    subparsers.add_parser("verify-bundle", help="Verify the frozen V4 release bundle.")
+    subparsers.add_parser("verify-bundle", help="Verify the frozen V5 release bundle.")
     subparsers.add_parser("frontend-status", help="Report whether frontend/dist is already built.")
     self_test_parser = subparsers.add_parser(
         "self-test", help="Run and render the application readiness self-test."

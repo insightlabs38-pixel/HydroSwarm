@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Native macOS setup for HydroSwarm: creates a project-local virtual
 # environment, installs the CPU runtime, verifies WNTR/EPANET and the
-# frozen HydroCore-v4 release bundle, builds the frontend if needed, and
+# frozen HydroCore-v5 release bundle, builds the frontend if needed, and
 # runs the readiness self-test. Safe to re-run -- every step is idempotent.
 #
 # This script never uses `sudo`, never installs anything outside ./.venv,
@@ -74,18 +74,18 @@ log "Installing dependencies into .venv (CPU wheels; never global) ..."
 "$VENV_PYTHON" -m pip install -e "." --quiet
 log "✓ Runtime dependencies installed"
 
-# --- 4. Verify WNTR/EPANET import + the frozen V4 release bundle -----------
+# --- 4. Verify WNTR/EPANET import + the frozen V5 release bundle -----------
 log "Verifying WNTR/EPANET import ..."
 if ! "$VENV_PYTHON" -c "import wntr; wntr.sim.EpanetSimulator" >/dev/null 2>&1; then
   fail "WNTR failed to import its EPANET simulator binding. Reinstall with: .venv/bin/python -m pip install --force-reinstall wntr"
 fi
 log "✓ WNTR/EPANET import verified"
 
-log "Verifying frozen HydroCore-v4 release bundle ..."
+log "Verifying frozen HydroCore-v5 release bundle ..."
 if ! "$VENV_PYTHON" "$PROJECT_ROOT/scripts/setup_common.py" verify-bundle; then
-  fail "frozen HydroCore-v4 bundle failed verification (see above). This is a P0 blocker -- the release bundle under models/hydrocore-v4-release/ must be present and hash-verified before the app can serve the frozen architecture."
+  fail "frozen HydroCore-v5 bundle failed verification (see above). This is a P0 blocker -- the release bundle under models/hydrocore-v5-release/ must be present and hash-verified before the app can serve the frozen architecture."
 fi
-log "✓ Frozen HydroCore-v4 bundle verified"
+log "✓ Frozen HydroCore-v5 bundle verified"
 
 # --- 5. Frontend: use prebuilt dist/ if present, else build with Node 22 ----
 FRONTEND_STATUS=$("$VENV_PYTHON" "$PROJECT_ROOT/scripts/setup_common.py" frontend-status)

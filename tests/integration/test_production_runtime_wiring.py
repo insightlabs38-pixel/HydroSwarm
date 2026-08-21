@@ -1,15 +1,22 @@
 """UI-11.1 Section 1: the normal documented production launch
 (start_hydroswarm.sh/.bat -> hydroswarm.cli start -> hydroswarm.api.app:app)
-must serve the frozen, tagged `hydrocore-v4-architecture-freeze` candidate by
-default, composed through the existing `V4PipelineFactory` against the
-committed `models/hydrocore-v4-release/` bundle -- not the older
-`DefaultPipelineFactory`/`models/hydrocore-s-learning-v1.safetensors`
-(hydrocore-v3, adapters=true, feature_and_logit) path.
+must serve the frozen HydroCore-v5 M10 frozen release by default, composed
+through `V5PipelineFactory` against the committed `models/hydrocore-v5-release/`
+bundle -- not the older `DefaultPipelineFactory`/
+`models/hydrocore-s-learning-v1.safetensors` (hydrocore-v3, adapters=true,
+feature_and_logit) path, and never falling back to the historical
+`V4PipelineFactory`/`models/hydrocore-v4-release/` bundle either. Two tests
+below (`test_missing_v4_release_bundle_fails_closed`,
+`test_v4_factory_drives_a_real_incident_analysis_through_the_production_app`)
+separately exercise `V4PipelineFactory` itself in isolation -- that class
+still exists and is still correct, it is simply not what production wiring
+resolves to.
 
-These identity constants are copied verbatim from the `hydrocore-v4-architecture-freeze`
-git tag message and `reports/results/v4/architecture-freeze.json` -- if this
-test ever needs to change these values, that is itself a sign something
-requires human review (a real re-freeze), not a routine test update.
+These identity constants are copied verbatim from the M11.2 finalist freeze
+(`reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json`) and the
+frozen `models/hydrocore-v5-release/runtime_manifest.json` -- if this test
+ever needs to change these values, that is itself a sign something requires
+human review (a real re-freeze), not a routine test update.
 """
 
 from __future__ import annotations
@@ -39,7 +46,7 @@ V5_RELEASE_BUNDLE_DIR = PROJECT_ROOT / "models" / "hydrocore-v5-release"
 def test_module_level_production_app_is_wired_to_v5_pipeline_factory() -> None:
     """The real module-level `app` object -- exactly what
     `uvicorn hydroswarm.api.app:app` (started by start_hydroswarm.sh/.bat via
-    `hydroswarm.cli start`) serves -- must resolve to V4PipelineFactory, not
+    `hydroswarm.cli start`) serves -- must resolve to V5PipelineFactory, not
     DefaultPipelineFactory."""
 
     from hydroswarm.api.app import DEFAULT_V5_RELEASE_BUNDLE_DIR, app
@@ -183,7 +190,7 @@ def test_exact_wntr_verification_authority_is_unaffected_by_the_pipeline_factory
     source; this test proves the underlying WNTR machinery that code path
     calls remains fully real and unaltered). This is why swapping the
     default neural pipeline_factory from DefaultPipelineFactory to
-    V4PipelineFactory cannot weaken exact verification: the two concerns
+    V5PipelineFactory cannot weaken exact verification: the two concerns
     are architecturally decoupled, not merely coincidentally unaffected."""
 
     network = wntr.network.WaterNetworkModel(str(PROJECT_ROOT / "data" / "topologies" / "loop-grid.inp"))

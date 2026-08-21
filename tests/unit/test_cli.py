@@ -32,7 +32,7 @@ def test_self_test_validates_dependencies_network_sqlite_and_model() -> None:
 @pytest.mark.real_simulation
 def test_strict_self_test_passes_against_the_real_committed_frozen_release(tmp_path) -> None:
     """SUB-12.1 #21: against this repository's own committed state (the
-    frozen V4 release bundle, its FITTED calibration, the committed
+    frozen V5 release bundle, its FITTED calibration, the committed
     reference-demo artifact, and a built frontend/dist), strict mode must
     report real success -- not just that it runs without crashing."""
     report = cli.run_self_test(strict=True)
@@ -134,7 +134,7 @@ def test_main_self_test_human_prints_checklist_not_json(
     out = capsys.readouterr().out
     assert "HydroSwarm readiness" in out
     assert "READY" in out
-    assert "OK Frozen HydroCore-v4 bundle verified" in out
+    assert "OK Frozen HydroCore-v5 bundle verified" in out
     with pytest.raises(json.JSONDecodeError):
         json.loads(out)
 
@@ -150,9 +150,29 @@ def test_render_self_test_report_flags_not_ready_reasons() -> None:
     }
     rendered = cli.render_self_test_report(report)
     assert "NOT READY" in rendered
-    assert "FAIL Frozen HydroCore-v4 bundle verified" in rendered
+    assert "FAIL Frozen HydroCore-v5 bundle verified" in rendered
     assert "reason: classical-safe fallback" in rendered
     assert "reason: frontend not built" in rendered
+
+
+@pytest.mark.real_simulation
+def test_human_readable_report_agrees_with_machine_readable_v5_identity() -> None:
+    """No self-test surface may say V4 while reporting V5 machine identity:
+    the human-facing checklist's bundle-verified line must describe
+    HydroCore-v5, matching the machine-readable architecture_version,
+    model_sha256, and calibration_status the same report already carries."""
+    report = cli.run_self_test(strict=False)
+    rendered = cli.render_self_test_report(report)
+
+    assert "V4" not in rendered
+    trained_assets = report["trained_assets"]
+    if trained_assets["ready"]:
+        assert "OK Frozen HydroCore-v5 bundle verified" in rendered
+        assert trained_assets["architecture_version"] == "hydroswarm-v5-release-v1"
+        assert trained_assets["model_sha256"] == "de2b3f56243a1933d1d7c5957cd74a29fade119f7d104ce7f1500b3dd7b6d2a5"
+        assert trained_assets["calibration_status"] == "FITTED"
+    else:
+        assert "FAIL Frozen HydroCore-v5 bundle verified" in rendered
 
 
 def test_start_uses_localhost_and_default_port(monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]) -> None:

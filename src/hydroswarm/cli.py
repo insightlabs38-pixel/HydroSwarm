@@ -28,7 +28,7 @@ DEFAULT_PORT = 8765
 def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     """Run bounded startup checks with fixed model and WNTR reference execution.
 
-    `strict=True` (SUB-12.1 #21) additionally requires the frozen V4 bundle
+    `strict=True` (SUB-12.1 #21) additionally requires the frozen V5 bundle
     to be ready with a genuinely FITTED calibration artifact (not merely
     loadable), the reference-demo artifact to be present, the frontend to
     be built, and resource checks to have produced zero warnings -- used by
@@ -138,8 +138,8 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     # UI-11.1 / submission-readiness SUB-1: self-test must validate the
     # exact same production runtime hydroswarm.api.app:app actually
     # launches with. Both now resolve the bundle directory through the
-    # single shared hydroswarm.runtime.paths.resolve_v4_bundle_dir
-    # function (HYDROSWARM_V4_BUNDLE_DIR override, else the source-tree
+    # single shared hydroswarm.runtime.paths.resolve_v5_bundle_dir
+    # function (HYDROSWARM_V5_BUNDLE_DIR override, else the source-tree
     # default) instead of two independently-computed, workspace-relative
     # paths that could silently diverge for a non-editable install or a
     # non-repository-root working directory.
@@ -147,12 +147,12 @@ def run_self_test(*, strict: bool = False) -> dict[str, Any]:
     trained_assets_ready = trained_factory.trained_assets_ready
     release_manifest = trained_factory.manifest
 
-    # SUB-12.1 #21: read the bundle's own calibration-status.json directly
-    # (the same file V4PipelineFactory's internal loader already validated
-    # a real calibration.json against, or explicitly recorded the reason
-    # one isn't present) rather than adding a new public property to the
-    # runtime factory just for this report -- self-test already resolves
-    # the same bundle directory the factory loaded from.
+    # SUB-12.1 #21: read the bundle's own calibration-status directly (the
+    # same calibration.json V5PipelineFactory's internal loader already
+    # validated, or explicitly recorded the reason one isn't present)
+    # rather than adding a new public property to the runtime factory just
+    # for this report -- self-test already resolves the same bundle
+    # directory the factory loaded from.
     calibration_status = "FITTED" if trained_assets_ready else "MISSING"
 
     reference_artifact_path = resolve_reference_demo_path()
@@ -231,7 +231,7 @@ def render_self_test_report(report: dict[str, Any]) -> str:
     reference_artifact = report.get("reference_artifact", {})
     checks: list[tuple[bool, str]] = [
         (report.get("ok", False), "Python runtime"),
-        (bool(trained_assets.get("ready")), "Frozen HydroCore-v4 bundle verified"),
+        (bool(trained_assets.get("ready")), "Frozen HydroCore-v5 bundle verified"),
         (bool(trained_assets.get("model_sha256")), "Model SHA-256 verified"),
         (bool(trained_assets.get("normalization_hash")), "Normalization verified"),
         (trained_assets.get("calibration_status") == "FITTED", "Calibration FITTED"),
@@ -301,7 +301,7 @@ def self_test_command(
         False,
         "--strict",
         help=(
-            "Also require the frozen V4 bundle to be ready with a FITTED "
+            "Also require the frozen V5 bundle to be ready with a FITTED "
             "calibration, the reference-demo artifact to be present, the "
             "frontend to be built, and zero resource warnings -- exits "
             "nonzero if any of those fail, not just on a crash. Used by "
