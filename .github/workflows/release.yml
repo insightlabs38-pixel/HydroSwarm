@@ -223,7 +223,11 @@ jobs:
         run: |
           expected="${{ needs.build-candidate.outputs.digest }}"
           for tag in "${{ needs.verify-frozen-bundle.outputs.release_version }}" latest; do
-            resolved=$(docker buildx imagetools inspect "${{ env.IMAGE_NAME }}:${tag}" --format '{{json .Manifest}}' | python3 -c "import json, sys; print('sha256:' + json.load(sys.stdin)['digest'].split(':', 1)[1])")
+            # The default (non --format) text output's own "Digest:" line
+            # is the documented, stable way to read this back -- avoids
+            # depending on undocumented internal field names of the
+            # manifest-list JSON body itself.
+            resolved=$(docker buildx imagetools inspect "${{ env.IMAGE_NAME }}:${tag}" | awk '/^Digest:/{print $2; exit}')
             if [ "$resolved" != "$expected" ]; then
               echo "::error::Promoted tag '${tag}' resolves to ${resolved}, not the tested candidate digest ${expected}" >&2
               exit 1
