@@ -23,7 +23,7 @@ The older six-diagram set remains intact for historical provenance and existing 
 | [authority-architecture.mmd](authority-architecture.mmd) / [SVG](authority-architecture.svg) | Pre-V5 authority architecture |
 | [hydrocore-v4.mmd](hydrocore-v4.mmd) / [SVG](hydrocore-v4.svg) | HydroCore-v4 architecture |
 | [model-lifecycle.mmd](model-lifecycle.mmd) / [SVG](model-lifecycle.svg) | Pre-final-V5 lifecycle |
-| [reference-incident-flow.mmd](reference-incident-flow.mmd) / [SVG](reference-incident-flow.svg) | Reference-incident workflow; still useful as workflow evidence. The `.mmd` source's final-stage label was corrected for the post-completion Replay-unavailable truth (see [Reference demo](../REFERENCE_DEMO.md#replay-availability)); the committed SVG export has not been regenerated to match and remains stale on that one label pending a browser-capable render |
+| [reference-incident-flow.mmd](reference-incident-flow.mmd) / [SVG](reference-incident-flow.svg) | Reference-incident workflow; still useful as workflow evidence. The final-stage label reflects the post-completion Replay-unavailable truth (see [Reference demo](../REFERENCE_DEMO.md#replay-availability)) |
 | [offline-deployment.mmd](offline-deployment.mmd) / [SVG](offline-deployment.svg) | Historical deployment diagram |
 
 ## Rendering
