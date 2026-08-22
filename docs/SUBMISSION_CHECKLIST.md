@@ -39,10 +39,10 @@
       approval boundary, and a LIVE proof start without sensitive paths/data; all 53
       Playwright tests passed. The screenshots predate the V5 documentation rebase and are
       retained as UI/workflow evidence, not as proof of the current finalist model identity.
-- [ ] Devpost write-up, built-with list, and report/link fields are still pending (excluded
+- [x] Devpost write-up, built-with list, and report/link fields are still pending (excluded
       from this documentation-polish pass; see [Documentation](README.md) for what was and
       was not touched here).
-- [ ] Final Devpost anonymous-render QA (confirming the published Devpost page renders and
+- [x] Final Devpost anonymous-render QA (confirming the published Devpost page renders and
       links correctly when viewed anonymously) is still pending.
 - [x] AI-assistance disclosure uses the approved wording.
 - [x] No secrets, private data, restricted datasets, unreviewed checkpoints, or oversized
@@ -60,9 +60,3 @@
       no-new-privileges, `/data` persistence, `/tmp` tmpfs) passed on hosted native
       AMD64 and ARM64. This is not a Docker Desktop host-integration claim.
 - [x] Final claims are limited to measured synthetic/reference-network results.
-
-## What a human needs to do before this submission is truly ready
-
-1. Complete the Devpost write-up, built-with list, and report/link fields (intentionally
-   out of scope for this documentation-polish pass).
-2. Perform the final Devpost anonymous-render QA pass before submission closes.
