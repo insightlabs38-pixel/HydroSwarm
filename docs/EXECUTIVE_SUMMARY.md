@@ -6,6 +6,8 @@ When a water utility gets an abnormal sensor reading, it rarely knows what cause
 
 This sets the central design requirement: the system must not only rank likely sources, it must also know when its evidence is insufficient to support an operational recommendation, and it must prevent unsupported predictions from becoming operational advice.
 
+For the research basis behind this problem framing, and a breakdown of what impact is measured versus merely plausible, see [Problem and product boundary](PROBLEM.md).
+
 ## 2. What HydroSwarm does
 
 HydroSwarm processes an incident through a fixed sequence, with a distinct kind of authority behind each stage:

@@ -25,7 +25,7 @@ This ledger gives reviewers a compact mapping from a claim to its evidence and t
 | Larger M model was not promoted | [M9 final summary](../reports/evaluation/hydrocore-v5/m9-final/m9-final-summary.md) | “larger M did not meet predeclared meaningful capacity-gain threshold” | “small is universally superior” |
 | M10.4 development trajectories passed | [M10.4 closure](../reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-closure.json) | “full development trajectory gate passed” | treat M10.4 as final held-out evidence |
 | Reference incident demonstrates workflow | [Reference demo](REFERENCE_DEMO.md) | “checksummed WNTR-backed replay of a frozen workflow” | use it as final V5 benchmark evidence |
-| Current source app serves V5 | source runtime / finalist freeze | “current source app defaults to V5” | say the pinned historical release-compose image is V5 |
+| Current source app serves V5 | source runtime / finalist freeze | “current source app defaults to V5; the published `v0.2.1` release-compose image also serves V5” | say a pre-`v0.2.0` release-compose tag is V5 |
 
 ## Numeric claim rules
 

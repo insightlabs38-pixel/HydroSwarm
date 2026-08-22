@@ -110,7 +110,7 @@ See [Authority and safety](AUTHORITY_AND_SAFETY.md) for the full authority matri
 
 ## Runtime and deployment
 
-The current source app uses `V5PipelineFactory(resolve_v5_bundle_dir())`. The current Dockerfile bakes both historical V4 and final V5 assets but the app chooses V5. For an actual V5 container, build the current checkout; the pinned historical release-compose tag predates the V5 freeze. See [Installation](INSTALLATION.md).
+The current source app uses `V5PipelineFactory(resolve_v5_bundle_dir())`. The current Dockerfile bakes both historical V4 and final V5 assets but the app chooses V5. For a V5 container, either pull the published `docker-compose.release.yml` image (`ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1`) or build the current checkout; both resolve to the same frozen V5 identity. See [Installation](INSTALLATION.md).
 
 ## Security boundary
 

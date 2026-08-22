@@ -1,6 +1,6 @@
 # Installation and offline launch
 
-> **Current model identity:** the source application serves the frozen HydroCore-v5 bundle through `V5PipelineFactory(resolve_v5_bundle_dir())`. `docker-compose.release.yml` now targets the intended `v0.2.0` V5 release image, but as of this pre-tag commit that tag has not been published yet; use one of the V5 source paths below until it is.
+> **Current model identity:** the source application serves the frozen HydroCore-v5 bundle through `V5PipelineFactory(resolve_v5_bundle_dir())`. `docker-compose.release.yml` points at the published `v0.2.1` V5 release image (see [Path A](#v5-path-a-published-release-recommended) below), and the same identity is served by a from-source build or a native install.
 
 ## Runtime boundary
 
@@ -26,9 +26,23 @@ Current diagram source: [diagrams/offline-deployment-v5.mmd](diagrams/offline-de
 - installation-time internet access to obtain dependencies unless they are already cached
 - runtime internet access is not required by the scientific pipeline
 
-## V5 path A: build the current Docker checkout
+## V5 path A: published release (recommended)
 
-This is the cleanest container path to the **current source**:
+This is the simplest path for a judge: no local build, just pull the tested image.
+
+```bash
+git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
+cd HydroSwarm
+docker compose -f docker-compose.release.yml up
+```
+
+Then open `http://127.0.0.1:8765`.
+
+`docker-compose.release.yml` pulls `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1` -- the published, tested multiarch (`linux/amd64` + `linux/arm64`) judge/release image -- rather than building from this checkout. That image is promoted only after passing the same strict self-test the from-source build runs, so it carries the same V5 identity as [Path B](#v5-path-b-build-the-current-docker-checkout) below. The release compose file publishes `127.0.0.1:8765`, drops Linux capabilities, prevents privilege escalation, uses a read-only root filesystem, and persists `/data` in a named volume.
+
+## V5 path B: build the current Docker checkout
+
+This is the container path to the **current source**, useful when reviewing an uncommitted or in-progress change rather than the tagged release:
 
 ```bash
 git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
@@ -50,17 +64,7 @@ The current `Dockerfile`:
 
 The developer compose file publishes `127.0.0.1:8765`, drops Linux capabilities, prevents privilege escalation, uses a read-only root filesystem, and persists `/data`.
 
-## Important: release-compose image is not published yet (pre-tag state)
-
-```bash
-docker compose -f docker-compose.release.yml up
-```
-
-is **not usable at the current repository state**. `docker-compose.release.yml` is pinned to `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.0`, the intended V5 release tag, but no image has been published under that tag yet -- `v0.2.0` has not been tagged or released. Once the real `v0.2.0` tag is pushed and the release workflow's `promote-release` job publishes the tested image, this path will work as documented; until then it will fail with an image-not-found error.
-
-This is a packaging/publication-sequencing fact, not a model/evaluation ambiguity. Until `v0.2.0` is published, use [V5 path A](#v5-path-a-build-the-current-docker-checkout) (developer compose, built from this checkout's own current Dockerfile) or [V5 path B](#v5-path-b-native-setup-and-launch) below instead.
-
-## V5 path B: native setup and launch
+## V5 path C: native setup and launch
 
 ```bash
 git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
@@ -158,7 +162,7 @@ The scientific runtime does not require a hosted model service. The application 
 - Frontend missing: rebuild `frontend/dist`.
 - WNTR/EPANET check fails: verify the installed simulator dependency/runtime.
 - Do not delete the incident database to “fix” a migration or evidence inconsistency; preserve the record and inspect the error.
-- Do not use the historical release-compose image when validating V5.
+- If validating V5 against an older tag (e.g. `v0.1.x-hackathon`), be aware those historical release artifacts are the pre-V5 bundle; use the published `v0.2.1` release or the current source checkout for V5.
 
 ## Reproducibility checks
 

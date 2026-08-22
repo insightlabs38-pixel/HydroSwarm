@@ -1,9 +1,21 @@
 # Changelog
 
-## Unreleased -- targeting `0.2.1` / future tag `v0.2.1`
+## Unreleased
+
+Documentation/submission polish only, after `v0.2.1`: corrected stale
+pre-tag/release-state wording (installation, quickstart, judging,
+submission checklist, doc router), corrected the Reference Incident
+replay-availability claim, added real-world problem evidence and a
+measured-vs-plausible impact section, and added a judge quick path and
+sustainability/scale summary.
+
+No runtime, model, calibration, authority, or M11.6 changes. M11.6 was not
+rerun.
+
+## 0.2.1 - 2026-08-22
 
 Patch release: one real product bug fix, no scientific/model/authority
-changes.
+changes. Tagged and published as `v0.2.1` on 2026-08-22.
 
 - Fixed the "Run Live Example" judge path: it called the real deterministic
   sampling-recommendation endpoint unconditionally after initial analysis.

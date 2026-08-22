@@ -30,7 +30,7 @@ Use this path to audit supervision scope, split governance, final lock, syntheti
 
 [Quickstart](QUICKSTART.md) → [Operator guide](USER_GUIDE.md) → [Limitations](LIMITATIONS.md)
 
-For V5, build/run the current source. The pinned `docker-compose.release.yml` image is historical V4 packaging.
+For V5, run the published `docker-compose.release.yml` image (`ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1`) or build/run the current source; both serve the same frozen V5 identity.
 
 ## Core current documentation
 

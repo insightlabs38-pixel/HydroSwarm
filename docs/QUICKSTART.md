@@ -2,20 +2,28 @@
 
 The fastest accurate path to the **current HydroCore-v5 source**.
 
-## Docker: current checkout
+## Docker: published release (recommended)
 
 ```bash
 git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
 cd HydroSwarm
+docker compose -f docker-compose.release.yml up
+```
+
+Open `http://127.0.0.1:8765`.
+
+This pulls the published, tested multiarch `v0.2.1` image (`ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1`) directly rather than building locally.
+
+## Docker: build from this checkout
+
+```bash
 docker compose build
 docker compose up
 ```
 
 Open `http://127.0.0.1:8765`.
 
-This builds the current Dockerfile, includes the frozen V5 bundle, runs the strict V5 readiness check during the build, and launches the V5-default API.
-
-> `docker compose -f docker-compose.release.yml up` now points at the intended `v0.2.0` V5 release image, but that tag has not been published yet at this pre-tag commit -- it will fail with an image-not-found error until `v0.2.0` is tagged and released. Use the checkout build above to verify the current V5 system in the meantime.
+This builds the current Dockerfile, includes the frozen V5 bundle, runs the strict V5 readiness check during the build, and launches the V5-default API. Useful when reviewing an uncommitted or in-progress change rather than the tagged release.
 
 ## Native
 

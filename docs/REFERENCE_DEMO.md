@@ -31,7 +31,7 @@ flowchart TD
   M6 --> M7["unsafe_plan_rejected"]
   M7 --> M8["safe_plan_verified"]
   M8 --> M9["human_approval_boundary<br/>PAUSE: approve plan"]
-  M9 --> M10["completed<br/>replayable event ledger"]
+  M9 --> M10["completed<br/>final audit hash; Replay unavailable"]
 ```
 
 Source: [diagrams/reference-incident-flow.mmd](diagrams/reference-incident-flow.mmd).
@@ -57,11 +57,24 @@ The generated artifact reveals fields only after the underlying frozen workflow 
 
 The deterministic-classical reference replay does not run the live V5 split-conformal pipeline. It therefore must not display live calibration coverage as if it were current model evidence. A LIVE incident retains current calibration/applicability fields.
 
+## Replay availability
+
+The Reference Incident is a deterministic, checksummed, progressive replay of a frozen
+WNTR-backed workflow. That replay demonstrates the staged workflow itself — explicit sample and
+human-approval pauses, exact verification state, and a final provenance/audit hash.
+
+Post-completion **Replay of the Reference Incident is intentionally unavailable**. The frozen
+reference artifact does not contain individual event-ledger records, so there is nothing to
+populate the Replay workspace with after completion. The application deliberately leaves Replay
+in an "unavailable" state rather than rendering an empty or fabricated ledger. This is a stated
+limitation of the reference artifact, not a bug: a LIVE incident's own audit/history is a
+separate, independently supported code path and is not affected by this limitation.
+
 ## What the reference incident proves—and does not
 
-It is strong evidence that the product can present the intended governed workflow, provenance labels, exact-plan verification states, human pause, and replay.
+It is strong evidence that the product can present the intended governed workflow, provenance labels, exact-plan verification states, and the human approval pause.
 
-It does **not** establish V5 predictive accuracy, locked-test performance, novel-topology generalization, or field safety. Those claims belong to [Scientific evidence](SCIENTIFIC_EVIDENCE.md).
+It does **not** establish V5 predictive accuracy, locked-test performance, novel-topology generalization, or field safety. Those claims belong to [Scientific evidence](SCIENTIFIC_EVIDENCE.md). It also does not provide a populated post-completion Replay workspace — see [Replay availability](#replay-availability) above.
 
 ## Validation
 

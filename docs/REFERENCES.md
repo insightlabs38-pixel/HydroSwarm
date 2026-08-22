@@ -20,7 +20,8 @@ The table intentionally makes narrow claims about prior systems rather than asse
 - US EPA, [Water Network Tool for Resilience (WNTR)](https://usepa.github.io/WNTR/).
 - US EPA, [TEVA-SPOT Toolkit](https://www.epa.gov/water-research/teva-spot-toolkit).
 - US EPA, [CANARY Event Detection Software](https://www.epa.gov/water-research/canary-event-detection-software).
-- US EPA, [Water Quality Surveillance and Response](https://www.epa.gov/waterresilience).
+- US EPA, [Information about Public Water Systems](https://www.epa.gov/dwreginfo/information-about-public-water-systems) — public water system count and population served.
+- US EPA, [Fact Sheet about Water Quality Surveillance and Response System](https://www.epa.gov/waterresilience/fact-sheet-about-water-quality-surveillance-and-response-system) — monitoring/sampling/response framework.
 - University of Kentucky, [Water Distribution System Research Database](https://uknowledge.uky.edu/wdsrd/).
 
 ## Models, uncertainty, and training

@@ -4,9 +4,9 @@ flowchart TD
   A <--> P["V5PipelineFactory"]
   P <--> M["Frozen HydroCore-v5 bundle"]
   P <--> W["WNTR / EPANET"]
+  R["release-compose: published<br/>ghcr.io v0.2.1 image"] --> A
   S["Current-source Docker build"] --> A
   N["Current-source native launch"] --> A
-  R["release-compose tag v0.2.0<br/>(intended V5 path,<br/>not yet published)"] -.-> H["Pending publication"]
 
   X["No hosted model API"]
   Y["No required cloud inference"]

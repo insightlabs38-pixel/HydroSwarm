@@ -49,7 +49,13 @@ docker compose up
 
 The current Dockerfile includes the V5 bundle and runs the strict self-test during image build.
 
-Do not use `docker-compose.release.yml` to verify the final V5 system yet: it is pinned to the intended `v0.2.0` release image, but as of this pre-tag commit that tag has not been published, so the pull will fail.
+`docker-compose.release.yml` is pinned to the published `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1` image and is also a valid way to reproduce the current V5 system without a local build:
+
+```bash
+docker compose -f docker-compose.release.yml up
+```
+
+That image was promoted only after the same strict amd64/arm64 self-test the local Docker build runs, so both paths verify the same V5 identity.
 
 ## Verify the one-time lock without reopening it
 
@@ -125,7 +131,7 @@ The M9.6 manifest preserves the other seeds and calibration/development evaluati
 
 - Early V5 M1 corpus generation records cross-environment WNTR/NumPy RNG divergence relative to historical `cycle-b2` replay; the generated V5 corpus is therefore identified by its own manifests rather than assumed to reproduce old scenario IDs.
 - The final M9.6 train/serve unobserved-age semantic deviation is frozen and documented.
-- Release packaging is not yet aligned: the pinned public release-compose image is older than the V5 source (a new immutable image tag must be published before `docker-compose.release.yml` can point at it).
+- Release packaging is aligned as of `v0.2.1`: the published `docker-compose.release.yml` image and the current V5 source resolve to the same frozen bundle identity.
 
 These caveats should be fixed only in a separate authorized code/packaging pass, not silently rewritten into the frozen evidence.
 

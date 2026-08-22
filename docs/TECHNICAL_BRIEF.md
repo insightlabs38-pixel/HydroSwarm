@@ -56,7 +56,7 @@ Topology predictive metrics are descriptive/non-gating. The operational topology
 
 FastAPI + SQLite + bounded local jobs expose typed local APIs and durable audit history. The current source app serves V5. `hydroswarm self-test --strict` checks the V5 bundle and a bounded real WNTR run.
 
-For V5 Docker, build the current checkout. The pinned `docker-compose.release.yml` tag is historical V4 packaging and is not a current V5 release image.
+For V5 Docker, either run the published release (`docker compose -f docker-compose.release.yml up`, `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1`) or build the current checkout; both resolve to the same frozen V5 identity.
 
 ## Reproducibility
 

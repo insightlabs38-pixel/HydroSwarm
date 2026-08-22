@@ -8,6 +8,14 @@ Offline, physics-verified decision support for drinking-water contamination inci
 
 > **Research software, not production control.** All reported model/evaluation data are synthetic. HydroSwarm does not identify contaminant chemistry, certify water safety, replace laboratory or utility procedures, or execute infrastructure actions.
 
+## Judge quick path
+
+- **Watch** — final 3:23 demo: [vimeo.com/1220385465](https://vimeo.com/1220385465?share=copy&fl=sv&fe=ci#t=0)
+- **Run** — published `v0.2.1` via `docker compose -f docker-compose.release.yml up` (see [below](#try-the-current-v5-source))
+- **Understand** — [docs/EXECUTIVE_SUMMARY.md](docs/EXECUTIVE_SUMMARY.md)
+- **Verify** — [docs/SCIENTIFIC_EVIDENCE.md](docs/SCIENTIFIC_EVIDENCE.md)
+- **Deep technical review** — [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) + [docs/AUTHORITY_AND_SAFETY.md](docs/AUTHORITY_AND_SAFETY.md)
+
 ![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](docs/screenshots/first-launch-gateway.png)
 
 *Screenshots ([more in docs/screenshots](docs/screenshots)) document the operator experience and provenance labels; they are not evidence of the current model identity. Final V5 identity and results are tied to immutable artifacts below.*
@@ -67,7 +75,19 @@ The aggregate stress matrix is materially weaker than the nominal subset, especi
 
 ## Try the current V5 source
 
-### Docker from this checkout
+### Published release (recommended)
+
+```bash
+git clone https://github.com/insightlabs38-pixel/HydroSwarm.git
+cd HydroSwarm
+docker compose -f docker-compose.release.yml up
+```
+
+Open `http://127.0.0.1:8765`.
+
+This pulls the published, tested multiarch `v0.2.1` image (`ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1`) directly from GHCR rather than building locally.
+
+### Build from this checkout
 
 ```bash
 docker compose build
@@ -85,7 +105,7 @@ cd HydroSwarm
 ./start_hydroswarm_linux.sh   # or matching platform launcher
 ```
 
-The current API default serves V5 and `hydroswarm self-test --strict` validates the V5 release bundle; the native setup scripts, the runtime ZIP builder, `RELEASE_MANIFEST.json` generation, and the Docker image now all resolve exclusively to the same V5 bundle, with no current-path dependency on the historical V4 bundle. One packaging caveat remains: `docker-compose.release.yml` now targets the intended `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.0` release image, but that tag is **not yet published** at this pre-tag commit -- it will become the V5 launch path once `v0.2.0` is tagged and released. See [Installation](docs/INSTALLATION.md) for exact behavior.
+The current API default serves V5 and `hydroswarm self-test --strict` validates the V5 release bundle. The native setup scripts, the runtime ZIP builder, `RELEASE_MANIFEST.json` generation, and the Docker image (both the published `v0.2.1` release image and a from-source build) all resolve exclusively to the same V5 bundle, with no current-path dependency on the historical V4 bundle. See [Installation](docs/INSTALLATION.md) for full platform support and exact behavior.
 
 ## Authority and safety boundaries
 
@@ -99,10 +119,17 @@ The current API default serves V5 and `hydroswarm self-test --strict` validates 
 
 These are architectural boundaries and measured locked-evaluation invariants; they do not establish real-world utility safety.
 
+## What is actually novel?
+
+HydroSwarm does not claim that hydraulic simulation, contamination localization, graph learning, conformal prediction, or active sampling are individually novel — see [References and prior art](docs/REFERENCES.md) for the specific systems and papers this work builds on.
+
+Its implemented contribution is the **governed integration** of those pieces into one auditable authority chain: learned/localization evidence → explicit calibration applicability → deterministic OOD/evidence gating → deterministic sampling/planning → exact WNTR/EPANET verification → separate human approval. Prediction and permission-to-act are decided by different mechanisms, and a learned output alone cannot authorize a response.
+
 ## Documentation
 
 For a fast technical review:
 
+- [Problem and impact](docs/PROBLEM.md) — real-world basis, measured-vs-plausible impact, sustainability/scale path.
 - [Scientific evidence](docs/SCIENTIFIC_EVIDENCE.md) — final locked matrix, gates, provenance, limitations.
 - [Judging evidence map](docs/JUDGING.md) — 2-minute, 5-minute, and deep-review paths.
 - [Final system](docs/FINAL_SYSTEM.md) — frozen identity and authority.

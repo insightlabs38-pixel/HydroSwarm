@@ -15,7 +15,7 @@ flowchart TD
   M6 --> M7["unsafe_plan_rejected"]
   M7 --> M8["safe_plan_verified"]
   M8 --> M9["human_approval_boundary\n(PAUSE -- Approve plan)"]
-  M9 --> M10["completed\n(replayable event ledger)"]
+  M9 --> M10["completed\n(final audit hash; Replay unavailable)"]
 
   classDef pause fill:#f4b45f,stroke:#7a5a20,color:#1a1206,font-weight:bold;
   classDef done fill:#b6df83,stroke:#324a1a,color:#0c1806,font-weight:bold;

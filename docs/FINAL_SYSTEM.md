@@ -134,7 +134,7 @@ For the complete per-condition matrix and gating/descriptive distinction, see [S
 
 The current source application default is V5. `hydroswarm.api.app:app` constructs `V5PipelineFactory(resolve_v5_bundle_dir())`, and the current strict self-test loads the same V5 bundle.
 
-For current V5 Docker behavior, build the current checkout (`docker compose build && docker compose up`). `docker-compose.release.yml` is pinned to the intended `v0.2.0` V5 release image, but that tag has not been published yet at this pre-tag commit; it will become a working V5 release path once `v0.2.0` is tagged and released. This is a packaging/publication-sequencing fact, not a change to the frozen finalist.
+For V5 via the published release, run `docker compose -f docker-compose.release.yml up`, which pulls `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1` -- the current published judge/release image, promoted only after passing the same strict self-test. For a from-source V5 container, build the current checkout (`docker compose build && docker compose up`) instead. Both paths resolve to the same frozen finalist identity.
 
 See [Installation](INSTALLATION.md).
 
