@@ -4,7 +4,7 @@ AI coding assistants were used as engineering tools during HydroSwarm developmen
 
 - ChatGPT / Codex;
 - Claude / Claude Code;
-- Codebuff.
+- Freebuff.
 
 They were used for implementation assistance, debugging, test generation, documentation review, code/architecture critique, and repository maintenance.
 
