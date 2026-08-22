@@ -1,6 +1,6 @@
 # Quickstart
 
-The fastest accurate path to the **current HydroCore-v5 source**.
+The fastest accurate path to the **current HydroSwarm v0.2.1 release and frozen HydroCore-v5 runtime**.
 
 ## Docker: published release (recommended)
 

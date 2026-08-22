@@ -53,7 +53,7 @@ This maps the six submission-review categories plus the bonus to explicit subcri
 | Rubric subcriterion | Evidence | Claim boundary |
 |---|---|---|
 | **Ease of use** | [Operator guide](USER_GUIDE.md) — primary left-rail workflow, persistent Decision Inspector, Technical Dock, explicit states, and first-launch Reference/Live paths | Designed for the intended professional context; not a formal operator-usability study |
-| **Aesthetic appeal** | Professional decision-support information hierarchy — primary workflow separated from Decision Inspector/Technical Dock; evidence, provenance, verification, and authority intentionally remain visible | Technical density is intentional engineering design; no claim of validated human-factors optimization |
+| **Visual quality** | Professional decision-support information hierarchy — primary workflow separated from Decision Inspector/Technical Dock; evidence, provenance, verification, and authority intentionally remain visible | Technical density is intentional engineering design; no claim of validated human-factors optimization |
 | **Accessibility** | Explicit text status labels (`PROPOSED`, `VERIFYING`, `REJECTED`, `VERIFIED`, `APPROVED`), provenance banners, burned-caption demo, and documented workflow states rather than color-only meaning | These are concrete accessibility-oriented choices; this is not a formal accessibility audit |
 
 ### 5. Sustainability & Scalability
@@ -66,11 +66,11 @@ This maps the six submission-review categories plus the bonus to explicit subcri
 
 ### 6. Presentation & Communication
 
-| Review subcriterion | Evidence | Claim boundary |
+| Rubric subcriterion | Evidence | Claim boundary |
 |---|---|---|
-| **Narrative clarity** | [Executive summary](EXECUTIVE_SUMMARY.md) + [README judge quick path](../README.md#judge-quick-path) — problem first, then governed workflow, final evidence, and limitations | Concise routing does not replace the underlying technical/scientific dossiers |
-| **Demo quality** | [Final demo video (3:23)](https://vimeo.com/1220385465?share=copy&fl=sv&fe=ci#t=0) — burned captions, explicit distinction between Reference replay and Live `v0.2.1` computation, an actual governed abstention, then the locked scientific evidence | A recorded walkthrough and current runtime observation, not a substitute for running the release or benchmark evidence |
-| **Documentation & evidence traceability** | [Scientific evidence](SCIENTIFIC_EVIDENCE.md), [Claims and evidence](CLAIMS_AND_EVIDENCE.md), [Final system](FINAL_SYSTEM.md) — one canonical detailed scientific dossier, with headline summaries elsewhere linking back to it | Repeated headline metrics are summaries; immutable/generated artifacts remain the authority when prose conflicts |
+| **Clarity** | [README](../README.md), [Executive summary](EXECUTIVE_SUMMARY.md), and the [final 3:23 demo](https://vimeo.com/1220385465?share=copy&fl=sv&fe=ci#t=0) explain the problem, governed workflow, results, and limitations | Concise presentation and routing do not replace the underlying technical and scientific evidence |
+| **Demonstration** | [Final 3:23 demo](https://vimeo.com/1220385465?share=copy&fl=sv&fe=ci#t=0) shows the governed workflow, Reference/Live distinction, actual governed abstention, verification state, and locked scientific evidence, with burned captions | A recorded walkthrough and current runtime observation; the Live example is not M11.6 benchmark evidence and the video is not a substitute for running the release |
+| **Q&A / defensibility** | [Final system](FINAL_SYSTEM.md), [Architecture](ARCHITECTURE.md), [Authority and safety](AUTHORITY_AND_SAFETY.md), [Scientific evidence](SCIENTIFIC_EVIDENCE.md), [Reproducibility](REPRODUCIBILITY.md), [Limitations](LIMITATIONS.md), and [Claims and evidence](CLAIMS_AND_EVIDENCE.md) provide traceable evidence for model identity, architecture, authority boundaries, evaluation methodology, limitations, and exact claim wording, so major design and result claims can be defended from source artifacts rather than unsupported assertions | **Documentation and immutable artifacts support technical defensibility of the project’s major claims; this does not imply that every possible implementation or domain question has been independently validated.** |
 
 ### Bonus: Exceptionality
 
