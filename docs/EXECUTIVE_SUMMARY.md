@@ -10,7 +10,7 @@ For the research basis behind this problem framing, and a breakdown of what impa
 
 ## 2. What HydroSwarm does
 
-HydroSwarm processes an incident through a fixed sequence, with a distinct kind of authority behind each stage:
+HydroSwarm processes an incident through a governed sequence with explicit stop points, with a distinct kind of authority behind each stage:
 
 ```mermaid
 flowchart LR
@@ -22,7 +22,9 @@ flowchart LR
   F --> G["Human approves"]
 ```
 
-**Observe.** Sensor readings, pressures, and which sensors are currently online enter the incident. **Localize.** Classical hydraulic signatures and HydroCore-v5, a small learned model, jointly rank plausible source locations; this is advisory evidence, not a verdict. **Check uncertainty.** A calibration step and a separate non-learned out-of-distribution check decide whether the current situation is one the localization step is allowed to determine whether calibrated candidate-set semantics apply and whether the workflow may proceed operationally; on an unfamiliar network layout, the system says so rather than pretending otherwise. **Sample if useful.** A deterministic sampling policy, not the learned model, can recommend the next measurement location. **Generate response options.** A deterministic planner proposes a bounded set of typed actions. **Verify.** Every option that could be recommended must pass exact hydraulic simulation in WNTR/EPANET, the system's final physical authority. **Human approves.** The operator sees the evidence, the ranking, the uncertainty state, and only the physically verified options, and must explicitly approve one. HydroSwarm has no connector to infrastructure and cannot act on its own.
+Later stages are conditional; abstention or suppression can be a valid terminal outcome.
+
+**Observe.** Sensor readings, pressures, and which sensors are currently online enter the incident. **Localize.** Classical hydraulic signatures and HydroCore-v5, a small learned model, jointly rank plausible source locations; this is advisory evidence, not a verdict. **Check uncertainty.** A frozen calibration procedure determines whether calibrated candidate-set semantics are applicable, while a separate deterministic out-of-distribution/evidence gate determines whether the workflow may proceed operationally. **Sample if useful.** A deterministic sampling policy, not the learned model, can recommend the next measurement location. **Generate response options.** A deterministic planner proposes a bounded set of typed actions. **Verify.** Every option that could be recommended must pass exact hydraulic simulation in WNTR/EPANET, the system's final physical authority. **Human approves.** The operator sees the evidence, the ranking, the uncertainty state, and only the physically verified options, and must explicitly approve one. HydroSwarm has no connector to infrastructure and cannot act on its own.
 
 HydroCore-v5 contributes learned evidence at exactly one stage. Every other stage (calibration/fusion, OOD gating, sampling, planning, verification) is deterministic or physics-based, and approval is always human.
 
@@ -44,7 +46,7 @@ Prediction and permission-to-act are kept as two different things, decided by tw
 
 ## 4. What the final evaluation showed
 
-The finalist model was selected and frozen using development data only. Two locked populations were then established: 105 locked-final incidents, and a separately locked 20-incident novel-topology set. Opening either required an explicit, logged authorization step. Once opened, every incident ran exactly once: no rerun, and no tuning after seeing results. Each locked population was opened exactly once.
+The finalist model was selected and frozen using development data only. Two locked populations were then established: 105 locked-final incidents, and a separately locked 20-incident novel-topology set. The two locked populations were opened together through one explicitly authorized transition. All 125 incidents then ran once, with no rerun and no post-lock tuning.
 
 | Population | Cases | Top-1 | Top-3 | Coverage | Actionable |
 |---|---:|---:|---:|---:|---:|
@@ -64,7 +66,7 @@ Three points of interpretation, no more:
 
 ## 5. What this establishes, and what it does not
 
-- All evaluation data (training, development, and the final locked test) is simulation-generated, not drawn from real utility incidents.
+- All evaluation data (training, development, and the final locked test) are simulation-generated, not drawn from real utility incidents.
 - HydroSwarm has not been validated against a real utility incident of any kind.
 - Reported metrics are synthetic performance, not field-deployment accuracy, and should not be read as a forecast of either.
 - Performance under stress and under genuine topology shift remains limited, as shown above.

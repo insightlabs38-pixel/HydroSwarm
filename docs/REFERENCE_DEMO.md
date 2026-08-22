@@ -18,6 +18,10 @@ telemetry."*
 For the current V5 serving identity, use [Final system](FINAL_SYSTEM.md). The reference-demo
 resolver is independent of model-bundle selection.
 
+## Reference Incident vs Live Example
+
+**Reference Incident** is a deterministic checksummed replay of a frozen WNTR-backed workflow. **Live Example** runs the current frozen `v0.2.1` runtime on the same bundled scenario inputs. They are not expected to reproduce identical downstream states. In the current bundled Live Example, the governed runtime abstains rather than continuing into planning; that is a current runtime observation, not M11.6 benchmark evidence.
+
 ## Workflow
 
 ```mermaid

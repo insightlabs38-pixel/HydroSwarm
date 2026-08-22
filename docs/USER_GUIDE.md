@@ -8,7 +8,11 @@
 
 **Persistent surfaces**: the Decision Inspector (right-hand panel, present on the primary-workflow pages only) and the Technical Dock (bottom drawer, timeline/evidence/verification detail) are available throughout the workflow. A mode/reference banner appears at the top whenever the incident is not an ordinary LIVE/NORMAL one — REFERENCE, REPLAY, the illustrative DEMO_FALLBACK, or a suppressed-planning state.
 
-**REFERENCE INCIDENT vs LIVE EXAMPLE**: Reference Incident is a deterministic, checksummed replay of a frozen workflow artifact, used to demonstrate the product's workflow and authority boundaries reliably. Live Example runs the current HydroCore-v5 runtime on the same reference inputs. Reference replay is not live V5 inference and is never presented as one — see [Reference demo](REFERENCE_DEMO.md). Post-completion Replay of the Reference Incident specifically is intentionally unavailable, because the frozen reference artifact does not contain individual event-ledger records; this does not affect a LIVE incident's own audit/history, which is a separate code path.
+**REFERENCE INCIDENT vs LIVE EXAMPLE**: Reference Incident is a deterministic, checksummed replay of a frozen workflow artifact, used to demonstrate the product's workflow and authority boundaries reliably. Live Example runs the current HydroCore-v5 runtime on the same bundled scenario inputs. Reference replay is not live V5 inference and is never presented as one — see [Reference demo](REFERENCE_DEMO.md). Post-completion Replay of the Reference Incident specifically is intentionally unavailable, because the frozen reference artifact does not contain individual event-ledger records; this does not affect a LIVE incident's own audit/history, which is a separate code path.
+
+## Design intent and validation boundary
+
+HydroSwarm intentionally uses a technical engineering interface rather than collapsing the incident into a single recommendation. Evidence, uncertainty, provenance, hydraulic constraints, verification state, and authority remain visible because they affect operational interpretation. These design choices have not yet undergone formal usability validation with utility operators and should be treated as engineering design decisions rather than validated human-factors findings.
 
 ## 0. Start
 

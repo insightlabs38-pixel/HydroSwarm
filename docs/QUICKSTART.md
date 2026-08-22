@@ -55,7 +55,7 @@ Exact identity: [Final system](FINAL_SYSTEM.md).
 On first launch:
 
 - **Run Reference Incident** — deterministic checksummed replay of the frozen golden workflow. It demonstrates workflow/authority, not final V5 benchmark performance.
-- **Run Live Example** — executes the real API pipeline against known reference inputs.
+- **Run Live Example** — executes the frozen `v0.2.1` runtime against the same bundled scenario inputs. Its governed result may differ from the Reference Incident because Reference is a frozen replay, not live V5 recomputation; the current bundled example reaches a governed abstention.
 - **Import Your Own Network** — advanced path for a local EPANET `.inp`.
 - **Illustrative fallback** — clearly labeled hand-authored fallback.
 

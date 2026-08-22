@@ -1,6 +1,6 @@
 # HydroSwarm
 
-Offline, physics-first decision support for drinking-water contamination incidents. HydroSwarm combines hydraulic simulation, classical source signatures, and a governed HydroCore-v5 learned Sentinel to localize plausible sources, determine whether additional evidence is useful and, when justified, recommend where to collect it, compare response alternatives, and stop at an explicit human-approval boundary.
+HydroSwarm is offline, physics-first decision support for drinking-water contamination incidents. It helps responders narrow plausible sources, decide whether another sample would meaningfully reduce uncertainty, compare response options against the hydraulic network, and stop before field action at an explicit human-approval boundary. Its hybrid architecture combines hydraulic simulation, classical source signatures, and a governed HydroCore-v5 learned Sentinel while keeping prediction, operational permission, physical verification, and approval under distinct authorities.
 
 [![CI](https://github.com/insightlabs38-pixel/HydroSwarm/actions/workflows/ci.yml/badge.svg)](https://github.com/insightlabs38-pixel/HydroSwarm/actions/workflows/ci.yml)
 
@@ -15,7 +15,7 @@ Offline, physics-first decision support for drinking-water contamination inciden
 - **Understand** — [docs/EXECUTIVE_SUMMARY.md](docs/EXECUTIVE_SUMMARY.md)
 - **Verify** — [docs/SCIENTIFIC_EVIDENCE.md](docs/SCIENTIFIC_EVIDENCE.md)
 - **Deep technical review** — [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) + [docs/AUTHORITY_AND_SAFETY.md](docs/AUTHORITY_AND_SAFETY.md)
-- **Submission** — HydroSwarm on [Devpost](https://devpost.com/software/hydroswarm)
+- **Submission** — HydroSwarm on [Devpost](https://devpost.com/software/hydroswarm) · **Reverie Hacks 2026 track: Software Development.**
 
 ![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](docs/screenshots/first-launch-gateway.png)
 
@@ -132,7 +132,7 @@ For a fast technical review:
 
 - [Problem and impact](docs/PROBLEM.md) — real-world basis, measured-vs-plausible impact, sustainability/scale path.
 - [Scientific evidence](docs/SCIENTIFIC_EVIDENCE.md) — final locked matrix, gates, provenance, limitations.
-- [Judging evidence map](docs/JUDGING.md) — 2-minute, 5-minute, and deep-review paths.
+- [Judging evidence map](docs/JUDGING.md) — rubric evidence, five-minute review, and deep-review paths.
 - [Final system](docs/FINAL_SYSTEM.md) — frozen identity and authority.
 - [Architecture](docs/ARCHITECTURE.md) — end-to-end technical design.
 - [Model card](docs/MODEL_CARD.md) — intended use, supervision, calibration, stress behavior.

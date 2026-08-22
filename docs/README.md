@@ -1,6 +1,6 @@
 # HydroSwarm documentation map
 
-The final submission is **HydroCore-v5**. Start with the path that matches your review goal; historical V3/V4/M9/M10 material is preserved but never overrides [Final system](FINAL_SYSTEM.md).
+The final HydroSwarm submission serves the frozen **HydroCore-v5** system. Start with the path that matches your review goal; historical V3/V4/M9/M10 material is preserved but never overrides [Final system](FINAL_SYSTEM.md).
 
 ## New reader / domain expert path
 
@@ -8,7 +8,7 @@ The final submission is **HydroCore-v5**. Start with the path that matches your 
 
 Read this first if you are new to the project or reviewing it from a water-infrastructure or general technical background. It explains the problem, the system, the final results, and the limitations without requiring any other document.
 
-## Two-minute judge path
+## Judge skim path
 
 [Top-level README](../README.md) → [Scientific evidence](SCIENTIFIC_EVIDENCE.md) → [Judging evidence map](JUDGING.md)
 
