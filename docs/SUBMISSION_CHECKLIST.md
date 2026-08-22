@@ -39,11 +39,9 @@
       approval boundary, and a LIVE proof start without sensitive paths/data; all 53
       Playwright tests passed. The screenshots predate the V5 documentation rebase and are
       retained as UI/workflow evidence, not as proof of the current finalist model identity.
-- [x] Devpost write-up, built-with list, and report/link fields are still pending (excluded
-      from this documentation-polish pass; see [Documentation](README.md) for what was and
-      was not touched here).
+- [x] Devpost write-up, built-with list, and report/link fields are complete.
 - [x] Final Devpost anonymous-render QA (confirming the published Devpost page renders and
-      links correctly when viewed anonymously) is still pending.
+      links correctly when viewed anonymously) is complete.
 - [x] AI-assistance disclosure uses the approved wording.
 - [x] No secrets, private data, restricted datasets, unreviewed checkpoints, or oversized
       caches are committed.
