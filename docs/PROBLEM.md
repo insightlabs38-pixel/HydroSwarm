@@ -49,11 +49,10 @@ CANARY tools and the prior-art table this project builds on.
 
 ## Measured vs. plausible impact
 
-Claims about HydroSwarm's impact fall into three tiers. Only the first is backed by the current
-locked evaluation; the rest are explicitly labeled as not yet measured.
+Claims about HydroSwarm's impact fall into three tiers. The first is backed by measured repository evidence from M11.6 and current runtime/release behavior as individually cited; the remaining tiers are explicitly not yet measured.
 
 **Measured in the current research prototype** (source: [Scientific
-evidence](SCIENTIFIC_EVIDENCE.md), [Authority and safety](AUTHORITY_AND_SAFETY.md)):
+evidence](SCIENTIFIC_EVIDENCE.md), [Authority and safety](AUTHORITY_AND_SAFETY.md), and the v0.2.1 release/runtime evidence cited below):
 
 - source-localization metrics (Top-1/Top-3/MRR) across nominal, stress, and novel-topology
   populations;
