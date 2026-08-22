@@ -1,6 +1,31 @@
 # Changelog
 
-## Unreleased -- targeting `0.2.0` / future tag `v0.2.0`
+## Unreleased -- targeting `0.2.1` / future tag `v0.2.1`
+
+Patch release: one real product bug fix, no scientific/model/authority
+changes.
+
+- Fixed the "Run Live Example" judge path: it called the real deterministic
+  sampling-recommendation endpoint unconditionally after initial analysis.
+  Against this repository's own bundled Live Example scenario, the real
+  active-sampling policy correctly abstains on the very first analysis
+  (best remaining candidate's expected information gain is below the
+  configured minimum), which the backend correctly reports as a governed
+  stop -- but the frontend treated that as a hard failure, so the judge
+  path reliably ended in "Something went wrong" for everyone. The flow now
+  reads the real, already-authoritative Evidence Certificate
+  (`GET /incidents/{id}/evidence-certificate`) after initial analysis and
+  branches truthfully: skip straight to planning when evidence is already
+  sufficient, continue sampling when the policy asks for a sample, or show
+  the real governed stop state when planning is not currently permitted.
+  No sample is ever fabricated and no plan is ever generated to force a
+  result through a governed stop.
+
+No model weights, calibration values, deterministic thresholds, frozen
+scenario values, or M11.6 results/gates/authorization changed; M11.6 was
+not rerun.
+
+## 0.2.0 - 2026-08-21
 
 Product minor release: material system-level changes since `0.1.x`, not a
 patch. Highlights:
@@ -46,8 +71,8 @@ Also in this cycle:
   with the frozen release bundle and characterization evidence.
 
 No model weights, calibration values, or M11.6 results/gates/authorization
-changed; M11.6 was not rerun. `pyproject.toml`/frontend package version is
-now `0.2.0`; no `v0.2.0` tag or GitHub Release has been cut by this entry yet.
+changed; M11.6 was not rerun. Tagged and published as `v0.2.0` on
+2026-08-21.
 
 ## 0.2.0 (internal, 2026-08-03) -- superseded, never tagged or published
 
@@ -57,8 +82,8 @@ now `0.2.0`; no `v0.2.0` tag or GitHub Release has been cut by this entry yet.
 > `## 0.1.0` entry below, dated the same day). It is kept as historical
 > development metadata, not as evidence of a real "0.2.0" release. The
 > product version `0.2.0` first introduced in this repository's actual
-> `pyproject.toml`/tag is the one under `## Unreleased` above, first
-> targeted at future tag `v0.2.0`.
+> `pyproject.toml`/tag is the `## 0.2.0 - 2026-08-21` entry above, tagged
+> and published as `v0.2.0`.
 
 - Added deterministic bounded swarm orchestration and specialist agents.
 - Added secure persistent EPANET imports and authoritative WNTR verification.
