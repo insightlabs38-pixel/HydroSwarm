@@ -23,7 +23,7 @@ This maps to the six judging categories plus the bonus, each with its strongest 
 |---|---|
 | [Problem and product boundary](PROBLEM.md) — research basis, target interval, measured-vs-plausible impact | EPA sources establish context for the problem space, not endorsement of HydroSwarm or utility validation |
 | [Executive summary §1](EXECUTIVE_SUMMARY.md) — why sparse/delayed evidence and hydraulic consequence make this hard | Motivates the design; not a substitute for field evidence |
-| [Measured vs. plausible impact](PROBLEM.md#measured-vs-plausible-impact) | Only the "measured" tier is backed by M11.6; everything else is explicitly labeled plausible or unvalidated |
+| [Measured vs. plausible impact](PROBLEM.md#measured-vs-plausible-impact) | The "measured" tier is backed by M11.6 and current runtime/release evidence, each individually cited (e.g. the LIVE governed sampling abstention is a `v0.2.1` runtime observation, not an M11.6 result); everything else is explicitly labeled plausible or unvalidated |
 
 ### 2. Technical Execution — Software Development
 

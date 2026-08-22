@@ -34,7 +34,7 @@ Linux:
 ./start_hydroswarm_linux.sh
 ```
 
-macOS and Windows have matching `_macos.sh` and `_windows.ps1` scripts.
+macOS and Windows have matching `_macos.sh` and `_windows.ps1` scripts. Native macOS support is Apple Silicon/ARM64 only; native macOS Intel/x86_64 is not supported (no upstream `torch>=2.5` wheel exists for it). Native Windows support is x86_64.
 
 The setup scripts finish with the strict application self-test, verifying the frozen V5 release bundle throughout.
 

@@ -38,6 +38,8 @@ Source: [diagrams/reference-incident-flow.mmd](diagrams/reference-incident-flow.
 
 There are two meaningful pauses: evidence collection and human approval. The replay never assumes that a sample was collected or that a response was approved without the corresponding explicit action.
 
+The frozen milestone IDs shown above (e.g. `safe_plan_verified`) are artifact/stage identifiers for this deterministic replay, not a claim about real-world safety.
+
 ## Stage-correctness
 
 The generated artifact reveals fields only after the underlying frozen workflow has produced them:

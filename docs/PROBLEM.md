@@ -7,10 +7,12 @@ Meanwhile, an intervention that reduces contaminant exposure can create unaccept
 pressure or service consequences.
 
 HydroSwarm is local decision support for this interval between detection and field action.
-It estimates a calibrated source region, identifies the sample that should reduce
-uncertainty most, and compares typed response plans against both a no-response baseline
-and authoritative WNTR simulation. It exposes evidence, disagreement, and failure states
-to an operator instead of issuing autonomous commands.
+It estimates a source region, calibrated when the frozen calibration artifact is applicable,
+and a deterministic sampling policy may recommend the next sample expected to reduce
+uncertainty most or abstain when the evidence does not support one. It compares typed
+response plans against both a no-response baseline and authoritative WNTR simulation. It
+exposes evidence, disagreement, and failure states to an operator instead of issuing
+autonomous commands.
 
 The primary users are utility incident commanders, hydraulic engineers, water-quality
 staff, and field-sampling coordinators. HydroSwarm does not identify chemistry, certify
@@ -57,7 +59,7 @@ evidence](SCIENTIFIC_EVIDENCE.md), [Authority and safety](AUTHORITY_AND_SAFETY.m
   populations;
 - conformal coverage where calibration is applicable;
 - actionable/planning rates per population;
-- exact hydraulic constraint rejection (unsafe/infeasible plans are rejected before human review);
+- exact hydraulic constraint rejection (modeled constraint-violating or infeasible plans are rejected before human review);
 - 0 of 15 hard safety counters violated across the complete 125-incident M11.6 locked evaluation;
 - novel-topology calibration inapplicable, 0% actionable — the correct fail-closed behavior under
   genuine topology shift, not a hidden failure;

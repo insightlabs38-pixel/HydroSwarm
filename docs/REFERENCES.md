@@ -52,4 +52,4 @@ External literature supplies context, not the final numerical claims. Final Hydr
 - [M11.6 gate](../reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-gate.json)
 - [M11.6 safety counters](../reports/evaluation/hydrocore-v5/m11/m11-6-final/m11-6-safety-counters.json)
 
-External links and licenses should be rechecked for a release; no unverified external benchmark is used to characterize the final locked V5 result.
+External links and licenses should be rechecked for future releases; no unverified external benchmark is used to characterize the final locked V5 result.
