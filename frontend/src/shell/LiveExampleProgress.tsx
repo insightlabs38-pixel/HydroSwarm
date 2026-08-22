@@ -1,5 +1,18 @@
 import type { LiveExampleController } from '../liveExample/useLiveExampleFlow';
 import { formatDisplayId } from '../displayId';
+import { StatusBadge } from '../components/StatusBadge';
+import type { EvidenceCertificate } from '../types';
+
+/** Mirrors SamplingWorkspace.tsx's STATUS_LABEL -- same real
+ * EvidenceCertificate contract, same wording, just reused here for the
+ * LIVE judge path's own governed-stop pause. */
+const CERTIFICATE_STATUS_LABEL: Record<EvidenceCertificate['status'], string> = {
+  EVIDENCE_SUFFICIENT: 'EVIDENCE SUFFICIENT',
+  CONTINUE_SAMPLING: 'CONTINUE SAMPLING',
+  STOP_BUDGET_EXHAUSTED: 'STOP: SAMPLE BUDGET EXHAUSTED',
+  STOP_NO_USEFUL_CANDIDATE: 'STOP: NO USEFUL CANDIDATE',
+  STOP_ABSTAIN: 'STOP: ABSTAIN',
+};
 
 /** submission.txt SUB-12.1 P1 #4: "LIVE COMPUTATION · REFERENCE INPUTS" --
  * shown while the real production pipeline is actually computing this
@@ -24,6 +37,7 @@ const STAGE_LABELS: Record<string, string> = {
   awaiting_approval: 'Verified plan ready for approval',
   approving: 'Recording approval',
   complete: 'Complete',
+  governed_stop: 'Planning is not currently permitted for this incident',
   error: 'Something went wrong',
 };
 
@@ -119,6 +133,24 @@ export function LiveExampleProgress({
             </p>
             <button type="button" onClick={controller.approve}>
               Approve plan
+            </button>
+          </div>
+        )}
+
+        {stage === 'governed_stop' && controller.evidenceCertificate && (
+          <div className="live-example-pause">
+            <StatusBadge tone="warn">
+              {CERTIFICATE_STATUS_LABEL[controller.evidenceCertificate.status]}
+            </StatusBadge>
+            <p className="supporting">{controller.evidenceCertificate.message}</p>
+            <p className="supporting">
+              This is the real deterministic evidence/sampling policy correctly declining to
+              recommend a further sample or permit planning for this incident's current evidence --
+              not an application error. No sample is fabricated and no plan is generated to force a
+              result.
+            </p>
+            <button type="button" onClick={controller.restart}>
+              Run again
             </button>
           </div>
         )}

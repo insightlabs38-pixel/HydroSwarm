@@ -56,6 +56,22 @@ async function mockLiveExampleFlow(page: Page) {
       });
     if (path.endsWith('/incidents') && method === 'POST')
       return json({ incident_id: 'live-incident-12345678', status: 'SAMPLING' });
+    if (path.endsWith('/evidence-certificate'))
+      return json({
+        status: 'CONTINUE_SAMPLING',
+        stop: false,
+        message: 'CONTINUE SAMPLING\nCandidate region: 2 node(s)\nSample budget remaining: 5',
+        posterior_entropy_bits: 1.0,
+        candidate_set_size: 2,
+        candidate_nodes: ['J1', 'J8'],
+        candidate_region_calibrated: true,
+        recommended_sample_node: 'J8',
+        expected_information_gain_bits: 1.2,
+        expected_candidate_reduction: 1,
+        sample_budget_remaining: 5,
+        already_sampled_nodes: ['J1'],
+        recommended_node_accessible: true,
+      });
     if (path.endsWith('/samples/recommend'))
       return json({ node_id: 'J8', expected_information_gain: 1.2, alternatives: ['J1'] });
     if (path.endsWith('/plans/generate'))

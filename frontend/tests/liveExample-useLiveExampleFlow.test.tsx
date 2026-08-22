@@ -10,8 +10,10 @@ import {
   submitLiveExampleSample,
   verifyLiveExamplePlan,
 } from '../src/api/liveExampleFlow';
+import { fetchEvidenceCertificate } from '../src/api/sampling';
 import { selectIncident } from '../src/incidentSelection';
 import { useLiveExampleFlow } from '../src/liveExample/useLiveExampleFlow';
+import type { EvidenceCertificate } from '../src/types';
 
 vi.mock('../src/api/liveExampleFlow', () => ({
   fetchLiveExampleInputs: vi.fn(),
@@ -22,6 +24,9 @@ vi.mock('../src/api/liveExampleFlow', () => ({
   recommendLiveExampleSample: vi.fn(),
   generateLiveExamplePlans: vi.fn(),
   verifyLiveExamplePlan: vi.fn(),
+}));
+vi.mock('../src/api/sampling', () => ({
+  fetchEvidenceCertificate: vi.fn(),
 }));
 vi.mock('../src/api/approval', () => ({
   approvePlan: vi.fn(),
@@ -48,6 +53,25 @@ const FAKE_INPUTS = {
   contaminationThresholdMgL: 0.001,
 };
 
+function certificate(overrides: Partial<EvidenceCertificate> = {}): EvidenceCertificate {
+  return {
+    status: 'CONTINUE_SAMPLING',
+    stop: false,
+    message: 'CONTINUE SAMPLING\nCandidate region: 7 node(s)\nSample budget remaining: 5',
+    posteriorEntropyBits: 2.9,
+    candidateSetSize: 7,
+    candidateNodes: ['J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8'],
+    candidateRegionCalibrated: true,
+    recommendedSampleNode: 'J8',
+    expectedInformationGainBits: 1.0,
+    expectedCandidateReduction: 2,
+    sampleBudgetRemaining: 5,
+    alreadySampledNodes: ['J1'],
+    recommendedNodeAccessible: true,
+    ...overrides,
+  };
+}
+
 function setUpHappyPath() {
   vi.mocked(fetchLiveExampleInputs).mockResolvedValue(FAKE_INPUTS);
   vi.mocked(importLiveExampleNetwork).mockResolvedValue({
@@ -65,6 +89,7 @@ function setUpHappyPath() {
   });
   vi.mocked(createLiveExampleIncident).mockResolvedValue('incident-live-1');
   vi.mocked(analyzeLiveExampleIncident).mockResolvedValue(undefined);
+  vi.mocked(fetchEvidenceCertificate).mockResolvedValue(certificate());
   vi.mocked(recommendLiveExampleSample).mockResolvedValue({
     nodeId: 'J8',
     expectedInformationGain: 1.0,
@@ -91,13 +116,14 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-test('drives the full flow: import -> create -> analyze -> pause -> collect -> plans -> verify -> pause -> approve -> complete', async () => {
+test('CONTINUE_SAMPLING: drives the full flow: import -> create -> analyze -> pause -> collect -> plans -> verify -> pause -> approve -> complete', async () => {
   setUpHappyPath();
   const { result } = renderHook(() => useLiveExampleFlow(true));
 
   await waitFor(() => expect(result.current.stage).toBe('awaiting_sample_collection'));
   expect(importLiveExampleNetwork).toHaveBeenCalledWith(FAKE_INPUTS);
   expect(createLiveExampleIncident).toHaveBeenCalledWith('loop-grid-v1', FAKE_INPUTS);
+  expect(fetchEvidenceCertificate).toHaveBeenCalledWith('incident-live-1');
   expect(result.current.incidentId).toBe('incident-live-1');
   expect(result.current.recommendedNode).toBe('J8');
   expect(result.current.expectedInformationGainBits).toBe(1.0);
@@ -122,6 +148,48 @@ test('drives the full flow: import -> create -> analyze -> pause -> collect -> p
   expect(selectIncident).toHaveBeenCalledWith('incident-live-1');
 });
 
+test('EVIDENCE_SUFFICIENT: skips the sample-collection pause and goes straight to real plan generation/verification', async () => {
+  setUpHappyPath();
+  vi.mocked(fetchEvidenceCertificate).mockResolvedValue(
+    certificate({
+      status: 'EVIDENCE_SUFFICIENT',
+      stop: true,
+      message: 'EVIDENCE SUFFICIENT\nPlanning gate satisfied',
+      recommendedSampleNode: null,
+    }),
+  );
+  const { result } = renderHook(() => useLiveExampleFlow(true));
+
+  await waitFor(() => expect(result.current.stage).toBe('awaiting_approval'));
+  expect(recommendLiveExampleSample).not.toHaveBeenCalled();
+  expect(submitLiveExampleSample).not.toHaveBeenCalled();
+  expect(generateLiveExamplePlans).toHaveBeenCalledWith('incident-live-1');
+  expect(result.current.verifiedPlan).toEqual({ planId: 'plan-safe', name: 'Flush downstream J8' });
+});
+
+test.each([
+  ['STOP_NO_USEFUL_CANDIDATE', 'STOP: NO USEFUL SAMPLE CANDIDATE REMAINS\nPlanning suppressed'],
+  ['STOP_BUDGET_EXHAUSTED', 'STOP: SAMPLE BUDGET EXHAUSTED\nPlanning suppressed'],
+  ['STOP_ABSTAIN', 'STOP: ABSTAINING\nPlanning suppressed'],
+] as const)(
+  '%s: a governed stop is a real terminal state, not an error, and never fabricates a sample or plan',
+  async (status, message) => {
+    setUpHappyPath();
+    vi.mocked(fetchEvidenceCertificate).mockResolvedValue(
+      certificate({ status, stop: true, message, recommendedSampleNode: null }),
+    );
+    const { result } = renderHook(() => useLiveExampleFlow(true));
+
+    await waitFor(() => expect(result.current.stage).toBe('governed_stop'));
+    expect(result.current.evidenceCertificate?.status).toBe(status);
+    expect(result.current.evidenceCertificate?.message).toBe(message);
+    expect(result.current.errorMessage).toBeNull();
+    expect(recommendLiveExampleSample).not.toHaveBeenCalled();
+    expect(submitLiveExampleSample).not.toHaveBeenCalled();
+    expect(generateLiveExamplePlans).not.toHaveBeenCalled();
+  },
+);
+
 test('does nothing when disabled -- never starts a real flow the app did not ask for', () => {
   setUpHappyPath();
   const { result } = renderHook(() => useLiveExampleFlow(false));
@@ -136,6 +204,15 @@ test('a failed step reaches the error stage with a real error message, not an in
 
   await waitFor(() => expect(result.current.stage).toBe('error'));
   expect(result.current.errorMessage).toBe('network unreachable');
+});
+
+test('a genuine evidence-certificate fetch failure is a real error, not a swallowed governed stop', async () => {
+  setUpHappyPath();
+  vi.mocked(fetchEvidenceCertificate).mockRejectedValue(new Error('HydroSwarm API 500: internal'));
+  const { result } = renderHook(() => useLiveExampleFlow(true));
+
+  await waitFor(() => expect(result.current.stage).toBe('error'));
+  expect(result.current.errorMessage).toBe('HydroSwarm API 500: internal');
 });
 
 test('no plan VERIFIED is a real stop, not a forced approval', async () => {

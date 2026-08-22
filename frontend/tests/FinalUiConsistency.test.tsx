@@ -27,6 +27,7 @@ function controller(incidentId: string | null): LiveExampleController {
     expectedInformationGainBits: null,
     plans: [],
     verifiedPlan: null,
+    evidenceCertificate: null,
     collectSample: () => {},
     approve: () => {},
     restart: () => {},

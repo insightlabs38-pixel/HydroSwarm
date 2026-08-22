@@ -12,6 +12,8 @@ import {
   type LiveExampleInputs,
   type LiveExamplePlanSummary,
 } from '../api/liveExampleFlow';
+import { fetchEvidenceCertificate } from '../api/sampling';
+import type { EvidenceCertificate } from '../types';
 import { selectIncident } from '../incidentSelection';
 
 /** submission.txt SUB-12.1 P1 #4: the "Run Live Example" judge path --
@@ -22,12 +24,18 @@ import { selectIncident } from '../incidentSelection';
  * network nor real field telemetry. Every stage here is a real network
  * request; nothing is a fixture, a fake wait, or a hard-coded outcome.
  *
- * Mirrors the REFERENCE controller's two-pause shape deliberately (see
- * reference/useReferenceIncident.ts): pause once to let the judge trigger
- * evidence collection, once more at the human-approval boundary. Neither
- * pause here is scripted -- which node gets recommended, whether the
- * unsafe plan gets rejected the same way, etc. are all real outcomes of
- * the real pipeline running against the real imported network.
+ * Mirrors the REFERENCE controller's two-pause shape *only when the real
+ * deterministic evidence/sampling policy actually asks for a sample*: once
+ * to let the judge trigger evidence collection, once more at the
+ * human-approval boundary. The sample-collection pause is conditional --
+ * see the real GET /incidents/{id}/evidence-certificate branch below --
+ * because a real incident is not guaranteed to need another sample before
+ * planning, and one is not guaranteed to have a useful candidate left to
+ * offer. Forcing either case through the old unconditional
+ * POST /samples/recommend call surfaced the real, correct
+ * `marginal_value_below_threshold` / `no_accessible_sample` abstention as
+ * a generic "Something went wrong" error; the branch below represents each
+ * of those governed outcomes truthfully instead.
  */
 
 export type LiveExampleStage =
@@ -43,6 +51,11 @@ export type LiveExampleStage =
   | 'awaiting_approval'
   | 'approving'
   | 'complete'
+  /** The real deterministic evidence/sampling policy stopped: no useful
+   * sample remains, the sample budget is exhausted, or it abstained
+   * outright -- and planning is therefore not permitted either. A real,
+   * governed terminal state, not a failure. */
+  | 'governed_stop'
   | 'error';
 
 export interface LiveExampleController {
@@ -53,6 +66,9 @@ export interface LiveExampleController {
   expectedInformationGainBits: number | null;
   plans: LiveExamplePlanSummary[];
   verifiedPlan: LiveExamplePlanSummary | null;
+  /** Set only when `stage === 'governed_stop'`: the real Evidence
+   * Certificate that explains why planning is currently not permitted. */
+  evidenceCertificate: EvidenceCertificate | null;
   /** Advances past the sample-collection pause: submits the real
    * WNTR-simulated concentration for whichever node was recommended. */
   collectSample: () => void;
@@ -76,6 +92,7 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
   );
   const [plans, setPlans] = useState<LiveExamplePlanSummary[]>([]);
   const [verifiedPlan, setVerifiedPlan] = useState<LiveExamplePlanSummary | null>(null);
+  const [evidenceCertificate, setEvidenceCertificate] = useState<EvidenceCertificate | null>(null);
   const [restartToken, setRestartToken] = useState(0);
 
   const inputsRef = useRef<LiveExampleInputs | null>(null);
@@ -84,6 +101,77 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
     setErrorMessage(error instanceof Error ? error.message : String(error));
     setStage('error');
   }, []);
+
+  /** Shared by both the "no sampling needed" (EVIDENCE_SUFFICIENT) path
+   * and the ordinary post-sample-collection path: real plan generation,
+   * real exact WNTR/EPANET verification of each candidate, then the
+   * human-approval pause. Returns false (having already called fail())
+   * if verification produced no VERIFIED plan -- that remains a real
+   * stop, never a forced approval. */
+  const runPlanningAndVerification = useCallback(
+    async (id: string): Promise<boolean> => {
+      setStage('generating_plans');
+      const generated = await generateLiveExamplePlans(id);
+      setPlans(generated);
+
+      setStage('verifying_plans');
+      let firstVerified: LiveExamplePlanSummary | null = null;
+      for (const plan of generated) {
+        const { decision } = await verifyLiveExamplePlan(id, plan.planId);
+        if (decision === 'VERIFIED' && !firstVerified) {
+          firstVerified = plan;
+        }
+      }
+      if (!firstVerified) {
+        fail(
+          new Error(
+            'no generated plan was VERIFIED by exact WNTR verification -- correct behavior ' +
+              'here is to stop, not to force an unverified plan through',
+          ),
+        );
+        return false;
+      }
+      setVerifiedPlan(firstVerified);
+      setStage('awaiting_approval');
+      return true;
+    },
+    [fail],
+  );
+
+  /** Real branch point, driven by the real, already-authoritative
+   * GET /incidents/{id}/evidence-certificate (the same certificate the
+   * ordinary LIVE Sampling workspace renders -- see SamplingWorkspace.tsx
+   * and hydroswarm.inference.evidence_certificate.build_evidence_certificate
+   * on the backend):
+   *  - EVIDENCE_SUFFICIENT: the planning gate is already satisfied; no
+   *    sample-collection pause is truthful here, so skip straight to real
+   *    plan generation/verification.
+   *  - CONTINUE_SAMPLING: unchanged from before -- request the real
+   *    sampling recommendation and pause for the judge to collect it.
+   *  - Any STOP_* status: planning is not permitted. This is a real,
+   *    governed terminal state (`governed_stop`), not an error -- no
+   *    sample is fabricated and no plan is generated just to keep the
+   *    demo moving. */
+  const advanceFromEvidence = useCallback(
+    async (id: string): Promise<void> => {
+      const certificate = await fetchEvidenceCertificate(id);
+      if (certificate.status === 'EVIDENCE_SUFFICIENT') {
+        await runPlanningAndVerification(id);
+        return;
+      }
+      if (certificate.status === 'CONTINUE_SAMPLING') {
+        const recommendation = await recommendLiveExampleSample(id);
+        setRecommendedNode(recommendation.nodeId);
+        setExpectedInformationGainBits(recommendation.expectedInformationGain);
+        setStage('awaiting_sample_collection');
+        return;
+      }
+      // STOP_BUDGET_EXHAUSTED / STOP_NO_USEFUL_CANDIDATE / STOP_ABSTAIN.
+      setEvidenceCertificate(certificate);
+      setStage('governed_stop');
+    },
+    [runPlanningAndVerification],
+  );
 
   // Guards against re-starting the flow on every stage transition: `run()`
   // below calls setStage() repeatedly as it progresses, and if `stage`
@@ -117,11 +205,7 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
         await analyzeLiveExampleIncident(newIncidentId);
         if (cancelled) return;
 
-        const recommendation = await recommendLiveExampleSample(newIncidentId);
-        if (cancelled) return;
-        setRecommendedNode(recommendation.nodeId);
-        setExpectedInformationGainBits(recommendation.expectedInformationGain);
-        setStage('awaiting_sample_collection');
+        await advanceFromEvidence(newIncidentId);
       } catch (error) {
         if (!cancelled) fail(error);
       }
@@ -131,7 +215,7 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
     return () => {
       cancelled = true;
     };
-  }, [enabled, restartToken, fail]);
+  }, [enabled, restartToken, fail, advanceFromEvidence]);
 
   const collectSample = useCallback(() => {
     const inputs = inputsRef.current;
@@ -154,34 +238,12 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
         setStage('reanalyzing');
         await analyzeLiveExampleIncident(incidentId);
 
-        setStage('generating_plans');
-        const generated = await generateLiveExamplePlans(incidentId);
-        setPlans(generated);
-
-        setStage('verifying_plans');
-        let firstVerified: LiveExamplePlanSummary | null = null;
-        for (const plan of generated) {
-          const { decision } = await verifyLiveExamplePlan(incidentId, plan.planId);
-          if (decision === 'VERIFIED' && !firstVerified) {
-            firstVerified = plan;
-          }
-        }
-        if (!firstVerified) {
-          fail(
-            new Error(
-              'no generated plan was VERIFIED by exact WNTR verification -- correct behavior ' +
-                'here is to stop, not to force an unverified plan through',
-            ),
-          );
-          return;
-        }
-        setVerifiedPlan(firstVerified);
-        setStage('awaiting_approval');
+        await runPlanningAndVerification(incidentId);
       } catch (error) {
         fail(error);
       }
     })();
-  }, [incidentId, recommendedNode, stage, fail]);
+  }, [incidentId, recommendedNode, stage, fail, runPlanningAndVerification]);
 
   const approve = useCallback(() => {
     if (!incidentId || !verifiedPlan || stage !== 'awaiting_approval') return;
@@ -206,6 +268,7 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
     setExpectedInformationGainBits(null);
     setPlans([]);
     setVerifiedPlan(null);
+    setEvidenceCertificate(null);
     setStage('idle');
     setRestartToken((token) => token + 1);
   }, []);
@@ -218,6 +281,7 @@ export function useLiveExampleFlow(enabled: boolean): LiveExampleController {
     expectedInformationGainBits,
     plans,
     verifiedPlan,
+    evidenceCertificate,
     collectSample,
     approve,
     restart,
