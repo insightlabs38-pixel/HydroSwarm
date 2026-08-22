@@ -1,39 +1,307 @@
 1
-00:00:00,000 --> 00:00:25,000
-A water-quality alert rarely identifies its source. Sparse evidence, changing flow, and unsafe interventions make the next decision hard.
+00:00:00,000 --> 00:00:02,550
+A water-quality alert reveals a problem.
 
 2
-00:00:25,000 --> 00:00:50,000
-HydroSwarm runs locally. Hydraulic physics and source signatures combine with a compact graph-time model. Uncertainty controls sampling, and WNTR verifies every plan.
+00:00:02,840 --> 00:00:06,850
+Across a municipal network,
+it rarely reveals where it began.
 
 3
-00:00:50,000 --> 00:01:25,000
-This frozen scenario begins with four equally plausible source nodes. These results come from WNTR and the checked-in backend, not a map overlay.
+00:00:07,200 --> 00:00:10,970
+Sparse sensors can leave several
+upstream sources plausible.
 
 4
-00:01:25,000 --> 00:01:55,000
-Scout selects J2 with one bit of measured information gain. When the simulated sample arrives, the source set contracts from four nodes to one and J2 reaches 99.4 percent posterior probability.
+00:00:11,290 --> 00:00:13,180
+Another sample costs time,
 
 5
-00:01:55,000 --> 00:02:20,000
-Strategist proposes bounded alternatives. The default WNTR path rejects a sole-feeder closure because pressure falls below the configured minimum.
+00:00:13,270 --> 00:00:17,710
+while a reasonable-looking response can
+reduce pressure or disrupt service elsewhere.
 
 6
-00:02:20,000 --> 00:02:40,000
-A controlled J4 flush passes the modeled pressure and service checks, but it still cannot execute and must wait for a person.
+00:00:18,040 --> 00:00:20,730
+So the question is not only
+what a model predicts.
 
 7
-00:02:40,000 --> 00:03:10,000
-Separate exact simulations estimate 2,541,416 milligrams consumed with no response and 2,526,693 milligrams for the verified alternative: a modeled reduction of 14,723 milligrams.
+00:00:20,920 --> 00:00:24,430
+It is what evidence is strong enough
+to justify the next decision.
 
 8
-00:03:10,000 --> 00:03:35,000
-Every explanation is grounded in typed evidence: measurements, posterior revisions, sensitivity, simulator outcomes, abstention state, and an immutable event history.
+00:00:24,560 --> 00:00:27,220
+A proposed response must survive physics,
 
 9
-00:03:35,000 --> 00:03:50,000
-Three seeded golden runs pass the regression gate. Neural checkpoints are explicitly reported as not run, because no governed checkpoint is included.
+00:00:27,310 --> 00:00:29,220
+then stop at a human boundary.
 
 10
-00:03:50,000 --> 00:04:00,000
-HydroSwarm operates offline. It is research decision support, not chemistry identification or autonomous control. Localize the risk. Choose the evidence. Verify the response.
+00:00:29,260 --> 00:00:31,390
+HydroSwarm is offline,
+
+11
+00:00:31,430 --> 00:00:34,880
+physics-first decision support
+built around that distinction.
+
+12
+00:00:35,200 --> 00:00:39,220
+This checksummed Reference Incident
+exposes the complete workflow.
+
+13
+00:00:39,520 --> 00:00:41,230
+From the first observation,
+
+14
+00:00:41,380 --> 00:00:45,770
+HydroCore-v5 contributes learned evidence
+to rank plausible sources,
+
+15
+00:00:45,860 --> 00:00:50,060
+while uncertainty remains visible
+instead of collapsing into one answer.
+
+16
+00:00:50,930 --> 00:00:52,710
+When evidence is insufficient,
+
+17
+00:00:52,790 --> 00:00:55,830
+HydroSwarm does not simply
+ask the model again.
+
+18
+00:00:56,030 --> 00:00:59,940
+A deterministic sampling policy identifies
+a useful next measurement,
+
+19
+00:01:00,040 --> 00:01:02,350
+and the workflow pauses for that evidence.
+
+20
+00:01:02,550 --> 00:01:04,730
+Only then does the workflow advance.
+
+21
+00:01:06,680 --> 00:01:08,360
+When that sample arrives,
+
+22
+00:01:08,370 --> 00:01:10,390
+the posterior changes sharply.
+
+23
+00:01:10,660 --> 00:01:12,710
+The earlier prediction was evidence,
+
+24
+00:01:12,860 --> 00:01:14,580
+not a permanent conclusion.
+
+25
+00:01:16,480 --> 00:01:17,540
+Next,
+
+26
+00:01:17,580 --> 00:01:20,260
+response candidates are generated
+deterministically
+
+27
+00:01:20,270 --> 00:01:24,330
+and checked by exact WNTR
+and EPANET simulation.
+
+28
+00:01:24,610 --> 00:01:26,520
+The first candidate is rejected
+
+29
+00:01:26,540 --> 00:01:29,240
+because it violates the configured
+pressure constraint.
+
+30
+00:01:29,550 --> 00:01:32,030
+A second satisfies
+the modeled constraints
+
+31
+00:01:32,070 --> 00:01:33,550
+and is marked verified.
+
+32
+00:01:33,740 --> 00:01:35,580
+Proposal is not permission.
+
+33
+00:01:35,730 --> 00:01:38,680
+Physics can veto
+a plausible-looking response.
+
+34
+00:01:40,120 --> 00:01:43,180
+And verified still does not mean executed.
+
+35
+00:01:43,750 --> 00:01:47,250
+HydroSwarm has no
+infrastructure-actuation authority.
+
+36
+00:01:47,400 --> 00:01:51,150
+The consequential step remains
+a separate human approval boundary,
+
+37
+00:01:51,270 --> 00:01:55,390
+with verification context and provenance
+available for inspection.
+
+38
+00:01:57,120 --> 00:01:59,960
+The Technical Dock preserves
+the network identity
+
+39
+00:02:00,000 --> 00:02:02,800
+and verification context
+behind that decision.
+
+40
+00:02:04,960 --> 00:02:07,540
+That was the reproducible
+Reference Incident.
+
+41
+00:02:07,870 --> 00:02:12,520
+This is the frozen v0.2.1 runtime
+on the same inputs.
+
+42
+00:02:12,810 --> 00:02:16,790
+Here, no useful sample remains
+while planning is unjustified.
+
+43
+00:02:17,130 --> 00:02:18,760
+HydroSwarm stops.
+
+44
+00:02:19,060 --> 00:02:20,680
+Rather than forcing a result.
+
+45
+00:02:20,720 --> 00:02:22,750
+HydroCore-v5 is advisory.
+
+46
+00:02:22,790 --> 00:02:26,820
+Calibration and deterministic OOD checks
+bound its authority.
+
+47
+00:02:27,130 --> 00:02:29,500
+Sampling and planning stay deterministic.
+
+48
+00:02:29,560 --> 00:02:32,560
+WNTR and EPANET verify physics.
+
+49
+00:02:32,740 --> 00:02:34,540
+Final approval stays human.
+
+50
+00:02:34,580 --> 00:02:37,000
+The evaluation was locked before opening.
+
+51
+00:02:37,140 --> 00:02:40,050
+Nominal Top-1 was 73.3%;
+
+52
+00:02:40,200 --> 00:02:42,300
+Top-3, 86.7%.
+
+53
+00:02:42,470 --> 00:02:45,120
+Across 105 locked-final cases,
+
+54
+00:02:45,160 --> 00:02:47,635
+Top-1 was 55.2%,
+
+55
+00:02:47,675 --> 00:02:50,280
+with 88.6% conformal coverage.
+
+56
+00:02:50,470 --> 00:02:51,835
+On novel topology,
+
+57
+00:02:51,875 --> 00:02:53,710
+localization signal remains,
+
+58
+00:02:53,730 --> 00:02:55,470
+but calibration is inapplicable
+
+59
+00:02:55,510 --> 00:02:57,210
+and actionable rate is zero.
+
+60
+00:02:57,420 --> 00:03:00,170
+None of 15 hard safety counters
+were violated.
+
+61
+00:03:00,260 --> 00:03:01,255
+No rerun.
+
+62
+00:03:01,295 --> 00:03:02,670
+No post-lock tuning.
+
+63
+00:03:02,710 --> 00:03:04,590
+HydroSwarm runs locally
+
+64
+00:03:04,630 --> 00:03:07,460
+and accepts standard EPANET
+network models,
+
+65
+00:03:07,550 --> 00:03:10,640
+keeping infrastructure data
+in the operator environment.
+
+66
+00:03:10,680 --> 00:03:13,080
+Every path ends in a governed decision.
+
+67
+00:03:13,260 --> 00:03:15,150
+This is simulation-validated,
+
+68
+00:03:15,190 --> 00:03:16,730
+not field-validated.
+
+69
+00:03:16,940 --> 00:03:19,080
+The goal is not greater confidence.
+
+70
+00:03:19,310 --> 00:03:21,420
+It is a more defensible decision.
