@@ -136,7 +136,7 @@ Questions that path answers:
 
 ## Demo path
 
-For a UI/workflow demonstration, use the **REFERENCE INCIDENT** after launching the current release. It gives a deterministic walkthrough from initial uncertainty through sample collection, unsafe-plan rejection, exact verification, and human approval. Post-completion Replay of the Reference Incident is intentionally unavailable, because the reference artifact does not contain individual event-ledger records to populate it — see [Reference demo](REFERENCE_DEMO.md#replay-availability).
+For a UI/workflow demonstration, use the **REFERENCE INCIDENT** after launching the current release. It gives a deterministic walkthrough from initial uncertainty through sample collection, modeled constraint-violating plan rejection, exact verification, and human approval. Post-completion Replay of the Reference Incident is intentionally unavailable, because the reference artifact does not contain individual event-ledger records to populate it — see [Reference demo](REFERENCE_DEMO.md#replay-availability).
 
 Do not present the reference replay as final V5 performance evidence. The benchmark evidence is M11.6.
 
