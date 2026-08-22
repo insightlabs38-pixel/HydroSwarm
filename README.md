@@ -1,6 +1,6 @@
 # HydroSwarm
 
-Offline, physics-verified decision support for drinking-water contamination incidents. HydroSwarm combines hydraulic simulation, classical source signatures, and a governed HydroCore-v5 learned Sentinel to localize plausible sources, recommend the next evidence to collect, compare response alternatives, and stop at an explicit human-approval boundary. Learned outputs are advisory: deterministic controls decide whether sampling or planning is allowed, WNTR/EPANET is required to verify a response plan, and HydroSwarm contains no autonomous actuation connector.
+Offline, physics-first decision support for drinking-water contamination incidents. HydroSwarm combines hydraulic simulation, classical source signatures, and a governed HydroCore-v5 learned Sentinel to localize plausible sources, determine whether additional evidence is useful and, when justified, recommend where to collect it, compare response alternatives, and stop at an explicit human-approval boundary.
 
 [![CI](https://github.com/insightlabs38-pixel/HydroSwarm/actions/workflows/ci.yml/badge.svg)](https://github.com/insightlabs38-pixel/HydroSwarm/actions/workflows/ci.yml)
 
