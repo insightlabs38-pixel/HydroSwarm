@@ -24,15 +24,15 @@ Offline, physics-first decision support for drinking-water contamination inciden
 
 ```mermaid
 flowchart LR
-  O["Telemetry / samples"] --> R["Hydraulic reconciliation"]
+  O["Telemetry &#47; samples"] --> R["Hydraulic reconciliation"]
   R --> C["Classical feasibility + signatures"]
   O --> S["HydroCore-v5 Sentinel"]
   C --> F["Calibrated fusion"]
   S --> F
-  F --> D["Deterministic OOD / evidence gate"]
+  F --> D["Deterministic OOD &#47; evidence gate"]
   D --> Q["Deterministic Scout"]
   D --> P["Deterministic plan generator"]
-  P --> V["Exact WNTR / EPANET verification"]
+  P --> V["Exact WNTR &#47; EPANET verification"]
   V --> H["Human approval boundary"]
   Q --> E["Append-only audit history"]
   H --> E
