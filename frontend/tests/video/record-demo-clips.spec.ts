@@ -207,15 +207,26 @@ test.describe('final-presentation demo clips', () => {
     await expect(page.getByText('LIVE COMPUTATION · REFERENCE INPUTS')).toBeVisible();
     // Real, sequential production-pipeline stages against the real
     // released HydroCore-v5 runtime and real WNTR/EPANET path -- no
-    // mocked Live API. Each step is a real network request, so these
-    // waits are for genuine backend work, not artificial delay.
-    await expect(page.getByText('Real sampling recommendation ready')).toBeVisible({
-      timeout: 60_000,
-    });
-    await page.waitForTimeout(3000);
-    await page.getByRole('button', { name: 'Collect reference sample' }).click();
-    await expect(page.getByText('Verified plan ready:')).toBeVisible({ timeout: 60_000 });
-    await page.waitForTimeout(6000);
+    // mocked Live API. The real deterministic evidence/sampling policy
+    // decides for itself, from the real Evidence Certificate, whether
+    // another sample is worth collecting -- this harness captures
+    // whichever real, governed outcome it reaches instead of forcing a
+    // particular branch. A governed stop here (planning not currently
+    // permitted) is a legitimate, honest outcome, not an application
+    // failure, and must never be forced past into a fabricated sample
+    // or plan.
+    const samplingReady = page.getByText('Real sampling recommendation ready');
+    const governedStop = page.getByText('Planning is not currently permitted for this incident');
+    await expect(samplingReady.or(governedStop)).toBeVisible({ timeout: 60_000 });
+
+    if (await samplingReady.isVisible()) {
+      await page.waitForTimeout(3000);
+      await page.getByRole('button', { name: 'Collect reference sample' }).click();
+      await expect(page.getByText('Verified plan ready:')).toBeVisible({ timeout: 60_000 });
+      await page.waitForTimeout(6000);
+    } else {
+      await page.waitForTimeout(8000);
+    }
     await finalizeClip(page, '08-live-v5');
   });
 
