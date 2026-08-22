@@ -1,3 +1,5 @@
+![HydroSwarm — Reverie Hacks 2026](media/hydroswarm-devpost-thumbnail-v0.2.1.png)
+
 # HydroSwarm — Devpost Submission
 
 > **Offline, physics-first decision support for drinking-water contamination incidents.**
