@@ -42,7 +42,7 @@ Prediction and permission-to-act are kept as two different things, decided by tw
 
 ## 4. What the final evaluation showed
 
-The finalist model was selected and frozen using development data only. A separate population of 125 test incidents was then locked, and opening it required an explicit, logged authorization step. Once opened, all 125 incidents ran exactly once: no rerun, and no tuning after seeing results. The locked test was opened exactly once.
+The finalist model was selected and frozen using development data only. Two locked populations were then established: 105 locked-final incidents, and a separately locked 20-incident novel-topology set. Opening either required an explicit, logged authorization step. Once opened, every incident ran exactly once: no rerun, and no tuning after seeing results. Each locked population was opened exactly once.
 
 | Population | Cases | Top-1 | Top-3 | Coverage | Actionable |
 |---|---:|---:|---:|---:|---:|
@@ -58,7 +58,7 @@ Three points of interpretation, no more:
 
 1. Nominal performance was substantially stronger than the stressed or shifted populations.
 2. Performance degraded under stress (measurement noise, sensor dropout, ambiguous signals, shifting severity), and that degradation is reported rather than hidden. This does not mean planning was suppressed across every degraded condition; several stressed conditions still produced actionable plans (see [SCIENTIFIC_EVIDENCE.md](SCIENTIFIC_EVIDENCE.md) for the per-condition breakdown).
-3. On genuine topology shift, the model retained measurable localization signal (55% Top-1 / 70% Top-3), so it was not guessing randomly. But calibration is only statistically valid under conditions it was computed for, so it did not apply, and the system withheld operational authority entirely: 0% actionable across all 20 incidents. This is not weak generalization being spun positively; it is the governance behaving as designed when calibration cannot be trusted.
+3. On genuine topology shift, localization retained measurable signal (55% Top-1 / 70% Top-3), but calibration was inapplicable and operational authority was withheld entirely: 0% actionable across all 20 incidents. This is not weak generalization being spun positively; it is the governance behaving as designed when calibration cannot be trusted.
 
 ## 5. What this establishes, and what it does not
 
