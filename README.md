@@ -15,6 +15,7 @@ Offline, physics-first decision support for drinking-water contamination inciden
 - **Understand** — [docs/EXECUTIVE_SUMMARY.md](docs/EXECUTIVE_SUMMARY.md)
 - **Verify** — [docs/SCIENTIFIC_EVIDENCE.md](docs/SCIENTIFIC_EVIDENCE.md)
 - **Deep technical review** — [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) + [docs/AUTHORITY_AND_SAFETY.md](docs/AUTHORITY_AND_SAFETY.md)
+- **Submission** — HydroSwarm on [Devpost](https://devpost.com/software/hydroswarm)
 
 ![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](docs/screenshots/first-launch-gateway.png)
 
