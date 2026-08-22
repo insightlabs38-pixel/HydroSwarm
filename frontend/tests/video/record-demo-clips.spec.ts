@@ -230,6 +230,37 @@ test.describe('final-presentation demo clips', () => {
     await finalizeClip(page, '08-live-v5');
   });
 
+  // v2: captures the real LIVE progression itself (not just the final
+  // state) so a viewer can see HydroSwarm actually executing its current
+  // governed policy against the real published release -- real network
+  // import, real incident creation, real HydroCore-v5 analysis, real
+  // Evidence Certificate, then whichever real governed outcome results.
+  // No artificial per-stage delays: fast real stages stay fast. Kept as
+  // an additional clip alongside '08-live-v5' (not a replacement).
+  test('08-live-v5-v2', async ({ page }) => {
+    await page.goto('/?experience=live');
+    await expect(page.getByText('LIVE COMPUTATION · REFERENCE INPUTS')).toBeVisible();
+    await page.waitForTimeout(3000);
+
+    const samplingReady = page.getByText('Real sampling recommendation ready');
+    const governedStop = page.getByText('Planning is not currently permitted for this incident');
+    await expect(samplingReady.or(governedStop)).toBeVisible({ timeout: 60_000 });
+
+    if (await governedStop.isVisible()) {
+      // Real, governed terminal state -- hold it so the frame clearly
+      // reads as a deliberate decision, not an error.
+      await page.waitForTimeout(6000);
+    } else {
+      // The real deterministic policy asked for a sample this run --
+      // still a real, honest outcome; follow it through.
+      await page.waitForTimeout(3000);
+      await page.getByRole('button', { name: 'Collect reference sample' }).click();
+      await expect(page.getByText('Verified plan ready:')).toBeVisible({ timeout: 60_000 });
+      await page.waitForTimeout(5000);
+    }
+    await finalizeClip(page, '08-live-v5-v2');
+  });
+
   test('09-validation-model-network', async ({ page }) => {
     await openReferenceAtMilestone(page, 9);
 
