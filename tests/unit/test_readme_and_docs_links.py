@@ -126,12 +126,16 @@ def test_each_diagram_is_embedded_in_at_least_one_doc() -> None:
 
 
 def test_readme_and_devpost_tell_the_same_story() -> None:
-    """submission.txt SUB-10 acceptance criterion: "README and Devpost tell
-    the same story." Checked by requiring both to name the same headline
-    product concepts, not by comparing prose verbatim."""
+    """README and Devpost must share the current headline product concepts."""
     readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
     devpost = (PROJECT_ROOT / "docs" / "DEVPOST.md").read_text(encoding="utf-8")
-    for phrase in ["HydroCore-v4", "REFERENCE INCIDENT", "WNTR", r"human[ -]approval"]:
+    for phrase in [
+        "HydroCore-v5",
+        "REFERENCE INCIDENT",
+        "WNTR",
+        r"deterministic",
+        r"human[ -]approval",
+    ]:
         pattern = re.compile(phrase, re.IGNORECASE)
         assert pattern.search(readme), f"README missing shared concept: {phrase}"
         assert pattern.search(devpost), f"DEVPOST missing shared concept: {phrase}"
