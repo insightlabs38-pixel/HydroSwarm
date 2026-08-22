@@ -9,9 +9,9 @@ import { defineConfig, devices } from '@playwright/test';
  * regression gate. Running it must never change anything about the
  * existing E2E config or its snapshots.
  *
- * Target app: the real published `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.0`
+ * Target app: the real published `ghcr.io/insightlabs38-pixel/hydroswarm:v0.2.1`
  * release, started separately via `docker compose -f docker-compose.release.yml up`
- * (or an equivalent real v0.2.0 runtime) and expected at HYDROSWARM_RECORDING_BASE_URL
+ * (or an equivalent real v0.2.1 runtime) and expected at HYDROSWARM_RECORDING_BASE_URL
  * (default http://127.0.0.1:8765). No webServer block here on purpose --
  * this harness never boots its own (dev-built, mockable) server.
  */

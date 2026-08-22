@@ -8,7 +8,7 @@ import type { Page } from '@playwright/test';
  * Dedicated final-presentation recording flow -- NOT part of the regular
  * E2E/visual-regression suite (see ../e2e/*.spec.ts, which stays
  * untouched). Produces the 9 clean demo source clips for the final
- * video, captured against a real running HydroSwarm v0.2.0 release
+ * video, captured against a real running HydroSwarm v0.2.1 release
  * instance (see global-setup.ts for the preflight that enforces this --
  * no mocked `/api/**` routes are used anywhere in this file).
  *
@@ -234,8 +234,12 @@ test.describe('final-presentation demo clips', () => {
     // B. Model & Authority -- Decision authority path.
     await page.getByRole('button', { name: 'Model & Authority' }).click();
     await expect(page.getByRole('heading', { name: 'Decision authority path' })).toBeVisible();
-    await expect(page.locator('.authority-path-label').filter({ hasText: 'HydroCore-v5 Sentinel' })).toBeVisible();
-    await expect(page.locator('.authority-path-label').filter({ hasText: 'Human operator' })).toBeVisible();
+    await expect(
+      page.locator('.authority-path-label').filter({ hasText: 'HydroCore-v5 Sentinel' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('.authority-path-label').filter({ hasText: 'Human operator' }),
+    ).toBeVisible();
     await page.waitForTimeout(6000);
 
     // C. Network -- standard EPANET .inp import/validation surface.

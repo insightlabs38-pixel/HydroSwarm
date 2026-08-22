@@ -1,11 +1,11 @@
 /**
  * Preflight for the demo-clip recording harness. Fails fast (before any
- * browser opens) unless a real HydroSwarm v0.2.0 release instance is
+ * browser opens) unless a real HydroSwarm v0.2.1 release instance is
  * already running and reachable -- this harness must never fall back to
  * a mocked or dev-built app for final footage.
  */
 const BASE_URL = process.env.HYDROSWARM_RECORDING_BASE_URL ?? 'http://127.0.0.1:8765';
-const REQUIRED_VERSION = '0.2.0';
+const REQUIRED_VERSION = '0.2.1';
 
 async function getJson(path: string): Promise<unknown> {
   const response = await fetch(`${BASE_URL}${path}`);
@@ -30,7 +30,7 @@ export default async function globalSetup(): Promise<void> {
     throw new Error(
       `Refusing to record: ${BASE_URL}/api/health reports version "${health.version}", ` +
         `expected "${REQUIRED_VERSION}". This harness only records against the real published ` +
-        `v0.2.0 release, never a dev/preview build.`,
+        `v0.2.1 release, never a dev/preview build.`,
     );
   }
 

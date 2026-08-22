@@ -85,5 +85,5 @@ experiments/jobs/*/job.pid
 
 # Local final-presentation demo-clip recordings (frontend/tests/video/
 # record-demo-clips.spec.ts). Large source video, regenerable by re-running
-# the harness against a real running v0.2.0 release -- never committed.
+# the harness against a real running v0.2.1 release -- never committed.
 /artifacts/video-recording/
