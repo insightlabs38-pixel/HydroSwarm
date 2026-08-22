@@ -157,7 +157,7 @@ HydroCore-v4 and the earlier HydroCore-S/M/L program remain preserved as histori
 
 ## AI-assisted development
 
-ChatGPT/Codex, Claude/Claude Code, and Codebuff were used for implementation assistance, debugging, testing, documentation review, and architecture critique. Scientific objectives, evaluation governance, claims, and release decisions remained human-governed. These tools are not runtime dependencies; HydroCore-v5 is a locally trained scientific model, not a hosted LLM. See [AI assistance](docs/AI_ASSISTANCE.md).
+ChatGPT/Codex, Claude/Claude Code, and Freebuff were used for implementation assistance, debugging, testing, documentation review, and architecture critique. Scientific objectives, evaluation governance, claims, and release decisions remained human-governed. These tools are not runtime dependencies; HydroCore-v5 is a locally trained scientific model, not a hosted LLM. See [AI assistance](docs/AI_ASSISTANCE.md).
 
 ## License
 
