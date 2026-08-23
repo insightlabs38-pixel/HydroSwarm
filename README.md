@@ -19,7 +19,61 @@ HydroSwarm is offline, physics-first decision support for drinking-water contami
 
 ![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](docs/screenshots/first-launch-gateway.png)
 
-*Screenshots ([more in docs/screenshots](docs/screenshots)) document the operator experience and provenance labels; they are not evidence of the current model identity. Final V5 identity and results are tied to immutable artifacts below.*
+<details>
+<summary><strong>📸 Explore the product — 7 screenshots</strong></summary>
+
+<details>
+<summary><strong>1 · Localize plausible source</strong></summary>
+
+![HydroSwarm source-localization workflow](docs/screenshots/reference-source-localization.png)
+
+</details>
+
+<details>
+<summary><strong>2 · Decide where to sample</strong></summary>
+
+![HydroSwarm evidence-guided sampling workflow](docs/screenshots/reference-sampling.png)
+
+</details>
+
+<details>
+<summary><strong>3 · Verify response against physics</strong></summary>
+
+![HydroSwarm hydraulic response verification](docs/screenshots/reference-response-verification.png)
+
+</details>
+
+<details>
+<summary><strong>4 · Preserve human approval</strong></summary>
+
+![HydroSwarm human approval boundary](docs/screenshots/reference-approval-boundary.png)
+
+</details>
+
+<details>
+<summary><strong>5 · Inspect model authority</strong></summary>
+
+![HydroSwarm model and operational authority view](docs/screenshots/model-authority.png)
+
+</details>
+
+<details>
+<summary><strong>6 · Inspect validation</strong></summary>
+
+![HydroSwarm validation interface](docs/screenshots/validation.png)
+
+</details>
+
+<details>
+<summary><strong>7 · Review benchmark evidence</strong></summary>
+
+![HydroSwarm benchmark results](docs/screenshots/benchmarks.png)
+
+</details>
+
+</details>
+
+*Screenshots ([also available in docs/screenshots](docs/screenshots)) document the operator experience and provenance labels; they are not evidence of the current model identity. Final V5 identity and results are tied to immutable artifacts below.*
 
 ## What HydroSwarm does
 
