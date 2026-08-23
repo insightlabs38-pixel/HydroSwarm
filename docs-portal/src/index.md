@@ -42,6 +42,8 @@ HydroSwarm helps responders narrow plausible sources, decide whether another sam
 
 ![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](screenshots/first-launch-gateway.png)
 
+[Explore the product workflow →](PRODUCT_TOUR.md)
+
 ## How HydroSwarm works
 
 ```mermaid
