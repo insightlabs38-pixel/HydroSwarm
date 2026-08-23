@@ -17,6 +17,8 @@ flowchart TD
 
 Current diagram source: [diagrams/offline-deployment-v5.mmd](diagrams/offline-deployment-v5.mmd).
 
+The browser interface is intentionally served on localhost rather than as a hosted web application so network models, incident data, model inference, and hydraulic verification can remain on the operator's machine.
+
 ## Requirements
 
 ### Published Docker release (recommended)
