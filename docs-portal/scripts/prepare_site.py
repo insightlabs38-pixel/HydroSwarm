@@ -29,6 +29,15 @@ COPY_ASSET_SUFFIXES = {
     ".webp",
 }
 
+PRODUCT_TOUR_SCREENSHOTS = (
+    "reference-source-localization.png",
+    "reference-sampling.png",
+    "reference-response-verification.png",
+    "reference-approval-boundary.png",
+    "model-authority.png",
+    "validation.png",
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -301,12 +310,18 @@ def main() -> None:
 
     static_files = {
         portal_root / "src" / "index.md": output_root / "index.md",
+        portal_root / "src" / "PRODUCT_TOUR.md": output_root / "PRODUCT_TOUR.md",
         portal_root / "src" / "archive" / "index.md": output_root / "archive" / "index.md",
         portal_root / "src" / "assets" / "extra.css": output_root / "assets" / "extra.css",
         source_root / "docs" / "screenshots" / "first-launch-gateway.png": (
             output_root / "screenshots" / "first-launch-gateway.png"
         ),
     }
+    for name in PRODUCT_TOUR_SCREENSHOTS:
+        static_files[source_root / "docs" / "screenshots" / name] = (
+            output_root / "screenshots" / name
+        )
+
     for src, dst in static_files.items():
         if not src.is_file():
             raise FileNotFoundError(f"required static file missing: {src}")
