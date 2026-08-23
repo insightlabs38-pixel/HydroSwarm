@@ -20,7 +20,7 @@ HydroSwarm is offline, physics-first decision support for drinking-water contami
 ![HydroSwarm first-launch gateway offering Reference Incident, Live Example, and Import Network entry points](docs/screenshots/first-launch-gateway.png)
 
 <details>
-<summary><strong>📸 Explore the product — 7 screenshots</strong></summary>
+<summary><strong>Explore the product — 7 screenshots</strong></summary>
 
 <details>
 <summary><strong>1 · Localize plausible source</strong></summary>
