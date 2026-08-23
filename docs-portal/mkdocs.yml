@@ -60,7 +60,7 @@ nav:
       - Executive Summary: EXECUTIVE_SUMMARY.md
       - Problem & Impact: PROBLEM.md
       - Judging Evidence Map: JUDGING.md
-      - Documentation Map: README.md
+      - Documentation Map: DOCUMENTATION_MAP.md
   - Product:
       - Reference Incident: REFERENCE_DEMO.md
       - Operator Guide: USER_GUIDE.md
