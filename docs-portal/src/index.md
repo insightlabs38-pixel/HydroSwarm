@@ -16,7 +16,7 @@ HydroSwarm helps responders narrow plausible sources, decide whether another sam
 
 > **Research software, not production control.** All reported model and evaluation data are synthetic. HydroSwarm does not identify contaminant chemistry, certify water safety, replace laboratory or utility procedures, or execute infrastructure actions.
 
-## Choose your review path
+## Judge quick path
 
 <div class="grid cards reviewer-paths" markdown>
 
@@ -82,7 +82,7 @@ The final evidence run completed **125 / 125** incidents across the locked-final
 
 [Read the scientific evidence →](SCIENTIFIC_EVIDENCE.md)
 
-## What makes HydroSwarm different?
+## What is actually novel?
 
 **Prediction does not equal permission to act.**
 
@@ -92,4 +92,4 @@ HydroSwarm's contribution is the governed integration of localization evidence, 
 
 This portal is generated from the immutable hackathon source snapshot [`4bbf6fa3ff9f`](https://github.com/insightlabs38-pixel/HydroSwarm/tree/4bbf6fa3ff9f68c99e111ca3abdeaeb6e4a6c2f9). The repository remains the canonical source of truth; this site is a judge-friendly presentation layer.
 
-[Explore the documentation map →](README.md)
+[Explore the documentation map →](DOCUMENTATION_MAP.md)
