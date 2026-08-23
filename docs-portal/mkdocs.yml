@@ -62,6 +62,7 @@ nav:
       - Judging Evidence Map: JUDGING.md
       - Documentation Map: DOCUMENTATION_MAP.md
   - Product:
+      - Product Tour: PRODUCT_TOUR.md
       - Reference Incident: REFERENCE_DEMO.md
       - Operator Guide: USER_GUIDE.md
       - Quickstart: QUICKSTART.md
