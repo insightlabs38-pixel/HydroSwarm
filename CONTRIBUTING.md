@@ -2,7 +2,8 @@
 
 HydroSwarm is safety-sensitive research software. Changes must preserve the product
 boundary: local decision support only, physics before fluency, exact verification before a
-plan can be labeled verified, and explicit operator approval before response simulation.
+plan can be labeled `VERIFIED`, and explicit operator approval before a verified response can
+become `APPROVED`.
 
 Create focused commits, add regression tests for every scientific or safety behavior, and
 run:

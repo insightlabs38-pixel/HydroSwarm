@@ -22,6 +22,8 @@
 | Serving identity | `V5PipelineFactory(resolve_v5_bundle_dir())` |
 | V4 fallback | none |
 
+`HydroCore-v5 M10 frozen release` is the bundle identity established at M10.5; M11.2 then froze that exact bundle as the finalist, and M11.6 later evaluated it once without changing the bundle identity.
+
 Primary frozen records: [M11.2 finalist freeze](../reports/evaluation/hydrocore-v5/m11/m11-2/finalist-freeze.json), [V5 runtime manifest](../models/hydrocore-v5-release/runtime_manifest.json), and [M10.5 completion closure](../reports/evaluation/hydrocore-v5/m10/m10-5-completion/m10-5-completion-closure.json).
 
 ## Training recipe and selected checkpoint

@@ -61,8 +61,11 @@ For V5, run the published `docker-compose.release.yml` image (`ghcr.io/insightla
 
 - [Reference incident](REFERENCE_DEMO.md) — workflow demonstration, not final V5 benchmark evidence.
 - [Problem and product boundary](PROBLEM.md)
+- [Devpost submission copy](DEVPOST.md)
+- [Final video narration/script](VIDEO_SCRIPT.md)
+- [Video and caption materials](video/)
 
-Submission artifacts are archived separately: Devpost submission copy, final video narration, and captions. These mirror the frozen v0.2.1 submission story and are not scientific authorities.
+The submission artifacts above mirror the frozen v0.2.1 submission story and are not scientific authorities.
 
 ## Historical research
 

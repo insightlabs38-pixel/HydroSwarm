@@ -53,7 +53,7 @@ This maps the six submission-review categories plus the bonus to explicit subcri
 | Rubric subcriterion | Evidence | Claim boundary |
 |---|---|---|
 | **Ease of use** | [Operator guide](USER_GUIDE.md) — primary left-rail workflow, persistent Decision Inspector, Technical Dock, explicit states, and first-launch Reference/Live paths | Designed for the intended professional context; not a formal operator-usability study |
-| **Visual quality** | Professional decision-support information hierarchy — primary workflow separated from Decision Inspector/Technical Dock; evidence, provenance, verification, and authority intentionally remain visible | Technical density is intentional engineering design; no claim of validated human-factors optimization |
+| **Visual quality** | [README product screenshots](../README.md#judge-quick-path) + professional decision-support information hierarchy — primary workflow separated from Decision Inspector/Technical Dock; evidence, provenance, verification, and authority intentionally remain visible | Technical density is intentional engineering design; no claim of validated human-factors optimization |
 | **Accessibility** | Explicit text status labels (`PROPOSED`, `VERIFYING`, `REJECTED`, `VERIFIED`, `APPROVED`), provenance banners, burned-caption demo, and documented workflow states rather than color-only meaning | These are concrete accessibility-oriented choices; this is not a formal accessibility audit |
 
 ### 5. Sustainability & Scalability

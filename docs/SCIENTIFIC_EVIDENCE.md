@@ -31,7 +31,7 @@ M9 selected the final S-scale predictor/training recipe without access to the lo
 
 M10 made the model/output-governance boundary explicit and tested the integrated production path. M10.4 covered 360 physical incidents / 720 API trajectories over trained and unseen development families and seven condition kinds. The full trajectory gate passed, with development Top-1 `0.8194` in its own population. This number is not the final held-out headline because M10 was still development evidence.
 
-A disclosed M10.4 gate was vacuous: a selected-plan-vs-NO_ACTION comparison could not be positively characterized because NO_ACTION did not appear in the generated candidate set for that population. The artifact reports that limitation rather than claiming a positive non-harm result.
+A disclosed M10.4 gate was vacuous: a selected-plan-vs-NO_ACTION comparison could not be positively characterized because NO_ACTION did not appear in the generated candidate set for that population. The artifact reports that limitation rather than claiming a positive non-harm result. This was a limitation of that M10.4 development population, not a statement that the current product lacks a no-response comparison: the current response-planning workflow compares typed response plans against a no-response baseline and authoritative WNTR simulation. See [Problem and product boundary](PROBLEM.md).
 
 Sources: [M10.4 gate](../reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-gate.json), [population](../reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-population-manifest.json), [closure](../reports/evaluation/hydrocore-v5/m10/m10-4/m10-4-closure.json).
 

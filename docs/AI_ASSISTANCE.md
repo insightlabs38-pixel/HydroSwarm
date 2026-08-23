@@ -12,7 +12,7 @@ The project author retained responsibility for scientific objectives, architectu
 
 ## Scientific boundary
 
-The final HydroCore-v5 model is not a hosted general-purpose LLM. It is a locally loaded scientific model trained for the governed Sentinel task family on synthetic WNTR/EPANET-generated evidence. ChatGPT, Claude, and Codebuff are not inference components and have no runtime authority.
+The final HydroCore-v5 model is not a hosted general-purpose LLM. It is a locally loaded scientific model trained for the governed Sentinel task family on synthetic WNTR/EPANET-generated evidence. ChatGPT, Claude, and Freebuff are not inference components and have no runtime authority.
 
 No hosted AI API is required for HydroSwarm's scientific runtime.
 

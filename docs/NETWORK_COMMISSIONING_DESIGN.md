@@ -1,8 +1,8 @@
 # Network commissioning design
 
 Commissioning is the deliberate bridge between a parseable EPANET network and
-one where learned, calibrated planning is applicable. It is not implied by a
-successful upload.
+one where calibrated learned evidence may support governed deterministic
+planning. It is not implied by a successful upload.
 
 1. Store immutable uploaded `.inp` bytes and validate parse/simulation.
 2. Derive canonical structural identity and a separate mutable hydraulic-state

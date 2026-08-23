@@ -55,10 +55,11 @@ history when only one report exists and must not collapse available history to
 the latest report merely for convenience.
 
 The canonical initial feature window has a maximum of 25 ordered report steps,
-matching HydroCore-v4's trained representation. When fewer than 25 causal
-reports exist, all available reports are used. When more exist, the latest 25
-reports whose timestamps are at or before the analysis decision time are used.
-This is a bounded causal window, not a future trajectory.
+consistent with HydroCore-v5's governed causal-prefix training/evaluation
+design. When fewer than 25 causal reports exist, all available reports are
+used. When more exist, the latest 25 reports whose timestamps are at or before
+the analysis decision time are used. This is a bounded causal window, not a
+future trajectory.
 
 ## Network identity contract
 

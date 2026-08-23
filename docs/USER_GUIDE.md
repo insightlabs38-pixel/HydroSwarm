@@ -2,7 +2,7 @@
 
 ## Where things are
 
-**Primary operator workflow** (left rail, top group): Incident → Source → Sampling → Response → Approval → Replay (once available). This is the sequence sections 2–7 below walk through.
+**Primary operator workflow** (left rail, top group): Incident → Source → Sampling → Response → Approval → Replay (when the incident has replayable event history). This is the sequence sections 2–7 below walk through.
 
 **Secondary utilities** (left rail, bottom group): Network, Validation, Model & Authority, Benchmarks. These do not depend on which incident is open — Validation is the frozen M11.6 scientific evaluation, Benchmarks is deterministic regression/runtime evidence, Model & Authority is the frozen system authority path plus the current incident's Decision Certificates, and Network is where a local `.inp` is imported and validated.
 

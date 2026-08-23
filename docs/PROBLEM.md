@@ -104,7 +104,7 @@ evidence](SCIENTIFIC_EVIDENCE.md), [Authority and safety](AUTHORITY_AND_SAFETY.m
 
 - Sensitive infrastructure data (network models, incident records) can remain entirely local.
 - No autonomous actuation connector exists anywhere in the system.
-- Every response candidate requires a separate, explicit human-approval event.
+- A verified response cannot become `APPROVED` without a separate, explicit human-approval event.
 - Fail-closed behavior: exact simulation is required before a plan is `VERIFIED`, and calibration
   or evidence inadequacy can suppress planning rather than silently proceeding.
 - Limitations are stated explicitly rather than implied away — see [Limitations](LIMITATIONS.md).
