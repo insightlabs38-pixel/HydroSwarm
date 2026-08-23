@@ -59,6 +59,10 @@ jobs:
             --portal-root docs-portal \
             --output docs-portal/generated \
             --frozen-ref "${FROZEN_REF}"
+          python docs-portal/scripts/prepare_product_tour.py \
+            --source-root _frozen \
+            --portal-root docs-portal \
+            --output docs-portal/generated
 
       - name: Build MkDocs site
         run: mkdocs build --strict --config-file docs-portal/mkdocs.yml
