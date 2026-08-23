@@ -1,0 +1,86 @@
+name: Deploy judge documentation
+
+on:
+  push:
+    branches: [docs-site]
+    paths:
+      - ".github/workflows/docs-pages.yml"
+      - "docs-portal/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  actions: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  FROZEN_REF: 4bbf6fa3ff9f68c99e111ca3abdeaeb6e4a6c2f9
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  build:
+    name: Build documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout documentation portal
+        uses: actions/checkout@v5
+
+      - name: Checkout frozen submission source
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ env.FROZEN_REF }}
+          path: _frozen
+          sparse-checkout: |
+            README.md
+            docs
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: docs-portal/requirements.txt
+
+      - name: Install documentation dependencies
+        run: python -m pip install --disable-pip-version-check -r docs-portal/requirements.txt
+
+      - name: Prepare curated documentation
+        run: |
+          python docs-portal/scripts/prepare_site.py \
+            --source-root _frozen \
+            --portal-root docs-portal \
+            --output docs-portal/generated \
+            --frozen-ref "${FROZEN_REF}"
+
+      - name: Build MkDocs site
+        run: mkdocs build --strict --config-file docs-portal/mkdocs.yml
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: docs-portal/site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5

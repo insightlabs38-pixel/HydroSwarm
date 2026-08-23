@@ -1,0 +1,76 @@
+/* Keep Material for MkDocs mostly stock; these tokens only carry HydroSwarm's identity. */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #102832;
+  --md-primary-fg-color--light: #31545f;
+  --md-primary-fg-color--dark: #07151d;
+  --md-accent-fg-color: #176f78;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #0c202a;
+  --md-primary-fg-color--light: #15313c;
+  --md-primary-fg-color--dark: #07151d;
+  --md-accent-fg-color: #6bd6dd;
+  --md-default-bg-color: #07151d;
+  --md-default-fg-color: #d8e7eb;
+  --md-default-fg-color--light: #a9bec6;
+  --md-default-fg-color--lighter: #8da9b4;
+  --md-default-fg-color--lightest: #31545f;
+  --md-code-bg-color: #0c202a;
+  --md-code-fg-color: #d8e7eb;
+}
+
+.status-banner {
+  margin: 0.8rem 0 1.4rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.25rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.status-current {
+  border-left: 4px solid #176f78;
+  background: rgba(23, 111, 120, 0.09);
+}
+
+.status-historical {
+  border-left: 4px solid #b56d12;
+  background: rgba(181, 109, 18, 0.10);
+}
+
+[data-md-color-scheme="slate"] .status-current {
+  border-left-color: #6bd6dd;
+  background: rgba(107, 214, 221, 0.09);
+}
+
+[data-md-color-scheme="slate"] .status-historical {
+  border-left-color: #f4b45f;
+  background: rgba(244, 180, 95, 0.10);
+}
+
+.md-typeset .reviewer-paths > ul > li,
+.md-typeset .metric-cards > ul > li {
+  border-radius: 0.35rem;
+}
+
+.md-typeset .metric-cards > ul > li > p:first-child {
+  margin-bottom: 0.2rem;
+  font-size: 1.55rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+}
+
+.md-typeset img {
+  border-radius: 0.35rem;
+}
+
+.md-header,
+.md-tabs {
+  box-shadow: none;
+}
+
+@media screen and (min-width: 76.25em) {
+  .md-grid {
+    max-width: 78rem;
+  }
+}

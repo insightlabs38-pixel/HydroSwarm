@@ -1,0 +1,91 @@
+site_name: HydroSwarm Documentation
+site_description: Judge-facing documentation for the frozen HydroSwarm Reverie Hacks 2026 submission.
+site_url: https://insightlabs38-pixel.github.io/HydroSwarm/
+repo_url: https://github.com/insightlabs38-pixel/HydroSwarm
+repo_name: insightlabs38-pixel/HydroSwarm
+
+docs_dir: generated
+site_dir: site
+strict: true
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+extra_css:
+  - assets/extra.css
+
+copyright: HydroSwarm · Frozen Reverie Hacks 2026 submission · v0.2.1
+
+nav:
+  - Home: index.md
+  - Start Here:
+      - Executive Summary: EXECUTIVE_SUMMARY.md
+      - Problem & Impact: PROBLEM.md
+      - Judging Evidence Map: JUDGING.md
+      - Documentation Map: README.md
+  - Product:
+      - Reference Incident: REFERENCE_DEMO.md
+      - Operator Guide: USER_GUIDE.md
+      - Quickstart: QUICKSTART.md
+      - Installation: INSTALLATION.md
+  - System:
+      - Architecture: ARCHITECTURE.md
+      - Final System: FINAL_SYSTEM.md
+      - Authority & Safety: AUTHORITY_AND_SAFETY.md
+      - Model Card: MODEL_CARD.md
+      - Security: SECURITY.md
+  - Evidence:
+      - Scientific Evidence: SCIENTIFIC_EVIDENCE.md
+      - Evaluation: EVALUATION.md
+      - Dataset Card: DATASET_CARD.md
+      - Data Generation: DATA_GENERATION.md
+      - Claims & Evidence: CLAIMS_AND_EVIDENCE.md
+      - Reproducibility: REPRODUCIBILITY.md
+      - Limitations: LIMITATIONS.md
+  - Reference:
+      - Technical Brief: TECHNICAL_BRIEF.md
+      - Glossary: GLOSSARY.md
+      - References & Prior Art: REFERENCES.md
+      - AI Assistance: AI_ASSISTANCE.md
+  - Archive:
+      - Archive Overview: archive/index.md
+      - Capability Diagnostic: archive/CAPABILITY_DIAGNOSTIC.md
+      - Capability Remediation: archive/CAPABILITY_REMEDIATION.md

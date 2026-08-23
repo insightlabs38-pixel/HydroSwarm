@@ -1,0 +1,138 @@
+{
+  "repo": "insightlabs38-pixel/HydroSwarm",
+  "frozen_ref": "4bbf6fa3ff9f68c99e111ca3abdeaeb6e4a6c2f9",
+  "release": "v0.2.1",
+  "system": "HydroCore-v5",
+  "pages": [
+    {
+      "source": "docs/EXECUTIVE_SUMMARY.md",
+      "output": "EXECUTIVE_SUMMARY.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/PROBLEM.md",
+      "output": "PROBLEM.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/JUDGING.md",
+      "output": "JUDGING.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/README.md",
+      "output": "README.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/REFERENCE_DEMO.md",
+      "output": "REFERENCE_DEMO.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/USER_GUIDE.md",
+      "output": "USER_GUIDE.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/QUICKSTART.md",
+      "output": "QUICKSTART.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/INSTALLATION.md",
+      "output": "INSTALLATION.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/ARCHITECTURE.md",
+      "output": "ARCHITECTURE.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/FINAL_SYSTEM.md",
+      "output": "FINAL_SYSTEM.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/AUTHORITY_AND_SAFETY.md",
+      "output": "AUTHORITY_AND_SAFETY.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/MODEL_CARD.md",
+      "output": "MODEL_CARD.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/SECURITY.md",
+      "output": "SECURITY.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/SCIENTIFIC_EVIDENCE.md",
+      "output": "SCIENTIFIC_EVIDENCE.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/EVALUATION.md",
+      "output": "EVALUATION.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/DATASET_CARD.md",
+      "output": "DATASET_CARD.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/DATA_GENERATION.md",
+      "output": "DATA_GENERATION.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/CLAIMS_AND_EVIDENCE.md",
+      "output": "CLAIMS_AND_EVIDENCE.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/REPRODUCIBILITY.md",
+      "output": "REPRODUCIBILITY.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/LIMITATIONS.md",
+      "output": "LIMITATIONS.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/TECHNICAL_BRIEF.md",
+      "output": "TECHNICAL_BRIEF.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/GLOSSARY.md",
+      "output": "GLOSSARY.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/REFERENCES.md",
+      "output": "REFERENCES.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/AI_ASSISTANCE.md",
+      "output": "AI_ASSISTANCE.md",
+      "status": "current"
+    },
+    {
+      "source": "docs/evaluation/CAPABILITY_DIAGNOSTIC.md",
+      "output": "archive/CAPABILITY_DIAGNOSTIC.md",
+      "status": "historical"
+    },
+    {
+      "source": "docs/evaluation/CAPABILITY_REMEDIATION.md",
+      "output": "archive/CAPABILITY_REMEDIATION.md",
+      "status": "historical"
+    }
+  ]
+}
