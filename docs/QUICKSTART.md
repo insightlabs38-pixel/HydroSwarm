@@ -27,6 +27,8 @@ This builds the current Dockerfile, includes the frozen V5 bundle, runs the stri
 
 ## Native
 
+For a fresh source checkout, native setup requires 64-bit Python 3.12+ and Node.js 22+. See [Installation](INSTALLATION.md#requirements) for exact platform prerequisites, including the additional Linux ARM64 EPANET build tools.
+
 Linux:
 
 ```bash
