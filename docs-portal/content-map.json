@@ -21,7 +21,7 @@
     },
     {
       "source": "docs/README.md",
-      "output": "README.md",
+      "output": "DOCUMENTATION_MAP.md",
       "status": "current"
     },
     {
