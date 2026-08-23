@@ -19,12 +19,31 @@ Current diagram source: [diagrams/offline-deployment-v5.mmd](diagrams/offline-de
 
 ## Requirements
 
+### Published Docker release (recommended)
+
+- Docker Engine or Docker Desktop with Docker Compose v2 (`docker compose`)
+- internet access for the initial image pull unless the image is already cached
+- roughly 4 GiB available RAM for the small/default local demonstration
+- Git only if using the documented `git clone` command
+- host Python and Node.js are **not required**
+
+### Docker build from source
+
+- Docker Engine or Docker Desktop with Docker Compose v2 (`docker compose`)
+- internet access during the build to obtain base images and third-party dependencies unless already cached
+- roughly 4 GiB available RAM for the small/default local demonstration
+- Git only if using the documented `git clone` command
+- host Python and Node.js are **not required**; they run inside the Docker build
+
+### Native install
+
 - 64-bit Python 3.12+
-- Node.js 22+ only when the frontend must be rebuilt
+- Node.js 22+ for a fresh source checkout; `frontend/dist` is generated locally by the setup script
+- installation-time internet access to obtain Python/npm dependencies unless already cached
 - roughly 4 GiB RAM for the small/default local demonstration
-- Docker, if using the container path
-- installation-time internet access to obtain dependencies unless they are already cached
-- runtime internet access is not required by the scientific pipeline
+- Linux ARM64 additionally requires `git`, `cmake`, `make`, and a C compiler for the architecture-native EPANET build described below
+
+Runtime internet access is not required by the scientific pipeline after the required image/dependencies are available locally.
 
 ## V5 path A: published release (recommended)
 
