@@ -49,6 +49,12 @@ data/learning-v2/**/tensors-normalized/**/*.safetensors
 models/checkpoints/
 experiments/cache/
 experiments/runs/
+# Generated pilot-training checkpoints/logs for the experimental topology-
+# generalization branch (exp/topology-generalization) -- same convention as
+# experiments/runs/ above: generated runs stay out of version control, only
+# compact measured summaries under reports/evaluation/topology-generalization/
+# are committed.
+experiments/topology-generalization/runs/
 experiments/registry/*.lock
 experiments/jobs/*/job.lock
 experiments/jobs/*/job.pid
