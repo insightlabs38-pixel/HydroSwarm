@@ -47,7 +47,6 @@ from hydroswarm.training.sharded_data import ShardedScenarioDataset  # noqa: E40
 from hydroswarm.training.trainer import Trainer  # noqa: E402
 from hydroswarm.training.variable_collate import collate_variable_topology  # noqa: E402
 from hydroswarm.classical.metrics import (  # noqa: E402
-    candidate_set_metrics,
     localization_top_k,
     mean_reciprocal_rank,
 )

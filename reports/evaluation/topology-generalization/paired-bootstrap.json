@@ -1,0 +1,80 @@
+{
+  "development_holdout": {
+    "control_top1_mean": 0.69,
+    "experimental_top1_mean": 0.6933333333333334,
+    "mrr_delta": {
+      "ci_high": 0.008330158730158549,
+      "ci_low": -0.002873809523809457,
+      "n": 300,
+      "observed": 0.002496031746031857,
+      "resamples": 2000
+    },
+    "n": 300,
+    "top1_delta": {
+      "ci_high": 0.013333333333333308,
+      "ci_low": -0.006666666666666599,
+      "n": 300,
+      "observed": 0.0033333333333334103,
+      "resamples": 2000
+    },
+    "top3_delta": {
+      "ci_high": 0.006666666666666599,
+      "ci_low": -0.013333333333333308,
+      "n": 300,
+      "observed": -0.0033333333333332993,
+      "resamples": 2000
+    }
+  },
+  "ood-UNSEEN_TOPOLOGY": {
+    "control_top1_mean": 0.375,
+    "experimental_top1_mean": 0.375,
+    "mrr_delta": {
+      "ci_high": 0.009761904761904755,
+      "ci_low": -0.02167261904761911,
+      "n": 280,
+      "observed": -0.0060714285714285054,
+      "resamples": 2000
+    },
+    "n": 280,
+    "top1_delta": {
+      "ci_high": 0.028571428571428525,
+      "ci_low": -0.02857142857142858,
+      "n": 280,
+      "observed": 0.0,
+      "resamples": 2000
+    },
+    "top3_delta": {
+      "ci_high": -0.0035714285714285587,
+      "ci_low": -0.046428571428571486,
+      "n": 280,
+      "observed": -0.025000000000000022,
+      "resamples": 2000
+    }
+  },
+  "validation": {
+    "control_top1_mean": 0.6933333333333334,
+    "experimental_top1_mean": 0.7,
+    "mrr_delta": {
+      "ci_high": 0.012333928571428752,
+      "ci_low": -0.00465535714285712,
+      "n": 300,
+      "observed": 0.0039642857142858645,
+      "resamples": 2000
+    },
+    "n": 300,
+    "top1_delta": {
+      "ci_high": 0.023333333333333317,
+      "ci_low": -0.006833333333333454,
+      "n": 300,
+      "observed": 0.006666666666666599,
+      "resamples": 2000
+    },
+    "top3_delta": {
+      "ci_high": 0.006666666666666599,
+      "ci_low": -0.013333333333333308,
+      "n": 300,
+      "observed": -0.0033333333333332993,
+      "resamples": 2000
+    }
+  }
+}
