@@ -1,0 +1,107 @@
+{
+  "arm": "EXPERIMENTAL_TOPOLOGY_RELATIVE",
+  "augmented": true,
+  "calibration": {
+    "coverage": 0.9073033707865169,
+    "expected_calibration_error": 0.05954776084007273,
+    "mean_set_size": 2.6713483146067416,
+    "n": 712
+  },
+  "populations": {
+    "development_holdout": {
+      "by_family": {
+        "branched-loop": {
+          "mrr": 0.721205357142857,
+          "n": 96,
+          "top1": 0.5625,
+          "top3": 0.8541666666666666
+        },
+        "golden-reference": {
+          "mrr": 0.9672619047619048,
+          "n": 112,
+          "top1": 0.9464285714285714,
+          "top3": 1.0
+        },
+        "loop-grid": {
+          "mrr": 0.6717908902691512,
+          "n": 92,
+          "top1": 0.5217391304347826,
+          "top3": 0.75
+        }
+      },
+      "event_presence_accuracy": 1.0,
+      "known_family_fraction": 1.0,
+      "mrr": 0.7979126984126984,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03333333333333333,
+      "proxy_actionable_rate": 0.9666666666666667,
+      "proxy_calibrated_coverage": 0.8966666666666666,
+      "proxy_candidate_set_size": 2.6,
+      "top1": 0.6933333333333334,
+      "top3": 0.8766666666666667
+    },
+    "ood-UNSEEN_TOPOLOGY": {
+      "by_family": {
+        "coastal-branch": {
+          "mrr": 0.5795833333333333,
+          "n": 280,
+          "top1": 0.375,
+          "top3": 0.7321428571428571
+        }
+      },
+      "event_presence_accuracy": 0.7,
+      "known_family_fraction": 0.0,
+      "mrr": 0.5795833333333333,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.375,
+      "top3": 0.7321428571428571
+    },
+    "validation": {
+      "by_family": {
+        "branched-loop": {
+          "mrr": 0.7474341192787795,
+          "n": 103,
+          "top1": 0.6213592233009708,
+          "top3": 0.8349514563106796
+        },
+        "golden-reference": {
+          "mrr": 0.9660194174757282,
+          "n": 103,
+          "top1": 0.941747572815534,
+          "top3": 1.0
+        },
+        "loop-grid": {
+          "mrr": 0.676177811550152,
+          "n": 94,
+          "top1": 0.5212765957446809,
+          "top3": 0.7659574468085106
+        }
+      },
+      "event_presence_accuracy": 1.0,
+      "known_family_fraction": 1.0,
+      "mrr": 0.800154761904762,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.023333333333333334,
+      "proxy_actionable_rate": 0.9766666666666667,
+      "proxy_calibrated_coverage": 0.9066666666666666,
+      "proxy_candidate_set_size": 2.5633333333333335,
+      "top1": 0.7,
+      "top3": 0.87
+    }
+  },
+  "train_topology_hashes": [
+    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+  ]
+}
