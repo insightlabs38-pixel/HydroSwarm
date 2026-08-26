@@ -40,6 +40,13 @@ class HydroBatch(TypedDict, total=False):
     travel_time: Tensor
     reservoir_reachability: Tensor
     demand_centrality: Tensor
+    # exp/graph-structural-encoder-v2 (EXPERIMENTAL, NON-RELEASE): optional
+    # per-node structural/observability columns for GraphStructuralEncoder's
+    # opt-in structural_feature_dim > 0 path (see encoders.py). Absent from
+    # every existing batch/caller; forward() reads it via batch.get(...) and
+    # is unaffected when it is missing, exactly like every other optional
+    # HydroBatch field below.
+    structural_features: Tensor
     edge_index: Tensor
     edge_features: Tensor
     node_mask: Tensor
@@ -533,6 +540,15 @@ class HydroCore(nn.Module):
         # checkpoint/caller (Arms A/B included) is unaffected unless this
         # is explicitly overridden.
         elapsed_time_normalization: str = "window_relative",
+        # exp/graph-structural-encoder-v2 (EXPERIMENTAL, NON-RELEASE): plain
+        # passthroughs to GraphStructuralEncoder's own matching parameters
+        # (encoders.py). Both default to the encoder's original behavior
+        # exactly -- 0/False -- so every existing caller/checkpoint is
+        # unaffected unless explicitly overridden. See docs/evaluation/
+        # experimental/GRAPH_STRUCTURAL_ENCODER_V2_PLAN.md Section 2.
+        graph_structural_feature_dim: int = 0,
+        graph_structural_edge_aggregation: bool = False,
+        graph_structural_edge_aggregation_source: str = "graph",
         # HydroCore-v5 Milestone 9.1 preflight: experiment-scoped seam for
         # swapping the temporal-latent-production step (temporal_encoder +
         # quality_encoder) for a continuous-time alternative (Graph Neural
@@ -629,6 +645,9 @@ class HydroCore(nn.Module):
         self.ood_category_head_enabled = ood_category_head
         self.scout_control_heads = scout_control_heads
         self.elapsed_time_normalization = elapsed_time_normalization
+        self.graph_structural_feature_dim = graph_structural_feature_dim
+        self.graph_structural_edge_aggregation = graph_structural_edge_aggregation
+        self.graph_structural_edge_aggregation_source = graph_structural_edge_aggregation_source
         # core-issues.txt repair item 9: set by from_variant() so a
         # checkpoint's own architecture_config() records which named
         # variant it was built from; a model constructed directly (e.g. the
@@ -639,7 +658,12 @@ class HydroCore(nn.Module):
             node_feature_dim, d_model, normalization=normalization, activation=activation
         )
         self.graph_encoder = GraphStructuralEncoder(
-            d_model, normalization=normalization, activation=activation
+            d_model,
+            normalization=normalization,
+            activation=activation,
+            structural_feature_dim=graph_structural_feature_dim,
+            use_edge_aggregation=graph_structural_edge_aggregation,
+            edge_aggregation_source=graph_structural_edge_aggregation_source,
         )
         temporal_args = dict(
             d_model=d_model,
@@ -889,6 +913,9 @@ class HydroCore(nn.Module):
             "residual_feature_dim": self.residual_feature_dim,
             "dropout": self.dropout_value,
             "elapsed_time_normalization": self.elapsed_time_normalization,
+            "graph_structural_feature_dim": self.graph_structural_feature_dim,
+            "graph_structural_edge_aggregation": self.graph_structural_edge_aggregation,
+            "graph_structural_edge_aggregation_source": self.graph_structural_edge_aggregation_source,
         }
 
     def _attention_pool(self, hidden: Tensor, mask: Tensor) -> Tensor:
@@ -952,6 +979,10 @@ class HydroCore(nn.Module):
             batch.get("travel_time", zeros),
             batch.get("reservoir_reachability", zeros),
             batch.get("demand_centrality", zeros),
+            structural_features=batch.get("structural_features"),
+            edge_index=batch.get("edge_index"),
+            edge_mask=batch.get("edge_mask"),
+            node_mask=node_mask,
         )
         if self.temporal_dynamics is None:
             temporal = self.temporal_encoder(
