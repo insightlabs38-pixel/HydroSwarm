@@ -1,0 +1,53 @@
+{
+  "by_arm": {
+    "B_CANDIDATE_CONDITIONED": {
+      "long_distance": {
+        "arm_top1_mean": 0.38869257950530034,
+        "ci_high": 0.03180212014134276,
+        "ci_low": -0.024734982332155486,
+        "control_top1_mean": 0.38515901060070673,
+        "excludes_zero": false,
+        "n": 283,
+        "observed": 0.003533568904593609,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.44,
+        "ci_high": 0.01428571428571429,
+        "ci_low": -0.025714285714285745,
+        "control_top1_mean": 0.44571428571428573,
+        "excludes_zero": false,
+        "n": 350,
+        "observed": -0.005714285714285727,
+        "resamples": 2000
+      }
+    },
+    "C_PHYSICS_INFORMED": {
+      "long_distance": {
+        "arm_top1_mean": 0.392226148409894,
+        "ci_high": 0.0424028268551237,
+        "ci_low": -0.03180212014134276,
+        "control_top1_mean": 0.38515901060070673,
+        "excludes_zero": false,
+        "n": 283,
+        "observed": 0.007067137809187274,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.45714285714285713,
+        "ci_high": 0.03999999999999998,
+        "ci_low": -0.01428571428571429,
+        "control_top1_mean": 0.44571428571428573,
+        "excludes_zero": false,
+        "n": 350,
+        "observed": 0.011428571428571399,
+        "resamples": 2000
+      }
+    }
+  },
+  "distance_median": 0.0,
+  "tercile_cutoffs": {
+    "high_cut": 0.2767857015132904,
+    "low_cut": 0.1190476194024086
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "development_holdout": {
+    "B_CANDIDATE_CONDITIONED": {
+      "mean_margin_delta": 0.0007709645233747627,
+      "mean_rank_delta": -0.04,
+      "n": 300,
+      "rank_improved_unchanged_worsened": [
+        16,
+        277,
+        7
+      ],
+      "top1_bootstrap_delta": {
+        "ci_high": 0.023333333333333317,
+        "ci_low": -0.010000000000000009,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.00666666666666671,
+        "resamples": 2000
+      },
+      "top1_transition_table": {
+        "arm_only": 5,
+        "both_correct": 204,
+        "both_wrong": 88,
+        "control_only": 3
+      },
+      "top3_bootstrap_delta": {
+        "ci_high": 0.016666666666666607,
+        "ci_low": -0.010000000000000009,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.0033333333333332993,
+        "resamples": 2000
+      }
+    },
+    "C_PHYSICS_INFORMED": {
+      "mean_margin_delta": 0.002521224998830197,
+      "mean_rank_delta": -0.043333333333333335,
+      "n": 300,
+      "rank_improved_unchanged_worsened": [
+        23,
+        268,
+        9
+      ],
+      "top1_bootstrap_delta": {
+        "ci_high": 0.026666666666666616,
+        "ci_low": -0.013333333333333308,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.00666666666666671,
+        "resamples": 2000
+      },
+      "top1_transition_table": {
+        "arm_only": 7,
+        "both_correct": 202,
+        "both_wrong": 86,
+        "control_only": 5
+      },
+      "top3_bootstrap_delta": {
+        "ci_high": 0.010000000000000009,
+        "ci_low": -0.01666666666666672,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": -0.0033333333333332993,
+        "resamples": 2000
+      }
+    }
+  },
+  "ood-UNSEEN_TOPOLOGY": {
+    "B_CANDIDATE_CONDITIONED": {
+      "mean_margin_delta": -0.03195047995749129,
+      "mean_rank_delta": 0.09285714285714286,
+      "n": 280,
+      "rank_improved_unchanged_worsened": [
+        22,
+        222,
+        36
+      ],
+      "top1_bootstrap_delta": {
+        "ci_high": 0.04285714285714287,
+        "ci_low": -0.010714285714285732,
+        "excludes_zero": false,
+        "n": 280,
+        "observed": 0.01428571428571429,
+        "resamples": 2000
+      },
+      "top1_transition_table": {
+        "arm_only": 12,
+        "both_correct": 97,
+        "both_wrong": 163,
+        "control_only": 8
+      },
+      "top3_bootstrap_delta": {
+        "ci_high": -0.021428571428571463,
+        "ci_low": -0.06428571428571428,
+        "excludes_zero": true,
+        "n": 280,
+        "observed": -0.042857142857142816,
+        "resamples": 2000
+      }
+    },
+    "C_PHYSICS_INFORMED": {
+      "mean_margin_delta": -0.03100495372491423,
+      "mean_rank_delta": -0.13214285714285715,
+      "n": 280,
+      "rank_improved_unchanged_worsened": [
+        69,
+        170,
+        41
+      ],
+      "top1_bootstrap_delta": {
+        "ci_high": 0.10000000000000003,
+        "ci_low": 0.025000000000000022,
+        "excludes_zero": true,
+        "n": 280,
+        "observed": 0.06428571428571428,
+        "resamples": 2000
+      },
+      "top1_transition_table": {
+        "arm_only": 29,
+        "both_correct": 94,
+        "both_wrong": 146,
+        "control_only": 11
+      },
+      "top3_bootstrap_delta": {
+        "ci_high": 0.042857142857142816,
+        "ci_low": -0.025000000000000022,
+        "excludes_zero": false,
+        "n": 280,
+        "observed": 0.0071428571428571175,
+        "resamples": 2000
+      }
+    }
+  },
+  "validation": {
+    "B_CANDIDATE_CONDITIONED": {
+      "mean_margin_delta": 0.004269420465449609,
+      "mean_rank_delta": -0.04,
+      "n": 300,
+      "rank_improved_unchanged_worsened": [
+        16,
+        276,
+        8
+      ],
+      "top1_bootstrap_delta": {
+        "ci_high": 0.036666666666666625,
+        "ci_low": 0.0,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.016666666666666607,
+        "resamples": 2000
+      },
+      "top1_transition_table": {
+        "arm_only": 8,
+        "both_correct": 205,
+        "both_wrong": 84,
+        "control_only": 3
+      },
+      "top3_bootstrap_delta": {
+        "ci_high": 0.023333333333333317,
+        "ci_low": -0.0033333333333332993,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.010000000000000009,
+        "resamples": 2000
+      }
+    },
+    "C_PHYSICS_INFORMED": {
+      "mean_margin_delta": -0.0030987359916616695,
+      "mean_rank_delta": -0.03666666666666667,
+      "n": 300,
+      "rank_improved_unchanged_worsened": [
+        23,
+        262,
+        15
+      ],
+      "top1_bootstrap_delta": {
+        "ci_high": 0.033333333333333326,
+        "ci_low": -0.013333333333333308,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.010000000000000009,
+        "resamples": 2000
+      },
+      "top1_transition_table": {
+        "arm_only": 10,
+        "both_correct": 201,
+        "both_wrong": 82,
+        "control_only": 7
+      },
+      "top3_bootstrap_delta": {
+        "ci_high": 0.013333333333333308,
+        "ci_low": -0.013333333333333308,
+        "excludes_zero": false,
+        "n": 300,
+        "observed": 0.0,
+        "resamples": 2000
+      }
+    }
+  }
+}

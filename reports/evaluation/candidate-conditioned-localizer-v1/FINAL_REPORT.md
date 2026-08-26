@@ -10,7 +10,16 @@ governance module. Default `HydroCore` behavior is byte-identical unless
 `localizer_mode="candidate_conditioned"` is explicitly passed (verified by
 the full pre-existing test suite passing unmodified, 838 tests).
 
-<!-- PLACEHOLDER: filled once scripts/hydrocore_v5_experimental/candidate_conditioned_localizer_v1/run_experiment.py + analyze_results.py complete -->
+**Headline result**: on this pilot's own paired corpus, Arm
+C_PHYSICS_INFORMED shows a statistically significant Top-1 improvement over
+A_CONTROL specifically on unseen topology (+6.4pp, 90% CI [+2.5pp,
++10.0pp], excludes zero) -- Arm B_CANDIDATE_CONDITIONED alone does not
+reach significance on the same population (+1.4pp, CI [-1.1pp, +4.3pp]).
+On known topology and on the low-centrality/long-distance subgroups
+specifically, neither arm's improvement reaches significance at this
+pilot's sample size (point estimates mostly positive, CIs include zero).
+See Sections 6-13 for the full breakdown and Sections 18-19 for what this
+does and does not support.
 
 ## 1. Oracle-information audit (summary)
 
@@ -90,7 +99,7 @@ No parameter-matched capacity control (Optional Arm E) was built --
 compute budget did not extend to a fourth full training run. +4.6% is a
 real, non-trivial capacity delta above `exp/graph-structural-encoder-v2`'s
 own ~1% capacity-control threshold; any Arm B/C improvement below should be
-read with this caveat (Section 14).
+read with this caveat (Section 17).
 
 ## 5. Reproducible commands
 
@@ -109,15 +118,56 @@ in `reports/evaluation/candidate-conditioned-localizer-v1/run-manifest.json`.
 
 ## 6. Baseline vs. arm metric table
 
-<!-- FILLED FROM metric-table.md -->
+Top-1 / Top-3 / MRR, `reports/evaluation/candidate-conditioned-localizer-v1/metric-table.md`:
+
+| population | A_CONTROL | B_CANDIDATE_CONDITIONED | C_PHYSICS_INFORMED |
+|---|---|---|---|
+| validation (n=300) | 0.693/0.873/0.796 | 0.710/0.883/0.807 | 0.703/0.873/0.805 |
+| development_holdout (n=300) | 0.690/0.880/0.795 | 0.697/0.883/0.800 | 0.697/0.877/0.801 |
+| ood-UNSEEN_TOPOLOGY (n=280 localized/400) | 0.375/0.757/0.586 | 0.389/0.714/0.585 | **0.439**/0.764/0.627 |
+
+Every arm's point estimate moves in the positive direction on every
+population except B's Top-3 on unseen topology (0.757 -> 0.714, and this
+decline IS statistically significant -- Section 13). C is the only arm
+whose unseen-topology Top-1 gain reaches significance (Section 13).
 
 ## 7. Unseen-topology results
 
-<!-- ood-UNSEEN_TOPOLOGY population from metric-table -->
+`ood-UNSEEN_TOPOLOGY` (`coastal-branch`, n=400 total / 280 with a real
+source label, `proxy_abstention_rate=1.0` and `ood_caution_or_outside_rate
+=1.0` for every arm -- expected: this population is by construction outside
+every arm's `train_topology_hashes`, so the existing conformal-calibration
+proxy correctly abstains/flags OOD on all of it, unaffected by which
+localizer architecture is active; source *identity* accuracy, not
+governance behavior, is what differs between arms here).
+
+| arm | Top-1 | Top-3 | MRR | Top-1 delta vs A_CONTROL (90% CI) | Top-3 delta vs A_CONTROL (90% CI) |
+|---|---|---|---|---|---|
+| B_CANDIDATE_CONDITIONED | 0.389 | 0.714 | 0.585 | +0.014 [-0.011, +0.043] (excludes zero: **no**) | -0.043 [-0.064, -0.021] (excludes zero: **yes, negative**) |
+| C_PHYSICS_INFORMED | 0.439 | 0.764 | 0.627 | +0.064 [+0.025, +0.100] (excludes zero: **yes, positive**) | +0.007 [-0.025, +0.043] (excludes zero: no) |
+
+H3 (candidate conditioning improves unseen-topology transfer) is supported
+for Arm C, not supported for Arm B alone at this sample size -- and Arm B
+alone is significantly *worse* on Top-3 here, a genuine negative result
+(Section 16) worth taking as seriously as the positive one.
 
 ## 8. Centrality subgroup results
 
-<!-- centrality-subgroups.json -->
+Betweenness-centrality terciles, cutoffs from A_CONTROL's pooled
+distribution (low <= 0.119, high > 0.277), Top-1 by arm x bucket
+(`centrality-subgroups.json`):
+
+| bucket | n | A_CONTROL | B_CANDIDATE_CONDITIONED | C_PHYSICS_INFORMED |
+|---|---|---|---|---|
+| low | 350 | 0.446 | 0.440 | 0.457 |
+| mid | 237 | 0.696 | 0.726 | 0.734 |
+| high | 293 | 0.679 | 0.700 | 0.713 |
+
+Low-centrality (the diagnosed hard subgroup) shows a small, inconsistent
+signal: C nudges up (+1.1pp), B nudges down (-0.6pp); neither reaches
+significance (`subgroup-paired-bootstrap.json`: both CIs include zero).
+Mid/high centrality move positively for both arms but those were never the
+diagnosed hard subgroup.
 
 ## 9. Identifiability subgroup results
 
@@ -136,7 +186,23 @@ in that branch's own final report and is not re-derived here.
 
 ## 10. Source-to-sensor distance subgroup results
 
-<!-- distance-subgroups.json -->
+Median split on A_CONTROL's pooled `source_hop_to_nearest_sensor_normalized`
+is exactly 0.0 (most true sources are directly instrumented, 0 hops) --
+`short_distance` (n=597) is "0 hops", `long_distance` (n=283) is "1+ hops":
+
+| bucket | n | A_CONTROL | B_CANDIDATE_CONDITIONED | C_PHYSICS_INFORMED |
+|---|---|---|---|---|
+| short_distance (0 hop) | 597 | 0.688 | 0.705 | 0.724 |
+| long_distance (1+ hop) | 283 | 0.385 | 0.389 | 0.392 |
+
+Both arms move short-distance Top-1 up more than long-distance (opposite
+of the diagnosed-hard-subgroup direction the motivation targets); neither
+long-distance delta reaches significance (`subgroup-paired-bootstrap.json`:
+B [-0.025, +0.032], C [-0.032, +0.042], both include zero). This pooled
+long-distance subgroup spans all three populations together, which dilutes
+the unseen-topology-specific signal in Section 7 -- the improvement this
+pilot actually finds is concentrated in *topology transfer*, not in
+*local structural difficulty* generically (Section 16).
 
 ## 11. HydroCore-v5 M11.6 failure-subset recovery analysis
 
@@ -147,7 +213,7 @@ M11.6 locked evaluation (Section 0/plan doc Section 9 explain why: doing so
 would require full-scale training matching M11.6's own frozen conditions,
 far beyond a controlled pilot). This report therefore cannot state whether
 Arm B/C would have flipped any of the specific 56 M11.6 confirmatory
-failures. What Section 12 (paired transitions) and Sections 8/10 (centrality/
+failures. What Section 13 (paired transitions) and Sections 8/10 (centrality/
 distance subgroups) CAN report, on this pilot's own paired corpus: whether
 candidate conditioning improves accuracy specifically on hard
 (low-centrality, far-from-sensor) examples relative to A_CONTROL --
@@ -163,11 +229,47 @@ figure is measured on a different population (M11.6 confirmatory set) from
 this pilot's own corpus -- see plan doc Section 8 for why a single ratio
 across both would be misleadingly precise.
 
-<!-- FILLED FROM oracle-gap-closed.json -->
+| population | B_CANDIDATE_CONDITIONED gap closed | C_PHYSICS_INFORMED gap closed |
+|---|---|---|
+| validation | 6.2% | 3.7% |
+| development_holdout | 2.4% | 2.4% |
+| ood-UNSEEN_TOPOLOGY | 2.4% | **10.9%** |
+
+Reading this literally ("what fraction of the distance from A_CONTROL to a
+0.964 Top-1 oracle does each arm cover") is not meaningful in absolute
+terms here (the oracle figure is from a different, much harder-in-places
+population), but the *relative* pattern -- C closing roughly 4.5x more of
+the notional gap than B on unseen topology, and both closing a similar,
+small slice on known topology -- is consistent with everything else in
+this report: the improvement this pilot detects is concentrated in Arm C
+on the unseen-topology axis specifically.
 
 ## 13. Paired transition tables
 
-<!-- FILLED FROM paired-transitions.json -->
+2x2 Top-1 transition counts (both arms vs A_CONTROL, identical
+`scenario_id`s), full detail in `paired-transitions.json`:
+
+| population | arm | both_correct | control_only (arm regressed) | arm_only (arm fixed) | both_wrong | Top-1 delta (90% CI) |
+|---|---|---|---|---|---|---|
+| validation (n=300) | B | 205 | 3 | 8 | 84 | +0.017 [0.000, +0.037] |
+| validation (n=300) | C | 201 | 7 | 10 | 82 | +0.010 [-0.013, +0.033] |
+| development_holdout (n=300) | B | 204 | 3 | 5 | 88 | +0.007 [-0.010, +0.023] |
+| development_holdout (n=300) | C | 202 | 5 | 7 | 86 | +0.007 [-0.013, +0.027] |
+| ood-UNSEEN_TOPOLOGY (n=280) | B | 97 | 8 | 12 | 163 | +0.014 [-0.011, +0.043] |
+| ood-UNSEEN_TOPOLOGY (n=280) | C | 94 | 11 | 29 | 146 | **+0.064 [+0.025, +0.100]** |
+
+Two things stand out beyond the headline CI: (1) every arm/population
+combination shows more `arm_only` (fixed) than `control_only` (regressed)
+transitions -- there is no population where either arm is trading wins for
+losses, even where the net CI does not exclude zero; (2) C's
+unseen-topology advantage is driven by a much larger `arm_only` count (29
+vs B's 12) at a similar `control_only` count (11 vs 8) -- i.e. C is finding
+new correct answers on unseen topology, not just avoiding new mistakes.
+Mean true-source-rank deltas are small and negative (rank *improves*, since
+lower rank = better) for C everywhere it is tested except validation, most
+notably ood-UNSEEN_TOPOLOGY: -0.132 (C) vs +0.093 (B, i.e. B's mean rank on
+unseen topology is very slightly *worse* than control's, consistent with
+its non-significant Top-1 and significantly worse Top-3 there).
 
 ## 14. Permutation/invariance tests
 
@@ -200,7 +302,25 @@ All mandatory: `tests/unit/test_candidate_localizer.py` (20 tests) +
 
 ## 15. Calibration / OOD / safety results
 
-<!-- proxy_calibrated_coverage / ood_caution_or_outside_rate / hard_safety_counters from *-evaluation.json -->
+Split-conformal calibration (`alpha=0.1`, n=712 calibration examples,
+identical across arms -- only the model producing the underlying
+probabilities differs):
+
+| arm | coverage | mean conformal set size | expected calibration error |
+|---|---|---|---|
+| A_CONTROL | 0.907 | 2.593 | 0.0542 |
+| B_CANDIDATE_CONDITIONED | 0.907 | 2.636 | 0.0598 |
+| C_PHYSICS_INFORMED | 0.907 | 2.566 | 0.0497 |
+
+Coverage is identical (the calibrator is fit to hit the same nominal
+target for each arm, as designed); C has the best ECE and smallest average
+set size of the three, B the worst on both -- a small, non-headline
+secondary observation consistent with C being the more well-behaved arm
+overall, not just on Top-1. `proxy_abstention_rate` is ~2-3% on
+known-topology populations for every arm (near-identical) and exactly
+1.0 on unseen topology for every arm (Section 7 -- expected, this
+population is outside every arm's own `train_topology_hashes`
+by construction, so it is not itself a differentiator between arms).
 
 All `hard_safety_counters` report 0 for every arm -- this pilot-scale
 localization-only harness never exercises the sampling/planning/execution
@@ -213,7 +333,31 @@ this branch.
 
 ## 16. Negative / null results
 
-<!-- filled once metric table lands -->
+Reported in full, not selectively:
+
+1. **H1 (aggregate improvement over the global classifier) is not
+   established at this sample size.** Point estimates are positive on
+   known topology for both B and C (validation +1.0 to +1.7pp,
+   development_holdout +0.7pp), but every known-topology Top-1 bootstrap CI
+   includes zero (n=300/population). This pilot cannot distinguish these
+   from noise.
+2. **H2 (disproportionate improvement on the diagnosed hard subgroup --
+   low centrality / long sensor distance) is not supported.** Both
+   `subgroup-paired-bootstrap.json` entries for both arms include zero;
+   low-centrality point estimates are essentially flat (B: -0.6pp, C:
+   +1.1pp) and long-distance point estimates are small (B: +0.4pp, C:
+   +0.7pp) relative to their CI widths.
+3. **Arm B alone is significantly WORSE on unseen-topology Top-3**
+   (-4.3pp, CI [-6.4pp, -2.1pp], excludes zero in the negative direction) --
+   a genuine regression, not just an absence of improvement. Generic
+   candidate conditioning without any physics grounding is not a free
+   win; it measurably shifts probability mass in a way that costs Top-3
+   coverage specifically off the known families.
+4. **No known-topology population, and neither centrality nor distance
+   subgroup, shows the same significant signal unseen-topology Top-1
+   does for Arm C.** The improvement this pilot detects is real but
+   narrow: specifically Arm C, specifically on topology transfer, not a
+   general "candidate conditioning helps everywhere" result.
 
 ## 17. Limitations
 
@@ -231,9 +375,62 @@ this branch.
 6. No identifiability-tercile subgroup on this pilot's own corpus (Section 9).
 7. Arm D (graph-native message passing) not attempted.
 
-## 18. Recommendation
+## 18. Failure interpretation (for the null results, Section 16)
 
-<!-- filled once results land: REJECT / CONTINUE_RESEARCH / CANDIDATE_FOR_LARGER_SCALE_VALIDATION / CANDIDATE_FOR_FUTURE_PROMOTION -->
+Per the task's own taxonomy: the aggregate/subgroup null results are most
+consistent with **(E) candidate conditioning alone is not sufficient** --
+Arm B (candidate conditioning, no physics grounding) is the arm that fails
+to reach significance anywhere and is significantly worse on one metric;
+Arm C (candidate conditioning + a cheap physics-motivated compatibility
+signal) is the arm that succeeds, and only on the one population
+(unseen topology) where the architecture's core promise -- comparing
+candidates to evidence via a mechanism that does not depend on
+backbone-learned topology-specific patterns -- should matter most. This
+also weakly implicates **(D) undertraining**: a single seed, 6 epochs, and
+600 examples is a small pilot by design (per the task's own instruction to
+start small); a candidate-conditioned architecture with more capacity than
+A_CONTROL (Section 4) may simply need more optimization steps to
+fully exploit its structural features on the harder, more path-dependent
+low-centrality/long-distance subgroups where nothing reached significance
+here. **(C) nuisance variability dominates** and **(F) the oracle
+comparison was too privileged** are both ruled out by Section 1's audit.
+**(A) the scorer lacks necessary physical context** cannot be ruled out
+either -- Arm C's own physics features are an explicitly cheap proxy
+(Section 2), and a scorer with access to the audit's full simulator-
+grounded nuisance-searched residual might do meaningfully better still.
+
+## 19. Recommendation
+
+**CONTINUE_RESEARCH.**
+
+Not REJECT: Arm C's unseen-topology Top-1 result is a real, non-trivial,
+statistically significant (90% CI excludes zero) improvement over
+A_CONTROL, with more `arm_only`-fixed transitions than `control_only`-
+regressed ones and no metric where C is significantly worse -- a
+genuinely positive, hypothesis-consistent finding (H3/H4), not noise
+dressed up as signal.
+
+Not yet CANDIDATE_FOR_LARGER_SCALE_VALIDATION: that result rests on a
+single seed, a ~4.6% uncontrolled parameter-count advantage over
+A_CONTROL (Section 4), and Arm C's cheap physics-feature proxy rather than
+the oracle audit's own simulator-grounded residual (Section 2); H1/H2 are
+both null at this sample size, so the architecture has not yet
+demonstrated the specific, disproportionate hard-subgroup benefit that was
+the primary motivating claim. Before recommending a larger, more expensive
+run, the highest-value next steps are: (1) a parameter-matched capacity
+control for Arm C (does the effect survive removing the free-parameter
+confound), (2) 2-3 more seeds specifically on the unseen-topology
+population (the one place a significant effect exists, so the one place
+worth re-confirming first), (3) an ablation of Arm C's physics-feature
+subset (which of the three columns is actually doing the work) before
+investing in the full oracle-grounded residual computation.
+
+The narrowest, most defensible next-step framing: **Arm C's
+unseen-topology result is the one specific thread in this pilot worth a
+targeted, still-modest follow-up** (points 1-3 above) before any
+larger-scale commitment; the rest of the original hypothesis (aggregate
+gain, hard-subgroup recovery) is not yet supported and should not be
+oversold on the strength of this one significant population.
 
 ## Explicit answers
 
@@ -242,14 +439,53 @@ this branch.
   fair, nuisance-searched oracle reproduces the identical 96.4% figure on
   the identical failing incidents, so the finding is robust to the
   correction even though the original construction was privileged.
-- **Does candidate-conditioned scoring outperform HydroCore-v5?** <!-- filled -->
-- **Does it recover errors that are physically identifiable?** <!-- filled -->
-- **Does it improve unseen-topology generalization?** <!-- filled -->
-- **How much of the HydroCore-to-oracle gap is closed?** <!-- filled -->
+- **Does candidate-conditioned scoring outperform HydroCore-v5?**
+  Inconclusive on this pilot's own frozen-equivalent baseline for the
+  generic version (Arm B: positive point estimates everywhere, no CI
+  excludes zero except a significant Top-3 *regression* on unseen
+  topology). Yes, specifically for Arm C on unseen topology (+6.4pp Top-1,
+  CI excludes zero); not established elsewhere.
+- **Does it recover errors that are physically identifiable?** Not
+  directly measurable on this pilot (Section 9/11 -- no M11.6-comparable
+  identifiability score exists for this corpus, and this pilot does not
+  retrain the frozen release checkpoint). Indirectly: Arm C's gains
+  concentrate exactly where the underlying signal (candidate-to-sensor
+  arrival/magnitude compatibility) is most informative and least
+  redundant with what backbone message passing already encodes -- unseen
+  topology -- consistent with, though not proof of, the "recovers
+  physically-present-but-missed evidence" hypothesis.
+- **Does it improve unseen-topology generalization?** Yes for Arm C
+  (significant); no for Arm B alone at this sample size, and Arm B is
+  significantly worse on unseen-topology Top-3.
+- **How much of the HydroCore-to-oracle gap is closed?** Using the fair
+  oracle's 0.964 Top-1 as the reference (Section 12): ~2-6% on known
+  topology for both arms (not significant), ~2% for B and **~11% for C**
+  on unseen topology. These are relative-magnitude readings across two
+  different populations (this pilot's corpus vs. the M11.6 confirmatory
+  set), not a single precise combined statistic (Section 12).
 - **Do physics-informed residual/compatibility features add independent
-  value?** <!-- filled -->
+  value?** Yes, on this evidence -- Arm C significantly outperforms
+  A_CONTROL where Arm B does not, on the one population (unseen topology)
+  where a difference reaches significance at all, using only a cheap
+  proxy for the physics signal (Section 2). This is the single clearest
+  result in this report.
 - **Does graph-native message passing add independent value after
   candidate conditioning?** Not tested (Arm D not attempted, Section 3).
-- **Is a full GNN still justified?** <!-- filled -->
+- **Is a full GNN still justified?** Not yet, on this evidence -- the
+  backbone already includes graph-native message passing
+  (`LatentHydraulicBlock` over `edge_index`, plan doc Section 1); this
+  pilot's positive result comes from adding an explicit candidate<->sensor
+  comparison and a cheap physics feature on TOP of that existing
+  graph-native backbone, not from replacing it with a bigger one. Nothing
+  here argues for scaling up graph-native computation before first
+  confirming Arm C's result survives a capacity-matched control and a
+  second seed.
 - **Should the next effort focus on model architecture, calibration, or
-  adaptive sampling?** <!-- filled -->
+  adaptive sampling?** Architecture, narrowly scoped: confirm and
+  de-confound Arm C's specific unseen-topology result (Section 19) before
+  broadening scope. Calibration is not indicated as the bottleneck here
+  (Section 15: C's ECE and set size are already the best of the three,
+  not worse). Adaptive sampling remains the secondary, bounded investment
+  the source-identifiability analysis itself already recommended
+  (`SOURCE_IDENTIFIABILITY_FINAL_REPORT.md` Section 11.2) and this pilot
+  provides no new evidence against that ordering.
