@@ -97,3 +97,12 @@ experiments/jobs/*/job.pid
 # exp/graph-structural-encoder-v2. The evaluation JSON/JSONL outputs under
 # reports/evaluation/candidate-conditioned-localizer-v1/ ARE committed.
 /experiments/candidate-conditioned-localizer-v1/runs/
+
+# exp/physics-informed-localizer-validation (EXPERIMENTAL, NON-RELEASE): same
+# rationale as candidate-conditioned-localizer-v1 above -- per-seed/per-arm
+# trained checkpoints are deterministically regenerable from the committed
+# run_experiment.py plus each seed's committed run-manifest.json, never
+# committed themselves. The evaluation JSON/JSONL outputs and pooled analysis
+# under reports/evaluation/physics-informed-localizer-validation/ ARE
+# committed.
+/experiments/physics-informed-localizer-validation/runs/
