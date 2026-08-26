@@ -48,6 +48,8 @@ are top-1 failures.
 | MEASUREMENT_NOISE | 0.400 | 0.667 | 0.586 | 4.20 | 1.425 |
 | AMBIGUITY_DISAGREEMENT | 0.400 | 0.600 | 0.567 | 4.40 | 1.608 |
 
+![Known-topology top-1 by condition_kind](../../../reports/evaluation/failure-mode-diagnostics/plots/condition_kind_top1.png)
+
 Stress is not uniform: `SEVERITY_SHIFT` and `SENSOR_HEALTH_DEGRADED` cost
 almost nothing relative to `NOMINAL`; `MEASUREMENT_NOISE`,
 `AMBIGUITY_DISAGREEMENT`, `SENSOR_DROPOUT`, and `LOW_COVERAGE_ACTIVE_SAMPLING`
@@ -94,6 +96,8 @@ Two independent, converging structural signals (`m11-6-subgroup-metrics.json`):
 - **Distance to reservoir**: top1 falls roughly monotonically from 0.714
   (1 hop, n=21) to 0.459 (3 hops, n=37) to 0.333 (5 hops, n=9, small); the
   6-hop cell (n=2) is degenerate.
+
+![Source-node centrality vs. top-1 accuracy](../../../reports/evaluation/failure-mode-diagnostics/plots/centrality_vs_top1.png)
 
 **Reading (correlational, not causal):** every one of these is a facet of
 the same underlying property — how central/well-connected the true source
@@ -243,6 +247,8 @@ a new/different run.
 (94+11=105 correct per arm / 280 = 0.3750 exactly, both arms — confirms
 the bit-identical aggregate is an exact 11-for-11 cancellation, not
 "nothing changed.")
+
+![Paired top-1 transition matrix](../../../reports/evaluation/failure-mode-diagnostics/plots/paired_top1_transitions.png)
 
 **Top-3 2x2 transition table:**
 
@@ -431,6 +437,7 @@ python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/build_m11_6_d
 python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/analyze_m11_6_failure_modes.py
 python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/rerun_topology_pilot_with_logging.py  # ~20 min/arm on CPU
 python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/analyze_paired_pilot.py
+python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/make_plots.py
 ```
 
 Each script is idempotent and deterministic (fixed seeds throughout,
