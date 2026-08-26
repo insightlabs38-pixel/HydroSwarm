@@ -288,6 +288,89 @@ def distance_subgroups(rows_by_arm: dict[str, dict[str, list[dict[str, Any]]]]) 
     return result
 
 
+def subgroup_paired_bootstrap(rows_by_arm: dict[str, dict[str, list[dict[str, Any]]]]) -> dict[str, Any]:
+    """Paired bootstrap CI (arm vs A_CONTROL, matched by scenario_id) on
+    top1, restricted to the low-centrality tercile and to the short/long
+    sensor-distance groups -- the direct significance test for the primary
+    success criterion (plan doc Section 6): does any arm improve the
+    diagnosed hard subgroup, with a CI that excludes zero, not just a point
+    estimate."""
+
+    reference_centrality = [
+        row
+        for population in POPULATIONS
+        for row in rows_by_arm["A_CONTROL"][population]
+        if row.get("has_source") and "source_betweenness_centrality" in row
+    ]
+    low_cut, high_cut = _tercile_bounds([row["source_betweenness_centrality"] for row in reference_centrality])
+    control_by_id: dict[str, dict[str, Any]] = {
+        row["scenario_id"]: row for row in reference_centrality
+    }
+    low_centrality_ids = {
+        scenario_id
+        for scenario_id, row in control_by_id.items()
+        if _bucket(row["source_betweenness_centrality"], low_cut, high_cut) == "low"
+    }
+    high_centrality_ids = {
+        scenario_id
+        for scenario_id, row in control_by_id.items()
+        if _bucket(row["source_betweenness_centrality"], low_cut, high_cut) == "high"
+    }
+
+    reference_distance = [
+        row
+        for population in POPULATIONS
+        for row in rows_by_arm["A_CONTROL"][population]
+        if row.get("has_source") and "source_hop_to_nearest_sensor_normalized" in row
+    ]
+    distance_median = statistics.median(row["source_hop_to_nearest_sensor_normalized"] for row in reference_distance)
+    long_distance_ids = {
+        row["scenario_id"] for row in reference_distance if row["source_hop_to_nearest_sensor_normalized"] > distance_median
+    }
+    short_distance_ids = {
+        row["scenario_id"] for row in reference_distance if row["source_hop_to_nearest_sensor_normalized"] <= distance_median
+    }
+
+    subgroups = {
+        "low_centrality": low_centrality_ids,
+        "high_centrality": high_centrality_ids,
+        "long_distance": long_distance_ids,
+        "short_distance": short_distance_ids,
+    }
+
+    control_rows_by_id: dict[str, dict[str, Any]] = {
+        row["scenario_id"]: row
+        for population in POPULATIONS
+        for row in rows_by_arm["A_CONTROL"][population]
+        if row.get("has_source")
+    }
+
+    result: dict[str, Any] = {"tercile_cutoffs": {"low_cut": low_cut, "high_cut": high_cut}, "distance_median": distance_median, "by_arm": {}}
+    for arm in ARM_NAMES:
+        if arm == "A_CONTROL":
+            continue
+        arm_rows_by_id: dict[str, dict[str, Any]] = {
+            row["scenario_id"]: row
+            for population in POPULATIONS
+            for row in rows_by_arm[arm][population]
+            if row.get("has_source")
+        }
+        arm_result: dict[str, Any] = {}
+        for subgroup_name, ids in subgroups.items():
+            shared_ids = sorted(ids & set(control_rows_by_id) & set(arm_rows_by_id))
+            control_top1 = [float(control_rows_by_id[sid]["top1"]) for sid in shared_ids]
+            arm_top1 = [float(arm_rows_by_id[sid]["top1"]) for sid in shared_ids]
+            bootstrap = paired_bootstrap(control_top1, arm_top1)
+            arm_result[subgroup_name] = {
+                "n": len(shared_ids),
+                "control_top1_mean": statistics.fmean(control_top1) if control_top1 else None,
+                "arm_top1_mean": statistics.fmean(arm_top1) if arm_top1 else None,
+                **bootstrap,
+            }
+        result["by_arm"][arm] = arm_result
+    return result
+
+
 # --------------------------------------------------------------------------
 # 4. Paired transitions (each arm vs A_CONTROL, identical scenario_ids)
 # --------------------------------------------------------------------------
@@ -493,6 +576,11 @@ def main() -> None:
 
     distance = distance_subgroups(rows_by_arm)
     (RESULTS_DIR / "distance-subgroups.json").write_text(json.dumps(distance, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    subgroup_bootstrap = subgroup_paired_bootstrap(rows_by_arm)
+    (RESULTS_DIR / "subgroup-bootstrap.json").write_text(
+        json.dumps(subgroup_bootstrap, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
     transitions = paired_transitions(rows_by_arm)
     (RESULTS_DIR / "paired-transitions.json").write_text(json.dumps(transitions, indent=2, sort_keys=True) + "\n", encoding="utf-8")

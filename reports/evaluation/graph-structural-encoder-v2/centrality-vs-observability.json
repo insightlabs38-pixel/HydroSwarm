@@ -1,0 +1,26 @@
+{
+  "centrality_distance_correlation": -0.07853424450145337,
+  "interpretation_note": "Coefficients are on standardized (z-scored) features, so magnitudes are directly comparable within this table. A joint centrality coefficient much smaller than the univariate one indicates centrality's apparent effect is largely explained by its correlation with sensor distance; a joint coefficient of comparable magnitude indicates centrality carries independent information. This is a descriptive/associational fit, not a causal estimate -- see plan doc Section 9's explicit caveat.",
+  "joint_centrality_coefficient_standardized": 0.4010479120776772,
+  "joint_distance_coefficient_standardized": -0.5504674155352629,
+  "n": 880,
+  "stratified_by_distance_tercile": {
+    "long_distance": {
+      "centrality_coefficient_standardized": 0.457306649477214,
+      "mean_top1": 0.38515901060070673,
+      "n": 283
+    },
+    "mid_distance": {
+      "centrality_coefficient_standardized": null,
+      "mean_top1": null,
+      "n": 0
+    },
+    "short_distance": {
+      "centrality_coefficient_standardized": 0.37376784112878136,
+      "mean_top1": 0.6884422110552764,
+      "n": 597
+    }
+  },
+  "univariate_centrality_coefficient_standardized": 0.42045988481531327,
+  "univariate_distance_coefficient_standardized": -0.5637480966245215
+}

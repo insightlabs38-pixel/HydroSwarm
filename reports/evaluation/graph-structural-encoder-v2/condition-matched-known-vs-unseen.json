@@ -1,0 +1,50 @@
+{
+  "A_CONTROL": {
+    "gap_known_minus_unseen": 0.295045045045045,
+    "known_n": 111,
+    "known_top1": 0.7117117117117117,
+    "note": "CLEAN (CurriculumStage) used as this corpus's own least-stressed-condition proxy; NOT the same taxonomy as M11.6's condition_kind (that field does not exist in this corpus -- see report Limitations).",
+    "unseen_n": 60,
+    "unseen_top1": 0.4166666666666667
+  },
+  "B_CENTRALITY": {
+    "gap_known_minus_unseen": 0.28738738738738734,
+    "known_n": 111,
+    "known_top1": 0.7207207207207207,
+    "note": "CLEAN (CurriculumStage) used as this corpus's own least-stressed-condition proxy; NOT the same taxonomy as M11.6's condition_kind (that field does not exist in this corpus -- see report Limitations).",
+    "unseen_n": 60,
+    "unseen_top1": 0.43333333333333335
+  },
+  "C_OBSERVABILITY": {
+    "gap_known_minus_unseen": 0.28603603603603606,
+    "known_n": 111,
+    "known_top1": 0.7027027027027027,
+    "note": "CLEAN (CurriculumStage) used as this corpus's own least-stressed-condition proxy; NOT the same taxonomy as M11.6's condition_kind (that field does not exist in this corpus -- see report Limitations).",
+    "unseen_n": 60,
+    "unseen_top1": 0.4166666666666667
+  },
+  "D_CAPACITY_CONTROL": {
+    "gap_known_minus_unseen": 0.31171171171171164,
+    "known_n": 111,
+    "known_top1": 0.7117117117117117,
+    "note": "CLEAN (CurriculumStage) used as this corpus's own least-stressed-condition proxy; NOT the same taxonomy as M11.6's condition_kind (that field does not exist in this corpus -- see report Limitations).",
+    "unseen_n": 60,
+    "unseen_top1": 0.4
+  },
+  "D_STRUCTURAL_AGG": {
+    "gap_known_minus_unseen": 0.31171171171171164,
+    "known_n": 111,
+    "known_top1": 0.7117117117117117,
+    "note": "CLEAN (CurriculumStage) used as this corpus's own least-stressed-condition proxy; NOT the same taxonomy as M11.6's condition_kind (that field does not exist in this corpus -- see report Limitations).",
+    "unseen_n": 60,
+    "unseen_top1": 0.4
+  },
+  "E_COMBINED": {
+    "gap_known_minus_unseen": 0.26036036036036037,
+    "known_n": 111,
+    "known_top1": 0.6936936936936937,
+    "note": "CLEAN (CurriculumStage) used as this corpus's own least-stressed-condition proxy; NOT the same taxonomy as M11.6's condition_kind (that field does not exist in this corpus -- see report Limitations).",
+    "unseen_n": 60,
+    "unseen_top1": 0.43333333333333335
+  }
+}
