@@ -1,0 +1,25 @@
+{
+  "all_predeclared_seeds": [
+    20260814,
+    20260901,
+    20260915
+  ],
+  "arms_run": [
+    "A_CONTROL",
+    "A_CAPACITY_MATCHED",
+    "B_CANDIDATE_CONDITIONED",
+    "C_FULL",
+    "C1",
+    "C2",
+    "C3"
+  ],
+  "calibration_count": 1000,
+  "capacity_matched_hidden_dim": 482,
+  "development_holdout_indices_count": 300,
+  "ood_unseen_topology_count": 400,
+  "pilot_epochs": 6,
+  "seed": 20260901,
+  "train_indices_count": 600,
+  "train_per_family": 200,
+  "validation_indices_count": 300
+}
