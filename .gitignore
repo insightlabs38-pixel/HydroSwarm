@@ -87,3 +87,13 @@ experiments/jobs/*/job.pid
 # record-demo-clips.spec.ts). Large source video, regenerable by re-running
 # the harness against a real running v0.2.1 release -- never committed.
 /artifacts/video-recording/
+
+# exp/candidate-conditioned-localizer-v1 (EXPERIMENTAL, NON-RELEASE): trained-
+# arm checkpoints from run_experiment.py, deterministically regenerable from
+# the committed script plus the fixed seed/config it records
+# (reports/evaluation/candidate-conditioned-localizer-v1/run-manifest.json) --
+# same not-a-release-artifact rationale as
+# /experiments/graph-structural-encoder-v2/runs/ on
+# exp/graph-structural-encoder-v2. The evaluation JSON/JSONL outputs under
+# reports/evaluation/candidate-conditioned-localizer-v1/ ARE committed.
+/experiments/candidate-conditioned-localizer-v1/runs/
