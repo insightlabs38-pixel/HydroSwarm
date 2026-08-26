@@ -1,0 +1,15 @@
+{
+  "arms_run": [
+    "A_CONTROL",
+    "B_CANDIDATE_CONDITIONED",
+    "C_PHYSICS_INFORMED"
+  ],
+  "calibration_count": 1000,
+  "development_holdout_indices_count": 300,
+  "ood_unseen_topology_count": 400,
+  "pilot_epochs": 6,
+  "seed": 20260814,
+  "train_indices_count": 600,
+  "train_per_family": 200,
+  "validation_indices_count": 300
+}
