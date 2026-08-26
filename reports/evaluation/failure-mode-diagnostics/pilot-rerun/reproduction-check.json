@@ -1,0 +1,130 @@
+{
+  "arms": {
+    "CONTROL": {
+      "reproduction_check": {
+        "committed_artifact_found": true,
+        "metric_diffs": {
+          "development_holdout.mrr": {
+            "committed": 0.7954166666666667,
+            "delta": 0.0,
+            "rerun": 0.7954166666666667
+          },
+          "development_holdout.top1": {
+            "committed": 0.69,
+            "delta": 0.0,
+            "rerun": 0.69
+          },
+          "development_holdout.top3": {
+            "committed": 0.88,
+            "delta": 0.0,
+            "rerun": 0.88
+          },
+          "ood-UNSEEN_TOPOLOGY.mrr": {
+            "committed": 0.5856547619047618,
+            "delta": 0.0,
+            "rerun": 0.5856547619047618
+          },
+          "ood-UNSEEN_TOPOLOGY.top1": {
+            "committed": 0.375,
+            "delta": 0.0,
+            "rerun": 0.375
+          },
+          "ood-UNSEEN_TOPOLOGY.top3": {
+            "committed": 0.7571428571428571,
+            "delta": 0.0,
+            "rerun": 0.7571428571428571
+          },
+          "validation.mrr": {
+            "committed": 0.7961904761904762,
+            "delta": 0.0,
+            "rerun": 0.7961904761904762
+          },
+          "validation.top1": {
+            "committed": 0.6933333333333334,
+            "delta": 0.0,
+            "rerun": 0.6933333333333334
+          },
+          "validation.top3": {
+            "committed": 0.8733333333333333,
+            "delta": 0.0,
+            "rerun": 0.8733333333333333
+          }
+        }
+      },
+      "training": {
+        "arm": "CONTROL",
+        "augmented": false,
+        "best_validation_loss": 2.854747761885325,
+        "elapsed_seconds": 580.553260079,
+        "epochs_completed": 6,
+        "global_steps": 309,
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false
+      }
+    },
+    "EXPERIMENTAL_TOPOLOGY_RELATIVE": {
+      "reproduction_check": {
+        "committed_artifact_found": true,
+        "metric_diffs": {
+          "development_holdout.mrr": {
+            "committed": 0.7979126984126984,
+            "delta": 0.0,
+            "rerun": 0.7979126984126984
+          },
+          "development_holdout.top1": {
+            "committed": 0.6933333333333334,
+            "delta": 0.0,
+            "rerun": 0.6933333333333334
+          },
+          "development_holdout.top3": {
+            "committed": 0.8766666666666667,
+            "delta": 0.0,
+            "rerun": 0.8766666666666667
+          },
+          "ood-UNSEEN_TOPOLOGY.mrr": {
+            "committed": 0.5795833333333333,
+            "delta": 0.0,
+            "rerun": 0.5795833333333333
+          },
+          "ood-UNSEEN_TOPOLOGY.top1": {
+            "committed": 0.375,
+            "delta": 0.0,
+            "rerun": 0.375
+          },
+          "ood-UNSEEN_TOPOLOGY.top3": {
+            "committed": 0.7321428571428571,
+            "delta": 0.0,
+            "rerun": 0.7321428571428571
+          },
+          "validation.mrr": {
+            "committed": 0.800154761904762,
+            "delta": 0.0,
+            "rerun": 0.800154761904762
+          },
+          "validation.top1": {
+            "committed": 0.7,
+            "delta": 0.0,
+            "rerun": 0.7
+          },
+          "validation.top3": {
+            "committed": 0.87,
+            "delta": 0.0,
+            "rerun": 0.87
+          }
+        }
+      },
+      "training": {
+        "arm": "EXPERIMENTAL_TOPOLOGY_RELATIVE",
+        "augmented": true,
+        "best_validation_loss": 2.9211150789260865,
+        "elapsed_seconds": 591.867286834,
+        "epochs_completed": 6,
+        "global_steps": 309,
+        "stop_reason": "maximum_epochs",
+        "stopped_early": false
+      }
+    }
+  },
+  "pilot_epochs": 6,
+  "seed": 20260814
+}

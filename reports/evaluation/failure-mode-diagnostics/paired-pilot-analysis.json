@@ -1,0 +1,79 @@
+{
+  "bootstrap": {
+    "mrr_delta": {
+      "ci_high": 0.008395833333333384,
+      "ci_low": -0.02179464285714266,
+      "excludes_zero": false,
+      "n": 280,
+      "observed": -0.0060714285714286165,
+      "resamples": 2000
+    },
+    "top1_delta": {
+      "ci_high": 0.025000000000000022,
+      "ci_low": -0.02517857142857154,
+      "excludes_zero": false,
+      "n": 280,
+      "observed": 0.0,
+      "resamples": 2000
+    },
+    "top3_delta": {
+      "ci_high": -0.0035714285714285587,
+      "ci_low": -0.046428571428571486,
+      "excludes_zero": true,
+      "n": 280,
+      "observed": -0.025000000000000022,
+      "resamples": 2000
+    }
+  },
+  "by_source_degree": {
+    "2": {
+      "control_top1": 0.3218884120171674,
+      "experimental_top1": 0.33476394849785407,
+      "n": 233
+    },
+    "4": {
+      "control_top1": 0.6382978723404256,
+      "experimental_top1": 0.574468085106383,
+      "n": 47
+    }
+  },
+  "fraction_examples_with_identical_top1_and_top3_status": 0.8714285714285714,
+  "margin_top1_top2_delta": {
+    "mean": -0.02167124967953506,
+    "n": 280
+  },
+  "n": 280,
+  "population": "ood-UNSEEN_TOPOLOGY",
+  "posterior_entropy_delta": {
+    "mean": 0.06726593243006068,
+    "n": 280
+  },
+  "regime_classification": {
+    "mean_abs_margin_delta": 0.11619088049514435,
+    "n": 280,
+    "net_top1_gain": 0,
+    "rationale": "22 examples flip top1 status but gains and losses exactly cancel (11 each way or asymmetric-but-net-zero); representation is doing something, just not something net-useful here",
+    "top1_churn": 22,
+    "verdict": "B_INFLUENTIAL_BUT_NOISY"
+  },
+  "top1_transition_table": {
+    "control_correct_experimental_correct": 94,
+    "control_correct_experimental_wrong": 11,
+    "control_wrong_experimental_correct": 11,
+    "control_wrong_experimental_wrong": 164
+  },
+  "top3_transition_table": {
+    "control_correct_experimental_correct": 201,
+    "control_correct_experimental_wrong": 11,
+    "control_wrong_experimental_correct": 4,
+    "control_wrong_experimental_wrong": 64
+  },
+  "true_source_rank_delta": {
+    "mean": 0.08571428571428572,
+    "median": 0.0,
+    "n": 280,
+    "n_improved": 22,
+    "n_unchanged": 220,
+    "n_worsened": 38
+  }
+}

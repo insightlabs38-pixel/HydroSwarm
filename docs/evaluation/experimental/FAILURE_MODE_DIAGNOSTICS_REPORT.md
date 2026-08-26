@@ -19,10 +19,15 @@ different questions and have different evidentiary weight:
    only because that pilot never persisted per-example predictions.
    **Exploratory / instrumentation for Phase 4**, on a smaller
    development-tier corpus with its own single-seed/6-epoch scale limits
-   (inherited verbatim from the original pilot). Its aggregate numbers are
-   expected to differ slightly from the original pilot's committed numbers
-   (fresh training run, not a bit-identical replay) — see
-   `pilot-rerun/reproduction-check.json` for the measured discrepancy.
+   (inherited verbatim from the original pilot). A priori this re-run's
+   aggregate numbers were expected to differ slightly from the original
+   pilot's committed numbers (fresh training run, not a guaranteed
+   bit-identical replay); in fact `pilot-rerun/reproduction-check.json`
+   shows every metric in both arms reproduced **exactly** (delta=0.0),
+   because the original run already pinned `deterministic=True`/
+   `fp32=True`/a fixed seed on CPU — so the per-example rows below are the
+   literal rows underlying the original pilot's own committed conclusions,
+   not an approximation of them.
 
 ## 1. Where does HydroCore-v5 fail? (M11.6 locked evidence)
 
@@ -145,20 +150,46 @@ a single failure mode with one severity, even within this frozen set.
 
 ## 4. Why did topology-relative augmentation likely fail?
 
-[FILLED IN AFTER PILOT RE-RUN COMPLETES — see Section 6 below for the
-paired per-example analysis this claim is based on.]
+Answered directly by Section 6's paired per-example re-run (which
+reproduced the original pilot's committed aggregate metrics **exactly**,
+delta=0.0 on every metric in both arms — `pilot-rerun/reproduction-
+check.json` — so the mechanism below is not an artifact of re-training
+noise, it is the actual mechanism behind the original pilot's own numbers).
 
-The original pilot's own aggregate result (Section 0 of the plan doc) is
-the confirmatory record: top-1 bit-for-bit identical (0.3750) on all 280
-examples between CONTROL and EXPERIMENTAL_TOPOLOGY_RELATIVE, top-3
-regressed -0.025 (90% CI excludes zero), calibration precision slightly
-worse. That alone supports regime (A) "largely ignored" for top-1
-specifically (the exact bit-identical result on a binary-outcome metric
-over 280 examples is hard to explain except by near-total insensitivity of
-the argmax decision to the added features) with a secondary, real but
-small, *negative* effect on the full ranking (top-3/ECE/mean-set-size).
-Section 6 below reports the per-example mechanism (transitions, rank
-deltas) from this branch's own re-run.
+**The augmentation is not simply ignored — it perturbs individual
+predictions, but the perturbations are close to a random reshuffle with
+respect to correctness, not a systematic improvement.** 22/280 examples
+(7.9%) flip top-1 status, split exactly 11 gained / 11 lost — the reason
+top-1 lands bit-for-bit identical (0.3750) is that the gains and losses
+happen to cancel exactly, not that the model's predictions are unchanged
+example-by-example (87.1% of examples are unchanged on both top1 AND top3
+status; the remaining ~13% do move). Top-3 tells a less neutral story: 11
+examples lose top-3 coverage, only 4 gain it, a genuine net loss of 7/280
+= -0.025 — exactly the regression the original pilot measured. The
+true-source rank moves for 60/280 examples (38 worse, 22 better; mean
+delta +0.086, i.e. net worse) and mean posterior entropy rises slightly
+(+0.067 bits) while the top1/top2 margin shrinks slightly (-0.022) — small,
+consistent, same-direction signals that the added features make the
+model's belief distribution marginally more diffuse on this unseen
+topology, without correcting which single node it favors.
+
+**This best matches classification (B) "influential but mostly noisy"**,
+not (A) "largely ignored": there is a measurable, non-zero per-example
+effect (mean |margin delta| = 0.116, real churn), but it is directionally
+inconsistent at top-1 (exactly cancels) and mildly and consistently
+*negative* once the metric is sensitive enough to see past the argmax
+(top-3, rank, entropy). A secondary, exploratory signal argues the effect
+is not perfectly regime-uniform either — see Section 6's degree breakdown
+— so a small (C)/(D) component may be mixed into the (B) verdict, but not
+strongly enough on n=280 from a single unseen topology to separate from
+noise. This is consistent with the representation change adding
+information that is present but not well-calibrated to actually
+discriminate the true source on this specific unseen network: the
+underlying hypothesis (train-topology-scale-dependent global
+normalization hurts unseen-scale examples) may be directionally real, but
+a simple per-graph max-abs renormalization of already-existing scalar
+columns does not supply new discriminative signal — it mostly redistributes
+existing uncertainty.
 
 ## 5. How often is the true source still in Top-3 when Top-1 fails? Is failure primarily ranking, representation, calibration, OOD, or insufficient evidence?
 
@@ -194,7 +225,74 @@ subgroup most worth a future targeted qualitative look.
 
 ## 6. Paired CONTROL vs EXPERIMENTAL_TOPOLOGY_RELATIVE per-example analysis
 
-[FILLED IN AFTER PILOT RE-RUN COMPLETES]
+Population: `ood-UNSEEN_TOPOLOGY` (coastal-branch), n=280 real-source
+examples, identical set for both arms (`paired-pilot-analysis.json`). This
+branch's re-run reproduced the original pilot's committed aggregate
+metrics **exactly** (all deltas 0.0 — deterministic training on CPU with
+`fp32=True, deterministic=True`), so this per-example breakdown describes
+the actual mechanism behind the original pilot's own reported numbers, not
+a new/different run.
+
+**Top-1 2x2 transition table:**
+
+| | EXPERIMENTAL correct | EXPERIMENTAL wrong |
+|---|---|---|
+| **CONTROL correct** | 94 | 11 |
+| **CONTROL wrong** | 11 | 164 |
+
+(94+11=105 correct per arm / 280 = 0.3750 exactly, both arms — confirms
+the bit-identical aggregate is an exact 11-for-11 cancellation, not
+"nothing changed.")
+
+**Top-3 2x2 transition table:**
+
+| | EXPERIMENTAL correct | EXPERIMENTAL wrong |
+|---|---|---|
+| **CONTROL correct** | 201 | 11 |
+| **CONTROL wrong** | 4 | 64 |
+
+Net -7/280 = -0.025, exactly the paired-bootstrap point estimate (90% CI
+[-0.046, -0.004], excludes zero — reproduced from this re-run's own 2000-
+resample bootstrap, same convention as `run_pilot.py`).
+
+**Other per-example deltas:**
+
+| quantity | value |
+|---|---|
+| fraction with identical top1 AND top3 status | 87.1% (244/280) |
+| true-source rank: improved / unchanged / worsened | 22 / 220 / 38 (mean delta +0.086, net worse) |
+| mean Δ(top1-top2 margin) | -0.022 (slightly less confident) |
+| mean Δ(posterior entropy, bits) | +0.067 (slightly more diffuse) |
+| mean \|Δ margin\| (magnitude of change, either direction) | 0.116 |
+
+**Reordering vs. new information:** the near-zero net top-1 effect
+combined with a real, nonzero per-example churn (22/280 flips) and a
+consistent small negative drift in top-3/rank/margin/entropy indicates the
+augmented features are being *used* by the model (they measurably change
+individual softmax outputs) rather than architecturally short-circuited —
+but what they change is closer to which candidates occupy the 2nd/3rd
+rank than which node wins the argmax, and that reordering is mildly
+harmful more often than helpful.
+
+**Exploratory subgroup signal (source degree, single unseen topology so
+this reduces to a per-source-node split of an 8-node network, not a
+cross-topology comparison):**
+
+| source degree | n | CONTROL top1 | EXPERIMENTAL top1 | delta |
+|---|---|---|---|---|
+| 2 | 233 | 0.322 | 0.335 | +1.3pp |
+| 4 | 47 | 0.638 | 0.574 | -6.4pp |
+
+The augmentation is mildly positive for the majority (degree-2) source
+nodes and more clearly negative for the higher-degree (degree-4) minority
+— consistent with a (C)/(D) mixed regime-dependence hiding underneath the
+(B) "noisy" verdict, but on a single 8-node topology this is not powered
+to separate from chance and is reported as exploratory only, not a
+confirmed regime split.
+
+**Verdict: (B) influential but mostly noisy**, with a secondary
+exploratory hint of (C)/(D) regime-dependence by source degree that this
+pilot's scale (one unseen topology, single seed) cannot confirm.
 
 ## 7. Error taxonomy summary
 
@@ -320,3 +418,26 @@ targets this report's strongest, most-replicated finding (Section 2), is
 cheap enough to falsify quickly (same pilot-scale compute budget that
 already ran once), and was explicitly flagged as the next-most-promising
 unexplored angle by the very pilot this branch was asked to diagnose.
+
+## Appendix: reproducible commands
+
+Run in this order from the repository root (`.venv`/system Python with
+`torch`, `wntr`, `networkx`, `safetensors` installed; large tensor shards
+under `data/learning-v2/cycle-b2/tensors-normalized/` are Git-LFS-tracked
+and must be pulled first — `git lfs pull --include="data/learning-v2/cycle-b2/tensors-normalized/**"`):
+
+```
+python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/build_m11_6_diagnostic_table.py
+python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/analyze_m11_6_failure_modes.py
+python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/rerun_topology_pilot_with_logging.py  # ~20 min/arm on CPU
+python3 scripts/hydrocore_v5_experimental/failure_mode_diagnostics/analyze_paired_pilot.py
+```
+
+Each script is idempotent and deterministic (fixed seeds throughout,
+`deterministic=True`/`fp32=True` training config inherited from
+`run_pilot.py`); re-running reproduces every number in this report exactly
+(confirmed for the pilot re-run via `pilot-rerun/reproduction-check.json`).
+No script in this branch writes to any path under `data/locked/`,
+`models/hydrocore-v5-release/`, or any `m9-*`/`m10-*`/`m11-*`/
+`topology-generalization` report path — every output lands under
+`reports/evaluation/failure-mode-diagnostics/`.
