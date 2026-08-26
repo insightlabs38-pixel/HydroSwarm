@@ -1,0 +1,52 @@
+{
+  "kind": "SOURCE_IDENTIFIABILITY_COUNTERFACTUAL_SENSOR",
+  "label": "NON-PROMOTABLE / DIAGNOSTIC ONLY -- deterministic value-of-one-more-observation estimate",
+  "n_hard_incidents": 41,
+  "hard_tercile_definition": "bottom third of normalized+correlation identifiability_score, confirmatory tier",
+  "n_resolved_ambiguity_by_best_single_sensor": 10,
+  "fraction_resolved": 0.24390243902439024,
+  "n_oracle_top1_flipped_by_best_single_sensor": 0,
+  "mean_score_improvement": 0.43857874838987665,
+  "most_frequently_best_extra_sensor_nodes": [
+    [
+      "J1",
+      11
+    ],
+    [
+      "JG",
+      4
+    ],
+    [
+      "JA",
+      3
+    ],
+    [
+      "JB",
+      3
+    ],
+    [
+      "J2",
+      3
+    ],
+    [
+      "JC",
+      2
+    ],
+    [
+      "JD",
+      2
+    ],
+    [
+      "JE",
+      2
+    ],
+    [
+      "J3",
+      2
+    ],
+    [
+      "J4",
+      2
+    ]
+  ]
+}

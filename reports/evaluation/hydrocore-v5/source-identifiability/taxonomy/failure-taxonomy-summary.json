@@ -1,0 +1,44 @@
+{
+  "kind": "SOURCE_IDENTIFIABILITY_FAILURE_TAXONOMY",
+  "n_total_incidents": 125,
+  "n_hydrocore_top1_failures": 56,
+  "prevalence": {
+    "A_information_limited": {
+      "n": 2,
+      "fraction_of_failures": 0.03571428571428571
+    },
+    "B_representation_limited": {
+      "n": 20,
+      "fraction_of_failures": 0.35714285714285715
+    },
+    "C_stress_induced_collapse": {
+      "n": 0,
+      "fraction_of_failures": 0.0
+    },
+    "D_ranking_limited": {
+      "n": 25,
+      "fraction_of_failures": 0.44642857142857145
+    },
+    "E_ood_governance_limited": {
+      "n": 55,
+      "fraction_of_failures": 0.9821428571428571
+    },
+    "F_inconclusive": {
+      "n": 34,
+      "fraction_of_failures": 0.6071428571428571
+    }
+  },
+  "by_known_vs_unseen_topology": {
+    "known": {
+      "n_failures": 47,
+      "fraction_representation_limited": 0.2978723404255319,
+      "fraction_information_limited": 0.0425531914893617
+    },
+    "unseen": {
+      "n_failures": 9,
+      "fraction_representation_limited": 0.6666666666666666,
+      "fraction_information_limited": 0.0
+    }
+  },
+  "note": "Categories overlap by design (see module docstring); counts do not sum to n."
+}
