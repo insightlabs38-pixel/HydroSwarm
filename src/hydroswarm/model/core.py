@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     # (anything exposing the same forward(...) contract works).
     from .continuous_time import TemporalDynamicsBase
 
-from .adapters import BottleneckAdapter, RoleHead
+from .adapters import BottleneckAdapter, CapacityMatchedProjection, RoleHead
 from .candidate_localizer import CandidateConditionedLocalizer
 from .candidate_plan_encoder import TARGET_TYPE_CLASSES, TARGET_TYPE_INDEX, CandidatePlanEncoder
 from .encoders import (
@@ -454,6 +454,17 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             "candidate_conditioned adds CandidateConditionedLocalizer parameters that default "
             "does not have"
         )
+    recorded_localizer_capacity_hidden_dim = metadata.get("localizer_capacity_hidden_dim")
+    if (
+        recorded_localizer_capacity_hidden_dim is not None
+        and recorded_localizer_capacity_hidden_dim != model.localizer_capacity_hidden_dim
+    ):
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with localizer_capacity_hidden_dim="
+            f"{recorded_localizer_capacity_hidden_dim!r} but this model instance is configured "
+            f"with localizer_capacity_hidden_dim={model.localizer_capacity_hidden_dim!r}; a "
+            "nonzero value adds CapacityMatchedProjection parameters a zero value does not have"
+        )
     recorded_ood_category_head = metadata.get("ood_category_head")
     if recorded_ood_category_head is not None and recorded_ood_category_head != model.ood_category_head_enabled:
         raise ArchitectureCompatibilityError(
@@ -573,6 +584,20 @@ class HydroCore(nn.Module):
         localizer_mode: LocalizerMode = "default",
         localizer_structural_feature_dim: int = 0,
         localizer_physics_feature_dim: int = 0,
+        # exp/physics-informed-localizer-validation (EXPERIMENTAL,
+        # NON-RELEASE) Phase 2: generic-capacity control for
+        # A_CAPACITY_MATCHED. 0 (default) constructs nothing -- byte-
+        # identical to pre-existing behavior for every caller. When > 0 and
+        # localizer_mode="default", adds a CapacityMatchedProjection
+        # (adapters.py) residual MLP block ahead of `source_node_head`, to
+        # test whether a candidate-conditioned/physics-informed arm's
+        # unseen-topology gain is explained by generic added capacity
+        # alone rather than by candidate conditioning or physics features
+        # specifically. No candidate/sensor/graph/physics information is
+        # available to this block -- it reads only `sentinel_nodes`. Has
+        # no effect when localizer_mode="candidate_conditioned" (that
+        # branch never reads `source_node_head` or this projection).
+        localizer_capacity_hidden_dim: int = 0,
         plan_feature_dim: int = PLAN_FEATURE_DIM,
         ood_category_head: bool = OOD_CATEGORY_HEAD_DEFAULT,
         scout_control_heads: bool = SCOUT_CONTROL_HEADS_DEFAULT,
@@ -625,6 +650,8 @@ class HydroCore(nn.Module):
             raise ValueError(f"localizer_mode must be one of {LOCALIZER_MODES}, got {localizer_mode!r}")
         if localizer_structural_feature_dim < 0 or localizer_physics_feature_dim < 0:
             raise ValueError("localizer_*_feature_dim must be non-negative")
+        if localizer_capacity_hidden_dim < 0:
+            raise ValueError("localizer_capacity_hidden_dim must be non-negative")
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
@@ -681,6 +708,7 @@ class HydroCore(nn.Module):
         self.localizer_mode = localizer_mode
         self.localizer_structural_feature_dim = localizer_structural_feature_dim
         self.localizer_physics_feature_dim = localizer_physics_feature_dim
+        self.localizer_capacity_hidden_dim = localizer_capacity_hidden_dim
         self.plan_feature_dim = plan_feature_dim
         self.ood_category_head_enabled = ood_category_head
         self.scout_control_heads = scout_control_heads
@@ -782,6 +810,13 @@ class HydroCore(nn.Module):
                 activation=activation,
             )
             if localizer_mode == "candidate_conditioned"
+            else None
+        )
+        # exp/physics-informed-localizer-validation Phase 2: see
+        # localizer_capacity_hidden_dim's constructor docstring above.
+        self.capacity_matched_projection = (
+            CapacityMatchedProjection(d_model, localizer_capacity_hidden_dim)
+            if localizer_capacity_hidden_dim > 0
             else None
         )
         # Exactly 3 incident-level region classes (hydroswarm.training.corpus.
@@ -933,6 +968,7 @@ class HydroCore(nn.Module):
             "localizer_mode": self.localizer_mode,
             "localizer_structural_feature_dim": self.localizer_structural_feature_dim,
             "localizer_physics_feature_dim": self.localizer_physics_feature_dim,
+            "localizer_capacity_hidden_dim": self.localizer_capacity_hidden_dim,
             "ood_category_head": self.ood_category_head_enabled,
             "scout_control_heads": self.scout_control_heads,
             "d_model": self.d_model,
@@ -1293,7 +1329,10 @@ class HydroCore(nn.Module):
                 physics_features=batch.get("candidate_physics_features"),
             )
         else:
-            source_logits = self.source_node_head(sentinel_nodes).squeeze(-1)
+            localizer_input = sentinel_nodes
+            if self.capacity_matched_projection is not None:
+                localizer_input = self.capacity_matched_projection(localizer_input)
+            source_logits = self.source_node_head(localizer_input).squeeze(-1)
         if prior is not None and self.prior_mode in ("logit_only", "feature_and_logit"):
             prior_mass = prior.float().clamp_min(1e-8)
             source_logits = source_logits + torch.nn.functional.softplus(
@@ -1453,6 +1492,8 @@ class HydroCore(nn.Module):
             heads += count(self.candidate_plan_encoder)
         if self.candidate_localizer is not None:
             heads += count(self.candidate_localizer)
+        if self.capacity_matched_projection is not None:
+            heads += count(self.capacity_matched_projection)
         if self.ood_category_head_enabled:
             heads += count(self.ood_category_head)
         return ParameterReport(
