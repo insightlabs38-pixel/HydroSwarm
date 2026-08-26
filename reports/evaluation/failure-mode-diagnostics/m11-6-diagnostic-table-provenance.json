@@ -1,0 +1,66 @@
+{
+  "derived_from_m11_6_raw_incidents": [
+    "seen_topology",
+    "actionable"
+  ],
+  "derived_via_networkx_from_frozen_inp_topology": [
+    "node_count",
+    "edge_count",
+    "graph_density",
+    "graph_diameter",
+    "dead_end_count",
+    "reservoir_count",
+    "source_degree",
+    "source_betweenness_centrality",
+    "source_closeness_centrality",
+    "source_normalized_graph_position",
+    "source_hops_to_reservoir",
+    "source_hops_to_nearest_dead_end",
+    "source_is_boundary_node",
+    "source_eccentricity"
+  ],
+  "not_available_in_frozen_data_and_therefore_omitted": [
+    "exact realized contamination strength/duration/start-time per incident (scenarios.jsonl only carries generator_config BIN RANGES, not the realized per-scenario draw)",
+    "sensor node identity/placement (only sensor_count=4, constant across all 125 incidents, is recorded -- no per-example sensor node IDs, so source-to-sensor graph distance cannot be computed for this frozen set)",
+    "event/evidence-head raw outputs (the locked harness's raw incident record does not carry them; only aggregate scout/planning counters do)"
+  ],
+  "recorded_from_locked_scenario_manifests": [
+    "event_type",
+    "perturbation_type",
+    "perturbation_level",
+    "sensor_noise_std_config",
+    "missing_rate",
+    "health_fraction",
+    "health_mode",
+    "coverage_condition",
+    "ambiguity_condition",
+    "hydraulic_condition",
+    "sensor_count_config"
+  ],
+  "recorded_from_m11_6_raw_incidents": [
+    "scenario_id",
+    "split",
+    "network_family",
+    "topology_id",
+    "condition_kind",
+    "source_node",
+    "top1_correct",
+    "top3_correct",
+    "reciprocal_rank",
+    "posterior_entropy",
+    "candidate_set_size",
+    "calibrated",
+    "conformal_truth_coverage",
+    "outcome",
+    "control_action",
+    "final_status",
+    "planning_allowed",
+    "plans_generated",
+    "plans_rejected",
+    "plans_verified",
+    "samples_taken",
+    "no_safe_plan",
+    "approval_attempted",
+    "human_approved"
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "known_topology_only": {
+    "categories": {
+      "ambiguity_or_low_coverage": {
+        "definition": "condition_kind is explicitly an ambiguous-evidence / low-sensor-coverage stress category -- plausibly intrinsically hard given available evidence, not necessarily a model defect",
+        "fraction_of_top1_failures": 0.3617021276595745,
+        "n": 17
+      },
+      "calibration_or_ood_fail_closed": {
+        "definition": "calibration was correctly withheld (calibrated=False) for this example -- the failure to be ACTIONABLE is governance behaving as designed, distinct from the localization failure itself",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "high_confidence_wrong_top1": {
+        "definition": "small candidate set (<=2) despite wrong top1 -- a confidently-wrong prediction, not a diffuse/uncertain one",
+        "fraction_of_top1_failures": 0.19148936170212766,
+        "n": 9
+      },
+      "insufficient_evidence_source_ambiguous_by_construction": {
+        "definition": "condition_kind explicitly constructs source ambiguity (AMBIGUITY_DISAGREEMENT) -- ceiling on achievable top1 is not 1.0 by design",
+        "fraction_of_top1_failures": 0.19148936170212766,
+        "n": 9
+      },
+      "network_identity_or_canonicalization_issue": {
+        "definition": "PR #12's live-serving network-identity/.inp-round-trip hashing defect is NOT evidenced in this population: M11.6 uses one fixed, non-round-tripped .inp per known family and per novel topology (single network_sha256 per family, verified in build_m11_6_diagnostic_table.py), so that specific mechanism does not apply here. Listed at n=0 rather than omitted, so this explicitly-checked-and-ruled-out category is visible, not silently dropped.",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "ranking_failure_true_source_in_top3": {
+        "definition": "top1 wrong but top3 correct -- model's belief set contains the truth, ordering does not",
+        "fraction_of_top1_failures": 0.46808510638297873,
+        "n": 22
+      },
+      "source_absent_from_top3": {
+        "definition": "truth outside the top-3 candidates entirely -- a representation/evidence gap, not just a ranking slip",
+        "fraction_of_top1_failures": 0.5319148936170213,
+        "n": 25
+      },
+      "stress_induced_known_topology": {
+        "definition": "failure on a KNOWN topology under a non-NOMINAL stress condition_kind",
+        "fraction_of_top1_failures": 0.9148936170212766,
+        "n": 43
+      },
+      "topology_transfer_failure": {
+        "definition": "failure occurred on a topology absent from training (locked_topology_test)",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      }
+    },
+    "n_top1_failures": 47,
+    "n_total": 105
+  },
+  "novel_topology_only": {
+    "categories": {
+      "ambiguity_or_low_coverage": {
+        "definition": "condition_kind is explicitly an ambiguous-evidence / low-sensor-coverage stress category -- plausibly intrinsically hard given available evidence, not necessarily a model defect",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "calibration_or_ood_fail_closed": {
+        "definition": "calibration was correctly withheld (calibrated=False) for this example -- the failure to be ACTIONABLE is governance behaving as designed, distinct from the localization failure itself",
+        "fraction_of_top1_failures": 1.0,
+        "n": 9
+      },
+      "high_confidence_wrong_top1": {
+        "definition": "small candidate set (<=2) despite wrong top1 -- a confidently-wrong prediction, not a diffuse/uncertain one",
+        "fraction_of_top1_failures": 0.7777777777777778,
+        "n": 7
+      },
+      "insufficient_evidence_source_ambiguous_by_construction": {
+        "definition": "condition_kind explicitly constructs source ambiguity (AMBIGUITY_DISAGREEMENT) -- ceiling on achievable top1 is not 1.0 by design",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "network_identity_or_canonicalization_issue": {
+        "definition": "PR #12's live-serving network-identity/.inp-round-trip hashing defect is NOT evidenced in this population: M11.6 uses one fixed, non-round-tripped .inp per known family and per novel topology (single network_sha256 per family, verified in build_m11_6_diagnostic_table.py), so that specific mechanism does not apply here. Listed at n=0 rather than omitted, so this explicitly-checked-and-ruled-out category is visible, not silently dropped.",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "ranking_failure_true_source_in_top3": {
+        "definition": "top1 wrong but top3 correct -- model's belief set contains the truth, ordering does not",
+        "fraction_of_top1_failures": 0.3333333333333333,
+        "n": 3
+      },
+      "source_absent_from_top3": {
+        "definition": "truth outside the top-3 candidates entirely -- a representation/evidence gap, not just a ranking slip",
+        "fraction_of_top1_failures": 0.6666666666666666,
+        "n": 6
+      },
+      "stress_induced_known_topology": {
+        "definition": "failure on a KNOWN topology under a non-NOMINAL stress condition_kind",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "topology_transfer_failure": {
+        "definition": "failure occurred on a topology absent from training (locked_topology_test)",
+        "fraction_of_top1_failures": 1.0,
+        "n": 9
+      }
+    },
+    "n_top1_failures": 9,
+    "n_total": 20
+  },
+  "overall": {
+    "categories": {
+      "ambiguity_or_low_coverage": {
+        "definition": "condition_kind is explicitly an ambiguous-evidence / low-sensor-coverage stress category -- plausibly intrinsically hard given available evidence, not necessarily a model defect",
+        "fraction_of_top1_failures": 0.30357142857142855,
+        "n": 17
+      },
+      "calibration_or_ood_fail_closed": {
+        "definition": "calibration was correctly withheld (calibrated=False) for this example -- the failure to be ACTIONABLE is governance behaving as designed, distinct from the localization failure itself",
+        "fraction_of_top1_failures": 0.16071428571428573,
+        "n": 9
+      },
+      "high_confidence_wrong_top1": {
+        "definition": "small candidate set (<=2) despite wrong top1 -- a confidently-wrong prediction, not a diffuse/uncertain one",
+        "fraction_of_top1_failures": 0.2857142857142857,
+        "n": 16
+      },
+      "insufficient_evidence_source_ambiguous_by_construction": {
+        "definition": "condition_kind explicitly constructs source ambiguity (AMBIGUITY_DISAGREEMENT) -- ceiling on achievable top1 is not 1.0 by design",
+        "fraction_of_top1_failures": 0.16071428571428573,
+        "n": 9
+      },
+      "network_identity_or_canonicalization_issue": {
+        "definition": "PR #12's live-serving network-identity/.inp-round-trip hashing defect is NOT evidenced in this population: M11.6 uses one fixed, non-round-tripped .inp per known family and per novel topology (single network_sha256 per family, verified in build_m11_6_diagnostic_table.py), so that specific mechanism does not apply here. Listed at n=0 rather than omitted, so this explicitly-checked-and-ruled-out category is visible, not silently dropped.",
+        "fraction_of_top1_failures": 0.0,
+        "n": 0
+      },
+      "ranking_failure_true_source_in_top3": {
+        "definition": "top1 wrong but top3 correct -- model's belief set contains the truth, ordering does not",
+        "fraction_of_top1_failures": 0.44642857142857145,
+        "n": 25
+      },
+      "source_absent_from_top3": {
+        "definition": "truth outside the top-3 candidates entirely -- a representation/evidence gap, not just a ranking slip",
+        "fraction_of_top1_failures": 0.5535714285714286,
+        "n": 31
+      },
+      "stress_induced_known_topology": {
+        "definition": "failure on a KNOWN topology under a non-NOMINAL stress condition_kind",
+        "fraction_of_top1_failures": 0.7678571428571429,
+        "n": 43
+      },
+      "topology_transfer_failure": {
+        "definition": "failure occurred on a topology absent from training (locked_topology_test)",
+        "fraction_of_top1_failures": 0.16071428571428573,
+        "n": 9
+      }
+    },
+    "n_top1_failures": 56,
+    "n_total": 125
+  }
+}
