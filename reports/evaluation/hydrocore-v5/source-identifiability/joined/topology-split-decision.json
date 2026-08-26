@@ -1,0 +1,147 @@
+{
+  "kind": "SOURCE_IDENTIFIABILITY_TOPOLOGY_SPLIT_DECISION",
+  "confirmatory_tier": {
+    "n_known": 105,
+    "n_unseen": 20,
+    "hydrocore_top1_known_minus_unseen": {
+      "n_a": 105,
+      "n_b": 20,
+      "mean_a": 0.5523809523809524,
+      "mean_b": 0.55,
+      "observed_mean_diff": 0.0023809523809523725,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": -0.19761904761904758,
+      "ci_upper": 0.20952380952380956,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": false
+    },
+    "hydrocore_mrr_known_minus_unseen": {
+      "n_a": 105,
+      "n_b": 20,
+      "mean_a": 0.6874603174603173,
+      "mean_b": 0.6522222222222223,
+      "observed_mean_diff": 0.03523809523809507,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": -0.11855385487528353,
+      "ci_upper": 0.19732851473922888,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": false
+    },
+    "identifiability_known_minus_unseen": {
+      "n_a": 105,
+      "n_b": 20,
+      "mean_a": 0.512498449624996,
+      "mean_b": 0.6149958085168965,
+      "observed_mean_diff": -0.10249735889190048,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": -0.2501249661085151,
+      "ci_upper": 0.053669095506220926,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": false
+    },
+    "oracle_top1_known_minus_unseen": {
+      "n_a": 105,
+      "n_b": 20,
+      "mean_a": 0.9333333333333333,
+      "mean_b": 1.0,
+      "observed_mean_diff": -0.06666666666666665,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": -0.10476190476190472,
+      "ci_upper": -0.02857142857142858,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": true
+    }
+  },
+  "exploratory_tier": {
+    "n_known": 225,
+    "n_unseen": 300,
+    "identifiability_known_minus_unseen": {
+      "n_a": 225,
+      "n_b": 300,
+      "mean_a": 0.5507289930077713,
+      "mean_b": 0.5558123008897796,
+      "observed_mean_diff": -0.005083307882008281,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": -0.06940963292405676,
+      "ci_upper": 0.059235446820109526,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": false
+    },
+    "oracle_top1_known_minus_unseen": {
+      "n_a": 225,
+      "n_b": 300,
+      "mean_a": 1.0,
+      "mean_b": 1.0,
+      "observed_mean_diff": 0.0,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": true
+    },
+    "by_condition": {
+      "CLEAN": {
+        "identifiability_known_minus_unseen": {
+          "n_a": 75,
+          "n_b": 100,
+          "mean_a": 0.5486339879474592,
+          "mean_b": 0.5840899257972559,
+          "observed_mean_diff": -0.035455937849796726,
+          "resamples": 2000,
+          "bootstrap_seed": 20260815,
+          "interval": 0.9,
+          "ci_lower": -0.14118655452817563,
+          "ci_upper": 0.06927136034972783,
+          "ci_entirely_positive": false,
+          "ci_entirely_non_positive": false
+        }
+      },
+      "MEASUREMENT_NOISE": {
+        "identifiability_known_minus_unseen": {
+          "n_a": 75,
+          "n_b": 100,
+          "mean_a": 0.5262108405751788,
+          "mean_b": 0.5691289158341789,
+          "observed_mean_diff": -0.042918075259000155,
+          "resamples": 2000,
+          "bootstrap_seed": 20260815,
+          "interval": 0.9,
+          "ci_lower": -0.1532507989851014,
+          "ci_upper": 0.06444570499943197,
+          "ci_entirely_positive": false,
+          "ci_entirely_non_positive": false
+        }
+      },
+      "SENSOR_DROPOUT": {
+        "identifiability_known_minus_unseen": {
+          "n_a": 75,
+          "n_b": 100,
+          "mean_a": 0.5773421505006757,
+          "mean_b": 0.5142180610379041,
+          "observed_mean_diff": 0.0631240894627716,
+          "resamples": 2000,
+          "bootstrap_seed": 20260815,
+          "interval": 0.9,
+          "ci_lower": -0.05055595045146841,
+          "ci_upper": 0.1748757916726791,
+          "ci_entirely_positive": false,
+          "ci_entirely_non_positive": false
+        }
+      }
+    }
+  },
+  "decision_from_confirmatory_tier": "NO_ROBUST_HYDROCORE_GAP_DETECTED_ON_THIS_EVIDENCE",
+  "caveat": "Confirmatory tier has only n_unseen=20 locked incidents -- a null or noisy result here does not positively establish 'no gap exists', only that this small locked sample cannot robustly detect one. The exploratory tier's much larger, condition-stratified identifiability comparison is the more statistically trustworthy read on whether unseen topologies are intrinsically less identifiable; the confirmatory tier remains the only one tied to real HydroCore-v5 predictions."
+}

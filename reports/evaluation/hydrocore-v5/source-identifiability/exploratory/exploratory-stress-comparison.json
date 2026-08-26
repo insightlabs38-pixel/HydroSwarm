@@ -1,0 +1,67 @@
+{
+  "kind": "SOURCE_IDENTIFIABILITY_EXPLORATORY_STRESS_COMPARISON",
+  "n_clean": 175,
+  "MEASUREMENT_NOISE": {
+    "n_a": 175,
+    "n_b": 175,
+    "mean_a": 0.5507354550088931,
+    "mean_b": 0.5688945238616288,
+    "observed_mean_diff": -0.01815906885273566,
+    "resamples": 2000,
+    "bootstrap_seed": 20260815,
+    "interval": 0.9,
+    "ci_lower": -0.09245493117467328,
+    "ci_upper": 0.05625540130795051,
+    "ci_entirely_positive": false,
+    "ci_entirely_non_positive": false
+  },
+  "SENSOR_DROPOUT": {
+    "n_a": 175,
+    "n_b": 175,
+    "mean_a": 0.5412712422362348,
+    "mean_b": 0.5688945238616288,
+    "observed_mean_diff": -0.02762328162539396,
+    "resamples": 2000,
+    "bootstrap_seed": 20260815,
+    "interval": 0.9,
+    "ci_lower": -0.10491833269624527,
+    "ci_upper": 0.04987068632917524,
+    "ci_entirely_positive": false,
+    "ci_entirely_non_positive": false
+  },
+  "oracle_top1_rates": {
+    "CLEAN": 1.0,
+    "MEASUREMENT_NOISE": 1.0,
+    "SENSOR_DROPOUT": 1.0
+  },
+  "oracle_top1_stress_minus_clean": {
+    "MEASUREMENT_NOISE": {
+      "n_a": 175,
+      "n_b": 175,
+      "mean_a": 1.0,
+      "mean_b": 1.0,
+      "observed_mean_diff": 0.0,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": true
+    },
+    "SENSOR_DROPOUT": {
+      "n_a": 175,
+      "n_b": 175,
+      "mean_a": 1.0,
+      "mean_b": 1.0,
+      "observed_mean_diff": 0.0,
+      "resamples": 2000,
+      "bootstrap_seed": 20260815,
+      "interval": 0.9,
+      "ci_lower": 0.0,
+      "ci_upper": 0.0,
+      "ci_entirely_positive": false,
+      "ci_entirely_non_positive": true
+    }
+  }
+}

@@ -29,7 +29,7 @@ sensor observations HydroCore-v5 saw, succeeds at Top-1 in **96.4%** of the
 cases where HydroCore-v5's own recorded Top-1 prediction was wrong (54 of
 56 confirmatory failures). Only 2 of 125 confirmatory incidents are cases
 where even the oracle fails -- true information-limited cases are rare in
-this locked evaluation. See Section 9 for the full decision and Section 10
+this locked evaluation. See Section 10 for the full decision and Section 11
 for ranked next directions.
 
 ## 1. Implementation summary
@@ -255,23 +255,67 @@ condition-matched comparison motivated this analysis, and should not be
 read as contradicting it -- only as this analysis's own, independently
 computed answer on this specific frozen evidence.
 
-### 8b. Exploratory tier (larger, self-generated, condition-stratified)
+### 8b. Exploratory tier (n=225 known / 300 unseen, self-generated, condition-stratified, much higher power)
 
-See `reports/evaluation/hydrocore-v5/source-identifiability/joined/
-topology-split-decision.json` for the full numbers (filled in after the
-exploratory corpus build, Section 8b addendum below).
+`reports/evaluation/hydrocore-v5/source-identifiability/joined/
+topology-split-decision.json`. Across CLEAN, MEASUREMENT_NOISE, and
+SENSOR_DROPOUT, identifiability known-minus-unseen is small and its 90% CI
+crosses zero in every single condition:
+
+| condition | known mean | unseen mean | diff | 90% CI |
+|---|---|---|---|---|
+| CLEAN | 0.549 | 0.584 | -0.035 | [-0.141, +0.069] |
+| MEASUREMENT_NOISE | 0.526 | 0.569 | -0.043 | [-0.153, +0.064] |
+| SENSOR_DROPOUT | 0.577 | 0.514 | +0.063 | [-0.051, +0.175] |
+
+Oracle Top-1 is **exactly 1.0 in both known and unseen networks** at this
+sample size (n=225/300). This is the highest-power evidence in this
+analysis, and it is unambiguous: **on these 7 networks, at these incident
+parameters, unseen topology is not intrinsically less physically
+identifiable than known topology.**
 
 ### Decision
 
 Per the protocol's A/B/C framing (worse identifiability vs. poorer
-representation vs. both): **on the confirmatory tier, decision B or
-"no robust gap" (see machine-readable decision file) — not A.** There is
-no evidence here that unseen topologies are intrinsically less
-identifiable; where a known/unseen HydroCore-v5 gap exists elsewhere, this
-analysis's evidence points toward representation, not physical
-information, as the explanation.
+representation vs. both): **B — comparable identifiability, not worse.**
+The confirmatory tier could not robustly detect a HydroCore-v5 known/unseen
+gap at all (n_unseen=20); the exploratory tier, with far more power,
+finds no known/unseen identifiability gap either. If a HydroCore-v5
+known/unseen performance gap exists (as referenced in this analysis's
+motivating context, from a different, condition-matched comparison this
+analysis did not itself reproduce), the evidence here rules out
+"physically less identifiable" as the explanation and is consistent
+instead with a representation-transfer gap — matching Section 10's overall
+conclusion.
 
-## 9. Decision: dominant bottleneck
+## 9. Exploratory clean-vs-stress (n=175/condition, higher power)
+
+`reports/evaluation/hydrocore-v5/source-identifiability/exploratory/
+exploratory-stress-comparison.json`. Pooled across all 7 networks:
+
+| condition | identifiability diff vs. CLEAN | 90% CI | oracle Top-1 |
+|---|---|---|---|
+| MEASUREMENT_NOISE (`sensor_noise_std` 0.01→0.05) | -0.018 | [-0.092, +0.056] | 1.000 |
+| SENSOR_DROPOUT (30% missingness) | -0.028 | [-0.105, +0.050] | 1.000 |
+
+Neither stress condition produces a CI-robust identifiability shift, and
+the oracle's Top-1 rate is **exactly 1.0 under every condition tested,
+including both stress conditions**. This is a genuine, higher-power null
+result, not a contradiction of Section 4/8a's harder-to-detect signal at
+n=15 -- it should be read narrowly: **at the specific stress magnitudes
+tested here (0.05 sensor-noise std, 30% missingness) and the long
+observation windows this corpus otherwise shares with the confirmatory
+tier, physical separability and oracle recoverability survive the applied
+stress almost entirely intact.** It does NOT establish that stress can
+never collapse identifiability -- only that these two specific,
+moderate-intensity stress mechanisms did not, on these networks. The four
+M11.6 conditions this analysis could not reproduce exactly
+(SENSOR_DROPOUT/LOW_COVERAGE_ACTIVE_SAMPLING/SENSOR_HEALTH_DEGRADED/
+AMBIGUITY_DISAGREEMENT's real mechanism, Section 6 of the protocol) may be
+more severe than this approximation and are not covered by this null
+result.
+
+## 10. Decision: dominant bottleneck
 
 **REPRESENTATION_LIMITED, with a real minority INFORMATION_LIMITED /
 stress-collapse component.**
@@ -294,7 +338,7 @@ Supporting evidence:
   meaningful fraction of the evidence is present but not decisive, not
   overwhelming.
 
-## 10. Ranked next research directions
+## 11. Ranked next research directions
 
 1. **Candidate-conditioned graph-native architecture is justified by this
    evidence** -- the dominant finding (oracle recovers 96% of failures)
@@ -304,7 +348,7 @@ Supporting evidence:
 2. **A parallel, smaller investment in evidence acquisition remains
    worthwhile, not a full pivot**: the 22 incidents (17.6%) with zero
    shape-based separation, and the 42% of hard incidents where the
-   deterministic single-extra-sensor analysis (Section 11) resolves the
+   deterministic single-extra-sensor analysis (Section 12) resolves the
    ambiguity, both indicate a real, bounded information-limited
    population that a graph-native model cannot fix by architecture alone.
 3. **Investigate the exact single VERIFIED-but-wrong incident** (Section
@@ -319,7 +363,7 @@ Supporting evidence:
    needed to reach a clear answer, and the identifiability-vs-outcome
    relationship, while real, explains only part of HydroCore-v5's error.
 
-## 11. Bounded counterfactual: one additional sensor
+## 12. Bounded counterfactual: one additional sensor
 
 For the bottom tercile by identifiability_score (n=41; golden-reference
 incidents excluded automatically since every junction there is already a
@@ -331,7 +375,7 @@ additional EPANET calls):
   incident" threshold (`identifiability_score` > 1.0) with one added
   sensor.
 - **0/41** oracle Top-1 flips from wrong to right -- because, consistent
-  with Section 4/9, the oracle was already correct in 100% of this
+  with Section 4/10, the oracle was already correct in 100% of this
   tercile using magnitude/timing cues alone; the extra sensor strengthens
   an otherwise fragile *shape*-only margin, it does not fix an oracle
   failure that didn't exist in this population.
@@ -343,7 +387,7 @@ additional EPANET calls):
   a future sensor-placement study rather than a claim that placement is
   the dominant lever.
 
-## 12. Explicit answers
+## 13. Explicit answers
 
 - **Are low-centrality sources physically less identifiable from current
   sensors?** Only weakly, if at all, in this data (correlation ≈ -0.016
@@ -373,17 +417,18 @@ additional EPANET calls):
   Section 8b for the higher-power exploratory read.
 - **How much does stress destroy otherwise-useful source separability?**
   Confirmatory tier (n=15/condition): no condition shows a CI-robust
-  identifiability shift from NOMINAL. See Section 8b/13 for the
-  exploratory tier's higher-power answer.
+  identifiability shift from NOMINAL. See Section 9 for the
+  exploratory tier's much higher-power answer (n=175/condition): also no
+  CI-robust shift, at the specific stress magnitudes tested.
 - **Could one additional strategically chosen observation resolve a
   meaningful portion of ambiguous cases?** Yes for about a quarter of the
   hardest (shape-ambiguity) cases, but it does not flip any oracle
   failures in this population because there were none to flip in that
-  subset -- see Section 11.
+  subset -- see Section 12.
 - **Is a full graph-native/GNN localization architecture now justified?**
-  Yes, primarily -- see Section 9/10.
+  Yes, primarily -- see Section 10/11.
 - **Or should the next research effort focus on sampling/sensor
-  placement?** As a secondary, bounded investment (Section 10.2), not the
+  placement?** As a secondary, bounded investment (Section 11.2), not the
   primary one.
 
 ## Reproducibility
@@ -406,4 +451,5 @@ python scripts/hydrocore_v5/source_identifiability/run_join_and_analyze.py
 python scripts/hydrocore_v5/source_identifiability/run_taxonomy.py
 python scripts/hydrocore_v5/source_identifiability/run_build_exploratory.py --per-network 25
 python scripts/hydrocore_v5/source_identifiability/run_topology_split_analysis.py
+python scripts/hydrocore_v5/source_identifiability/run_exploratory_stress_analysis.py
 ```
