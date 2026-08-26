@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from .continuous_time import TemporalDynamicsBase
 
 from .adapters import BottleneckAdapter, RoleHead
+from .candidate_localizer import CandidateConditionedLocalizer
 from .candidate_plan_encoder import TARGET_TYPE_CLASSES, TARGET_TYPE_INDEX, CandidatePlanEncoder
 from .encoders import (
     GraphStructuralEncoder,
@@ -53,6 +54,16 @@ class HydroBatch(TypedDict, total=False):
     residual_features: Tensor
     classical_prior: Tensor
     source_candidate_mask: Tensor
+    # exp/candidate-conditioned-localizer-v1 (EXPERIMENTAL, NON-RELEASE):
+    # read only when localizer_mode="candidate_conditioned" -- see
+    # CandidateConditionedLocalizer's own forward() docstring for exact
+    # shapes/semantics. All label-free, all computed once per topology by
+    # scripts/hydrocore_v5_experimental/candidate_conditioned_localizer_v1/
+    # candidate_sensor_features.py.
+    candidate_hop_distance: Tensor
+    active_sensor_mask_nodes: Tensor
+    candidate_structural_features: Tensor
+    candidate_physics_features: Tensor
     # core-issues4.txt Section E: candidate-conditioned Strategist forward
     # (strategist_mode="candidate_conditioned") reads these directly via
     # batch[...]/batch.get(...) but they were never declared on HydroBatch
@@ -221,6 +232,29 @@ MESSAGE_DIRECTIONS: tuple[MessageDirection, ...] = get_args(MessageDirection)
 #: unchanged either way; only how plan_hidden itself is built differs.
 StrategistMode = Literal["anonymous_queries", "candidate_conditioned"]
 STRATEGIST_MODES: tuple[StrategistMode, ...] = get_args(StrategistMode)
+
+#: exp/candidate-conditioned-localizer-v1 (EXPERIMENTAL, NON-RELEASE). "default"
+#: (default) matches the original source-localization head exactly:
+#: `source_node_head(sentinel_nodes)`, a shared-weight per-node linear
+#: projection with no explicit candidate-vs-sensor-evidence comparison.
+#: "candidate_conditioned" additionally scores every candidate through
+#: `CandidateConditionedLocalizer` (candidate_localizer.py): a shared
+#: cross-attention + MLP scorer where each candidate's query explicitly
+#: attends over sensor-node evidence, biased by a label-free candidate-to-
+#: sensor hop distance -- see docs/evaluation/experimental/
+#: CANDIDATE_CONDITIONED_LOCALIZER_V1_PLAN.md. When active, `source_logits`
+#: is computed ENTIRELY by the new scorer (`source_node_head` itself is
+#: still constructed and its parameters still exist on the module, for
+#: checkpoint-shape stability, but its output is not read) -- a clean
+#: substitution, not a residual blend, so H1 ("does candidate-conditioned
+#: scoring outperform the global-classifier head") is tested without being
+#: confounded by the old head's own contribution. Never constructed at all when the mode is
+#: "default" (the constructor default), so an unmodified HydroCore-v5
+#: checkpoint's state dict is unaffected -- exactly the
+#: prior_mode/incident_pooling/message_direction/strategist_mode
+#: convention this module already follows.
+LocalizerMode = Literal["default", "candidate_conditioned"]
+LOCALIZER_MODES: tuple[LocalizerMode, ...] = get_args(LocalizerMode)
 
 #: overnight-plan.txt Task 4.4. Class counts and index order for the
 #: event/next-step control heads must exactly match
@@ -412,6 +446,14 @@ def verify_architecture_compatibility(model: "HydroCore", metadata: dict[str, ob
             "candidate_conditioned adds CandidatePlanEncoder parameters that anonymous_queries "
             "does not have"
         )
+    recorded_localizer_mode = metadata.get("localizer_mode")
+    if recorded_localizer_mode is not None and recorded_localizer_mode != model.localizer_mode:
+        raise ArchitectureCompatibilityError(
+            f"checkpoint was trained with localizer_mode={recorded_localizer_mode!r} but this "
+            f"model instance is configured with localizer_mode={model.localizer_mode!r}; "
+            "candidate_conditioned adds CandidateConditionedLocalizer parameters that default "
+            "does not have"
+        )
     recorded_ood_category_head = metadata.get("ood_category_head")
     if recorded_ood_category_head is not None and recorded_ood_category_head != model.ood_category_head_enabled:
         raise ArchitectureCompatibilityError(
@@ -524,6 +566,13 @@ class HydroCore(nn.Module):
         auxiliary_heads: bool = AUXILIARY_HEADS_DEFAULT,
         consequence_prescreening_heads: bool = CONSEQUENCE_PRESCREENING_HEADS_DEFAULT,
         strategist_mode: StrategistMode = STRATEGIST_MODE_DEFAULT,
+        # exp/candidate-conditioned-localizer-v1 (EXPERIMENTAL, NON-RELEASE):
+        # see LocalizerMode's docstring above. Defaults to "default" for
+        # every existing caller/checkpoint -- byte-identical behavior and
+        # zero new parameters unless explicitly overridden.
+        localizer_mode: LocalizerMode = "default",
+        localizer_structural_feature_dim: int = 0,
+        localizer_physics_feature_dim: int = 0,
         plan_feature_dim: int = PLAN_FEATURE_DIM,
         ood_category_head: bool = OOD_CATEGORY_HEAD_DEFAULT,
         scout_control_heads: bool = SCOUT_CONTROL_HEADS_DEFAULT,
@@ -572,6 +621,10 @@ class HydroCore(nn.Module):
             )
         if strategist_mode not in STRATEGIST_MODES:
             raise ValueError(f"strategist_mode must be one of {STRATEGIST_MODES}, got {strategist_mode!r}")
+        if localizer_mode not in LOCALIZER_MODES:
+            raise ValueError(f"localizer_mode must be one of {LOCALIZER_MODES}, got {localizer_mode!r}")
+        if localizer_structural_feature_dim < 0 or localizer_physics_feature_dim < 0:
+            raise ValueError("localizer_*_feature_dim must be non-negative")
         self.d_model = d_model
         self.num_layers = num_layers
         self.latent_tokens_count = latent_tokens
@@ -625,6 +678,9 @@ class HydroCore(nn.Module):
         self.auxiliary_heads = auxiliary_heads
         self.consequence_prescreening_heads = consequence_prescreening_heads
         self.strategist_mode = strategist_mode
+        self.localizer_mode = localizer_mode
+        self.localizer_structural_feature_dim = localizer_structural_feature_dim
+        self.localizer_physics_feature_dim = localizer_physics_feature_dim
         self.plan_feature_dim = plan_feature_dim
         self.ood_category_head_enabled = ood_category_head
         self.scout_control_heads = scout_control_heads
@@ -714,6 +770,20 @@ class HydroCore(nn.Module):
         # Semantic heads expose the actual scientific tasks rather than anonymous widths.
         self.source_node_head = RoleHead(d_model, 1)
         self.prior_logit_scale = nn.Parameter(torch.tensor(0.54132485))
+        # exp/candidate-conditioned-localizer-v1: only constructed (any new
+        # parameters at all) when explicitly opted into -- see LocalizerMode.
+        self.candidate_localizer = (
+            CandidateConditionedLocalizer(
+                d_model,
+                structural_feature_dim=localizer_structural_feature_dim,
+                physics_feature_dim=localizer_physics_feature_dim,
+                dropout=dropout,
+                normalization=normalization,
+                activation=activation,
+            )
+            if localizer_mode == "candidate_conditioned"
+            else None
+        )
         # Exactly 3 incident-level region classes (hydroswarm.training.corpus.
         # SOURCE_REGION_COUNT) applied to incident_context, not a per-node
         # width -- core-issues.txt repair item 2: this used to be RoleHead(
@@ -860,6 +930,9 @@ class HydroCore(nn.Module):
             "auxiliary_heads": self.auxiliary_heads,
             "consequence_prescreening_heads": self.consequence_prescreening_heads,
             "strategist_mode": self.strategist_mode,
+            "localizer_mode": self.localizer_mode,
+            "localizer_structural_feature_dim": self.localizer_structural_feature_dim,
+            "localizer_physics_feature_dim": self.localizer_physics_feature_dim,
             "ood_category_head": self.ood_category_head_enabled,
             "scout_control_heads": self.scout_control_heads,
             "d_model": self.d_model,
@@ -1199,7 +1272,28 @@ class HydroCore(nn.Module):
             raise ValueError("source_candidate_mask must have shape [batch, nodes]")
         if not torch.all(source_mask.any(dim=1)):
             raise ValueError("every graph requires at least one source candidate")
-        source_logits = self.source_node_head(sentinel_nodes).squeeze(-1)
+        if self.candidate_localizer is not None:
+            hop_distance = batch.get("candidate_hop_distance")
+            active_sensor_mask_nodes = batch.get("active_sensor_mask_nodes")
+            if hop_distance is None or active_sensor_mask_nodes is None:
+                raise KeyError(
+                    "missing HydroBatch fields required by localizer_mode='candidate_conditioned': "
+                    "'candidate_hop_distance', 'active_sensor_mask_nodes'"
+                )
+            if hop_distance.shape != (batch_size, nodes, nodes):
+                raise ValueError("candidate_hop_distance must have shape [batch, nodes, nodes]")
+            if active_sensor_mask_nodes.shape != (batch_size, nodes):
+                raise ValueError("active_sensor_mask_nodes must have shape [batch, nodes]")
+            source_logits = self.candidate_localizer(
+                sentinel_nodes,
+                candidate_mask=source_mask,
+                sensor_mask_nodes=active_sensor_mask_nodes.bool(),
+                hop_distance=hop_distance.long(),
+                structural_features=batch.get("candidate_structural_features"),
+                physics_features=batch.get("candidate_physics_features"),
+            )
+        else:
+            source_logits = self.source_node_head(sentinel_nodes).squeeze(-1)
         if prior is not None and self.prior_mode in ("logit_only", "feature_and_logit"):
             prior_mass = prior.float().clamp_min(1e-8)
             source_logits = source_logits + torch.nn.functional.softplus(
@@ -1357,6 +1451,8 @@ class HydroCore(nn.Module):
             heads += count(self.consequence_proxy_heads)
         if self.strategist_mode == "candidate_conditioned":
             heads += count(self.candidate_plan_encoder)
+        if self.candidate_localizer is not None:
+            heads += count(self.candidate_localizer)
         if self.ood_category_head_enabled:
             heads += count(self.ood_category_head)
         return ParameterReport(
