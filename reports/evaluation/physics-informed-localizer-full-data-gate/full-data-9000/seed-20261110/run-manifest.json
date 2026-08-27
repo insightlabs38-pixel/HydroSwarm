@@ -1,0 +1,15 @@
+{
+  "arms_run": [
+    "A_CONTROL",
+    "C1_C2"
+  ],
+  "calibration_count": 1000,
+  "development_holdout_examples_count": 1750,
+  "ood_unseen_topology_count": 400,
+  "pilot_epochs": 6,
+  "seed": 20261110,
+  "stage": "full-data-9000",
+  "train_examples_count": 9000,
+  "train_subsampled": false,
+  "validation_examples_count": 1000
+}
