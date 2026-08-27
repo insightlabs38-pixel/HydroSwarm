@@ -1,0 +1,230 @@
+{
+  "A_CAPACITY_MATCHED": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.012614678899082576,
+        "ci_low": -0.008027522935779796,
+        "excludes_zero": false,
+        "n": 872,
+        "observed": 0.0022935779816513624,
+        "resamples": 2000
+      },
+      "total_n": 872
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.0009727626459143934,
+        "ci_low": -0.014591439688715957,
+        "excludes_zero": false,
+        "n": 1028,
+        "observed": -0.0068093385214008095,
+        "resamples": 2000
+      },
+      "total_n": 1028
+    },
+    "per_seed_n": {
+      "20260814": {
+        "long_distance": 283,
+        "low_centrality": 350
+      },
+      "20260901": {
+        "long_distance": 291,
+        "low_centrality": 338
+      },
+      "20260915": {
+        "long_distance": 298,
+        "low_centrality": 340
+      }
+    }
+  },
+  "B_CANDIDATE_CONDITIONED": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.032110091743119296,
+        "ci_low": 0.0034403669724770714,
+        "excludes_zero": true,
+        "n": 872,
+        "observed": 0.01834862385321101,
+        "resamples": 2000
+      },
+      "total_n": 872
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": -0.006809338521400754,
+        "ci_low": -0.027237354085603127,
+        "excludes_zero": true,
+        "n": 1028,
+        "observed": -0.017509727626459137,
+        "resamples": 2000
+      },
+      "total_n": 1028
+    },
+    "per_seed_n": {
+      "20260814": {
+        "long_distance": 283,
+        "low_centrality": 350
+      },
+      "20260901": {
+        "long_distance": 291,
+        "low_centrality": 338
+      },
+      "20260915": {
+        "long_distance": 298,
+        "low_centrality": 340
+      }
+    }
+  },
+  "C1": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.03555045871559631,
+        "ci_low": 0.0034403669724770714,
+        "excludes_zero": true,
+        "n": 872,
+        "observed": 0.019495412844036664,
+        "resamples": 2000
+      },
+      "total_n": 872
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.023346303501945553,
+        "ci_low": -0.0009727626459143934,
+        "excludes_zero": false,
+        "n": 1028,
+        "observed": 0.011673151750972777,
+        "resamples": 2000
+      },
+      "total_n": 1028
+    },
+    "per_seed_n": {
+      "20260814": {
+        "long_distance": 283,
+        "low_centrality": 350
+      },
+      "20260901": {
+        "long_distance": 291,
+        "low_centrality": 338
+      },
+      "20260915": {
+        "long_distance": 298,
+        "low_centrality": 340
+      }
+    }
+  },
+  "C2": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.05389908256880738,
+        "ci_low": 0.014908256880733939,
+        "excludes_zero": true,
+        "n": 872,
+        "observed": 0.0344036697247706,
+        "resamples": 2000
+      },
+      "total_n": 872
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.03696498054474706,
+        "ci_low": 0.008754863813229596,
+        "excludes_zero": true,
+        "n": 1028,
+        "observed": 0.023346303501945498,
+        "resamples": 2000
+      },
+      "total_n": 1028
+    },
+    "per_seed_n": {
+      "20260814": {
+        "long_distance": 283,
+        "low_centrality": 350
+      },
+      "20260901": {
+        "long_distance": 291,
+        "low_centrality": 338
+      },
+      "20260915": {
+        "long_distance": 298,
+        "low_centrality": 340
+      }
+    }
+  },
+  "C3": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.01611238532110088,
+        "ci_low": -0.014908256880733939,
+        "excludes_zero": false,
+        "n": 872,
+        "observed": 0.0011467889908256534,
+        "resamples": 2000
+      },
+      "total_n": 872
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.0,
+        "ci_low": -0.020428015564202318,
+        "excludes_zero": false,
+        "n": 1028,
+        "observed": -0.00972762645914399,
+        "resamples": 2000
+      },
+      "total_n": 1028
+    },
+    "per_seed_n": {
+      "20260814": {
+        "long_distance": 283,
+        "low_centrality": 350
+      },
+      "20260901": {
+        "long_distance": 291,
+        "low_centrality": 338
+      },
+      "20260915": {
+        "long_distance": 298,
+        "low_centrality": 340
+      }
+    }
+  },
+  "C_FULL": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.037844036697247674,
+        "ci_low": 0.001146788990825709,
+        "excludes_zero": true,
+        "n": 872,
+        "observed": 0.019495412844036664,
+        "resamples": 2000
+      },
+      "total_n": 872
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.035019455252918275,
+        "ci_low": 0.008706225680933799,
+        "excludes_zero": true,
+        "n": 1028,
+        "observed": 0.02140077821011671,
+        "resamples": 2000
+      },
+      "total_n": 1028
+    },
+    "per_seed_n": {
+      "20260814": {
+        "long_distance": 283,
+        "low_centrality": 350
+      },
+      "20260901": {
+        "long_distance": 291,
+        "low_centrality": 338
+      },
+      "20260915": {
+        "long_distance": 298,
+        "low_centrality": 340
+      }
+    }
+  }
+}

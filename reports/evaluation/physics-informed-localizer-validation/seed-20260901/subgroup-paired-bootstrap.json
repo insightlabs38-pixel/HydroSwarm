@@ -1,0 +1,141 @@
+{
+  "by_arm": {
+    "A_CAPACITY_MATCHED": {
+      "long_distance": {
+        "arm_top1_mean": 0.3642611683848797,
+        "ci_high": 0.0378006872852234,
+        "ci_low": -0.0034364261168384758,
+        "control_top1_mean": 0.3470790378006873,
+        "excludes_zero": false,
+        "n": 291,
+        "observed": 0.017182130584192434,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.4260355029585799,
+        "ci_high": -0.005917159763313584,
+        "ci_low": -0.026627218934911268,
+        "control_top1_mean": 0.4408284023668639,
+        "excludes_zero": true,
+        "n": 338,
+        "observed": -0.014792899408283988,
+        "resamples": 2000
+      }
+    },
+    "B_CANDIDATE_CONDITIONED": {
+      "long_distance": {
+        "arm_top1_mean": 0.3539518900343643,
+        "ci_high": 0.030927835051546393,
+        "ci_low": -0.017182130584192434,
+        "control_top1_mean": 0.3470790378006873,
+        "excludes_zero": false,
+        "n": 291,
+        "observed": 0.006872852233677007,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.4230769230769231,
+        "ci_high": 0.0,
+        "ci_low": -0.03550295857988167,
+        "control_top1_mean": 0.4408284023668639,
+        "excludes_zero": false,
+        "n": 338,
+        "observed": -0.017751479289940808,
+        "resamples": 2000
+      }
+    },
+    "C1": {
+      "long_distance": {
+        "arm_top1_mean": 0.3711340206185567,
+        "ci_high": 0.0515463917525773,
+        "ci_low": -0.0068728522336769515,
+        "control_top1_mean": 0.3470790378006873,
+        "excludes_zero": false,
+        "n": 291,
+        "observed": 0.02405498281786944,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.46449704142011833,
+        "ci_high": 0.05029585798816566,
+        "ci_low": 0.0,
+        "control_top1_mean": 0.4408284023668639,
+        "excludes_zero": false,
+        "n": 338,
+        "observed": 0.023668639053254448,
+        "resamples": 2000
+      }
+    },
+    "C2": {
+      "long_distance": {
+        "arm_top1_mean": 0.3917525773195876,
+        "ci_high": 0.07560137457044674,
+        "ci_low": 0.013573883161511946,
+        "control_top1_mean": 0.3470790378006873,
+        "excludes_zero": true,
+        "n": 291,
+        "observed": 0.04467353951890035,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.4378698224852071,
+        "ci_high": 0.020710059171597628,
+        "ci_low": -0.026627218934911268,
+        "control_top1_mean": 0.4408284023668639,
+        "excludes_zero": false,
+        "n": 338,
+        "observed": -0.0029585798816567643,
+        "resamples": 2000
+      }
+    },
+    "C3": {
+      "long_distance": {
+        "arm_top1_mean": 0.3711340206185567,
+        "ci_high": 0.05498281786941578,
+        "ci_low": -0.0068728522336769515,
+        "control_top1_mean": 0.3470790378006873,
+        "excludes_zero": false,
+        "n": 291,
+        "observed": 0.02405498281786944,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.42011834319526625,
+        "ci_high": -0.0029585798816567643,
+        "ci_low": -0.041420118343195256,
+        "control_top1_mean": 0.4408284023668639,
+        "excludes_zero": true,
+        "n": 338,
+        "observed": -0.020710059171597628,
+        "resamples": 2000
+      }
+    },
+    "C_FULL": {
+      "long_distance": {
+        "arm_top1_mean": 0.36769759450171824,
+        "ci_high": 0.05171821305841912,
+        "ci_low": -0.013745704467353959,
+        "control_top1_mean": 0.3470790378006873,
+        "excludes_zero": false,
+        "n": 291,
+        "observed": 0.020618556701030966,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.46449704142011833,
+        "ci_high": 0.047337278106508895,
+        "ci_low": 0.0,
+        "control_top1_mean": 0.4408284023668639,
+        "excludes_zero": false,
+        "n": 338,
+        "observed": 0.023668639053254448,
+        "resamples": 2000
+      }
+    }
+  },
+  "distance_median": 0.0,
+  "tercile_cutoffs": {
+    "high_cut": 0.2857142984867096,
+    "low_cut": 0.1190476194024086
+  }
+}

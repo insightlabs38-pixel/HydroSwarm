@@ -1,0 +1,260 @@
+{
+  "development_holdout": {
+    "A_CAPACITY_MATCHED": {
+      "mrr": 0.7842738095238094,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03,
+      "proxy_actionable_rate": 0.97,
+      "proxy_calibrated_coverage": 0.8933333333333333,
+      "proxy_candidate_set_size": 2.55,
+      "top1": 0.6666666666666666,
+      "top3": 0.89
+    },
+    "A_CONTROL": {
+      "mrr": 0.7849404761904762,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03666666666666667,
+      "proxy_actionable_rate": 0.9633333333333334,
+      "proxy_calibrated_coverage": 0.8933333333333333,
+      "proxy_candidate_set_size": 2.5633333333333335,
+      "top1": 0.6666666666666666,
+      "top3": 0.8966666666666666
+    },
+    "B_CANDIDATE_CONDITIONED": {
+      "mrr": 0.7864325396825397,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.04,
+      "proxy_actionable_rate": 0.96,
+      "proxy_calibrated_coverage": 0.9,
+      "proxy_candidate_set_size": 2.63,
+      "top1": 0.6666666666666666,
+      "top3": 0.8933333333333333
+    },
+    "C1": {
+      "mrr": 0.7879642857142857,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.02666666666666667,
+      "proxy_actionable_rate": 0.9733333333333334,
+      "proxy_calibrated_coverage": 0.91,
+      "proxy_candidate_set_size": 2.6333333333333333,
+      "top1": 0.6766666666666666,
+      "top3": 0.89
+    },
+    "C2": {
+      "mrr": 0.7930992063492064,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03333333333333333,
+      "proxy_actionable_rate": 0.9666666666666667,
+      "proxy_calibrated_coverage": 0.8933333333333333,
+      "proxy_candidate_set_size": 2.5033333333333334,
+      "top1": 0.6833333333333333,
+      "top3": 0.8833333333333333
+    },
+    "C3": {
+      "mrr": 0.7877658730158731,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.04,
+      "proxy_actionable_rate": 0.96,
+      "proxy_calibrated_coverage": 0.8933333333333333,
+      "proxy_candidate_set_size": 2.5766666666666667,
+      "top1": 0.6733333333333333,
+      "top3": 0.8833333333333333
+    },
+    "C_FULL": {
+      "mrr": 0.7898055555555555,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.02666666666666667,
+      "proxy_actionable_rate": 0.9733333333333334,
+      "proxy_calibrated_coverage": 0.9066666666666666,
+      "proxy_candidate_set_size": 2.5633333333333335,
+      "top1": 0.6833333333333333,
+      "top3": 0.8766666666666667
+    }
+  },
+  "ood-UNSEEN_TOPOLOGY": {
+    "A_CAPACITY_MATCHED": {
+      "mrr": 0.5808928571428572,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.3821428571428571,
+      "top3": 0.7071428571428572
+    },
+    "A_CONTROL": {
+      "mrr": 0.5891666666666667,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.4,
+      "top3": 0.7035714285714286
+    },
+    "B_CANDIDATE_CONDITIONED": {
+      "mrr": 0.5811904761904761,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.38571428571428573,
+      "top3": 0.7
+    },
+    "C1": {
+      "mrr": 0.6094047619047619,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.42142857142857143,
+      "top3": 0.7107142857142857
+    },
+    "C2": {
+      "mrr": 0.5869642857142857,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.4035714285714286,
+      "top3": 0.6821428571428572
+    },
+    "C3": {
+      "mrr": 0.5716071428571429,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.37142857142857144,
+      "top3": 0.6892857142857143
+    },
+    "C_FULL": {
+      "mrr": 0.6046428571428571,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.4107142857142857,
+      "top3": 0.7107142857142857
+    }
+  },
+  "validation": {
+    "A_CAPACITY_MATCHED": {
+      "mrr": 0.794718253968254,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03666666666666667,
+      "proxy_actionable_rate": 0.9633333333333334,
+      "proxy_calibrated_coverage": 0.8833333333333333,
+      "proxy_candidate_set_size": 2.42,
+      "top1": 0.6866666666666666,
+      "top3": 0.88
+    },
+    "A_CONTROL": {
+      "mrr": 0.7899960317460317,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03666666666666667,
+      "proxy_actionable_rate": 0.9633333333333334,
+      "proxy_calibrated_coverage": 0.8733333333333333,
+      "proxy_candidate_set_size": 2.4066666666666667,
+      "top1": 0.68,
+      "top3": 0.8766666666666667
+    },
+    "B_CANDIDATE_CONDITIONED": {
+      "mrr": 0.793218253968254,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03666666666666667,
+      "proxy_actionable_rate": 0.9633333333333334,
+      "proxy_calibrated_coverage": 0.8933333333333333,
+      "proxy_candidate_set_size": 2.49,
+      "top1": 0.6833333333333333,
+      "top3": 0.8866666666666667
+    },
+    "C1": {
+      "mrr": 0.7982738095238096,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03666666666666667,
+      "proxy_actionable_rate": 0.9633333333333334,
+      "proxy_calibrated_coverage": 0.9,
+      "proxy_candidate_set_size": 2.4766666666666666,
+      "top1": 0.6933333333333334,
+      "top3": 0.8866666666666667
+    },
+    "C2": {
+      "mrr": 0.7947698412698413,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03,
+      "proxy_actionable_rate": 0.97,
+      "proxy_calibrated_coverage": 0.89,
+      "proxy_candidate_set_size": 2.3966666666666665,
+      "top1": 0.6866666666666666,
+      "top3": 0.88
+    },
+    "C3": {
+      "mrr": 0.7961349206349206,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03,
+      "proxy_actionable_rate": 0.97,
+      "proxy_calibrated_coverage": 0.8966666666666666,
+      "proxy_candidate_set_size": 2.4566666666666666,
+      "top1": 0.69,
+      "top3": 0.88
+    },
+    "C_FULL": {
+      "mrr": 0.800968253968254,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03,
+      "proxy_actionable_rate": 0.97,
+      "proxy_calibrated_coverage": 0.9,
+      "proxy_candidate_set_size": 2.4233333333333333,
+      "top1": 0.6966666666666667,
+      "top3": 0.8833333333333333
+    }
+  }
+}

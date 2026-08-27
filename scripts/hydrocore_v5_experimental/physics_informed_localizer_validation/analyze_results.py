@@ -26,6 +26,12 @@ validation/):
     mrr, mean, median, stdev, n_seeds_positive_delta, n_seeds_negative_delta)
   - pooled/pooled-paired-bootstrap.json (concatenate every seed's paired
     per-example deltas vs A_CONTROL, one bootstrap CI per arm/population)
+  - pooled/pooled-subgroup-bootstrap.json (same pooling, restricted to the
+    low-centrality/long-distance hard subgroups)
+  - pooled/required-pairwise-comparisons.json (Phase 6's explicit
+    comparisons beyond "vs A_CONTROL": C_FULL vs A_CAPACITY_MATCHED,
+    C_FULL vs B, C1/C2/C3 vs B, C1/C2/C3 vs C_FULL, on
+    ood-UNSEEN_TOPOLOGY Top-1)
   - pooled/parameter-counts.json (every arm's exact parameter report,
     seed-independent by construction -- same architecture/seed only
     changes initialization)
@@ -436,6 +442,97 @@ def pooled_paired_bootstrap(seeds: list[int], arms: list[str]) -> dict[str, Any]
     return result
 
 
+def pooled_subgroup_bootstrap(seeds: list[int], arms: list[str]) -> dict[str, Any]:
+    """Same pooling idea as `pooled_paired_bootstrap`, restricted to the
+    low-centrality / long-distance hard subgroups (Phase 7's "required
+    subgroup analysis", pooled across seeds rather than read one seed at a
+    time). Subgroup membership (tercile cutoffs / distance median) is
+    recomputed per seed from that seed's own A_CONTROL rows -- consistent
+    with each seed's own `subgroup_paired_bootstrap` -- then every seed's
+    paired (control, arm) values for scenario_ids in that seed's subgroup
+    are concatenated before one bootstrap resampling."""
+
+    result: dict[str, Any] = {}
+    for arm in arms:
+        if arm == "A_CONTROL":
+            continue
+        subgroup_values: dict[str, dict[str, list[float]]] = {
+            "low_centrality": {"control": [], "arm": []},
+            "long_distance": {"control": [], "arm": []},
+        }
+        per_seed_n: dict[str, dict[str, int]] = {}
+        for seed in seeds:
+            reference_centrality = _pooled_localized({"A_CONTROL": {p: load_rows(seed, "A_CONTROL", p) for p in POPULATIONS}}, "A_CONTROL", "source_betweenness_centrality")
+            reference_distance = _pooled_localized({"A_CONTROL": {p: load_rows(seed, "A_CONTROL", p) for p in POPULATIONS}}, "A_CONTROL", "source_hop_to_nearest_sensor_normalized")
+            if not reference_centrality or not reference_distance:
+                continue
+            low_cut, high_cut = _tercile_bounds([row["source_betweenness_centrality"] for row in reference_centrality])
+            control_by_id = {row["scenario_id"]: row for row in reference_centrality}
+            low_centrality_ids = {sid for sid, row in control_by_id.items() if _bucket(row["source_betweenness_centrality"], low_cut, high_cut) == "low"}
+            distance_median = statistics.median(row["source_hop_to_nearest_sensor_normalized"] for row in reference_distance)
+            long_distance_ids = {row["scenario_id"] for row in reference_distance if row["source_hop_to_nearest_sensor_normalized"] > distance_median}
+
+            control_rows_by_id = {row["scenario_id"]: row for population in POPULATIONS for row in load_rows(seed, "A_CONTROL", population) if row.get("has_source")}
+            arm_rows_by_id = {row["scenario_id"]: row for population in POPULATIONS for row in load_rows(seed, arm, population) if row.get("has_source")}
+            per_seed_n[str(seed)] = {}
+            for subgroup_name, ids in (("low_centrality", low_centrality_ids), ("long_distance", long_distance_ids)):
+                shared_ids = sorted(ids & set(control_rows_by_id) & set(arm_rows_by_id))
+                per_seed_n[str(seed)][subgroup_name] = len(shared_ids)
+                for sid in shared_ids:
+                    subgroup_values[subgroup_name]["control"].append(float(control_rows_by_id[sid]["top1"]))
+                    subgroup_values[subgroup_name]["arm"].append(float(arm_rows_by_id[sid]["top1"]))
+
+        result[arm] = {
+            "per_seed_n": per_seed_n,
+            **{
+                subgroup_name: {
+                    "total_n": len(values["control"]),
+                    "top1": paired_bootstrap(values["control"], values["arm"]),
+                }
+                for subgroup_name, values in subgroup_values.items()
+            },
+        }
+    return result
+
+
+#: Phase 6's explicitly required comparisons beyond "every arm vs
+#: A_CONTROL" (already covered by `pooled_paired_bootstrap`): does C_FULL
+#: survive the capacity-matched control head-to-head, does it add value
+#: beyond candidate conditioning head-to-head, which single feature(s)
+#: beat B on their own, and does the full feature set beat any single
+#: feature. Pairs are (baseline, comparison) -- the bootstrap's "observed"
+#: sign is comparison-minus-baseline, same convention as
+#: `pooled_paired_bootstrap`'s arm-minus-A_CONTROL.
+REQUIRED_PAIRWISE_COMPARISONS: tuple[tuple[str, str], ...] = (
+    ("A_CAPACITY_MATCHED", "C_FULL"),
+    ("B_CANDIDATE_CONDITIONED", "C_FULL"),
+    ("B_CANDIDATE_CONDITIONED", "C1"),
+    ("B_CANDIDATE_CONDITIONED", "C2"),
+    ("B_CANDIDATE_CONDITIONED", "C3"),
+    ("C_FULL", "C1"),
+    ("C_FULL", "C2"),
+    ("C_FULL", "C3"),
+)
+
+
+def required_pairwise_comparisons(seeds: list[int], available_arms: set[str], population: str = "ood-UNSEEN_TOPOLOGY") -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for baseline, comparison in REQUIRED_PAIRWISE_COMPARISONS:
+        if baseline not in available_arms or comparison not in available_arms:
+            continue
+        baseline_top1: list[float] = []
+        comparison_top1: list[float] = []
+        for seed in seeds:
+            baseline_rows = {row["scenario_id"]: row for row in load_rows(seed, baseline, population) if row.get("has_source")}
+            comparison_rows = {row["scenario_id"]: row for row in load_rows(seed, comparison, population) if row.get("has_source")}
+            shared_ids = sorted(set(baseline_rows) & set(comparison_rows))
+            for sid in shared_ids:
+                baseline_top1.append(float(baseline_rows[sid]["top1"]))
+                comparison_top1.append(float(comparison_rows[sid]["top1"]))
+        result[f"{comparison}_vs_{baseline}"] = {"population": population, "n": len(baseline_top1), "top1": paired_bootstrap(baseline_top1, comparison_top1)}
+    return result
+
+
 def parameter_counts(seeds: list[int], arms: list[str]) -> dict[str, Any]:
     """Parameter counts are architecture-determined, not seed-determined
     (only initialization differs across seeds) -- report each arm's report
@@ -488,6 +585,12 @@ def main() -> None:
 
     pooled_bootstrap = pooled_paired_bootstrap(seeds, arms)
     (pooled_dir / "pooled-paired-bootstrap.json").write_text(json.dumps(pooled_bootstrap, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    pooled_subgroups = pooled_subgroup_bootstrap(seeds, arms)
+    (pooled_dir / "pooled-subgroup-bootstrap.json").write_text(json.dumps(pooled_subgroups, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+    pairwise = required_pairwise_comparisons(seeds, set(arms))
+    (pooled_dir / "required-pairwise-comparisons.json").write_text(json.dumps(pairwise, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     params = parameter_counts(seeds, arms)
     (pooled_dir / "parameter-counts.json").write_text(json.dumps(params, indent=2, sort_keys=True) + "\n", encoding="utf-8")

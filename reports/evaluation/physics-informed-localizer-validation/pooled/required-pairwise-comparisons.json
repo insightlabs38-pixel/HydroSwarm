@@ -1,0 +1,98 @@
+{
+  "C1_vs_B_CANDIDATE_CONDITIONED": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.051190476190476175,
+      "ci_low": 0.020238095238095277,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.0357142857142857,
+      "resamples": 2000
+    }
+  },
+  "C1_vs_C_FULL": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": -0.0023809523809523725,
+      "ci_low": -0.02619047619047621,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": -0.01428571428571429,
+      "resamples": 2000
+    }
+  },
+  "C2_vs_B_CANDIDATE_CONDITIONED": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.07023809523809521,
+      "ci_low": 0.03809523809523807,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.05357142857142855,
+      "resamples": 2000
+    }
+  },
+  "C2_vs_C_FULL": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.022619047619047594,
+      "ci_low": -0.015476190476190477,
+      "excludes_zero": false,
+      "n": 840,
+      "observed": 0.0035714285714285587,
+      "resamples": 2000
+    }
+  },
+  "C3_vs_B_CANDIDATE_CONDITIONED": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.025059523809523775,
+      "ci_low": -0.0035714285714285587,
+      "excludes_zero": false,
+      "n": 840,
+      "observed": 0.011904761904761862,
+      "resamples": 2000
+    }
+  },
+  "C3_vs_C_FULL": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": -0.02023809523809522,
+      "ci_low": -0.057142857142857106,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": -0.038095238095238126,
+      "resamples": 2000
+    }
+  },
+  "C_FULL_vs_A_CAPACITY_MATCHED": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.059523809523809534,
+      "ci_low": 0.023809523809523836,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.041666666666666685,
+      "resamples": 2000
+    }
+  },
+  "C_FULL_vs_B_CANDIDATE_CONDITIONED": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.06666666666666665,
+      "ci_low": 0.033333333333333326,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.04999999999999999,
+      "resamples": 2000
+    }
+  }
+}
