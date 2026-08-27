@@ -1,0 +1,80 @@
+{
+  "development_holdout": {
+    "A_CONTROL": {
+      "mrr": 0.806567007910656,
+      "n": 1750,
+      "n_localized": 1228,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.029315960912052116,
+      "proxy_actionable_rate": 0.9706840390879479,
+      "proxy_calibrated_coverage": 0.8827361563517915,
+      "proxy_candidate_set_size": 2.195439739413681,
+      "top1": 0.7076547231270358,
+      "top3": 0.8778501628664495
+    },
+    "C1_C2": {
+      "mrr": 0.8024342717543044,
+      "n": 1750,
+      "n_localized": 1228,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.02687296416938111,
+      "proxy_actionable_rate": 0.9731270358306189,
+      "proxy_calibrated_coverage": 0.8884364820846905,
+      "proxy_candidate_set_size": 2.232899022801303,
+      "top1": 0.6978827361563518,
+      "top3": 0.8819218241042345
+    }
+  },
+  "ood-UNSEEN_TOPOLOGY": {
+    "A_CONTROL": {
+      "mrr": 0.6525595238095239,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.4607142857142857,
+      "top3": 0.8
+    },
+    "C1_C2": {
+      "mrr": 0.6255952380952381,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.42857142857142855,
+      "top3": 0.775
+    }
+  },
+  "validation": {
+    "A_CONTROL": {
+      "mrr": 0.804226859283039,
+      "n": 1000,
+      "n_localized": 712,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.025280898876404494,
+      "proxy_actionable_rate": 0.9747191011235955,
+      "proxy_calibrated_coverage": 0.8890449438202247,
+      "proxy_candidate_set_size": 2.1853932584269664,
+      "top1": 0.702247191011236,
+      "top3": 0.8806179775280899
+    },
+    "C1_C2": {
+      "mrr": 0.8109634162653826,
+      "n": 1000,
+      "n_localized": 712,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.025280898876404494,
+      "proxy_actionable_rate": 0.9747191011235955,
+      "proxy_calibrated_coverage": 0.8974719101123596,
+      "proxy_candidate_set_size": 2.220505617977528,
+      "top1": 0.7148876404494382,
+      "top3": 0.8792134831460674
+    }
+  }
+}

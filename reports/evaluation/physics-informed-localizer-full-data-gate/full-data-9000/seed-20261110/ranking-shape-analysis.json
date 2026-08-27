@@ -1,0 +1,35 @@
+{
+  "correct_top3_converted_to_outside_top3": 12,
+  "fraction_of_top1_failures_with_source_in_top3": {
+    "a_control": 0.6291390728476821,
+    "c1_c2": 0.60625,
+    "n_a_control_top1_failures": 151,
+    "n_c1_c2_top1_failures": 160
+  },
+  "n": 280,
+  "net_top3_conversions": -7,
+  "population": "ood-UNSEEN_TOPOLOGY",
+  "rank_when_c1_c2_top1_wrong": {
+    "c1_c2_mean_rank": 3.4375,
+    "control_mean_rank": 3.09375,
+    "mean_rank_delta_c1_c2_minus_control": 0.34375,
+    "n": 160,
+    "n_improved": 14,
+    "n_unchanged": 92,
+    "n_worsened": 54
+  },
+  "top3_bootstrap_delta": {
+    "ci_high": 0.0,
+    "ci_low": -0.04999999999999993,
+    "excludes_zero": false,
+    "n": 280,
+    "observed": -0.025000000000000022,
+    "resamples": 2000
+  },
+  "top3_transition_table": {
+    "both_correct": 212,
+    "both_wrong": 51,
+    "c1_c2_only": 5,
+    "control_only": 12
+  }
+}

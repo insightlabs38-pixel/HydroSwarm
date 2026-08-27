@@ -1,5 +1,145 @@
 {
-  "available": false,
-  "classification": "INCONCLUSIVE_FULL_DATA_GATE",
-  "reason": "no full-data-9000 evaluation rows found yet"
+  "available": true,
+  "calibration_ood_diagnostics": {
+    "available": true,
+    "calibration": {
+      "a_control": {
+        "coverage": 0.9073033707865169,
+        "expected_calibration_error": 0.03452936572968148,
+        "mean_set_size": 2.264044943820225,
+        "n": 712
+      },
+      "c1_c2": {
+        "coverage": 0.9073033707865169,
+        "expected_calibration_error": 0.038245562143718756,
+        "mean_set_size": 2.2963483146067416,
+        "n": 712
+      }
+    },
+    "materially_worse": false,
+    "materially_worse_flags": [],
+    "populations": {
+      "development_holdout": {
+        "ood_caution_or_outside_rate": {
+          "a_control": 0.0,
+          "c1_c2": 0.0
+        },
+        "proxy_abstention_rate": {
+          "a_control": 0.029315960912052116,
+          "c1_c2": 0.02687296416938111
+        },
+        "proxy_actionable_rate": {
+          "a_control": 0.9706840390879479,
+          "c1_c2": 0.9731270358306189
+        },
+        "proxy_calibrated_coverage": {
+          "a_control": 0.8827361563517915,
+          "c1_c2": 0.8884364820846905
+        }
+      },
+      "ood-UNSEEN_TOPOLOGY": {
+        "ood_caution_or_outside_rate": {
+          "a_control": 1.0,
+          "c1_c2": 1.0
+        },
+        "proxy_abstention_rate": {
+          "a_control": 1.0,
+          "c1_c2": 1.0
+        },
+        "proxy_actionable_rate": {
+          "a_control": 0.0,
+          "c1_c2": 0.0
+        },
+        "proxy_calibrated_coverage": {
+          "a_control": null,
+          "c1_c2": null
+        }
+      },
+      "validation": {
+        "ood_caution_or_outside_rate": {
+          "a_control": 0.0,
+          "c1_c2": 0.0
+        },
+        "proxy_abstention_rate": {
+          "a_control": 0.025280898876404494,
+          "c1_c2": 0.025280898876404494
+        },
+        "proxy_actionable_rate": {
+          "a_control": 0.9747191011235955,
+          "c1_c2": 0.9747191011235955
+        },
+        "proxy_calibrated_coverage": {
+          "a_control": 0.8890449438202247,
+          "c1_c2": 0.8974719101123596
+        }
+      }
+    }
+  },
+  "classification": "FAIL_FULL_DATA_GATE",
+  "criteria": {
+    "1_top1_delta_positive": false,
+    "2_top1_delta_at_least_2pp": false,
+    "3_ci_excludes_zero_positive": false,
+    "4_no_top3_significant_negative_regression": true,
+    "5_no_mrr_significant_negative_regression": false,
+    "6_no_known_topology_material_regression": true,
+    "7_calibration_ood_not_materially_worse": true,
+    "8_no_governance_code_altered": true
+  },
+  "known_topology_regressions": {
+    "development_holdout": {
+      "material_statistically_supported_regression": false,
+      "n": 1228,
+      "top1_delta_bootstrap": {
+        "ci_high": 0.004071661237785018,
+        "ci_low": -0.023615635179153105,
+        "excludes_zero": false,
+        "n": 1228,
+        "observed": -0.009771986970684043,
+        "resamples": 2000
+      }
+    },
+    "validation": {
+      "material_statistically_supported_regression": false,
+      "n": 712,
+      "top1_delta_bootstrap": {
+        "ci_high": 0.030898876404494402,
+        "ci_low": -0.004213483146067398,
+        "excludes_zero": false,
+        "n": 712,
+        "observed": 0.012640449438202195,
+        "resamples": 2000
+      }
+    }
+  },
+  "mrr_bootstrap": {
+    "ci_high": -0.007916666666666683,
+    "ci_low": -0.04626488095238107,
+    "excludes_zero": true,
+    "n": 280,
+    "observed": -0.026964285714285663,
+    "resamples": 2000
+  },
+  "n_paired": 280,
+  "population": "ood-UNSEEN_TOPOLOGY",
+  "seed": 20261110,
+  "top1_bootstrap": {
+    "ci_high": 0.0035714285714285587,
+    "ci_low": -0.0678571428571429,
+    "excludes_zero": false,
+    "n": 280,
+    "observed": -0.03214285714285714,
+    "resamples": 2000
+  },
+  "top1_ci_high_pp": 0.3571428571428559,
+  "top1_ci_low_pp": -6.785714285714289,
+  "top1_observed_pp": -3.214285714285714,
+  "top3_bootstrap": {
+    "ci_high": 0.0,
+    "ci_low": -0.04999999999999993,
+    "excludes_zero": false,
+    "n": 280,
+    "observed": -0.025000000000000022,
+    "resamples": 2000
+  }
 }

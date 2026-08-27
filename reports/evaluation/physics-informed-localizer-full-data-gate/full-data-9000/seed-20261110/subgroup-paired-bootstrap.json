@@ -1,0 +1,31 @@
+{
+  "by_arm": {
+    "C1_C2": {
+      "long_distance": {
+        "arm_top1_mean": 0.5134048257372654,
+        "ci_high": 0.009383378016085797,
+        "ci_low": -0.0442359249329759,
+        "control_top1_mean": 0.5308310991957105,
+        "excludes_zero": false,
+        "n": 746,
+        "observed": -0.017426273458445052,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.5903307888040712,
+        "ci_high": -0.020292620865139974,
+        "ci_low": -0.059796437659033086,
+        "control_top1_mean": 0.6297709923664122,
+        "excludes_zero": true,
+        "n": 786,
+        "observed": -0.039440203562341014,
+        "resamples": 2000
+      }
+    }
+  },
+  "distance_median": 0.0,
+  "tercile_cutoffs": {
+    "high_cut": 0.2767857015132904,
+    "low_cut": 0.1190476194024086
+  }
+}

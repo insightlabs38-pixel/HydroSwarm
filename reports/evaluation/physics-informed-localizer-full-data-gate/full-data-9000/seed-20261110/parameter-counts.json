@@ -1,0 +1,34 @@
+{
+  "A_CONTROL": {
+    "by_seed": {
+      "20261110": {
+        "adapters": 57168,
+        "backbone": 2989248,
+        "encoders": 941376,
+        "heads": 56320,
+        "total": 4044113,
+        "trainable": 4044113
+      }
+    },
+    "consistent_across_seeds": true,
+    "delta_vs_control": 0,
+    "delta_vs_control_pct": 0.0,
+    "total": 4044113
+  },
+  "C1_C2": {
+    "by_seed": {
+      "20261110": {
+        "adapters": 57168,
+        "backbone": 2989248,
+        "encoders": 941376,
+        "heads": 244104,
+        "total": 4231897,
+        "trainable": 4231897
+      }
+    },
+    "consistent_across_seeds": true,
+    "delta_vs_control": 187784,
+    "delta_vs_control_pct": 4.643391517497153,
+    "total": 4231897
+  }
+}
