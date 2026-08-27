@@ -116,3 +116,14 @@ experiments/jobs/*/job.pid
 # reports/evaluation/physics-informed-localizer-scale-validation/ ARE
 # committed.
 /experiments/physics-informed-localizer-scale-validation/runs/
+
+# exp/physics-informed-localizer-full-data-gate (EXPERIMENTAL, NON-RELEASE):
+# data-scale validation gate (600 -> 9000 train examples, one pre-declared
+# seed), same not-a-release-artifact rationale as
+# physics-informed-localizer-scale-validation above -- pilot/full-data
+# trained checkpoints are deterministically regenerable from the committed
+# run_experiment.py plus the committed run-manifest.json for each stage. The
+# evaluation JSON/JSONL outputs and analysis under
+# reports/evaluation/physics-informed-localizer-full-data-gate/ ARE
+# committed.
+/experiments/physics-informed-localizer-full-data-gate/runs/
