@@ -58,7 +58,17 @@ def _cross_entropy(logits: Tensor, target: Tensor, *, weight: Tensor | None = No
     valid = flattened_target != -100
     count = int(valid.sum())
     if not valid.any():
-        return logits.sum() * 0.0, count
+        # Zero BEFORE summing, not after: `logits` can hold a large-magnitude
+        # masked-candidate sentinel (e.g. -3.4028e38) at every position for a
+        # scenario with several masked-out candidates and no valid target
+        # (source_node_mask all False). `logits.sum() * 0.0` sums those huge
+        # values FIRST -- two or more such sentinels overflow float32's
+        # representable range to +/-inf -- and inf * 0.0 is NaN, poisoning
+        # the whole multitask loss. `(logits * 0.0).sum()` zeroes every
+        # element first (0.0 * any finite value is exactly +/-0.0, never an
+        # overflow) so the sum is always exactly 0.0, still graph-connected
+        # to `logits` so backward() runs cleanly through this term.
+        return (logits * 0.0).sum(), count
     flattened_logits = logits.reshape(-1, logits.shape[-1])
     return F.cross_entropy(flattened_logits[valid], flattened_target[valid], weight=weight), count
 
@@ -79,7 +89,10 @@ def _ordinal_classification_loss(
     )
     count = int(valid.sum())
     if not valid.any():
-        return usable_logits.sum() * 0.0, count
+        # See _cross_entropy's identical fix above: zero before summing to
+        # avoid a float32 overflow-to-inf on large-magnitude masked-out
+        # sentinel logits producing inf * 0.0 == NaN.
+        return (usable_logits * 0.0).sum(), count
     flattened_logits = usable_logits.reshape(-1, class_count)[valid]
     valid_target = flattened_target[valid]
     categorical = F.cross_entropy(flattened_logits, valid_target)
@@ -167,8 +180,11 @@ def masked_regression(
     if not valid.any():
         # A graph-connected zero (not a detached Python float) so backward()
         # still runs cleanly through this term in a batch where every
-        # example happens to mask this particular task.
-        return prediction.sum() * 0.0, count
+        # example happens to mask this particular task. Zero before
+        # summing, not after (see _cross_entropy's identical fix), so a
+        # large-magnitude prediction cannot overflow float32 and turn this
+        # into inf * 0.0 == NaN.
+        return (prediction * 0.0).sum(), count
     return F.mse_loss(prediction[valid], target[valid]), count
 
 
@@ -287,7 +303,10 @@ def compute_multitask_loss(
                 outputs["sensor_fault_logits"].float()[valid], fault_target[valid]
             )
             if valid.any()
-            else outputs["sensor_fault_logits"].sum() * 0.0
+            # Zero before summing (see _cross_entropy's identical fix) to
+            # avoid a float32 overflow-to-inf on this task's own
+            # large-magnitude masked-out logits producing inf * 0.0 == NaN.
+            else (outputs["sensor_fault_logits"] * 0.0).sum()
         )
     if "event_presence" in targets and "event_presence_logits" in outputs:
         presence_target = targets["event_presence"].float()
@@ -298,7 +317,8 @@ def compute_multitask_loss(
                 outputs["event_presence_logits"].float()[valid], presence_target[valid]
             )
             if valid.any()
-            else outputs["event_presence_logits"].sum() * 0.0
+            # Zero before summing -- see _cross_entropy's identical fix.
+            else (outputs["event_presence_logits"] * 0.0).sum()
         )
     if "evidence_sufficiency" in targets and "evidence_sufficiency" in outputs:
         losses["evidence_sufficiency"] = F.binary_cross_entropy(
@@ -320,7 +340,8 @@ def compute_multitask_loss(
                 outputs["should_continue_sampling_logits"].float()[valid], continue_target[valid]
             )
             if valid.any()
-            else outputs["should_continue_sampling_logits"].sum() * 0.0
+            # Zero before summing -- see _cross_entropy's identical fix.
+            else (outputs["should_continue_sampling_logits"] * 0.0).sum()
         )
     if not losses:
         raise ValueError("no compatible model outputs and training targets")

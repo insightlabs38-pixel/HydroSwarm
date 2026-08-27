@@ -161,6 +161,36 @@ def test_masked_out_task_reports_zero_valid_count() -> None:
     torch.testing.assert_close(result.tasks["source_node"], torch.tensor(0.0), atol=1e-6, rtol=0)
 
 
+def test_masked_out_classification_task_with_extreme_logits_is_finite_not_nan() -> None:
+    """Regression test (physics-informed-localizer-full-data-gate,
+    full-data-9000 stage): CandidateConditionedLocalizer/default localizer
+    heads write a large-magnitude sentinel (observed: -3.4028e38, float32's
+    near-max-magnitude) into masked-out candidate positions of
+    `source_node_logits` before softmax/cross-entropy ever sees them. A
+    real scenario with source_node_mask all False (no real source in this
+    example -- overwhelmingly common once training uses the FULL, unfiltered
+    Cycle-B2 corpus rather than a has_real_source-filtered subsample) and
+    two or more masked-out candidates hits `not valid.any()`'s zero-loss
+    fallback. Summing two such sentinels overflows float32's representable
+    range to -inf; -inf * 0.0 is NaN, poisoning `compute_multitask_loss`'s
+    `total` and crashing `Trainer._train_epoch`'s `torch.isfinite(result.total)`
+    fail-closed check. The fallback must zero every element BEFORE summing
+    (never after) so it is always exactly 0.0, regardless of how extreme the
+    unmasked logits are."""
+
+    outputs, targets = _complete_batch()
+    sentinel = torch.finfo(torch.float32).min  # -3.4028235e38, the observed real-world sentinel magnitude
+    outputs["source_node_logits"] = torch.tensor(
+        [[0.5, sentinel, sentinel, sentinel], [0.1, sentinel, sentinel, sentinel]], requires_grad=True
+    )
+    targets["source_node"] = torch.tensor([-100, -100])  # every example masked out -- count == 0
+    result = compute_multitask_loss(outputs, targets)
+    assert result.valid_counts["source_node"] == 0
+    assert torch.isfinite(result.total), f"total loss must stay finite, got {result.total}"
+    torch.testing.assert_close(result.tasks["source_node"], torch.tensor(0.0), atol=1e-6, rtol=0)
+    result.total.backward()  # must not raise; confirms the zero stays graph-connected
+
+
 def test_validate_task_weights_complete_accepts_a_complete_mapping() -> None:
     validate_task_weights_complete({name: 1.0 for name in ALL_TASK_NAMES})  # must not raise
 

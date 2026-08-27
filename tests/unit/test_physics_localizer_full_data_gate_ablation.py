@@ -175,12 +175,30 @@ class TestCheckpointDiscovery:
     def test_latest_checkpoint_returns_none_when_absent(self, tmp_path: Path) -> None:
         assert gate._latest_checkpoint(tmp_path / "does-not-exist") is None
 
-    def test_latest_checkpoint_returns_highest_numbered_dir(self, tmp_path: Path) -> None:
-        checkpoints = tmp_path / "checkpoints"
-        checkpoints.mkdir(parents=True)
-        (checkpoints / "checkpoint-0001").mkdir()
-        (checkpoints / "checkpoint-0003").mkdir()
-        (checkpoints / "checkpoint-0002").mkdir()
+    def test_latest_checkpoint_returns_none_for_an_empty_run_instance(self, tmp_path: Path) -> None:
+        # RunArtifacts.create always makes the "checkpoints" dir up front,
+        # even before any periodic checkpoint has actually been saved (e.g.
+        # a crash on the very first batch of epoch 0).
+        (tmp_path / "20260101T000000Z-aaaa1111" / "checkpoints").mkdir(parents=True)
+        assert gate._latest_checkpoint(tmp_path) is None
+
+    def test_latest_checkpoint_finds_highest_numbered_checkpoint_within_the_latest_run_instance(
+        self, tmp_path: Path
+    ) -> None:
+        # RunArtifacts.create nests checkpoints one level deeper than
+        # run_root: run_root/{timestamp}-{uuid}/checkpoints/checkpoint-NNNN
+        # -- a fresh randomly-suffixed run-instance directory per Trainer
+        # construction, not directly at run_root/checkpoints.
+        older = tmp_path / "20260101T000000Z-aaaa1111" / "checkpoints"
+        older.mkdir(parents=True)
+        (older / "checkpoint-0003").mkdir()
+
+        newer = tmp_path / "20260102T000000Z-bbbb2222" / "checkpoints"
+        newer.mkdir(parents=True)
+        (newer / "checkpoint-0001").mkdir()
+        (newer / "checkpoint-0002").mkdir()
+
         result = gate._latest_checkpoint(tmp_path)
         assert result is not None
-        assert result.name == "checkpoint-0003"
+        assert result.name == "checkpoint-0002"
+        assert result.parent.parent.name == "20260102T000000Z-bbbb2222"

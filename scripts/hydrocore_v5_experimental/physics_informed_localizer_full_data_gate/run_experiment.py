@@ -96,13 +96,28 @@ def _latest_checkpoint(run_root: Path) -> Path | None:
     """Crash-recovery support (task requirement): if a previous attempt at
     this exact arm/seed/stage was interrupted mid-training, resume from its
     latest periodic checkpoint instead of restarting from scratch. Returns
-    None (train from scratch) if no checkpoint exists yet."""
+    None (train from scratch) if no checkpoint exists yet.
 
-    checkpoint_dir = run_root / "checkpoints"
-    if not checkpoint_dir.exists():
+    `RunArtifacts.create` (hydroswarm.training.artifacts) nests every run's
+    own checkpoints one level deeper than `run_root` itself, under a fresh
+    `{timestamp}-{uuid}` run-instance directory it generates per `Trainer`
+    construction (`run_root/{timestamp}-{uuid}/checkpoints/checkpoint-NNNN`)
+    -- NOT directly at `run_root/checkpoints`. Both the run-instance
+    timestamp prefix and the zero-padded checkpoint suffix sort
+    lexicographically in chronological order, so the latest of either is
+    simply the last sorted entry."""
+
+    if not run_root.exists():
         return None
-    candidates = sorted(p for p in checkpoint_dir.glob("checkpoint-*") if p.is_dir())
-    return candidates[-1] if candidates else None
+    run_instances = sorted(p for p in run_root.iterdir() if p.is_dir())
+    for run_instance in reversed(run_instances):
+        checkpoint_dir = run_instance / "checkpoints"
+        if not checkpoint_dir.exists():
+            continue
+        candidates = sorted(p for p in checkpoint_dir.glob("checkpoint-*") if p.is_dir())
+        if candidates:
+            return candidates[-1]
+    return None
 
 
 def train_arm_full_data(
