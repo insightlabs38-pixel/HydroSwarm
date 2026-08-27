@@ -1,0 +1,21 @@
+{
+  "all_predeclared_seeds": [
+    20260929,
+    20261013,
+    20261027
+  ],
+  "arms_run": [
+    "A_CONTROL",
+    "C2",
+    "C1_C2"
+  ],
+  "calibration_count": 1000,
+  "capacity_matched_hidden_dim": 482,
+  "development_holdout_indices_count": 300,
+  "ood_unseen_topology_count": 400,
+  "pilot_epochs": 6,
+  "seed": 20261027,
+  "train_indices_count": 600,
+  "train_per_family": 200,
+  "validation_indices_count": 300
+}
