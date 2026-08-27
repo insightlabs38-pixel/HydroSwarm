@@ -1,0 +1,20 @@
+{
+  "note": "Descriptive scale-effect classification (strengthens/preserves/attenuates/eliminates) based on the ratio of full-data delta to pilot delta at the SAME seed (20261110); not a new statistical test beyond the primary-endpoint gate's own bootstrap CI.",
+  "population": "ood-UNSEEN_TOPOLOGY",
+  "scale_effect_direction": "unavailable",
+  "seed": 20261110,
+  "stages": {
+    "full-data-9000": {
+      "a_control_top1": null,
+      "c1_c2_top1": null,
+      "delta": null,
+      "delta_pp": null
+    },
+    "pilot-600": {
+      "a_control_top1": 0.3357142857142857,
+      "c1_c2_top1": 0.4035714285714286,
+      "delta": 0.0678571428571429,
+      "delta_pp": 6.785714285714289
+    }
+  }
+}
