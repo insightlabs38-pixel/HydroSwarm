@@ -1,0 +1,91 @@
+{
+  "arm": "A_CONTROL",
+  "calibration": {
+    "coverage": 0.9073033707865169,
+    "expected_calibration_error": 0.03452936572968148,
+    "mean_set_size": 2.264044943820225,
+    "n": 712
+  },
+  "hard_safety_counters": {
+    "human_approval_bypassed": 0,
+    "inaccessible_sample_selected": 0,
+    "invariant_failures": 0,
+    "nonfinite_value_reached_decision": 0,
+    "rejected_plan_surfaced_as_safe": 0,
+    "sampled_node_reselected": 0,
+    "sampling_budget_exceeded": 0,
+    "unverified_plan_surfaced_as_actionable": 0
+  },
+  "hard_safety_counters_note": "This pilot-scale localization-only harness does not exercise the sampling/planning/execution control loop that produces these counters in the M11.6 evaluation tier; all are reported as 0 because the corresponding code paths are never invoked here, not because they were independently re-verified at that tier. No governance module is modified by this branch.",
+  "localizer_mode": "default",
+  "model_kwargs": {},
+  "parameter_report": {
+    "adapters": 57168,
+    "backbone": 2989248,
+    "encoders": 941376,
+    "heads": 56320,
+    "total": 4044113,
+    "trainable": 4044113
+  },
+  "physics_columns": null,
+  "populations": {
+    "development_holdout": {
+      "event_presence_accuracy": 0.8411428571428572,
+      "known_family_fraction": 1.0,
+      "mrr": 0.806567007910656,
+      "n": 1750,
+      "n_localized": 1228,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.029315960912052116,
+      "proxy_actionable_rate": 0.9706840390879479,
+      "proxy_calibrated_coverage": 0.8827361563517915,
+      "proxy_candidate_set_size": 2.195439739413681,
+      "top1": 0.7076547231270358,
+      "top3": 0.8778501628664495
+    },
+    "ood-UNSEEN_TOPOLOGY": {
+      "event_presence_accuracy": 0.75,
+      "known_family_fraction": 0.0,
+      "mrr": 0.6525595238095239,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.4607142857142857,
+      "top3": 0.8
+    },
+    "validation": {
+      "event_presence_accuracy": 0.844,
+      "known_family_fraction": 1.0,
+      "mrr": 0.804226859283039,
+      "n": 1000,
+      "n_localized": 712,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.025280898876404494,
+      "proxy_actionable_rate": 0.9747191011235955,
+      "proxy_calibrated_coverage": 0.8890449438202247,
+      "proxy_candidate_set_size": 2.1853932584269664,
+      "top1": 0.702247191011236,
+      "top3": 0.8806179775280899
+    }
+  },
+  "train_topology_hashes": [
+    "0b1817cd6c28d42f98b1a1a74cb0234d619ee2985b1c7cf70cba4f274094b056",
+    "0e9cfc042e0876f34a8ecbf9435bcbee3c2d840462a274e5ca831c3b40e4fe88",
+    "628a6dccfeff1af5a81a41d7374f8408085611ddf5ac925ff01e7b809c89464e"
+  ],
+  "training": {
+    "arm": "A_CONTROL",
+    "best_validation_loss": 2.441269466280937,
+    "elapsed_seconds": 5952.170529231999,
+    "epochs_completed": 6,
+    "global_steps": 4500,
+    "resumed_from": null,
+    "seed": 20261110,
+    "stop_reason": "maximum_epochs",
+    "stopped_early": false
+  }
+}
