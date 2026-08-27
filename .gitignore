@@ -106,3 +106,13 @@ experiments/jobs/*/job.pid
 # under reports/evaluation/physics-informed-localizer-validation/ ARE
 # committed.
 /experiments/physics-informed-localizer-validation/runs/
+
+# exp/physics-informed-localizer-scale-validation (EXPERIMENTAL, NON-RELEASE):
+# focused C1+C2 confirmation follow-up on 3 fresh seeds, same not-a-release-
+# artifact rationale as physics-informed-localizer-validation above -- per-
+# seed/per-arm trained checkpoints are deterministically regenerable from the
+# committed run_experiment.py plus each seed's committed run-manifest.json.
+# The evaluation JSON/JSONL outputs and pooled analysis under
+# reports/evaluation/physics-informed-localizer-scale-validation/ ARE
+# committed.
+/experiments/physics-informed-localizer-scale-validation/runs/
