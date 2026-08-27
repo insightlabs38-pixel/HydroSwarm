@@ -1,0 +1,116 @@
+{
+  "c1_c2_vs_c2_top3_and_mrr": {
+    "mrr_delta_c1_c2_minus_c2": {
+      "ci_high": 0.010777777777777822,
+      "ci_low": -0.005616071428571495,
+      "excludes_zero": false,
+      "n": 840,
+      "observed": 0.0024404761904761596,
+      "resamples": 2000
+    },
+    "per_seed_n": {
+      "20260929": 280,
+      "20261013": 280,
+      "20261027": 280
+    },
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top3_delta_c1_c2_minus_c2": {
+      "ci_high": 0.03214285714285714,
+      "ci_low": 0.008333333333333415,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.020238095238095277,
+      "resamples": 2000
+    },
+    "total_n": 840
+  },
+  "c1_c2_vs_c2_top3_transitions": {
+    "net": 17,
+    "per_seed_n": {
+      "20260929": 280,
+      "20261013": 280,
+      "20261027": 280
+    },
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top3_transition_table": {
+      "both_correct": 572,
+      "both_wrong": 231,
+      "c1_c2_only": 27,
+      "c2_only": 10
+    }
+  },
+  "c1_recovers_ranking_harmed_by_c2": {
+    "per_seed": {
+      "20260929": {
+        "fully_recovered": 6,
+        "harmed_by_c2": 16,
+        "recovered_by_c1": 6
+      },
+      "20261013": {
+        "fully_recovered": 4,
+        "harmed_by_c2": 21,
+        "recovered_by_c1": 4
+      },
+      "20261027": {
+        "fully_recovered": 6,
+        "harmed_by_c2": 17,
+        "recovered_by_c1": 7
+      }
+    },
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "recovery_fraction": 0.3148148148148148,
+    "total_examples_c2_harmed_vs_control": 54,
+    "total_fully_recovered_to_at_least_control_rank": 16,
+    "total_recovered_by_c1_partial_or_full": 17
+  },
+  "description": "Task-required Top-3 tension analysis: does C1_C2 resolve, worsen, or leave unchanged the completed validation study's C2-specific finding (strong positive Top-1/MRR, small negative Top-3 point estimate whose 90% CI crossed zero)?",
+  "top1_improved_but_outside_top3": {
+    "note": "top1_correct_top3_wrong should always be 0 by construction (a correct Top-1 prediction is trivially within Top-3 whenever there are >=1 candidates); reported as an explicit sanity check, not a real tension. The second count is the ecologically relevant one but is also expected near-zero for the same reason -- Top-1 correctness structurally implies Top-3 correctness in this harness's `localization_top_k` metric.",
+    "per_seed": {
+      "20260929": {
+        "top1_correct_top3_wrong": 0,
+        "top1_gain_over_control_but_top3_wrong": 0
+      },
+      "20261013": {
+        "top1_correct_top3_wrong": 0,
+        "top1_gain_over_control_but_top3_wrong": 0
+      },
+      "20261027": {
+        "top1_correct_top3_wrong": 0,
+        "top1_gain_over_control_but_top3_wrong": 0
+      }
+    },
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "total_top1_correct_top3_wrong": 0,
+    "total_top1_gain_over_control_but_top3_wrong": 0
+  },
+  "true_source_rank_distribution": {
+    "by_arm": {
+      "A_CONTROL": {
+        "mean": 2.7785714285714285,
+        "median": 2.0,
+        "n": 840,
+        "rank_1_fraction": 0.3333333333333333,
+        "rank_le_3_fraction": 0.6833333333333333,
+        "stdev": 1.7035384494532364
+      },
+      "C1_C2": {
+        "mean": 2.6011904761904763,
+        "median": 2.0,
+        "n": 840,
+        "rank_1_fraction": 0.3880952380952381,
+        "rank_le_3_fraction": 0.7130952380952381,
+        "stdev": 1.6605206219808326
+      },
+      "C2": {
+        "mean": 2.6476190476190475,
+        "median": 2.0,
+        "n": 840,
+        "rank_1_fraction": 0.3880952380952381,
+        "rank_le_3_fraction": 0.6928571428571428,
+        "stdev": 1.7129163799051499
+      }
+    },
+    "population": "ood-UNSEEN_TOPOLOGY"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "C1_C2": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.03276836158192087,
+        "ci_low": -0.002259887005649719,
+        "excludes_zero": false,
+        "n": 885,
+        "observed": 0.014689265536723173,
+        "resamples": 2000
+      },
+      "total_n": 885
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.023166023166023175,
+        "ci_low": -0.0038610038610038533,
+        "excludes_zero": false,
+        "n": 1036,
+        "observed": 0.009652509652509633,
+        "resamples": 2000
+      },
+      "total_n": 1036
+    },
+    "per_seed_n": {
+      "20260929": {
+        "long_distance": 292,
+        "low_centrality": 343
+      },
+      "20261013": {
+        "long_distance": 304,
+        "low_centrality": 353
+      },
+      "20261027": {
+        "long_distance": 289,
+        "low_centrality": 340
+      }
+    }
+  },
+  "C2": {
+    "long_distance": {
+      "top1": {
+        "ci_high": 0.04067796610169494,
+        "ci_low": 0.006779661016949157,
+        "excludes_zero": true,
+        "n": 885,
+        "observed": 0.02372881355932205,
+        "resamples": 2000
+      },
+      "total_n": 885
+    },
+    "low_centrality": {
+      "top1": {
+        "ci_high": 0.02702702702702703,
+        "ci_low": 0.004826254826254872,
+        "excludes_zero": true,
+        "n": 1036,
+        "observed": 0.016409266409266376,
+        "resamples": 2000
+      },
+      "total_n": 1036
+    },
+    "per_seed_n": {
+      "20260929": {
+        "long_distance": 292,
+        "low_centrality": 343
+      },
+      "20261013": {
+        "long_distance": 304,
+        "low_centrality": 353
+      },
+      "20261027": {
+        "long_distance": 289,
+        "low_centrality": 340
+      }
+    }
+  }
+}

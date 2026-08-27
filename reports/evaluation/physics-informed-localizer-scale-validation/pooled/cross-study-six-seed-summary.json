@@ -1,0 +1,100 @@
+{
+  "arms": {
+    "A_CONTROL": {
+      "n_seeds": 6,
+      "n_seeds_negative_delta_vs_control": null,
+      "n_seeds_positive_delta_vs_control": null,
+      "per_seed": {
+        "20260814": {
+          "mrr": 0.5856547619047618,
+          "study": "physics-informed-localizer-validation (prior, committed, immutable)",
+          "top1": 0.375,
+          "top3": 0.7571428571428571
+        },
+        "20260901": {
+          "mrr": 0.5891666666666667,
+          "study": "physics-informed-localizer-validation (prior, committed, immutable)",
+          "top1": 0.4,
+          "top3": 0.7035714285714286
+        },
+        "20260915": {
+          "mrr": 0.5801785714285714,
+          "study": "physics-informed-localizer-validation (prior, committed, immutable)",
+          "top1": 0.39285714285714285,
+          "top3": 0.725
+        },
+        "20260929": {
+          "mrr": 0.5513095238095238,
+          "study": "physics-informed-localizer-scale-validation (this branch, fresh)",
+          "top1": 0.34285714285714286,
+          "top3": 0.6714285714285714
+        },
+        "20261013": {
+          "mrr": 0.5344642857142857,
+          "study": "physics-informed-localizer-scale-validation (this branch, fresh)",
+          "top1": 0.3142857142857143,
+          "top3": 0.6928571428571428
+        },
+        "20261027": {
+          "mrr": 0.5492857142857144,
+          "study": "physics-informed-localizer-scale-validation (this branch, fresh)",
+          "top1": 0.34285714285714286,
+          "top3": 0.6857142857142857
+        }
+      },
+      "top1_delta_vs_control_mean": 0.0,
+      "top1_mean": 0.3613095238095238,
+      "top1_median": 0.35892857142857143,
+      "top1_stdev": 0.03338219208349446
+    },
+    "C2": {
+      "n_seeds": 6,
+      "n_seeds_negative_delta_vs_control": 0,
+      "n_seeds_positive_delta_vs_control": 6,
+      "per_seed": {
+        "20260814": {
+          "mrr": 0.6180357142857144,
+          "study": "physics-informed-localizer-validation (prior, committed, immutable)",
+          "top1": 0.4392857142857143,
+          "top3": 0.7214285714285714
+        },
+        "20260901": {
+          "mrr": 0.5869642857142857,
+          "study": "physics-informed-localizer-validation (prior, committed, immutable)",
+          "top1": 0.4035714285714286,
+          "top3": 0.6821428571428572
+        },
+        "20260915": {
+          "mrr": 0.6101190476190477,
+          "study": "physics-informed-localizer-validation (prior, committed, immutable)",
+          "top1": 0.42857142857142855,
+          "top3": 0.7392857142857143
+        },
+        "20260929": {
+          "mrr": 0.580595238095238,
+          "study": "physics-informed-localizer-scale-validation (this branch, fresh)",
+          "top1": 0.3892857142857143,
+          "top3": 0.6928571428571428
+        },
+        "20261013": {
+          "mrr": 0.5776785714285714,
+          "study": "physics-informed-localizer-scale-validation (this branch, fresh)",
+          "top1": 0.37142857142857144,
+          "top3": 0.7071428571428572
+        },
+        "20261027": {
+          "mrr": 0.5855357142857143,
+          "study": "physics-informed-localizer-scale-validation (this branch, fresh)",
+          "top1": 0.4035714285714286,
+          "top3": 0.6785714285714286
+        }
+      },
+      "top1_delta_vs_control_mean": 0.044642857142857144,
+      "top1_mean": 0.405952380952381,
+      "top1_median": 0.4035714285714286,
+      "top1_stdev": 0.02491482087673374
+    }
+  },
+  "note": "DESCRIPTIVE cross-study pooling only, not a new confirmatory statistical test: the 3 prior-study seeds and 3 fresh seeds were run under the completed physics-informed-localizer-validation branch and this branch respectively, at different times, and are combined here only to describe six-seed consistency for A_CONTROL/C2. C1_C2 has no prior-study seeds and is deliberately not given a six-seed summary; its confirmatory evidence is fresh-3-seed-only (see pooled-paired-bootstrap.json / cross-seed-summary.json in this branch's own results directory).",
+  "population": "ood-UNSEEN_TOPOLOGY"
+}

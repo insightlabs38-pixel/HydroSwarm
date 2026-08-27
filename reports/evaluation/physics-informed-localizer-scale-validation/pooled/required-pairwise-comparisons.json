@@ -1,0 +1,38 @@
+{
+  "C1_C2_vs_A_CONTROL": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.07142857142857145,
+      "ci_low": 0.03809523809523807,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.05476190476190479,
+      "resamples": 2000
+    }
+  },
+  "C1_C2_vs_C2": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.01428571428571429,
+      "ci_low": -0.014285714285714238,
+      "excludes_zero": false,
+      "n": 840,
+      "observed": 0.0,
+      "resamples": 2000
+    }
+  },
+  "C2_vs_A_CONTROL": {
+    "n": 840,
+    "population": "ood-UNSEEN_TOPOLOGY",
+    "top1": {
+      "ci_high": 0.07142857142857145,
+      "ci_low": 0.03928571428571426,
+      "excludes_zero": true,
+      "n": 840,
+      "observed": 0.05476190476190479,
+      "resamples": 2000
+    }
+  }
+}

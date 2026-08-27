@@ -1,0 +1,53 @@
+{
+  "by_arm": {
+    "C1_C2": {
+      "long_distance": {
+        "arm_top1_mean": 0.410958904109589,
+        "ci_high": 0.04794520547945208,
+        "ci_low": -0.02054794520547948,
+        "control_top1_mean": 0.3972602739726027,
+        "excludes_zero": false,
+        "n": 292,
+        "observed": 0.0136986301369863,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.42565597667638483,
+        "ci_high": 0.04956268221574345,
+        "ci_low": -0.005830903790087438,
+        "control_top1_mean": 0.40233236151603496,
+        "excludes_zero": false,
+        "n": 343,
+        "observed": 0.023323615160349864,
+        "resamples": 2000
+      }
+    },
+    "C2": {
+      "long_distance": {
+        "arm_top1_mean": 0.4075342465753425,
+        "ci_high": 0.04452054794520549,
+        "ci_low": -0.023972602739726012,
+        "control_top1_mean": 0.3972602739726027,
+        "excludes_zero": false,
+        "n": 292,
+        "observed": 0.010273972602739767,
+        "resamples": 2000
+      },
+      "low_centrality": {
+        "arm_top1_mean": 0.40524781341107874,
+        "ci_high": 0.023323615160349864,
+        "ci_low": -0.017638483965014683,
+        "control_top1_mean": 0.40233236151603496,
+        "excludes_zero": false,
+        "n": 343,
+        "observed": 0.0029154518950437747,
+        "resamples": 2000
+      }
+    }
+  },
+  "distance_median": 0.0,
+  "tercile_cutoffs": {
+    "high_cut": 0.2857142984867096,
+    "low_cut": 0.1190476194024086
+  }
+}

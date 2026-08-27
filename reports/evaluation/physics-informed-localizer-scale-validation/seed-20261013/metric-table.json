@@ -1,0 +1,116 @@
+{
+  "development_holdout": {
+    "A_CONTROL": {
+      "mrr": 0.8045515873015873,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.02666666666666667,
+      "proxy_actionable_rate": 0.9733333333333334,
+      "proxy_calibrated_coverage": 0.9133333333333333,
+      "proxy_candidate_set_size": 2.506666666666667,
+      "top1": 0.7066666666666667,
+      "top3": 0.87
+    },
+    "C1_C2": {
+      "mrr": 0.808968253968254,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03666666666666667,
+      "proxy_actionable_rate": 0.9633333333333334,
+      "proxy_calibrated_coverage": 0.8966666666666666,
+      "proxy_candidate_set_size": 2.4366666666666665,
+      "top1": 0.7133333333333334,
+      "top3": 0.8666666666666667
+    },
+    "C2": {
+      "mrr": 0.8061349206349206,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.04,
+      "proxy_actionable_rate": 0.96,
+      "proxy_calibrated_coverage": 0.9,
+      "proxy_candidate_set_size": 2.506666666666667,
+      "top1": 0.71,
+      "top3": 0.87
+    }
+  },
+  "ood-UNSEEN_TOPOLOGY": {
+    "A_CONTROL": {
+      "mrr": 0.5344642857142857,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.3142857142857143,
+      "top3": 0.6928571428571428
+    },
+    "C1_C2": {
+      "mrr": 0.5826190476190476,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.37857142857142856,
+      "top3": 0.7214285714285714
+    },
+    "C2": {
+      "mrr": 0.5776785714285714,
+      "n": 400,
+      "n_localized": 280,
+      "ood_caution_or_outside_rate": 1.0,
+      "proxy_abstention_rate": 1.0,
+      "proxy_actionable_rate": 0.0,
+      "proxy_calibrated_coverage": null,
+      "proxy_candidate_set_size": null,
+      "top1": 0.37142857142857144,
+      "top3": 0.7071428571428572
+    }
+  },
+  "validation": {
+    "A_CONTROL": {
+      "mrr": 0.7984087301587302,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.03333333333333333,
+      "proxy_actionable_rate": 0.9666666666666667,
+      "proxy_calibrated_coverage": 0.9066666666666666,
+      "proxy_candidate_set_size": 2.5866666666666664,
+      "top1": 0.6833333333333333,
+      "top3": 0.88
+    },
+    "C1_C2": {
+      "mrr": 0.8020515873015873,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.02,
+      "proxy_actionable_rate": 0.98,
+      "proxy_calibrated_coverage": 0.9166666666666666,
+      "proxy_candidate_set_size": 2.493333333333333,
+      "top1": 0.6933333333333334,
+      "top3": 0.8833333333333333
+    },
+    "C2": {
+      "mrr": 0.8089325396825396,
+      "n": 300,
+      "n_localized": 300,
+      "ood_caution_or_outside_rate": 0.0,
+      "proxy_abstention_rate": 0.02,
+      "proxy_actionable_rate": 0.98,
+      "proxy_calibrated_coverage": 0.9233333333333333,
+      "proxy_candidate_set_size": 2.5633333333333335,
+      "top1": 0.7033333333333334,
+      "top3": 0.89
+    }
+  }
+}
